@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <IsPackable>True</IsPackable>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <VersionSuffix Condition="'$(Configuration)' == 'Debug'">pre</VersionSuffix>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <PackageTags>AppDomain.contracts</PackageTags>
+        <IncludeSource>true</IncludeSource>
+        <Authors>ABCDEG</Authors>
+        <Company>ABCDEG</Company>
+        <Copyright>Copyright (c) ABCDEG. All rights reserved.</Copyright>
+        <RepositoryUrl>https://github.com/ABCDEG/templates</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="Operations.Extensions.Abstractions.Messaging.DefaultDomainAttribute">
+            <Domain>AppDomain</Domain>
+        </AssemblyAttribute>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Include="..\AppDomain\**\Contracts\IntegrationEvents\*.cs" Link="%(RecursiveDir)%(Filename)%(Extension)"/>
+        <Compile Include="..\AppDomain\**\Contracts\Models\*.cs" Link="%(RecursiveDir)%(Filename)%(Extension)"/>
+        <Content Include="..\AppDomain.Api\**\Protos\**\*.proto" Link="%(RecursiveDir)%(Filename)%(Extension)" Pack="true">
+            <PackagePath>Protos</PackagePath>
+        </Content>
+        <Content Include="AppDomain.Contracts.props" Pack="true" PackagePath="build/"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\libs\Operations\src\Operations.Extensions.Abstractions\Operations.Extensions.Abstractions.csproj"/>
+    </ItemGroup>
+
+</Project>

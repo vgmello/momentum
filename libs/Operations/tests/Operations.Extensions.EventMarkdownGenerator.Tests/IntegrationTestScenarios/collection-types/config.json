@@ -1,0 +1,9 @@
+{
+  "strictFileMatching": true,
+  "ignoreFiles": [],
+  "customAssertions": {
+    "bulk-data-processed.md": "Should properly handle various collection types (arrays, lists, IEnumerable, ICollection, Dictionary)"
+  },
+  "generateSchemas": false,
+  "generateSidebar": false
+}

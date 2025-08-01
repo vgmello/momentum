@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <IsRoslynComponent>true</IsRoslynComponent>
+        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+        <CompilerGeneratedFilesOutputPath>Internal/Generated</CompilerGeneratedFilesOutputPath>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+        <LangVersion>Latest</LangVersion>
+        <NoWarn>$(NoWarn);RS1041;RS2007;RS1036</NoWarn>
+        <PackageId>Operations.Extensions.SourceGenerators</PackageId>
+        <PackageDescription>Source generators for the Operations platform providing compile-time code generation utilities to reduce boilerplate and improve developer productivity. Includes generators for common patterns used across Operations libraries.</PackageDescription>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/vgmello/momentum-sample/blob/main/libs/Operations/src/Operations.Extensions.SourceGenerators/README.md</PackageProjectUrl>
+        <PackageTags>operations;sourcegenerators;codegen;roslyn;analyzers;metaprogramming</PackageTags>
+        <PackageReleaseNotes>https://github.com/vgmello/momentum-sample/releases/tag/v$(PackageVersion)</PackageReleaseNotes>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all"/>
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all"/>
+    </ItemGroup>
+
+    <!--#if (!LocalLibs) -->
+    <ItemGroup>
+        <!-- Used for nuget packaging -->
+        <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false"/>
+        <None Include="$(ProjectDir)\..\Operations.Extensions.Abstractions\$(OutputPath)\Operations.Extensions.Abstractions.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false"/>
+        <None Include="Operations.Extensions.SourceGenerators.props" Pack="true" PackagePath="build" />
+    </ItemGroup>
+    <!--#endif -->
+
+    <ItemGroup>
+        <ProjectReference Include="..\Operations.Extensions.Abstractions\Operations.Extensions.Abstractions.csproj" PrivateAssets="all"/>
+    </ItemGroup>
+
+    <PropertyGroup>
+        <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
+    </PropertyGroup>
+
+    <Target Name="GetDependencyTargetPaths">
+        <ItemGroup>
+            <TargetPathWithTargetPlatformMoniker Include="$(ProjectDir)\..\Operations.Extensions.Abstractions\$(OutputPath)\Operations.Extensions.Abstractions.dll"
+                                                 IncludeRuntimeDependency="false"/>
+        </ItemGroup>
+    </Target>
+
+</Project>

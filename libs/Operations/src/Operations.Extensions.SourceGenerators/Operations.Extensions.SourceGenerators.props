@@ -1,0 +1,14 @@
+<Project>
+
+    <PropertyGroup Condition="'$(OperationsExtensionsSourceGeneratorsPropsImported)' != 'true'">
+        <OperationsExtensionsSourceGeneratorsPropsImported>true</OperationsExtensionsSourceGeneratorsPropsImported>
+        <!-- Defines the default value for the DbCommandAttribute.ParamsCase -->
+        <DbCommandDefaultParamCase Condition="'$(DbCommandDefaultParamCase)' == ''">None</DbCommandDefaultParamCase>
+    </PropertyGroup>
+
+    <ItemGroup Condition="'$(OperationsExtensionsSourceGeneratorsPropsImported)' == 'true'">
+        <!-- Makes the DbCommandDefaultParamCase property visible to the C# compiler and to source generators. -->
+        <CompilerVisibleProperty Include="DbCommandDefaultParamCase"/>
+    </ItemGroup>
+
+</Project>

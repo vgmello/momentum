@@ -1,0 +1,28 @@
+{
+  "name": "docs",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm install --force && pnpm docs:events && pnpm docs:dotnet && pnpm adr:logs && pnpm docs:dev",
+    "docs:dev": "vitepress dev",
+    "docs:build": "pnpm run generate:adr-table && pnpm run check:docfx && vitepress build",
+    "docs:preview": "vitepress preview",
+    "docs:dotnet": "tsx .vitepress/scripts/docs-dotnet.ts",
+    "docs:events": "tsx .vitepress/scripts/generate-events-docs.ts \"../src/AppDomain.BackOffice/bin/Debug/net9.0/AppDomain.BackOffice.dll,../src/AppDomain/bin/Debug/net9.0/AppDomain.dll\"",
+    "adr:logs": "tsx .vitepress/scripts/adrlogs-table-gen.ts"
+  },
+  "dependencies": {
+    "glob": "^10.4.5",
+    "gray-matter": "^4.0.3",
+    "yaml": "^2.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.14",
+    "markdown-it": "^14.1.0",
+    "mermaid": "^11.9.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3",
+    "vitepress": "^1.6.3"
+  }
+}

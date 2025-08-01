@@ -1,0 +1,144 @@
+services:
+  # Base services - no profile assigned, will be started if a dependent service is run.
+  AppDomain-db:
+    image: postgres:17-alpine
+    profiles: ["api","backoffice"]
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password@
+    ports:
+      - "54320:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  AppDomain-db-migrations:
+    image: liquibase/liquibase:4.32-alpine
+    profiles: ["api","backoffice"]
+    volumes:
+      - ./infra/AppDomain.Database:/app
+    depends_on:
+      AppDomain-db:
+        condition: service_healthy
+    working_dir: /app
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        echo 'Running database migrations...' && \
+        liquibase update --defaults-file liquibase.setup.properties --url=jdbc:postgresql://AppDomain-db:5432/postgres && \
+        liquibase update --defaults-file liquibase.servicebus.properties --url=jdbc:postgresql://AppDomain-db:5432/service_bus && \
+        liquibase update --url=jdbc:postgresql://AppDomain-db:5432/AppDomain && \
+        echo 'Database migrations completed successfully!'
+
+  # Kafka Infrastructure
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    profiles: ["api","backoffice"]
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,PLAINTEXT_HOST://0.0.0.0:29092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+
+  # Profiled Services
+  aspire-dashboard:
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:9.3
+    profiles: [ "aspire" ]
+    ports:
+      - "18100:18888"
+      - "18890:18890"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=true
+    restart: unless-stopped
+
+  AppDomain-api:
+    build:
+      dockerfile: ./src/AppDomain.Api/Dockerfile
+    profiles: ["api"]
+    ports:
+      - "8101:8080"
+      - "8102:8102"
+    depends_on:
+      AppDomain-db:
+        condition: service_healthy
+      AppDomain-db-migrations:
+        condition: service_completed_successfully
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ServiceName=AppDomain
+      - ConnectionStrings__AppDomainDb=Host=AppDomain-db;Port=5432;Database=AppDomain;Username=postgres;Password=password@
+      - ConnectionStrings__ServiceBus=Host=AppDomain-db;Port=5432;Database=service_bus;Username=postgres;Password=password@
+      - Kestrel__Endpoints__Http__Protocols=Http1
+      - Kestrel__Endpoints__Http__Url=http://+:8080
+      - Kestrel__Endpoints__Grpc__Protocols=Http2
+      - Kestrel__Endpoints__Grpc__Url=http://+:8102
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://aspire-dashboard:18890
+      - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+      - OTEL_SERVICE_NAME=AppDomain-api
+      - OTEL_SERVICE_VERSION=1.0.0
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8080/health/internal || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  AppDomain-backoffice:
+    build:
+      dockerfile: ./src/AppDomain.BackOffice/Dockerfile
+    profiles: ["backoffice"]
+    ports:
+      - "8103:8080"
+    depends_on:
+      AppDomain-db:
+        condition: service_healthy
+      AppDomain-db-migrations:
+        condition: service_completed_successfully
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ServiceName=AppDomain
+      - ConnectionStrings__AppDomainDb=Host=AppDomain-db;Port=5432;Database=AppDomain;Username=postgres;Password=password@
+      - ConnectionStrings__ServiceBus=Host=AppDomain-db;Port=5432;Database=service_bus;Username=postgres;Password=password@
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8080/health/internal || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  AppDomain-docs:
+    build:
+      context: ./
+      dockerfile: docs/Dockerfile
+    profiles: ["docs"]
+    ports:
+      - "8119:5173"
+    volumes:
+      - ./:/app
+      - pnpm_node_modules:/app/docs/node_modules
+    command: ["pnpm", "dev", "--host"]
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:5173/index.html || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+volumes:
+  pnpm_node_modules:

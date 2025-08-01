@@ -1,0 +1,32 @@
+<Project>
+    <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))"
+            Condition="'' != $([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))"/>
+
+    <PropertyGroup>
+        <IsPackable>True</IsPackable>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' ">
+        <VersionSuffix>$([System.DateTime]::UtcNow.ToString("yyyyMMdd-HHmmss"))</VersionSuffix>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(IsPackable)' == 'true' ">
+        <PackageTags>platform;sdk;</PackageTags>
+        <IncludeSource>true</IncludeSource>
+        <Authors>Operations Team</Authors>
+        <Company>Operations Platform</Company>
+        <Copyright>Copyright (c) 2025 Operations Platform. All rights reserved.</Copyright>
+        <RepositoryUrl>https://github.com/vgmello/momentum-sample</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Debug' ">true</GeneratePackageOnBuild>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    </PropertyGroup>
+
+    <ItemGroup Condition=" '$(IsPackable)' == 'true' ">
+        <PackageReference Include="Microsoft.SourceLink.GitHub" />
+    </ItemGroup>
+
+</Project>

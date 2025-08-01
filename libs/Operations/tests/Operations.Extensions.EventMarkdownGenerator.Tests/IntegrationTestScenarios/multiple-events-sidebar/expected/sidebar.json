@@ -1,0 +1,54 @@
+[
+  {
+    "text": "Users",
+    "link": null,
+    "collapsed": false,
+    "items": [
+      {
+        "text": "User Created",
+        "link": "/user-created"
+      },
+      {
+        "text": "User Deleted",
+        "link": "/user-deleted"
+      }
+    ]
+  },
+  {
+    "text": "Subscriptions",
+    "link": null,
+    "collapsed": false,
+    "items": [
+      {
+        "text": "Subscription Activated",
+        "link": "/subscription-activated"
+      },
+      {
+        "text": "Subscription Cancelled",
+        "link": "/subscription-cancelled"
+      }
+    ]
+  },
+  {
+    "text": "Invoices",
+    "link": null,
+    "collapsed": false,
+    "items": [
+      {
+        "text": "Invoice Generated",
+        "link": "/invoice-generated"
+      }
+    ]
+  },
+  {
+    "text": "Payments",
+    "link": null,
+    "collapsed": false,
+    "items": [
+      {
+        "text": "Payment Processed",
+        "link": "/payment-processed"
+      }
+    ]
+  }
+]

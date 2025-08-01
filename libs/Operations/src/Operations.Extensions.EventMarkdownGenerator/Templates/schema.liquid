@@ -1,0 +1,38 @@
+---
+editLink: false
+---
+
+# {{ schema.name }}
+
+## Description
+
+{{ schema.description }}
+
+## Schema
+
+<!-- #region schema -->
+
+| Property | Type | Required | Description |
+| -------- | ---- | -------- | ----------- |
+{% for property in schema.properties -%}
+    | {% if property.schemaLink -%}[{{ property.name }}](/events/schemas/{{ property.schemaLink }}){% else -%}{{ property.name }}{% endif -%} | `{{ property.typeName }}` | {% if property.isRequired -%}✓{% endif -%} | {{ property.description }} |
+{% endfor %}
+
+<!-- #endregion schema -->
+
+{% assign referencedSchemas = schema.properties | where: "schemaLink" -%}
+{% if referencedSchemas.size > 0 -%}
+### Reference Schemas
+
+{% for property in referencedSchemas -%}
+{% if property.isCollectionType -%}
+{% assign elementType = property.typeName | replace: 'List<', '' | replace: '>', '' -%}
+#### {{ elementType }}
+{% else -%}
+#### {{ property.typeName }}
+{% endif -%}
+
+<!--@include: @/events/schemas/{{ property.schemaPath }}#schema-->
+
+{% endfor -%}
+{% endif -%}

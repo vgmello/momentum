@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TestEvents</name>
+    </assembly>
+    <members>
+        <member name="T:AppDomain.Internal.Audit.IntegrationEvents.InternalAuditLogCreated">
+            <summary>Published internally when audit log entries are created for compliance tracking</summary>
+            <remarks>
+            ## When It's Triggered
+            
+            This internal event is published when:
+            - Sensitive operations are performed that require audit logging
+            - Compliance-related actions need to be tracked
+            - Internal system actions require monitoring
+            
+            ## Security Notice
+            
+            This is an internal event that should not be exposed to external systems.
+            It contains sensitive audit information that must remain within the system boundary.
+            
+            ## Processing Requirements
+            
+            - Event must be processed within the same security context
+            - Audit data must be encrypted at rest
+            - Access requires elevated permissions
+            </remarks>
+        </member>
+        <member name="M:AppDomain.Internal.Audit.IntegrationEvents.InternalAuditLogCreated.#ctor(System.Guid,System.String,System.String,System.String,System.DateTime,System.String)">
+            <param name="tenantId">Identifier of the tenant for audit isolation</param>
+            <param name="userId">Identifier of the user who performed the action</param>
+            <param name="action">Description of the action that was performed</param>
+            <param name="resource">Resource that was affected by the action</param>
+            <param name="timestamp">When the audited action occurred</param>
+            <param name="metadata">Additional metadata about the action in JSON format</param>
+        </member>
+    </members>
+</doc>

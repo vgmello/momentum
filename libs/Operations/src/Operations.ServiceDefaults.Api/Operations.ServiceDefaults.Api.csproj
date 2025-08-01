@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <IsAspireSharedProject>true</IsAspireSharedProject>
+        <PackageId>Operations.ServiceDefaults.Api</PackageId>
+        <PackageDescription>API-specific service defaults for Operations platform extending the base ServiceDefaults with gRPC, OpenAPI documentation (Scalar), and API-focused configurations. Essential for Operations API projects.</PackageDescription>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/vgmello/momentum-sample/blob/main/libs/Operations/src/Operations.ServiceDefaults.Api/README.md</PackageProjectUrl>
+        <PackageTags>operations;api;grpc;openapi;scalar;servicedefaults;aspire</PackageTags>
+        <PackageReleaseNotes>https://github.com/vgmello/momentum-sample/releases/tag/v$(PackageVersion)</PackageReleaseNotes>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Grpc.AspNetCore"/>
+        <PackageReference Include="Grpc.AspNetCore.Server.Reflection"/>
+        <PackageReference Include="Grpc.AspNetCore.Web"/>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi"/>
+        <PackageReference Include="OpenTelemetry.Extensions.Hosting" />
+        <PackageReference Include="Scalar.AspNetCore"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Operations.Extensions.Abstractions\Operations.Extensions.Abstractions.csproj" />
+      <ProjectReference Include="..\Operations.Extensions.XmlDocs\Operations.Extensions.XmlDocs.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+    </ItemGroup>
+
+</Project>

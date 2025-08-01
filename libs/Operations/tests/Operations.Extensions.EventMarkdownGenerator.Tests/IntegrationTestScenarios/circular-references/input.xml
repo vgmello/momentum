@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TestEvents</name>
+    </assembly>
+    <members>
+        <member name="T:Graph.Nodes.Contracts.IntegrationEvents.NodeRelationshipCreated">
+            <summary>Published when a new relationship is created between graph nodes</summary>
+            <remarks>
+            ## When It's Triggered
+            
+            This event is published when:
+            - New relationships are established between nodes
+            - Graph topology changes require notification
+            - Circular dependencies are intentionally created
+            
+            ## Circular Reference Handling
+            
+            This event contains types that reference each other in a circular manner:
+            - Node references Parent node
+            - Parent node references Child nodes
+            - Child nodes reference their Parent
+            - This tests the circular reference detection in schema generation
+            </remarks>
+        </member>
+        <member name="M:Graph.Nodes.Contracts.IntegrationEvents.NodeRelationshipCreated.#ctor(System.Guid,Graph.Nodes.Contracts.Models.GraphNode,Graph.Nodes.Contracts.Models.GraphNode,System.String)">
+            <param name="tenantId">Identifier of the tenant that owns the graph</param>
+            <param name="sourceNode">The source node in the relationship</param>
+            <param name="targetNode">The target node in the relationship</param>
+            <param name="relationshipType">Type of relationship being created</param>
+        </member>
+        <member name="T:Graph.Nodes.Contracts.Models.GraphNode">
+            <summary>Represents a node in a graph structure with potential circular references</summary>
+        </member>
+        <member name="P:Graph.Nodes.Contracts.Models.GraphNode.Id">
+            <summary>Unique identifier for the graph node</summary>
+        </member>
+        <member name="P:Graph.Nodes.Contracts.Models.GraphNode.Name">
+            <summary>Display name of the graph node</summary>
+        </member>
+        <member name="P:Graph.Nodes.Contracts.Models.GraphNode.Parent">
+            <summary>Reference to the parent node (null for root nodes)</summary>
+        </member>
+        <member name="P:Graph.Nodes.Contracts.Models.GraphNode.Children">
+            <summary>Collection of child nodes that reference this node as their parent</summary>
+        </member>
+        <member name="P:Graph.Nodes.Contracts.Models.GraphNode.Metadata">
+            <summary>Additional node metadata and properties</summary>
+        </member>
+        <member name="T:Graph.Nodes.Contracts.Models.NodeMetadata">
+            <summary>Contains metadata about a graph node</summary>
+        </member>
+        <member name="P:Graph.Nodes.Contracts.Models.NodeMetadata.CreatedAt">
+            <summary>When the node was created</summary>
+        </member>
+        <member name="P:Graph.Nodes.Contracts.Models.NodeMetadata.CreatedBy">
+            <summary>Who created the node</summary>
+        </member>
+        <member name="P:Graph.Nodes.Contracts.Models.NodeMetadata.Tags">
+            <summary>List of tags associated with the node</summary>
+        </member>
+        <member name="P:Graph.Nodes.Contracts.Models.NodeMetadata.OwnerNode">
+            <summary>Reference back to the node that owns this metadata (circular reference)</summary>
+        </member>
+    </members>
+</doc>

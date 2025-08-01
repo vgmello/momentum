@@ -1,0 +1,9 @@
+{
+  "strictFileMatching": true,
+  "ignoreFiles": [],
+  "customAssertions": {
+    "sidebar.json": "Should properly group events by subdomain and create hierarchical navigation structure"
+  },
+  "generateSchemas": false,
+  "generateSidebar": true
+}

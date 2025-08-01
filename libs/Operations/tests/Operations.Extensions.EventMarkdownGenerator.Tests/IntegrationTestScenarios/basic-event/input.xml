@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TestEvents</name>
+    </assembly>
+    <members>
+        <member name="T:AppDomain.Cashiers.Contracts.IntegrationEvents.CashierCreated">
+            <summary>Published when a new cashier is successfully created in the AppDomain system</summary>
+            <remarks>
+            ## When It's Triggered
+            
+            This event is published when:
+            - The cashier creation process completes successfully
+            
+            ## Some other event data
+            
+            Some other event data text
+            </remarks>
+        </member>
+        <member name="M:AppDomain.Cashiers.Contracts.IntegrationEvents.CashierCreated.#ctor(System.Guid,System.Int32,AppDomain.Cashiers.Contracts.IntegrationEvents.Cashier)">
+            <param name="tenantId">Identifier of the tenant that owns the cashier</param>
+            <param name="partitionKeyTest">Additional partition key for message routing</param>
+            <param name="cashier">Complete cashier object containing all cashier data and configuration</param>
+        </member>
+        <member name="T:AppDomain.Cashiers.Contracts.IntegrationEvents.Cashier">
+            <summary>Represents a cashier in the AppDomain system</summary>
+        </member>
+        <member name="P:AppDomain.Cashiers.Contracts.IntegrationEvents.Cashier.Id">
+            <summary>Unique identifier for the cashier</summary>
+        </member>
+        <member name="P:AppDomain.Cashiers.Contracts.IntegrationEvents.Cashier.Name">
+            <summary>Display name of the cashier</summary>
+        </member>
+        <member name="P:AppDomain.Cashiers.Contracts.IntegrationEvents.Cashier.Email">
+            <summary>Email address for the cashier</summary>
+        </member>
+        <member name="P:AppDomain.Cashiers.Contracts.IntegrationEvents.Cashier.IsActive">
+            <summary>Whether the cashier is currently active</summary>
+        </member>
+    </members>
+</doc>

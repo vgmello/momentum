@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.Build.NoTargets/3.7.56">
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <ImportDirectoryBuildProps>false</ImportDirectoryBuildProps>
+        <ImportProjectExtensionProps>false</ImportProjectExtensionProps>
+        <ExcludeRestorePackageImports>true</ExcludeRestorePackageImports>
+        <SkipResolvePackageAssets>true</SkipResolvePackageAssets>
+        <MicrosoftCommonPropsHasBeenImported>true</MicrosoftCommonPropsHasBeenImported>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="**"/>
+    </ItemGroup>
+
+    <Target Name="Clean"/>
+    <Target Name="Restore"/>
+    <Target Name="Build"/>
+    <Target Name="Publish"/>
+    <Target Name="Pack"/>
+</Project>

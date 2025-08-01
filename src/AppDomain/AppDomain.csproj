@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <DbCommandDefaultParamCase>SnakeCase</DbCommandDefaultParamCase>
+        <DbCommandParamPrefix>p_</DbCommandParamPrefix>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Aspire.Npgsql"/>
+        <PackageReference Include="Npgsql"/>
+        <PackageReference Include="Riok.Mapperly" />
+        <PackageReference Include="linq2db.AspNet"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="Operations.Extensions.Abstractions.Messaging.DefaultDomainAttribute">
+            <Domain>AppDomain</Domain>
+        </AssemblyAttribute>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\libs\Operations\src\Operations.Extensions\Operations.Extensions.csproj"/>
+        <ProjectReference Include="..\..\libs\Operations\src\Operations.Extensions.SourceGenerators\Operations.Extensions.SourceGenerators.csproj"
+                          OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
+    </ItemGroup>
+
+    <Import Project="..\..\libs\Operations\src\Operations.Extensions\Operations.Extensions.props" />
+    <Import Project="..\..\libs\Operations\src\Operations.Extensions.SourceGenerators\Operations.Extensions.SourceGenerators.props" />
+
+</Project>

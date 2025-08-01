@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TestEvents</name>
+    </assembly>
+    <members>
+        <member name="T:Enterprise.AppDomain.Payments.Gateway.External.Contracts.IntegrationEvents.ExternalPaymentGatewayResponseReceived">
+            <summary>Published when responses are received from external payment gateway systems</summary>
+            <remarks>
+            ## When It's Triggered
+            
+            This event is published when:
+            - External payment gateway sends webhook responses
+            - Asynchronous payment processing completes on third-party systems
+            - Gateway status updates are received
+            
+            ## Namespace Structure
+            
+            This event demonstrates deep namespace hierarchies:
+            - Enterprise: Top-level organization namespace
+            - AppDomain: Business domain
+            - Payments: Sub-domain within AppDomain
+            - Gateway: Specific service area
+            - External: Implementation detail (external vs internal gateways)
+            - Contracts: Contract definitions
+            - IntegrationEvents: Event type classification
+            </remarks>
+        </member>
+        <member name="M:Enterprise.AppDomain.Payments.Gateway.External.Contracts.IntegrationEvents.ExternalPaymentGatewayResponseReceived.#ctor(System.Guid,System.String,System.String,System.String,System.Collections.Generic.Dictionary{System.String,System.Object},System.DateTime)">
+            <param name="tenantId">Identifier of the tenant for this payment gateway interaction</param>
+            <param name="gatewayName">Name of the external payment gateway (e.g., Stripe, PayPal, Square)</param>
+            <param name="transactionId">Transaction identifier provided by the external gateway</param>
+            <param name="responseStatus">Status code or message returned by the gateway</param>
+            <param name="responseData">Complete response payload from the gateway as key-value pairs</param>
+            <param name="receivedAt">Timestamp when the response was received from the gateway</param>
+        </member>
+    </members>
+</doc>

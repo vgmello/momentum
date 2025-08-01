@@ -1,0 +1,12 @@
+<Project>
+
+    <ItemGroup Condition="'$(ImplicitUsings)' == 'enable'">
+        <Using Include="FluentValidation"/>
+        <Using Include="Operations.Extensions"/>
+        <Using Include="Operations.Extensions.Abstractions.Extensions"/>
+        <Using Include="Operations.Extensions.Abstractions.Messaging"/>
+        <Using Include="Operations.Extensions.Messaging"/>
+        <Using Include="Wolverine"/>
+    </ItemGroup>
+
+</Project>

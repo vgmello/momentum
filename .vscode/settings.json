@@ -1,0 +1,4 @@
+{
+  "dotnet.defaultSolution": "AppDomain.slnx",
+  "dotnet.automaticallyCreateSolutionInWorkspace": false
+}

@@ -1,0 +1,9 @@
+{
+  "strictFileMatching": true,
+  "ignoreFiles": [],
+  "customAssertions": {
+    "payment-processed.md": "Should contain obsolete warning and migration notes"
+  },
+  "generateSchemas": false,
+  "generateSidebar": false
+}

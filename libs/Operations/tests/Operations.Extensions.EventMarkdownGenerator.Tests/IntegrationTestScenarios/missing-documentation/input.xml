@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TestEvents</name>
+    </assembly>
+    <members>
+        <!-- Event with no documentation at all -->
+        <member name="T:Missing.Docs.UndocumentedEvent">
+        </member>
+        
+        <!-- Event with empty summary -->
+        <member name="T:Missing.Docs.EmptySummaryEvent">
+            <summary></summary>
+        </member>
+        
+        <!-- Event with summary but no parameter docs -->
+        <member name="T:Missing.Docs.MissingParamDocsEvent">
+            <summary>Event with missing parameter documentation</summary>
+        </member>
+        <member name="M:Missing.Docs.MissingParamDocsEvent.#ctor(System.Guid,System.String)">
+            <!-- Parameters with no documentation -->
+        </member>
+        
+        <!-- Event with malformed XML elements -->
+        <member name="T:Missing.Docs.MalformedXmlEvent">
+            <summary>Event with malformed XML in documentation</summary>
+            <remarks>
+                This has unclosed tags and <badtag>malformed content
+                <!-- Missing closing remarks tag will be handled gracefully -->
+        </member>
+    </members>
+</doc>

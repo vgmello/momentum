@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option csharp_namespace = "AppDomain.Invoices.Grpc.Models";
+
+package AppDomain.invoices;
+
+message Invoice {
+    string tenant_id = 1;
+    string invoiceId = 2;
+    string name = 3;
+    string status = 4;
+    double amount = 5;
+    string currency = 6;
+    optional google.protobuf.Timestamp due_date = 7;
+    google.protobuf.StringValue cashierId = 8;
+    google.protobuf.Timestamp created_date_utc = 9;
+    google.protobuf.Timestamp updated_date_utc = 10;
+    int32 version = 11;
+}

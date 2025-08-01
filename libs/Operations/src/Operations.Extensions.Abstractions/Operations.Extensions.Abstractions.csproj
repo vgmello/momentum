@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <LangVersion>Latest</LangVersion>
+        <PackageId>Operations.Extensions.Abstractions</PackageId>
+        <PackageDescription>Core abstractions and interfaces for the Operations platform. This foundational package defines contracts, base types, and abstractions used across all Operations libraries. Essential for extensibility and loose coupling.</PackageDescription>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/vgmello/momentum-sample/blob/main/libs/Operations/src/Operations.Extensions.Abstractions/README.md</PackageProjectUrl>
+        <PackageTags>operations;abstractions;interfaces;contracts;foundation</PackageTags>
+        <PackageReleaseNotes>https://github.com/vgmello/momentum-sample/releases/tag/v$(PackageVersion)</PackageReleaseNotes>
+    </PropertyGroup>
+
+
+</Project>

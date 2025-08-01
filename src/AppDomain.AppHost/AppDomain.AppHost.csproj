@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <Sdk Name="Aspire.AppHost.Sdk" Version="$(AspireAppHostSdkVersion)"/>
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <IsAspireHost>true</IsAspireHost>
+        <UserSecretsId>5196deed-b92b-45ff-8da8-ebc24b8f58ae</UserSecretsId>
+        <NoWarn>$(NoWarn);ASPIREPROXYENDPOINTS001</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Aspire.Hosting.AppHost"/>
+        <PackageReference Include="Aspire.Hosting.Kafka"/>
+        <PackageReference Include="Aspire.Hosting.PostgreSQL"/>
+        <PackageReference Include="Aspire.Hosting.Azure.Storage"/>
+        <PackageReference Include="Aspire.Hosting.Orleans"/>
+        <PackageReference Include="Aspire.Hosting.NodeJS"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\AppDomain.Api\AppDomain.Api.csproj"/>
+        <ProjectReference Include="..\AppDomain.BackOffice\AppDomain.BackOffice.csproj"/>
+        <ProjectReference Include="..\AppDomain.BackOffice.Orleans\AppDomain.BackOffice.Orleans.csproj"/>
+    </ItemGroup>
+
+</Project>

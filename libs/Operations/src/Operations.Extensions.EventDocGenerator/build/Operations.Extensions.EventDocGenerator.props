@@ -1,0 +1,57 @@
+<Project>
+
+  <PropertyGroup>
+    <!-- Default output directory for event documentation -->
+    <EventDocsOutput Condition="'$(EventDocsOutput)' == ''">$(MSBuildProjectDirectory)/docs/events</EventDocsOutput>
+    
+    <!-- Default filename for the generated markdown -->
+    <EventDocsFileName Condition="'$(EventDocsFileName)' == ''">events.md</EventDocsFileName>
+    
+    <!-- Environment for topic name generation -->
+    <EventDocsEnvironment Condition="'$(EventDocsEnvironment)' == ''">dev</EventDocsEnvironment>
+    
+    <!-- Enable/disable event documentation generation -->
+    <GenerateEventDocs Condition="'$(GenerateEventDocs)' == ''">true</GenerateEventDocs>
+    
+    <!-- Enable verbose output -->
+    <EventDocsVerbose Condition="'$(EventDocsVerbose)' == ''">false</EventDocsVerbose>
+  </PropertyGroup>
+
+  <!-- Target to generate event documentation after build -->
+  <Target Name="GenerateEventDocs" 
+          AfterTargets="Build" 
+          Condition="'$(GenerateEventDocs)' == 'true' AND '$(TargetPath)' != '' AND '$(MSBuildProjectName)' != 'Operations.Extensions.EventDocGenerator'">
+    
+    <PropertyGroup>
+      <!-- Construct the command line arguments -->
+      <EventDocGenArgs>--assembly "$(TargetPath)" --output "$(EventDocsOutput)" --filename "$(EventDocsFileName)" --environment "$(EventDocsEnvironment)"</EventDocGenArgs>
+      <EventDocGenArgs Condition="'$(DocumentationFile)' != ''">$(EventDocGenArgs) --xml-docs "$(DocumentationFile)"</EventDocGenArgs>
+      <EventDocGenArgs Condition="'$(EventDocsVerbose)' == 'true'">$(EventDocGenArgs) --verbose</EventDocGenArgs>
+    </PropertyGroup>
+
+    <!-- Ensure output directory exists -->
+    <MakeDir Directories="$(EventDocsOutput)" Condition="!Exists('$(EventDocsOutput)')" />
+
+    <!-- Execute the event documentation generator -->
+    <Exec Command="dotnet $(MSBuildThisFileDirectory)../tools/net9.0/Operations.Extensions.EventDocGenerator.dll $(EventDocGenArgs)"
+          ContinueOnError="true"
+          Condition="Exists('$(TargetPath)')" />
+
+    <Message Text="Event documentation generated in: $(EventDocsOutput)" 
+             Importance="normal" 
+             Condition="Exists('$(EventDocsOutput)/$(EventDocsFileName)')" />
+  </Target>
+
+  <!-- Target to clean generated documentation -->
+  <Target Name="CleanEventDocs" BeforeTargets="Clean">
+    <ItemGroup>
+      <EventDocsFiles Include="$(EventDocsOutput)/$(EventDocsFileName)" />
+      <EventDocsFiles Include="$(EventDocsOutput)/*.sidebar.json" />
+    </ItemGroup>
+    
+    <Delete Files="@(EventDocsFiles)" ContinueOnError="true" />
+    
+    <Message Text="Cleaned event documentation files" Importance="normal" />
+  </Target>
+
+</Project>

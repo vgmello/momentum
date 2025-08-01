@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <IsTestProject>true</IsTestProject>
+        <NoWarn>$(NoWarn);CS0436;</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing"/>
+        <PackageReference Include="Testcontainers"/>
+        <PackageReference Include="Testcontainers.PostgreSql"/>
+        <PackageReference Include="Grpc.Tools"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\AppDomain.Api\AppDomain.Api.csproj"/>
+        <ProjectReference Include="..\..\src\AppDomain.BackOffice\AppDomain.BackOffice.csproj"/>
+        <ProjectReference Include="..\..\src\AppDomain\AppDomain.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Protobuf Include="..\..\src\AppDomain.Api\**\Protos\**\*.proto"
+                  ProtoRoot="..\..\src\AppDomain.Api\"
+                  GrpcServices="Client"
+                  Link="Integration\%(RecursiveDir)%(Filename)%(Extension)"/>
+    </ItemGroup>
+
+</Project>

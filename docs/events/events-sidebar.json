@@ -1,0 +1,96 @@
+[
+  {
+    "text": "Cashiers",
+    "link": null,
+    "items": [
+      {
+        "text": "Cashier Created",
+        "link": "/AppDomain.Cashiers.Contracts.IntegrationEvents.CashierCreated",
+        "items": [],
+        "collapsed": false
+      },
+      {
+        "text": "Cashier Deleted",
+        "link": "/AppDomain.Cashiers.Contracts.IntegrationEvents.CashierDeleted",
+        "items": [],
+        "collapsed": false
+      },
+      {
+        "text": "Cashier Updated",
+        "link": "/AppDomain.Cashiers.Contracts.IntegrationEvents.CashierUpdated",
+        "items": [],
+        "collapsed": false
+      }
+    ],
+    "collapsed": false
+  },
+  {
+    "text": "Invoices",
+    "link": null,
+    "items": [
+      {
+        "text": "Invoice Cancelled",
+        "link": "/AppDomain.Invoices.Contracts.IntegrationEvents.InvoiceCancelled",
+        "items": [],
+        "collapsed": false
+      },
+      {
+        "text": "Invoice Created",
+        "link": "/AppDomain.Invoices.Contracts.IntegrationEvents.InvoiceCreated",
+        "items": [],
+        "collapsed": false
+      },
+      {
+        "text": "Invoice Finalized",
+        "link": "/AppDomain.Invoices.Contracts.IntegrationEvents.InvoiceFinalized",
+        "items": [],
+        "collapsed": false
+      },
+      {
+        "text": "Invoice Paid",
+        "link": "/AppDomain.Invoices.Contracts.IntegrationEvents.InvoicePaid",
+        "items": [],
+        "collapsed": false
+      },
+      {
+        "text": "Payment Received",
+        "link": "/AppDomain.Invoices.Contracts.IntegrationEvents.PaymentReceived",
+        "items": [],
+        "collapsed": false
+      },
+      {
+        "text": "Domain Events",
+        "link": null,
+        "items": [
+          {
+            "text": "Invoice Generated",
+            "link": "/AppDomain.Invoices.Contracts.DomainEvents.InvoiceGenerated",
+            "items": [],
+            "collapsed": false
+          }
+        ],
+        "collapsed": false
+      }
+    ],
+    "collapsed": false
+  },
+  {
+    "text": "Schemas",
+    "link": null,
+    "items": [
+      {
+        "text": "Cashier",
+        "link": "/schemas/AppDomain.Cashiers.Contracts.Models.Cashier",
+        "items": [],
+        "collapsed": false
+      },
+      {
+        "text": "Invoice",
+        "link": "/schemas/AppDomain.Invoices.Contracts.Models.Invoice",
+        "items": [],
+        "collapsed": false
+      }
+    ],
+    "collapsed": false
+  }
+]
