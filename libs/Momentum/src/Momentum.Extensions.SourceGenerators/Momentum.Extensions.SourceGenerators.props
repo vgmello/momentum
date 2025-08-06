@@ -1,0 +1,14 @@
+<Project>
+
+    <PropertyGroup Condition="'$(MomentumExtensionsSourceGeneratorsPropsImported)' != 'true'">
+        <MomentumExtensionsSourceGeneratorsPropsImported>true</MomentumExtensionsSourceGeneratorsPropsImported>
+        <!-- Defines the default value for the DbCommandAttribute.ParamsCase -->
+        <DbCommandDefaultParamCase Condition="'$(DbCommandDefaultParamCase)' == ''">None</DbCommandDefaultParamCase>
+    </PropertyGroup>
+
+    <ItemGroup Condition="'$(MomentumExtensionsSourceGeneratorsPropsImported)' == 'true'">
+        <!-- Makes the DbCommandDefaultParamCase property visible to the C# compiler and to source generators. -->
+        <CompilerVisibleProperty Include="DbCommandDefaultParamCase"/>
+    </ItemGroup>
+
+</Project>

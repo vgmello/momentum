@@ -1,9 +1,9 @@
 // Copyright (c) ABCDEG. All rights reserved.
 
 using AppDomain.Infrastructure;
-using Operations.ServiceDefaults;
-using Operations.ServiceDefaults.Api;
-using Operations.ServiceDefaults.HealthChecks;
+using Momentum.ServiceDefaults;
+using Momentum.ServiceDefaults.Api;
+using Momentum.ServiceDefaults.HealthChecks;
 
 [assembly: DomainAssembly(typeof(IAppDomainAssembly))]
 

@@ -20,13 +20,13 @@ WORKDIR /generator
 COPY .editorconfig ./
 COPY Directory.Build.props ./
 COPY Directory.Packages.props ./
-COPY libs/Operations/src/Directory.Build.props ./libs/Operations/src/
-COPY libs/Operations/src/Operations.Extensions.EventMarkdownGenerator ./libs/Operations/src/Operations.Extensions.EventMarkdownGenerator
-COPY libs/Operations/src/Operations.Extensions ./libs/Operations/src/Operations.Extensions
-COPY libs/Operations/src/Operations.Extensions.Abstractions ./libs/Operations/src/Operations.Extensions.Abstractions
-COPY libs/Operations/src/Operations.Extensions.XmlDocs ./libs/Operations/src/Operations.Extensions.XmlDocs
+COPY libs/Momentum/src/Directory.Build.props ./libs/Momentum/src/
+COPY libs/Momentum/src/Momentum.Extensions.EventMarkdownGenerator ./libs/Momentum/src/Momentum.Extensions.EventMarkdownGenerator
+COPY libs/Momentum/src/Momentum.Extensions ./libs/Momentum/src/Momentum.Extensions
+COPY libs/Momentum/src/Momentum.Extensions.Abstractions ./libs/Momentum/src/Momentum.Extensions.Abstractions
+COPY libs/Momentum/src/Momentum.Extensions.XmlDocs ./libs/Momentum/src/Momentum.Extensions.XmlDocs
 
-RUN dotnet build libs/Operations/src/Operations.Extensions.EventMarkdownGenerator \
+RUN dotnet build libs/Momentum/src/Momentum.Extensions.EventMarkdownGenerator \
     -c Debug -p:IsPackable=false -p:TreatWarningsAsErrors=false -p:RunCodeAnalysis=false
 
 WORKDIR /app/docs

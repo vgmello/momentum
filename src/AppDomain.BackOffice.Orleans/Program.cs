@@ -3,8 +3,8 @@
 using AppDomain.BackOffice.Orleans;
 using AppDomain.BackOffice.Orleans.Infrastructure.Extensions;
 using AppDomain.BackOffice.Orleans.Invoices.Grains;
-using Operations.ServiceDefaults;
-using Operations.ServiceDefaults.HealthChecks;
+using Momentum.ServiceDefaults;
+using Momentum.ServiceDefaults.HealthChecks;
 
 var builder = WebApplication.CreateSlimBuilder(args);
 

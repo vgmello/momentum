@@ -1,0 +1,17 @@
+{
+  "$schema": "https://raw.githubusercontent.com/dotnet/docfx/main/schemas/docfx.schema.json",
+  "metadata": [
+    {
+      "src": [
+        {
+          "src": "../src",
+          "files": ["**/bin/Debug/**/Momentum.**.dll", "**/bin/Release/**/Momentum.**.dll"]
+        }
+      ],
+      "output": "reference/",
+      "outputFormat": "markdown",
+      "namespaceLayout": "nested",
+      "categoryLayout": "nested"
+    }
+  ]
+}

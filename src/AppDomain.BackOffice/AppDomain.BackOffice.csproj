@@ -10,10 +10,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\libs\Operations\src\Operations.ServiceDefaults\Operations.ServiceDefaults.csproj"/>
+        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
     </ItemGroup>
 
-    <Import Project="..\..\libs\Operations\src\Operations.ServiceDefaults\Operations.ServiceDefaults.props" />
+    <Import Project="..\..\libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.props" />
 
     <ItemGroup>
         <Folder Include="Invoices\Messaging\" />

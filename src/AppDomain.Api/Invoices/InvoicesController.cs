@@ -10,7 +10,7 @@ using AppDomain.Invoices.Queries;
 namespace AppDomain.Api.Invoices;
 
 /// <summary>
-///     Manages invoice operations such as retrieval, creation, cancellation, and payment processing.
+///     Manages invoice Momentum such as retrieval, creation, cancellation, and payment processing.
 /// </summary>
 [ApiController]
 [Route("[controller]")]

@@ -1,3 +1,0 @@
-<Project>
-    <Import Project="..\Operations.Extensions\Operations.Extensions.props" />
-</Project>

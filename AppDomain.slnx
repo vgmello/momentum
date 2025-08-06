@@ -3,20 +3,20 @@
     <Project Path="infra\AppDomain.Database\AppDomain.Database.csproj" />
   </Folder>
   <Folder Name="/Libs/">
-    <Project Path="libs\Operations\src\Operations.Extensions.Abstractions\Operations.Extensions.Abstractions.csproj" />
-    <Project Path="libs\Operations\src\Operations.Extensions.EventMarkdownGenerator\Operations.Extensions.EventMarkdownGenerator.csproj" />
-    <Project Path="libs\Operations\src\Operations.Extensions.SourceGenerators\Operations.Extensions.SourceGenerators.csproj" />
-    <Project Path="libs\Operations\src\Operations.Extensions.XmlDocs\Operations.Extensions.XmlDocs.csproj" />
-    <Project Path="libs\Operations\src\Operations.Extensions\Operations.Extensions.csproj" />
-    <Project Path="libs\Operations\src\Operations.ServiceDefaults.Api\Operations.ServiceDefaults.Api.csproj" />
-    <Project Path="libs\Operations\src\Operations.ServiceDefaults\Operations.ServiceDefaults.csproj" />
+    <Project Path="libs\Momentum\src\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj" />
+    <Project Path="libs\Momentum\src\Momentum.Extensions.EventMarkdownGenerator\Momentum.Extensions.EventMarkdownGenerator.csproj" />
+    <Project Path="libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.csproj" />
+    <Project Path="libs\Momentum\src\Momentum.Extensions.XmlDocs\Momentum.Extensions.XmlDocs.csproj" />
+    <Project Path="libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.csproj" />
+    <Project Path="libs\Momentum\src\Momentum.ServiceDefaults.Api\Momentum.ServiceDefaults.Api.csproj" />
+    <Project Path="libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj" />
   </Folder>
   <Folder Name="/Libs/Misc/">
-    <File Path="libs\Operations\src\Directory.Build.props" />
-    <File Path="libs\Operations\src\Directory.Build.targets" />
+    <File Path="libs\Momentum\src\Directory.Build.props" />
+    <File Path="libs\Momentum\src\Directory.Build.targets" />
   </Folder>
   <Folder Name="/Libs/Tests/">
-    <Project Path="libs\Operations\tests\Operations.Extensions.EventMarkdownGenerator.Tests\Operations.Extensions.EventMarkdownGenerator.Tests.csproj" />
+    <Project Path="libs\Momentum\tests\Momentum.Extensions.EventMarkdownGenerator.Tests\Momentum.Extensions.EventMarkdownGenerator.Tests.csproj" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".dockerignore" />

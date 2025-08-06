@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RuleSet Name="Operations Rule Set" ToolsVersion="17.0">
-    <Rules AnalyzerId="SonarAnalyzer.CSharp" RuleNamespace="SonarAnalyzer.CSharp">
-        <Rule Id="S6602" Action="Hidden"/>
-    </Rules>
-</RuleSet>

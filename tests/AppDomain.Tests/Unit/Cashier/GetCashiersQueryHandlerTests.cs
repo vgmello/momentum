@@ -3,7 +3,7 @@
 using AppDomain.Cashiers.Queries;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
-using Operations.Extensions.Messaging;
+using Momentum.Extensions.Messaging;
 using Wolverine;
 
 namespace AppDomain.Tests.Unit.Cashier;

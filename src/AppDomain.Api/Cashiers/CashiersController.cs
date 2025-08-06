@@ -9,7 +9,7 @@ using AppDomain.Cashiers.Queries;
 namespace AppDomain.Api.Cashiers;
 
 /// <summary>
-///     Manages cashier operations such as retrieval, creation, updating, and deletion.
+///     Manages cashier Momentum such as retrieval, creation, updating, and deletion.
 /// </summary>
 [ApiController]
 [Route("[controller]")]

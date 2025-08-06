@@ -4,7 +4,7 @@ using AppDomain.Invoices.Contracts.IntegrationEvents;
 using AppDomain.Invoices.Contracts.Models;
 using AppDomain.Invoices.Data;
 using FluentValidation.Results;
-using Operations.Extensions.Abstractions.Dapper;
+using Momentum.Extensions.Abstractions.Dapper;
 
 namespace AppDomain.Invoices.Commands;
 

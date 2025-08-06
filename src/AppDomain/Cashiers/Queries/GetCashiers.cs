@@ -1,6 +1,6 @@
 // Copyright (c) ABCDEG. All rights reserved.
 
-using Operations.Extensions.Abstractions.Dapper;
+using Momentum.Extensions.Abstractions.Dapper;
 
 namespace AppDomain.Cashiers.Queries;
 

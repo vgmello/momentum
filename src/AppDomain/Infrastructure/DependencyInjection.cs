@@ -7,7 +7,7 @@ using LinqToDB.AspNet;
 using LinqToDB.AspNet.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Operations.Extensions.Data.LinqToDb;
+using Momentum.Extensions.Data.LinqToDb;
 
 namespace AppDomain.Infrastructure;
 

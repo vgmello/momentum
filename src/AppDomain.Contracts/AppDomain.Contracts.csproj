@@ -18,7 +18,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <AssemblyAttribute Include="Operations.Extensions.Abstractions.Messaging.DefaultDomainAttribute">
+        <AssemblyAttribute Include="Momentum.Extensions.Abstractions.Messaging.DefaultDomainAttribute">
             <Domain>AppDomain</Domain>
         </AssemblyAttribute>
     </ItemGroup>
@@ -33,7 +33,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\libs\Operations\src\Operations.Extensions.Abstractions\Operations.Extensions.Abstractions.csproj"/>
+        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
     </ItemGroup>
 
 </Project>

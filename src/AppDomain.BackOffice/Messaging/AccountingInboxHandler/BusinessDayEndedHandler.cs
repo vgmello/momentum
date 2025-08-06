@@ -30,5 +30,5 @@ public class BusinessDayEndedHandler(ILogger<BusinessDayEndedHandler> logger, IM
 
 // This declared in this file, for example purposes,
 // in a real-world scenario is supposed to be declared in a different domain/project
-[EventTopic("operations", domain: "accounting")]
+[EventTopic("Momentum", domain: "accounting")]
 public record BusinessDayEnded(DateTime BusinessDate, string Market, string Region);

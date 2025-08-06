@@ -2,8 +2,8 @@
 
 using AppDomain.BackOffice;
 using AppDomain.Infrastructure;
-using Operations.ServiceDefaults;
-using Operations.ServiceDefaults.HealthChecks;
+using Momentum.ServiceDefaults;
+using Momentum.ServiceDefaults.HealthChecks;
 
 var builder = WebApplication.CreateSlimBuilder(args);
 

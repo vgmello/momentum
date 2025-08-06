@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <IsAspireSharedProject>true</IsAspireSharedProject>
+        <PackageId>Momentum.ServiceDefaults.Api</PackageId>
+        <PackageDescription>API-specific service defaults for Momentum platform extending the base ServiceDefaults with gRPC, OpenAPI documentation (Scalar), and API-focused configurations. Essential for Momentum API projects.</PackageDescription>
+        <PackageProjectUrl>https://github.com/vgmello/momentum-sample/blob/main/libs/Momentum/src/Momentum.ServiceDefaults.Api/README.md</PackageProjectUrl>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Grpc.AspNetCore"/>
+        <PackageReference Include="Grpc.AspNetCore.Server.Reflection"/>
+        <PackageReference Include="Grpc.AspNetCore.Web"/>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi"/>
+        <PackageReference Include="OpenTelemetry.Extensions.Hosting" />
+        <PackageReference Include="Scalar.AspNetCore"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj" />
+      <ProjectReference Include="..\Momentum.Extensions.XmlDocs\Momentum.Extensions.XmlDocs.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+    </ItemGroup>
+
+</Project>

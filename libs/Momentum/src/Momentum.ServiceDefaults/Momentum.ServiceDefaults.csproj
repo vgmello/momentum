@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <IsAspireSharedProject>true</IsAspireSharedProject>
+        <PackageId>Momentum.ServiceDefaults</PackageId>
+        <PackageDescription>Service defaults for Momentum platform providing common configurations for Aspire-based services including Kafka, PostgreSQL, OpenTelemetry, Serilog, resilience patterns, and service discovery. Essential for all Momentum host projects.</PackageDescription>
+        <PackageProjectUrl>https://github.com/vgmello/momentum-sample/blob/main/libs/Momentum/src/Momentum.ServiceDefaults/README.md</PackageProjectUrl>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="Momentum.ServiceDefaults.props" Pack="true" PackagePath="build/"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    </ItemGroup>
+
+    <!--
+        IMPORTANT Reminder: All the dependencies in this project should be needed by all the Host projects (Api, Backoffice, Orleans, etc.).
+        We want to avoid adding a dependency to a specific Host project type, as it would not be used by the others.
+    -->
+
+    <ItemGroup>
+        <PackageReference Include="Aspire.Confluent.Kafka"/>
+        <PackageReference Include="Aspire.Npgsql"/>
+        <PackageReference Include="CloudNative.CloudEvents.Kafka"/>
+        <PackageReference Include="CloudNative.CloudEvents.SystemTextJson"/>
+        <PackageReference Include="FluentValidation.DependencyInjectionExtensions"/>
+        <PackageReference Include="Microsoft.Extensions.Http.Resilience"/>
+        <PackageReference Include="Microsoft.Extensions.ServiceDiscovery"/>
+        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol"/>
+        <PackageReference Include="OpenTelemetry.Extensions.Hosting"/>
+        <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore"/>
+        <PackageReference Include="OpenTelemetry.Instrumentation.Http"/>
+        <PackageReference Include="OpenTelemetry.Instrumentation.Runtime"/>
+        <PackageReference Include="OpenTelemetry.Instrumentation.GrpcNetClient"/>
+        <PackageReference Include="Serilog.AspNetCore"/>
+        <PackageReference Include="Serilog.Exceptions"/>
+        <PackageReference Include="Serilog.Sinks.OpenTelemetry"/>
+        <PackageReference Include="WolverineFx"/>
+        <PackageReference Include="WolverineFx.Kafka"/>
+        <PackageReference Include="WolverineFx.Postgresql"/>
+        <PackageReference Include="Confluent.Kafka.Extensions.OpenTelemetry"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Momentum.Extensions\Momentum.Extensions.csproj"/>
+    </ItemGroup>
+
+</Project>

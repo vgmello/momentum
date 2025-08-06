@@ -11,7 +11,7 @@ env:
 jobs:
   prerelease:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -22,29 +22,29 @@ jobs:
       id: change_check
       run: |
         echo "🔍 Checking for consumer-visible changes in libs folder..."
-        
+
         # Get changed files in libs folder
         CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD | grep '^libs/' || true)
-        
+
         if [ -z "$CHANGED_FILES" ]; then
           echo "No changes in libs folder, skipping pre-release"
           echo "skip=true" >> $GITHUB_OUTPUT
           exit 0
         fi
-        
+
         echo "Changed files in libs:"
         echo "$CHANGED_FILES"
-        
+
         # Filter to consumer-visible changes only
         CONSUMER_CHANGES=$(echo "$CHANGED_FILES" | grep -E '\.(cs|csproj|props|targets)$' | grep -v -E '(Test|\.Tests\.|\.md$|\.gitignore$|\.editorconfig$)' || true)
-        
+
         if [ -z "$CONSUMER_CHANGES" ]; then
           echo "No consumer-visible changes in libs folder, skipping pre-release"
           echo "Changes were limited to tests, documentation, or configuration files"
           echo "skip=true" >> $GITHUB_OUTPUT
           exit 0
         fi
-        
+
         echo "✅ Consumer-visible changes detected:"
         echo "$CONSUMER_CHANGES"
         echo "skip=false" >> $GITHUB_OUTPUT
@@ -64,15 +64,15 @@ jobs:
           echo "Create this file with a valid semantic version (e.g., '1.0.0')"
           exit 1
         fi
-        
+
         FILE_VERSION=$(cat libs/version.txt | tr -d '[:space:]')
-        
+
         if ! [[ $FILE_VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
           echo "❌ Error: Invalid version format in libs/version.txt: $FILE_VERSION"
           echo "Expected format: X.Y.Z (e.g., '1.2.3')"
           exit 1
         fi
-        
+
         echo "📋 File version: $FILE_VERSION"
         echo "version=$FILE_VERSION" >> $GITHUB_OUTPUT
 
@@ -81,25 +81,25 @@ jobs:
       id: version_validation
       run: |
         FILE_VERSION="${{ steps.file_version.outputs.version }}"
-        
+
         # Find latest regular release tag (excluding pre-releases)
         LATEST_RELEASE=$(git tag -l "v*.*.*" --sort=-v:refname | grep -v 'pre' | head -1)
-        
+
         if [ -n "$LATEST_RELEASE" ]; then
           LATEST_VERSION=$(echo $LATEST_RELEASE | sed 's/^v//')
           echo "📋 Latest release: $LATEST_RELEASE (version: $LATEST_VERSION)"
-          
+
           # Version comparison function
           version_greater() {
               [ "$(printf '%s\n' "$1" "$2" | sort -V | tail -n1)" = "$1" ]
           }
-          
+
           if ! version_greater "$FILE_VERSION" "$LATEST_VERSION"; then
             echo "❌ Error: version.txt ($FILE_VERSION) must be greater than latest release ($LATEST_VERSION)"
             echo "Please update libs/version.txt to a version higher than the latest release"
             exit 1
           fi
-          
+
           echo "✅ Version validation passed: $FILE_VERSION > $LATEST_VERSION"
         else
           echo "ℹ️  No previous releases found, using version from file: $FILE_VERSION"
@@ -110,14 +110,14 @@ jobs:
       id: prerelease_version
       run: |
         FILE_VERSION="${{ steps.file_version.outputs.version }}"
-        
+
         echo "📋 Target version: $FILE_VERSION"
-        
+
         # Find latest pre-release for target version
         LATEST_PRERELEASE=$(git tag -l "v${FILE_VERSION}-pre.*" --sort=-v:refname | head -1)
-        
+
         if [ -z "$LATEST_PRERELEASE" ]; then
-          # First pre-release for this version  
+          # First pre-release for this version
           PRERELEASE_VERSION="${FILE_VERSION}-pre.1"
           echo "ℹ️  First pre-release for version $FILE_VERSION"
         else
@@ -128,20 +128,20 @@ jobs:
           PRERELEASE_VERSION="${FILE_VERSION}-pre.${NEXT_SEQUENCE}"
           echo "ℹ️  Incrementing pre-release sequence: $SEQUENCE → $NEXT_SEQUENCE"
         fi
-        
+
         PRERELEASE_TAG="v${PRERELEASE_VERSION}"
         echo "📋 Pre-release version: $PRERELEASE_VERSION"
         echo "📋 Pre-release tag: $PRERELEASE_TAG"
-        
+
         echo "version=$PRERELEASE_VERSION" >> $GITHUB_OUTPUT
         echo "tag=$PRERELEASE_TAG" >> $GITHUB_OUTPUT
 
     - name: Build packages
       if: steps.change_check.outputs.skip != 'true'
       run: |
-        echo "🔨 Building all Operations packages for pre-release..."
-        dotnet build libs/Operations/src --configuration Release --verbosity minimal
-        
+        echo "🔨 Building all Momentum packages for pre-release..."
+        dotnet build libs/Momentum/src --configuration Release --verbosity minimal
+
         if [ $? -ne 0 ]; then
           echo "❌ Build failed"
           exit 1
@@ -154,10 +154,10 @@ jobs:
       run: |
         PRERELEASE_TAG="${{ steps.prerelease_version.outputs.tag }}"
         CURRENT_COMMIT=$(git rev-parse HEAD)
-        
+
         # Find last regular release for changelog base
         LAST_RELEASE_TAG=$(git tag -l "v*.*.*" --sort=-v:refname | grep -v 'pre' | head -1)
-        
+
         if [ -n "$LAST_RELEASE_TAG" ]; then
           echo "Generating changelog from $LAST_RELEASE_TAG to $CURRENT_COMMIT"
           COMMITS=$(git log --pretty=format:"- %s" ${LAST_RELEASE_TAG}..HEAD)
@@ -165,41 +165,41 @@ jobs:
           echo "No previous release found, generating changelog from start"
           COMMITS=$(git log --pretty=format:"- %s")
         fi
-        
+
         # Create release notes
         cat > release_notes.md << EOF
-        # Operations Libraries ${PRERELEASE_TAG} (Pre-release)
-        
+        # Momentum Libraries ${PRERELEASE_TAG} (Pre-release)
+
         🚧 **This is a pre-release version** - Use for testing purposes only
-        
+
         ## Changes Since Last Release
-        
+
         $COMMITS
-        
+
         ## Pre-release Packages Published
-        
-        - Operations.Extensions
-        - Operations.ServiceDefaults  
-        - Operations.Extensions.SourceGenerators
-        - Operations.Extensions.EventDocGenerator
-        - Operations.ServiceDefaults.Api
-        - Operations.Extensions.Abstractions
-        
+
+        - Momentum.Extensions
+        - Momentum.ServiceDefaults
+        - Momentum.Extensions.SourceGenerators
+        - Momentum.Extensions.EventDocGenerator
+        - Momentum.ServiceDefaults.Api
+        - Momentum.Extensions.Abstractions
+
         All packages are published with version ${{ steps.prerelease_version.outputs.version }}.
-        
+
         ## Installation
-        
+
         To install these pre-release packages, use the \`--prerelease\` flag:
-        
+
         \`\`\`bash
-        dotnet add package Operations.Extensions --version ${{ steps.prerelease_version.outputs.version }}
+        dotnet add package Momentum.Extensions --version ${{ steps.prerelease_version.outputs.version }}
         \`\`\`
-        
+
         ---
-        
+
         🤖 Generated with [Claude Code](https://claude.ai/code)
         EOF
-        
+
         echo "Release notes generated:"
         cat release_notes.md
 
@@ -208,15 +208,15 @@ jobs:
       id: create_prerelease
       run: |
         PRERELEASE_TAG="${{ steps.prerelease_version.outputs.tag }}"
-        
+
         echo "🚀 Creating GitHub pre-release: $PRERELEASE_TAG"
-        
+
         gh release create $PRERELEASE_TAG \
-          --title "Operations Libraries ${PRERELEASE_TAG} (Pre-release)" \
+          --title "Momentum Libraries ${PRERELEASE_TAG} (Pre-release)" \
           --notes-file release_notes.md \
           --prerelease \
           --target main
-        
+
         echo "✅ GitHub pre-release created successfully"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -225,32 +225,32 @@ jobs:
       if: steps.change_check.outputs.skip != 'true'
       run: |
         PRERELEASE_VERSION="${{ steps.prerelease_version.outputs.version }}"
-        
+
         echo "📦 Building packages with pre-release version $PRERELEASE_VERSION"
-        dotnet pack libs/Operations/src \
+        dotnet pack libs/Momentum/src \
           --configuration Release \
           --no-build \
           --verbosity minimal \
           -p:PackageVersion=$PRERELEASE_VERSION
-        
+
         echo "✅ Packages built successfully with pre-release version"
 
     - name: Publish to NuGet
       if: steps.change_check.outputs.skip != 'true'
       run: |
         echo "🚀 Publishing pre-release packages to NuGet.org..."
-        
-        # Find all .nupkg files in the Operations projects
-        PACKAGES=$(find libs/Operations/src -name "*.nupkg" -not -path "*/bin/Debug/*")
-        
+
+        # Find all .nupkg files in the Momentum projects
+        PACKAGES=$(find libs/Momentum/src -name "*.nupkg" -not -path "*/bin/Debug/*")
+
         if [ -z "$PACKAGES" ]; then
           echo "❌ No packages found to publish"
           exit 1
         fi
-        
+
         echo "Found pre-release packages:"
         echo "$PACKAGES"
-        
+
         # Publish each package
         for package in $PACKAGES; do
           echo "Publishing pre-release package $package..."
@@ -258,7 +258,7 @@ jobs:
             --api-key ${{ secrets.NUGET_API_KEY }} \
             --source https://api.nuget.org/v3/index.json \
             --skip-duplicate
-          
+
           if [ $? -eq 0 ]; then
             echo "✅ Successfully published $(basename $package)"
           else
@@ -266,7 +266,7 @@ jobs:
             exit 1
           fi
         done
-        
+
         echo "🎉 All pre-release packages published successfully!"
 
     - name: Update pre-release with package info
@@ -274,5 +274,5 @@ jobs:
       run: |
         PRERELEASE_VERSION="${{ steps.prerelease_version.outputs.version }}"
         echo "✅ NuGet pre-release packages published successfully"
-        echo "📦 All Operations libraries are now available on NuGet.org with version $PRERELEASE_VERSION"
+        echo "📦 All Momentum libraries are now available on NuGet.org with version $PRERELEASE_VERSION"
         echo "🔍 Use --prerelease flag when installing these packages"

@@ -1,7 +1,7 @@
 // Copyright (c) ABCDEG. All rights reserved.
 
 using AppDomain.Invoices.Contracts.Models;
-using Operations.Extensions.Abstractions.Messaging;
+using Momentum.Extensions.Abstractions.Messaging;
 
 namespace AppDomain.Invoices.Contracts.IntegrationEvents;
 

@@ -14,7 +14,7 @@ namespace AppDomain.Cashiers.Contracts.IntegrationEvents;
 ///     This event is published when:
 ///     - A cashier is permanently removed from the system
 ///     - The deletion process completes successfully
-///     - All associated cleanup operations are finished
+///     - All associated cleanup Momentum are finished
 ///
 ///     ## Impact and Considerations
 ///

@@ -14,18 +14,18 @@
     </ItemGroup>
 
     <ItemGroup>
-        <AssemblyAttribute Include="Operations.Extensions.Abstractions.Messaging.DefaultDomainAttribute">
+        <AssemblyAttribute Include="Momentum.Extensions.Abstractions.Messaging.DefaultDomainAttribute">
             <Domain>AppDomain</Domain>
         </AssemblyAttribute>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\libs\Operations\src\Operations.Extensions\Operations.Extensions.csproj"/>
-        <ProjectReference Include="..\..\libs\Operations\src\Operations.Extensions.SourceGenerators\Operations.Extensions.SourceGenerators.csproj"
+        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.csproj"/>
+        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.csproj"
                           OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
     </ItemGroup>
 
-    <Import Project="..\..\libs\Operations\src\Operations.Extensions\Operations.Extensions.props" />
-    <Import Project="..\..\libs\Operations\src\Operations.Extensions.SourceGenerators\Operations.Extensions.SourceGenerators.props" />
+    <Import Project="..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.props" />
+    <Import Project="..\..\libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.props" />
 
 </Project>

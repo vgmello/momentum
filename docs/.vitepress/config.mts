@@ -9,7 +9,7 @@ import EventsSidebar from "./plugins/eventsSidebar";
 const REF_DIR = "reference/toc.yml";
 const ADR_DIR = "arch/adr";
 
-const allMarkdownTransformers: MarkdownOptions = {
+const markdownOptions: MarkdownOptions = {
     theme: {
         light: "github-light",
         dark: "github-dark",
@@ -27,7 +27,7 @@ const allMarkdownTransformers: MarkdownOptions = {
 export default defineConfig({
     title: "AppDomain Solution",
     description: "Comprehensive AppDomain management system with Cashiers, Invoices, and Bills",
-    markdown: allMarkdownTransformers,
+    markdown: markdownOptions,
     themeConfig: {
         nav: [
             { text: "Home", link: "/" },
