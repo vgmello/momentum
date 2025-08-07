@@ -1,6 +1,5 @@
-// Copyright (c) ABCDEG. All rights reserved.
+// Copyright (c) Momentum .NET. All rights reserved.
 
-using Momentum.Extensions.Abstractions.Dapper;
 using Momentum.Extensions.Abstractions.Extensions;
 using Momentum.Extensions.Abstractions.Messaging;
 using Momentum.Extensions.SourceGenerators.Extensions;

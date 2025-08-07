@@ -1,3 +1,5 @@
+// Copyright (c) Momentum .NET. All rights reserved.
+
 namespace AppDomain.Orders.Contracts.Models;
 
 /// <summary>Represents customer information for order processing</summary>

@@ -1,4 +1,4 @@
-// Copyright (c) ABCDEG. All rights reserved.
+// Copyright (c) Momentum .NET. All rights reserved.
 
 global using Xunit;
 global using Shouldly;

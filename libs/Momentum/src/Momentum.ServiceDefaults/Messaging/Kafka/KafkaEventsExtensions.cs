@@ -1,4 +1,4 @@
-// Copyright (c) ABCDEG. All rights reserved.
+// Copyright (c) Momentum .NET. All rights reserved.
 
 using JasperFx.Core.Reflection;
 using Microsoft.Extensions.Configuration;

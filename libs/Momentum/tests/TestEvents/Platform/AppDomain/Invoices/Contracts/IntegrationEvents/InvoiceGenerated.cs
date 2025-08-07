@@ -1,9 +1,11 @@
+// Copyright (c) Momentum .NET. All rights reserved.
+
 using Momentum.Extensions.Abstractions.Messaging;
 
 namespace Platform.AppDomain.Invoices.Contracts.IntegrationEvents;
 
 /// <summary>
-/// Published when an invoice is generated for a customer
+///     Published when an invoice is generated for a customer
 /// </summary>
 /// <param name="TenantId">Tenant identifier</param>
 /// <param name="InvoiceId">Invoice identifier</param>

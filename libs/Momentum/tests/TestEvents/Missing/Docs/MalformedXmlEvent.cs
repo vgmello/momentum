@@ -1,12 +1,14 @@
+// Copyright (c) Momentum .NET. All rights reserved.
+
 using Momentum.Extensions.Abstractions.Messaging;
 
 namespace Missing.Docs;
 
 /// <summary>
-/// Event with malformed XML in documentation
+///     Event with malformed XML in documentation
 /// </summary>
 /// <remarks>
-/// This has unclosed tags and malformed content
+///     This has unclosed tags and malformed content
 /// </remarks>
 [EventTopic<MalformedXmlEvent>]
 public sealed record MalformedXmlEvent(

@@ -1,3 +1,5 @@
+// Copyright (c) Momentum .NET. All rights reserved.
+
 using Momentum.Extensions.Abstractions.Messaging;
 using AppDomain.Orders.Contracts.Models;
 
@@ -12,20 +14,20 @@ namespace AppDomain.Orders.Contracts.IntegrationEvents;
 /// <param name="TotalAmount">Final total amount charged to the customer</param>
 /// <param name="CompletedAt">Date and time when the order was completed</param>
 /// <remarks>
-/// ## When It's Triggered
-///
-/// This event is published when:
-/// - Payment processing completes successfully
-/// - All order items are confirmed as available
-/// - Order status is updated to completed
-///
-/// ## Business Impact
-///
-/// This event triggers:
-/// - Inventory reduction for ordered items
-/// - Customer notification emails
-/// - Analytics and reporting updates
-/// - Loyalty points calculation
+///     ## When It's Triggered
+/// 
+///     This event is published when:
+///     - Payment processing completes successfully
+///     - All order items are confirmed as available
+///     - Order status is updated to completed
+/// 
+///     ## Business Impact
+/// 
+///     This event triggers:
+///     - Inventory reduction for ordered items
+///     - Customer notification emails
+///     - Analytics and reporting updates
+///     - Loyalty points calculation
 /// </remarks>
 [EventTopic<Order>]
 public sealed record OrderCompleted(

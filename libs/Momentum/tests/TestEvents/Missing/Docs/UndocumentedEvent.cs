@@ -1,3 +1,5 @@
+// Copyright (c) Momentum .NET. All rights reserved.
+
 using Momentum.Extensions.Abstractions.Messaging;
 
 namespace Missing.Docs;

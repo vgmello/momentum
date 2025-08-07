@@ -1,9 +1,11 @@
+// Copyright (c) Momentum .NET. All rights reserved.
+
 using Momentum.Extensions.Abstractions.Messaging;
 
 namespace Events.Core;
 
 /// <summary>
-/// Simple event with minimal documentation
+///     Simple event with minimal documentation
 /// </summary>
 /// <param name="Id">Event identifier</param>
 [EventTopic<MinimalEvent>]

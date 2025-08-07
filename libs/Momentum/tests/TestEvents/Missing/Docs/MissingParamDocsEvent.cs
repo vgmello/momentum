@@ -1,9 +1,11 @@
+// Copyright (c) Momentum .NET. All rights reserved.
+
 using Momentum.Extensions.Abstractions.Messaging;
 
 namespace Missing.Docs;
 
 /// <summary>
-/// Event with missing parameter documentation
+///     Event with missing parameter documentation
 /// </summary>
 [EventTopic<MissingParamDocsEvent>]
 public sealed record MissingParamDocsEvent(

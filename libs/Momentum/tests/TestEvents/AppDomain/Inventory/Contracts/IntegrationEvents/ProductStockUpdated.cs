@@ -1,9 +1,11 @@
+// Copyright (c) Momentum .NET. All rights reserved.
+
 using Momentum.Extensions.Abstractions.Messaging;
 
 namespace AppDomain.Inventory.Contracts.IntegrationEvents;
 
 /// <summary>
-/// Published when product stock levels are updated in the inventory system
+///     Published when product stock levels are updated in the inventory system
 /// </summary>
 /// <param name="TenantId">Identifier of the tenant that owns the inventory</param>
 /// <param name="WarehouseId">Identifier of the warehouse where stock is managed</param>
@@ -13,20 +15,20 @@ namespace AppDomain.Inventory.Contracts.IntegrationEvents;
 /// <param name="NewQuantity">Stock quantity after the update</param>
 /// <param name="UpdatedAt">Date and time when the stock was updated</param>
 /// <remarks>
-/// ## When It's Triggered
-///
-/// This event is published when:
-/// - Product stock is adjusted manually
-/// - Automated stock replenishment occurs
-/// - Stock is reserved for orders
-/// - Stock reservations are released
-///
-/// ## Partition Strategy
-///
-/// This event uses multiple partition keys to optimize message routing:
-/// - Primary partitioning by tenant for isolation
-/// - Secondary partitioning by warehouse for regional processing
-/// - Tertiary partitioning by product category for specialized handlers
+///     ## When It's Triggered
+/// 
+///     This event is published when:
+///     - Product stock is adjusted manually
+///     - Automated stock replenishment occurs
+///     - Stock is reserved for orders
+///     - Stock reservations are released
+/// 
+///     ## Partition Strategy
+/// 
+///     This event uses multiple partition keys to optimize message routing:
+///     - Primary partitioning by tenant for isolation
+///     - Secondary partitioning by warehouse for regional processing
+///     - Tertiary partitioning by product category for specialized handlers
 /// </remarks>
 [EventTopic<Product>]
 public sealed record ProductStockUpdated(
@@ -40,7 +42,7 @@ public sealed record ProductStockUpdated(
 );
 
 /// <summary>
-/// Represents a product in the inventory system
+///     Represents a product in the inventory system
 /// </summary>
 public record Product
 {

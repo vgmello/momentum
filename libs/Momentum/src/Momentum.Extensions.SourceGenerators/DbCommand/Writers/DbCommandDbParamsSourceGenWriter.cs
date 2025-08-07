@@ -1,6 +1,5 @@
-// Copyright (c) ABCDEG. All rights reserved.
+// Copyright (c) Momentum .NET. All rights reserved.
 
-using Momentum.Extensions.Abstractions.Dapper;
 using System.Text;
 
 namespace Momentum.Extensions.SourceGenerators.DbCommand.Writers;

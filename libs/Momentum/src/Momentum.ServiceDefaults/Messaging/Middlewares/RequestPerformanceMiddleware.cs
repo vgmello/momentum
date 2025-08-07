@@ -1,4 +1,4 @@
-// Copyright (c) ABCDEG. All rights reserved.
+// Copyright (c) Momentum .NET. All rights reserved.
 
 using Microsoft.Extensions.Logging;
 using Momentum.ServiceDefaults.Messaging.Telemetry;

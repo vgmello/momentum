@@ -1,9 +1,11 @@
+// Copyright (c) Momentum .NET. All rights reserved.
+
 using Momentum.Extensions.Abstractions.Messaging;
 
 namespace Platform.Subscriptions.Contracts.IntegrationEvents;
 
 /// <summary>
-/// Published when a subscription is cancelled
+///     Published when a subscription is cancelled
 /// </summary>
 /// <param name="TenantId">Tenant identifier</param>
 /// <param name="SubscriptionId">Subscription identifier</param>

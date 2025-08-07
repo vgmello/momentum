@@ -1,9 +1,11 @@
+// Copyright (c) Momentum .NET. All rights reserved.
+
 using Momentum.Extensions.Abstractions.Messaging;
 
 namespace AppDomain.Collections.Contracts.IntegrationEvents;
 
 /// <summary>
-/// Published when bulk data processing Momentum complete with mixed result types
+///     Published when bulk data processing Momentum complete with mixed result types
 /// </summary>
 /// <param name="TenantId">Identifier of the tenant that owns the bulk operation</param>
 /// <param name="ProcessedFiles">Array of file names that were processed during the operation</param>
@@ -13,20 +15,20 @@ namespace AppDomain.Collections.Contracts.IntegrationEvents;
 /// <param name="Metadata">Dictionary of key-value pairs containing operation metadata</param>
 /// <param name="CompletedAt">Timestamp when the bulk processing operation completed</param>
 /// <remarks>
-/// ## When It's Triggered
-///
-/// This event is published when:
-/// - Batch processing jobs complete
-/// - Multiple data types are processed together
-/// - Collection-based Momentum finish
-///
-/// ## Collection Types
-///
-/// This event demonstrates various collection patterns:
-/// - Arrays of primitive types
-/// - Lists of complex objects
-/// - Generic collections with different element types
-/// - Nested collections within complex types
+///     ## When It's Triggered
+/// 
+///     This event is published when:
+///     - Batch processing jobs complete
+///     - Multiple data types are processed together
+///     - Collection-based Momentum finish
+/// 
+///     ## Collection Types
+/// 
+///     This event demonstrates various collection patterns:
+///     - Arrays of primitive types
+///     - Lists of complex objects
+///     - Generic collections with different element types
+///     - Nested collections within complex types
 /// </remarks>
 [EventTopic<BulkDataProcessed>]
 public sealed record BulkDataProcessed(

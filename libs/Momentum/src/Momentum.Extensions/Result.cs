@@ -1,4 +1,4 @@
-// Copyright (c) ABCDEG. All rights reserved.
+// Copyright (c) Momentum .NET. All rights reserved.
 
 using FluentValidation.Results;
 using OneOf;
@@ -22,7 +22,7 @@ namespace Momentum.Extensions;
 ///     var validationResult = validator.Validate(command);
 ///     if (!validationResult.IsValid)
 ///         return validationResult.Errors;
-///
+/// 
 ///     var user = new User(command.Name, command.Email);
 ///     return user;
 /// }

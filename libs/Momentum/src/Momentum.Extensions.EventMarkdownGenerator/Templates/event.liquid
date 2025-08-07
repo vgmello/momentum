@@ -26,13 +26,13 @@ editLink: false
 {{ event.Description }}
 
 {% if event.Remarks -%}
-{{ event.Remarks }}
+    {{ event.Remarks }}
 {% endif -%}
 
 {% if event.Example -%}
-### Example
+    ### Example
 
-{{ event.Example }}
+    {{ event.Example }}
 {% endif -%}
 
 ## Event Payload
@@ -44,16 +44,16 @@ editLink: false
 {% endfor %}
 
 {% if event.PartitionKeys.size > 0 -%}
-### Partition Keys
+    ### Partition Keys
 
-{% if event.PartitionKeys.size == 1 -%}
-This event uses a partition key for message routing:
-{% else -%}
-This event uses multiple partition keys for message routing:
-{% endif -%}
-{% for partitionKey in event.PartitionKeys -%}
-- `{{ partitionKey.Name }}`{% if partitionKey.Description %} - {{ partitionKey.Description }}{% endif %}
-{% endfor -%}
+    {% if event.PartitionKeys.size == 1 -%}
+        This event uses a partition key for message routing:
+    {% else -%}
+        This event uses multiple partition keys for message routing:
+    {% endif -%}
+    {% for partitionKey in event.PartitionKeys -%}
+        - `{{ partitionKey.Name }}`{% if partitionKey.Description %} - {{ partitionKey.Description }}{% endif %}
+    {% endfor -%}
 {% endif -%}
 
 {% assign complexTypes = event.Properties | where: "IsComplexType", true | where: "IsCollectionType", false -%}
@@ -61,23 +61,23 @@ This event uses multiple partition keys for message routing:
 {% assign allComplexTypes = complexTypes | concat: collectionComplexTypes -%}
 
 {% if allComplexTypes.size > 0 %}
-### Reference Schemas
+    ### Reference Schemas
 
-{% for property in complexTypes -%}
-{% assign typeName = property.TypeName -%}
-#### {{ typeName }}
+    {% for property in complexTypes -%}
+        {% assign typeName = property.TypeName -%}
+        #### {{ typeName }}
 
-<!--@include: @/events/schemas/{{ property.SchemaPath }}#schema-->
+        <!--@include: @/events/schemas/{{ property.SchemaPath }}#schema-->
 
-{% endfor -%}
+    {% endfor -%}
 
-{% for property in collectionComplexTypes -%}
-{% assign elementTypeName = property.ElementTypeName | default: property.TypeName -%}
-#### {{ elementTypeName }}s
+    {% for property in collectionComplexTypes -%}
+        {% assign elementTypeName = property.ElementTypeName | default: property.TypeName -%}
+        #### {{ elementTypeName }}s
 
-<!--@include: @/events/schemas/{{ property.ElementSchemaPath | default: property.SchemaPath }}#schema-->
+        <!--@include: @/events/schemas/{{ property.ElementSchemaPath | default: property.SchemaPath }}#schema-->
 
-{% endfor -%}
+    {% endfor -%}
 {% endif -%}
 
 ## Technical Details

@@ -1,22 +1,24 @@
+// Copyright (c) Momentum .NET. All rights reserved.
+
 namespace AppDomain.Types.Contracts.Enums;
 
 /// <summary>
-/// Enumeration of supported payment methods
+///     Enumeration of supported payment methods
 /// </summary>
 public enum PaymentMethod
 {
     /// <summary>
-    /// Payment via credit card
+    ///     Payment via credit card
     /// </summary>
     CreditCard,
 
     /// <summary>
-    /// Payment via bank transfer
+    ///     Payment via bank transfer
     /// </summary>
     BankTransfer,
 
     /// <summary>
-    /// Payment via digital wallet service
+    ///     Payment via digital wallet service
     /// </summary>
     DigitalWallet
 }

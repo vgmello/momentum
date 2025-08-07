@@ -1,9 +1,11 @@
+// Copyright (c) Momentum .NET. All rights reserved.
+
 using Momentum.Extensions.Abstractions.Messaging;
 
 namespace Platform.AppDomain.Payments.Contracts.IntegrationEvents;
 
 /// <summary>
-/// Published when a payment is successfully processed
+///     Published when a payment is successfully processed
 /// </summary>
 /// <param name="TenantId">Tenant identifier</param>
 /// <param name="PaymentId">Payment identifier</param>

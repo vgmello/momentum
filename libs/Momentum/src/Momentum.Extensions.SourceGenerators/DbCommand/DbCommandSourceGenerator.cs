@@ -1,6 +1,6 @@
-// Copyright (c) ABCDEG. All rights reserved.
+// Copyright (c) Momentum .NET. All rights reserved.
 
-using Momentum.Extensions.Abstractions.Dapper;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Momentum.Extensions.SourceGenerators.DbCommand.Writers;
 using Momentum.Extensions.SourceGenerators.Extensions;
 

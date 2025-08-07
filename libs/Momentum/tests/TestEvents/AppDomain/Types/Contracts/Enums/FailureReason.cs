@@ -1,27 +1,29 @@
+// Copyright (c) Momentum .NET. All rights reserved.
+
 namespace AppDomain.Types.Contracts.Enums;
 
 /// <summary>
-/// Enumeration of possible payment failure reasons
+///     Enumeration of possible payment failure reasons
 /// </summary>
 public enum FailureReason
 {
     /// <summary>
-    /// Insufficient funds in the payment source
+    ///     Insufficient funds in the payment source
     /// </summary>
     InsufficientFunds,
 
     /// <summary>
-    /// Payment method is invalid or expired
+    ///     Payment method is invalid or expired
     /// </summary>
     InvalidPaymentMethod,
 
     /// <summary>
-    /// Network connectivity issues during processing
+    ///     Network connectivity issues during processing
     /// </summary>
     NetworkError,
 
     /// <summary>
-    /// Security checks failed during payment processing
+    ///     Security checks failed during payment processing
     /// </summary>
     SecurityViolation
 }
