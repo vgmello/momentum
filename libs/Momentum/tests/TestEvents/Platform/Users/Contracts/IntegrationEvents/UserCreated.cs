@@ -2,7 +2,7 @@
 
 using Momentum.Extensions.Abstractions.Messaging;
 
-namespace Platform.Users.Contracts.IntegrationEvents;
+namespace TestEvents.Platform.Users.Contracts.IntegrationEvents;
 
 /// <summary>
 ///     Published when a new user account is created

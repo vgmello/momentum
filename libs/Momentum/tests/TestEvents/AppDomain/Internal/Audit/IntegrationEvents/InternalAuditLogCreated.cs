@@ -2,7 +2,7 @@
 
 using Momentum.Extensions.Abstractions.Messaging;
 
-namespace AppDomain.Internal.Audit.IntegrationEvents;
+namespace TestEvents.AppDomain.Internal.Audit.IntegrationEvents;
 
 /// <summary>
 ///     Published internally when audit log entries are created for compliance tracking

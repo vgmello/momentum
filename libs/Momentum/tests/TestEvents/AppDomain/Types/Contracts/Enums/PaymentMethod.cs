@@ -1,6 +1,6 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-namespace AppDomain.Types.Contracts.Enums;
+namespace TestEvents.AppDomain.Types.Contracts.Enums;
 
 /// <summary>
 ///     Enumeration of supported payment methods

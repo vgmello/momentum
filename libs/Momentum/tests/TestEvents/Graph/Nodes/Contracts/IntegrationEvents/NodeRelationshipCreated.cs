@@ -1,9 +1,9 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
 using Momentum.Extensions.Abstractions.Messaging;
-using Graph.Nodes.Contracts.Models;
+using TestEvents.Graph.Nodes.Contracts.Models;
 
-namespace Graph.Nodes.Contracts.IntegrationEvents;
+namespace TestEvents.Graph.Nodes.Contracts.IntegrationEvents;
 
 /// <summary>
 ///     Published when a new relationship is created between graph nodes

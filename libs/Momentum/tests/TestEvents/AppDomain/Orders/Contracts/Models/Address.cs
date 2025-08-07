@@ -1,6 +1,6 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-namespace AppDomain.Orders.Contracts.Models;
+namespace TestEvents.AppDomain.Orders.Contracts.Models;
 
 /// <summary>Represents a physical address for AppDomain or shipping</summary>
 public record Address

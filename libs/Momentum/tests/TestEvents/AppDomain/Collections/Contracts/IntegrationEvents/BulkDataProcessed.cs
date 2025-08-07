@@ -2,7 +2,7 @@
 
 using Momentum.Extensions.Abstractions.Messaging;
 
-namespace AppDomain.Collections.Contracts.IntegrationEvents;
+namespace TestEvents.AppDomain.Collections.Contracts.IntegrationEvents;
 
 /// <summary>
 ///     Published when bulk data processing Momentum complete with mixed result types

@@ -2,7 +2,7 @@
 
 using Momentum.Extensions.Abstractions.Messaging;
 
-namespace AppDomain.Inventory.Contracts.IntegrationEvents;
+namespace TestEvents.AppDomain.Inventory.Contracts.IntegrationEvents;
 
 /// <summary>
 ///     Published when product stock levels are updated in the inventory system

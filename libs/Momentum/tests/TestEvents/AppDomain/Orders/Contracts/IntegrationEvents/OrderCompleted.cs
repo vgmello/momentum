@@ -1,9 +1,9 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
 using Momentum.Extensions.Abstractions.Messaging;
-using AppDomain.Orders.Contracts.Models;
+using TestEvents.AppDomain.Orders.Contracts.Models;
 
-namespace AppDomain.Orders.Contracts.IntegrationEvents;
+namespace TestEvents.AppDomain.Orders.Contracts.IntegrationEvents;
 
 /// <summary>Published when an order is successfully completed and payment is processed</summary>
 /// <param name="TenantId">Identifier of the tenant that owns the order</param>

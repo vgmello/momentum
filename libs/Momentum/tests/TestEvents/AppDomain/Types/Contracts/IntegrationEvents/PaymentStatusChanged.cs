@@ -1,9 +1,9 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
 using Momentum.Extensions.Abstractions.Messaging;
-using AppDomain.Types.Contracts.Enums;
+using TestEvents.AppDomain.Types.Contracts.Enums;
 
-namespace AppDomain.Types.Contracts.IntegrationEvents;
+namespace TestEvents.AppDomain.Types.Contracts.IntegrationEvents;
 
 /// <summary>
 ///     Published when payment status transitions occur with optional metadata and enum values

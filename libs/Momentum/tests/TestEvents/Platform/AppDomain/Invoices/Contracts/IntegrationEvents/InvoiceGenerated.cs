@@ -2,7 +2,7 @@
 
 using Momentum.Extensions.Abstractions.Messaging;
 
-namespace Platform.AppDomain.Invoices.Contracts.IntegrationEvents;
+namespace TestEvents.Platform.AppDomain.Invoices.Contracts.IntegrationEvents;
 
 /// <summary>
 ///     Published when an invoice is generated for a customer

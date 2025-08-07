@@ -2,7 +2,7 @@
 
 using Momentum.Extensions.Abstractions.Messaging;
 
-namespace Enterprise.AppDomain.Payments.Gateway.External.Contracts.IntegrationEvents;
+namespace TestEvents.Enterprise.AppDomain.Payments.Gateway.External.Contracts.IntegrationEvents;
 
 /// <summary>
 ///     Published when responses are received from external payment gateway systems

@@ -1,6 +1,6 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-namespace Graph.Nodes.Contracts.Models;
+namespace TestEvents.Graph.Nodes.Contracts.Models;
 
 /// <summary>
 ///     Contains metadata about a graph node

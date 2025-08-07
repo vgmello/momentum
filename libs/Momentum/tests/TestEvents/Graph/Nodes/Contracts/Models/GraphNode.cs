@@ -1,6 +1,6 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-namespace Graph.Nodes.Contracts.Models;
+namespace TestEvents.Graph.Nodes.Contracts.Models;
 
 /// <summary>
 ///     Represents a node in a graph structure with potential circular references

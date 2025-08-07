@@ -2,7 +2,7 @@
 
 using Momentum.Extensions.Abstractions.Messaging;
 
-namespace Events.Core;
+namespace TestEvents.Events.Core;
 
 /// <summary>
 ///     Simple event with minimal documentation

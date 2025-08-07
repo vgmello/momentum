@@ -2,7 +2,7 @@
 
 using Momentum.Extensions.Abstractions.Messaging;
 
-namespace Missing.Docs;
+namespace TestEvents.Missing.Docs;
 
 [EventTopic<UndocumentedEvent>]
 public sealed record UndocumentedEvent(

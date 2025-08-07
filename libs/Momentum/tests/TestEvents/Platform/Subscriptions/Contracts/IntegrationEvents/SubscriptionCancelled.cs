@@ -2,7 +2,7 @@
 
 using Momentum.Extensions.Abstractions.Messaging;
 
-namespace Platform.Subscriptions.Contracts.IntegrationEvents;
+namespace TestEvents.Platform.Subscriptions.Contracts.IntegrationEvents;
 
 /// <summary>
 ///     Published when a subscription is cancelled

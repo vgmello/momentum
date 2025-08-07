@@ -2,7 +2,7 @@
 
 using Momentum.Extensions.Abstractions.Messaging;
 
-namespace AppDomain.Cashiers.Contracts.IntegrationEvents;
+namespace TestEvents.AppDomain.Cashiers.Contracts.IntegrationEvents;
 
 /// <summary>
 ///     Published when a new cashier is successfully created in the AppDomain system. This event contains the complete cashier data and

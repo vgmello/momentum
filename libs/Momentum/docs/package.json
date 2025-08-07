@@ -4,7 +4,7 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "dev": "pnpm docs:dev",
+    "dev": "pnpm install && pnpm docs:dev",
     "docs:pre": "pnpm docs:dotnet && pnpm docs:adr",
     "docs:dev": "pnpm docs:pre && vitepress dev",
     "docs:build": "pnpm docs:pre && vitepress build",

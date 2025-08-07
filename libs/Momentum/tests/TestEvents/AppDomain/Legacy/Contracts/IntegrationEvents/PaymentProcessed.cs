@@ -2,7 +2,7 @@
 
 using Momentum.Extensions.Abstractions.Messaging;
 
-namespace AppDomain.Legacy.Contracts.IntegrationEvents;
+namespace TestEvents.AppDomain.Legacy.Contracts.IntegrationEvents;
 
 /// <summary>
 ///     Published when a payment is processed through the legacy payment system
@@ -12,13 +12,13 @@ namespace AppDomain.Legacy.Contracts.IntegrationEvents;
 /// <param name="TransactionId">Legacy transaction identifier</param>
 /// <remarks>
 ///     ## When It's Triggered
-/// 
+///
 ///     This event was published when:
 ///     - Payment was processed through the old payment gateway
 ///     - Transaction was completed successfully
-/// 
+///
 ///     ## Migration Notes
-/// 
+///
 ///     This event has been replaced by the new PaymentCompleted event which provides:
 ///     - Enhanced payment method tracking
 ///     - Better error handling and retry logic

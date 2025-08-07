@@ -2,7 +2,7 @@
 
 using Momentum.Extensions.Abstractions.Messaging;
 
-namespace Platform.AppDomain.Payments.Contracts.IntegrationEvents;
+namespace TestEvents.Platform.AppDomain.Payments.Contracts.IntegrationEvents;
 
 /// <summary>
 ///     Published when a payment is successfully processed

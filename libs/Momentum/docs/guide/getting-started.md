@@ -16,15 +16,9 @@ A template-driven .NET 9 microservices solution that transforms how you build bu
 -   Real-world business patterns that mirror your actual operations
 -   Code so intuitive that non-technical stakeholders can understand it
 
-**🤖 LLM-Friendly Architecture**
-
--   Natural patterns that AI models understand perfectly
--   Accelerates development with AI coding assistants
--   Self-documenting code structure
-
 **📦 Template-Driven Approach**
 
--   Copy the code you need, modify what you want
+-   Copy/import the code you need, modify what you want
 -   No framework lock-in or hidden magic
 -   Full control over your codebase
 
@@ -33,6 +27,12 @@ A template-driven .NET 9 microservices solution that transforms how you build bu
 -   .NET 9, Orleans, Kafka, PostgreSQL
 -   Event-driven microservices architecture
 -   Comprehensive testing with Testcontainers
+
+**🤖 LLM-Friendly Architecture**
+
+-   Natural patterns that AI models understand perfectly
+-   Accelerates development with AI coding assistants
+-   Self-documenting code structure
 
 > **New to CQRS or event-driven architecture?** This guide assumes basic familiarity with these patterns. If you need background, see our [Architecture Overview](./arch/) first.
 
@@ -55,7 +55,7 @@ A template-driven .NET 9 microservices solution that transforms how you build bu
 Rather than being a traditional framework, Momentum operates as an **opinionated template** that you can:
 
 -   Install as NuGet packages for managed dependencies
--   Copy source code directly into your project for full control
+-   Import source code directly into your project for full control
 -   Customize patterns to fit your specific requirements
 
 This approach gives you the flexibility of code ownership while maintaining the benefits of proven patterns and configurations.
