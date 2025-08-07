@@ -1,0 +1,105 @@
+name: 'Generate Release Notes'
+description: 'Generate release notes for Momentum libraries'
+
+inputs:
+  version:
+    description: 'Package version'
+    required: true
+  tag:
+    description: 'Release tag'
+    required: true
+  release-type:
+    description: 'Type of release (prerelease/stable)'
+    required: false
+    default: 'stable'
+  output-file:
+    description: 'Output file name'
+    required: false
+    default: 'release_notes.md'
+
+outputs:
+  notes-file:
+    description: 'Path to generated release notes file'
+    value: ${{ inputs.output-file }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Generate release notes
+      shell: bash
+      run: |
+        VERSION="${{ inputs.version }}"
+        TAG="${{ inputs.tag }}"
+        RELEASE_TYPE="${{ inputs.release-type }}"
+        OUTPUT_FILE="${{ inputs.output-file }}"
+        
+        # Find the appropriate base for changelog
+        if [ "$RELEASE_TYPE" == "prerelease" ]; then
+          # For pre-releases, find last regular release
+          LAST_RELEASE=$(git tag -l "v*.*.*" --sort=-v:refname | grep -v 'pre' | head -1)
+          CHANGELOG_TITLE="Changes Since Last Release"
+        else
+          # For stable releases, find previous release
+          LAST_RELEASE=$(git tag -l "v*.*.*" --sort=-v:refname | grep -v 'pre' | head -1)
+          CHANGELOG_TITLE="Changes"
+        fi
+        
+        # Generate commit list
+        if [ -n "$LAST_RELEASE" ]; then
+          COMMITS=$(git log --pretty=format:"- %s" ${LAST_RELEASE}..HEAD)
+        else
+          COMMITS=$(git log --pretty=format:"- %s")
+        fi
+        
+        # Create release notes based on type
+        if [ "$RELEASE_TYPE" == "prerelease" ]; then
+          cat > "$OUTPUT_FILE" << EOF
+        # Momentum Libraries ${TAG} (Pre-release)
+        
+        🚧 **This is a pre-release version** - Use for testing purposes only
+        
+        ## $CHANGELOG_TITLE
+        
+        $COMMITS
+        
+        ## Pre-release Packages
+        
+        - Momentum.Extensions
+        - Momentum.ServiceDefaults
+        - Momentum.Extensions.SourceGenerators
+        - Momentum.Extensions.EventDocGenerator
+        - Momentum.ServiceDefaults.Api
+        - Momentum.Extensions.Abstractions
+        
+        Version: ${VERSION}
+        
+        ## Installation
+        
+        \`\`\`bash
+        dotnet add package Momentum.Extensions --version ${VERSION}
+        \`\`\`
+        EOF
+        else
+          cat > "$OUTPUT_FILE" << EOF
+        # Momentum Libraries ${TAG}
+        
+        ## $CHANGELOG_TITLE
+        
+        $COMMITS
+        
+        ## Packages Published
+        
+        - Momentum.Extensions
+        - Momentum.ServiceDefaults
+        - Momentum.Extensions.SourceGenerators
+        - Momentum.Extensions.EventDocGenerator
+        - Momentum.ServiceDefaults.Api
+        - Momentum.Extensions.Abstractions
+        
+        Version: ${VERSION}
+        EOF
+        fi
+        
+        echo "📝 Generated release notes in $OUTPUT_FILE"
+        echo "Contents:"
+        cat "$OUTPUT_FILE"

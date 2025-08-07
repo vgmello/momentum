@@ -1,0 +1,97 @@
+name: "Build Documentation"
+description: "Build VitePress documentation"
+
+inputs:
+  dotnet-version:
+    description: ".NET SDK version"
+    required: false
+    default: "9.0.x"
+  node-version:
+    description: "Node.js version"
+    required: false
+    default: "22"
+  pnpm-version:
+    description: "pnpm version"
+    required: false
+    default: "9"
+  docs-path:
+    description: "Path to documentation directory"
+    required: false
+    default: "libs/Momentum/docs"
+  build-dotnet:
+    description: "Whether to build .NET projects first"
+    required: false
+    default: "true"
+
+outputs:
+  dist-path:
+    description: "Path to built documentation"
+    value: ${{ steps.paths.outputs.dist }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup .NET
+      if: inputs.build-dotnet == 'true'
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ inputs.dotnet-version }}
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: ${{ inputs.pnpm-version }}
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: pnpm
+        cache-dependency-path: ${{ inputs.docs-path }}/pnpm-lock.yaml
+
+    - name: Build .NET projects
+      if: inputs.build-dotnet == 'true'
+      shell: bash
+      working-directory: ${{ inputs.docs-path }}
+      run: |
+        echo "🔨 Building .NET projects..."
+        dotnet build ../src --configuration Release --verbosity minimal
+
+        if [ $? -ne 0 ]; then
+          echo "❌ .NET build failed"
+          exit 1
+        fi
+        echo "✅ .NET build successful"
+
+    - name: Install DocFX
+      shell: bash
+      run: |
+        echo "📦 Installing DocFX..."
+        dotnet tool install -g docfx
+
+    - name: Install npm dependencies
+      shell: bash
+      working-directory: ${{ inputs.docs-path }}
+      run: |
+        echo "📦 Installing npm dependencies..."
+        pnpm install
+
+    - name: Build documentation
+      shell: bash
+      working-directory: ${{ inputs.docs-path }}
+      run: |
+        echo "📚 Building documentation with VitePress..."
+        pnpm docs:build
+
+        if [ $? -ne 0 ]; then
+          echo "❌ Documentation build failed"
+          exit 1
+        fi
+        echo "✅ Documentation built successfully"
+
+    - name: Set output paths
+      id: paths
+      shell: bash
+      run: |
+        echo "dist=${{ inputs.docs-path }}/.vitepress/dist" >> $GITHUB_OUTPUT
+
