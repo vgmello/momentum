@@ -1,6 +1,6 @@
-﻿<Solution>
+<Solution>
   <Folder Name="/Solution Items/">
-    <Project Path="docs\Momentum.Docs.csproj" Type="Classic C#" />
+    <Project Path="docs\Momentum.Docs.csproj" />
     <File Path="Directory.Build.props" />
     <File Path="Directory.Build.targets" />
     <File Path="Momentum.ruleset" />
@@ -8,16 +8,16 @@
     <File Path="version.txt" />
   </Folder>
   <Folder Name="/Tests/">
-    <Project Path="tests\Momentum.Extensions.EventMarkdownGenerator.Tests\Momentum.Extensions.EventMarkdownGenerator.Tests.csproj" Type="Classic C#" />
-    <Project Path="tests\Momentum.Extensions.SourceGenerators.Tests\Momentum.Extensions.SourceGenerators.Tests.csproj" Type="Classic C#" />
-    <Project Path="tests\Momentum.Extensions.Tests\Momentum.Extensions.Tests.csproj" Type="Classic C#" />
-    <Project Path="tests\TestEvents\TestEvents.csproj" Type="Classic C#" />
+    <Project Path="tests\Momentum.Extensions.EventMarkdownGenerator.Tests\Momentum.Extensions.EventMarkdownGenerator.Tests.csproj" />
+    <Project Path="tests\Momentum.Extensions.SourceGenerators.Tests\Momentum.Extensions.SourceGenerators.Tests.csproj" />
+    <Project Path="tests\Momentum.Extensions.Tests\Momentum.Extensions.Tests.csproj" />
+    <Project Path="tests\TestEvents\TestEvents.csproj" />
   </Folder>
-  <Project Path="src\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj" Type="Classic C#" />
-  <Project Path="src\Momentum.Extensions.EventMarkdownGenerator\Momentum.Extensions.EventMarkdownGenerator.csproj" Type="Classic C#" />
-  <Project Path="src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.csproj" Type="Classic C#" />
-  <Project Path="src\Momentum.Extensions.XmlDocs\Momentum.Extensions.XmlDocs.csproj" Type="Classic C#" />
-  <Project Path="src\Momentum.Extensions\Momentum.Extensions.csproj" Type="Classic C#" />
-  <Project Path="src\Momentum.ServiceDefaults.Api\Momentum.ServiceDefaults.Api.csproj" Type="Classic C#" />
-  <Project Path="src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj" Type="Classic C#" />
+  <Project Path="src\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj" />
+  <Project Path="src\Momentum.Extensions.EventMarkdownGenerator\Momentum.Extensions.EventMarkdownGenerator.csproj" />
+  <Project Path="src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.csproj" />
+  <Project Path="src\Momentum.Extensions.XmlDocs\Momentum.Extensions.XmlDocs.csproj" />
+  <Project Path="src\Momentum.Extensions\Momentum.Extensions.csproj" />
+  <Project Path="src\Momentum.ServiceDefaults.Api\Momentum.ServiceDefaults.Api.csproj" />
+  <Project Path="src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj" />
 </Solution>

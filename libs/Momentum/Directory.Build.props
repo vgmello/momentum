@@ -22,6 +22,7 @@
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <PackageIcon>icon.png</PackageIcon>
         <PackageTags>momentum;mmt</PackageTags>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageReleaseNotes>https://github.com/vgmello/momentum/releases/tag/v$(PackageVersion)</PackageReleaseNotes>
@@ -32,7 +33,11 @@
     </PropertyGroup>
 
     <ItemGroup Condition=" '$(IsPackable)' == 'true' ">
-        <PackageReference Include="Microsoft.SourceLink.GitHub" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="..\..\assets\icon.png" Pack="true" PackagePath=""/>
     </ItemGroup>
 
     <ItemGroup>

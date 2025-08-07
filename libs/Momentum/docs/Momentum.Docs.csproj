@@ -1,20 +1,19 @@
-﻿<Project Sdk="Microsoft.Build.NoTargets/3.7.56">
+<Project>
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <ImportDirectoryBuildProps>false</ImportDirectoryBuildProps>
         <ImportProjectExtensionProps>false</ImportProjectExtensionProps>
-        <ExcludeRestorePackageImports>true</ExcludeRestorePackageImports>
-        <SkipResolvePackageAssets>true</SkipResolvePackageAssets>
-        <MicrosoftCommonPropsHasBeenImported>true</MicrosoftCommonPropsHasBeenImported>
+        <ImportProjectExtensionTargets>false</ImportProjectExtensionTargets>
+        <ImportNuGetBuildTasksPackTargetsFromSdk>false</ImportNuGetBuildTasksPackTargetsFromSdk>
+        <NuGetPropsFile>false</NuGetPropsFile>
     </PropertyGroup>
 
+    <Import Project="Sdk.props" Sdk="Microsoft.Build.NoTargets" Version="3.7.56" />
+    <Import Project="Sdk.targets" Sdk="Microsoft.Build.NoTargets" Version="3.7.56"/>
+
     <ItemGroup>
-        <None Include="**"/>
+        <None Include=".vitepress/**"/>
     </ItemGroup>
 
-    <Target Name="Clean"/>
-    <Target Name="Restore"/>
-    <Target Name="Build"/>
-    <Target Name="Publish"/>
-    <Target Name="Pack"/>
+    <Target Name="PrepareForBuild" />
 </Project>
