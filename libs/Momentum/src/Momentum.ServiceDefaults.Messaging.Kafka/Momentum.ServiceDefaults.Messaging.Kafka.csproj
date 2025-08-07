@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <PackageReference Include="Aspire.Confluent.Kafka"/>
+        <PackageReference Include="CloudNative.CloudEvents.Kafka"/>
+        <PackageReference Include="WolverineFx.Kafka"/>
+        <PackageReference Include="Confluent.Kafka.Extensions.OpenTelemetry"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj" />
+    </ItemGroup>
+
+</Project>

@@ -1,16 +1,16 @@
 // Copyright (c) ABCDEG. All rights reserved.
 
-using Billing.Invoices.Contracts.Models;
+using AppDomain.Invoices.Contracts.Models;
 
-namespace Billing.Invoices.Contracts.DomainEvents;
+namespace AppDomain.Invoices.Contracts.DomainEvents;
 
 /// <summary>
 ///     Published when an invoice is generated in the system.
-/// 
+///
 ///     This event is triggered during the invoice creation process
 ///     and contains the essential invoice information needed for
 ///     downstream processing.
-/// 
+///
 ///     Key details:
 ///     - Contains tenant isolation data
 ///     - Includes invoice identification

@@ -3,7 +3,7 @@
 using System.Reflection;
 using Wolverine.Runtime.Handlers;
 
-namespace Momentum.ServiceDefaults.Messaging.Kafka;
+namespace Momentum.ServiceDefaults.Messaging;
 
 public static class DistributedEventsDiscovery
 {

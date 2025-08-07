@@ -4,7 +4,6 @@ using JasperFx.Resources;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Momentum.ServiceDefaults.Messaging.Kafka;
 using Momentum.ServiceDefaults.Messaging.Middlewares;
 using System.Reflection;
 using Wolverine;
@@ -108,20 +107,6 @@ public static class WolverineSetupExtensions
             opts.Policies.AddMiddleware(typeof(OpenTelemetryInstrumentationMiddleware));
 
             opts.Policies.ConventionalLocalRoutingIsAdditive();
-
-            var kafkaConnectionString = configuration.GetConnectionString(KafkaEventsExtensions.ConnectionStringName);
-
-            if (!string.IsNullOrEmpty(kafkaConnectionString))
-            {
-                services.AddSingleton<IWolverineExtension, KafkaEventsExtensions>();
-
-                services
-                    .AddHealthChecks()
-                    .AddKafka(options =>
-                    {
-                        options.BootstrapServers = kafkaConnectionString;
-                    }, name: "kafka", tags: ["messaging", "kafka"]);
-            }
 
             opts.ConfigureAppHandlers(opts.ApplicationAssembly);
 

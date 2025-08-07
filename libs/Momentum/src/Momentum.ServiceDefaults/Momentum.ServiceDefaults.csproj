@@ -21,9 +21,7 @@
     -->
 
     <ItemGroup>
-        <PackageReference Include="Aspire.Confluent.Kafka"/>
         <PackageReference Include="Aspire.Npgsql"/>
-        <PackageReference Include="CloudNative.CloudEvents.Kafka"/>
         <PackageReference Include="CloudNative.CloudEvents.SystemTextJson"/>
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions"/>
         <PackageReference Include="Microsoft.Extensions.Http.Resilience"/>
@@ -38,9 +36,7 @@
         <PackageReference Include="Serilog.Exceptions"/>
         <PackageReference Include="Serilog.Sinks.OpenTelemetry"/>
         <PackageReference Include="WolverineFx"/>
-        <PackageReference Include="WolverineFx.Kafka"/>
         <PackageReference Include="WolverineFx.Postgresql"/>
-        <PackageReference Include="Confluent.Kafka.Extensions.OpenTelemetry"/>
     </ItemGroup>
 
     <ItemGroup>

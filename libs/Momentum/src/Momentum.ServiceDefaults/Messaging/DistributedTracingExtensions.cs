@@ -3,7 +3,7 @@
 using CloudNative.CloudEvents;
 using static CloudNative.CloudEvents.CloudEventAttribute;
 
-namespace Momentum.ServiceDefaults.Messaging.Kafka;
+namespace Momentum.ServiceDefaults.Messaging;
 
 public static class DistributedTracingExtensions
 {

@@ -2,7 +2,6 @@
 
 using Momentum.Extensions.Abstractions.Messaging;
 using Momentum.ServiceDefaults.Messaging.Wolverine;
-using Momentum.ServiceDefaults.Messaging.Kafka;
 using System.Diagnostics;
 using Wolverine;
 

@@ -19,5 +19,6 @@
   <Project Path="src\Momentum.Extensions.XmlDocs\Momentum.Extensions.XmlDocs.csproj" />
   <Project Path="src\Momentum.Extensions\Momentum.Extensions.csproj" />
   <Project Path="src\Momentum.ServiceDefaults.Api\Momentum.ServiceDefaults.Api.csproj" />
+  <Project Path="src\Momentum.ServiceDefaults.Messaging.Kafka\Momentum.ServiceDefaults.Messaging.Kafka.csproj" Type="Classic C#" />
   <Project Path="src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj" />
 </Solution>
