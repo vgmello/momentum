@@ -1,6 +1,23 @@
 # Best Practices for Momentum Applications
 
-This guide outlines proven practices for building robust, scalable, and maintainable applications with Momentum. These practices are derived from real-world experience and production deployments.
+This guide outlines proven practices for building robust, scalable, and maintainable applications with Momentum. These practices are derived from real-world experience and production deployments, emphasizing Momentum's template-driven approach and real-world mirroring philosophy.
+
+## Core Principles
+
+### Real-World Mirroring
+
+Structure your code to directly correspond to business operations:
+
+-   **Commands represent business actions**: If your business can "Create Order" or "Process Payment", your code should have `CreateOrderCommand` and `ProcessPaymentCommand`
+-   **Queries represent business information needs**: If your business needs to "Find Customer" or "Calculate Total", use `FindCustomerQuery` and `CalculateTotalQuery`
+-   **Avoid technical abstractions**: Don't create repositories, services, or managers unless they mirror real business roles
+-   **Use business language**: Non-technical stakeholders should understand your code structure
+
+### Template-Driven Development
+
+-   **Copy and customize**: Take patterns from Momentum and adapt them to your specific needs
+-   **No framework lock-in**: You own the code completely and can modify patterns as needed
+-   **Maintain patterns**: Keep consistent approaches across your codebase for maintainability
 
 ## Architecture and Design
 
@@ -78,12 +95,12 @@ public class Cashier
     public Guid TenantId { get; private set; }
     public string Name { get; private set; }
     public string Email { get; private set; }
-    
+
     public void UpdateEmail(string newEmail)
     {
         if (!IsValidEmail(newEmail))
             throw new InvalidOperationException("Invalid email");
-            
+
         Email = newEmail;
     }
 }
@@ -106,15 +123,15 @@ Tailor queries to specific use cases:
 
 ```csharp
 // List view - minimal data
-public record GetCashierSummariesQuery(Guid TenantId, int Page, int PageSize) 
+public record GetCashierSummariesQuery(Guid TenantId, int Page, int PageSize)
     : IQuery<Result<PagedResult<CashierSummary>>>;
 
 // Detail view - complete data
-public record GetCashierDetailQuery(Guid TenantId, Guid CashierId) 
+public record GetCashierDetailQuery(Guid TenantId, Guid CashierId)
     : IQuery<Result<CashierDetail>>;
 
 // Search - specific fields
-public record SearchCashiersQuery(Guid TenantId, string SearchTerm) 
+public record SearchCashiersQuery(Guid TenantId, string SearchTerm)
     : IQuery<Result<List<CashierSearchResult>>>;
 ```
 
@@ -233,10 +250,10 @@ public class CashierEntity
 {
     [Column("cashier_id")]
     public Guid CashierId { get; set; }
-    
+
     [Column("tenant_id")]
     public Guid TenantId { get; set; }
-    
+
     [Column("created_date_utc")]
     public DateTime CreatedDateUtc { get; set; }
 }
@@ -258,7 +275,7 @@ public static async Task<Result<Cashier>> Handle(
     // All database work in one quick transaction
     var dbCommand = CreateInsertCommand(command);
     var result = await messaging.InvokeCommandAsync(dbCommand, cancellationToken);
-    
+
     return result.ToModel();
 }
 
@@ -271,13 +288,13 @@ public static async Task<Result<Cashier>> Handle(
 {
     // Don't include slow external calls in transactions
     using var transaction = await db.BeginTransactionAsync();
-    
+
     // Database work
     var cashier = await CreateCashierAsync(command);
-    
+
     // This makes the transaction long and prone to deadlocks
     await httpClient.PostAsync("external-service", /* data */);
-    
+
     await transaction.CommitAsync();
 }
 ```
@@ -315,7 +332,7 @@ public class CreateCashierSaga
                 {
                     await compensation.CompensateAsync();
                 }
-                
+
                 return Result.Failure($"Saga failed at step {step.GetType().Name}: {ex.Message}");
             }
         }
@@ -350,7 +367,7 @@ var summaries = await db.Cashiers
 var cashiers = await db.Cashiers
     .Where(c => c.TenantId == tenantId)
     .ToListAsync(cancellationToken);
-    
+
 var summaries = cashiers.Select(c => c.ToSummary()).ToList(); // Wasteful
 ```
 
@@ -360,8 +377,8 @@ Always paginate large result sets:
 
 ```csharp
 public record GetCashiersQuery(
-    Guid TenantId, 
-    int Page = 1, 
+    Guid TenantId,
+    int Page = 1,
     int PageSize = 20) // Default reasonable page size
     : IQuery<Result<PagedResult<Cashier>>>;
 
@@ -377,13 +394,13 @@ public static async Task<Result<PagedResult<Cashier>>> Handle(
     }
 
     var skip = (query.Page - 1) * query.PageSize;
-    
+
     var cashiersQuery = db.Cashiers
         .Where(c => c.TenantId == query.TenantId)
         .OrderBy(c => c.Name);
 
     var totalCount = await cashiersQuery.CountAsync(cancellationToken);
-    
+
     var items = await cashiersQuery
         .Skip(skip)
         .Take(query.PageSize)
@@ -415,22 +432,22 @@ public static class GetCashierQueryHandler
         CancellationToken cancellationToken)
     {
         var cacheKey = $"cashier_{query.TenantId}_{query.Id}";
-        
+
         if (cache.TryGetValue(cacheKey, out Cashier? cachedCashier))
         {
             return cachedCashier!;
         }
 
         var cashier = await db.Cashiers
-            .FirstOrDefaultAsync(c => 
-                c.TenantId == query.TenantId && 
-                c.CashierId == query.Id, 
+            .FirstOrDefaultAsync(c =>
+                c.TenantId == query.TenantId &&
+                c.CashierId == query.Id,
                 cancellationToken);
 
         if (cashier != null)
         {
             var result = cashier.ToModel();
-            
+
             // Cache for 5 minutes with size limit
             cache.Set(cacheKey, result, new MemoryCacheEntryOptions
             {
@@ -439,7 +456,7 @@ public static class GetCashierQueryHandler
                 Size = 1,
                 Priority = CacheItemPriority.Normal
             });
-            
+
             return result;
         }
 
@@ -460,18 +477,18 @@ public static class UpdateCashierCommandHandler
         CancellationToken cancellationToken)
     {
         var result = await messaging.InvokeCommandAsync(
-            new DbCommand(command.ToEntity()), 
+            new DbCommand(command.ToEntity()),
             cancellationToken);
-        
+
         if (result != null)
         {
             // Invalidate cache
             var cacheKey = $"cashier_{command.TenantId}_{command.Id}";
             cache.Remove(cacheKey);
-            
+
             var model = result.ToModel();
             var updatedEvent = new CashierUpdated(command.TenantId, model);
-            
+
             return (model, updatedEvent);
         }
 
@@ -497,7 +514,7 @@ public static async Task<Result<Cashier>> Handle(
         .FirstOrDefaultAsync(c => c.TenantId == query.TenantId, cancellationToken)
         .ConfigureAwait(false); // Avoid deadlocks in library code
 
-    return cashier?.ToModel() ?? 
+    return cashier?.ToModel() ??
            new List<ValidationFailure> { new("Id", "Not found") };
 }
 
@@ -517,7 +534,7 @@ public static async Task Handle(
     CancellationToken cancellationToken)
 {
     await emailService.SendWelcomeEmailAsync(
-        userCreated.User.Email, 
+        userCreated.User.Email,
         cancellationToken);
 }
 
@@ -542,8 +559,8 @@ public class TenantAuthorizationHandler : AuthorizationHandler<TenantRequirement
         TenantRequirement requirement)
     {
         var userTenantId = context.User.FindFirst("tenant_id")?.Value;
-        
-        if (userTenantId != null && 
+
+        if (userTenantId != null &&
             Guid.Parse(userTenantId) == requirement.TenantId)
         {
             context.Succeed(requirement);
@@ -556,7 +573,7 @@ public class TenantAuthorizationHandler : AuthorizationHandler<TenantRequirement
 // Usage in commands
 public record CreateCashierCommand(
     [TenantId] Guid TenantId, // Will be validated against user's tenant
-    string Name, 
+    string Name,
     string Email) : ICommand<Result<Cashier>>;
 ```
 
@@ -600,13 +617,13 @@ public class EncryptedCashierEntity
     public Guid CashierId { get; set; }
     public Guid TenantId { get; set; }
     public string Name { get; set; } = string.Empty;
-    
+
     [Encrypted] // Custom attribute for encryption
     public string Email { get; set; } = string.Empty;
-    
+
     [Encrypted]
     public string SocialSecurityNumber { get; set; } = string.Empty;
-    
+
     public DateTime CreatedDateUtc { get; set; }
 }
 
@@ -680,7 +697,7 @@ public class Result<T>
 
     public static implicit operator Result<T>(T value) => Result.Success(value);
     public static implicit operator Result<T>(string error) => Result.Failure<T>(error);
-    public static implicit operator Result<T>(List<ValidationFailure> errors) => 
+    public static implicit operator Result<T>(List<ValidationFailure> errors) =>
         Result.Failure<T>(errors.Select(e => e.ErrorMessage));
 }
 ```
@@ -697,7 +714,7 @@ public static async Task<Result<Cashier>> Handle(
     {
         var cashier = new CashierEntity { /* ... */ };
         var result = await db.Cashiers.InsertWithOutputAsync(cashier, token: cancellationToken);
-        
+
         return result.ToModel();
     }
     catch (PostgresException ex) when (ex.SqlState == "23505") // Unique violation
@@ -752,7 +769,7 @@ public static class RetryPolicy
                 attempt++;
                 var delayTime = TimeSpan.FromMilliseconds(
                     delay.TotalMilliseconds * Math.Pow(2, attempt - 1));
-                    
+
                 await Task.Delay(delayTime, cancellationToken);
             }
         }
@@ -785,17 +802,17 @@ public async Task Handle_ValidCommand_ReturnsSuccessResult()
 {
     // Arrange
     var command = new CreateCashierCommand(
-        Guid.NewGuid(), 
-        "John Doe", 
+        Guid.NewGuid(),
+        "John Doe",
         "john@example.com");
 
     var mockMessaging = new Mock<IMessageBus>();
     mockMessaging
         .Setup(m => m.InvokeCommandAsync(
-            It.IsAny<CreateCashierCommandHandler.DbCommand>(), 
+            It.IsAny<CreateCashierCommandHandler.DbCommand>(),
             It.IsAny<CancellationToken>()))
-        .ReturnsAsync(new CashierEntity 
-        { 
+        .ReturnsAsync(new CashierEntity
+        {
             CashierId = Guid.NewGuid(),
             TenantId = command.TenantId,
             Name = command.Name,
@@ -872,11 +889,11 @@ public class CashierIntegrationTests : IClassFixture<TestDatabaseFixture>
         // Verify in database
         var cashier = await db.Cashiers
             .FirstOrDefaultAsync(c => c.CashierId == result.Value.Id);
-        
+
         cashier.Should().NotBeNull();
         cashier!.Name.Should().Be("John Doe");
         cashier.Email.Should().Be("john@example.com");
-        
+
         // Verify event
         integrationEvent.Should().NotBeNull();
         integrationEvent!.Cashier.Id.Should().Be(result.Value.Id);
@@ -900,13 +917,13 @@ public class TestDatabaseFixture : IAsyncLifetime
     public async Task InitializeAsync()
     {
         await _dbContainer.StartAsync();
-        
+
         var services = new ServiceCollection();
         services.AddDbContext<AppDomainDb>(options =>
             options.UseNpgsql(_dbContainer.GetConnectionString()));
-        
+
         ServiceProvider = services.BuildServiceProvider();
-        
+
         // Run migrations
         using var scope = ServiceProvider.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDomainDb>();
@@ -963,15 +980,15 @@ public class BusinessMetrics
     public BusinessMetrics(IMeterProvider meterProvider)
     {
         var meter = meterProvider.GetMeter("AppDomain.Business");
-        
+
         _cashiersCreated = meter.CreateCounter<int>(
             "cashiers_created_total",
             "Total number of cashiers created");
-            
+
         _commandDuration = meter.CreateHistogram<double>(
             "command_duration_seconds",
             "Duration of command execution");
-            
+
         _activeCashiers = meter.CreateGauge<int>(
             "active_cashiers",
             "Number of active cashiers");
@@ -984,7 +1001,7 @@ public class BusinessMetrics
 
     public void RecordCommandDuration(string commandName, TimeSpan duration)
     {
-        _commandDuration.Record(duration.TotalSeconds, 
+        _commandDuration.Record(duration.TotalSeconds,
             KeyValuePair.Create("command", (object)commandName));
     }
 }
@@ -1031,7 +1048,7 @@ public class BusinessMetrics
 public class DatabaseOptions
 {
     public const string SectionName = "Database";
-    
+
     public string ConnectionString { get; set; } = string.Empty;
     public int CommandTimeout { get; set; } = 30;
     public int MaxRetryCount { get; set; } = 3;
@@ -1044,12 +1061,12 @@ public static class ConfigurationExtensions
     {
         var options = new DatabaseOptions();
         configuration.GetSection(DatabaseOptions.SectionName).Bind(options);
-        
+
         if (string.IsNullOrEmpty(options.ConnectionString))
         {
             throw new InvalidOperationException("Database connection string is required");
         }
-        
+
         return options;
     }
 }
@@ -1080,12 +1097,12 @@ public class ApplicationHealthCheck : IHealthCheck
         try
         {
             var results = await Task.WhenAll(checks.Select(c => c.Check));
-            
-            var healthData = checks.Zip(results, (check, result) => new 
-            { 
-                Name = check.Name, 
+
+            var healthData = checks.Zip(results, (check, result) => new
+            {
+                Name = check.Name,
                 Status = result.Status.ToString(),
-                Description = result.Description 
+                Description = result.Description
             }).ToDictionary(x => x.Name, x => (object)new { x.Status, x.Description });
 
             var unhealthyResults = results.Where(r => r.Status == HealthStatus.Unhealthy).ToList();
@@ -1131,7 +1148,7 @@ Remember: these are guidelines, not absolute rules. Adapt them to your specific 
 
 ## Next Steps
 
-- Review the [Troubleshooting Guide](./troubleshooting) for common issues
-- Explore [Testing Strategies](./testing/) in detail
-- Check [Service Configuration](./service-configuration/) for operational setup
-- See the [Architecture Overview](./arch/) for system design patterns
+-   Review the [Troubleshooting Guide](./troubleshooting) for common issues
+-   Explore [Testing Strategies](./testing/) in detail
+-   Check [Service Configuration](./service-configuration/) for operational setup
+-   See the [Architecture Overview](./arch/) for system design patterns

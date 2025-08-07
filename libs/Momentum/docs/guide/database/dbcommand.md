@@ -5,10 +5,11 @@ The DbCommand pattern in Momentum provides a type-safe, testable approach to dat
 ## What is DbCommand?
 
 The DbCommand pattern:
-- **Separates concerns**: Database operations are isolated from business logic
-- **Improves testability**: Business logic can be unit tested without database
-- **Ensures consistency**: All database operations follow the same pattern
-- **Provides type safety**: Compile-time checking of database operations
+
+-   **Separates concerns**: Database operations are isolated from business logic
+-   **Improves testability**: Business logic can be unit tested without database
+-   **Ensures consistency**: All database operations follow the same pattern
+-   **Provides type safety**: Compile-time checking of database operations
 
 ## Basic DbCommand Structure
 
@@ -22,19 +23,19 @@ public static class CreateCashierCommandHandler
 
     // Main handler - orchestrates business logic
     public static async Task<(Result<Cashier>, CashierCreated?)> Handle(
-        CreateCashierCommand command, 
+        CreateCashierCommand command,
         IMessageBus messaging,
         CancellationToken cancellationToken)
     {
         // Create database command
         var dbCommand = CreateInsertCommand(command);
-        
+
         // Execute database operation
         var insertedCashier = await messaging.InvokeCommandAsync(dbCommand, cancellationToken);
 
         // Transform to domain model
         var result = insertedCashier.ToModel();
-        
+
         // Create integration event
         var createdEvent = new CashierCreated(result.TenantId, PartitionKeyTest: 0, result);
 
@@ -43,8 +44,8 @@ public static class CreateCashierCommandHandler
 
     // Database handler - performs actual database operation
     public static async Task<Data.Entities.Cashier> Handle(
-        DbCommand command, 
-        AppDomainDb db, 
+        DbCommand command,
+        AppDomainDb db,
         CancellationToken cancellationToken)
     {
         return await db.Cashiers.InsertWithOutputAsync(command.Cashier, token: cancellationToken);
@@ -74,7 +75,7 @@ public static class CreateInvoiceCommandHandler
     public record DbCommand(Data.Entities.Invoice Invoice) : ICommand<Data.Entities.Invoice>;
 
     public static async Task<(Result<Invoice>, InvoiceCreated?)> Handle(
-        CreateInvoiceCommand command, 
+        CreateInvoiceCommand command,
         IMessageBus messaging,
         CancellationToken cancellationToken)
     {
@@ -88,8 +89,8 @@ public static class CreateInvoiceCommandHandler
     }
 
     public static async Task<Data.Entities.Invoice> Handle(
-        DbCommand command, 
-        AppDomainDb db, 
+        DbCommand command,
+        AppDomainDb db,
         CancellationToken cancellationToken)
     {
         return await db.Invoices.InsertWithOutputAsync(command.Invoice, token: cancellationToken);
@@ -116,15 +117,15 @@ public static class CreateInvoiceCommandHandler
 public static class UpdateCashierCommandHandler
 {
     public record DbCommand(
-        Guid TenantId, 
-        Guid CashierId, 
-        string Name, 
-        string? Email, 
+        Guid TenantId,
+        Guid CashierId,
+        string Name,
+        string? Email,
         int Version
     ) : ICommand<Data.Entities.Cashier?>;
 
     public static async Task<(Result<Cashier>, CashierUpdated?)> Handle(
-        UpdateCashierCommand command, 
+        UpdateCashierCommand command,
         IMessageBus messaging,
         CancellationToken cancellationToken)
     {
@@ -141,13 +142,13 @@ public static class UpdateCashierCommandHandler
 
         // Create update command
         var dbCommand = new DbCommand(
-            command.TenantId, 
-            command.CashierId, 
-            command.Name, 
-            command.Email, 
+            command.TenantId,
+            command.CashierId,
+            command.Name,
+            command.Email,
             existing.Version
         );
-        
+
         var updatedCashier = await messaging.InvokeCommandAsync(dbCommand, cancellationToken);
 
         if (updatedCashier is null)
@@ -162,13 +163,13 @@ public static class UpdateCashierCommandHandler
     }
 
     public static async Task<Data.Entities.Cashier?> Handle(
-        DbCommand command, 
-        AppDomainDb db, 
+        DbCommand command,
+        AppDomainDb db,
         CancellationToken cancellationToken)
     {
         return await db.Cashiers
-            .Where(c => c.TenantId == command.TenantId && 
-                       c.CashierId == command.CashierId && 
+            .Where(c => c.TenantId == command.TenantId &&
+                       c.CashierId == command.CashierId &&
                        c.Version == command.Version)
             .UpdateWithOutputAsync(
                 _ => new Data.Entities.Cashier
@@ -176,7 +177,7 @@ public static class UpdateCashierCommandHandler
                     Name = command.Name,
                     Email = command.Email,
                     UpdatedDateUtc = DateTime.UtcNow
-                }, 
+                },
                 token: cancellationToken);
     }
 }
@@ -190,7 +191,7 @@ public static class DeleteCashierCommandHandler
     public record DbCommand(Guid TenantId, Guid CashierId) : ICommand<int>;
 
     public static async Task<(Result<bool>, CashierDeleted?)> Handle(
-        DeleteCashierCommand command, 
+        DeleteCashierCommand command,
         IMessageBus messaging,
         CancellationToken cancellationToken)
     {
@@ -217,8 +218,8 @@ public static class DeleteCashierCommandHandler
     }
 
     public static async Task<int> Handle(
-        DbCommand command, 
-        AppDomainDb db, 
+        DbCommand command,
+        AppDomainDb db,
         CancellationToken cancellationToken)
     {
         return await db.Cashiers
@@ -242,13 +243,13 @@ public static partial class GetCashiersQueryHandler
     /// </summary>
     [DbCommand(fn: "$AppDomain.cashiers_get_all")]
     public partial record DbQuery(
-        Guid TenantId, 
-        int Limit, 
+        Guid TenantId,
+        int Limit,
         int Offset
     ) : IQuery<IEnumerable<Data.Entities.Cashier>>;
 
     public static async Task<IEnumerable<GetCashiersQuery.Result>> Handle(
-        GetCashiersQuery query, 
+        GetCashiersQuery query,
         IMessageBus messaging,
         CancellationToken cancellationToken)
     {
@@ -256,9 +257,9 @@ public static partial class GetCashiersQueryHandler
         var cashiers = await messaging.InvokeQueryAsync(dbQuery, cancellationToken);
 
         return cashiers.Select(c => new GetCashiersQuery.Result(
-            c.TenantId, 
-            c.CashierId, 
-            c.Name, 
+            c.TenantId,
+            c.CashierId,
+            c.Name,
             c.Email ?? "N/A"
         ));
     }
@@ -296,7 +297,7 @@ LANGUAGE plpgsql
 AS $$
 BEGIN
     RETURN QUERY
-    SELECT 
+    SELECT
         c.tenant_id,
         c.cashier_id,
         c.name,
@@ -315,7 +316,7 @@ $$;
 
 ## Advanced DbCommand Patterns
 
-### Bulk Operations
+### Bulk Operations for High Performance
 
 ```csharp
 public static class BulkInsertCashiersCommandHandler
@@ -323,7 +324,7 @@ public static class BulkInsertCashiersCommandHandler
     public record DbCommand(List<Data.Entities.Cashier> Cashiers) : ICommand<int>;
 
     public static async Task<(Result<int>, CashiersBulkInserted?)> Handle(
-        BulkInsertCashiersCommand command, 
+        BulkInsertCashiersCommand command,
         IMessageBus messaging,
         CancellationToken cancellationToken)
     {
@@ -345,8 +346,8 @@ public static class BulkInsertCashiersCommandHandler
     }
 
     public static async Task<int> Handle(
-        DbCommand command, 
-        AppDomainDb db, 
+        DbCommand command,
+        AppDomainDb db,
         CancellationToken cancellationToken)
     {
         return await db.BulkCopyAsync(command.Cashiers, cancellationToken);
@@ -354,7 +355,7 @@ public static class BulkInsertCashiersCommandHandler
 }
 ```
 
-### Complex Queries with Joins
+### Complex Queries and Joins
 
 ```csharp
 public static class GetCashierWithInvoicesCommandHandler
@@ -367,7 +368,7 @@ public static class GetCashierWithInvoicesCommandHandler
     );
 
     public static async Task<Result<CashierWithInvoices>> Handle(
-        GetCashierWithInvoicesQuery query, 
+        GetCashierWithInvoicesQuery query,
         IMessageBus messaging,
         CancellationToken cancellationToken)
     {
@@ -387,13 +388,13 @@ public static class GetCashierWithInvoicesCommandHandler
     }
 
     public static async Task<CashierWithInvoicesResult> Handle(
-        DbCommand command, 
-        AppDomainDb db, 
+        DbCommand command,
+        AppDomainDb db,
         CancellationToken cancellationToken)
     {
         var cashier = await db.Cashiers
-            .FirstOrDefaultAsync(c => c.TenantId == command.TenantId && 
-                                     c.CashierId == command.CashierId, 
+            .FirstOrDefaultAsync(c => c.TenantId == command.TenantId &&
+                                     c.CashierId == command.CashierId,
                                 cancellationToken);
 
         if (cashier == null)
@@ -410,27 +411,27 @@ public static class GetCashierWithInvoicesCommandHandler
 }
 ```
 
-### Transaction Handling
+### Transaction Management
 
 ```csharp
 public static class TransferInvoiceCommandHandler
 {
     public record DbCommand(
-        Guid TenantId, 
-        Guid InvoiceId, 
-        Guid FromCashierId, 
+        Guid TenantId,
+        Guid InvoiceId,
+        Guid FromCashierId,
         Guid ToCashierId
     ) : ICommand<bool>;
 
     public static async Task<(Result<bool>, InvoiceTransferred?)> Handle(
-        TransferInvoiceCommand command, 
+        TransferInvoiceCommand command,
         IMessageBus messaging,
         CancellationToken cancellationToken)
     {
         var dbCommand = new DbCommand(
-            command.TenantId, 
-            command.InvoiceId, 
-            command.FromCashierId, 
+            command.TenantId,
+            command.InvoiceId,
+            command.FromCashierId,
             command.ToCashierId
         );
 
@@ -439,12 +440,12 @@ public static class TransferInvoiceCommandHandler
         if (success)
         {
             var transferredEvent = new InvoiceTransferred(
-                command.TenantId, 
-                command.InvoiceId, 
-                command.FromCashierId, 
+                command.TenantId,
+                command.InvoiceId,
+                command.FromCashierId,
                 command.ToCashierId
             );
-            
+
             return (true, transferredEvent);
         }
 
@@ -452,20 +453,20 @@ public static class TransferInvoiceCommandHandler
     }
 
     public static async Task<bool> Handle(
-        DbCommand command, 
-        AppDomainDb db, 
+        DbCommand command,
+        AppDomainDb db,
         CancellationToken cancellationToken)
     {
         // Transaction is automatically handled by Wolverine
         using var transaction = await db.BeginTransactionAsync(cancellationToken);
-        
+
         try
         {
             // Verify source cashier has the invoice
             var invoice = await db.Invoices
-                .FirstOrDefaultAsync(i => i.TenantId == command.TenantId && 
-                                         i.InvoiceId == command.InvoiceId && 
-                                         i.CashierId == command.FromCashierId, 
+                .FirstOrDefaultAsync(i => i.TenantId == command.TenantId &&
+                                         i.InvoiceId == command.InvoiceId &&
+                                         i.CashierId == command.FromCashierId,
                                     cancellationToken);
 
             if (invoice == null)
@@ -475,8 +476,8 @@ public static class TransferInvoiceCommandHandler
 
             // Verify target cashier exists
             var targetCashier = await db.Cashiers
-                .AnyAsync(c => c.TenantId == command.TenantId && 
-                              c.CashierId == command.ToCashierId, 
+                .AnyAsync(c => c.TenantId == command.TenantId &&
+                              c.CashierId == command.ToCashierId,
                          cancellationToken);
 
             if (!targetCashier)
@@ -515,8 +516,8 @@ public async Task Handle_ValidCommand_CreatesDbCommandAndProcessesResult()
 {
     // Arrange
     var command = new CreateCashierCommand(
-        Guid.NewGuid(), 
-        "John Doe", 
+        Guid.NewGuid(),
+        "John Doe",
         "john@example.com"
     );
 
@@ -533,7 +534,7 @@ public async Task Handle_ValidCommand_CreatesDbCommandAndProcessesResult()
     var mockMessaging = new Mock<IMessageBus>();
     mockMessaging
         .Setup(m => m.InvokeCommandAsync(
-            It.IsAny<CreateCashierCommandHandler.DbCommand>(), 
+            It.IsAny<CreateCashierCommandHandler.DbCommand>(),
             It.IsAny<CancellationToken>()))
         .ReturnsAsync(expectedEntity);
 
@@ -545,15 +546,15 @@ public async Task Handle_ValidCommand_CreatesDbCommandAndProcessesResult()
     result.IsSuccess.Should().BeTrue();
     result.Value.Name.Should().Be(command.Name);
     result.Value.Email.Should().Be(command.Email);
-    
+
     integrationEvent.Should().NotBeNull();
     integrationEvent!.TenantId.Should().Be(command.TenantId);
-    
+
     // Verify DbCommand was called
     mockMessaging.Verify(
         m => m.InvokeCommandAsync(
-            It.Is<CreateCashierCommandHandler.DbCommand>(dc => 
-                dc.Cashier.Name == command.Name && 
+            It.Is<CreateCashierCommandHandler.DbCommand>(dc =>
+                dc.Cashier.Name == command.Name &&
                 dc.Cashier.Email == command.Email),
             It.IsAny<CancellationToken>()),
         Times.Once);
@@ -594,7 +595,7 @@ public async Task Handle_DbCommand_InsertsEntityAndReturnsResult()
     // Verify database state
     var inserted = await db.Cashiers
         .FirstOrDefaultAsync(c => c.CashierId == entity.CashierId);
-    
+
     inserted.Should().NotBeNull();
     inserted!.Name.Should().Be(entity.Name);
     inserted.Email.Should().Be(entity.Email);
@@ -610,9 +611,9 @@ public async Task Handle_SourceGeneratedDbQuery_ReturnsResults()
     // Arrange
     using var testContext = new IntegrationTestContext();
     var messaging = testContext.GetService<IMessageBus>();
-    
+
     var tenantId = Guid.NewGuid();
-    
+
     // Insert test data
     var testCashiers = new[]
     {
@@ -677,7 +678,7 @@ public async Task Handle_SourceGeneratedDbQuery_ReturnsResults()
 
 ## Next Steps
 
-- Learn about [Entity Mapping](./entity-mapping) for database schema design
-- Understand [Transactions](./transactions) for complex operations
-- Explore [Query Optimization](./query-optimization) for performance
-- See [Testing](../testing/) for comprehensive database testing strategies
+-   Learn about [Entity Mapping](./entity-mapping) for database schema design
+-   Understand [Transactions](./transactions) for complex operations
+-   Explore [Query Optimization](./query-optimization) for performance
+-   See [Testing](../testing/) for comprehensive database testing strategies

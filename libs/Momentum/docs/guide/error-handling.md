@@ -1,36 +1,100 @@
+---
+title: Error Handling in Momentum
+description: Master structured error handling with the Result pattern, FluentValidation integration, exception management, and consistent API responses.
+date: 2024-01-15
+---
+
 # Error Handling in Momentum
 
-Error handling in Momentum follows a structured, predictable approach that distinguishes between different types of failures and provides consistent patterns for handling them. This guide covers the error handling philosophy, patterns, and implementation strategies used throughout Momentum applications.
+Error handling in Momentum follows a **structured, predictable approach** that distinguishes between different types of failures and provides consistent patterns for handling them. This comprehensive guide covers error handling philosophy, implementation patterns, and production-ready strategies.
+
+> **Prerequisites**: Understanding of [Commands and Queries](./cqrs/) and [Handlers](./cqrs/handlers). New to Momentum? Start with our [Getting Started Guide](./getting-started).
 
 ## Error Handling Philosophy
 
-Momentum embraces these core principles for error handling:
+Momentum's error handling approach is built on these **core principles**:
 
-- **Explicit Error States**: Use `Result<T>` pattern to make success and failure states explicit
-- **Fail Fast**: Validate inputs early and return meaningful error messages
-- **Separation of Concerns**: Distinguish between validation failures and exceptional circumstances  
-- **Structured Logging**: Capture errors with context for debugging and monitoring
-- **Graceful Degradation**: Handle errors gracefully without exposing internal details
-- **Observability**: All errors are logged and tracked for operational insights
+### Design Principles
+
+| Principle                  | Description                                     | Implementation                                            |
+| -------------------------- | ----------------------------------------------- | --------------------------------------------------------- |
+| **Explicit Error States**  | Make success/failure states clear in code       | `Result<T>` pattern                                       |
+| **Fail Fast**              | Validate inputs early, return meaningful errors | FluentValidation integration                              |
+| **Separation of Concerns** | Distinguish validation failures from exceptions | Result for business errors, exceptions for infrastructure |
+| **Structured Logging**     | Capture errors with context for debugging       | Structured logs with correlation IDs                      |
+| **Graceful Degradation**   | Handle errors without exposing internal details | User-friendly error messages                              |
+| **Observability**          | All errors logged and tracked                   | OpenTelemetry integration                                 |
+
+### Error Classification
+
+Momentum classifies errors into distinct categories:
+
+```mermaid
+graph TD
+    A["Error Types"] --> B["Validation Failures"]
+    A --> C["Business Rule Violations"]
+    A --> D["Infrastructure Exceptions"]
+
+    B --> B1["Input validation"]
+    B --> B2["Missing data"]
+    B --> B3["Format errors"]
+
+    C --> C1["Business logic violations"]
+    C --> C2["State inconsistencies"]
+    C --> C3["Authorization failures"]
+
+    D --> D1["Database connectivity"]
+    D --> D2["External service failures"]
+    D --> D3["System exceptions"]
+
+    style B fill:#e8f5e8
+    style C fill:#fff3e0
+    style D fill:#ffebee
+```
 
 ## The Result\<T\> Pattern
 
-The `Result<T>` pattern is the foundation of error handling in Momentum. It provides a type-safe way to represent operations that can either succeed with a value or fail with validation errors.
+The `Result<T>` pattern is the **foundation** of error handling in Momentum, providing type-safe representation of operations that can succeed or fail.
 
-### Basic Usage
+### Why Result\<T\>?
+
+| Benefit           | Description                              | Alternative Problems           |
+| ----------------- | ---------------------------------------- | ------------------------------ |
+| **Type Safety**   | Compile-time guarantee of error handling | Exceptions can be ignored      |
+| **Explicit Flow** | Success/failure paths are clear          | Hidden exception propagation   |
+| **Composability** | Results can be chained and transformed   | Exception handling breaks flow |
+| **Performance**   | No exception throwing overhead           | Exceptions are expensive       |
+| **Testability**   | Easy to test both success and failure    | Exception testing is complex   |
+
+### Result\<T\> Structure
+
+The `Result<T>` type uses OneOf pattern for type-safe success/failure representation:
 
 ```csharp
 // Definition in Momentum.Extensions
 public partial class Result<T> : OneOfBase<T, List<ValidationFailure>>
 {
-    // Implicit conversions allow clean syntax
+    // Success case - implicit conversion from T
+    public static implicit operator Result<T>(T value) => new(value);
+
+    // Failure case - implicit conversion from validation errors
+    public static implicit operator Result<T>(List<ValidationFailure> errors) => new(errors);
+
+    // Helper properties
+    public bool IsSuccess => IsT0;
+    public bool IsFailure => IsT1;
+    public T Value => AsT0;
+    public List<ValidationFailure> Errors => AsT1;
 }
 
-// Success case
-Result<Cashier> result = cashier; // Implicit conversion from T
+// Usage examples
+Result<Cashier> success = cashier;              // Success case
+Result<Cashier> failure = validationErrors;     // Failure case
 
-// Failure case  
-Result<Cashier> result = validationErrors; // Implicit conversion from List<ValidationFailure>
+// Factory methods for clarity
+Result<Cashier> success = Result<Cashier>.Success(cashier);
+Result<Cashier> failure = Result<Cashier>.Failure("Error message");
+Result<Cashier> failure = Result<Cashier>.Failure(validationErrors);
 ```
 
 ### Pattern Matching with Result\<T\>
@@ -40,7 +104,7 @@ public async Task<IActionResult> GetCashier(Guid tenantId, Guid id)
 {
     var query = new GetCashierQuery(tenantId, id);
     var result = await _messageBus.InvokeAsync(query);
-    
+
     return result.Match<IActionResult>(
         cashier => Ok(cashier),           // Success case
         errors => BadRequest(errors)     // Failure case
@@ -66,17 +130,79 @@ public static async Task<Result<Cashier>> Handle(GetCashierQuery query, AppDomai
 }
 ```
 
-## Validation vs Exceptions
+## Validation vs Exceptions: The Clear Distinction
 
-Momentum makes a clear distinction between validation failures and exceptional circumstances.
+Momentum makes a **clear distinction** between different types of failures to ensure appropriate handling:
 
-### Validation Failures
+### Decision Matrix
 
-Use `Result<T>` with `ValidationFailure` for:
-- Invalid input data
-- Business rule violations  
-- Missing required resources
-- Logical inconsistencies
+| Scenario                     | Use Result\<T\> | Use Exception | Rationale                      |
+| ---------------------------- | --------------- | ------------- | ------------------------------ |
+| Invalid user input           | ✅              | ❌            | Expected, recoverable          |
+| Business rule violation      | ✅              | ❌            | Expected, part of domain logic |
+| Resource not found           | ✅              | ❌            | Expected in normal operation   |
+| Database connection failure  | ❌              | ✅            | Infrastructure, unexpected     |
+| Programming error (null ref) | ❌              | ✅            | Bug, needs immediate attention |
+| External service timeout     | ❌              | ✅            | Infrastructure, retryable      |
+
+### When to Use Result\<T\> (Validation Failures)
+
+Use the Result pattern for **expected failures** that are part of normal business operation:
+
+#### Categories
+
+```csharp
+// ✅ Input Validation Errors
+public static Result<User> ValidateUser(CreateUserCommand command)
+{
+    var errors = new List<ValidationFailure>();
+
+    if (string.IsNullOrEmpty(command.Email))
+        errors.Add(new ValidationFailure("Email", "Email is required"));
+
+    if (!IsValidEmail(command.Email))
+        errors.Add(new ValidationFailure("Email", "Please provide a valid email address"));
+
+    return errors.Any() ? errors : Result<User>.Success(user);
+}
+
+// ✅ Business Rule Violations
+public static Result<Invoice> ProcessPayment(ProcessPaymentCommand command)
+{
+    if (invoice.Status == InvoiceStatus.Paid)
+        return Result<Invoice>.Failure("Invoice is already paid");
+
+    if (invoice.Amount != command.PaymentAmount)
+        return Result<Invoice>.Failure("Payment amount must match invoice amount");
+
+    // Continue processing...
+}
+
+// ✅ Resource Not Found (Expected)
+public static async Task<Result<Cashier>> Handle(
+    GetCashierQuery query,
+    AppDomainDb db,
+    CancellationToken cancellationToken)
+{
+    var cashier = await db.Cashiers
+        .FirstOrDefaultAsync(c => c.Id == query.Id, cancellationToken);
+
+    return cashier?.ToModel() ??
+           new List<ValidationFailure> { new("Id", "Cashier not found") };
+}
+
+// ✅ State Inconsistencies
+public static Result<Order> CancelOrder(CancelOrderCommand command, Order order)
+{
+    if (order.Status == OrderStatus.Completed)
+        return Result<Order>.Failure("Cannot cancel completed order");
+
+    if (order.Status == OrderStatus.Cancelled)
+        return Result<Order>.Failure("Order is already cancelled");
+
+    // Continue with cancellation...
+}
+```
 
 ```csharp
 public static async Task<(Result<Cashier>, CashierUpdated?)> Handle(UpdateCashierCommand command, IMessageBus messaging, CancellationToken cancellationToken)
@@ -98,13 +224,127 @@ public static async Task<(Result<Cashier>, CashierUpdated?)> Handle(UpdateCashie
 }
 ```
 
-### Exceptions
+### When to Use Exceptions (Exceptional Circumstances)
 
-Reserve exceptions for truly exceptional circumstances:
-- Infrastructure failures (database connectivity, external service unavailable)
-- Programming errors (null reference, invalid operations)
-- Security violations
-- System-level failures
+Reserve exceptions for **unexpected failures** that indicate infrastructure problems or programming errors:
+
+#### Categories
+
+```csharp
+// ✅ Infrastructure Failures
+public static async Task<Data.Entities.Cashier> Handle(
+    DbCommand command,
+    AppDomainDb db,
+    CancellationToken cancellationToken)
+{
+    try
+    {
+        return await db.Cashiers.InsertWithOutputAsync(command.Cashier, token: cancellationToken);
+    }
+    catch (NpgsqlException ex) when (ex.IsTransient)
+    {
+        // Let transient database errors bubble up for retry
+        throw;
+    }
+    catch (NpgsqlException ex) when (ex.SqlState == "23505")
+    {
+        // Convert known database errors to business failures
+        throw new BusinessException("A cashier with this email already exists");
+    }
+}
+
+// ✅ Programming Errors (Should not happen in production)
+public static class ArgumentValidation
+{
+    public static T NotNull<T>(T value, string paramName) where T : class
+    {
+        return value ?? throw new ArgumentNullException(paramName);
+    }
+
+    public static void ValidateRange(int value, int min, int max, string paramName)
+    {
+        if (value < min || value > max)
+            throw new ArgumentOutOfRangeException(paramName,
+                $"Value must be between {min} and {max}");
+    }
+}
+
+// ✅ Security Violations
+public static async Task<Result<SecretData>> GetSecretData(
+    GetSecretDataQuery query,
+    ICurrentUser currentUser,
+    CancellationToken cancellationToken)
+{
+    if (!currentUser.IsInRole("Admin"))
+        throw new UnauthorizedAccessException("Admin role required for secret data access");
+
+    // Continue with authorized access...
+}
+
+// ✅ System-Level Failures
+public static async Task ProcessLargeFile(ProcessFileCommand command)
+{
+    try
+    {
+        // File processing logic
+        await ProcessFileInternal(command.FilePath);
+    }
+    catch (OutOfMemoryException)
+    {
+        // System resource exhaustion - let it bubble up
+        throw;
+    }
+    catch (IOException ex) when (ex.Message.Contains("disk full"))
+    {
+        // System resource issue - let it bubble up
+        throw;
+    }
+}
+```
+
+### Conversion Patterns
+
+Sometimes you need to **convert between exceptions and Results**:
+
+```csharp
+// Converting exceptions to Results for external service calls
+public static async Task<Result<PaymentResult>> ProcessPayment(
+    PaymentRequest request,
+    IExternalPaymentService paymentService)
+{
+    try
+    {
+        var result = await paymentService.ProcessAsync(request);
+        return Result<PaymentResult>.Success(result);
+    }
+    catch (PaymentDeclinedException ex)
+    {
+        // Business failure - convert to Result
+        return Result<PaymentResult>.Failure($"Payment declined: {ex.Reason}");
+    }
+    catch (PaymentServiceUnavailableException)
+    {
+        // Infrastructure failure - let exception bubble up for retry
+        throw;
+    }
+    catch (HttpRequestException ex) when (ex.Message.Contains("timeout"))
+    {
+        // Transient infrastructure failure - let it bubble up
+        throw;
+    }
+}
+
+// Converting Results to exceptions when needed
+public static async Task<User> GetUserOrThrow(Guid userId, IUserRepository repository)
+{
+    var result = await repository.GetByIdAsync(userId);
+
+    return result.Match(
+        user => user,
+        errors => throw new InvalidOperationException(
+            $"User not found: {string.Join(", ", errors.Select(e => e.ErrorMessage))}"));
+}
+```
 
 ```csharp
 public static async Task<(Result<Cashier>, CashierUpdated?)> Handle(UpdateCashierCommand command, IMessageBus messaging, CancellationToken cancellationToken)
@@ -114,7 +354,7 @@ public static async Task<(Result<Cashier>, CashierUpdated?)> Handle(UpdateCashie
     {
         throw new DivideByZeroException("Forced test unhandled exception to simulate error scenarios");
     }
-    
+
     // Normal flow continues...
 }
 ```
@@ -133,7 +373,7 @@ public class CreateCashierValidator : AbstractValidator<CreateCashierCommand>
         RuleFor(c => c.TenantId)
             .NotEmpty()
             .WithMessage("TenantId is required");
-            
+
         RuleFor(c => c.Name)
             .NotEmpty()
             .WithMessage("Name is required")
@@ -141,7 +381,7 @@ public class CreateCashierValidator : AbstractValidator<CreateCashierCommand>
             .WithMessage("Name must be at least 2 characters")
             .MaximumLength(100)
             .WithMessage("Name cannot exceed 100 characters");
-            
+
         RuleFor(c => c.Email)
             .NotEmpty()
             .WithMessage("Email is required")
@@ -170,16 +410,16 @@ public class CreateInvoiceValidator : AbstractValidator<CreateInvoiceCommand>
     {
         RuleFor(c => c.TenantId).NotEmpty();
         RuleFor(c => c.Name).NotEmpty().MaximumLength(100).MinimumLength(2);
-        
+
         RuleFor(c => c.Amount)
             .GreaterThan(0)
             .WithMessage("Invoice amount must be greater than 0");
-            
+
         RuleFor(c => c.Currency)
             .MaximumLength(3)
             .When(c => !string.IsNullOrEmpty(c.Currency))
             .WithMessage("Currency code must be 3 characters or less");
-            
+
         RuleFor(c => c.DueDate)
             .GreaterThan(DateTime.UtcNow)
             .When(c => c.DueDate.HasValue)
@@ -214,9 +454,10 @@ public class ExceptionHandlingFrame : SyncFrame
 ```
 
 This ensures that:
-- Exceptions are captured in the message envelope for logging
-- Exceptions are re-thrown for Wolverine's retry/DLQ handling
-- All handlers have consistent exception handling behavior
+
+-   Exceptions are captured in the message envelope for logging
+-   Exceptions are re-thrown for Wolverine's retry/DLQ handling
+-   All handlers have consistent exception handling behavior
 
 ### FluentValidation Integration
 
@@ -281,8 +522,8 @@ public class GlobalExceptionMiddleware
             error = "An error occurred processing your request",
             statusCode = context.Response.StatusCode,
             // Include details in development
-            details = context.RequestServices.GetService<IWebHostEnvironment>()?.IsDevelopment() == true 
-                ? exception.Message 
+            details = context.RequestServices.GetService<IWebHostEnvironment>()?.IsDevelopment() == true
+                ? exception.Message
                 : null
         };
 
@@ -309,12 +550,12 @@ public class CashiersController : ControllerBase
 
         return result.Match<IActionResult>(
             cashier => Ok(cashier),
-            errors => BadRequest(new { 
-                message = "Validation failed", 
-                errors = errors.Select(e => new { 
-                    field = e.PropertyName, 
-                    message = e.ErrorMessage 
-                }) 
+            errors => BadRequest(new {
+                message = "Validation failed",
+                errors = errors.Select(e => new {
+                    field = e.PropertyName,
+                    message = e.ErrorMessage
+                })
             })
         );
     }
@@ -323,22 +564,22 @@ public class CashiersController : ControllerBase
     public async Task<IActionResult> CreateCashier(CreateCashierRequest request)
     {
         var command = new CreateCashierCommand(request.TenantId, request.Name, request.Email);
-        
-        try 
+
+        try
         {
             var (result, integrationEvent) = await _messageBus.InvokeAsync(command);
-            
+
             return result.Match<IActionResult>(
                 cashier => CreatedAtAction(
-                    nameof(GetCashier), 
-                    new { tenantId = cashier.TenantId, id = cashier.Id }, 
+                    nameof(GetCashier),
+                    new { tenantId = cashier.TenantId, id = cashier.Id },
                     cashier),
-                errors => BadRequest(new { 
-                    message = "Validation failed", 
-                    errors = errors.Select(e => new { 
-                        field = e.PropertyName, 
-                        message = e.ErrorMessage 
-                    }) 
+                errors => BadRequest(new {
+                    message = "Validation failed",
+                    errors = errors.Select(e => new {
+                        field = e.PropertyName,
+                        message = e.ErrorMessage
+                    })
                 })
             );
         }
@@ -412,14 +653,14 @@ public static async Task<(Result<Cashier>, CashierCreated?)> Handle(CreateCashie
     catch (DbException ex)
     {
         _logger.LogError(ex, "Database error creating cashier for tenant {TenantId}", command.TenantId);
-        
+
         // Convert database errors to validation failures
         if (ex.Message.Contains("unique constraint"))
         {
             var failures = new List<ValidationFailure> { new("Email", "Email address already exists") };
             return (failures, null);
         }
-        
+
         throw; // Re-throw for infrastructure errors
     }
 }
@@ -443,7 +684,7 @@ public class CashierCreatedHandler
                 integrationEvent.Cashier.Email,
                 integrationEvent.Cashier.Name,
                 cancellationToken);
-                
+
             _logger.LogInformation("Welcome email sent to {Email} for cashier {CashierId}",
                 integrationEvent.Cashier.Email, integrationEvent.Cashier.Id);
         }
@@ -451,7 +692,7 @@ public class CashierCreatedHandler
         {
             _logger.LogError(ex, "Failed to send welcome email to {Email} for cashier {CashierId}",
                 integrationEvent.Cashier.Email, integrationEvent.Cashier.Id);
-                
+
             // Don't re-throw - email failure shouldn't fail the entire event processing
             // Consider publishing a compensation event or storing for retry
         }
@@ -473,12 +714,12 @@ public static IHostApplicationBuilder AddServiceDefaults(this IHostApplicationBu
         // Configure retry policy for database-related exceptions
         options.Policies.OnException<NpgsqlException>()
             .RetryWithCooldown(50.Milliseconds(), 100.Milliseconds(), 250.Milliseconds());
-            
+
         // Configure retry policy for HTTP exceptions
         options.Policies.OnException<HttpRequestException>()
             .RetryWithCooldown(1.Seconds(), 2.Seconds(), 5.Seconds());
     });
-    
+
     return builder;
 }
 ```
@@ -495,14 +736,14 @@ public static IHostApplicationBuilder AddServiceDefaults(this IHostApplicationBu
         // After 3 retries, move to dead letter queue
         options.Policies.OnException<Exception>()
             .MoveToErrorQueue();
-            
+
         // Configure specific handling for different message types
         options.Policies.ForMessagesOfType<CashierCreated>()
             .OnException<EmailException>()
             .RetryWithCooldown(30.Seconds(), 60.Seconds())
             .Then.MoveToErrorQueue();
     });
-    
+
     return builder;
 }
 ```
@@ -521,15 +762,15 @@ public class PaymentFailedHandler
             integrationEvent.TenantId,
             integrationEvent.InvoiceId,
             "Payment failed - automatically canceled");
-            
+
         await messageBus.InvokeAsync(compensationCommand, cancellationToken);
-        
+
         // Publish compensation event
         var compensationEvent = new InvoiceCanceled(
             integrationEvent.TenantId,
             integrationEvent.InvoiceId,
             "Payment failure compensation");
-            
+
         await messageBus.PublishAsync(compensationEvent, cancellationToken);
     }
 }
@@ -556,7 +797,7 @@ public static async Task<(Result<Cashier>, CashierUpdated?)> Handle(UpdateCashie
         {
             logger.LogWarning("Cashier {CashierId} not found for tenant {TenantId} during update",
                 command.CashierId, command.TenantId);
-                
+
             var failures = new List<ValidationFailure> { new("CashierId", "Cashier not found") };
             return (failures, null);
         }
@@ -591,7 +832,7 @@ public class RequestPerformanceMiddleware
     public async Task InvokeAsync(HttpContext context)
     {
         var stopwatch = Stopwatch.StartNew();
-        
+
         try
         {
             await _next(context);
@@ -599,7 +840,7 @@ public class RequestPerformanceMiddleware
         finally
         {
             stopwatch.Stop();
-            
+
             if (stopwatch.ElapsedMilliseconds > 1000) // Log slow requests
             {
                 _logger.LogWarning("Slow request: {Method} {Path} took {Duration}ms",
@@ -651,10 +892,10 @@ public class ErrorMetrics
 
     public static void RecordError(string errorType, string operation, double durationMs)
     {
-        ErrorCounter.Add(1, 
+        ErrorCounter.Add(1,
             new KeyValuePair<string, object?>("error.type", errorType),
             new KeyValuePair<string, object?>("operation", operation));
-            
+
         ErrorDuration.Record(durationMs,
             new KeyValuePair<string, object?>("error.type", errorType),
             new KeyValuePair<string, object?>("operation", operation));
@@ -678,7 +919,7 @@ public class UpdateCashierCommandHandlerTests
         // Arrange
         var command = new UpdateCashierCommand(Guid.NewGuid(), Guid.NewGuid(), "Updated Name", "updated@example.com");
         var mockMessaging = new Mock<IMessageBus>();
-        
+
         mockMessaging.Setup(m => m.InvokeCommandAsync(It.IsAny<UpdateCashierCommandHandler.DbCommand>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((Data.Entities.Cashier?)null);
 
@@ -697,7 +938,7 @@ public class UpdateCashierCommandHandlerTests
         // Arrange
         var command = new UpdateCashierCommand(Guid.NewGuid(), Guid.NewGuid(), "Updated Name", "updated@example.com");
         var mockMessaging = new Mock<IMessageBus>();
-        
+
         mockMessaging.Setup(m => m.InvokeCommandAsync(It.IsAny<UpdateCashierCommandHandler.DbCommand>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(new InvalidOperationException("Database connection failed"));
 
@@ -719,15 +960,15 @@ public async Task CreateCashier_DuplicateEmail_ReturnsBadRequest()
     // Arrange
     var tenantId = Guid.NewGuid();
     var email = "duplicate@example.com";
-    
+
     // Create first cashier
     var firstRequest = new CreateCashierRequest(tenantId, "First User", email);
     await _client.PostAsJsonAsync("/api/cashiers", firstRequest);
-    
+
     // Act - try to create duplicate
     var duplicateRequest = new CreateCashierRequest(tenantId, "Second User", email);
     var response = await _client.PostAsJsonAsync("/api/cashiers", duplicateRequest);
-    
+
     // Assert
     response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     var content = await response.Content.ReadAsStringAsync();
@@ -738,24 +979,46 @@ public async Task CreateCashier_DuplicateEmail_ReturnsBadRequest()
 ## Best Practices Summary
 
 ### Do's
-- **Use Result\<T\> for business logic failures**: Make success/failure explicit
-- **Reserve exceptions for exceptional circumstances**: Infrastructure failures, programming errors
-- **Validate early**: Use FluentValidation to catch issues before processing
-- **Log with context**: Include relevant identifiers and state information
-- **Handle errors gracefully**: Don't expose internal details to clients
-- **Test error scenarios**: Both success and failure paths should be tested
-- **Use structured logging**: Enable better observability and debugging
+
+-   **Use Result\<T\> for business logic failures**: Make success/failure explicit
+-   **Reserve exceptions for exceptional circumstances**: Infrastructure failures, programming errors
+-   **Validate early**: Use FluentValidation to catch issues before processing
+-   **Log with context**: Include relevant identifiers and state information
+-   **Handle errors gracefully**: Don't expose internal details to clients
+-   **Test error scenarios**: Both success and failure paths should be tested
+-   **Use structured logging**: Enable better observability and debugging
 
 ### Don'ts
-- **Don't use exceptions for control flow**: Use Result\<T\> for expected failures
-- **Don't ignore errors**: Every error should be logged or handled appropriately
-- **Don't leak implementation details**: Return generic error messages to clients
-- **Don't block on error handling**: Keep error handling asynchronous
-- **Don't create chatty logs**: Log at appropriate levels with meaningful messages
+
+-   **Don't use exceptions for control flow**: Use Result\<T\> for expected failures
+-   **Don't ignore errors**: Every error should be logged or handled appropriately
+-   **Don't leak implementation details**: Return generic error messages to clients
+-   **Don't block on error handling**: Keep error handling asynchronous
+-   **Don't create chatty logs**: Log at appropriate levels with meaningful messages
 
 ## Next Steps
 
-- Review [CQRS Patterns](./cqrs/) for command and query error handling specifics
-- Explore [Messaging Error Handling](./messaging/) for event-driven error scenarios  
-- See [Testing Strategies](./testing/) for comprehensive error testing approaches
-- Check [Troubleshooting](./troubleshooting) for common error handling issues
+Now that you understand error handling fundamentals, explore these related topics:
+
+### Core Implementation
+
+1. **[CQRS Error Patterns](./cqrs/commands#error-handling)** - Error handling in commands and queries
+2. **[Handler Error Management](./cqrs/handlers#error-handling-patterns)** - Structured error handling in handlers
+3. **[Validation Integration](./cqrs/validation)** - FluentValidation and Result pattern integration
+
+### Advanced Scenarios
+
+4. **[Database Error Handling](./database/dbcommand#error-handling-and-resilience)** - Database-specific error patterns
+5. **[Messaging Error Patterns](./messaging/kafka#error-handling)** - Event processing error handling
+6. **[API Error Responses](./best-practices#api-error-handling)** - Consistent HTTP error responses
+
+### Testing and Operations
+
+7. **[Testing Error Scenarios](./testing/unit-tests#testing-error-cases)** - Comprehensive error testing strategies
+8. **[Troubleshooting Guide](./troubleshooting#error-handling-issues)** - Common error handling problems
+9. **[Observability](./service-configuration/observability#error-monitoring)** - Error monitoring and alerting
+
+### Production Readiness
+
+10. **[Best Practices](./best-practices#error-handling-guidelines)** - Production error handling guidelines
+11. **[Performance Considerations](./best-practices#error-handling-performance)** - Error handling performance optimization

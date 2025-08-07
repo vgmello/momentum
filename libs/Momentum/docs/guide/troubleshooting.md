@@ -7,13 +7,15 @@ This guide covers common issues you might encounter when building applications w
 ### "Assembly not found" Errors
 
 **Symptoms:**
-- Application fails to start
-- Error messages about missing assemblies
-- Commands/queries not being discovered
+
+-   Application fails to start
+-   Error messages about missing assemblies
+-   Commands/queries not being discovered
 
 **Solutions:**
 
 1. **Mark domain assemblies correctly:**
+
 ```csharp
 // In your API project Program.cs
 using YourApp.Domain;
@@ -25,6 +27,7 @@ var builder = WebApplication.CreateSlimBuilder(args);
 ```
 
 2. **Create proper domain marker interfaces:**
+
 ```csharp
 // YourApp.Domain/IYourDomainAssembly.cs
 namespace YourApp.Domain;
@@ -33,6 +36,7 @@ public interface IYourDomainAssembly;
 ```
 
 3. **Set entry assembly manually if needed:**
+
 ```csharp
 // Before calling AddServiceDefaults()
 ServiceDefaultsExtensions.EntryAssembly = typeof(Program).Assembly;
@@ -43,13 +47,15 @@ builder.AddServiceDefaults();
 ### Service Discovery Issues
 
 **Symptoms:**
-- Services not being registered
-- Dependency injection failures
-- "Service not found" exceptions
+
+-   Services not being registered
+-   Dependency injection failures
+-   "Service not found" exceptions
 
 **Solutions:**
 
 1. **Verify service defaults are added:**
+
 ```csharp
 var builder = WebApplication.CreateSlimBuilder(args);
 
@@ -61,16 +67,18 @@ builder.Services.AddScoped<IMyService, MyService>();
 ```
 
 2. **Check domain assembly registration:**
+
 ```csharp
 // Verify assemblies are marked correctly
 [assembly: DomainAssembly(typeof(IDomainMarker))]
 
 // Check logs for assembly discovery
-logger.LogInformation("Discovered assemblies: {Assemblies}", 
+logger.LogInformation("Discovered assemblies: {Assemblies}",
     DomainAssemblyAttribute.GetDomainAssemblies().Select(a => a.FullName));
 ```
 
 3. **Manual service registration as fallback:**
+
 ```csharp
 // If automatic discovery fails
 builder.Services.AddValidatorsFromAssemblyContaining<MyValidator>();
@@ -82,22 +90,25 @@ builder.Services.AddMediatR(typeof(MyCommand));
 ### Connection String Problems
 
 **Symptoms:**
-- "Cannot connect to database" errors
-- Timeout exceptions
-- Authentication failures
+
+-   "Cannot connect to database" errors
+-   Timeout exceptions
+-   Authentication failures
 
 **Solutions:**
 
 1. **Verify connection string format:**
+
 ```json
 {
-  "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Port=5432;Database=myapp;Username=postgres;Password=password"
-  }
+    "ConnectionStrings": {
+        "DefaultConnection": "Host=localhost;Port=5432;Database=myapp;Username=postgres;Password=password"
+    }
 }
 ```
 
 2. **Check database availability:**
+
 ```bash
 # Test PostgreSQL connection
 psql -h localhost -p 5432 -U postgres -d myapp
@@ -107,13 +118,14 @@ SELECT datname FROM pg_database WHERE datname = 'myapp';
 ```
 
 3. **Use connection string validation:**
+
 ```csharp
 public static class DatabaseExtensions
 {
     public static void ValidateConnectionString(this IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
-        
+
         if (string.IsNullOrEmpty(connectionString))
         {
             throw new InvalidOperationException("Database connection string not found");
@@ -139,13 +151,15 @@ builder.Configuration.ValidateConnectionString();
 ### Migration Issues
 
 **Symptoms:**
-- Database schema not up to date
-- Missing tables or columns
-- Migration execution failures
+
+-   Database schema not up to date
+-   Missing tables or columns
+-   Migration execution failures
 
 **Solutions:**
 
 1. **Run migrations manually:**
+
 ```bash
 # Using Docker Compose
 docker compose up myapp-db-migrations
@@ -155,6 +169,7 @@ docker compose exec myapp-db-migrations liquibase status
 ```
 
 2. **Verify migration files:**
+
 ```bash
 # Check migration directory
 ls -la infra/MyApp.Database/migrations/
@@ -164,6 +179,7 @@ docker compose exec myapp-db-migrations liquibase validate
 ```
 
 3. **Reset database for development:**
+
 ```bash
 # Completely reset development database
 docker compose down -v
@@ -175,13 +191,15 @@ docker compose up myapp-db myapp-db-migrations
 ### Validators Not Found
 
 **Symptoms:**
-- Validation not running
-- Commands/queries not being validated
-- No validation errors when expected
+
+-   Validation not running
+-   Commands/queries not being validated
+-   No validation errors when expected
 
 **Solutions:**
 
 1. **Check validator registration:**
+
 ```csharp
 // Ensure validators are in domain assemblies
 [assembly: DomainAssembly(typeof(IDomainMarker))]
@@ -196,22 +214,24 @@ public class CreateUserValidator : AbstractValidator<CreateUserCommand>
 ```
 
 2. **Manual validator registration:**
+
 ```csharp
 // As fallback, register manually
 builder.Services.AddValidatorsFromAssemblyContaining<CreateUserValidator>();
 ```
 
 3. **Debug validator discovery:**
+
 ```csharp
 // Add logging to see what validators are found
 var validators = builder.Services
-    .Where(s => s.ServiceType.IsGenericType && 
+    .Where(s => s.ServiceType.IsGenericType &&
                s.ServiceType.GetGenericTypeDefinition() == typeof(IValidator<>))
     .ToList();
 
 foreach (var validator in validators)
 {
-    logger.LogInformation("Found validator: {ValidatorType} for {CommandType}", 
+    logger.LogInformation("Found validator: {ValidatorType} for {CommandType}",
         validator.ImplementationType, validator.ServiceType.GetGenericArguments()[0]);
 }
 ```
@@ -219,13 +239,15 @@ foreach (var validator in validators)
 ### Validation Rules Not Working
 
 **Symptoms:**
-- Validation rules are ignored
-- Unexpected validation results
-- Custom validation logic not executing
+
+-   Validation rules are ignored
+-   Unexpected validation results
+-   Custom validation logic not executing
 
 **Solutions:**
 
 1. **Check rule syntax:**
+
 ```csharp
 public class CreateUserValidator : AbstractValidator<CreateUserCommand>
 {
@@ -233,7 +255,7 @@ public class CreateUserValidator : AbstractValidator<CreateUserCommand>
     {
         // Correct
         RuleFor(x => x.Email).NotEmpty().EmailAddress();
-        
+
         // Incorrect - missing property selector
         // RuleFor("Email").NotEmpty(); // Won't work
     }
@@ -241,6 +263,7 @@ public class CreateUserValidator : AbstractValidator<CreateUserCommand>
 ```
 
 2. **Test validators independently:**
+
 ```csharp
 [Test]
 public void Validator_InvalidEmail_ReturnsError()
@@ -259,6 +282,7 @@ public void Validator_InvalidEmail_ReturnsError()
 ```
 
 3. **Enable validation debugging:**
+
 ```csharp
 // In appsettings.Development.json
 {
@@ -276,13 +300,15 @@ public void Validator_InvalidEmail_ReturnsError()
 ### Events Not Being Published
 
 **Symptoms:**
-- Integration events not appearing in Kafka
-- Event handlers not being triggered
-- No event-related logs
+
+-   Integration events not appearing in Kafka
+-   Event handlers not being triggered
+-   No event-related logs
 
 **Solutions:**
 
 1. **Verify event definition:**
+
 ```csharp
 /// <summary>
 /// Event documentation is required for discovery
@@ -295,6 +321,7 @@ public record UserCreated(
 ```
 
 2. **Check event handler return:**
+
 ```csharp
 public static async Task<(Result<User>, UserCreated?)> Handle(
     CreateUserCommand command,
@@ -302,26 +329,28 @@ public static async Task<(Result<User>, UserCreated?)> Handle(
     CancellationToken cancellationToken)
 {
     // ... business logic ...
-    
+
     var result = insertedUser.ToModel();
     var createdEvent = new UserCreated(result.TenantId, result); // Must return event
-    
+
     return (result, createdEvent); // Framework publishes the event
 }
 ```
 
 3. **Check Kafka configuration:**
+
 ```json
 {
-  "Kafka": {
-    "BootstrapServers": "localhost:9092",
-    "EnableAutoCommit": false,
-    "GroupId": "myapp-consumer-group"
-  }
+    "Kafka": {
+        "BootstrapServers": "localhost:9092",
+        "EnableAutoCommit": false,
+        "GroupId": "myapp-consumer-group"
+    }
 }
 ```
 
 4. **Verify Kafka is running:**
+
 ```bash
 # Check Kafka container
 docker compose ps kafka
@@ -339,13 +368,15 @@ docker compose exec kafka kafka-console-consumer \
 ### Event Handlers Not Executing
 
 **Symptoms:**
-- Events are published but handlers don't run
-- No handler logs
-- Events accumulate in topics
+
+-   Events are published but handlers don't run
+-   No handler logs
+-   Events accumulate in topics
 
 **Solutions:**
 
 1. **Check handler registration:**
+
 ```csharp
 public static class UserCreatedHandler
 {
@@ -364,6 +395,7 @@ public static class UserCreatedHandler
 ```
 
 2. **Check consumer group configuration:**
+
 ```csharp
 // In appsettings.json
 {
@@ -376,6 +408,7 @@ public static class UserCreatedHandler
 ```
 
 3. **Monitor handler errors:**
+
 ```csharp
 public static async Task Handle(
     UserCreated userCreated,
@@ -386,7 +419,7 @@ public static async Task Handle(
     {
         // Handler logic
         await DoSomethingAsync(userCreated, cancellationToken);
-        
+
         logger.LogInformation("Successfully processed UserCreated event");
     }
     catch (Exception ex)
@@ -402,23 +435,26 @@ public static async Task Handle(
 ### Slow Database Operations
 
 **Symptoms:**
-- High response times
-- Database timeouts
-- Connection pool exhaustion
+
+-   High response times
+-   Database timeouts
+-   Connection pool exhaustion
 
 **Solutions:**
 
 1. **Add database indexes:**
+
 ```sql
 -- Check for missing indexes
 EXPLAIN ANALYZE SELECT * FROM cashiers WHERE tenant_id = $1 AND email = $2;
 
 -- Add appropriate indexes
-CREATE INDEX CONCURRENTLY idx_cashiers_tenant_email 
+CREATE INDEX CONCURRENTLY idx_cashiers_tenant_email
 ON cashiers (tenant_id, email);
 ```
 
 2. **Monitor query performance:**
+
 ```csharp
 public class QueryPerformanceMiddleware
 {
@@ -428,7 +464,7 @@ public class QueryPerformanceMiddleware
     public async Task InvokeAsync(HttpContext context)
     {
         var stopwatch = Stopwatch.StartNew();
-        
+
         try
         {
             await _next(context);
@@ -436,7 +472,7 @@ public class QueryPerformanceMiddleware
         finally
         {
             stopwatch.Stop();
-            
+
             if (stopwatch.ElapsedMilliseconds > 1000) // Log slow requests
             {
                 _logger.LogWarning("Slow request: {Method} {Path} took {ElapsedMs}ms",
@@ -450,6 +486,7 @@ public class QueryPerformanceMiddleware
 ```
 
 3. **Optimize queries:**
+
 ```csharp
 // Use projection to reduce data transfer
 var summary = await db.Users
@@ -474,13 +511,15 @@ var pagedUsers = await db.Users
 ### High Memory Usage
 
 **Symptoms:**
-- OutOfMemoryException
-- Garbage collection pressure
-- Application crashes
+
+-   OutOfMemoryException
+-   Garbage collection pressure
+-   Application crashes
 
 **Solutions:**
 
 1. **Use streaming for large result sets:**
+
 ```csharp
 public static async IAsyncEnumerable<User> GetUsersStreamAsync(
     AppDomainDb db,
@@ -498,6 +537,7 @@ public static async IAsyncEnumerable<User> GetUsersStreamAsync(
 ```
 
 2. **Dispose resources properly:**
+
 ```csharp
 public static async Task<Result<ProcessingResult>> Handle(
     LargeProcessingCommand command,
@@ -505,15 +545,15 @@ public static async Task<Result<ProcessingResult>> Handle(
     CancellationToken cancellationToken)
 {
     using var transaction = await db.BeginTransactionAsync(cancellationToken);
-    
+
     try
     {
         // Process data in chunks
         const int batchSize = 1000;
         var processed = 0;
-        
+
         var query = db.LargeDataSet.Where(d => d.TenantId == command.TenantId);
-        
+
         await foreach (var batch in query
             .AsAsyncEnumerable()
             .Chunk(batchSize)
@@ -521,7 +561,7 @@ public static async Task<Result<ProcessingResult>> Handle(
         {
             await ProcessBatch(batch, db, cancellationToken);
             processed += batch.Length;
-            
+
             // Force garbage collection periodically
             if (processed % 10000 == 0)
             {
@@ -529,9 +569,9 @@ public static async Task<Result<ProcessingResult>> Handle(
                 GC.WaitForPendingFinalizers();
             }
         }
-        
+
         await transaction.CommitAsync(cancellationToken);
-        
+
         return new ProcessingResult { ProcessedCount = processed };
     }
     catch
@@ -543,6 +583,7 @@ public static async Task<Result<ProcessingResult>> Handle(
 ```
 
 3. **Monitor memory usage:**
+
 ```csharp
 public class MemoryMonitoringMiddleware
 {
@@ -553,7 +594,7 @@ public class MemoryMonitoringMiddleware
     {
         var beforeGC = GC.GetTotalMemory(false);
         var beforeWorking = Environment.WorkingSet;
-        
+
         try
         {
             await _next(context);
@@ -564,7 +605,7 @@ public class MemoryMonitoringMiddleware
             var afterWorking = Environment.WorkingSet;
             var memoryDelta = afterGC - beforeGC;
             var workingDelta = afterWorking - beforeWorking;
-            
+
             if (memoryDelta > 10_000_000) // 10MB
             {
                 _logger.LogWarning("High memory allocation in request {Path}: GC={GCDelta}MB, Working={WorkingDelta}MB",
@@ -582,13 +623,15 @@ public class MemoryMonitoringMiddleware
 ### JWT Token Problems
 
 **Symptoms:**
-- 401 Unauthorized responses
-- Token validation failures
-- Claims not found
+
+-   401 Unauthorized responses
+-   Token validation failures
+-   Claims not found
 
 **Solutions:**
 
 1. **Verify JWT configuration:**
+
 ```csharp
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -596,17 +639,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.Authority = builder.Configuration["Auth:Authority"];
         options.Audience = builder.Configuration["Auth:Audience"];
         options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
-        
+
         options.Events = new JwtBearerEvents
         {
             OnAuthenticationFailed = context =>
             {
                 var logger = context.HttpContext.RequestServices
                     .GetRequiredService<ILogger<JwtBearerHandler>>();
-                    
+
                 logger.LogError(context.Exception, "JWT authentication failed: {Error}",
                     context.Exception.Message);
-                    
+
                 return Task.CompletedTask;
             }
         };
@@ -614,6 +657,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 ```
 
 2. **Debug token validation:**
+
 ```csharp
 public class TokenDebuggingMiddleware
 {
@@ -625,19 +669,19 @@ public class TokenDebuggingMiddleware
         if (context.Request.Headers.ContainsKey("Authorization"))
         {
             var token = context.Request.Headers.Authorization.FirstOrDefault();
-            _logger.LogDebug("Processing request with token: {Token}", 
+            _logger.LogDebug("Processing request with token: {Token}",
                 token?.Substring(0, Math.Min(token.Length, 50)) + "...");
         }
         else
         {
             _logger.LogDebug("Processing request without authorization header");
         }
-        
+
         await _next(context);
-        
+
         if (!context.User.Identity?.IsAuthenticated == true)
         {
-            _logger.LogWarning("Request completed without authentication for path: {Path}", 
+            _logger.LogWarning("Request completed without authentication for path: {Path}",
                 context.Request.Path);
         }
     }
@@ -645,6 +689,7 @@ public class TokenDebuggingMiddleware
 ```
 
 3. **Test token manually:**
+
 ```bash
 # Decode JWT token
 echo "YOUR_JWT_TOKEN" | base64 -d
@@ -656,19 +701,21 @@ curl -H "Authorization: Bearer YOUR_JWT_TOKEN" https://localhost:5001/api/users
 ### Authorization Policy Issues
 
 **Symptoms:**
-- 403 Forbidden responses
-- Authorization policies not working
-- Claims-based authorization failures
+
+-   403 Forbidden responses
+-   Authorization policies not working
+-   Claims-based authorization failures
 
 **Solutions:**
 
 1. **Check policy configuration:**
+
 ```csharp
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("RequireAdmin", policy =>
         policy.RequireClaim("role", "admin"));
-        
+
     options.AddPolicy("SameTenant", policy =>
         policy.AddRequirements(new TenantRequirement()));
 });
@@ -678,6 +725,7 @@ builder.Services.AddScoped<IAuthorizationHandler, TenantAuthorizationHandler>();
 ```
 
 2. **Debug authorization:**
+
 ```csharp
 public class AuthorizationLoggingHandler : IAuthorizationHandler
 {
@@ -688,12 +736,12 @@ public class AuthorizationLoggingHandler : IAuthorizationHandler
         _logger.LogDebug("Evaluating authorization for user {UserId} with claims: {Claims}",
             context.User.FindFirst("sub")?.Value,
             string.Join(", ", context.User.Claims.Select(c => $"{c.Type}={c.Value}")));
-            
+
         foreach (var requirement in context.Requirements)
         {
             _logger.LogDebug("Checking requirement: {RequirementType}", requirement.GetType().Name);
         }
-        
+
         return Task.CompletedTask;
     }
 }
@@ -704,13 +752,15 @@ public class AuthorizationLoggingHandler : IAuthorizationHandler
 ### Integration Test Failures
 
 **Symptoms:**
-- Tests fail in CI but pass locally
-- Database-related test failures
-- Service dependency issues
+
+-   Tests fail in CI but pass locally
+-   Database-related test failures
+-   Service dependency issues
 
 **Solutions:**
 
 1. **Use test containers properly:**
+
 ```csharp
 public class IntegrationTestBase : IAsyncLifetime
 {
@@ -725,7 +775,7 @@ public class IntegrationTestBase : IAsyncLifetime
             .WithUsername("test_user")
             .WithPassword("test_password")
             .Build();
-            
+
         _kafkaContainer = new KafkaBuilder()
             .Build();
     }
@@ -734,7 +784,7 @@ public class IntegrationTestBase : IAsyncLifetime
     {
         await _dbContainer.StartAsync();
         await _kafkaContainer.StartAsync();
-        
+
         // Run migrations
         await RunMigrations();
     }
@@ -748,27 +798,28 @@ public class IntegrationTestBase : IAsyncLifetime
 ```
 
 2. **Isolate tests properly:**
+
 ```csharp
 [Fact]
 public async Task CreateUser_ValidData_ReturnsCreatedUser()
 {
     // Arrange - use unique tenant ID for isolation
     var tenantId = Guid.NewGuid();
-    
+
     using var scope = _factory.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDomainDb>();
-    
+
     // Clean up before test
     await db.Users.Where(u => u.TenantId == tenantId).DeleteAsync();
-    
+
     var command = new CreateUserCommand(tenantId, "John Doe", "john@example.com");
-    
+
     // Act
     var result = await SendAsync(command);
-    
+
     // Assert
     result.IsSuccess.Should().BeTrue();
-    
+
     // Verify in database
     var user = await db.Users.FirstOrDefaultAsync(u => u.UserId == result.Value.Id);
     user.Should().NotBeNull();
@@ -780,50 +831,53 @@ public async Task CreateUser_ValidData_ReturnsCreatedUser()
 ### Container Startup Problems
 
 **Symptoms:**
-- Containers fail to start
-- Port binding issues
-- Volume mounting problems
+
+-   Containers fail to start
+-   Port binding issues
+-   Volume mounting problems
 
 **Solutions:**
 
 1. **Check Docker Compose configuration:**
-```yaml
-version: '3.8'
-services:
-  app:
-    build: .
-    ports:
-      - "5000:8080"  # Map host:container ports correctly
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=db;Database=myapp;Username=postgres;Password=password
-    depends_on:
-      - db
-    networks:
-      - myapp-network
 
-  db:
-    image: postgres:15
-    environment:
-      POSTGRES_DB: myapp
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - myapp-network
+```yaml
+version: "3.8"
+services:
+    app:
+        build: .
+        ports:
+            - "5000:8080" # Map host:container ports correctly
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Development
+            - ConnectionStrings__DefaultConnection=Host=db;Database=myapp;Username=postgres;Password=password
+        depends_on:
+            - db
+        networks:
+            - myapp-network
+
+    db:
+        image: postgres:15
+        environment:
+            POSTGRES_DB: myapp
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: password
+        ports:
+            - "5432:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        networks:
+            - myapp-network
 
 volumes:
-  postgres_data:
+    postgres_data:
 
 networks:
-  myapp-network:
-    driver: bridge
+    myapp-network:
+        driver: bridge
 ```
 
 2. **Debug container issues:**
+
 ```bash
 # Check container logs
 docker compose logs app
@@ -843,13 +897,15 @@ netstat -tlnp | grep 5000
 ### Health Check Failures
 
 **Symptoms:**
-- Health check endpoints return unhealthy
-- Load balancer removes instances
-- Kubernetes pods fail readiness checks
+
+-   Health check endpoints return unhealthy
+-   Load balancer removes instances
+-   Kubernetes pods fail readiness checks
 
 **Solutions:**
 
 1. **Improve health check implementation:**
+
 ```csharp
 public class ComprehensiveHealthCheck : IHealthCheck
 {
@@ -877,7 +933,7 @@ public class ComprehensiveHealthCheck : IHealthCheck
         }
 
         var errors = string.Join("; ", failed.Select(f => f.Description));
-        
+
         if (failed.Any(f => f.Status == HealthStatus.Unhealthy))
         {
             return HealthCheckResult.Unhealthy($"Critical failures: {errors}");
@@ -889,12 +945,13 @@ public class ComprehensiveHealthCheck : IHealthCheck
 ```
 
 2. **Configure appropriate timeouts:**
+
 ```csharp
 builder.Services.AddHealthChecks()
-    .AddCheck<ComprehensiveHealthCheck>("comprehensive", 
+    .AddCheck<ComprehensiveHealthCheck>("comprehensive",
         timeout: TimeSpan.FromSeconds(30),
         tags: ["ready"])
-    .AddCheck("quick", () => HealthCheckResult.Healthy(), 
+    .AddCheck("quick", () => HealthCheckResult.Healthy(),
         tags: ["live"]);
 
 // Different endpoints with different timeouts
@@ -915,13 +972,15 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions
 ### Missing Telemetry Data
 
 **Symptoms:**
-- No traces in monitoring system
-- Missing metrics
-- Logs not appearing
+
+-   No traces in monitoring system
+-   Missing metrics
+-   Logs not appearing
 
 **Solutions:**
 
 1. **Verify OpenTelemetry configuration:**
+
 ```csharp
 // Check exporter configuration
 builder.Services.ConfigureOpenTelemetryTracingBuilder(tracing =>
@@ -939,6 +998,7 @@ builder.Services.ConfigureOpenTelemetryTracingBuilder(tracing =>
 ```
 
 2. **Add custom instrumentation:**
+
 ```csharp
 public static class TelemetryExtensions
 {
@@ -951,7 +1011,7 @@ public static class TelemetryExtensions
     {
         using var activity = ActivitySource.StartActivity(operationName);
         configure?.Invoke(activity);
-        
+
         try
         {
             var result = await task;
@@ -968,6 +1028,7 @@ public static class TelemetryExtensions
 ```
 
 3. **Debug telemetry pipeline:**
+
 ```csharp
 // Add console exporter for debugging
 builder.Services.ConfigureOpenTelemetryTracingBuilder(tracing =>
@@ -979,7 +1040,7 @@ builder.Services.ConfigureOpenTelemetryTracingBuilder(tracing =>
 var instrumentation = builder.Services
     .Where(s => s.ServiceType.Name.Contains("Instrumentation"))
     .ToList();
-    
+
 foreach (var instr in instrumentation)
 {
     logger.LogInformation("Registered instrumentation: {Type}", instr.ImplementationType);
@@ -991,9 +1052,10 @@ foreach (var instr in instrumentation)
 ### Logging Best Practices
 
 1. **Use structured logging:**
+
 ```csharp
 // Good
-logger.LogInformation("Processing order {OrderId} for customer {CustomerId}", 
+logger.LogInformation("Processing order {OrderId} for customer {CustomerId}",
     orderId, customerId);
 
 // Bad
@@ -1001,6 +1063,7 @@ logger.LogInformation($"Processing order {orderId} for customer {customerId}");
 ```
 
 2. **Include correlation IDs:**
+
 ```csharp
 public class CorrelationMiddleware
 {
@@ -1008,15 +1071,15 @@ public class CorrelationMiddleware
     {
         var correlationId = context.Request.Headers["X-Correlation-ID"].FirstOrDefault()
             ?? Guid.NewGuid().ToString();
-            
+
         context.Items["CorrelationId"] = correlationId;
         context.Response.Headers["X-Correlation-ID"] = correlationId;
-        
+
         using var scope = logger.BeginScope(new Dictionary<string, object>
         {
             ["CorrelationId"] = correlationId
         });
-        
+
         await next(context);
     }
 }
@@ -1025,11 +1088,12 @@ public class CorrelationMiddleware
 ### Error Handling Best Practices
 
 1. **Provide actionable error messages:**
+
 ```csharp
 public static Result<User> ValidateUser(CreateUserCommand command)
 {
     var errors = new List<ValidationFailure>();
-    
+
     if (string.IsNullOrEmpty(command.Email))
     {
         errors.Add(new ValidationFailure("Email", "Email is required"));
@@ -1038,12 +1102,13 @@ public static Result<User> ValidateUser(CreateUserCommand command)
     {
         errors.Add(new ValidationFailure("Email", "Please provide a valid email address"));
     }
-    
+
     return errors.Any() ? errors : Result<User>.Success(/* user */);
 }
 ```
 
 2. **Log exceptions with context:**
+
 ```csharp
 catch (Exception ex)
 {
@@ -1051,7 +1116,7 @@ catch (Exception ex)
         command.GetType().Name,
         command.TenantId,
         new { UserId = context.User?.FindFirst("sub")?.Value, RequestId = context.TraceIdentifier });
-    
+
     throw;
 }
 ```
@@ -1059,6 +1124,7 @@ catch (Exception ex)
 ### Testing and Debugging
 
 1. **Use debugger effectively:**
+
 ```csharp
 [Conditional("DEBUG")]
 public static void DebugBreakIf(bool condition, string message = "")
@@ -1075,6 +1141,7 @@ DebugBreakIf(user.TenantId != expectedTenantId, "Tenant mismatch detected");
 ```
 
 2. **Create debugging endpoints:**
+
 ```csharp
 #if DEBUG
 app.MapGet("/debug/health-detailed", async (
@@ -1082,7 +1149,7 @@ app.MapGet("/debug/health-detailed", async (
 {
     var healthCheckService = services.GetRequiredService<HealthCheckService>();
     var result = await healthCheckService.CheckHealthAsync();
-    
+
     return Results.Ok(new
     {
         Status = result.Status.ToString(),
@@ -1100,41 +1167,96 @@ app.MapGet("/debug/health-detailed", async (
 #endif
 ```
 
-## Getting Help
+## Quick Reference: Common Error Patterns
 
-### Internal Resources
+### Error Message Lookup Table
 
-1. **Check application logs:**
-   - Application-specific logs in your logging system
-   - ASP.NET Core logs for request pipeline issues
-   - Entity Framework logs for database issues
+| Error Message Pattern    | Category       | Quick Fix                                     |
+| ------------------------ | -------------- | --------------------------------------------- |
+| "Assembly not found"     | Startup        | Add `[assembly: DomainAssembly(...)]`         |
+| "Service not registered" | DI             | Check service registration order              |
+| "Connection refused"     | Database       | Verify database is running and accessible     |
+| "Topic not found"        | Messaging      | Check Kafka topic auto-creation settings      |
+| "Validation failed"      | Business Logic | Check FluentValidation rules                  |
+| "Unauthorized"           | Security       | Verify JWT configuration and claims           |
+| "Timeout"                | Performance    | Check database indexes and query performance  |
+| "Memory" issues          | Resources      | Profile application and optimize memory usage |
 
-2. **Use diagnostic tools:**
-   - dotnet-trace for performance issues
-   - dotnet-dump for memory issues
-   - dotnet-counters for real-time metrics
+### Environment-Specific Troubleshooting
 
-3. **Review configuration:**
-   - appsettings.json files
-   - Environment variables
-   - Docker Compose files
+#### Development Environment
 
-### External Resources
+```bash
+# Quick development reset
+docker compose down -v  # Remove all containers and volumes
+docker compose up -d postgres kafka  # Start infrastructure
+dotnet run --project src/YourApp.Api  # Start application
+```
+
+#### Production Environment
+
+```bash
+# Check application health
+curl -f http://localhost:5000/health || echo "Health check failed"
+
+# Check resource usage
+free -m  # Memory
+df -h    # Disk space
+top      # CPU and process information
+
+# Check logs
+journalctl -u your-app-service --since "1 hour ago"
+```
+
+#### Docker Environment
+
+```bash
+# Container diagnostics
+docker ps -a                    # List all containers
+docker logs container-name      # View container logs
+docker exec -it container bash  # Access container shell
+docker stats                    # Real-time resource usage
+```
+
+## Getting Help and Resources
+
+### Self-Service Resources
 
 1. **Momentum Documentation:**
-   - [Getting Started](./getting-started)
-   - [CQRS Guide](./cqrs/)
-   - [Best Practices](./best-practices)
 
-2. **Framework Documentation:**
-   - ASP.NET Core docs
-   - Entity Framework Core docs
-   - OpenTelemetry docs
-   - Wolverine docs
+    - [Getting Started Guide](./getting-started) - Basic setup and configuration
+    - [CQRS Guide](./cqrs/) - Commands, queries, and handlers
+    - [Best Practices](./best-practices) - Production-ready patterns
+    - [Testing Guide](./testing) - Comprehensive testing strategies
 
-3. **Community Support:**
-   - GitHub Issues
-   - Stack Overflow
-   - .NET Discord
+2. **Diagnostic Tools:**
 
-Remember to always include relevant context when seeking help: error messages, configuration, logs, and steps to reproduce the issue.
+    - `dotnet-trace` for performance issues
+    - `dotnet-dump` for memory issues
+    - `dotnet-counters` for real-time metrics
+    - `dotnet-gcdump` for garbage collection analysis
+
+3. **Framework Documentation:**
+    - ASP.NET Core documentation
+    - Entity Framework Core documentation
+    - OpenTelemetry documentation
+    - Wolverine messaging documentation
+
+### Community and Support
+
+-   **GitHub Issues** - Report bugs and feature requests
+-   **Stack Overflow** - Community Q&A with `momentum-dotnet` tag
+-   **Discord/Slack** - Real-time community support
+
+### Performance Troubleshooting Checklist
+
+-   [ ] Database indexes are properly configured
+-   [ ] Connection pooling is optimized
+-   [ ] Memory usage is within acceptable limits
+-   [ ] CPU usage is not consistently high
+-   [ ] Network latency is acceptable
+-   [ ] Garbage collection is not excessive
+-   [ ] Thread pool is not exhausted
+-   [ ] External service calls are optimized
+
+> **Remember**: Always include error messages, configuration (redacted), logs, and steps to reproduce when seeking help.
