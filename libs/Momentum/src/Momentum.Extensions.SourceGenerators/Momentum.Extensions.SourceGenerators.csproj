@@ -8,7 +8,8 @@
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <LangVersion>Latest</LangVersion>
-        <NoWarn>$(NoWarn);RS1041;RS2007;RS1036</NoWarn>
+        <NoWarn>$(NoWarn);RS1041;RS2007;RS1036;NU5128</NoWarn>
+        <IsPackable>true</IsPackable>
         <PackageId>Momentum.Extensions.SourceGenerators</PackageId>
         <PackageDescription>Source generators for the Momentum platform providing compile-time code generation utilities to reduce boilerplate and improve developer productivity. Includes generators for common patterns used across Momentum libraries.</PackageDescription>
         <PackageProjectUrl>https://github.com/vgmello/momentum-sample/blob/main/libs/Momentum/src/Momentum.Extensions.SourceGenerators/README.md</PackageProjectUrl>

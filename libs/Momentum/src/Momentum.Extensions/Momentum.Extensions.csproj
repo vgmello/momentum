@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <IsPackable>true</IsPackable>
         <PackageId>Momentum.Extensions</PackageId>
         <PackageDescription>Core extensions library for Momentum .NET providing common utilities, result types, messaging abstractions, and data access helpers. Includes integrations with Dapper, FluentValidation, OneOf, and WolverineFx.</PackageDescription>
         <PackageProjectUrl>https://github.com/vgmello/momentum-sample/blob/main/libs/Momentum/src/Momentum.Extensions/README.md</PackageProjectUrl>

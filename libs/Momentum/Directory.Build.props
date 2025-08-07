@@ -11,34 +11,9 @@
         <NoWarn>$(NoWarn);CS1591</NoWarn>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(IsPackable)' == 'true' ">
-        <Authors>Vitor M</Authors>
-        <Company>Momentum .NET</Company>
-        <Copyright>Copyright (c) 2025 Momentum .NET</Copyright>
-        <RepositoryUrl>https://github.com/vgmello/momentum</RepositoryUrl>
-        <RepositoryType>git</RepositoryType>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <EmbedUntrackedSources>true</EmbedUntrackedSources>
-        <IncludeSymbols>true</IncludeSymbols>
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <PackageIcon>icon.png</PackageIcon>
-        <PackageTags>momentum;mmt</PackageTags>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageReleaseNotes>https://github.com/vgmello/momentum/releases/tag/v$(PackageVersion)</PackageReleaseNotes>
-    </PropertyGroup>
-
-    <PropertyGroup Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' ">
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
         <VersionSuffix>$([System.DateTime]::UtcNow.ToString("yyyyMMdd-HHmmss"))</VersionSuffix>
     </PropertyGroup>
-
-    <ItemGroup Condition=" '$(IsPackable)' == 'true' ">
-        <PackageReference Include="Microsoft.SourceLink.GitHub"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <None Include="..\..\assets\icon.png" Pack="true" PackagePath="" Visible="false"/>
-    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="SonarAnalyzer.CSharp" developmentDependency="true">

@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <IsAspireSharedProject>true</IsAspireSharedProject>
+        <IsPackable>true</IsPackable>
         <PackageId>Momentum.ServiceDefaults</PackageId>
         <PackageDescription>Service defaults for Momentum platform providing common configurations for Aspire-based services including Kafka, PostgreSQL, OpenTelemetry, Serilog, resilience patterns, and service discovery. Essential for all Momentum host projects.</PackageDescription>
         <PackageProjectUrl>https://github.com/vgmello/momentum-sample/blob/main/libs/Momentum/src/Momentum.ServiceDefaults/README.md</PackageProjectUrl>

@@ -2,7 +2,6 @@
 
     <PropertyGroup>
         <IsTestProject>true</IsTestProject>
-        <IsPackable>False</IsPackable>
         <NoWarn>$(NoWarn);S3885</NoWarn>
     </PropertyGroup>
 

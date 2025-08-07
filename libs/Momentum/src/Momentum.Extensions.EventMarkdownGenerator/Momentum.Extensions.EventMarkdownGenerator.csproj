@@ -3,6 +3,7 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <PackAsTool>true</PackAsTool>
+        <IsPackable>true</IsPackable>
         <ToolCommandName>events-docsgen</ToolCommandName>
         <PackageId>Momentum.Extensions.EventMarkdownGenerator</PackageId>
         <Description>Generates individual markdown documentation files for distributed events from assemblies and XML documentation</Description>

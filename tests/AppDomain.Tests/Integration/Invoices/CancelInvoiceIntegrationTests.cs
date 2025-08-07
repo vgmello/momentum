@@ -114,7 +114,7 @@ public class CancelInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
             Version = createdInvoice.Version
         };
 
-        var cancelledInvoice = await _client.CancelInvoiceAsync(cancelRequest, cancellationToken: TestContext.Current.CancellationToken);
+        await _client.CancelInvoiceAsync(cancelRequest, cancellationToken: TestContext.Current.CancellationToken);
 
         // Act & Assert - Try to cancel again with old version
         var secondCancelRequest = new CancelInvoiceRequest

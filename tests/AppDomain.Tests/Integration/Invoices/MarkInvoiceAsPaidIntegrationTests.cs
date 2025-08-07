@@ -184,7 +184,7 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
             AmountPaid = 100.00
         };
 
-        var paidInvoice = await _client.MarkInvoiceAsPaidAsync(markPaidRequest, cancellationToken: TestContext.Current.CancellationToken);
+       await _client.MarkInvoiceAsPaidAsync(markPaidRequest, cancellationToken: TestContext.Current.CancellationToken);
 
         // Act & Assert - Try to pay again with old version
         var secondPayRequest = new MarkInvoiceAsPaidRequest

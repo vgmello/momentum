@@ -1,4 +1,27 @@
 <Project>
+
+    <PropertyGroup Condition=" '$(IsPackable)' == 'true' ">
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Authors>Vitor M</Authors>
+        <Company>Momentum .NET</Company>
+        <Copyright>Copyright (c) 2025 Momentum .NET</Copyright>
+        <RepositoryUrl>https://github.com/vgmello/momentum</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <PackageIcon>icon.png</PackageIcon>
+        <PackageTags>momentum;mmt</PackageTags>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReleaseNotes>https://github.com/vgmello/momentum/releases/tag/v$(PackageVersion)</PackageReleaseNotes>
+    </PropertyGroup>
+
+    <ItemGroup Condition=" '$(IsPackable)' == 'true' ">
+        <PackageReference Include="Microsoft.SourceLink.GitHub"/>
+        <None Include="..\..\assets\icon.png" Pack="true" PackagePath="" Visible="false"/>
+    </ItemGroup>
+
     <Target Name="CleanOldPackages" AfterTargets="Build" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' ">
         <ItemGroup>
             <OldPackagesToDelete Include="$(MSBuildProjectDirectory)/$(PackageOutputPath)*.nupkg"/>
@@ -13,4 +36,5 @@
         <MakeDir Directories="$(SolutionDir).local/nuget"/>
         <Exec Command="dotnet nuget push &quot;$(PackageOutputPath)$(PackageId).$(PackageVersion).nupkg&quot; --source &quot;$(SolutionDir).local/nuget&quot; --skip-duplicate"/>
     </Target>
+
 </Project>
