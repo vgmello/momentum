@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Wolverine;
 
-namespace Momentum.ServiceDefaults.Messaging.Kafka;
+namespace Momentum.Extensions.Messaging.Kafka;
 
 public static class KafkaMessagingExtensions
 {

@@ -55,7 +55,7 @@ export default defineConfig({
                         collapsed: false,
                         items: [
                             { text: "Overview", link: "/" },
-                            { text: "Event-Driven Architecture", link: "/eda" },
+                            { text: "Event-Driven Architecture", link: "/events" },
                             { text: "Database Design", link: "/database" },
                             { text: "Background Processing", link: "/background-processing" },
                             { text: "ADRs", base: "/arch/adr", items: AdrSidebar(ADR_DIR) },
@@ -102,9 +102,11 @@ export default defineConfig({
                         text: "Developer Guide",
                         collapsed: false,
                         items: [
+                            { text: "Development Setup", link: "/dev-setup" },
+                            { text: "First Contribution", link: "/first-contribution" },
                             { text: "Documentation Layout", link: "/documentation-layout" },
                             { text: "Running Database Queries and Commands", link: "/dbcommand-usage-guide.md" },
-                            { text: "Debugging Tips", link: "debugging" },
+                            { text: "Debugging Tips", link: "/debugging" },
                         ],
                     },
                 ],

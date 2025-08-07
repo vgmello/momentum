@@ -5,11 +5,12 @@ using CloudNative.CloudEvents.Kafka;
 using CloudNative.CloudEvents.SystemTextJson;
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
+using Momentum.ServiceDefaults.Messaging;
 using System.Text;
 using Wolverine;
 using Wolverine.Kafka;
 
-namespace Momentum.ServiceDefaults.Messaging.Kafka;
+namespace Momentum.Extensions.Messaging.Kafka;
 
 public class CloudEventMapper(IOptions<ServiceBusOptions> serviceBusOptions) : IKafkaEnvelopeMapper
 {

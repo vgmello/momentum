@@ -5,7 +5,7 @@ using Momentum.ServiceDefaults.Extensions;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Momentum.ServiceDefaults.Messaging.Kafka;
+namespace Momentum.Extensions.Messaging.Kafka;
 
 #pragma warning disable S3011
 

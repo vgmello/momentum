@@ -1,29 +1,39 @@
 # Momentum.Extensions.EventMarkdownGenerator
 
-This project provides automatic documentation generation for integration events in .NET applications using C# XML documentation comments. The tool generates markdown documentation for events and their schemas, complete with Kafka topic information, partition keys, and structured metadata.
+Generates individual markdown documentation files for distributed events from assemblies and XML documentation.
 
-## Features
+## Overview
 
--   **Automatic Event Discovery**: Finds events annotated with `EventTopic` attributes through assembly reflection
--   **Markdown Documentation Generation**: Creates comprehensive documentation for each event with metadata, payload details, and schema references
--   **Schema Documentation**: Generates documentation for complex types referenced by events
--   **Sidebar Navigation**: Creates structured sidebar JSON for documentation site integration
--   **Template Customization**: Uses Liquid templating engine for fully customizable output format
--   **MSBuild Integration**: Automatically generates documentation during build process
--   **CLI Tool**: Standalone command-line tool for CI/CD and manual generation
--   **GitHub Integration**: Links to source code when GitHub URL is configured
+The `Momentum.Extensions.EventMarkdownGenerator` provides automatic documentation generation for integration events in .NET applications using C# XML documentation comments. The tool generates comprehensive markdown documentation for events and their schemas, complete with Kafka topic information, partition keys, and structured metadata.
+
+## Key Features
+
+- **Automatic Event Discovery**: Finds events annotated with `EventTopic` attributes through assembly reflection
+- **Markdown Documentation Generation**: Creates comprehensive documentation for each event with metadata, payload details, and schema references
+- **Schema Documentation**: Generates documentation for complex types referenced by events
+- **Sidebar Navigation**: Creates structured sidebar JSON for documentation site integration
+- **Template Customization**: Uses Liquid templating engine for fully customizable output format
+- **MSBuild Integration**: Automatically generates documentation during build process
+- **CLI Tool**: Standalone command-line tool for CI/CD and manual generation
+- **GitHub Integration**: Links to source code when GitHub URL is configured
 
 ## Installation
 
 ### MSBuild Integration (Recommended)
 
-Add the NuGet package to your project for automatic documentation generation during builds:
+Add the package to your project using the .NET CLI:
+
+```bash
+dotnet add package Momentum.Extensions.EventMarkdownGenerator
+```
+
+Or add the package reference directly in your `.csproj`:
 
 ```xml
 <PackageReference Include="Momentum.Extensions.EventMarkdownGenerator" Version="*" />
 ```
 
-This will automatically generate event documentation in the `docs/events/` directory after each build.
+This automatically generates event documentation in the `docs/events/` directory after each build.
 
 ### Global CLI Tool
 

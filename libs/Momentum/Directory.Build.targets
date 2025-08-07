@@ -12,7 +12,8 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PackageIcon>icon.png</PackageIcon>
-        <PackageTags>momentum;mmt</PackageTags>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageTags>momentum;mmt;</PackageTags>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageReleaseNotes>https://github.com/vgmello/momentum/releases/tag/v$(PackageVersion)</PackageReleaseNotes>
     </PropertyGroup>
@@ -20,6 +21,7 @@
     <ItemGroup Condition=" '$(IsPackable)' == 'true' ">
         <PackageReference Include="Microsoft.SourceLink.GitHub"/>
         <None Include="..\..\assets\icon.png" Pack="true" PackagePath="" Visible="false"/>
+        <None Include="README.md" Pack="true" PackagePath="\" Visible="false" Condition="Exists('README.md')"/>
     </ItemGroup>
 
     <Target Name="CleanOldPackages" AfterTargets="Build" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' ">

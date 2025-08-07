@@ -7,6 +7,8 @@
         <ToolCommandName>events-docsgen</ToolCommandName>
         <PackageId>Momentum.Extensions.EventMarkdownGenerator</PackageId>
         <Description>Generates individual markdown documentation files for distributed events from assemblies and XML documentation</Description>
+        <PackageDescription>$(Description)</PackageDescription>
+        <PackageProjectUrl>https://github.com/vgmello/momentum/blob/main/libs/Momentum/src/Momentum.Extensions.EventMarkdownGenerator/README.md</PackageProjectUrl>
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <NoWarn>$(NoWarn);S3885</NoWarn>
     </PropertyGroup>

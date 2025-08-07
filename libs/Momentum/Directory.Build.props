@@ -15,6 +15,7 @@
         <VersionSuffix>$([System.DateTime]::UtcNow.ToString("yyyyMMdd-HHmmss"))</VersionSuffix>
     </PropertyGroup>
 
+
     <ItemGroup>
         <PackageReference Include="SonarAnalyzer.CSharp" developmentDependency="true">
             <PrivateAssets>all</PrivateAssets>

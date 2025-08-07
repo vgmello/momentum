@@ -130,8 +130,8 @@ The template follows a microservices architecture with shared platform libraries
 └── libs/                            # Shared libraries
     └── Operations/                  # Operations libs
         ├── src/                     # Platform source code
-        │   ├── Operations.Extensions.*
-        │   ├── Operations.ServiceDefaults.*
+        │   ├── Momentum.Extensions.*
+        │   ├── Momentum.ServiceDefaults.*
         │   └── ...
         └── tests/                   # Platform tests
 ```

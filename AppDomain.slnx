@@ -4,14 +4,13 @@
         <Project Path="infra\AppDomain.Database\AppDomain.Database.csproj"/>
     </Folder>
     <Folder Name="/Libs/">
+        <Project Path="libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.csproj"/>
         <Project Path="libs\Momentum\src\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
         <Project Path="libs\Momentum\src\Momentum.Extensions.EventMarkdownGenerator\Momentum.Extensions.EventMarkdownGenerator.csproj"/>
+        <Project Path="libs\Momentum\src\Momentum.Extensions.Messaging.Kafka\Momentum.Extensions.Messaging.Kafka.csproj"/>
         <Project Path="libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.csproj"/>
         <Project Path="libs\Momentum\src\Momentum.Extensions.XmlDocs\Momentum.Extensions.XmlDocs.csproj"/>
-        <Project Path="libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.csproj"/>
         <Project Path="libs\Momentum\src\Momentum.ServiceDefaults.Api\Momentum.ServiceDefaults.Api.csproj"/>
-        <Project Path="libs\Momentum\src\Momentum.ServiceDefaults.Messaging.Kafka\Momentum.ServiceDefaults.Messaging.Kafka.csproj"
-                 Type="Classic C#"/>
         <Project Path="libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
     </Folder>
     <Folder Name="/Libs/Misc/">

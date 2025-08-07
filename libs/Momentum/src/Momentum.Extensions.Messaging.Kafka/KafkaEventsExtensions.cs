@@ -7,13 +7,14 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Momentum.Extensions.Abstractions.Extensions;
 using Momentum.Extensions.Abstractions.Messaging;
+using Momentum.ServiceDefaults.Messaging;
 using System.Reflection;
 using Wolverine;
 using Wolverine.Kafka;
 
 #pragma warning disable S3011
 
-namespace Momentum.ServiceDefaults.Messaging.Kafka;
+namespace Momentum.Extensions.Messaging.Kafka;
 
 /// <summary>
 ///     Wolverine extension for configuring distributed events with Kafka.

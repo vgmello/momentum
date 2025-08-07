@@ -499,7 +499,7 @@ services.AddKeyedSingleton<DbDataSource>("AnalyticsDb", sp =>
 View generated code in Visual Studio:
 
 -   Go to **Project Properties** → **Build** → **Advanced** → **Debugging Information** → **Full**
--   Generated files appear in **Dependencies** → **Analyzers** → **Operations.Extensions.SourceGenerators**
+-   Generated files appear in **Dependencies** → **Analyzers** → **Momentum.Extensions.SourceGenerators**
 
 ## Summary
 

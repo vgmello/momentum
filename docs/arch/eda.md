@@ -219,7 +219,7 @@ The Platform's messaging infrastructure is built on Wolverine and provides autom
 The system automatically discovers integration events using namespace conventions:
 
 ```csharp
-// libs/Operations/src/Operations.ServiceDefaults/Messaging/Kafka/IntegrationEventsDiscovery.cs:91
+// libs/Momentum/src/Momentum.ServiceDefaults/Messaging/Kafka/IntegrationEventsDiscovery.cs:91
 private static bool IsIntegrationEventType(Type messageType) =>
     messageType.Namespace?.EndsWith(IntegrationEventsNamespace) == true;
 ```
@@ -267,7 +267,7 @@ The system generates fully qualified topic names following this pattern:
 **Implementation:**
 
 ```csharp
-// libs/Operations/src/Operations.ServiceDefaults/Messaging/Kafka/KafkaIntegrationEventsExtensions.cs:156-177
+// libs/Momentum/src/Momentum.ServiceDefaults/Messaging/Kafka/KafkaIntegrationEventsExtensions.cs:156-177
 private static string GetTopicName(Type messageType, EventTopicAttribute topicAttribute, string env)
 {
     var envName = env switch
@@ -297,7 +297,7 @@ The Kafka integration provides:
 #### Publisher Configuration
 
 ```csharp
-// libs/Operations/src/Operations.ServiceDefaults/Messaging/Kafka/KafkaIntegrationEventsExtensions.cs:129-147
+// libs/Momentum/src/Momentum.ServiceDefaults/Messaging/Kafka/KafkaIntegrationEventsExtensions.cs:129-147
 private static void SetupKafkaPublisherRoute<TEventType>(WolverineOptions options, string topicName)
 {
     var partitionKeyGetter = PartitionKeyProviderFactory.GetPartitionKeyFunction<TEventType>();
@@ -322,7 +322,7 @@ private static void SetupKafkaPublisherRoute<TEventType>(WolverineOptions option
 #### Subscriber Configuration
 
 ```csharp
-// libs/Operations/src/Operations.ServiceDefaults/Messaging/Kafka/KafkaIntegrationEventsExtensions.cs:95-127
+// libs/Momentum/src/Momentum.ServiceDefaults/Messaging/Kafka/KafkaIntegrationEventsExtensions.cs:95-127
 private void SetupSubscribers(WolverineOptions options)
 {
     var integrationEventTypesWithHandlers = IntegrationEventsDiscovery.GetIntegrationEventTypesWithHandlers();
@@ -474,7 +474,7 @@ public record CashierCreated(
 The system automatically generates partition key functions:
 
 ```csharp
-// libs/Operations/src/Operations.ServiceDefaults/Messaging/Kafka/KafkaIntegrationEventsExtensions.cs:131
+// libs/Momentum/src/Momentum.ServiceDefaults/Messaging/Kafka/KafkaIntegrationEventsExtensions.cs:131
 var partitionKeyGetter = PartitionKeyProviderFactory.GetPartitionKeyFunction<TEventType>();
 ```
 

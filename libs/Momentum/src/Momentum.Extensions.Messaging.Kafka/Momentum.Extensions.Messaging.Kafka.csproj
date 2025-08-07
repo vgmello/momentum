@@ -1,7 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    
+
     <PropertyGroup>
         <IsPackable>true</IsPackable>
+        <PackageId>Momentum.Extensions.Messaging.Kafka</PackageId>
+        <PackageDescription>Kafka messaging integration for Momentum platform providing event-driven communication through Apache Kafka with CloudEvents, WolverineFx, and OpenTelemetry support.</PackageDescription>
+        <PackageProjectUrl>https://github.com/vgmello/momentum/blob/main/libs/Momentum/src/Momentum.Extensions.Messaging.Kafka/README.md</PackageProjectUrl>
     </PropertyGroup>
 
     <ItemGroup>

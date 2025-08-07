@@ -51,8 +51,8 @@ try {
 
     // Look for the pre-built DLL in both local and Docker environments
     const possibleDllPaths = [
-        '/generator/libs/Operations/src/Operations.Extensions.EventMarkdownGenerator/bin/Debug/net9.0/Operations.Extensions.EventMarkdownGenerator.dll',
-        path.resolve('..', 'libs', 'Operations', 'src', 'Operations.Extensions.EventMarkdownGenerator', 'bin', 'Debug', 'net9.0', 'Operations.Extensions.EventMarkdownGenerator.dll')
+        '/generator/libs/Momentum/src/Momentum.Extensions.EventMarkdownGenerator/bin/Debug/net9.0/Momentum.Extensions.EventMarkdownGenerator.dll',
+        path.resolve('..', 'libs', 'Momentum', 'src', 'Momentum.Extensions.EventMarkdownGenerator', 'bin', 'Debug', 'net9.0', 'Momentum.Extensions.EventMarkdownGenerator.dll')
     ];
 
     const toolDllPath = possibleDllPaths.find(dllPath => fs.existsSync(dllPath));

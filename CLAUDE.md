@@ -75,11 +75,11 @@ Each domain area (Cashiers, Invoices) follows consistent patterns:
 
 -   **Integration Events**: Cross-service communication (CashierCreated, InvoicePaid, etc.)
 -   **Domain Events**: Internal domain notifications (InvoiceGenerated)
--   **Event Documentation**: Auto-generated from XML comments using Operations.Extensions.EventMarkdownGenerator
+-   **Event Documentation**: Auto-generated from XML comments using Momentum.Extensions.EventMarkdownGenerator
 
 ### Custom Source Generators
 
-The solution includes custom source generators in `libs/Operations/`:
+The solution includes custom source generators in `libs/Momentum/`:
 
 -   **DbCommand Generator**: Generates type-safe database command handlers
 -   **Event Documentation Generator**: Creates markdown documentation from integration events
@@ -92,7 +92,7 @@ The solution includes custom source generators in `libs/Operations/`:
 
 ### Operations Libraries
 
-Shared platform libraries in `libs/Operations/` provide:
+Shared platform libraries in `libs/Momentum/` provide:
 
 -   **ServiceDefaults**: Common hosting, logging, OpenTelemetry, health checks
 -   **Extensions**: CQRS abstractions, database extensions, result types

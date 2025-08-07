@@ -22,7 +22,7 @@ The system uses a `Result<T>` type that represents either success or failure exp
 
 ### Result Type Implementation
 
-<<< @/../libs/Operations/src/Operations.Extensions/Result.cs
+<<< @/../libs/Momentum/src/Momentum.Extensions/Result.cs
 
 ### Why Result Over Exceptions
 
@@ -68,11 +68,11 @@ The system integrates FluentValidation with the Result pattern for comprehensive
 
 The system automatically applies validation through middleware:
 
-<<< @/../libs/Operations/src/Operations.ServiceDefaults/Messaging/Middlewares/FluentValidationExecutor.cs{19-39}
+<<< @/../libs/Momentum/src/Momentum.ServiceDefaults/Messaging/Middlewares/FluentValidationExecutor.cs{19-39}
 
 ### Validation Policy
 
-<<< @/../libs/Operations/src/Operations.ServiceDefaults/Messaging/Middlewares/FluentValidationPolicy.cs{12-28}
+<<< @/../libs/Momentum/src/Momentum.ServiceDefaults/Messaging/Middlewares/FluentValidationPolicy.cs{12-28}
 
 ## API Error Handling
 
@@ -168,11 +168,11 @@ System errors represent unexpected problems that stop normal operation.
 
 ### Exception Handling Middleware
 
-<<< @/../libs/Operations/src/Operations.ServiceDefaults/Messaging/Middlewares/ExceptionHandlingFrame.cs{17-33}
+<<< @/../libs/Momentum/src/Momentum.ServiceDefaults/Messaging/Middlewares/ExceptionHandlingFrame.cs{17-33}
 
 ### Exception Handling Policy
 
-<<< @/../libs/Operations/src/Operations.ServiceDefaults/Messaging/Middlewares/ExceptionHandlingPolicy.cs{13-25}
+<<< @/../libs/Momentum/src/Momentum.ServiceDefaults/Messaging/Middlewares/ExceptionHandlingPolicy.cs{13-25}
 
 ## Testing Error Scenarios
 
