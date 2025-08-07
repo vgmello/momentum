@@ -15,12 +15,12 @@ hero:
 
 features:
     - title: Data Access
-      details: TBD
+      details: Type-safe database operations with LinqToDB, entity mapping, and the DbCommand pattern for clean separation of business and data logic.
       link: /guide/rdbms
     - title: Messaging
-      details: TBD
+      details: Event-driven architecture with Kafka integration, CQRS command/query separation, and automatic CloudEvents formatting for reliable service communication.
       link: /guide/messaging
     - title: Open Telemetry
-      details: TBD
+      details: Production-ready observability with structured logging via Serilog, distributed tracing, metrics collection, and health monitoring out-of-the-box.
       link: /guide/otel
 ---
