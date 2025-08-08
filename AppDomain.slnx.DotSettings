@@ -78,5 +78,243 @@
   &amp;lt;/Language&amp;gt;
 &amp;lt;/profile&amp;gt;&lt;/RIDER_SETTINGS&gt;&lt;CSOptimizeUsings&gt;&lt;/CSOptimizeUsings&gt;&lt;CSReformatCode&gt;True&lt;/CSReformatCode&gt;&lt;CSharpFormatDocComments&gt;True&lt;/CSharpFormatDocComments&gt;&lt;CSArrangeQualifiers&gt;True&lt;/CSArrangeQualifiers&gt;&lt;CSFixBuiltinTypeReferences&gt;True&lt;/CSFixBuiltinTypeReferences&gt;&lt;/Profile&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/CodeCleanup/SilentCleanupProfile/@EntryValue">Default Code Cleanup Profile</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=355BE2ED4EA6A74FADDFE55A61B14E9B/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=355BE2ED4EA6A74FADDFE55A61B14E9B/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=355BE2ED4EA6A74FADDFE55A61B14E9B/Description/@EntryValue">HTTP PUT</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=355BE2ED4EA6A74FADDFE55A61B14E9B/Field/=ACTION/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=355BE2ED4EA6A74FADDFE55A61B14E9B/Field/=ACTION/Order/@EntryValue">0</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=355BE2ED4EA6A74FADDFE55A61B14E9B/Field/=DESC/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=355BE2ED4EA6A74FADDFE55A61B14E9B/Field/=DESC/Order/@EntryValue">3</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=355BE2ED4EA6A74FADDFE55A61B14E9B/Field/=REQUEST/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=355BE2ED4EA6A74FADDFE55A61B14E9B/Field/=REQUEST/Order/@EntryValue">1</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=355BE2ED4EA6A74FADDFE55A61B14E9B/Field/=RESULT/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=355BE2ED4EA6A74FADDFE55A61B14E9B/Field/=RESULT/Order/@EntryValue">2</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=355BE2ED4EA6A74FADDFE55A61B14E9B/Reformat/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=355BE2ED4EA6A74FADDFE55A61B14E9B/Scope/=C3001E7C0DA78E4487072B7E050D86C5/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=355BE2ED4EA6A74FADDFE55A61B14E9B/Scope/=C3001E7C0DA78E4487072B7E050D86C5/CustomProperties/=minimumLanguageVersion/@EntryIndexedValue">2.0</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=355BE2ED4EA6A74FADDFE55A61B14E9B/Scope/=C3001E7C0DA78E4487072B7E050D86C5/Type/@EntryValue">InCSharpFile</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=355BE2ED4EA6A74FADDFE55A61B14E9B/Shortcut/@EntryValue">httpput</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=355BE2ED4EA6A74FADDFE55A61B14E9B/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=355BE2ED4EA6A74FADDFE55A61B14E9B/Text/@EntryValue">/// &lt;summary&gt;
+///     Updates $DESC$
+/// &lt;/summary&gt;
+/// &lt;param name="request"&gt;The update request&lt;/param&gt;
+/// &lt;param name="cancellationToken"&gt;Cancellation token&lt;/param&gt;
+/// &lt;returns&gt;The updated $DESC$&lt;/returns&gt;
+/// &lt;response code="200" /&gt;
+/// &lt;response code="400" /&gt;
+/// &lt;response code="404" /&gt;
+[HttpPut]
+public async Task&lt;ActionResult&lt;$RESULT$&gt;&gt; $ACTION$([FromBody] $REQUEST$ request, CancellationToken cancellationToken)
+{
+    var command = request.ToCommand();
+    var result = await bus.InvokeCommandAsync(command, cancellationToken);
+
+    return result.Match&lt;ActionResult&lt;$RESULT$&gt;&gt;(
+        ok =&gt; Ok(ok),
+        errors =&gt; BadRequest(new { Errors = errors }));
+}
+</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=65C10A6C244B03409522DEBFE85694FD/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=65C10A6C244B03409522DEBFE85694FD/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=65C10A6C244B03409522DEBFE85694FD/Description/@EntryValue">HTTP DELETE</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=65C10A6C244B03409522DEBFE85694FD/Field/=ACTION/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=65C10A6C244B03409522DEBFE85694FD/Field/=ACTION/Order/@EntryValue">0</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=65C10A6C244B03409522DEBFE85694FD/Field/=DESC/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=65C10A6C244B03409522DEBFE85694FD/Field/=DESC/Order/@EntryValue">2</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=65C10A6C244B03409522DEBFE85694FD/Field/=REQUEST/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=65C10A6C244B03409522DEBFE85694FD/Field/=REQUEST/Order/@EntryValue">1</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=65C10A6C244B03409522DEBFE85694FD/Reformat/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=65C10A6C244B03409522DEBFE85694FD/Scope/=C3001E7C0DA78E4487072B7E050D86C5/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=65C10A6C244B03409522DEBFE85694FD/Scope/=C3001E7C0DA78E4487072B7E050D86C5/CustomProperties/=minimumLanguageVersion/@EntryIndexedValue">2.0</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=65C10A6C244B03409522DEBFE85694FD/Scope/=C3001E7C0DA78E4487072B7E050D86C5/Type/@EntryValue">InCSharpFile</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=65C10A6C244B03409522DEBFE85694FD/Shortcut/@EntryValue">httpdel</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=65C10A6C244B03409522DEBFE85694FD/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=65C10A6C244B03409522DEBFE85694FD/Text/@EntryValue">/// &lt;summary&gt;
+///     Deletes $DESC$
+/// &lt;/summary&gt;
+/// &lt;param name="request"&gt;The deletion request&lt;/param&gt;
+/// &lt;param name="cancellationToken"&gt;Cancellation token&lt;/param&gt;
+/// &lt;returns&gt;No content if successful&lt;/returns&gt;
+/// &lt;response code="204" /&gt;
+/// &lt;response code="400" /&gt;
+/// &lt;response code="404" /&gt;
+[HttpDelete]
+public async Task&lt;ActionResult&gt; $ACTION$([FromBody] $REQUEST$ request, CancellationToken cancellationToken)
+{
+    var command = request.ToCommand();
+    var result = await bus.InvokeCommandAsync(command, cancellationToken);
+
+    return result.Match&lt;ActionResult&gt;(
+        _ =&gt; NoContent(),
+        errors =&gt; BadRequest(new { Errors = errors }));
+}
+</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A328E23A0530884394D6430FB24DD380/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A328E23A0530884394D6430FB24DD380/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A328E23A0530884394D6430FB24DD380/Description/@EntryValue">HTTP POST</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A328E23A0530884394D6430FB24DD380/Field/=ACTION/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A328E23A0530884394D6430FB24DD380/Field/=ACTION/Order/@EntryValue">0</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A328E23A0530884394D6430FB24DD380/Field/=DESC/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A328E23A0530884394D6430FB24DD380/Field/=DESC/Order/@EntryValue">3</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A328E23A0530884394D6430FB24DD380/Field/=REQUEST/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A328E23A0530884394D6430FB24DD380/Field/=REQUEST/Order/@EntryValue">1</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A328E23A0530884394D6430FB24DD380/Field/=RESULT/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A328E23A0530884394D6430FB24DD380/Field/=RESULT/Order/@EntryValue">2</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A328E23A0530884394D6430FB24DD380/Reformat/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A328E23A0530884394D6430FB24DD380/Scope/=C3001E7C0DA78E4487072B7E050D86C5/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A328E23A0530884394D6430FB24DD380/Scope/=C3001E7C0DA78E4487072B7E050D86C5/CustomProperties/=minimumLanguageVersion/@EntryIndexedValue">2.0</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A328E23A0530884394D6430FB24DD380/Scope/=C3001E7C0DA78E4487072B7E050D86C5/Type/@EntryValue">InCSharpFile</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A328E23A0530884394D6430FB24DD380/Shortcut/@EntryValue">httppost</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A328E23A0530884394D6430FB24DD380/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=A328E23A0530884394D6430FB24DD380/Text/@EntryValue">/// &lt;summary&gt;
+///     Creates $DESC$
+/// &lt;/summary&gt;
+/// &lt;param name="request"&gt;The creation request&lt;/param&gt;
+/// &lt;param name="cancellationToken"&gt;Cancellation token&lt;/param&gt;
+/// &lt;returns&gt;The created $DESC$&lt;/returns&gt;
+/// &lt;response code="201" /&gt;
+/// &lt;response code="400" /&gt;
+/// &lt;response code="409" /&gt;
+[HttpPost]
+public async Task&lt;ActionResult&lt;$RESULT$&gt;&gt; $ACTION$([FromBody] $REQUEST$ request, CancellationToken cancellationToken)
+{
+    var command = request.ToCommand();
+    var result = await bus.InvokeCommandAsync(command, cancellationToken);
+
+    return result.Match(
+        created =&gt; StatusCode(StatusCodes.Status201Created, created),
+        errors =&gt; BadRequest(new { Errors = errors }));
+}
+</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B270F12E3398AE49A17E0359E335D5B0/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B270F12E3398AE49A17E0359E335D5B0/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B270F12E3398AE49A17E0359E335D5B0/Categories/=Imported_0020Visual_0020C_0023_0020Snippets/@EntryIndexedValue">Imported Visual C# Snippets</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B270F12E3398AE49A17E0359E335D5B0/Description/@EntryValue">Query + Handler</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B270F12E3398AE49A17E0359E335D5B0/Field/=Action/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B270F12E3398AE49A17E0359E335D5B0/Field/=Action/Order/@EntryValue">0</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B270F12E3398AE49A17E0359E335D5B0/Field/=Datasource/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B270F12E3398AE49A17E0359E335D5B0/Field/=Datasource/Order/@EntryValue">2</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B270F12E3398AE49A17E0359E335D5B0/Field/=EntitySet/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B270F12E3398AE49A17E0359E335D5B0/Field/=EntitySet/Order/@EntryValue">3</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B270F12E3398AE49A17E0359E335D5B0/Field/=Result/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B270F12E3398AE49A17E0359E335D5B0/Field/=Result/Order/@EntryValue">1</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B270F12E3398AE49A17E0359E335D5B0/IsBlessed/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B270F12E3398AE49A17E0359E335D5B0/Reformat/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B270F12E3398AE49A17E0359E335D5B0/Scope/=4B847A5ED8F7574F925C66209222DF71/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B270F12E3398AE49A17E0359E335D5B0/Scope/=4B847A5ED8F7574F925C66209222DF71/Type/@EntryValue">AtLineStart</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B270F12E3398AE49A17E0359E335D5B0/Scope/=74A278E9BF386142B53D57114609A033/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B270F12E3398AE49A17E0359E335D5B0/Scope/=74A278E9BF386142B53D57114609A033/CustomProperties/=minimumLanguageVersion/@EntryIndexedValue">2.0</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B270F12E3398AE49A17E0359E335D5B0/Scope/=74A278E9BF386142B53D57114609A033/Type/@EntryValue">InCSharpExceptStringLiterals</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B270F12E3398AE49A17E0359E335D5B0/Shortcut/@EntryValue">qryh</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B270F12E3398AE49A17E0359E335D5B0/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=B270F12E3398AE49A17E0359E335D5B0/Text/@EntryValue">public record $Action$Query() : IQuery&lt;Result&lt;$Result$&gt;&gt;;
+
+public static class $Action$QueryHandler
+{
+    public static async Task&lt;Result&lt;$Result$&gt;&gt; Handle($Action$Query query, $Datasource$ db, CancellationToken cancellationToken)
+    {
+        var entity = await db.$EntitySet$
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (entity is not null)
+        {
+            return entity.ToModel();
+        }
+
+        return new List&lt;ValidationFailure&gt; { };
+    }
+}
+</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC2090CBBF14E243B3562888D24EF1A8/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC2090CBBF14E243B3562888D24EF1A8/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC2090CBBF14E243B3562888D24EF1A8/Description/@EntryValue">HTTP GET</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC2090CBBF14E243B3562888D24EF1A8/Field/=ACTION/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC2090CBBF14E243B3562888D24EF1A8/Field/=ACTION/Order/@EntryValue">0</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC2090CBBF14E243B3562888D24EF1A8/Field/=DESC/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC2090CBBF14E243B3562888D24EF1A8/Field/=DESC/Order/@EntryValue">3</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC2090CBBF14E243B3562888D24EF1A8/Field/=REQUEST/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC2090CBBF14E243B3562888D24EF1A8/Field/=REQUEST/Order/@EntryValue">1</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC2090CBBF14E243B3562888D24EF1A8/Field/=RESULT/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC2090CBBF14E243B3562888D24EF1A8/Field/=RESULT/Order/@EntryValue">2</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC2090CBBF14E243B3562888D24EF1A8/Reformat/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC2090CBBF14E243B3562888D24EF1A8/Scope/=C3001E7C0DA78E4487072B7E050D86C5/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC2090CBBF14E243B3562888D24EF1A8/Scope/=C3001E7C0DA78E4487072B7E050D86C5/CustomProperties/=minimumLanguageVersion/@EntryIndexedValue">2.0</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC2090CBBF14E243B3562888D24EF1A8/Scope/=C3001E7C0DA78E4487072B7E050D86C5/Type/@EntryValue">InCSharpFile</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC2090CBBF14E243B3562888D24EF1A8/Shortcut/@EntryValue">httpget</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC2090CBBF14E243B3562888D24EF1A8/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=BC2090CBBF14E243B3562888D24EF1A8/Text/@EntryValue">/// &lt;summary&gt;
+///     Retrieves $DESC$
+/// &lt;/summary&gt;
+/// &lt;param name="request"&gt;The request parameters&lt;/param&gt;
+/// &lt;param name="cancellationToken"&gt;Cancellation token&lt;/param&gt;
+/// &lt;returns&gt;$DESC$&lt;/returns&gt;
+/// &lt;response code="200" /&gt;
+/// &lt;response code="404" /&gt;
+/// &lt;response code="400" /&gt;
+[HttpGet]
+public async Task&lt;ActionResult&lt;$RESULT$&gt;&gt; $ACTION$([FromQuery] $REQUEST$ request, CancellationToken cancellationToken)
+{
+    var query = request.ToQuery();
+    var result = await bus.InvokeQueryAsync(query, cancellationToken);
+
+    return result.Match&lt;ActionResult&lt;$RESULT$&gt;&gt;(
+        ok =&gt; Ok(ok),
+        errors =&gt; NotFound(new { Errors = errors }));
+}
+</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F0692E1249D71D4CBE0D166B1A8AB7BC/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F0692E1249D71D4CBE0D166B1A8AB7BC/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F0692E1249D71D4CBE0D166B1A8AB7BC/Applicability/=Surround/@EntryIndexedValue">False</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F0692E1249D71D4CBE0D166B1A8AB7BC/Categories/=Imported_0020Visual_0020C_0023_0020Snippets/@EntryIndexedValue">Imported Visual C# Snippets</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F0692E1249D71D4CBE0D166B1A8AB7BC/Description/@EntryValue">Command + Handler</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F0692E1249D71D4CBE0D166B1A8AB7BC/Field/=Action/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F0692E1249D71D4CBE0D166B1A8AB7BC/Field/=Action/Order/@EntryValue">0</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F0692E1249D71D4CBE0D166B1A8AB7BC/Field/=Datasource/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F0692E1249D71D4CBE0D166B1A8AB7BC/Field/=Datasource/Order/@EntryValue">3</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F0692E1249D71D4CBE0D166B1A8AB7BC/Field/=Event/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F0692E1249D71D4CBE0D166B1A8AB7BC/Field/=Event/Order/@EntryValue">2</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F0692E1249D71D4CBE0D166B1A8AB7BC/Field/=Result/@KeyIndexDefined">True</s:Boolean>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F0692E1249D71D4CBE0D166B1A8AB7BC/Field/=Result/Order/@EntryValue">1</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F0692E1249D71D4CBE0D166B1A8AB7BC/IsBlessed/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F0692E1249D71D4CBE0D166B1A8AB7BC/Reformat/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F0692E1249D71D4CBE0D166B1A8AB7BC/Scope/=4B847A5ED8F7574F925C66209222DF71/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F0692E1249D71D4CBE0D166B1A8AB7BC/Scope/=4B847A5ED8F7574F925C66209222DF71/Type/@EntryValue">AtLineStart</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F0692E1249D71D4CBE0D166B1A8AB7BC/Scope/=74A278E9BF386142B53D57114609A033/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F0692E1249D71D4CBE0D166B1A8AB7BC/Scope/=74A278E9BF386142B53D57114609A033/CustomProperties/=minimumLanguageVersion/@EntryIndexedValue">2.0</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F0692E1249D71D4CBE0D166B1A8AB7BC/Scope/=74A278E9BF386142B53D57114609A033/Type/@EntryValue">InCSharpExceptStringLiterals</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F0692E1249D71D4CBE0D166B1A8AB7BC/Shortcut/@EntryValue">cmdh</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F0692E1249D71D4CBE0D166B1A8AB7BC/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F0692E1249D71D4CBE0D166B1A8AB7BC/Text/@EntryValue">public record $Action$Command() : ICommand&lt;Result&lt;$Result$&gt;&gt;;
+
+public class $Action$Validator : AbstractValidator&lt;$Action$Command&gt;
+{
+    public $Action$Validator()
+    {
+        // TODO: Add validation rules
+        $END$
+    }
+}
+
+public static class $Action$CommandHandler
+{
+    public record DbCommand() : ICommand&lt;int&gt;;
+
+    public static async Task&lt;(Result&lt;$Result$&gt;, $Event$?)&gt; Handle($Action$Command command, IMessageBus messaging,
+        CancellationToken cancellationToken)
+    {
+        var dbCommand = new DbCommand();
+        var affected = await messaging.InvokeCommandAsync(dbCommand, cancellationToken);
+
+        var @event = new $Event$();
+        return (default!, @event);
+    }
+
+    public static async Task&lt;int&gt; Handle(DbCommand command, $Datasource$ db, CancellationToken cancellationToken)
+    {
+        // TODO: Implement DB command handling
+        return default;
+    }
+}</s:String>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=abcdeg/@EntryIndexedValue">True</s:Boolean>
 </wpf:ResourceDictionary>
