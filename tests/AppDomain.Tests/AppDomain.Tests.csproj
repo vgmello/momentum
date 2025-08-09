@@ -1,37 +1,28 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
+        <NoWarn>$(NoWarn);CS0436;</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="coverlet.collector"/>
-        <PackageReference Include="Microsoft.NET.Test.Sdk"/>
-        <PackageReference Include="xunit"/>
-        <PackageReference Include="xunit.runner.visualstudio"/>
-        <PackageReference Include="FluentAssertions"/>
-        <PackageReference Include="NSubstitute"/>
-        <PackageReference Include="Testcontainers.PostgreSql"/>
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing"/>
-        <PackageReference Include="NetArchTest.Rules"/>
+        <PackageReference Include="Testcontainers"/>
+        <PackageReference Include="Testcontainers.PostgreSql"/>
+        <PackageReference Include="Grpc.Tools"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\AppDomain\AppDomain.csproj"/>
         <ProjectReference Include="..\..\src\AppDomain.Api\AppDomain.Api.csproj"/>
         <ProjectReference Include="..\..\src\AppDomain.BackOffice\AppDomain.BackOffice.csproj"/>
-        <ProjectReference Include="..\..\src\AppDomain.Contracts\AppDomain.Contracts.csproj"/>
-    </ItemGroup>
-
-    <ItemGroup Condition="Exists('..\..\src\AppDomain.BackOffice.Orleans\AppDomain.BackOffice.Orleans.csproj')">
-        <ProjectReference Include="..\..\src\AppDomain.BackOffice.Orleans\AppDomain.BackOffice.Orleans.csproj"/>
+        <ProjectReference Include="..\..\src\AppDomain\AppDomain.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <Using Include="FluentAssertions"/>
-        <Using Include="NSubstitute"/>
-        <Using Include="Xunit"/>
+        <Protobuf Include="..\..\src\AppDomain.Api\**\Protos\**\*.proto"
+                  ProtoRoot="..\..\src\AppDomain.Api\"
+                  GrpcServices="Client"
+                  Link="Integration\%(RecursiveDir)%(Filename)%(Extension)"/>
     </ItemGroup>
 
 </Project>

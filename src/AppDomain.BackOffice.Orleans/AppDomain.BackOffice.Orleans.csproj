@@ -19,9 +19,9 @@
     <!-- Conditional ServiceDefaults library -->
     <!--#if (includeLibDefaults) -->
     <ItemGroup>
-        <ProjectReference Include="libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
+        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
     </ItemGroup>
-    <Import Project="libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.props"/>
+    <Import Project="..\..\libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.props"/>
     <!--#else -->
     <ItemGroup>
         <PackageReference Include="Momentum.ServiceDefaults"/>

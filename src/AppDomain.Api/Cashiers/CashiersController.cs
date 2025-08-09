@@ -55,10 +55,10 @@ public class CashiersController(IMessageBus bus) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetCashier([FromRoute] Guid cashierId, CancellationToken cancellationToken)
     {
-        var tenantId = HttpContext.GetTenantId();
+        var tenantId = User.GetTenantId();
         var query = new GetCashierQuery(tenantId, cashierId);
         
-        var result = await _messageBus.InvokeAsync<Result<Contracts.Models.Cashier>>(query, cancellationToken);
+        var result = await bus.InvokeAsync<Result<Contracts.Models.Cashier>>(query, cancellationToken);
         
         if (result.IsFailure)
         {
@@ -78,10 +78,10 @@ public class CashiersController(IMessageBus bus) : ControllerBase
     [ProducesResponseType<IEnumerable<GetCashiersQuery.Result>>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCashiers([FromQuery] GetCashiersRequest request, CancellationToken cancellationToken)
     {
-        var tenantId = HttpContext.GetTenantId();
+        var tenantId = User.GetTenantId();
         var query = request.ToQuery(tenantId);
         
-        var result = await _messageBus.InvokeAsync<IEnumerable<GetCashiersQuery.Result>>(query, cancellationToken);
+        var result = await bus.InvokeAsync<IEnumerable<GetCashiersQuery.Result>>(query, cancellationToken);
         
         return Ok(result);
     }
@@ -99,10 +99,10 @@ public class CashiersController(IMessageBus bus) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateCashier([FromRoute] Guid cashierId, [FromBody] UpdateCashierRequest request, CancellationToken cancellationToken)
     {
-        var tenantId = HttpContext.GetTenantId();
+        var tenantId = User.GetTenantId();
         var command = request.ToCommand(tenantId, cashierId);
         
-        var result = await _messageBus.InvokeAsync<Result<Contracts.Models.Cashier>>(command, cancellationToken);
+        var result = await bus.InvokeAsync<Result<Contracts.Models.Cashier>>(command, cancellationToken);
         
         if (result.IsFailure)
         {
@@ -123,10 +123,10 @@ public class CashiersController(IMessageBus bus) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteCashier([FromRoute] Guid cashierId, CancellationToken cancellationToken)
     {
-        var tenantId = HttpContext.GetTenantId();
+        var tenantId = User.GetTenantId();
         var command = new DeleteCashierCommand(tenantId, cashierId);
         
-        var result = await _messageBus.InvokeAsync<Result>(command, cancellationToken);
+        var result = await bus.InvokeAsync<Result>(command, cancellationToken);
         
         if (result.IsFailure)
         {

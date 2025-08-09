@@ -27,9 +27,9 @@
     <!-- Conditional Extensions library -->
     <!--#if (includeLibExt) -->
     <ItemGroup>
-        <ProjectReference Include="libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.csproj"/>
+        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.csproj"/>
     </ItemGroup>
-    <Import Project="libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.props" />
+    <Import Project="..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.props" />
     <!--#else -->
     <ItemGroup>
         <PackageReference Include="Momentum.Extensions"/>
@@ -39,10 +39,10 @@
     <!-- Conditional SourceGenerators library -->  
     <!--#if (includeLibGenerators) -->
     <ItemGroup>
-        <ProjectReference Include="libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.csproj"
+        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.csproj"
                           OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
     </ItemGroup>
-    <Import Project="libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.props" />
+    <Import Project="..\..\libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.props" />
     <!--#else -->
     <ItemGroup>
         <PackageReference Include="Momentum.Extensions.SourceGenerators"/>
