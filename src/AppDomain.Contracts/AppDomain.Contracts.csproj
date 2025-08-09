@@ -32,8 +32,9 @@
         <Content Include="AppDomain.Contracts.props" Pack="true" PackagePath="build/"/>
     </ItemGroup>
 
+    <!-- Always NuGet packages -->
     <ItemGroup>
-        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
+        <PackageReference Include="Momentum.Extensions.Abstractions"/>
     </ItemGroup>
 
 </Project>

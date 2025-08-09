@@ -1,37 +1,25 @@
 // Copyright (c) ABCDEG. All rights reserved.
 
-using AppDomain.BackOffice.Orleans;
-using AppDomain.BackOffice.Orleans.Infrastructure.Extensions;
-using AppDomain.BackOffice.Orleans.Invoices.Grains;
+using AppDomain.Infrastructure;
 using Momentum.ServiceDefaults;
-using Momentum.ServiceDefaults.HealthChecks;
 
-var builder = WebApplication.CreateSlimBuilder(args);
+var builder = Host.CreateApplicationBuilder(args);
 
 builder.AddServiceDefaults();
-builder.AddOrleans();
 
-// Application Services
-builder.AddApplicationServices();
-
-var app = builder.Build();
-
-app.MapOrleansDashboard();
-app.MapDefaultHealthCheckEndpoints();
-
-app.MapPost("/invoices/{id:guid}/pay", async (Guid id, decimal amount, IGrainFactory grains) =>
+// Add Orleans
+builder.UseOrleans(siloBuilder =>
 {
-    var grain = grains.GetGrain<IInvoiceGrain>(id);
-    await grain.Pay(amount);
-
-    return Results.Accepted();
+    siloBuilder.UseLocalhostClustering()
+        .AddMemoryGrainStorage("AppDomainStorage");
 });
 
-app.MapGet("/invoices/{id:guid}", async (Guid id, IGrainFactory grains) =>
-{
-    var grain = grains.GetGrain<IInvoiceGrain>(id);
+// Add domain services
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? 
+    throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-    return Results.Ok(await grain.GetState());
-});
+builder.Services.AddAppDomainServices(connectionString);
 
-await app.RunAsync(args);
+var host = builder.Build();
+
+host.Run();

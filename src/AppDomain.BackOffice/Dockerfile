@@ -1,42 +1,39 @@
-# syntax=docker/dockerfile:1-labs
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine AS base
+# Copyright (c) ABCDEG. All rights reserved.
+
+FROM mcr.microsoft.com/dotnet/runtime:9.0 AS base
 USER $APP_UID
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 8443
 
-# Build stage
-FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
-
-## Install gRPC tools
-RUN apk add --no-cache grpc-plugins
-ENV PROTOBUF_PROTOC=/usr/bin/protoc
-ENV GRPC_PROTOC_PLUGIN=/usr/bin/grpc_csharp_plugin
-
 WORKDIR /src
 
-## Copy all project and solution files to restore dependencies
-COPY --parents **/**/**/*.csproj .
-COPY *.slnx Directory.Build.props Directory.Packages.props ./
+# Copy project files and restore dependencies
+COPY ["src/AppDomain.BackOffice/AppDomain.BackOffice.csproj", "src/AppDomain.BackOffice/"]
+COPY ["src/AppDomain/AppDomain.csproj", "src/AppDomain/"]
+COPY ["src/AppDomain.Contracts/AppDomain.Contracts.csproj", "src/AppDomain.Contracts/"]
+COPY ["libs/Momentum/src/Momentum.ServiceDefaults/Momentum.ServiceDefaults.csproj", "libs/Momentum/src/Momentum.ServiceDefaults/"]
+COPY ["libs/Momentum/src/Momentum.Extensions/Momentum.Extensions.csproj", "libs/Momentum/src/Momentum.Extensions/"]
+COPY ["libs/Momentum/src/Momentum.Extensions.SourceGenerators/Momentum.Extensions.SourceGenerators.csproj", "libs/Momentum/src/Momentum.Extensions.SourceGenerators/"]
+COPY ["libs/Momentum/src/Momentum.Extensions.Abstractions/Momentum.Extensions.Abstractions.csproj", "libs/Momentum/src/Momentum.Extensions.Abstractions/"]
 
-## Restore packages - this layer is cached unless dependencies change
-RUN dotnet restore --verbosity minimal
+# Copy package files
+COPY ["Directory.Build.props", "Directory.Build.props"]
+COPY ["Directory.Packages.props", "Directory.Packages.props"]
 
-## Copy source code (this layer invalidates on any code change)
+RUN dotnet restore "src/AppDomain.BackOffice/AppDomain.BackOffice.csproj"
+
+# Copy source code
 COPY . .
 
-# Build & Publish
-RUN dotnet publish "src/AppDomain.BackOffice/AppDomain.BackOffice.csproj" \
-    -c "$BUILD_CONFIGURATION" \
-    -o /app/publish \
-    --no-restore \
-    /p:UseAppHost=false \
-    --verbosity minimal
+WORKDIR "/src/src/AppDomain.BackOffice"
+RUN dotnet build "AppDomain.BackOffice.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "AppDomain.BackOffice.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
-
-COPY --from=build /app/publish .
-
+COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "AppDomain.BackOffice.dll"]

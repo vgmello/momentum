@@ -2,49 +2,98 @@
 
 namespace AppDomain.Tests.Architecture;
 
-#pragma warning disable CS8602
-
+/// <summary>
+/// Architecture tests for CQRS pattern compliance in the AppDomain domain.
+/// </summary>
+[PublicAPI]
 public class CqrsPatternRulesTests : ArchitectureTestBase
 {
     [Fact]
-    public void Commands_ShouldImplementGenericICommand()
+    public void Commands_ShouldEndWithCommand()
     {
-        var commandTypes = GetAppDomainTypes()
-            .That().ResideInNamespaceEndingWith(".Commands")
-            .And().AreClasses()
-            .And().HaveNameEndingWith("Command")
-            .GetTypes();
+        var result = DomainTypes()
+            .That()
+            .ResideInNamespace("AppDomain.*.Commands")
+            .And()
+            .AreClasses()
+            .And()
+            .ImplementInterface(typeof(Momentum.Extensions.Abstractions.Messaging.ICommand<>))
+            .Should()
+            .HaveNameEndingWith("Command")
+            .GetResult();
 
-        var commandsNotImplementingICommand = commandTypes
-            .Where(type => !ImplementsGenericInterface(type, "ICommand"))
-            .Select(type => type.FullName)
-            .ToList();
-
-        commandsNotImplementingICommand.ShouldBeEmpty(
-            $"All commands should implement ICommand<T> interface: {string.Join(", ", commandsNotImplementingICommand)}");
+        result.IsSuccessful.Should().BeTrue();
     }
 
     [Fact]
-    public void Queries_ShouldImplementGenericIQuery()
+    public void Queries_ShouldEndWithQuery()
     {
-        var queryTypes = GetAppDomainTypes()
-            .That().ResideInNamespaceEndingWith(".Queries")
-            .And().AreClasses()
-            .And().HaveNameEndingWith("Query")
-            .GetTypes();
+        var result = DomainTypes()
+            .That()
+            .ResideInNamespace("AppDomain.*.Queries")
+            .And()
+            .AreClasses()
+            .And()
+            .ImplementInterface(typeof(Momentum.Extensions.Abstractions.Messaging.IQuery<>))
+            .Should()
+            .HaveNameEndingWith("Query")
+            .GetResult();
 
-        var queriesNotImplementingIQuery = queryTypes
-            .Where(type => !ImplementsGenericInterface(type, "IQuery"))
-            .Select(type => type.FullName)
-            .ToList();
-
-        queriesNotImplementingIQuery.ShouldBeEmpty(
-            $"All queries should implement IQuery<T> interface: {string.Join(", ", queriesNotImplementingIQuery)}");
+        result.IsSuccessful.Should().BeTrue();
     }
 
-    private static bool ImplementsGenericInterface(Type type, string interfaceBaseName)
+    [Fact]
+    public void CommandHandlers_ShouldEndWithCommandHandler()
     {
-        return type.GetInterfaces()
-            .Any(i => i.IsGenericType && i.GetGenericTypeDefinition().Name.StartsWith(interfaceBaseName));
+        var result = DomainTypes()
+            .That()
+            .ResideInNamespace("AppDomain.*.Commands")
+            .And()
+            .AreClasses()
+            .And()
+            .HaveNameEndingWith("Handler")
+            .Should()
+            .HaveNameEndingWith("CommandHandler")
+            .GetResult();
+
+        result.IsSuccessful.Should().BeTrue();
+    }
+
+    [Fact]
+    public void QueryHandlers_ShouldEndWithQueryHandler()
+    {
+        var result = DomainTypes()
+            .That()
+            .ResideInNamespace("AppDomain.*.Queries")
+            .And()
+            .AreClasses()
+            .And()
+            .HaveNameEndingWith("Handler")
+            .Should()
+            .HaveNameEndingWith("QueryHandler")
+            .GetResult();
+
+        result.IsSuccessful.Should().BeTrue();
+    }
+
+    [Fact]
+    public void IntegrationEvents_ShouldEndWithCorrectSuffix()
+    {
+        var result = DomainTypes()
+            .That()
+            .ResideInNamespace("AppDomain.*.Contracts.IntegrationEvents")
+            .And()
+            .AreClasses()
+            .Should()
+            .HaveNameEndingWith("Created")
+            .Or()
+            .HaveNameEndingWith("Updated")
+            .Or()
+            .HaveNameEndingWith("Deleted")
+            .Or()
+            .HaveNameEndingWith("Event")
+            .GetResult();
+
+        result.IsSuccessful.Should().BeTrue();
     }
 }

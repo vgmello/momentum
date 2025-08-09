@@ -1,20 +1,18 @@
 // Copyright (c) ABCDEG. All rights reserved.
 
-using AppDomain.BackOffice;
 using AppDomain.Infrastructure;
 using Momentum.ServiceDefaults;
-using Momentum.ServiceDefaults.HealthChecks;
 
-var builder = WebApplication.CreateSlimBuilder(args);
+var builder = Host.CreateApplicationBuilder(args);
 
 builder.AddServiceDefaults();
 
-// Application Services
-builder.AddAppDomainServices();
-builder.AddApplicationServices();
+// Add domain services
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? 
+    throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-var app = builder.Build();
+builder.Services.AddAppDomainServices(connectionString);
 
-app.MapDefaultHealthCheckEndpoints();
+var host = builder.Build();
 
-await app.RunAsync(args);
+host.Run();

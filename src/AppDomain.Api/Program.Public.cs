@@ -1,11 +1,8 @@
 // Copyright (c) ABCDEG. All rights reserved.
 
-// Note: Remove this file after .NET 10 migration
+namespace AppDomain.Api;
 
-// ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
-
-# pragma warning disable S1118
-# pragma warning disable S3903
-
+/// <summary>
+/// Public program class for testing.
+/// </summary>
 public partial class Program;

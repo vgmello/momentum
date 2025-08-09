@@ -1,0 +1,534 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "ABCDEG",
+  "classifications": ["Web", "DDD", "Microservices", "CQRS", "EventDriven"],
+  "name": "Momentum Domain Template",
+  "description": "A comprehensive template for creating domain-driven microservices following Momentum architecture patterns",
+  "identity": "Momentum.DomainTemplate",
+  "shortName": "mmt",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "AppDomain",
+  "preferNameDirectory": true,
+  "guids": [
+    "4d1e9d4f-ee8a-4d91-8c2b-11e09987ac0b",
+    "5e2f0e5f-ff9b-5e02-9d3c-22f10098bd1c",
+    "6f3g1f6g-gg0c-6f13-0e4d-33g21109ce2d",
+    "00000000-0000-0000-0000-000000000001"
+  ],
+  "symbols": {
+    "domain": {
+      "type": "parameter",
+      "isRequired": true,
+      "description": "Sets the domain name for all generated projects",
+      "displayName": "Domain Name",
+      "datatype": "string",
+      "replaces": "AppDomain",
+      "fileRename": "AppDomain"
+    },
+    "libs": {
+      "type": "parameter",
+      "datatype": "choice",
+      "allowMultipleValues": true,
+      "enableQuotelessLiterals": true,
+      "description": "Momentum libraries to include as project references",
+      "displayName": "Momentum Libraries",
+      "defaultValue": "none",
+      "choices": [
+        {
+          "choice": "none",
+          "description": "Use NuGet packages for all libraries"
+        },
+        {
+          "choice": "ext",
+          "description": "Include Momentum.Extensions as project reference"
+        },
+        {
+          "choice": "defaults",
+          "description": "Include Momentum.ServiceDefaults as project reference"
+        },
+        {
+          "choice": "api",
+          "description": "Include Momentum.Api as project reference"
+        },
+        {
+          "choice": "kafka",
+          "description": "Include Momentum.Kafka as project reference"
+        },
+        {
+          "choice": "generators",
+          "description": "Include Momentum.Generators as project reference"
+        }
+      ]
+    },
+    "lib-name": {
+      "type": "parameter",
+      "datatype": "string",
+      "description": "Name prefix to replace 'Momentum' in library names and namespaces",
+      "displayName": "Library Name Prefix",
+      "defaultValue": "Momentum",
+      "replaces": "Momentum"
+    },
+    "docs": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "Include documentation folder in generated template",
+      "displayName": "Include Documentation",
+      "defaultValue": "true"
+    },
+    "api": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "Generate API project (REST/gRPC endpoints)",
+      "displayName": "Include API Project",
+      "defaultValue": "true"
+    },
+    "backoffice": {
+      "type": "parameter", 
+      "datatype": "bool",
+      "description": "Generate BackOffice project (background event processing)",
+      "displayName": "Include BackOffice Project",
+      "defaultValue": "true"
+    },
+    "orleans": {
+      "type": "parameter",
+      "datatype": "bool", 
+      "description": "Generate Orleans-based BackOffice project (stateful processing)",
+      "displayName": "Include Orleans BackOffice",
+      "defaultValue": "false"
+    },
+    "db": {
+      "type": "parameter",
+      "datatype": "string",
+      "description": "Database type configuration (comma-separated: liquid,npgsql)",
+      "displayName": "Database Type", 
+      "defaultValue": "liquid,npgsql"
+    },
+    "no-sample": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "Skip generating sample domain entity with CQRS implementation",
+      "displayName": "Skip Sample Content",
+      "defaultValue": "false"
+    },
+    "port": {
+      "type": "parameter",
+      "datatype": "int",
+      "defaultValue": "8100",
+      "description": "Base port number for the application services",
+      "displayName": "Service Base Port",
+      "replaces": "SERVICE_BASE_PORT"
+    },
+    "generateAll": {
+      "type": "computed",
+      "value": "(!(api || backoffice || orleans))"
+    },
+    "includeApi": {
+      "type": "computed", 
+      "value": "(api || generateAll)"
+    },
+    "includeBackOffice": {
+      "type": "computed",
+      "value": "(backoffice || generateAll)"
+    },
+    "includeOrleans": {
+      "type": "computed",
+      "value": "orleans"
+    },
+    "includeAppHost": {
+      "type": "computed",
+      "value": "generateAll"
+    },
+    "includeDb": {
+      "type": "computed",
+      "value": "(db != \"\")"
+    },
+    "includeLiquibase": {
+      "type": "computed",
+      "value": "(db.Contains(liquid))"
+    },
+    "includeNpgsql": {
+      "type": "computed",
+      "value": "(db.Contains(npgsql))"
+    },
+    "includeSample": {
+      "type": "computed",
+      "value": "(!no-sample)"
+    },
+    "includeLibExt": {
+      "type": "computed",
+      "value": "(libs != none && libs.Contains(ext))"
+    },
+    "includeLibDefaults": {
+      "type": "computed",
+      "value": "(libs != none && libs.Contains(defaults))"
+    },
+    "includeLibApi": {
+      "type": "computed",
+      "value": "(libs != none && libs.Contains(api))"
+    },
+    "includeLibKafka": {
+      "type": "computed",
+      "value": "(libs != none && libs.Contains(kafka))"
+    },
+    "includeLibGenerators": {
+      "type": "computed",
+      "value": "(libs != none && libs.Contains(generators))"
+    },
+    "includeLocalLibs": {
+      "type": "computed",
+      "value": "(libs != none)"
+    },
+    "includeDocs": {
+      "type": "computed",
+      "value": "docs"
+    },
+    "apiUserSecretsId": {
+      "type": "generated",
+      "generator": "guid",
+      "replaces": "4d1e9d4f-ee8a-4d91-8c2b-11e09987ac0b"
+    },
+    "backOfficeUserSecretsId": {
+      "type": "generated",
+      "generator": "guid",
+      "replaces": "5e2f0e5f-ff9b-5e02-9d3c-22f10098bd1c"
+    },
+    "orleansUserSecretsId": {
+      "type": "generated",
+      "generator": "guid",
+      "replaces": "6f3g1f6g-gg0c-6f13-0e4d-33g21109ce2d"
+    },
+    "defaultTenantId": {
+      "type": "generated",
+      "generator": "guid",
+      "replaces": "00000000-0000-0000-0000-000000000001",
+      "parameters": {
+        "defaultValue": "00000000-0000-0000-0000-000000000001"
+      }
+    },
+    "dbPassword": {
+      "type": "generated",
+      "generator": "constant",
+      "parameters": {
+        "value": "ChangeMe123!"
+      },
+      "replaces": "password"
+    },
+    "aspireHttp": {
+      "type": "computed",
+      "value": "(port + 10000)"
+    },
+    "aspireHttps": {
+      "type": "computed",
+      "value": "(port + 10010)"
+    },
+    "mainApiHttp": {
+      "type": "computed",
+      "value": "(port + 1)"
+    },
+    "mainApiHttps": {
+      "type": "computed",
+      "value": "(port + 11)"
+    },
+    "mainApiGrpc": {
+      "type": "computed",
+      "value": "(port + 2)"
+    },
+    "backOfficeHttp": {
+      "type": "computed",
+      "value": "(port + 3)"
+    },
+    "backOfficeHttps": {
+      "type": "computed",
+      "value": "(port + 13)"
+    },
+    "orleansHttp": {
+      "type": "computed",
+      "value": "(port + 4)"
+    },
+    "orleansHttps": {
+      "type": "computed",
+      "value": "(port + 14)"
+    },
+    "documentationHttp": {
+      "type": "computed",
+      "value": "(port + 19)"
+    }
+  },
+  "sources": [
+    {
+      "source": "./",
+      "target": "./",
+      "include": [
+        "**/*"
+      ],
+      "exclude": [
+        "**/[Bb]in/**",
+        "**/[Oo]bj/**",
+        ".template.config/**/*",
+        "**/*.filelist",
+        "**/*.user",
+        "**/*.lock.json",
+        ".git/**/*",
+        ".vs/**/*",
+        ".vscode/**/*",
+        "*.suo",
+        "*.user",
+        ".claude/**/*",
+        "temp-test/**/*",
+        "template-test*/**/*",
+        "requirements/**/*",
+        "infra-main-backup*/**/*",
+        "src-main-backup*/**/*"
+      ],
+      "modifiers": [
+        {
+          "condition": "(!includeApi)",
+          "exclude": [
+            "src/AppDomain.Api/**/*"
+          ]
+        },
+        {
+          "condition": "(!includeBackOffice)",
+          "exclude": [
+            "src/AppDomain.BackOffice/**/*"
+          ]
+        },
+        {
+          "condition": "(!includeOrleans)",
+          "exclude": [
+            "src/AppDomain.BackOffice.Orleans/**/*"
+          ]
+        },
+        {
+          "condition": "(!includeAppHost)",
+          "exclude": [
+            "src/AppDomain.AppHost/**/*"
+          ]
+        },
+        {
+          "condition": "(!includeDb)",
+          "exclude": [
+            "infra/**/*"
+          ]
+        },
+        {
+          "condition": "(!includeSample)",
+          "exclude": [
+            "**/*Cashier*",
+            "**/*cashier*",
+            "**/Cashiers/**/*",
+            "**/cashiers/**/*",
+            "**/*Invoice*",
+            "**/*invoice*",
+            "**/Invoices/**/*",
+            "**/invoices/**/*",
+            "src/AppDomain/Cashiers/**/*",
+            "src/AppDomain/Invoices/**/*",
+            "src/AppDomain.Api/Cashiers/**/*",
+            "src/AppDomain.Api/Invoices/**/*",
+            "src/AppDomain.BackOffice/Messaging/AppDomainInboxHandler/**/*",
+            "src/AppDomain.BackOffice/Invoices/**/*",
+            "src/AppDomain.BackOffice.Orleans/Invoices/**/*",
+            "infra/AppDomain.Database/Liquibase/AppDomain/cashiers/**/*",
+            "infra/AppDomain.Database/Liquibase/AppDomain/invoices/**/*",
+            "tests/AppDomain.Tests/Unit/Cashiers/**/*",
+            "tests/AppDomain.Tests/Unit/Invoices/**/*",
+            "tests/AppDomain.Tests/Integration/Cashiers/**/*",
+            "tests/AppDomain.Tests/Integration/Invoices/**/*"
+          ]
+        },
+        {
+          "condition": "(!includeDocs)",
+          "exclude": [
+            "docs/**/*"
+          ]
+        },
+        {
+          "condition": "(!includeLocalLibs)",
+          "exclude": [
+            "libs/**/*"
+          ]
+        }
+      ]
+    }
+  ],
+  "primaryOutputs": [
+    {
+      "condition": "includeApi",
+      "path": "src/AppDomain.Api/AppDomain.Api.csproj"
+    },
+    {
+      "condition": "includeBackOffice", 
+      "path": "src/AppDomain.BackOffice/AppDomain.BackOffice.csproj"
+    },
+    {
+      "condition": "includeOrleans",
+      "path": "src/AppDomain.BackOffice.Orleans/AppDomain.BackOffice.Orleans.csproj"
+    },
+    {
+      "condition": "includeAppHost",
+      "path": "src/AppDomain.AppHost/AppDomain.AppHost.csproj"
+    },
+    {
+      "path": "src/AppDomain/AppDomain.csproj"
+    },
+    {
+      "path": "src/AppDomain.Contracts/AppDomain.Contracts.csproj"
+    },
+    {
+      "condition": "includeDb",
+      "path": "infra/AppDomain.Database/AppDomain.Database.csproj"
+    },
+    {
+      "path": "tests/AppDomain.Tests/AppDomain.Tests.csproj"
+    }
+  ],
+  "postActions": [
+    {
+      "description": "Add Domain project to solution",
+      "manualInstructions": [
+        { "text": "Add src/AppDomain/AppDomain.csproj to solution manually." }
+      ],
+      "args": {
+        "projectPath": "src/AppDomain/AppDomain.csproj",
+        "solutionFolder": "src"
+      },
+      "actionId": "D396686C-DE0E-4DE6-906D-291CD29FC5DE",
+      "continueOnError": true
+    },
+    {
+      "description": "Add Contracts project to solution",
+      "manualInstructions": [
+        { "text": "Add src/AppDomain.Contracts/AppDomain.Contracts.csproj to solution manually." }
+      ],
+      "args": {
+        "projectPath": "src/AppDomain.Contracts/AppDomain.Contracts.csproj",
+        "solutionFolder": "src"
+      },
+      "actionId": "D396686C-DE0E-4DE6-906D-291CD29FC5DE",
+      "continueOnError": true
+    },
+    {
+      "condition": "includeApi",
+      "description": "Add API project to solution",
+      "manualInstructions": [
+        { "text": "Add src/AppDomain.Api/AppDomain.Api.csproj to solution manually." }
+      ],
+      "args": {
+        "projectPath": "src/AppDomain.Api/AppDomain.Api.csproj",
+        "solutionFolder": "src"
+      },
+      "actionId": "D396686C-DE0E-4DE6-906D-291CD29FC5DE",
+      "continueOnError": true
+    },
+    {
+      "condition": "includeBackOffice",
+      "description": "Add BackOffice project to solution",
+      "manualInstructions": [
+        { "text": "Add src/AppDomain.BackOffice/AppDomain.BackOffice.csproj to solution manually." }
+      ],
+      "args": {
+        "projectPath": "src/AppDomain.BackOffice/AppDomain.BackOffice.csproj",
+        "solutionFolder": "src"
+      },
+      "actionId": "D396686C-DE0E-4DE6-906D-291CD29FC5DE",
+      "continueOnError": true
+    },
+    {
+      "condition": "includeOrleans",
+      "description": "Add Orleans BackOffice project to solution",
+      "manualInstructions": [
+        { "text": "Add src/AppDomain.BackOffice.Orleans/AppDomain.BackOffice.Orleans.csproj to solution manually." }
+      ],
+      "args": {
+        "projectPath": "src/AppDomain.BackOffice.Orleans/AppDomain.BackOffice.Orleans.csproj",
+        "solutionFolder": "src"
+      },
+      "actionId": "D396686C-DE0E-4DE6-906D-291CD29FC5DE",
+      "continueOnError": true
+    },
+    {
+      "condition": "includeAppHost",
+      "description": "Add AppHost project to solution",
+      "manualInstructions": [
+        { "text": "Add src/AppDomain.AppHost/AppDomain.AppHost.csproj to solution manually." }
+      ],
+      "args": {
+        "projectPath": "src/AppDomain.AppHost/AppDomain.AppHost.csproj",
+        "solutionFolder": "src"
+      },
+      "actionId": "D396686C-DE0E-4DE6-906D-291CD29FC5DE",
+      "continueOnError": true
+    },
+    {
+      "condition": "includeDb",
+      "description": "Add Database project to solution",
+      "manualInstructions": [
+        { "text": "Add infra/AppDomain.Database/AppDomain.Database.csproj to solution manually." }
+      ],
+      "args": {
+        "projectPath": "infra/AppDomain.Database/AppDomain.Database.csproj",
+        "solutionFolder": "infra"
+      },
+      "actionId": "D396686C-DE0E-4DE6-906D-291CD29FC5DE",
+      "continueOnError": true
+    },
+    {
+      "description": "Add Tests project to solution",
+      "manualInstructions": [
+        { "text": "Add tests/AppDomain.Tests/AppDomain.Tests.csproj to solution manually." }
+      ],
+      "args": {
+        "projectPath": "tests/AppDomain.Tests/AppDomain.Tests.csproj",
+        "solutionFolder": "tests"
+      },
+      "actionId": "D396686C-DE0E-4DE6-906D-291CD29FC5DE",
+      "continueOnError": true
+    },
+    {
+      "description": "Restore NuGet packages",
+      "manualInstructions": [
+        { "text": "Run 'dotnet restore' to restore NuGet packages" }
+      ],
+      "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+      "continueOnError": true
+    }
+  ],
+  "specialCustomOperations": {
+    "**/*.csproj": {
+      "operations": [
+        {
+          "type": "conditional",
+          "configuration": {
+            "if": ["<!--#if"],
+            "else": ["<!--#else"],
+            "elseif": ["<!--#elseif"],
+            "endif": ["<!--#endif"],
+            "trim": "true",
+            "wholeLine": "true",
+            "evaluator": "C++"
+          }
+        }
+      ]
+    },
+    "**/*.props": {
+      "operations": [
+        {
+          "type": "conditional",
+          "configuration": {
+            "if": ["<!--#if"],
+            "else": ["<!--#else"],
+            "elseif": ["<!--#elseif"],
+            "endif": ["<!--#endif"],
+            "trim": "true",
+            "wholeLine": "true",
+            "evaluator": "C++"
+          }
+        }
+      ]
+    }
+  }
+}

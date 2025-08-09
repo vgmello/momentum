@@ -1,29 +1,37 @@
+<!--#if (includeSample)-->
 // Copyright (c) ABCDEG. All rights reserved.
-
-using AppDomain.Cashiers.Contracts.Models;
 
 namespace AppDomain.Cashiers.Contracts.IntegrationEvents;
 
 /// <summary>
-///     Published when a cashier is successfully deleted from the AppDomain system. This event contains the essential identifiers for the deleted
-///     cashier and ensures proper cleanup and audit trail.
+/// Published when a cashier is successfully deleted from the AppDomain system. 
+/// This event contains the deleted cashier identifier and partition key information for proper message routing.
 /// </summary>
+/// <param name="TenantId">Unique identifier for the tenant</param>
+/// <param name="PartitionKeyTest">Additional partition key for message routing</param>
+/// <param name="CashierId">Unique identifier of the deleted cashier</param>
+/// <param name="DeletedAt">Date and time when the cashier was deleted (UTC)</param>
 /// <remarks>
-///     ## When It's Triggered
+/// ## When It's Triggered
 ///
-///     This event is published when:
-///     - A cashier is permanently removed from the system
-///     - The deletion process completes successfully
-///     - All associated cleanup Momentum are finished
+/// This event is published when:
+/// - The cashier deletion process completes successfully
+/// - The cashier has been removed from the database
+/// - All related cleanup operations are complete
 ///
-///     ## Impact and Considerations
+/// ## Event Usage
 ///
-///     When this event is published:
-///     - All dependent systems should remove references to this cashier
-///     - Any cached data related to this cashier should be invalidated
-///     - Audit logs should record the deletion for compliance purposes
+/// This event can be used by other services to:
+/// - Remove cashier from operational systems
+/// - Archive historical transaction data
+/// - Clean up related authentication records
+/// - Notify dependent services of cashier removal
 /// </remarks>
-/// <param name="TenantId">The unique identifier of the tenant that owned the deleted cashier</param>
-/// <param name="CashierId">The unique identifier of the cashier that was deleted</param>
-[EventTopic<Cashier>]
-public record CashierDeleted([PartitionKey] Guid TenantId, Guid CashierId);
+[EventTopic<Guid>]
+public record CashierDeleted(
+    [PartitionKey(Order = 0)] Guid TenantId,
+    [PartitionKey(Order = 1)] int PartitionKeyTest,
+    Guid CashierId,
+    DateTime DeletedAt
+);
+<!--#endif-->

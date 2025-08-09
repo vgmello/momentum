@@ -1,6 +1,7 @@
 // Copyright (c) ABCDEG. All rights reserved.
 
 using AppDomain.Cashiers.Contracts.Models;
+using Momentum.Extensions.Abstractions.Messaging;
 
 namespace AppDomain.Cashiers.Contracts.IntegrationEvents;
 
@@ -26,4 +27,4 @@ public record CashierCreated(
     [PartitionKey(Order = 0)] Guid TenantId,
     [PartitionKey(Order = 1)] int PartitionKeyTest,
     Cashier Cashier
-);
+) : IDistributedEvent;

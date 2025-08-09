@@ -3,22 +3,18 @@
 using AppDomain.Infrastructure;
 using Momentum.ServiceDefaults;
 using Momentum.ServiceDefaults.Api;
-using Momentum.ServiceDefaults.HealthChecks;
 
-[assembly: DomainAssembly(typeof(IAppDomainAssembly))]
-
-var builder = WebApplication.CreateSlimBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
-builder.AddApiServiceDefaults();
+builder.AddApiServices();
 
-// Application Services
+// Add domain services
 builder.AddAppDomainServices();
-builder.AddApplicationServices();
 
 var app = builder.Build();
 
-app.ConfigureApiUsingDefaults(requireAuth: false);
-app.MapDefaultHealthCheckEndpoints();
+app.UseServiceDefaults();
+app.UseApiServices();
 
-await app.RunAsync(args);
+app.Run();

@@ -1,28 +1,37 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
-        <NoWarn>$(NoWarn);CS0436;</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing"/>
-        <PackageReference Include="Testcontainers"/>
+        <PackageReference Include="coverlet.collector"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk"/>
+        <PackageReference Include="xunit"/>
+        <PackageReference Include="xunit.runner.visualstudio"/>
+        <PackageReference Include="FluentAssertions"/>
+        <PackageReference Include="NSubstitute"/>
         <PackageReference Include="Testcontainers.PostgreSql"/>
-        <PackageReference Include="Grpc.Tools"/>
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing"/>
+        <PackageReference Include="NetArchTest.Rules"/>
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\src\AppDomain\AppDomain.csproj"/>
         <ProjectReference Include="..\..\src\AppDomain.Api\AppDomain.Api.csproj"/>
         <ProjectReference Include="..\..\src\AppDomain.BackOffice\AppDomain.BackOffice.csproj"/>
-        <ProjectReference Include="..\..\src\AppDomain\AppDomain.csproj"/>
+        <ProjectReference Include="..\..\src\AppDomain.Contracts\AppDomain.Contracts.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup Condition="Exists('..\..\src\AppDomain.BackOffice.Orleans\AppDomain.BackOffice.Orleans.csproj')">
+        <ProjectReference Include="..\..\src\AppDomain.BackOffice.Orleans\AppDomain.BackOffice.Orleans.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <Protobuf Include="..\..\src\AppDomain.Api\**\Protos\**\*.proto"
-                  ProtoRoot="..\..\src\AppDomain.Api\"
-                  GrpcServices="Client"
-                  Link="Integration\%(RecursiveDir)%(Filename)%(Extension)"/>
+        <Using Include="FluentAssertions"/>
+        <Using Include="NSubstitute"/>
+        <Using Include="Xunit"/>
     </ItemGroup>
 
 </Project>

@@ -472,25 +472,43 @@ app.MapPost("/users", async (CreateUserCommand command, IMessageBus messaging) =
 
 ## Port Configuration
 
-The template uses the following default port configuration:
+The template uses a systematic port allocation pattern for consistent service endpoints.
 
-### Aspire Dashboard
+### Port Assignment Pattern
 
+#### **Aspire Dashboard Ports**
+- **HTTP**: Service base + 10,000 (e.g., 8100 → 18100)
+- **HTTPS**: Service base + 10,010 (e.g., 8100 → 18110)
+
+#### **Port Pattern Within Each Service Block (XX00-XX19)**
+```
+Aspire Resource Service: XX00 (HTTP) / XX10 (HTTPS)
+Main API:               XX01 (HTTP) / XX11 (HTTPS) / XX02 (gRPC-HTTP)
+BackOffice:             XX03 (HTTP) / XX13 (HTTPS)
+Orleans:                XX04 (HTTP) / XX14 (HTTPS)
+UI/Frontend:            XX05 (HTTP) / XX15 (HTTPS)
+Documentation:          XX19 (reserved for last port of range)
+```
+
+### Default Port Assignments (8100-8119)
+
+#### Aspire Services
 -   **Aspire Dashboard:** 18100 (HTTP) / 18110 (HTTPS)
 -   **Aspire Resource Service:** 8100 (HTTP) / 8110 (HTTPS)
 
-### Service Ports (8100-8119)
-
--   **[Domain].UI:** 8105 (HTTP) / 8115 (HTTPS)
+#### Application Services
 -   **[Domain].Api:** 8101 (HTTP) / 8111 (HTTPS) / 8102 (gRPC insecure)
 -   **[Domain].BackOffice:** 8103 (HTTP) / 8113 (HTTPS)
 -   **[Domain].BackOffice.Orleans:** 8104 (HTTP) / 8114 (HTTPS)
+-   **[Domain].UI:** 8105 (HTTP) / 8115 (HTTPS)
 -   **Documentation Service:** 8119
 
-### Infrastructure Services
-
+#### Infrastructure Services
 -   **54320**: PostgreSQL
--   **4317/4318**: OpenTelemetry OTLP
+-   **9092**: Apache Kafka
+-   **4317/4318**: OpenTelemetry OTLP (gRPC/HTTP)
+
+> **Full Documentation**: For detailed port allocation patterns including multi-domain configuration and troubleshooting, see the [Port Allocation Guide](./service-configuration/port-allocation)
 
 ## Running Your Application
 

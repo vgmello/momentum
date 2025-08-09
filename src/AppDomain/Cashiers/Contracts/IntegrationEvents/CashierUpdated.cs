@@ -1,3 +1,4 @@
+<!--#if (includeSample)-->
 // Copyright (c) ABCDEG. All rights reserved.
 
 using AppDomain.Cashiers.Contracts.Models;
@@ -5,27 +6,31 @@ using AppDomain.Cashiers.Contracts.Models;
 namespace AppDomain.Cashiers.Contracts.IntegrationEvents;
 
 /// <summary>
-///     Published when an existing cashier's information is successfully updated in the AppDomain system. This event signals that cashier data
-///     has been modified and dependent systems should refresh their local copies.
+/// Published when a cashier is successfully updated in the AppDomain system. 
+/// This event contains the updated cashier data and partition key information for proper message routing.
 /// </summary>
+/// <param name="TenantId">Unique identifier for the tenant</param>
+/// <param name="PartitionKeyTest">Additional partition key for message routing</param>
+/// <param name="Cashier">Updated cashier object containing all current cashier data</param>
 /// <remarks>
-///     ## When It's Triggered
+/// ## When It's Triggered
 ///
-///     This event is published when:
-///     - Cashier profile information is modified (name, email, permissions, etc.)
-///     - Cashier status changes (active/inactive, role updates)
-///     - Configuration settings for the cashier are updated
-///     - The update operation completes successfully
+/// This event is published when:
+/// - The cashier update process completes successfully
+/// - All validation rules pass for the updated data
+/// - The updated cashier data has been persisted to the database
 ///
-///     ## Data Synchronization
+/// ## Event Usage
 ///
-///     This event ensures:
-///     - All systems maintain consistent cashier information
-///     - Cached data is invalidated and refreshed
-///     - Downstream services can react to cashier changes appropriately
-///     - Audit trails are maintained for compliance purposes
+/// This event can be used by other services to:
+/// - Update cached cashier information
+/// - Synchronize cashier data across systems
+/// - Notify dependent services of cashier changes
 /// </remarks>
-/// <param name="TenantId">The unique identifier of the tenant that owns the updated cashier</param>
-/// <param name="CashierId">The unique identifier of the cashier that was updated</param>
 [EventTopic<Cashier>]
-public record CashierUpdated([PartitionKey] Guid TenantId, Guid CashierId);
+public record CashierUpdated(
+    [PartitionKey(Order = 0)] Guid TenantId,
+    [PartitionKey(Order = 1)] int PartitionKeyTest,
+    Cashier Cashier
+);
+<!--#endif-->

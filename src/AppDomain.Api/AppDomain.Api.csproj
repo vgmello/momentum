@@ -15,12 +15,28 @@
         <ProjectReference Include="..\AppDomain\AppDomain.csproj"/>
     </ItemGroup>
 
+    <!-- Conditional ServiceDefaults.Api library -->
+    <!--#if (includeLibApi) -->
     <ItemGroup>
-        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.ServiceDefaults.Api\Momentum.ServiceDefaults.Api.csproj"/>
-        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
+        <ProjectReference Include="libs\Momentum\src\Momentum.ServiceDefaults.Api\Momentum.ServiceDefaults.Api.csproj"/>
     </ItemGroup>
+    <!--#else -->
+    <ItemGroup>
+        <PackageReference Include="Momentum.ServiceDefaults.Api"/>
+    </ItemGroup>
+    <!--#endif -->
 
-    <Import Project="..\..\libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.props"/>
+    <!-- Conditional ServiceDefaults library -->
+    <!--#if (includeLibDefaults) -->
+    <ItemGroup>
+        <ProjectReference Include="libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
+    </ItemGroup>
+    <Import Project="libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.props"/>
+    <!--#else -->
+    <ItemGroup>
+        <PackageReference Include="Momentum.ServiceDefaults"/>
+    </ItemGroup>
+    <!--#endif -->
 
     <ItemGroup>
         <Protobuf Include="**/Protos/**/*.proto" ProtoRoot="." GrpcServices="Server"/>

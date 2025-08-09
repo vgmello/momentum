@@ -4,7 +4,11 @@ using AppDomain.Cashiers.Contracts.IntegrationEvents;
 using AppDomain.Cashiers.Contracts.Models;
 using AppDomain.Cashiers.Data;
 using AppDomain.Core.Data;
+using FluentValidation;
 using LinqToDB;
+using Momentum.Extensions;
+using Momentum.Extensions.Abstractions.Messaging;
+using Wolverine;
 
 namespace AppDomain.Cashiers.Commands;
 

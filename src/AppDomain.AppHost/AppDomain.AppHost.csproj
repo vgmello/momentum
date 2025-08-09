@@ -4,7 +4,7 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <IsAspireHost>true</IsAspireHost>
-        <UserSecretsId>5196deed-b92b-45ff-8da8-ebc24b8f58ae</UserSecretsId>
+        <UserSecretsId>apiUserSecretsId</UserSecretsId>
         <NoWarn>$(NoWarn);ASPIREPROXYENDPOINTS001</NoWarn>
     </PropertyGroup>
 
@@ -17,9 +17,15 @@
         <PackageReference Include="Aspire.Hosting.NodeJS"/>
     </ItemGroup>
 
-    <ItemGroup>
+    <ItemGroup Condition="'$(includeApi)' == 'True'">
         <ProjectReference Include="..\AppDomain.Api\AppDomain.Api.csproj"/>
+    </ItemGroup>
+    
+    <ItemGroup Condition="'$(includeBackOffice)' == 'True'">
         <ProjectReference Include="..\AppDomain.BackOffice\AppDomain.BackOffice.csproj"/>
+    </ItemGroup>
+    
+    <ItemGroup Condition="'$(includeOrleans)' == 'True'">
         <ProjectReference Include="..\AppDomain.BackOffice.Orleans\AppDomain.BackOffice.Orleans.csproj"/>
     </ItemGroup>
 

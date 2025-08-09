@@ -8,5 +8,5 @@ namespace AppDomain.Invoices.Data;
 [Mapper]
 public static partial class DbMapper
 {
-    public static partial Invoice ToModel(this Entities.Invoice cashier);
+    public static partial Invoice ToModel(this Entities.Invoice invoice);
 }

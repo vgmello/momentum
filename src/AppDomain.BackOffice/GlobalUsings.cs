@@ -1,3 +1,5 @@
 // Copyright (c) ABCDEG. All rights reserved.
 
-global using Dapper;
+global using JetBrains.Annotations;
+global using Momentum.Extensions;
+global using Wolverine;
