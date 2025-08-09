@@ -3,7 +3,7 @@
     <PropertyGroup>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <UserSecretsId>6f3g1f6g-gg0c-6f13-0e4d-33g21109ce2d</UserSecretsId>
+        <UserSecretsId>310fa8e1-342a-4675-a3f0-f8912a5da0dd</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
