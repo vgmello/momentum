@@ -1,7 +1,12 @@
 {
   "$schema": "http://json.schemastore.org/template",
   "author": "Momentum .NET",
-  "classifications": ["Microservices", "CQRS", "EventDriven", "Momentum.NET"],
+  "classifications": [
+    "Microservices",
+    "CQRS",
+    "EventDriven",
+    "Momentum.NET"
+  ],
   "name": "Momentum .NET Template",
   "description": "A comprehensive template for creating domain-driven microservices following standard architecture patterns",
   "identity": "Momentum.Template",
@@ -12,14 +17,22 @@
   },
   "sourceName": "AppDomain",
   "preferNameDirectory": true,
-  "guids": ["4d1e9d4f-ee8a-4d91-8c2b-11e09987ac0b", "5e2f0e5f-ff9b-5e02-9d3c-22f10098bd1c", "310fa8e1-342a-4675-a3f0-f8912a5da0dd"],
+  "guids": [
+    "4d1e9d4f-ee8a-4d91-8c2b-11e09987ac0b",
+    "5e2f0e5f-ff9b-5e02-9d3c-22f10098bd1c",
+    "310fa8e1-342a-4675-a3f0-f8912a5da0dd"
+  ],
   "symbols": {
     "AppDomain": {
       "type": "bind",
       "binding": "name",
       "replaces": "AppDomain",
       "fileRename": "AppDomain",
-      "forms": { "global": ["snake"] }
+      "forms": {
+        "global": [
+          "snake"
+        ]
+      }
     },
     "aspire": {
       "type": "parameter",
@@ -63,7 +76,7 @@
       "enableQuotelessLiterals": true,
       "description": "Data access setup configuration",
       "displayName": "Data Access Setup",
-      "defaultValue": "",
+      "defaultValue": "unspecified",
       "choices": [
         {
           "choice": "npgsql",
@@ -76,6 +89,10 @@
         {
           "choice": "none",
           "description": "No database setup"
+        },
+        {
+          "choice": "unspecified",
+          "description": "Unspecified"
         }
       ]
     },
@@ -165,7 +182,7 @@
     },
     "includeDb": {
       "type": "computed",
-      "value": "((all || db != '') && db != 'none')"
+      "value": "((all || db != 'unspecified') && db != 'none')"
     },
     "includeSample": {
       "type": "computed",
@@ -177,15 +194,15 @@
     },
     "dbConfig": {
       "type": "computed",
-      "value": "(db == '' ? 'npgsql|liquibase' : db)"
+      "value": "(db == 'unspecified' ? 'npgsql|liquibase' : db)"
     },
     "useNpgsql": {
       "type": "computed",
-      "value": "(includeDb && dbConfig.Contains('npgsql'))"
+      "value": "(includeDb && dbConfig == 'npgsql')"
     },
     "useLiquibase": {
       "type": "computed",
-      "value": "(includeDb && dbConfig.Contains('liquibase'))"
+      "value": "(includeDb && dbConfig == 'liquibase')"
     },
     "aspireHttp": {
       "type": "computed",
@@ -258,7 +275,9 @@
     {
       "source": "./",
       "target": "./",
-      "include": ["**/*"],
+      "include": [
+        "**/*"
+      ],
       "exclude": [
         "**/[Bb]in/**",
         "**/[Oo]bj/**",
@@ -278,27 +297,39 @@
       "modifiers": [
         {
           "condition": "!(includeAspire)",
-          "exclude": ["src/AppDomain.AppHost/**/*"]
+          "exclude": [
+            "src/AppDomain.AppHost/**/*"
+          ]
         },
         {
           "condition": "!(includeApi)",
-          "exclude": ["src/AppDomain.Api/**/*"]
+          "exclude": [
+            "src/AppDomain.Api/**/*"
+          ]
         },
         {
           "condition": "!(includeBackOffice)",
-          "exclude": ["src/AppDomain.BackOffice/**/*"]
+          "exclude": [
+            "src/AppDomain.BackOffice/**/*"
+          ]
         },
         {
           "condition": "(!orleans)",
-          "exclude": ["src/AppDomain.BackOffice.Orleans/**/*"]
+          "exclude": [
+            "src/AppDomain.BackOffice.Orleans/**/*"
+          ]
         },
         {
           "condition": "(!includeDocs)",
-          "exclude": ["docs/**/*"]
+          "exclude": [
+            "docs/**/*"
+          ]
         },
         {
           "condition": "(!includeDb)",
-          "exclude": ["infra/**/*"]
+          "exclude": [
+            "infra/**/*"
+          ]
         },
         {
           "condition": "(!no-sample)",
@@ -328,7 +359,10 @@
         },
         {
           "condition": "libs.Contains('defaults')",
-          "include": ["libs/Momentum/src/Momentum.ServiceDefaults/**/*", "libs/Momentum/src/Momentum.ServiceDefaults.Api/**/*"]
+          "include": [
+            "libs/Momentum/src/Momentum.ServiceDefaults/**/*",
+            "libs/Momentum/src/Momentum.ServiceDefaults.Api/**/*"
+          ]
         }
       ]
     }
@@ -388,10 +422,23 @@
         {
           "type": "conditional",
           "configuration": {
-            "actionableIf": ["<!--#if"],
-            "actionableElse": ["#else", "<!--#else"],
-            "actionableElseif": ["#elseif", "<!--#elseif", "#elif", "<!--#elif"],
-            "endif": ["#endif", "<!--#endif"],
+            "actionableIf": [
+              "<!--#if"
+            ],
+            "actionableElse": [
+              "#else",
+              "<!--#else"
+            ],
+            "actionableElseif": [
+              "#elseif",
+              "<!--#elseif",
+              "#elif",
+              "<!--#elif"
+            ],
+            "endif": [
+              "#endif",
+              "<!--#endif"
+            ],
             "trim": "true",
             "wholeLine": "true",
             "evaluator": "C++"
@@ -411,7 +458,11 @@
     }
   },
   "forms": {
-    "kebab": { "identifier": "kebabCase" },
-    "snake": { "identifier": "snakeCase" }
+    "kebab": {
+      "identifier": "kebabCase"
+    },
+    "snake": {
+      "identifier": "snakeCase"
+    }
   }
 }
