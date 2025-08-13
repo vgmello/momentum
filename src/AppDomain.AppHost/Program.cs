@@ -23,8 +23,8 @@ var database = pgsql.AddDatabase(name: "AppDomainDb", databaseName: "app_domain"
 var serviceBusDb = pgsql.AddDatabase(name: "ServiceBus", databaseName: "service_bus");
 #if (db == liquibase)
 builder.AddLiquibaseMigrations(pgsql, dbPassword);
-
 #endif
+
 #endif
 #if (useKafka)
 var kafka = builder.AddKafka("messaging", port: 59092);
