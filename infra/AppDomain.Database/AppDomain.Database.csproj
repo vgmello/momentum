@@ -1,1 +1,19 @@
-<Project Sdk="Microsoft.Build.NoTargets/3.7.56" />
+<Project>
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <ImportDirectoryBuildProps>false</ImportDirectoryBuildProps>
+        <ImportProjectExtensionProps>false</ImportProjectExtensionProps>
+        <ImportProjectExtensionTargets>false</ImportProjectExtensionTargets>
+        <ImportNuGetBuildTasksPackTargetsFromSdk>false</ImportNuGetBuildTasksPackTargetsFromSdk>
+        <NuGetPropsFile>false</NuGetPropsFile>
+    </PropertyGroup>
+
+    <Import Project="Sdk.props" Sdk="Microsoft.Build.NoTargets" Version="3.7.56" />
+    <Import Project="Sdk.targets" Sdk="Microsoft.Build.NoTargets" Version="3.7.56"/>
+
+    <ItemGroup>
+        <None Include=".vitepress/**"/>
+    </ItemGroup>
+
+    <Target Name="PrepareForBuild" />
+</Project>
