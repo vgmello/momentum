@@ -10,24 +10,24 @@
 
     <ItemGroup>
         <PackageReference Include="Aspire.Hosting.AppHost"/>
-        <!--#if (useKafka) -->
+        <!--#if (USE_KAFKA) -->
         <PackageReference Include="Aspire.Hosting.Kafka"/>
         <!--#endif -->
         <PackageReference Include="Aspire.Hosting.PostgreSQL"/>
-        <!--#if (includeOrleans) -->
+        <!--#if (INCLUDE_ORLEANS) -->
         <PackageReference Include="Aspire.Hosting.Azure.Storage"/>
         <PackageReference Include="Aspire.Hosting.Orleans"/>
         <!--#endif -->
     </ItemGroup>
 
     <ItemGroup>
-        <!--#if (includeApi) -->
+        <!--#if (INCLUDE_API) -->
         <ProjectReference Include="..\AppDomain.Api\AppDomain.Api.csproj"/>
         <!--#endif -->
-        <!--#if (includeBackOffice) -->
+        <!--#if (INCLUDE_BACK_OFFICE) -->
         <ProjectReference Include="..\AppDomain.BackOffice\AppDomain.BackOffice.csproj"/>
         <!--#endif -->
-        <!--#if (includeOrleans) -->
+        <!--#if (INCLUDE_ORLEANS) -->
         <ProjectReference Include="..\AppDomain.BackOffice.Orleans\AppDomain.BackOffice.Orleans.csproj"/>
         <!--#endif -->
     </ItemGroup>

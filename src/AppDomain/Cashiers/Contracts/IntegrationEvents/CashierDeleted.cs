@@ -1,5 +1,5 @@
-< !--#if (includeSample)-->
-// Copyright (c) OrgName. All rights reserved.
+< !--#if (INCLUDE_SAMPLE)-->
+// Copyright (c) ORG_NAME. All rights reserved.
 
 namespace AppDomain.Cashiers.Contracts.IntegrationEvents;
 

@@ -1,4 +1,4 @@
-// Copyright (c) OrgName. All rights reserved.
+// Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Cashiers.Contracts.Models;
 using Riok.Mapperly.Abstractions;

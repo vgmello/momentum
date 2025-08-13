@@ -13,7 +13,7 @@
   "shortName": "mmt",
   "tags": {
     "language": "C#",
-    "type": "project"
+    "type": "solution"
   },
   "sourceName": "AppDomain",
   "preferNameDirectory": true,
@@ -153,91 +153,91 @@
       "defaultValue": "Momentum",
       "replaces": "Momentum"
     },
-    "all": {
+    "ALL": {
       "type": "computed",
       "value": "!(aspire || api || back-office || docs)"
     },
-    "includeAspire": {
+    "INCLUDE_ASPIRE": {
       "type": "computed",
-      "value": "(aspire || all)"
+      "value": "(aspire || ALL)"
     },
-    "includeApi": {
+    "INCLUDE_API": {
       "type": "computed",
-      "value": "(api || all)"
+      "value": "(api || ALL)"
     },
-    "includeBackOffice": {
+    "INCLUDE_BACK_OFFICE": {
       "type": "computed",
-      "value": "(back-office || all)"
+      "value": "(back-office || ALL)"
     },
-    "includeDocs": {
+    "INCLUDE_DOCS": {
       "type": "computed",
-      "value": "(docs || all)"
+      "value": "(docs || ALL)"
     },
-    "includeInfraDb": {
-      "type": "computed",
-      "value": "(db == liquibase)"
-    },
-    "includeOrleans": {
+    "INCLUDE_ORLEANS": {
       "type": "computed",
       "value": "(orleans)"
     },
-    "includeSample": {
+    "INCLUDE_INFRA_DB": {
+      "type": "computed",
+      "value": "(db == liquibase)"
+    },
+    "INCLUDE_SAMPLE": {
       "type": "computed",
       "value": "(!no-sample)"
     },
-    "includeLibs": {
+    "INCLUDE_LIBS": {
       "type": "computed",
       "value": "(libs != 'none')"
     },
-    "useDb": {
+    "USE_DB": {
       "type": "computed",
       "value": "(db == npgsql)"
     },
-    "useKafka": {
+    "USE_KAFKA": {
       "type": "computed",
-      "value": "(kafka && (includeApi || includeBackOffice))"
+      "value": "(kafka && (INCLUDE_API || INCLUDE_BACK_OFFICE))"
     },
-    "aspireHttp": {
+    "AspireHttpPort": {
       "type": "computed",
       "value": "(port + 10000)"
     },
-    "aspireHttps": {
+    "ASPIRE_HTTPS_PORT": {
       "type": "computed",
       "value": "(port + 10010)"
     },
-    "mainApiHttp": {
+    "API_HTTP_PORT": {
       "type": "computed",
       "value": "(port + 1)"
     },
-    "mainApiHttps": {
+    "API_HTTPS_PORT": {
       "type": "computed",
       "value": "(port + 11)"
     },
-    "mainApiGrpc": {
+    "API_GRPC_HTTP_PORT": {
       "type": "computed",
       "value": "(port + 2)"
     },
-    "backOfficeHttp": {
+    "BACKOFFICE_HTTP_PORT": {
       "type": "computed",
       "value": "(port + 3)"
     },
-    "backOfficeHttps": {
+    "BACKOFFICE_HTTPS_PORT": {
       "type": "computed",
       "value": "(port + 13)"
     },
-    "orleansHttp": {
+    "ORLEANS_HTTP_PORT": {
       "type": "computed",
       "value": "(port + 4)"
     },
-    "orleansHttps": {
+    "ORLEANS_HTTPS_PORT": {
       "type": "computed",
       "value": "(port + 14)"
     },
-    "documentationHttp": {
+    "DOCS_HTTP_PORT": {
       "type": "computed",
       "value": "(port + 19)"
     },
-    "orgGen": {
+    "DefaultOrgName": {
       "type": "generated",
       "generator": "join",
       "parameters": {
@@ -253,118 +253,105 @@
         ]
       }
     },
-    "orgName": {
+    "OrgName": {
       "type": "generated",
       "generator": "coalesce",
       "parameters": {
         "sourceVariableName": "org",
-        "fallbackVariableName": "orgGen"
+        "fallbackVariableName": "DefaultOrgName"
       },
-      "replaces": "OrgName"
+      "replaces": "ORG_NAME"
     },
-    "AppDomain": {
-      "type": "computed",
-      "value": "(name)",
-      "replaces": "AppDomain",
-      "fileRename": "AppDomain",
-      "forms": {
-        "global": [
-          "snake",
-          "lower"
-        ]
-      }
+    "AppDomainSnakeCase": {
+      "type": "derived",
+      "valueSource": "name",
+      "valueTransform": "snake_case",
+      "replaces": "app_domain"
+    },
+    "AppDomainKebab": {
+      "type": "derived",
+      "valueSource": "name",
+      "valueTransform": "kebab-case",
+      "replaces": "app-domain"
     }
   },
   "sources": [
     {
-      "source": "./",
-      "target": "./",
       "include": [
-        "**/*"
-      ],
-      "exclude": [
-        "**/[Bb]in/**",
-        "**/[Oo]bj/**",
-        "**/*.lock.json",
-        ".template.config/**",
-        ".local/**",
-        ".idea/**",
-        ".git/**",
-        ".github/**/*",
-        ".claude/**/*",
-        "requirements/**",
-        "libs/**",
-        "LICENSE",
-        "CLAUDE.md",
-        "README.md",
-        "ProjectREADME.md",
-        "Momentum.Template.csproj"
+        ".dockerignore",
+        ".editorconfig",
+        ".gitattributes",
+        ".gitignore",
+        ".mcp.json",
+        "compose.yml",
+        "*.ruleset",
+        "*.slnx",
+        "*.slnx.DotSettings",
+        "*.props"
       ],
       "modifiers": [
         {
-          "condition": "!(includeAspire)",
-          "exclude": [
+          "condition": "(INCLUDE_ASPIRE)",
+          "include": [
             "src/AppDomain.AppHost/**/*"
           ]
         },
         {
-          "condition": "!(includeApi)",
-          "exclude": [
+          "condition": "(INCLUDE_API)",
+          "include": [
             "src/AppDomain.Api/**/*"
           ]
         },
         {
-          "condition": "!(includeBackOffice)",
-          "exclude": [
+          "condition": "(INCLUDE_BACK_OFFICE)",
+          "include": [
             "src/AppDomain.BackOffice/**/*"
           ]
         },
         {
-          "condition": "(!orleans)",
-          "exclude": [
-            "src/AppDomain.BackOffice.Orleans/**/*"
-          ]
-        },
-        {
-          "condition": "(!includeDocs)",
-          "exclude": [
+          "condition": "(INCLUDE_DOCS)",
+          "include": [
             "docs/**/*"
           ]
         },
         {
-          "condition": "(!includeInfraDb)",
-          "exclude": [
+          "condition": "(INCLUDE_ORLEANS)",
+          "include": [
+            "src/AppDomain.BackOffice.Orleans/**/*"
+          ]
+        },
+        {
+          "condition": "(INCLUDE_INFRA_DB)",
+          "include": [
             "infra/AppDomain.Database/**/*"
           ]
         },
         {
-          "condition": "(no-sample)",
+          "condition": "(!INCLUDE_SAMPLE)",
           "exclude": [
-            "**/*Cashier*",
-            "**/*cashier*",
-            "**/Cashiers/**/*",
-            "**/cashiers/**/*",
-            "**/*Invoice*",
-            "**/*invoice*",
-            "**/Invoices/**/*",
-            "**/invoices/**/*",
             "src/AppDomain/Cashiers/**/*",
             "src/AppDomain/Invoices/**/*",
-            "src/AppDomain.Api/Cashiers/**/*",
-            "src/AppDomain.Api/Invoices/**/*",
-            "src/AppDomain.BackOffice/Messaging/AppDomainInboxHandler/**/*",
-            "src/AppDomain.BackOffice/Invoices/**/*",
-            "src/AppDomain.BackOffice.Orleans/Invoices/**/*",
             "infra/AppDomain.Database/Liquibase/AppDomain/cashiers/**/*",
-            "infra/AppDomain.Database/Liquibase/AppDomain/invoices/**/*",
-            "tests/AppDomain.Tests/Unit/Cashiers/**/*",
-            "tests/AppDomain.Tests/Unit/Invoices/**/*",
-            "tests/AppDomain.Tests/Integration/Cashiers/**/*",
-            "tests/AppDomain.Tests/Integration/Invoices/**/*"
+            "infra/AppDomain.Database/Liquibase/AppDomain/invoices/**/*"
           ]
         },
         {
-          "condition": "libs.Contains('defaults')",
+          "condition": "(!INCLUDE_SAMPLE || !INCLUDE_BACK_OFFICE)",
+          "exclude": [
+            "src/AppDomain.BackOffice/Messaging/AppDomainInboxHandler/**/*",
+            "src/AppDomain.BackOffice/Invoices/**/*",
+            "src/AppDomain.BackOffice.Orleans/Invoices/**/*"
+          ]
+        },
+        {
+          "condition": "(!INCLUDE_SAMPLE || !INCLUDE_API)",
+          "exclude": [
+            "src/AppDomain.Api/Cashiers/**/*",
+            "src/AppDomain.Api/Invoices/**/*"
+          ]
+        },
+        {
+          "condition": "libs == 'defaults'",
           "include": [
             "libs/Momentum/src/Momentum.ServiceDefaults/**/*",
             "libs/Momentum/src/Momentum.ServiceDefaults.Api/**/*"
@@ -385,118 +372,22 @@
   ],
   "postActions": [
     {
-      "condition": "(includeApi)",
-      "description": "Add Api to {{AppDomain}}.slnx",
+      "description": "Add Domain project to .slnx",
       "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
-      "args": {
-        "executable": "dotnet",
-        "args": "sln {{AppDomain}}.slnx add \"src/{{AppDomain}}.Api/{{AppDomain}}.Api.csproj\""
-      },
-      "manualInstructions": [
-        {
-          "text": "Run: dotnet sln {{AppDomain}}.slnx add src/{{AppDomain}}.Api/{{AppDomain}}.Api.csproj"
-        }
+      "applyFileRenamesToArgs": [
+        "args"
       ],
-      "continueOnError": true
-    },
-    {
-      "condition": "(includeBackOffice)",
-      "description": "Add BackOffice to AppDomain.slnx",
-      "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
       "args": {
         "executable": "dotnet",
-        "args": "sln AppDomain.slnx add \"src/AppDomain.BackOffice/AppDomain.BackOffice.csproj\""
+        "args": "sln AppDomain.slnx add \"src/AppDomain/AppDomain.csproj\""
       },
       "manualInstructions": [
         {
-          "text": "Run: dotnet sln AppDomain.slnx add src/AppDomain.BackOffice/AppDomain.BackOffice.csproj"
-        }
-      ],
-      "continueOnError": true
-    },
-    {
-      "condition": "(includeOrleans)",
-      "description": "Add Orleans BackOffice to AppDomain.slnx",
-      "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
-      "args": {
-        "executable": "dotnet",
-        "args": "sln AppDomain.slnx add \"src/AppDomain.BackOffice.Orleans/AppDomain.BackOffice.Orleans.csproj\""
-      },
-      "manualInstructions": [
-        {
-          "text": "Run: dotnet sln AppDomain.slnx add src/AppDomain.BackOffice.Orleans/AppDomain.BackOffice.Orleans.csproj"
-        }
-      ],
-      "continueOnError": true
-    },
-    {
-      "condition": "(includeAspire)",
-      "description": "Add AppHost to AppDomain.slnx",
-      "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
-      "args": {
-        "executable": "dotnet",
-        "args": "sln AppDomain.slnx add \"src/AppDomain.AppHost/AppDomain.AppHost.csproj\""
-      },
-      "manualInstructions": [
-        {
-          "text": "Run: dotnet sln AppDomain.slnx add src/AppDomain.AppHost/AppDomain.AppHost.csproj"
-        }
-      ],
-      "continueOnError": true
-    },
-    {
-      "condition": "(includeInfraDb)",
-      "description": "Add Database to AppDomain.slnx",
-      "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
-      "args": {
-        "executable": "dotnet",
-        "args": "sln AppDomain.slnx add \"infra/AppDomain.Database/AppDomain.Database.csproj\""
-      },
-      "manualInstructions": [
-        {
-          "text": "Run: dotnet sln AppDomain.slnx add infra/AppDomain.Database/AppDomain.Database.csproj"
-        }
-      ],
-      "continueOnError": true
-    },
-    {
-      "description": "Add Core to solution",
-      "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
-      "args": {
-        "executable": "dotnet",
-        "args": "sln {{AppDomain}}.slnx add \"src/{{AppDomain}}/{{AppDomain}}.csproj\""
-      },
-      "manualInstructions": [
-        {
-          "text": "dotnet sln {{AppDomain}}.slnx add src/{{AppDomain}}/{{AppDomain}}.csproj"
-        }
-      ],
-      "continueOnError": true
-    },
-    {
-      "description": "Add Contracts to AppDomain.slnx",
-      "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
-      "args": {
-        "executable": "dotnet",
-        "args": "sln AppDomain.slnx add \"src/AppDomain.Contracts/AppDomain.Contracts.csproj\""
-      },
-      "manualInstructions": [
-        {
-          "text": "Run: dotnet sln AppDomain.slnx add src/AppDomain.Contracts/AppDomain.Contracts.csproj"
+          "text": "Run: dotnet sln <YourSolution>.slnx add src/<YourSolution>/<YourSolution>.csproj"
         }
       ],
       "continueOnError": true
     }
-    // {
-    //   "description": "Restore NuGet packages",
-    //   "manualInstructions": [
-    //     {
-    //       "text": "Run 'dotnet restore' to restore NuGet packages"
-    //     }
-    //   ],
-    //   "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
-    //   "continueOnError": true
-    // }
   ],
   "SpecialCustomOperations": {
     "**.slnx": {
@@ -564,14 +455,11 @@
     }
   },
   "forms": {
-    "kebab": {
+    "kebab-case": {
       "identifier": "kebabCase"
     },
-    "snake": {
+    "snake_case": {
       "identifier": "snakeCase"
-    },
-    "lower": {
-      "identifier": "lowerCaseInvariant"
     }
   }
 }

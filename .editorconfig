@@ -31,7 +31,7 @@ tab_width = 2
 # C# files
 [*.cs]
 # Core Settings
-file_header_template = Copyright (c) OrgName. All rights reserved.
+file_header_template = Copyright (c) ORG_NAME. All rights reserved.
 
 #### .NET Coding Conventions ####
 csharp_use_heuristics_for_body_style = true:suggestion

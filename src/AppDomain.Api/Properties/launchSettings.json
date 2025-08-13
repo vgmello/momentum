@@ -6,13 +6,13 @@
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "scalar",
-      "applicationUrl": "http://localhost:mainApiHttp;http://localhost:mainApiGrpc;",
+      "applicationUrl": "http://localhost:$MainApiHttpPort;http://localhost:$MainApiGrpcPort;",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "Kestrel__Endpoints__Http__Protocols": "Http1",
-        "Kestrel__Endpoints__Http__Url": "http://localhost:mainApiHttp",
+        "Kestrel__Endpoints__Http__Url": "http://localhost:$MainApiHttpPort",
         "Kestrel__Endpoints__Grpc__Protocols": "Http2",
-        "Kestrel__Endpoints__Grpc__Url": "http://localhost:mainApiGrpc"
+        "Kestrel__Endpoints__Grpc__Url": "http://localhost:$MainApiGrpcPort"
       }
     },
     "https": {
@@ -20,7 +20,7 @@
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "scalar",
-      "applicationUrl": "https://localhost:mainApiHttps;",
+      "applicationUrl": "https://localhost:$MainApiHttpsPort;",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

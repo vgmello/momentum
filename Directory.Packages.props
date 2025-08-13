@@ -1,19 +1,19 @@
 <Project>
     <PropertyGroup>
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-        <AspireAppHostSdkVersion>9.3.1</AspireAppHostSdkVersion>
+        <AspireAppHostSdkVersion>9.4</AspireAppHostSdkVersion>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageVersion Include="Aspire.Azure.Data.Tables" Version="9.3.1"/>
-        <PackageVersion Include="Aspire.Confluent.Kafka" Version="9.3.1"/>
-        <PackageVersion Include="Aspire.Hosting.AppHost" Version="9.3.1"/>
-        <PackageVersion Include="Aspire.Hosting.Azure.Storage" Version="9.3.1"/>
-        <PackageVersion Include="Aspire.Hosting.Kafka" Version="9.3.1"/>
-        <PackageVersion Include="Aspire.Hosting.NodeJS" Version="9.3.1"/>
-        <PackageVersion Include="Aspire.Hosting.Orleans" Version="9.3.1"/>
-        <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="9.3.1"/>
-        <PackageVersion Include="Aspire.Npgsql" Version="9.3.1"/>
+        <PackageVersion Include="Aspire.Azure.Data.Tables" Version="9.4"/>
+        <PackageVersion Include="Aspire.Confluent.Kafka" Version="9.4"/>
+        <PackageVersion Include="Aspire.Hosting.AppHost" Version="9.4"/>
+        <PackageVersion Include="Aspire.Hosting.Azure.Storage" Version="9.4"/>
+        <PackageVersion Include="Aspire.Hosting.Kafka" Version="9.4"/>
+        <PackageVersion Include="Aspire.Hosting.NodeJS" Version="9.4"/>
+        <PackageVersion Include="Aspire.Hosting.Orleans" Version="9.4"/>
+        <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="9.4"/>
+        <PackageVersion Include="Aspire.Npgsql" Version="9.4"/>
         <PackageVersion Include="BenchmarkDotNet" Version="0.14.0"/>
         <PackageVersion Include="CloudNative.CloudEvents.Kafka" Version="2.8.0"/>
         <PackageVersion Include="CloudNative.CloudEvents.SystemTextJson" Version="2.8.0"/>
@@ -44,7 +44,7 @@
         <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.6"/>
         <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="9.7.0"/>
         <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.7"/>
-        <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="9.3.1"/>
+        <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="9.4"/>
         <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1"/>
         <PackageVersion Include="Microsoft.Orleans.Analyzers" Version="9.2.1">
             <PrivateAssets>all</PrivateAssets>

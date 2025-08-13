@@ -1,4 +1,4 @@
-// Copyright (c) OrgName. All rights reserved.
+// Copyright (c) ORG_NAME. All rights reserved.
 
 using Microsoft.AspNetCore.Http;
 using System.Net.Sockets;

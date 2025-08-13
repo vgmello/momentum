@@ -1,4 +1,4 @@
-// Copyright (c) OrgName. All rights reserved.
+// Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.AppHost.Extensions;
 
@@ -26,7 +26,7 @@ builder.AddLiquibaseMigrations(pgsql, dbPassword);
 #endif
 
 #endif
-#if (useKafka)
+#if (USE_KAFKA)
 var kafka = builder.AddKafka("messaging", port: 59092);
 kafka.WithKafkaUI(resource => resource
     .WithHostPort(port: 59093)
@@ -34,7 +34,7 @@ kafka.WithKafkaUI(resource => resource
     .WithUrlForEndpoint("http", url => url.DisplayText = "Kafka UI"));
 
 #endif
-#if (includeOrleans)
+#if (INCLUDE_ORLEANS)
 var storage = builder.AddAzureStorage("AppDomain-azure-storage").RunAsEmulator();
 var clustering = storage.AddTables("OrleansClustering");
 var grainTables = storage.AddTables("OrleansGrainState");
@@ -45,50 +45,50 @@ var orleans = builder
     .WithGrainStorage("Default", grainTables);
 
 #endif
-#if (includeApi)
+#if (INCLUDE_API)
 var AppDomainApi = builder
     .AddProject<Projects.AppDomain_Api>("AppDomain-api")
     .WithEnvironment("ServiceName", "AppDomain")
     .WithKestrelLaunchProfileEndpoints()
-#if (useDb)
+#if (USE_DB)
     .WithReference(database)
     .WithReference(serviceBusDb)
 #endif
     .WithReference(kafka)
-#if (useDb)
+#if (USE_DB)
     .WaitFor(database)
 #endif
     .WithHttpHealthCheck("/health/internal");
 
 #endif
-#if (includeBackOffice)
+#if (INCLUDE_BACK_OFFICE)
 builder
     .AddProject<Projects.AppDomain_BackOffice>("AppDomain-backoffice")
     .WithEnvironment("ServiceName", "AppDomain")
-#if (useDb)
+#if (USE_DB)
     .WithReference(database)
     .WithReference(serviceBusDb)
 #endif
     .WithReference(kafka)
-#if (useDb)
+#if (USE_DB)
     .WaitFor(database)
 #endif
     .WithHttpHealthCheck("/health/internal");
 
 #endif
-#if (includeOrleans)
+#if (INCLUDE_ORLEANS)
 builder
     .AddProject<Projects.AppDomain_BackOffice_Orleans>("AppDomain-backoffice-orleans")
     .WithEnvironment("ServiceName", "AppDomain")
     .WithEnvironment("Orleans__UseLocalhostClustering", "false")
     .WithEnvironment("Aspire__Azure__Data__Tables__DisableHealthChecks", "true")
     .WithReference(orleans)
-#if (useDb)
+#if (USE_DB)
     .WithReference(database)
     .WithReference(serviceBusDb)
 #endif
     .WithReference(kafka)
-#if (useDb)
+#if (USE_DB)
     .WaitFor(pgsql)
 #endif
     .WithReplicas(3)
@@ -105,9 +105,9 @@ builder
     .WithDockerfile("../../", "docs/Dockerfile")
     .WithBindMount("../../", "/app")
     .WithVolume("/app/docs/node_modules")
-    .WithHttpEndpoint(port: documentationHttp, targetPort: 5173, name: "http")
+    .WithHttpEndpoint(port: 8119, targetPort: 5173, name: "http")
     .WithUrlForEndpoint("http", url => url.DisplayText = "App Documentation")
-#if (includeApi)
+#if (INCLUDE_API)
     .WaitFor(AppDomainApi)
 #endif
     .WithHttpHealthCheck("/");

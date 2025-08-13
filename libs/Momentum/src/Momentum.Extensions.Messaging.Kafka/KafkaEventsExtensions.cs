@@ -59,7 +59,7 @@ public class KafkaEventsExtensions(
         var cloudEventMapper = new CloudEventMapper(serviceBusOptions);
 
         options
-            .UseKafka(kafkaConnectionString)
+            .USE_KAFKA(kafkaConnectionString)
             .ConfigureSenders(cfg => cfg.UseInterop(cloudEventMapper))
             .ConfigureListeners(cfg => cfg.UseInterop(cloudEventMapper))
             .ConfigureConsumers(consumer =>

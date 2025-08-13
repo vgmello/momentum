@@ -27,15 +27,15 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\AppDomain\AppDomain.csproj"/>
-        <!--#if (includeApi) -->
+        <!--#if (INCLUDE_API) -->
         <ProjectReference Include="..\..\src\AppDomain.Api\AppDomain.Api.csproj"/>
         <!--#endif -->
-        <!--#if (includeBackOffice) -->
+        <!--#if (INCLUDE_BACK_OFFICE) -->
         <ProjectReference Include="..\..\src\AppDomain.BackOffice\AppDomain.BackOffice.csproj"/>
         <!--#endif -->
     </ItemGroup>
 
-    <!--#if (includeApi) -->
+    <!--#if (INCLUDE_API) -->
     <ItemGroup>
         <Protobuf Include="..\..\src\AppDomain.Api\**\Protos\**\*.proto"
                   ProtoRoot="..\..\src\AppDomain.Api\"
