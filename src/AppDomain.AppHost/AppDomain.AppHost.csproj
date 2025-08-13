@@ -4,29 +4,32 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <IsAspireHost>true</IsAspireHost>
-        <UserSecretsId>apiUserSecretsId</UserSecretsId>
+        <UserSecretsId>1358a541-294a-491c-a8c3-46ac380e4c69</UserSecretsId>
         <NoWarn>$(NoWarn);ASPIREPROXYENDPOINTS001</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Aspire.Hosting.AppHost"/>
+        <!--#if (useKafka) -->
         <PackageReference Include="Aspire.Hosting.Kafka"/>
+        <!--#endif -->
         <PackageReference Include="Aspire.Hosting.PostgreSQL"/>
+        <!--#if (includeOrleans) -->
         <PackageReference Include="Aspire.Hosting.Azure.Storage"/>
         <PackageReference Include="Aspire.Hosting.Orleans"/>
-        <PackageReference Include="Aspire.Hosting.NodeJS"/>
+        <!--#endif -->
     </ItemGroup>
 
-    <ItemGroup Condition="'$(includeApi)' == 'True'">
+    <ItemGroup>
+        <!--#if (includeApi) -->
         <ProjectReference Include="..\AppDomain.Api\AppDomain.Api.csproj"/>
-    </ItemGroup>
-    
-    <ItemGroup Condition="'$(includeBackOffice)' == 'True'">
+        <!--#endif -->
+        <!--#if (includeBackOffice) -->
         <ProjectReference Include="..\AppDomain.BackOffice\AppDomain.BackOffice.csproj"/>
-    </ItemGroup>
-    
-    <ItemGroup Condition="'$(includeOrleans)' == 'True'">
+        <!--#endif -->
+        <!--#if (includeOrleans) -->
         <ProjectReference Include="..\AppDomain.BackOffice.Orleans\AppDomain.BackOffice.Orleans.csproj"/>
+        <!--#endif -->
     </ItemGroup>
 
 </Project>

@@ -2,27 +2,55 @@
 
     <PropertyGroup>
         <IsTestProject>true</IsTestProject>
+        <IsPackable>false</IsPackable>
+        <OutputType>Exe</OutputType>
+        <EnableDefaultContentItems>false</EnableDefaultContentItems>
         <NoWarn>$(NoWarn);CS0436;</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing"/>
-        <PackageReference Include="Testcontainers"/>
-        <PackageReference Include="Testcontainers.PostgreSql"/>
+        <PackageReference Include="coverlet.collector">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="Grpc.Tools"/>
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk"/>
+        <PackageReference Include="NetArchTest.Rules"/>
+        <PackageReference Include="NSubstitute"/>
+        <PackageReference Include="Shouldly"/>
+        <PackageReference Include="Testcontainers.PostgreSql"/>
+        <PackageReference Include="Testcontainers"/>
+        <PackageReference Include="xunit.runner.visualstudio"/>
+        <PackageReference Include="xunit.v3"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\AppDomain.Api\AppDomain.Api.csproj"/>
-        <ProjectReference Include="..\..\src\AppDomain.BackOffice\AppDomain.BackOffice.csproj"/>
         <ProjectReference Include="..\..\src\AppDomain\AppDomain.csproj"/>
+        <!--#if (includeApi) -->
+        <ProjectReference Include="..\..\src\AppDomain.Api\AppDomain.Api.csproj"/>
+        <!--#endif -->
+        <!--#if (includeBackOffice) -->
+        <ProjectReference Include="..\..\src\AppDomain.BackOffice\AppDomain.BackOffice.csproj"/>
+        <!--#endif -->
     </ItemGroup>
 
+    <!--#if (includeApi) -->
     <ItemGroup>
         <Protobuf Include="..\..\src\AppDomain.Api\**\Protos\**\*.proto"
                   ProtoRoot="..\..\src\AppDomain.Api\"
                   GrpcServices="Client"
                   Link="Integration\%(RecursiveDir)%(Filename)%(Extension)"/>
+    </ItemGroup>
+
+    <!--#endif -->
+    <ItemGroup>
+        <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit"/>
+        <Using Include="Shouldly"/>
     </ItemGroup>
 
 </Project>

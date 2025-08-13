@@ -1,9 +1,9 @@
 services:
-<!--#if (includeDb) -->
+  # #if (db == 'npgsql')
   # Database services
-  AppDomain-db:
+  app-domain-db:
     image: postgres:17-alpine
-    profiles: [<!--#if (includeApi) -->"api"<!--#endif --><!--#if (includeApi && includeBackOffice) -->, <!--#endif --><!--#if (includeBackOffice) -->"backoffice"<!--#endif -->]
+    profiles: ["db", "api", "backoffice"]
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password@
@@ -15,9 +15,10 @@ services:
       timeout: 5s
       retries: 5
 
-  AppDomain-db-migrations:
+  # #if (db == 'liquibase')
+  app-domain-db-migrations:
     image: liquibase/liquibase:4.32-alpine
-    profiles: [<!--#if (includeApi) -->"api"<!--#endif --><!--#if (includeApi && includeBackOffice) -->, <!--#endif --><!--#if (includeBackOffice) -->"backoffice"<!--#endif -->]
+    profiles: ["db", "api", "backoffice"]
     volumes:
       - ./infra/AppDomain.Database:/app
     depends_on:
@@ -31,15 +32,16 @@ services:
         echo 'Running database migrations...' && \
         liquibase update --defaults-file liquibase.setup.properties --url=jdbc:postgresql://AppDomain-db:5432/postgres && \
         liquibase update --defaults-file liquibase.servicebus.properties --url=jdbc:postgresql://AppDomain-db:5432/service_bus && \
-        liquibase update --url=jdbc:postgresql://AppDomain-db:5432/app_domain && \
+        liquibase update --url=jdbc:postgresql://AppDomain-db:5432/AppDomain && \
         echo 'Database migrations completed successfully!'
-<!--#endif -->
 
-<!--#if (includeApi || includeBackOffice) -->
+  # #endif
+  # #endif
+  # #if (useKafka)
   # Kafka Infrastructure
   kafka:
     image: confluentinc/cp-kafka:7.6.0
-    profiles: [<!--#if (includeApi) -->"api"<!--#endif --><!--#if (includeApi && includeBackOffice) -->, <!--#endif --><!--#if (includeBackOffice) -->"backoffice"<!--#endif -->]
+    profiles: ["messaging", "api", "backoffice"]
     ports:
       - "59092:9092"
       - "59094:29092"
@@ -58,9 +60,8 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
       KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
       CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
-<!--#endif -->
 
-<!--#if (includeAspire) -->
+  # #endif
   # Aspire Dashboard
   aspire-dashboard:
     image: mcr.microsoft.com/dotnet/aspire-dashboard:9.3
@@ -72,9 +73,8 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=true
     restart: unless-stopped
-<!--#endif -->
 
-<!--#if (includeApi) -->
+  # #if (includeApi)
   AppDomain-api:
     build:
       dockerfile: ./src/AppDomain.Api/Dockerfile
@@ -82,28 +82,22 @@ services:
     ports:
       - "8101:8080"
       - "8102:8102"
-<!--#if (includeDb) -->
     depends_on:
       AppDomain-db:
         condition: service_healthy
       AppDomain-db-migrations:
         condition: service_completed_successfully
-<!--#endif -->
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ServiceName=AppDomain
-<!--#if (includeDb) -->
-      - ConnectionStrings__AppDomainDb=Host=AppDomain-db;Port=5432;Database=app_domain;Username=postgres;Password=password@
+      - ConnectionStrings__AppDomainDb=Host=AppDomain-db;Port=5432;Database=AppDomain;Username=postgres;Password=password@
       - ConnectionStrings__ServiceBus=Host=AppDomain-db;Port=5432;Database=service_bus;Username=postgres;Password=password@
-<!--#endif -->
       - Kestrel__Endpoints__Http__Protocols=Http1
       - Kestrel__Endpoints__Http__Url=http://+:8080
       - Kestrel__Endpoints__Grpc__Protocols=Http2
       - Kestrel__Endpoints__Grpc__Url=http://+:8102
-<!--#if (includeAspire) -->
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://aspire-dashboard:18890
       - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
-<!--#endif -->
       - OTEL_SERVICE_NAME=AppDomain-api
       - OTEL_SERVICE_VERSION=1.0.0
     healthcheck:
@@ -112,33 +106,27 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-<!--#endif -->
 
-<!--#if (includeBackOffice) -->
+  # #endif
+  # #if (includeBackOffice)
   AppDomain-backoffice:
     build:
       dockerfile: ./src/AppDomain.BackOffice/Dockerfile
     profiles: ["backoffice"]
     ports:
       - "8103:8080"
-<!--#if (includeDb) -->
     depends_on:
       AppDomain-db:
         condition: service_healthy
       AppDomain-db-migrations:
         condition: service_completed_successfully
-<!--#endif -->
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ServiceName=AppDomain
-<!--#if (includeDb) -->
-      - ConnectionStrings__AppDomainDb=Host=AppDomain-db;Port=5432;Database=app_domain;Username=postgres;Password=password@
+      - ConnectionStrings__AppDomainDb=Host=AppDomain-db;Port=5432;Database=AppDomain;Username=postgres;Password=password@
       - ConnectionStrings__ServiceBus=Host=AppDomain-db;Port=5432;Database=service_bus;Username=postgres;Password=password@
-<!--#endif -->
-<!--#if (includeAspire) -->
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://aspire-dashboard:18890
       - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
-<!--#endif -->
       - OTEL_SERVICE_NAME=AppDomain-backoffice
       - OTEL_SERVICE_VERSION=1.0.0
     healthcheck:
@@ -147,9 +135,9 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-<!--#endif -->
 
-<!--#if (includeDocs) -->
+  # #endif
+  # #if (includeDocs)
   AppDomain-docs:
     build:
       context: ./
@@ -167,9 +155,8 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
-<!--#endif -->
-
-<!--#if (includeDocs) -->
+  # #endif
 volumes:
+  # #if (includeDocs)
   pnpm_node_modules:
-<!--#endif -->
+  # #endif

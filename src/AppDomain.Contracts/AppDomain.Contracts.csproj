@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <PackageTags>AppDomain.contracts</PackageTags>
+        <PackageTags>app_domain.contracts</PackageTags>
         <IncludeSource>true</IncludeSource>
         <Authors>OrgName</Authors>
         <Company>OrgName</Company>

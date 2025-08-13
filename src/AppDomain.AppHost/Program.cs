@@ -4,9 +4,8 @@ using AppDomain.AppHost.Extensions;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-#if (includeDb)
+#if (db == npgsql)
 var dbPassword = builder.AddParameter("DbPassword", secret: true);
-
 var pgsql = builder
     .AddPostgres("AppDomain-db", password: dbPassword, port: 54320)
     .WithImage("postgres", "17-alpine")
@@ -22,15 +21,19 @@ var pgsql = builder
 
 var database = pgsql.AddDatabase(name: "AppDomainDb", databaseName: "app_domain");
 var serviceBusDb = pgsql.AddDatabase(name: "ServiceBus", databaseName: "service_bus");
+#if (db == liquibase)
 builder.AddLiquibaseMigrations(pgsql, dbPassword);
-#endif
 
+#endif
+#endif
+#if (useKafka)
 var kafka = builder.AddKafka("messaging", port: 59092);
 kafka.WithKafkaUI(resource => resource
     .WithHostPort(port: 59093)
     .WaitFor(kafka)
     .WithUrlForEndpoint("http", url => url.DisplayText = "Kafka UI"));
 
+#endif
 #if (includeOrleans)
 var storage = builder.AddAzureStorage("AppDomain-azure-storage").RunAsEmulator();
 var clustering = storage.AddTables("OrleansClustering");
@@ -40,39 +43,39 @@ var orleans = builder
     .AddOrleans("AppDomain-orleans")
     .WithClustering(clustering)
     .WithGrainStorage("Default", grainTables);
-#endif
 
+#endif
 #if (includeApi)
 var AppDomainApi = builder
     .AddProject<Projects.AppDomain_Api>("AppDomain-api")
     .WithEnvironment("ServiceName", "AppDomain")
     .WithKestrelLaunchProfileEndpoints()
-#if (includeDb)
+#if (useDb)
     .WithReference(database)
     .WithReference(serviceBusDb)
 #endif
     .WithReference(kafka)
-#if (includeDb)
+#if (useDb)
     .WaitFor(database)
 #endif
     .WithHttpHealthCheck("/health/internal");
-#endif
 
+#endif
 #if (includeBackOffice)
 builder
     .AddProject<Projects.AppDomain_BackOffice>("AppDomain-backoffice")
     .WithEnvironment("ServiceName", "AppDomain")
-#if (includeDb)
+#if (useDb)
     .WithReference(database)
     .WithReference(serviceBusDb)
 #endif
     .WithReference(kafka)
-#if (includeDb)
+#if (useDb)
     .WaitFor(database)
 #endif
     .WithHttpHealthCheck("/health/internal");
-#endif
 
+#endif
 #if (includeOrleans)
 builder
     .AddProject<Projects.AppDomain_BackOffice_Orleans>("AppDomain-backoffice-orleans")
@@ -80,12 +83,12 @@ builder
     .WithEnvironment("Orleans__UseLocalhostClustering", "false")
     .WithEnvironment("Aspire__Azure__Data__Tables__DisableHealthChecks", "true")
     .WithReference(orleans)
-#if (includeDb)
+#if (useDb)
     .WithReference(database)
     .WithReference(serviceBusDb)
 #endif
     .WithReference(kafka)
-#if (includeDb)
+#if (useDb)
     .WaitFor(pgsql)
 #endif
     .WithReplicas(3)
@@ -95,8 +98,8 @@ builder
         url.Url = "/dashboard";
     })
     .WithHttpHealthCheck("/health/internal");
-#endif
 
+#endif
 builder
     .AddContainer("AppDomain-docs", "AppDomain-docfx")
     .WithDockerfile("../../", "docs/Dockerfile")

@@ -28,6 +28,10 @@
     "org": {
       "longName": "org",
       "shortName": ""
+    },
+    "kafka": {
+      "longName": "kafka",
+      "shortName": ""
     }
   }
 }

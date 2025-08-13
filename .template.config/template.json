@@ -20,21 +20,10 @@
   "guids": [
     "4d1e9d4f-ee8a-4d91-8c2b-11e09987ac0b",
     "5e2f0e5f-ff9b-5e02-9d3c-22f10098bd1c",
-    "310fa8e1-342a-4675-a3f0-f8912a5da0dd"
+    "310fa8e1-342a-4675-a3f0-f8912a5da0dd",
+    "1358a541-294a-491c-a8c3-46ac380e4c69"
   ],
   "symbols": {
-    "AppDomain": {
-      "type": "computed",
-      "value": "name",
-      "replaces": "AppDomain",
-      "fileRename": "AppDomain",
-      "forms": {
-        "global": [
-          "snake",
-          "lower"
-        ]
-      }
-    },
     "aspire": {
       "type": "parameter",
       "datatype": "bool",
@@ -77,7 +66,7 @@
       "enableQuotelessLiterals": true,
       "description": "Data access setup configuration",
       "displayName": "Data Access Setup",
-      "defaultValue": "unspecified",
+      "defaultValue": "npgsql|liquibase",
       "choices": [
         {
           "choice": "npgsql",
@@ -90,19 +79,15 @@
         {
           "choice": "none",
           "description": "No database setup"
-        },
-        {
-          "choice": "unspecified",
-          "description": "Unspecified"
         }
       ]
     },
-    "no-sample": {
+    "kafka": {
       "type": "parameter",
       "datatype": "bool",
-      "description": "Skip generating sample code",
-      "displayName": "Skip Sample Content",
-      "defaultValue": "false"
+      "description": "Use Apache Kafka",
+      "displayName": "Include Apache Kafka setup",
+      "defaultValue": "true"
     },
     "port": {
       "type": "parameter",
@@ -112,9 +97,18 @@
       "displayName": "Service Base Port",
       "replaces": "SERVICE_BASE_PORT"
     },
-    "all": {
-      "type": "computed",
-      "value": "!(aspire || api || back-office || docs)"
+    "org": {
+      "type": "parameter",
+      "datatype": "string",
+      "description": "Organization / Team name",
+      "displayName": "Organization / Team name"
+    },
+    "no-sample": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "Skip generating sample code",
+      "displayName": "Skip Sample Content",
+      "defaultValue": "false"
     },
     "libs": {
       "type": "parameter",
@@ -159,11 +153,9 @@
       "defaultValue": "Momentum",
       "replaces": "Momentum"
     },
-    "org": {
-      "type": "parameter",
-      "datatype": "string",
-      "description": "Organization / Team name",
-      "displayName": "Organization / Team name"
+    "all": {
+      "type": "computed",
+      "value": "!(aspire || api || back-office || docs)"
     },
     "includeAspire": {
       "type": "computed",
@@ -181,9 +173,13 @@
       "type": "computed",
       "value": "(docs || all)"
     },
-    "includeDb": {
+    "includeInfraDb": {
       "type": "computed",
-      "value": "(db != 'none' && (all || db == 'liquibase'))"
+      "value": "(db == liquibase)"
+    },
+    "includeOrleans": {
+      "type": "computed",
+      "value": "(orleans)"
     },
     "includeSample": {
       "type": "computed",
@@ -193,17 +189,13 @@
       "type": "computed",
       "value": "(libs != 'none')"
     },
-    "dbConfig": {
+    "useDb": {
       "type": "computed",
-      "value": "(db == 'unspecified' ? 'npgsql|liquibase' : db)"
+      "value": "(db == npgsql)"
     },
-    "useNpgsql": {
+    "useKafka": {
       "type": "computed",
-      "value": "(dbConfig == 'npgsql')"
-    },
-    "useLiquibase": {
-      "type": "computed",
-      "value": "(includeDb && dbConfig == 'liquibase')"
+      "value": "(kafka && (includeApi || includeBackOffice))"
     },
     "aspireHttp": {
       "type": "computed",
@@ -248,7 +240,6 @@
     "orgGen": {
       "type": "generated",
       "generator": "join",
-      "replaces": "OrgName",
       "parameters": {
         "symbols": [
           {
@@ -261,16 +252,28 @@
           }
         ]
       }
-    }
-  },
-  "orgName": {
-    "type": "generated",
-    "generator": "coalesce",
-    "parameters": {
-      "sourceVariableName": "org",
-      "fallbackVariableName": "orgGen"
     },
-    "replaces": "OrgName"
+    "orgName": {
+      "type": "generated",
+      "generator": "coalesce",
+      "parameters": {
+        "sourceVariableName": "org",
+        "fallbackVariableName": "orgGen"
+      },
+      "replaces": "OrgName"
+    },
+    "AppDomain": {
+      "type": "computed",
+      "value": "(name)",
+      "replaces": "AppDomain",
+      "fileRename": "AppDomain",
+      "forms": {
+        "global": [
+          "snake",
+          "lower"
+        ]
+      }
+    }
   },
   "sources": [
     {
@@ -327,9 +330,9 @@
           ]
         },
         {
-          "condition": "(!includeDb)",
+          "condition": "(!includeInfraDb)",
           "exclude": [
-            "infra/**/*"
+            "infra/AppDomain.Database/**/*"
           ]
         },
         {
@@ -368,55 +371,121 @@
       ]
     }
   ],
-  "primaryOutputs": [
+  "postActions": [
     {
-      "condition": "includeApi",
-      "path": "src/AppDomain.Api/AppDomain.Api.csproj"
+      "condition": "(includeApi)",
+      "description": "Add Api to AppDomain.slnx",
+      "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
+      "args": {
+        "executable": "dotnet",
+        "args": "sln AppDomain.slnx add \"src/AppDomain.Api/AppDomain.Api.csproj\""
+      },
+      "manualInstructions": [
+        {
+          "text": "Run: dotnet sln AppDomain.slnx add src/AppDomain.Api/AppDomain.Api.csproj"
+        }
+      ],
+      "continueOnError": true
     },
     {
-      "condition": "includeBackOffice",
-      "path": "src/AppDomain.BackOffice/AppDomain.BackOffice.csproj"
+      "condition": "(includeBackOffice)",
+      "description": "Add BackOffice to AppDomain.slnx",
+      "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
+      "args": {
+        "executable": "dotnet",
+        "args": "sln AppDomain.slnx add \"src/AppDomain.BackOffice/AppDomain.BackOffice.csproj\""
+      },
+      "manualInstructions": [
+        {
+          "text": "Run: dotnet sln AppDomain.slnx add src/AppDomain.BackOffice/AppDomain.BackOffice.csproj"
+        }
+      ],
+      "continueOnError": true
     },
     {
-      "condition": "includeOrleans",
-      "path": "src/AppDomain.BackOffice.Orleans/AppDomain.BackOffice.Orleans.csproj"
+      "condition": "(includeOrleans)",
+      "description": "Add Orleans BackOffice to AppDomain.slnx",
+      "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
+      "args": {
+        "executable": "dotnet",
+        "args": "sln AppDomain.slnx add \"src/AppDomain.BackOffice.Orleans/AppDomain.BackOffice.Orleans.csproj\""
+      },
+      "manualInstructions": [
+        {
+          "text": "Run: dotnet sln AppDomain.slnx add src/AppDomain.BackOffice.Orleans/AppDomain.BackOffice.Orleans.csproj"
+        }
+      ],
+      "continueOnError": true
     },
     {
-      "condition": "includeAppHost",
-      "path": "src/AppDomain.AppHost/AppDomain.AppHost.csproj"
+      "condition": "(includeAspire)",
+      "description": "Add AppHost to AppDomain.slnx",
+      "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
+      "args": {
+        "executable": "dotnet",
+        "args": "sln AppDomain.slnx add \"src/AppDomain.AppHost/AppDomain.AppHost.csproj\""
+      },
+      "manualInstructions": [
+        {
+          "text": "Run: dotnet sln AppDomain.slnx add src/AppDomain.AppHost/AppDomain.AppHost.csproj"
+        }
+      ],
+      "continueOnError": true
     },
     {
-      "condition": "includeDb",
-      "path": "infra/AppDomain.Database/AppDomain.Database.csproj"
+      "condition": "(includeInfraDb)",
+      "description": "Add Database to AppDomain.slnx",
+      "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
+      "args": {
+        "executable": "dotnet",
+        "args": "sln AppDomain.slnx add \"infra/AppDomain.Database/AppDomain.Database.csproj\""
+      },
+      "manualInstructions": [
+        {
+          "text": "Run: dotnet sln AppDomain.slnx add infra/AppDomain.Database/AppDomain.Database.csproj"
+        }
+      ],
+      "continueOnError": true
     },
     {
-      "path": "src/AppDomain/AppDomain.csproj"
+      "description": "Add AppDomain core to AppDomain.slnx",
+      "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
+      "args": {
+        "executable": "dotnet",
+        "args": "sln AppDomain.slnx add \"src/AppDomain/AppDomain.csproj\""
+      },
+      "manualInstructions": [
+        {
+          "text": "Run: dotnet sln AppDomain.slnx add src/AppDomain/AppDomain.csproj"
+        }
+      ],
+      "continueOnError": true
     },
     {
-      "path": "src/AppDomain.Contracts/AppDomain.Contracts.csproj"
+      "description": "Add Contracts to AppDomain.slnx",
+      "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
+      "args": {
+        "executable": "dotnet",
+        "args": "sln AppDomain.slnx add \"src/AppDomain.Contracts/AppDomain.Contracts.csproj\""
+      },
+      "manualInstructions": [
+        {
+          "text": "Run: dotnet sln AppDomain.slnx add src/AppDomain.Contracts/AppDomain.Contracts.csproj"
+        }
+      ],
+      "continueOnError": true
     }
+    // {
+    //   "description": "Restore NuGet packages",
+    //   "manualInstructions": [
+    //     {
+    //       "text": "Run 'dotnet restore' to restore NuGet packages"
+    //     }
+    //   ],
+    //   "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+    //   "continueOnError": true
+    // }
   ],
-  // "postActions": [
-  //   {
-  //     "description": "Add projects to solution",
-  //     "manualInstructions": [
-  //       {
-  //         "text": "Add generated project to solution manually."
-  //       }
-  //     ],
-  //     "args": {
-  //       "inRoot": true
-  //     },
-  //     "actionId": "D396686C-DE0E-4DE6-906D-291CD29FC5DE",
-  //     "continueOnError": true
-  //   },
-  //   {
-  //     "description": "Restore NuGet packages",
-  //     "manualInstructions": [{ "text": "Run 'dotnet restore' to restore NuGet packages" }],
-  //     "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
-  //     "continueOnError": true
-  //   }
-  // ]
   "SpecialCustomOperations": {
     "**.slnx": {
       "operations": [
@@ -453,6 +522,30 @@
             "pseudoEndToken": "-- >",
             "id": "fixPseudoNestedComments",
             "resetFlag": "_TestResetFlag_"
+          }
+        }
+      ]
+    },
+    "**.yml": {
+      "operations": [
+        {
+          "type": "conditional",
+          "configuration": {
+            "actionableIf": [
+              "# #if"
+            ],
+            "actionableElse": [
+              "# #else"
+            ],
+            "actionableElseif": [
+              "# #elseif"
+            ],
+            "endif": [
+              "# #endif"
+            ],
+            "trim": "true",
+            "wholeLine": "true",
+            "evaluator": "C++"
           }
         }
       ]

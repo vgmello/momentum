@@ -11,9 +11,5 @@
     <Import Project="Sdk.props" Sdk="Microsoft.Build.NoTargets" Version="3.7.56" />
     <Import Project="Sdk.targets" Sdk="Microsoft.Build.NoTargets" Version="3.7.56"/>
 
-    <ItemGroup>
-        <None Include=".vitepress/**"/>
-    </ItemGroup>
-
     <Target Name="PrepareForBuild" />
 </Project>
