@@ -189,13 +189,17 @@
       "type": "computed",
       "value": "(libs != 'none')"
     },
+    "HAS_BACKEND": {
+      "type": "computed",
+      "value": "(INCLUDE_API || INCLUDE_BACK_OFFICE || INCLUDE_ORLEANS)"
+    },
     "USE_DB": {
       "type": "computed",
       "value": "(db == npgsql)"
     },
     "USE_KAFKA": {
       "type": "computed",
-      "value": "(kafka && (INCLUDE_API || INCLUDE_BACK_OFFICE))"
+      "value": "(kafka && HAS_BACKEND)"
     },
     "AspireHttpPort": {
       "type": "computed",
@@ -266,13 +270,15 @@
       "type": "derived",
       "valueSource": "name",
       "valueTransform": "snake_case",
-      "replaces": "app_domain"
+      "replaces": "app_domain",
+      "fileRename": "app_domain"
     },
     "AppDomainKebab": {
       "type": "derived",
       "valueSource": "name",
       "valueTransform": "kebab-case",
-      "replaces": "app-domain"
+      "replaces": "app-domain",
+      "fileRename": "app-domain"
     }
   },
   "sources": [
@@ -327,6 +333,14 @@
           ]
         },
         {
+          "condition": "(HAS_BACKEND)",
+          "include": [
+            "src/AppDomain/**/*",
+            "src/AppDomain.Contracts/**/*",
+            "tests/AppDomain.Tests/**/*"
+          ]
+        },
+        {
           "condition": "(!INCLUDE_SAMPLE)",
           "exclude": [
             "src/AppDomain/Cashiers/**/*",
@@ -372,18 +386,108 @@
   ],
   "postActions": [
     {
-      "description": "Add Domain project to .slnx",
+      "condition": "(INCLUDE_API)",
+      "description": "Add API project to .slnx",
       "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
       "applyFileRenamesToArgs": [
         "args"
       ],
       "args": {
         "executable": "dotnet",
-        "args": "sln AppDomain.slnx add \"src/AppDomain/AppDomain.csproj\""
+        "args": "sln AppDomain.slnx add \"src/AppDomain.Api/AppDomain.Api.csproj\""
       },
       "manualInstructions": [
         {
-          "text": "Run: dotnet sln <YourSolution>.slnx add src/<YourSolution>/<YourSolution>.csproj"
+          "text": "Run: dotnet sln <YourSolution>.slnx add src/<YourSolution>.Api/<YourSolution>.Api.csproj"
+        }
+      ],
+      "continueOnError": true
+    },
+    {
+      "condition": "(INCLUDE_BACK_OFFICE)",
+      "description": "Add BackOffice project to .slnx",
+      "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
+      "applyFileRenamesToArgs": [
+        "args"
+      ],
+      "args": {
+        "executable": "dotnet",
+        "args": "sln AppDomain.slnx add \"src/AppDomain.BackOffice/AppDomain.BackOffice.csproj\""
+      },
+      "manualInstructions": [
+        {
+          "text": "Run: dotnet sln <YourSolution>.slnx add src/<YourSolution>.BackOffice/<YourSolution>.BackOffice.csproj"
+        }
+      ],
+      "continueOnError": true
+    },
+    {
+      "condition": "(INCLUDE_ORLEANS)",
+      "description": "Add Orleans BackOffice project to .slnx",
+      "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
+      "applyFileRenamesToArgs": [
+        "args"
+      ],
+      "args": {
+        "executable": "dotnet",
+        "args": "sln AppDomain.slnx add \"src/AppDomain.BackOffice.Orleans/AppDomain.BackOffice.Orleans.csproj\""
+      },
+      "manualInstructions": [
+        {
+          "text": "Run: dotnet sln <YourSolution>.slnx add src/<YourSolution>.BackOffice.Orleans/<YourSolution>.BackOffice.Orleans.csproj"
+        }
+      ],
+      "continueOnError": true
+    },
+    {
+      "condition": "(INCLUDE_ASPIRE)",
+      "description": "Add AppHost project to .slnx",
+      "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
+      "applyFileRenamesToArgs": [
+        "args"
+      ],
+      "args": {
+        "executable": "dotnet",
+        "args": "sln AppDomain.slnx add \"src/AppDomain.AppHost/AppDomain.AppHost.csproj\""
+      },
+      "manualInstructions": [
+        {
+          "text": "Run: dotnet sln <YourSolution>.slnx add src/<YourSolution>.AppHost/<YourSolution>.AppHost.csproj"
+        }
+      ],
+      "continueOnError": true
+    },
+    {
+      "condition": "(INCLUDE_INFRA_DB)",
+      "description": "Add Database project to .slnx",
+      "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
+      "applyFileRenamesToArgs": [
+        "args"
+      ],
+      "args": {
+        "executable": "dotnet",
+        "args": "sln AppDomain.slnx add \"infra/AppDomain.Database/AppDomain.Database.csproj\""
+      },
+      "manualInstructions": [
+        {
+          "text": "Run: dotnet sln <YourSolution>.slnx add infra/<YourSolution>.Database/<YourSolution>.Database.csproj"
+        }
+      ],
+      "continueOnError": true
+    },
+    {
+      "description": "Add Contracts project to .slnx",
+      "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
+      "applyFileRenamesToArgs": [
+        "args"
+      ],
+      "args": {
+        "executable": "dotnet",
+        "args": "sln AppDomain.slnx add \"src/AppDomain.Contracts/AppDomain.Contracts.csproj\""
+      },
+      "manualInstructions": [
+        {
+          "text": "Run: dotnet sln <YourSolution>.slnx add src/<YourSolution>.Contracts/<YourSolution>.Contracts.csproj"
         }
       ],
       "continueOnError": true
@@ -458,8 +562,17 @@
     "kebab-case": {
       "identifier": "kebabCase"
     },
+    "dash-to-underscore": {
+      "identifier": "replace",
+      "pattern": "-",
+      "replacement": "_"
+    },
     "snake_case": {
-      "identifier": "snakeCase"
+      "identifier": "chain",
+      "steps": [
+        "kebab-case",
+        "dash-to-underscore"
+      ]
     }
   }
 }

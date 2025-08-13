@@ -7,7 +7,7 @@
 
     <include file="app_domain/app_domain.sql"/>
 
-<!--#if (INCLUDE_SAMPLE)-->
+<!--#if (INCLUDE_SAMPLE) -->
     <!-- Sample domain content - remove with --no-sample -->
     <include file="app_domain/cashiers/tables/cashiers.sql"/>
     <include file="app_domain/cashiers/tables/cashier_currencies.sql"/>

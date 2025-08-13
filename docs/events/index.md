@@ -6,33 +6,11 @@ This document provides a comprehensive overview of all events published by the A
 
 Integration events are published to external systems and can be consumed by other bounded contexts and services.
 
-### Invoice Events
-
-| Event Name                                 | Description                                                               | Status |
-| ------------------------------------------ | ------------------------------------------------------------------------- | ------ |
-| [InvoiceCreated](./invoice-created.md)     | Published when a new invoice is created in the system                     | Active |
-| [InvoiceCancelled](./invoice-cancelled.md) | Published when an invoice is cancelled                                    | Active |
-| [InvoiceFinalized](./invoice-finalized.md) | Published when an invoice is finalized during business day end processing | Active |
-| [InvoicePaid](./invoice-paid.md)           | Published when an invoice is marked as paid                               | Active |
-| [PaymentReceived](./payment-received.md)   | Published when a payment is received and processed                        | Active |
-
-### Cashier Events
-
-| Event Name                             | Description                                         | Status |
-| -------------------------------------- | --------------------------------------------------- | ------ |
-| [CashierCreated](./cashier-created.md) | Published when a new cashier is created             | Active |
-| [CashierUpdated](./cashier-updated.md) | Published when an existing cashier is updated       | Active |
-| [CashierDeleted](./cashier-deleted.md) | Published when a cashier is deleted from the system | Active |
+<!--@include: ./integration_events.md-->
 
 ## Domain Events
 
-Domain events are internal to the AppDomain bounded context and used for coordinating domain logic within the service.
-
-### Invoice Domain Events
-
-| Event Name                                 | Description                                                                 | Status |
-| ------------------------------------------ | --------------------------------------------------------------------------- | ------ |
-| [InvoiceGenerated](./invoice-generated.md) | Internal event triggered when an invoice is generated for domain processing | Active |
+<!--@include: ./domain_events.md-->
 
 ## Event Versioning Strategy
 
