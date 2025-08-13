@@ -111,3 +111,5 @@ Shared platform libraries in `libs/Momentum/` provide:
 -   **VitePress**: Documentation framework with TypeScript automation
 -   **Auto-generated**: Event schemas and API docs generated from code
 -   **ADR Tracking**: Architecture Decision Records in `docs/arch/adr/`
+
+IMPORTANT: use `\_temp` folder to store the template tests instead of using /tmp, create a ./\_temp/ directory and use that

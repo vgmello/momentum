@@ -67,7 +67,7 @@ services:
     image: mcr.microsoft.com/dotnet/aspire-dashboard:9.3
     profiles: [ "aspire" ]
     ports:
-      - "18100:18888"
+      - "$AspireHttpPort:18888"
       - "18890:18890"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -80,8 +80,8 @@ services:
       dockerfile: ./src/AppDomain.Api/Dockerfile
     profiles: ["api"]
     ports:
-      - "8101:8080"
-      - "8102:8102"
+      - "$MainApiHttpPort:8080"
+      - "$MainApiGrpcPort:8102"
     depends_on:
       AppDomain-db:
         condition: service_healthy
@@ -114,7 +114,7 @@ services:
       dockerfile: ./src/AppDomain.BackOffice/Dockerfile
     profiles: ["backoffice"]
     ports:
-      - "8103:8080"
+      - "$BackOfficeHttpPort:8080"
     depends_on:
       AppDomain-db:
         condition: service_healthy
@@ -144,7 +144,7 @@ services:
       dockerfile: docs/Dockerfile
     profiles: ["docs"]
     ports:
-      - "8119:5173"
+      - "$DocumentationHttpPort:5173"
     volumes:
       - ./:/app
       - pnpm_node_modules:/app/docs/node_modules

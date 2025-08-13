@@ -296,6 +296,8 @@
         "libs/**",
         "LICENSE",
         "CLAUDE.md",
+        "README.md",
+        "ProjectREADME.md",
         "Momentum.Template.csproj"
       ],
       "modifiers": [
@@ -336,7 +338,7 @@
           ]
         },
         {
-          "condition": "(!no-sample)",
+          "condition": "(no-sample)",
           "exclude": [
             "**/*Cashier*",
             "**/*cashier*",
@@ -369,6 +371,16 @@
           ]
         }
       ]
+    },
+    {
+      "source": "./",
+      "target": "./",
+      "include": [
+        "ProjectREADME.md"
+      ],
+      "rename": {
+        "ProjectREADME.md": "README.md"
+      }
     }
   ],
   "postActions": [

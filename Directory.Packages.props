@@ -102,5 +102,12 @@
         <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="4.14.0"/>
         <PackageVersion Include="System.CommandLine" Version="2.0.0-beta4.22272.1"/>
         <PackageVersion Include="System.Text.Json" Version="8.0.0"/>
+        <PackageVersion Include="Momentum.Extensions.Abstractions" Version="1.0.0"/>
+        <PackageVersion Include="Momentum.Extensions" Version="1.0.0"/>
+        <PackageVersion Include="Momentum.Extensions.SourceGenerators" Version="1.0.0"/>
+        <PackageVersion Include="Momentum.ServiceDefaults" Version="1.0.0"/>
+        <PackageVersion Include="Momentum.ServiceDefaults.Api" Version="1.0.0"/>
+        <PackageVersion Include="Momentum.Extensions.Messaging.Kafka" Version="1.0.0"/>
+        <PackageVersion Include="Microsoft.Orleans.Streaming" Version="9.2.1"/>
     </ItemGroup>
 </Project>
