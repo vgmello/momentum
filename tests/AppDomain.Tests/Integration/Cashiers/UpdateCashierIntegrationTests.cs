@@ -1,5 +1,5 @@
-<!--#if (includeSample)-->
-// Copyright (c) ABCDEG. All rights reserved.
+< !--#if (includeSample)-->
+// Copyright (c) OrgName. All rights reserved.
 
 using AppDomain.Cashiers.Grpc;
 using AppDomain.Tests.Integration._Internal;

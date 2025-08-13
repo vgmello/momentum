@@ -1,4 +1,4 @@
-// Copyright (c) ABCDEG. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
 using AppDomain.AppHost.Extensions;
 
@@ -20,7 +20,7 @@ var pgsql = builder
         .WithUrlForEndpoint("http", url => url.DisplayText = "PgAdmin (DB Management)"))
     .WithLifetime(ContainerLifetime.Persistent);
 
-var database = pgsql.AddDatabase(name: "AppDomainDb", databaseName: "AppDomain");
+var database = pgsql.AddDatabase(name: "AppDomainDb", databaseName: "app_domain");
 var serviceBusDb = pgsql.AddDatabase(name: "ServiceBus", databaseName: "service_bus");
 builder.AddLiquibaseMigrations(pgsql, dbPassword);
 #endif

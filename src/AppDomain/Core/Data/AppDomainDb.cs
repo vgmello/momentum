@@ -1,9 +1,9 @@
-// Copyright (c) ABCDEG. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
-<!--#if (includeSample)-->
+< !--#if (includeSample)-->
 using AppDomain.Cashiers.Data.Entities;
 using AppDomain.Invoices.Data.Entities;
-<!--#endif-->
+< !--#endif-->
 using LinqToDB;
 using LinqToDB.Data;
 

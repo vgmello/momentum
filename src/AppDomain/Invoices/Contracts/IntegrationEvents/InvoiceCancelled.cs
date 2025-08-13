@@ -1,12 +1,12 @@
-<!--#if (includeSample)-->
-// Copyright (c) ABCDEG. All rights reserved.
+< !--#if (includeSample)-->
+// Copyright (c) OrgName. All rights reserved.
 
 using AppDomain.Invoices.Contracts.Models;
 
 namespace AppDomain.Invoices.Contracts.IntegrationEvents;
 
 /// <summary>
-/// Published when an invoice is successfully cancelled in the AppDomain system. 
+/// Published when an invoice is successfully cancelled in the AppDomain system.
 /// This event contains the cancelled invoice data for proper message routing.
 /// </summary>
 /// <param name="TenantId">Unique identifier for the tenant</param>

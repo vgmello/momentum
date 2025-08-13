@@ -1,4 +1,4 @@
-// Copyright (c) ABCDEG. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
 global using JetBrains.Annotations;
 global using Microsoft.Extensions.Logging;

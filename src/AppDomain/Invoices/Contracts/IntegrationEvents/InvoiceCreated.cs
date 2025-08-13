@@ -1,12 +1,12 @@
-<!--#if (includeSample)-->
-// Copyright (c) ABCDEG. All rights reserved.
+< !--#if (includeSample)-->
+// Copyright (c) OrgName. All rights reserved.
 
 using AppDomain.Invoices.Contracts.Models;
 
 namespace AppDomain.Invoices.Contracts.IntegrationEvents;
 
 /// <summary>
-/// Published when a new invoice is successfully created in the AppDomain system. 
+/// Published when a new invoice is successfully created in the AppDomain system.
 /// This event contains the complete invoice data and partition key information for proper message routing.
 /// </summary>
 /// <param name="TenantId">Unique identifier for the tenant</param>

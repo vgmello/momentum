@@ -1,12 +1,12 @@
-<!--#if (includeSample)-->
-// Copyright (c) ABCDEG. All rights reserved.
+< !--#if (includeSample)-->
+// Copyright (c) OrgName. All rights reserved.
 
 using AppDomain.Cashiers.Contracts.Models;
 
 namespace AppDomain.Cashiers.Contracts.IntegrationEvents;
 
 /// <summary>
-/// Published when a cashier is successfully updated in the AppDomain system. 
+/// Published when a cashier is successfully updated in the AppDomain system.
 /// This event contains the updated cashier data and partition key information for proper message routing.
 /// </summary>
 /// <param name="TenantId">Unique identifier for the tenant</param>

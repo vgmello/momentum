@@ -1,4 +1,4 @@
-// Copyright (c) ABCDEG. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
 using AppDomain.Infrastructure;
 using Momentum.ServiceDefaults;
@@ -8,7 +8,7 @@ var builder = Host.CreateApplicationBuilder(args);
 builder.AddServiceDefaults();
 
 // Add domain services
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
     throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddAppDomainServices(connectionString);

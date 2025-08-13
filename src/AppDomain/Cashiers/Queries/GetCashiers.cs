@@ -1,4 +1,4 @@
-// Copyright (c) ABCDEG. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
 using Momentum.Extensions.Abstractions.Dapper;
 using Momentum.Extensions.Abstractions.Messaging;

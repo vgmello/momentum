@@ -1,10 +1,10 @@
-<!--#if (includeSample)-->
-// Copyright (c) ABCDEG. All rights reserved.
+< !--#if (includeSample)-->
+// Copyright (c) OrgName. All rights reserved.
 
 namespace AppDomain.Invoices.Contracts.IntegrationEvents;
 
 /// <summary>
-/// Published when a payment is received for an invoice in the AppDomain system. 
+/// Published when a payment is received for an invoice in the AppDomain system.
 /// This event contains the payment details for proper message routing and processing.
 /// </summary>
 /// <param name="TenantId">Unique identifier for the tenant</param>

@@ -1,5 +1,5 @@
-<!--#if (includeSample)-->
-// Copyright (c) ABCDEG. All rights reserved.
+< !--#if (includeSample)-->
+// Copyright (c) OrgName. All rights reserved.
 
 using AppDomain.Invoices.Grpc;
 using AppDomain.Tests.Integration._Internal;
@@ -185,7 +185,7 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
             AmountPaid = 100.00
         };
 
-       await _client.MarkInvoiceAsPaidAsync(markPaidRequest, cancellationToken: TestContext.Current.CancellationToken);
+        await _client.MarkInvoiceAsPaidAsync(markPaidRequest, cancellationToken: TestContext.Current.CancellationToken);
 
         // Act & Assert - Try to pay again with old version
         var secondPayRequest = new MarkInvoiceAsPaidRequest

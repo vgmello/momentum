@@ -1,10 +1,10 @@
-<!--#if (includeSample)-->
-// Copyright (c) ABCDEG. All rights reserved.
+< !--#if (includeSample)-->
+// Copyright (c) OrgName. All rights reserved.
 
 namespace AppDomain.Cashiers.Contracts.IntegrationEvents;
 
 /// <summary>
-/// Published when a cashier is successfully deleted from the AppDomain system. 
+/// Published when a cashier is successfully deleted from the AppDomain system.
 /// This event contains the deleted cashier identifier and partition key information for proper message routing.
 /// </summary>
 /// <param name="TenantId">Unique identifier for the tenant</param>

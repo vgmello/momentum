@@ -1,4 +1,4 @@
-// Copyright (c) ABCDEG. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
 using AppDomain.Tests.Integration._Internal;
 using AppDomain.Tests.Integration._Internal.Containers;

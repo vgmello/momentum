@@ -19,34 +19,32 @@
         </AssemblyAttribute>
     </ItemGroup>
 
-    <!-- Always NuGet packages -->
     <ItemGroup>
         <PackageReference Include="Momentum.Extensions.Abstractions"/>
-    </ItemGroup>
-
-    <!-- Conditional Extensions library -->
-    <!--#if (includeLibExt) -->
-    <ItemGroup>
-        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.csproj"/>
-    </ItemGroup>
-    <Import Project="..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.props" />
-    <!--#else -->
-    <ItemGroup>
+        <!--#if (!includeLibExt) -->
         <PackageReference Include="Momentum.Extensions"/>
+        <!--#endif -->
+        <!--#if (!includeLibGenerators) -->
+        <PackageReference Include="Momentum.Extensions.SourceGenerators"/>
+        <!--#endif -->
     </ItemGroup>
-    <!--#endif -->
 
-    <!-- Conditional SourceGenerators library -->  
-    <!--#if (includeLibGenerators) -->
     <ItemGroup>
+        <!--#if (includeLibExt) -->
+        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.csproj"/>
+        <!--#endif -->
+        <!--#if (includeLibGenerators) -->
         <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.csproj"
                           OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
+        <!--#endif -->
     </ItemGroup>
-    <Import Project="..\..\libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.props" />
-    <!--#else -->
-    <ItemGroup>
-        <PackageReference Include="Momentum.Extensions.SourceGenerators"/>
-    </ItemGroup>
-    <!--#endif -->
 
+    <ItemGroup>
+        <!--#if (includeLibExt) -->
+        <Import Project="..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.props" />
+        <!--#endif -->
+        <!--#if (includeLibGenerators) -->
+        <Import Project="..\..\libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.props" />
+        <!--#endif -->
+    </ItemGroup>
 </Project>

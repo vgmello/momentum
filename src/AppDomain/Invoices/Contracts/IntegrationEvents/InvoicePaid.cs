@@ -1,12 +1,12 @@
-<!--#if (includeSample)-->
-// Copyright (c) ABCDEG. All rights reserved.
+< !--#if (includeSample)-->
+// Copyright (c) OrgName. All rights reserved.
 
 using AppDomain.Invoices.Contracts.Models;
 
 namespace AppDomain.Invoices.Contracts.IntegrationEvents;
 
 /// <summary>
-/// Published when an invoice is successfully marked as paid in the AppDomain system. 
+/// Published when an invoice is successfully marked as paid in the AppDomain system.
 /// This event contains the updated invoice data with payment information for proper message routing.
 /// </summary>
 /// <param name="TenantId">Unique identifier for the tenant</param>
@@ -24,7 +24,7 @@ namespace AppDomain.Invoices.Contracts.IntegrationEvents;
 ///
 /// This event can be used by other services to:
 /// - Update customer account balances
-/// - Trigger revenue recognition processes  
+/// - Trigger revenue recognition processes
 /// - Send payment confirmation notifications
 /// - Update financial reporting systems
 /// </remarks>

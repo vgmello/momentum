@@ -1,5 +1,5 @@
-<!--#if (includeSample)-->
-// Copyright (c) ABCDEG. All rights reserved.
+< !--#if (includeSample)-->
+// Copyright (c) OrgName. All rights reserved.
 
 using AppDomain.Api.Cashiers.Mappers;
 using AppDomain.Api.Cashiers.Models;
@@ -33,9 +33,9 @@ public class CashiersController(IMessageBus bus) : ControllerBase
     {
         var tenantId = User.GetTenantId();
         var command = request.ToCommand(tenantId);
-        
+
         var result = await bus.InvokeAsync<Result<Cashier>>(command, cancellationToken);
-        
+
         if (result.IsFailure)
         {
             return BadRequest(result.Error);
@@ -57,9 +57,9 @@ public class CashiersController(IMessageBus bus) : ControllerBase
     {
         var tenantId = User.GetTenantId();
         var query = new GetCashierQuery(tenantId, cashierId);
-        
+
         var result = await bus.InvokeAsync<Result<Contracts.Models.Cashier>>(query, cancellationToken);
-        
+
         if (result.IsFailure)
         {
             return NotFound();
@@ -80,9 +80,9 @@ public class CashiersController(IMessageBus bus) : ControllerBase
     {
         var tenantId = User.GetTenantId();
         var query = request.ToQuery(tenantId);
-        
+
         var result = await bus.InvokeAsync<IEnumerable<GetCashiersQuery.Result>>(query, cancellationToken);
-        
+
         return Ok(result);
     }
 
@@ -101,9 +101,9 @@ public class CashiersController(IMessageBus bus) : ControllerBase
     {
         var tenantId = User.GetTenantId();
         var command = request.ToCommand(tenantId, cashierId);
-        
+
         var result = await bus.InvokeAsync<Result<Contracts.Models.Cashier>>(command, cancellationToken);
-        
+
         if (result.IsFailure)
         {
             return BadRequest(result.Error);
@@ -125,9 +125,9 @@ public class CashiersController(IMessageBus bus) : ControllerBase
     {
         var tenantId = User.GetTenantId();
         var command = new DeleteCashierCommand(tenantId, cashierId);
-        
+
         var result = await bus.InvokeAsync<Result>(command, cancellationToken);
-        
+
         if (result.IsFailure)
         {
             return NotFound();

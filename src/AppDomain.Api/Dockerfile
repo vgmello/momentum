@@ -1,4 +1,4 @@
-# Copyright (c) ABCDEG. All rights reserved.
+# Copyright (c) OrgName. All rights reserved.
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 USER $APP_UID

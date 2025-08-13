@@ -1,12 +1,12 @@
-<!--#if (includeSample)-->
-// Copyright (c) ABCDEG. All rights reserved.
+< !--#if (includeSample)-->
+// Copyright (c) OrgName. All rights reserved.
 
 using AppDomain.Invoices.Contracts.Models;
 
 namespace AppDomain.Invoices.Contracts.DomainEvents;
 
 /// <summary>
-/// Domain event published when an invoice is generated within the AppDomain system. 
+/// Domain event published when an invoice is generated within the AppDomain system.
 /// This is an internal domain event that triggers subsequent processing within the domain.
 /// </summary>
 /// <param name="TenantId">Unique identifier for the tenant</param>

@@ -24,13 +24,14 @@
   ],
   "symbols": {
     "AppDomain": {
-      "type": "bind",
-      "binding": "name",
+      "type": "computed",
+      "value": "name",
       "replaces": "AppDomain",
       "fileRename": "AppDomain",
       "forms": {
         "global": [
-          "snake"
+          "snake",
+          "lower"
         ]
       }
     },
@@ -182,7 +183,7 @@
     },
     "includeDb": {
       "type": "computed",
-      "value": "((all || db != 'unspecified') && db != 'none')"
+      "value": "(db != 'none' && (all || db == 'liquibase'))"
     },
     "includeSample": {
       "type": "computed",
@@ -198,7 +199,7 @@
     },
     "useNpgsql": {
       "type": "computed",
-      "value": "(includeDb && dbConfig == 'npgsql')"
+      "value": "(dbConfig == 'npgsql')"
     },
     "useLiquibase": {
       "type": "computed",
@@ -286,8 +287,8 @@
         ".local/**",
         ".idea/**",
         ".git/**",
-        ".github/**",
-        ".claude/**",
+        ".github/**/*",
+        ".claude/**/*",
         "requirements/**",
         "libs/**",
         "LICENSE",
@@ -463,6 +464,9 @@
     },
     "snake": {
       "identifier": "snakeCase"
+    },
+    "lower": {
+      "identifier": "lowerCaseInvariant"
     }
   }
 }
