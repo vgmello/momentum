@@ -10,10 +10,10 @@
     <PropertyGroup>
         <PackageTags>AppDomain.contracts</PackageTags>
         <IncludeSource>true</IncludeSource>
-        <Authors>ABCDEG</Authors>
-        <Company>ABCDEG</Company>
-        <Copyright>Copyright (c) ABCDEG. All rights reserved.</Copyright>
-        <RepositoryUrl>https://github.com/ABCDEG/templates</RepositoryUrl>
+        <Authors>OrgName</Authors>
+        <Company>OrgName</Company>
+        <Copyright>Copyright (c) OrgName. All rights reserved.</Copyright>
+        <RepositoryUrl>https://github.com/OrgName/AppDomain</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
     </PropertyGroup>
 
@@ -26,13 +26,13 @@
     <ItemGroup>
         <Compile Include="..\AppDomain\**\Contracts\IntegrationEvents\*.cs" Link="%(RecursiveDir)%(Filename)%(Extension)"/>
         <Compile Include="..\AppDomain\**\Contracts\Models\*.cs" Link="%(RecursiveDir)%(Filename)%(Extension)"/>
+        <!--#if (includeApi) -->
         <Content Include="..\AppDomain.Api\**\Protos\**\*.proto" Link="%(RecursiveDir)%(Filename)%(Extension)" Pack="true">
             <PackagePath>Protos</PackagePath>
         </Content>
-        <Content Include="AppDomain.Contracts.props" Pack="true" PackagePath="build/"/>
+        <!--#endif -->
     </ItemGroup>
 
-    <!-- Always NuGet packages -->
     <ItemGroup>
         <PackageReference Include="Momentum.Extensions.Abstractions"/>
     </ItemGroup>

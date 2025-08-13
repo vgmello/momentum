@@ -5,17 +5,17 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <include file="AppDomain/AppDomain.sql"/>
+    <include file="AppDomain_lower/AppDomain_lower.sql"/>
 
 <!--#if (includeSample)-->
     <!-- Sample domain content - remove with --no-sample -->
-    <include file="AppDomain/cashiers/tables/cashiers.sql"/>
-    <include file="AppDomain/cashiers/tables/cashier_currencies.sql"/>
-    <include file="AppDomain/cashiers/procedures/cashiers_get_all.sql"/>
+    <include file="AppDomain_lower/cashiers/tables/cashiers.sql"/>
+    <include file="AppDomain_lower/cashiers/tables/cashier_currencies.sql"/>
+    <include file="AppDomain_lower/cashiers/procedures/cashiers_get_all.sql"/>
 
-    <include file="AppDomain/invoices/tables/invoices.sql"/>
-    <include file="AppDomain/invoices/procedures/invoices_cancel.sql"/>
-    <include file="AppDomain/invoices/procedures/invoices_mark_paid.sql"/>
+    <include file="AppDomain_lower/invoices/tables/invoices.sql"/>
+    <include file="AppDomain_lower/invoices/procedures/invoices_cancel.sql"/>
+    <include file="AppDomain_lower/invoices/procedures/invoices_mark_paid.sql"/>
 <!--#endif-->
 
 </databaseChangeLog>

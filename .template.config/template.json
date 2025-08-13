@@ -14,6 +14,13 @@
   "preferNameDirectory": true,
   "guids": ["4d1e9d4f-ee8a-4d91-8c2b-11e09987ac0b", "5e2f0e5f-ff9b-5e02-9d3c-22f10098bd1c", "310fa8e1-342a-4675-a3f0-f8912a5da0dd"],
   "symbols": {
+    "AppDomain": {
+      "type": "bind",
+      "binding": "name",
+      "replaces": "AppDomain",
+      "fileRename": "AppDomain",
+      "forms": { "global": ["snake"] }
+    },
     "aspire": {
       "type": "parameter",
       "datatype": "bool",
@@ -134,6 +141,12 @@
       "defaultValue": "Momentum",
       "replaces": "Momentum"
     },
+    "org": {
+      "type": "parameter",
+      "datatype": "string",
+      "description": "Organization / Team name",
+      "displayName": "Organization / Team name"
+    },
     "includeAspire": {
       "type": "computed",
       "value": "(aspire || all)"
@@ -152,7 +165,11 @@
     },
     "includeDb": {
       "type": "computed",
-      "value": "(all || db != '') && db != 'none'"
+      "value": "((all || db != '') && db != 'none')"
+    },
+    "includeSample": {
+      "type": "computed",
+      "value": "(!no-sample)"
     },
     "includeLibs": {
       "type": "computed",
@@ -209,7 +226,33 @@
     "documentationHttp": {
       "type": "computed",
       "value": "(port + 19)"
+    },
+    "orgGen": {
+      "type": "generated",
+      "generator": "join",
+      "replaces": "OrgName",
+      "parameters": {
+        "symbols": [
+          {
+            "type": "ref",
+            "value": "name"
+          },
+          {
+            "type": "const",
+            "value": " Team"
+          }
+        ]
+      }
     }
+  },
+  "orgName": {
+    "type": "generated",
+    "generator": "coalesce",
+    "parameters": {
+      "sourceVariableName": "org",
+      "fallbackVariableName": "orgGen"
+    },
+    "replaces": "OrgName"
   },
   "sources": [
     {
@@ -219,11 +262,18 @@
       "exclude": [
         "**/[Bb]in/**",
         "**/[Oo]bj/**",
-        ".template.config/**/*",
         "**/*.lock.json",
-        ".git/**/*",
-        ".claude/**/*",
-        "requirements/**/*"
+        ".template.config/**",
+        ".local/**",
+        ".idea/**",
+        ".git/**",
+        ".github/**",
+        ".claude/**",
+        "requirements/**",
+        "libs/**",
+        "LICENSE",
+        "CLAUDE.md",
+        "Momentum.Template.csproj"
       ],
       "modifiers": [
         {
@@ -277,8 +327,8 @@
           ]
         },
         {
-          "condition": "(!includeLocalLibs)",
-          "exclude": ["libs/**/*"]
+          "condition": "libs.Contains('defaults')",
+          "include": ["libs/Momentum/src/Momentum.ServiceDefaults/**/*", "libs/Momentum/src/Momentum.ServiceDefaults.Api/**/*"]
         }
       ]
     }
@@ -309,102 +359,59 @@
     },
     {
       "path": "src/AppDomain.Contracts/AppDomain.Contracts.csproj"
-    },
-    {
-      "path": "tests/AppDomain.Tests/AppDomain.Tests.csproj"
     }
   ],
-  "postActions": [
-    {
-      "description": "Add Domain project to solution",
-      "manualInstructions": [{ "text": "Add src/AppDomain/AppDomain.csproj to solution manually." }],
-      "args": {
-        "projectPath": "src/AppDomain/AppDomain.csproj",
-        "solutionFolder": "src"
-      },
-      "actionId": "D396686C-DE0E-4DE6-906D-291CD29FC5DE",
-      "continueOnError": true
-    },
-    {
-      "description": "Add Contracts project to solution",
-      "manualInstructions": [{ "text": "Add src/AppDomain.Contracts/AppDomain.Contracts.csproj to solution manually." }],
-      "args": {
-        "projectPath": "src/AppDomain.Contracts/AppDomain.Contracts.csproj",
-        "solutionFolder": "src"
-      },
-      "actionId": "D396686C-DE0E-4DE6-906D-291CD29FC5DE",
-      "continueOnError": true
-    },
-    {
-      "condition": "includeAppHost",
-      "description": "Add AppHost project to solution",
-      "manualInstructions": [{ "text": "Add src/AppDomain.AppHost/AppDomain.AppHost.csproj to solution manually." }],
-      "args": {
-        "projectPath": "src/AppDomain.AppHost/AppDomain.AppHost.csproj",
-        "solutionFolder": "src"
-      },
-      "actionId": "D396686C-DE0E-4DE6-906D-291CD29FC5DE",
-      "continueOnError": true
-    },
-    {
-      "condition": "includeApi",
-      "description": "Add API project to solution",
-      "manualInstructions": [{ "text": "Add src/AppDomain.Api/AppDomain.Api.csproj to solution manually." }],
-      "args": {
-        "projectPath": "src/AppDomain.Api/AppDomain.Api.csproj",
-        "solutionFolder": "src"
-      },
-      "actionId": "D396686C-DE0E-4DE6-906D-291CD29FC5DE",
-      "continueOnError": true
-    },
-    {
-      "condition": "includeBackOffice",
-      "description": "Add BackOffice project to solution",
-      "manualInstructions": [{ "text": "Add src/AppDomain.BackOffice/AppDomain.BackOffice.csproj to solution manually." }],
-      "args": {
-        "projectPath": "src/AppDomain.BackOffice/AppDomain.BackOffice.csproj",
-        "solutionFolder": "src"
-      },
-      "actionId": "D396686C-DE0E-4DE6-906D-291CD29FC5DE",
-      "continueOnError": true
-    },
-    {
-      "condition": "includeOrleans",
-      "description": "Add Orleans BackOffice project to solution",
-      "manualInstructions": [{ "text": "Add src/AppDomain.BackOffice.Orleans/AppDomain.BackOffice.Orleans.csproj to solution manually." }],
-      "args": {
-        "projectPath": "src/AppDomain.BackOffice.Orleans/AppDomain.BackOffice.Orleans.csproj",
-        "solutionFolder": "src"
-      },
-      "actionId": "D396686C-DE0E-4DE6-906D-291CD29FC5DE",
-      "continueOnError": true
-    },
-    {
-      "condition": "includeDb",
-      "description": "Add Database project to solution",
-      "manualInstructions": [{ "text": "Add infra/AppDomain.Database/AppDomain.Database.csproj to solution manually." }],
-      "args": {
-        "projectPath": "infra/AppDomain.Database/AppDomain.Database.csproj",
-        "solutionFolder": "infra"
-      },
-      "actionId": "D396686C-DE0E-4DE6-906D-291CD29FC5DE",
-      "continueOnError": true
-    },
-    {
-      "description": "Add Tests project to solution",
-      "manualInstructions": [{ "text": "Add tests/AppDomain.Tests/AppDomain.Tests.csproj to solution manually." }],
-      "args": {
-        "projectPath": "tests/AppDomain.Tests/AppDomain.Tests.csproj",
-        "solutionFolder": "tests"
-      },
-      "actionId": "D396686C-DE0E-4DE6-906D-291CD29FC5DE",
-      "continueOnError": true
-    },
-    {
-      "description": "Restore NuGet packages",
-      "manualInstructions": [{ "text": "Run 'dotnet restore' to restore NuGet packages" }],
-      "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
-      "continueOnError": true
+  // "postActions": [
+  //   {
+  //     "description": "Add projects to solution",
+  //     "manualInstructions": [
+  //       {
+  //         "text": "Add generated project to solution manually."
+  //       }
+  //     ],
+  //     "args": {
+  //       "inRoot": true
+  //     },
+  //     "actionId": "D396686C-DE0E-4DE6-906D-291CD29FC5DE",
+  //     "continueOnError": true
+  //   },
+  //   {
+  //     "description": "Restore NuGet packages",
+  //     "manualInstructions": [{ "text": "Run 'dotnet restore' to restore NuGet packages" }],
+  //     "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+  //     "continueOnError": true
+  //   }
+  // ]
+  "SpecialCustomOperations": {
+    "**.slnx": {
+      "operations": [
+        {
+          "type": "conditional",
+          "configuration": {
+            "actionableIf": ["<!--#if"],
+            "actionableElse": ["#else", "<!--#else"],
+            "actionableElseif": ["#elseif", "<!--#elseif", "#elif", "<!--#elif"],
+            "endif": ["#endif", "<!--#endif"],
+            "trim": "true",
+            "wholeLine": "true",
+            "evaluator": "C++"
+          }
+        },
+        {
+          "type": "balancednesting",
+          "configuration": {
+            "startToken": "<!--",
+            "realEndToken": "-->",
+            "pseudoEndToken": "-- >",
+            "id": "fixPseudoNestedComments",
+            "resetFlag": "_TestResetFlag_"
+          }
+        }
+      ]
     }
-  ]
+  },
+  "forms": {
+    "kebab": { "identifier": "kebabCase" },
+    "snake": { "identifier": "snakeCase" }
+  }
 }

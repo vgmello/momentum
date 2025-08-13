@@ -10,23 +10,17 @@ A template-driven .NET 9 microservices solution that transforms how you build bu
 -   Real-world business patterns that mirror your actual operations
 -   Code so intuitive that non-technical stakeholders can understand it
 
-**🤖 LLM-Friendly Architecture**
+**⚡ Modern Stack, Battle-Tested Patterns**
 
--   Natural patterns that AI models understand perfectly
--   Accelerates development with AI coding assistants
--   Self-documenting code structure
+-   .NET 9, Orleans, Kafka, PostgreSQL
+-   Event-driven microservices architecture
+-   Comprehensive testing with Testcontainers
 
 **📦 Template-Driven Approach**
 
 -   Copy the code you need, modify what you want
 -   No framework lock-in or hidden magic
 -   Full control over your codebase
-
-**⚡ Modern Stack, Battle-Tested Patterns**
-
--   .NET 9, Orleans, Kafka, PostgreSQL
--   Event-driven microservices architecture
--   Comprehensive testing with Testcontainers
 
 ## TL;DR - Core Philosophy
 
@@ -81,24 +75,13 @@ behind-the-scenes processing.
 
 ## How to Use Momentum
 
-### Option 1: Template Approach (Recommended)
-
 ```bash
-# Use as a GitHub template or clone directly
-git clone https://github.com/your-org/momentum.git my-new-project
-cd my-new-project
-# Replace [Domain] with your business domain throughout the codebase
+# Install the template
+dotnet new install Momentum.Templates
+
+# Create a solution using the template
+dotnet new mmt -n MyService
 ```
-
-### Option 2: Selective Import
-
-Copy specific patterns and components you need:
-
--   Commands and Queries for CQRS patterns
--   Event handling infrastructure
--   Orleans stateful processing setup
--   Testcontainers integration test patterns
--   Database migration patterns with Liquibase
 
 ### What You Get Out of the Box
 
@@ -117,18 +100,18 @@ The template follows a microservices architecture with shared platform libraries
 .
 ├── docs/                            # VitePress documentation system
 ├── infra/                           # Infrastructure and database
-│   └── [Domain].Database/             # Liquibase Database project
+│   └── AppDomain.Database/          # Liquibase Database project
 ├── src/                             # Source code projects
-│   ├── [Domain]/                      # Domain logic (customizable)
-│   ├── [Domain].Api/                  # REST/gRPC endpoints
-│   ├── [Domain].AppHost/              # .NET Aspire orchestration
-│   ├── [Domain].BackOffice/           # Background processing
-│   ├── [Domain].BackOffice.Orleans/   # Orleans stateful processing
-│   └── [Domain].Contracts/            # Integration events and models
+│   ├── AppDomain/                      # Domain logic (customizable)
+│   ├── AppDomain.Api/                  # REST/gRPC endpoints
+│   ├── AppDomain.AppHost/              # .NET Aspire orchestration
+│   ├── AppDomain.BackOffice/           # Background processing
+│   ├── AppDomain.BackOffice.Orleans/   # Orleans stateful processing
+│   └── AppDomain.Contracts/            # Integration events and models
 ├── tests/                           # Testing projects
-│   └── [Domain].Tests/                # Unit, Integration, and Architecture tests
+│   └── AppDomain.Tests/                # Unit, Integration, and Architecture tests
 └── libs/                            # Shared libraries
-    └── Operations/                  # Operations libs
+    └── Momentum/                    # Momentum libs
         ├── src/                     # Platform source code
         │   ├── Momentum.Extensions.*
         │   ├── Momentum.ServiceDefaults.*
@@ -142,11 +125,15 @@ The template uses a systematic port allocation pattern for consistent service en
 
 ### Port Assignment Pattern
 
+<!--- TODO: Replace the ports with the template variables --->
+
 #### **Aspire Dashboard Ports**
-- **HTTP**: Service base + 10,000 (e.g., 8100 → 18100)
-- **HTTPS**: Service base + 10,010 (e.g., 8100 → 18110)
+
+-   **HTTP**: Service base + 10,000 (e.g., 8100 → 18100)
+-   **HTTPS**: Service base + 10,010 (e.g., 8100 → 18110)
 
 #### **Port Pattern Within Each Service Block (XX00-XX19)**
+
 ```
 Aspire Resource Service: XX00 (HTTP) / XX10 (HTTPS)
 Main API:               XX01 (HTTP) / XX11 (HTTPS) / XX02 (gRPC-HTTP)
@@ -159,17 +146,20 @@ Documentation:          XX19 (reserved for last port of range)
 ### Default Port Assignments (8100-8119)
 
 #### Aspire Services
+
 -   **Aspire Dashboard:** 18100 (HTTP) / 18110 (HTTPS)
 -   **Aspire Resource Service:** 8100 (HTTP) / 8110 (HTTPS)
 
 #### Application Services
--   **[Domain].Api:** 8101 (HTTP) / 8111 (HTTPS) / 8102 (gRPC insecure)
--   **[Domain].BackOffice:** 8103 (HTTP) / 8113 (HTTPS)
--   **[Domain].BackOffice.Orleans:** 8104 (HTTP) / 8114 (HTTPS)
--   **[Domain].UI:** 8105 (HTTP) / 8115 (HTTPS)
+
+-   **AppDomain.Api:** 8101 (HTTP) / 8111 (HTTPS) / 8102 (gRPC insecure)
+-   **AppDomain.BackOffice:** 8103 (HTTP) / 8113 (HTTPS)
+-   **AppDomain.BackOffice.Orleans:** 8104 (HTTP) / 8114 (HTTPS)
+-   **AppDomain.UI:** 8105 (HTTP) / 8115 (HTTPS)
 -   **Documentation Service:** 8119
 
 #### Infrastructure Services
+
 -   **54320**: PostgreSQL
 -   **9092**: Apache Kafka
 -   **4317/4318**: OpenTelemetry OTLP (gRPC/HTTP)

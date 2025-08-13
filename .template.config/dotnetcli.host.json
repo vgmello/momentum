@@ -24,6 +24,10 @@
     "db": {
       "longName": "db",
       "shortName": ""
+    },
+    "org": {
+      "longName": "org",
+      "shortName": ""
     }
   }
 }

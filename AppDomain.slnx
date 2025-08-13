@@ -1,5 +1,5 @@
 <Solution>
-
+<!--#if (libs == 'defaults') -->
     <Folder Name="/Infra/">
         <Project Path="infra\AppDomain.Database\AppDomain.Database.csproj"/>
     </Folder>
@@ -39,5 +39,5 @@
     <Project Path="src\AppDomain.BackOffice.Orleans\AppDomain.BackOffice.Orleans.csproj"/>
     <Project Path="src\AppDomain.BackOffice\AppDomain.BackOffice.csproj"/>
     <Project Path="src\AppDomain.Contracts\AppDomain.Contracts.csproj"/>
-
+<!--#endif -->
 </Solution>
