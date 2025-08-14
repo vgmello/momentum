@@ -32,4 +32,8 @@
         <!--#endif -->
     </ItemGroup>
 
+    <ItemGroup>
+        <Using Include="AppDomain.AppHost.Extensions"/>
+    </ItemGroup>
+
 </Project>

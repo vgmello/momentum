@@ -1,7 +1,5 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
-using AppDomain.AppHost.Extensions;
-
 var builder = DistributedApplication.CreateBuilder(args);
 
 #if (DB == npgsql)
