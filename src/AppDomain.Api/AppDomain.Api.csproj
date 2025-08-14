@@ -28,10 +28,7 @@
     </ItemGroup>
 
     <!--#if (libs == defaults) -->
-     <ItemGroup>
-        <Import Project="..\..\libs\ImportableMomentumServiceDefaults\src\ImportableMomentumServiceDefaults.ServiceDefaults\ImportableMomentumServiceDefaults.ServiceDefaults.props"/>
-    </ItemGroup>
-
+    <Import Project="..\..\libs\ImportableMomentumServiceDefaults\src\ImportableMomentumServiceDefaults.ServiceDefaults\ImportableMomentumServiceDefaults.ServiceDefaults.props"/>
     <!--#endif -->
     <ItemGroup>
         <Protobuf Include="**/Protos/**/*.proto" ProtoRoot="." GrpcServices="Server"/>
