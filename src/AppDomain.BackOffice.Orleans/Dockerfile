@@ -37,7 +37,7 @@ COPY . .
 RUN dotnet build -c "$BUILD_CONFIGURATION" --no-restore --verbosity minimal && \
     dotnet test  -c "$BUILD_CONFIGURATION" --no-build --filter FullyQualifiedName\!~Integration
 
-RUN dotnet publish "AppDomain/src/AppDomain.BackOffice.Orleans/AppDomain.BackOffice.Orleans.csproj" -c "$BUILD_CONFIGURATION" \
+RUN dotnet publish "src/AppDomain.BackOffice.Orleans/AppDomain.BackOffice.Orleans.csproj" -c "$BUILD_CONFIGURATION" \
     -o /app/publish \
     --no-build \
     --no-restore \

@@ -1,8 +1,8 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
-global using AppDomain.Api.Extensions;
-global using FluentValidation;
-global using JetBrains.Annotations;
+global using AppDomain;
+global using AppDomain.Api;
+global using AppDomain.Api.Cashiers.Mappers;
+global using Grpc.Core;
 global using Microsoft.AspNetCore.Mvc;
-global using Momentum.Extensions;
 global using Riok.Mapperly.Abstractions;

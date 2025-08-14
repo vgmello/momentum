@@ -22,7 +22,7 @@ services:
     volumes:
       - ./infra/AppDomain.Database:/app
     depends_on:
-      AppDomain-db:
+      app-domain-db:
         condition: service_healthy
     working_dir: /app
     entrypoint: /bin/sh
@@ -118,9 +118,9 @@ services:
     ports:
       - "8103:8080"
     depends_on:
-      AppDomain-db:
+      app-domain-db:
         condition: service_healthy
-      AppDomain-db-migrations:
+      app-domain-db-migrations:
         condition: service_completed_successfully
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
