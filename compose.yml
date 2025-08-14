@@ -1,5 +1,5 @@
 services:
-  # #if (db == 'npgsql')
+  # #if (USE_PGSQL)
   # Database services
   app-domain-db:
     image: postgres:17-alpine
@@ -15,7 +15,7 @@ services:
       timeout: 5s
       retries: 5
 
-  # #if (db == 'liquibase')
+  # #if (USE_LIQUIBASE)
   app-domain-db-migrations:
     image: liquibase/liquibase:4.32-alpine
     profiles: ["db", "api", "backoffice"]

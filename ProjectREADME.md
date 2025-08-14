@@ -167,7 +167,7 @@ The solution uses the following port allocations (default base port: SERVICE_BAS
 
 -   **.NET 9 SDK** or later
 -   **Docker Desktop** with Docker Compose
-    <!--#if (db == npgsql)-->
+    <!--#if (USE_PGSQL)-->
 -   **PostgreSQL** (handled by Docker Compose)
     <!--#endif-->
     <!--#if (USE_KAFKA)-->
@@ -177,7 +177,7 @@ The solution uses the following port allocations (default base port: SERVICE_BAS
 
 ### Optional Tools
 
-<!--#if (db == npgsql)-->
+<!--#if (USE_PGSQL)-->
 
 -   **pgAdmin** (included in Docker setup)
 <!--#endif-->

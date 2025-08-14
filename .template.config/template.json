@@ -27,22 +27,22 @@
     "aspire": {
       "type": "parameter",
       "datatype": "bool",
-      "description": "Generate AppHost Aspire project (Default)",
+      "description": "Generate AppHost Aspire project (Default)"
     },
     "web-api": {
       "type": "parameter",
       "datatype": "bool",
-      "description": "Generate API project (REST/gRPC endpoints) (Default)",
+      "description": "Generate API project (REST/gRPC endpoints) (Default)"
     },
     "back-office": {
       "type": "parameter",
       "datatype": "bool",
-      "description": "Generate BackOffice project (background event processing) (Default)",
+      "description": "Generate BackOffice project (background event processing) (Default)"
     },
     "docs": {
       "type": "parameter",
       "datatype": "bool",
-      "description": "Generates documentation project (Default)",
+      "description": "Generates documentation project (Default)"
     },
     "orleans": {
       "type": "parameter",
@@ -54,8 +54,8 @@
       "datatype": "choice",
       "allowMultipleValues": true,
       "enableQuotelessLiterals": true,
-      "description": "Data access setup configuration (Default: npgsql|liquibase)",
-      "defaultValue": "null",
+      "description": "Data access setup configuration",
+      "defaultValue": "default",
       "choices": [
         {
           "choice": "npgsql",
@@ -68,6 +68,10 @@
         {
           "choice": "none",
           "description": "No database setup"
+        },
+        {
+          "choice": "default",
+          "description": "NPgsql & Liquibase"
         }
       ]
     },
@@ -86,7 +90,7 @@
     },
     "org": {
       "type": "parameter",
-      "description": "Organization / Team name",
+      "description": "Organization / Team name"
     },
     "no-sample": {
       "type": "parameter",
@@ -179,38 +183,21 @@
       "type": "computed",
       "value": "ALL || HAS_BACKEND"
     },
-    "DEFAULT_DB_VALUE": {
-      "type": "generated",
-      "generator": "switch",
-      "parameters": {
-        "evaluator": "C++",
-        "cases": [
-          {
-            "condition": "AUTO_INCLUDE_DB",
-            "value": "npgsql|liquibase"
-          },
-          {
-            "condition": "true",
-            "value": "none"
-          }
-        ]
-      }
+    "USE_PGSQL": {
+      "type": "computed",
+      "value": "db-config == npgsql || (AUTO_INCLUDE_DB && db-config == default)"
     },
-    "DB": {
-      "type": "generated",
-      "generator": "coalesce",
-      "parameters": {
-        "sourceVariableName": "db-config",
-        "fallbackVariableName": "DEFAULT_DB_VALUE"
-      }
+    "USE_LIQUIBASE": {
+      "type": "computed",
+      "value": "db-config == liquibase || (AUTO_INCLUDE_DB && db-config == default)"
     },
     "INCLUDE_INFRA_DB": {
       "type": "computed",
-      "value": "DB == liquibase"
+      "value": "USE_LIQUIBASE"
     },
     "USE_DB": {
       "type": "computed",
-      "value": "DB == npgsql"
+      "value": "USE_PGSQL"
     },
     "USE_KAFKA": {
       "type": "computed",
@@ -343,13 +330,13 @@
           ]
         },
         {
-          "condition": "(DB != liquibase)",
+          "condition": "(!USE_LIQUIBASE)",
           "exclude": [
             "src/AppDomain.AppHost/Extensions/LiquibaseExtensions.cs"
           ]
         },
         {
-          "condition": "(DB == liquibase)",
+          "condition": "(USE_LIQUIBASE)",
           "include": [
             "src/AppDomain.AppHost/Extensions/LiquibaseExtensions.cs"
           ]
@@ -431,7 +418,8 @@
       "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
       "args": {
         "executable": "dotnet",
-        "args": "run --project .local/tools/post-setup -- --basePort $(port)"
+        "redirectStandardOutput": false,
+        "args": "run --project .local/tools/post-setup"
       },
       "continueOnError": true
     },

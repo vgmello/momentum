@@ -2,7 +2,7 @@
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-#if (DB == npgsql)
+#if (USE_PGSQL)
 var dbPassword = builder.AddParameter("DbPassword", secret: true);
 var pgsql = builder
     .AddPostgres("app-domain-db", password: dbPassword, port: 54320)
@@ -19,7 +19,7 @@ var pgsql = builder
 
 var database = pgsql.AddDatabase(name: "AppDomainDb", databaseName: "app_domain");
 var serviceBusDb = pgsql.AddDatabase(name: "ServiceBus", databaseName: "service_bus");
-#if (DB == liquibase)
+#if (USE_LIQUIBASE)
 builder.AddLiquibaseMigrations(pgsql, dbPassword);
 #endif
 

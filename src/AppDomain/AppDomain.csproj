@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <!--#if (DB == npgsql)-->
+        <!--#if (USE_PGSQL)-->
         <DbCommandDefaultParamCase>SnakeCase</DbCommandDefaultParamCase>
         <DbCommandParamPrefix>p_</DbCommandParamPrefix>
         <!--#endif-->
@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <!--#if (DB == npgsql)-->
+        <!--#if (USE_PGSQL)-->
         <PackageReference Include="Aspire.Npgsql"/>
         <PackageReference Include="Npgsql"/>
         <!--#endif-->
@@ -33,7 +33,7 @@
         <!--#endif -->
     </ItemGroup>
 
-    <!--#if (libs != 'none') -->
+    <!--#if (libs != none) -->
     <ItemGroup>
         <!--#if (libs == ext) -->
         <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.csproj"/>

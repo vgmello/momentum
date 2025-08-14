@@ -1,0 +1,4 @@
+{
+  "basePort": SERVICE_BASE_PORT,
+  "projectName": "sourceName"
+}
