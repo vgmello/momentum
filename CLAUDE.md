@@ -132,3 +132,5 @@ Additional guidelines:
 -   Test each configuration separately to isolate issues
 -   Verify the build after template generation: `dotnet build --verbosity quiet`
 -   Check if expected projects were created with `ls -la` after generation
+
+- Use -allow-scripts yes to run the template without needing a post action confirmation

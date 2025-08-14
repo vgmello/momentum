@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+option csharp_namespace = "AppDomain.Cashiers.Grpc.Models";
+
+package app_domain.cashiers;
+
+message Cashier {
+  string tenant_id = 1;
+  string cashierId = 2;
+  string name = 3;
+  string email = 4;
+}

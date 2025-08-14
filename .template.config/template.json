@@ -190,7 +190,7 @@
       "replaces": "Momentum.ServiceDefaults;"
     },
     "MomentumServiceDefaultsApiNamespace": {
-      "type": "generated", 
+      "type": "generated",
       "generator": "join",
       "parameters": {
         "symbols": [
@@ -212,7 +212,7 @@
       "parameters": {
         "symbols": [
           {
-            "type": "ref", 
+            "type": "ref",
             "value": "lib-name"
           },
           {
@@ -225,7 +225,7 @@
     },
     "MomentumExtensionsDataNamespace": {
       "type": "generated",
-      "generator": "join", 
+      "generator": "join",
       "parameters": {
         "symbols": [
           {
@@ -447,7 +447,8 @@
         {
           "condition": "(!USE_LIQUIBASE)",
           "exclude": [
-            "src/AppDomain.AppHost/Extensions/LiquibaseExtensions.cs"
+            "src/AppDomain.AppHost/Extensions/LiquibaseExtensions.cs",
+            "tests/AppDomain.Tests/Integration/_Internal/Containers/LiquibaseMigrationContainer.cs",
           ]
         },
         {
@@ -475,12 +476,6 @@
             "tests/AppDomain.Tests/Unit/Invoices/**/*",
             "tests/AppDomain.Tests/Integration/Cashiers/**/*",
             "tests/AppDomain.Tests/Integration/Invoices/**/*",
-            "tests/AppDomain.Tests/Integration/IntegrationTestFixture.cs",
-            "tests/AppDomain.Tests/Integration/_Internal/Containers/LiquibaseMigrationContainer.cs",
-            "tests/AppDomain.Tests/Integration/_Internal/IntegrationTest.cs",
-            "tests/AppDomain.Tests/Integration/_Internal/Extensions/DatabaseContainerExtensions.cs",
-            "tests/AppDomain.Tests/Integration/_Internal/Extensions/ServiceCollectionExtensions.cs",
-            "tests/AppDomain.Tests/Integration/_Internal/XUnitSink.cs",
             "tests/AppDomain.Tests/Architecture/DomainIsolationRulesTests.cs",
             "tests/AppDomain.Tests/Architecture/MultiTenancyRulesTests.cs"
           ]

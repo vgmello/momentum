@@ -3,22 +3,25 @@
 using AppDomain.Infrastructure;
 using Momentum.ServiceDefaults;
 using Momentum.ServiceDefaults.Api;
+using Momentum.ServiceDefaults.HealthChecks;
 
-var builder = WebApplication.CreateBuilder(args);
+[assembly: DomainAssembly(typeof(IAppDomainAssembly))]
+
+var builder = WebApplication.CreateSlimBuilder(args);
 
 builder.AddServiceDefaults();
-builder.AddApiServices();
-
-// Add domain services
-builder.AddAppDomainServices();
-
+builder.AddApiServiceDefaults();
 //#if (USE_KAFKA)
 builder.Services.AddKafkaMessaging(builder.Configuration);
 //#endif
 
+// Application Services
+builder.AddAppDomainServices();
+builder.AddApplicationServices();
+
 var app = builder.Build();
 
-app.UseServiceDefaults();
-app.UseApiServices();
+app.ConfigureApiUsingDefaults(requireAuth: false);
+app.MapDefaultHealthCheckEndpoints();
 
-app.Run();
+await app.RunAsync(args);

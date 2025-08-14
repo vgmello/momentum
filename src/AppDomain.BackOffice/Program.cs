@@ -1,24 +1,22 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
+using AppDomain.BackOffice;
 using AppDomain.Infrastructure;
 using Momentum.ServiceDefaults;
+using Momentum.ServiceDefaults.HealthChecks;
 
-var builder = Host.CreateApplicationBuilder(args);
+[assembly: DomainAssembly(typeof(IAppDomainAssembly))]
+
+var builder = WebApplication.CreateSlimBuilder(args);
 
 builder.AddServiceDefaults();
 
-//#if (USE_PGSQL)
-// Add domain services
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
-    throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+// Application Services
+builder.AddAppDomainServices();
+builder.AddApplicationServices();
 
-builder.Services.AddAppDomainServices(connectionString);
-//#endif
+var app = builder.Build();
 
-//#if (USE_KAFKA)
-builder.Services.AddKafkaMessaging(builder.Configuration);
-//#endif
+app.MapDefaultHealthCheckEndpoints();
 
-var host = builder.Build();
-
-host.Run();
+await app.RunAsync(args);

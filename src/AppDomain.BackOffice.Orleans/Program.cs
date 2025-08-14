@@ -1,55 +1,39 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
-using AppDomain.Infrastructure;
+using AppDomain.BackOffice.Orleans;
+using AppDomain.BackOffice.Orleans.Infrastructure.Extensions;
+using AppDomain.BackOffice.Orleans.Invoices.Grains;
 using Momentum.ServiceDefaults;
+using Momentum.ServiceDefaults.HealthChecks;
 
-var builder = Host.CreateApplicationBuilder(args);
+[assembly: DomainAssembly(typeof(IAppDomainAssembly))]
+
+var builder = WebApplication.CreateSlimBuilder(args);
 
 builder.AddServiceDefaults();
+builder.AddOrleans();
 
-// Add Orleans
-builder.UseOrleans(siloBuilder =>
+// Application Services
+builder.AddApplicationServices();
+
+var app = builder.Build();
+
+app.MapOrleansDashboard();
+app.MapDefaultHealthCheckEndpoints();
+
+app.MapPost("/invoices/{id:guid}/pay", async (Guid id, decimal amount, IGrainFactory grains) =>
 {
-    var useLocalhostClustering = builder.Configuration.GetValue<bool>("Orleans:UseLocalhostClustering", true);
-    
-    if (useLocalhostClustering)
-    {
-        siloBuilder.UseLocalhostClustering();
-    }
-    else
-    {
-        // Use Azure Storage clustering when configured via Aspire
-        siloBuilder.UseAzureStorageClustering(options =>
-        {
-            options.ConfigureTableServiceClient(builder.Configuration.GetConnectionString("OrleansClustering"));
-        });
-    }
-    
-    siloBuilder.AddMemoryGrainStorage("AppDomainStorage");
-    
-    // Configure persistent grain storage if available
-    var grainStorageConnectionString = builder.Configuration.GetConnectionString("OrleansGrainState");
-    if (!string.IsNullOrEmpty(grainStorageConnectionString))
-    {
-        siloBuilder.AddAzureTableGrainStorage("Default", options =>
-        {
-            options.ConfigureTableServiceClient(grainStorageConnectionString);
-        });
-    }
+    var grain = grains.GetGrain<IInvoiceGrain>(id);
+    await grain.Pay(amount);
+
+    return Results.Accepted();
 });
 
-//#if (USE_PGSQL)
-// Add domain services
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
-    throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+app.MapGet("/invoices/{id:guid}", async (Guid id, IGrainFactory grains) =>
+{
+    var grain = grains.GetGrain<IInvoiceGrain>(id);
 
-builder.Services.AddAppDomainServices(connectionString);
-//#endif
+    return Results.Ok(await grain.GetState());
+});
 
-//#if (USE_KAFKA)
-builder.Services.AddKafkaMessaging(builder.Configuration);
-//#endif
-
-var host = builder.Build();
-
-host.Run();
+await app.RunAsync(args);
