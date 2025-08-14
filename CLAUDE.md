@@ -113,3 +113,22 @@ Shared platform libraries in `libs/Momentum/` provide:
 -   **ADR Tracking**: Architecture Decision Records in `docs/arch/adr/`
 
 IMPORTANT: use `\_temp` folder to store the template tests instead of using /tmp, create a ./\_temp/ directory and use that
+
+## Template Testing Guidelines
+
+CRITICAL: dotnet new template causes buffer overflow errors in Claude Code. ALWAYS use output redirection:
+
+**MANDATORY**: Always use output redirection to prevent buffer overflow crashes:
+
+```bash
+dotnet new mmt [options] > /dev/null 2>&1
+```
+
+**NEVER** run `dotnet new mmt` without output redirection - it will crash Claude Code with RangeError: Invalid string length.
+
+Additional guidelines:
+
+-   Clean the \_temp directory before each test: `rm -rf _temp/TestProject && mkdir -p _temp`
+-   Test each configuration separately to isolate issues
+-   Verify the build after template generation: `dotnet build --verbosity quiet`
+-   Check if expected projects were created with `ls -la` after generation

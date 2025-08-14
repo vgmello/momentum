@@ -28,36 +28,30 @@
       "type": "parameter",
       "datatype": "bool",
       "description": "Generate AppHost Aspire project (Default)",
-      "displayName": "Include AppHost (Aspire) Project",
       "defaultValue": ""
     },
-    "api": {
+    "web-api": {
       "type": "parameter",
       "datatype": "bool",
       "description": "Generate API project (REST/gRPC endpoints) (Default)",
-      "displayName": "Include API Project",
       "defaultValue": ""
     },
     "back-office": {
       "type": "parameter",
       "datatype": "bool",
       "description": "Generate BackOffice project (background event processing) (Default)",
-      "displayName": "Include BackOffice Project",
       "defaultValue": ""
     },
     "docs": {
       "type": "parameter",
       "datatype": "bool",
       "description": "Generates documentation project (Default)",
-      "displayName": "Include Documentation",
       "defaultValue": ""
     },
     "orleans": {
       "type": "parameter",
       "datatype": "bool",
-      "description": "Generate Orleans-based BackOffice project (stateful processing)",
-      "displayName": "Include Orleans BackOffice",
-      "defaultValue": "false"
+      "description": "Generate Orleans-based BackOffice project (stateful processing)"
     },
     "db": {
       "type": "parameter",
@@ -65,7 +59,6 @@
       "allowMultipleValues": true,
       "enableQuotelessLiterals": true,
       "description": "Data access setup configuration",
-      "displayName": "Data Access Setup",
       "defaultValue": "npgsql|liquibase",
       "choices": [
         {
@@ -86,7 +79,6 @@
       "type": "parameter",
       "datatype": "bool",
       "description": "Use Apache Kafka",
-      "displayName": "Include Apache Kafka setup",
       "defaultValue": "true"
     },
     "port": {
@@ -94,21 +86,21 @@
       "datatype": "int",
       "defaultValue": "8100",
       "description": "Base port number for the application services",
-      "displayName": "Service Base Port",
       "replaces": "SERVICE_BASE_PORT"
     },
     "org": {
       "type": "parameter",
-      "datatype": "string",
       "description": "Organization / Team name",
-      "displayName": "Organization / Team name"
     },
     "no-sample": {
       "type": "parameter",
       "datatype": "bool",
       "description": "Skip generating sample code",
-      "displayName": "Skip Sample Content",
-      "defaultValue": "false"
+    },
+    "project-only": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "Only generate the project and its respective files. (no Solution, .gitignore, etc)"
     },
     "libs": {
       "type": "parameter",
@@ -116,7 +108,6 @@
       "allowMultipleValues": true,
       "enableQuotelessLiterals": true,
       "description": "Momentum libraries to include as direct project references",
-      "displayName": "Momentum Libraries",
       "defaultValue": "none",
       "choices": [
         {
@@ -149,13 +140,12 @@
       "type": "parameter",
       "datatype": "string",
       "description": "Name prefix to replace 'Momentum' in library names and namespaces",
-      "displayName": "Library Name Prefix",
       "defaultValue": "Momentum",
       "replaces": "Momentum"
     },
     "ALL": {
       "type": "computed",
-      "value": "!(aspire || api || back-office || docs)"
+      "value": "!(aspire || web-api || back-office || docs)"
     },
     "INCLUDE_ASPIRE": {
       "type": "computed",
@@ -163,7 +153,7 @@
     },
     "INCLUDE_API": {
       "type": "computed",
-      "value": "(api || ALL)"
+      "value": "(web-api || ALL)"
     },
     "INCLUDE_BACK_OFFICE": {
       "type": "computed",
@@ -187,7 +177,7 @@
     },
     "INCLUDE_LIBS": {
       "type": "computed",
-      "value": "(libs != 'none')"
+      "value": "(libs != none)"
     },
     "HAS_BACKEND": {
       "type": "computed",
@@ -200,46 +190,6 @@
     "USE_KAFKA": {
       "type": "computed",
       "value": "(kafka && HAS_BACKEND)"
-    },
-    "AspireHttpPort": {
-      "type": "computed",
-      "value": "(port + 10000)"
-    },
-    "ASPIRE_HTTPS_PORT": {
-      "type": "computed",
-      "value": "(port + 10010)"
-    },
-    "API_HTTP_PORT": {
-      "type": "computed",
-      "value": "(port + 1)"
-    },
-    "API_HTTPS_PORT": {
-      "type": "computed",
-      "value": "(port + 11)"
-    },
-    "API_GRPC_HTTP_PORT": {
-      "type": "computed",
-      "value": "(port + 2)"
-    },
-    "BACKOFFICE_HTTP_PORT": {
-      "type": "computed",
-      "value": "(port + 3)"
-    },
-    "BACKOFFICE_HTTPS_PORT": {
-      "type": "computed",
-      "value": "(port + 13)"
-    },
-    "ORLEANS_HTTP_PORT": {
-      "type": "computed",
-      "value": "(port + 4)"
-    },
-    "ORLEANS_HTTPS_PORT": {
-      "type": "computed",
-      "value": "(port + 14)"
-    },
-    "DOCS_HTTP_PORT": {
-      "type": "computed",
-      "value": "(port + 19)"
     },
     "DefaultOrgName": {
       "type": "generated",
@@ -284,57 +234,78 @@
   "sources": [
     {
       "include": [
-        ".dockerignore",
-        ".editorconfig",
-        ".gitattributes",
-        ".gitignore",
-        ".mcp.json",
-        "compose.yml",
-        "*.ruleset",
-        "*.slnx",
-        "*.slnx.DotSettings",
-        "*.props"
+        "docs/**/*",
+        "infra/**/*",
+        "libs/**/*",
+        "src/**/*",
+        "tests/**/*"
+      ],
+      "exclude": [
+        "**/[Bb]in/**",
+        "**/[Oo]bj/**",
+        ".template.config/**/*",
+        "**/*.filelist",
+        "**/*.user",
+        "**/*.lock.json",
+        "**/.vitepress/cache",
+        "**/.vitepress/dist"
       ],
       "modifiers": [
         {
-          "condition": "(INCLUDE_ASPIRE)",
+          "condition": "(!project-only)",
           "include": [
+            ".dockerignore",
+            ".editorconfig",
+            ".gitattributes",
+            ".gitignore",
+            ".mcp.json",
+            "compose.yml",
+            "*.ruleset",
+            "*.slnx",
+            "*.slnx.DotSettings",
+            "*.props",
+            ".vscode/**/*"
+          ]
+        },
+        {
+          "condition": "(!INCLUDE_ASPIRE)",
+          "exclude": [
             "src/AppDomain.AppHost/**/*"
           ]
         },
         {
-          "condition": "(INCLUDE_API)",
-          "include": [
+          "condition": "(!INCLUDE_API)",
+          "exclude": [
             "src/AppDomain.Api/**/*"
           ]
         },
         {
-          "condition": "(INCLUDE_BACK_OFFICE)",
-          "include": [
+          "condition": "(!INCLUDE_BACK_OFFICE)",
+          "exclude": [
             "src/AppDomain.BackOffice/**/*"
           ]
         },
         {
-          "condition": "(INCLUDE_DOCS)",
-          "include": [
+          "condition": "(!INCLUDE_DOCS)",
+          "exclude": [
             "docs/**/*"
           ]
         },
         {
-          "condition": "(INCLUDE_ORLEANS)",
-          "include": [
+          "condition": "(!INCLUDE_ORLEANS)",
+          "exclude": [
             "src/AppDomain.BackOffice.Orleans/**/*"
           ]
         },
         {
-          "condition": "(INCLUDE_INFRA_DB)",
-          "include": [
+          "condition": "(!INCLUDE_INFRA_DB)",
+          "exclude": [
             "infra/AppDomain.Database/**/*"
           ]
         },
         {
-          "condition": "(HAS_BACKEND)",
-          "include": [
+          "condition": "(!HAS_BACKEND || project-only)",
+          "exclude": [
             "src/AppDomain/**/*",
             "src/AppDomain.Contracts/**/*",
             "tests/AppDomain.Tests/**/*"
@@ -343,25 +314,15 @@
         {
           "condition": "(!INCLUDE_SAMPLE)",
           "exclude": [
-            "src/AppDomain/Cashiers/**/*",
-            "src/AppDomain/Invoices/**/*",
             "infra/AppDomain.Database/Liquibase/AppDomain/cashiers/**/*",
-            "infra/AppDomain.Database/Liquibase/AppDomain/invoices/**/*"
-          ]
-        },
-        {
-          "condition": "(!INCLUDE_SAMPLE || !INCLUDE_BACK_OFFICE)",
-          "exclude": [
-            "src/AppDomain.BackOffice/Messaging/AppDomainInboxHandler/**/*",
-            "src/AppDomain.BackOffice/Invoices/**/*",
-            "src/AppDomain.BackOffice.Orleans/Invoices/**/*"
-          ]
-        },
-        {
-          "condition": "(!INCLUDE_SAMPLE || !INCLUDE_API)",
-          "exclude": [
+            "infra/AppDomain.Database/Liquibase/AppDomain/invoices/**/*",
             "src/AppDomain.Api/Cashiers/**/*",
-            "src/AppDomain.Api/Invoices/**/*"
+            "src/AppDomain.Api/Invoices/**/*",
+            "src/AppDomain.BackOffice.Orleans/Invoices/**/*",
+            "src/AppDomain.BackOffice/Invoices/**/*",
+            "src/AppDomain.BackOffice/Messaging/AppDomainInboxHandler/**/*",
+            "src/AppDomain/Cashiers/**/*",
+            "src/AppDomain/Invoices/**/*"
           ]
         },
         {
@@ -386,7 +347,7 @@
   ],
   "postActions": [
     {
-      "condition": "(INCLUDE_API)",
+      "condition": "(INCLUDE_API && !project-only)",
       "description": "Add API project to .slnx",
       "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
       "applyFileRenamesToArgs": [
@@ -404,7 +365,7 @@
       "continueOnError": true
     },
     {
-      "condition": "(INCLUDE_BACK_OFFICE)",
+      "condition": "(INCLUDE_BACK_OFFICE && !project-only)",
       "description": "Add BackOffice project to .slnx",
       "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
       "applyFileRenamesToArgs": [
@@ -422,7 +383,7 @@
       "continueOnError": true
     },
     {
-      "condition": "(INCLUDE_ORLEANS)",
+      "condition": "(INCLUDE_ORLEANS && !project-only)",
       "description": "Add Orleans BackOffice project to .slnx",
       "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
       "applyFileRenamesToArgs": [
@@ -440,7 +401,7 @@
       "continueOnError": true
     },
     {
-      "condition": "(INCLUDE_ASPIRE)",
+      "condition": "(INCLUDE_ASPIRE && !project-only)",
       "description": "Add AppHost project to .slnx",
       "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
       "applyFileRenamesToArgs": [
@@ -458,7 +419,7 @@
       "continueOnError": true
     },
     {
-      "condition": "(INCLUDE_INFRA_DB)",
+      "condition": "(INCLUDE_INFRA_DB && !project-only)",
       "description": "Add Database project to .slnx",
       "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
       "applyFileRenamesToArgs": [
@@ -476,6 +437,7 @@
       "continueOnError": true
     },
     {
+      "condition": "(HAS_BACKEND && !project-only)",
       "description": "Add Contracts project to .slnx",
       "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
       "applyFileRenamesToArgs": [
@@ -488,6 +450,24 @@
       "manualInstructions": [
         {
           "text": "Run: dotnet sln <YourSolution>.slnx add src/<YourSolution>.Contracts/<YourSolution>.Contracts.csproj"
+        }
+      ],
+      "continueOnError": true
+    },
+    {
+      "condition": "(HAS_BACKEND && !project-only)",
+      "description": "Add Domain Core project to .slnx",
+      "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
+      "applyFileRenamesToArgs": [
+        "args"
+      ],
+      "args": {
+        "executable": "dotnet",
+        "args": "sln AppDomain.slnx add \"src/AppDomain/AppDomain.csproj\""
+      },
+      "manualInstructions": [
+        {
+          "text": "Run: dotnet sln <YourSolution>.slnx add src/<YourSolution>/<YourSolution>.csproj"
         }
       ],
       "continueOnError": true
