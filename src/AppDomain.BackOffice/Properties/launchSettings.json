@@ -5,7 +5,7 @@
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": false,
-      "applicationUrl": "http://localhost:$BackOfficeHttpPort",
+      "applicationUrl": "http://localhost:8103",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
@@ -14,7 +14,7 @@
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": false,
-      "applicationUrl": "https://localhost:$BackOfficeHttpsPort;http://localhost:$BackOfficeHttpPort",
+      "applicationUrl": "https://localhost:8113;http://localhost:8103",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
