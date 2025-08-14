@@ -1,4 +1,3 @@
-< !--#if (INCLUDE_SAMPLE)-->
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Cashiers.Grpc;
@@ -104,4 +103,3 @@ public class UpdateCashierIntegrationTests(IntegrationTestFixture fixture) : Int
         exception.Status.Detail.ShouldContain("Cashier not found");
     }
 }
-<!--#endif-->

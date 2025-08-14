@@ -1,4 +1,3 @@
-< !--#if (INCLUDE_SAMPLE)-->
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Invoices.Grpc;
@@ -130,4 +129,3 @@ public class CancelInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
         exception.Status.Detail.ShouldContain("Invoice not found, cannot be cancelled, or was modified by another user");
     }
 }
-<!--#endif-->
