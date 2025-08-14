@@ -1,4 +1,3 @@
-< !--#if (INCLUDE_SAMPLE)-->
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Invoices.Commands;
@@ -146,4 +145,3 @@ public class CreateInvoiceCommandHandlerTests
         invoice1.InvoiceId.ShouldNotBe(invoice2.InvoiceId);
     }
 }
-<!--#endif-->

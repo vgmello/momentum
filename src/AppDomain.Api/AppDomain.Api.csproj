@@ -10,26 +10,26 @@
         <PackageReference Include="Grpc.AspNetCore"/>
         <PackageReference Include="Grpc.Tools"/>
         <!--#if (libs != defaults) -->
-        <PackageReference Include="Momentum.ServiceDefaults"/>
+        <PackageReference Include="ImportableMomentumServiceDefaults.ServiceDefaults"/>
         <!--#endif -->
         <!--#if (libs != api) -->
-        <PackageReference Include="Momentum.ServiceDefaults.Api"/>
+        <PackageReference Include="ImportableMomentumServiceDefaultsApi.ServiceDefaults.Api"/>
         <!--#endif -->
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\AppDomain\AppDomain.csproj"/>
         <!--#if (libs == api) -->
-        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.ServiceDefaults.Api\Momentum.ServiceDefaults.Api.csproj"/>
+        <ProjectReference Include="..\..\libs\ImportableMomentumServiceDefaultsApi\src\ImportableMomentumServiceDefaultsApi.ServiceDefaults.Api\ImportableMomentumServiceDefaultsApi.ServiceDefaults.Api.csproj"/>
         <!--#endif -->
         <!--#if (libs == defaults) -->
-        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
+        <ProjectReference Include="..\..\libs\ImportableMomentumServiceDefaults\src\ImportableMomentumServiceDefaults.ServiceDefaults\ImportableMomentumServiceDefaults.ServiceDefaults.csproj"/>
         <!--#endif -->
     </ItemGroup>
 
     <!--#if (libs == defaults) -->
      <ItemGroup>
-        <Import Project="..\..\libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.props"/>
+        <Import Project="..\..\libs\ImportableMomentumServiceDefaults\src\ImportableMomentumServiceDefaults.ServiceDefaults\ImportableMomentumServiceDefaults.ServiceDefaults.props"/>
     </ItemGroup>
 
     <!--#endif -->

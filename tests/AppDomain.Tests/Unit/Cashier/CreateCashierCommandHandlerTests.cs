@@ -1,4 +1,3 @@
-< !--#if (INCLUDE_SAMPLE)-->
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Cashiers.Commands;
@@ -90,4 +89,3 @@ public class CreateCashierCommandHandlerTests
         cashier1.CashierId.ShouldNotBe(cashier2.CashierId);
     }
 }
-<!--#endif-->

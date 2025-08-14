@@ -1,4 +1,3 @@
-< !--#if (INCLUDE_SAMPLE)-->
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Invoices.Commands;
@@ -132,4 +131,3 @@ public class MarkInvoiceAsPaidCommandHandlerTests
         integrationEvent.ShouldBeNull();
     }
 }
-<!--#endif-->

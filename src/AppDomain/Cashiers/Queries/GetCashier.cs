@@ -1,4 +1,3 @@
-< !--#if (INCLUDE_SAMPLE)-->
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Cashiers.Contracts.Models;
@@ -46,4 +45,3 @@ public static class GetCashierQueryHandler
         return Result<Cashier>.Success(cashier.ToModel());
     }
 }
-<!--#endif-->

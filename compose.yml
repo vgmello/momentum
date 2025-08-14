@@ -75,7 +75,7 @@ services:
     restart: unless-stopped
 
   # #if (INCLUDE_API)
-  AppDomain-api:
+  app-domain-api:
     build:
       dockerfile: ./src/AppDomain.Api/Dockerfile
     profiles: ["api"]
@@ -111,7 +111,7 @@ services:
 
   # #endif
   # #if (INCLUDE_BACK_OFFICE)
-  AppDomain-backoffice:
+  app-domain-backoffice:
     build:
       dockerfile: ./src/AppDomain.BackOffice/Dockerfile
     profiles: ["backoffice"]
@@ -141,8 +141,8 @@ services:
       start_period: 40s
 
   # #endif
-  # #if (includeDocs)
-  AppDomain-docs:
+  # #if (INCLUDE_DOCS)
+  app-domain-docs:
     build:
       context: ./
       dockerfile: docs/Dockerfile
@@ -161,6 +161,6 @@ services:
       start_period: 10s
   # #endif
 volumes:
-  # #if (includeDocs)
+  # #if (INCLUDE_DOCS)
   pnpm_node_modules:
   # #endif

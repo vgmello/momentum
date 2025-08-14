@@ -1,4 +1,3 @@
-< !--#if (INCLUDE_SAMPLE)-->
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Cashiers.Contracts.IntegrationEvents;
@@ -112,4 +111,3 @@ public static class UpdateCashierCommandHandler
             UpdatedDateUtc = DateTime.UtcNow
         });
 }
-<!--#endif-->

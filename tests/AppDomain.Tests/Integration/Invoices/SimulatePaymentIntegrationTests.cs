@@ -1,4 +1,3 @@
-< !--#if (INCLUDE_SAMPLE)-->
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Invoices.Grpc;
@@ -179,4 +178,3 @@ public class SimulatePaymentIntegrationTests(IntegrationTestFixture fixture) : I
         exception.Status.Detail.ShouldContain("Payment Method");
     }
 }
-<!--#endif-->

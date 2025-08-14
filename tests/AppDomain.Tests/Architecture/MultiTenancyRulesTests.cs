@@ -1,4 +1,3 @@
-< !--#if (INCLUDE_SAMPLE)-->
 // Copyright (c) ORG_NAME. All rights reserved.
 
 namespace AppDomain.Tests.Architecture;
@@ -41,4 +40,3 @@ public class MultiTenancyRulesTests : ArchitectureTestBase
         return !commandsNotRequiringTenantId.Contains(type.Name);
     }
 }
-<!--#endif-->

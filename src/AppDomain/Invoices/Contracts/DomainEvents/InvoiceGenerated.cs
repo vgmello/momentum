@@ -1,4 +1,3 @@
-< !--#if (INCLUDE_SAMPLE)-->
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Invoices.Contracts.Models;
@@ -32,4 +31,3 @@ public record InvoiceGenerated(
     Invoice Invoice,
     DateTime GeneratedAt
 );
-<!--#endif-->

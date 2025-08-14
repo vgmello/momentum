@@ -26,32 +26,29 @@
     <ItemGroup>
         <PackageReference Include="Momentum.Extensions.Abstractions"/>
         <!--#if (libs != ext) -->
-        <PackageReference Include="Momentum.Extensions"/>
+        <PackageReference Include="ImportableMomentumExtensions.Extensions"/>
         <!--#endif -->
         <!--#if (libs != generators) -->
-        <PackageReference Include="Momentum.Extensions.SourceGenerators"/>
+        <PackageReference Include="ImportableMomentumSourceGenerators.Extensions.SourceGenerators"/>
         <!--#endif -->
     </ItemGroup>
 
     <!--#if (libs != none) -->
     <ItemGroup>
         <!--#if (libs == ext) -->
-        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.csproj"/>
+        <ProjectReference Include="..\..\libs\ImportableMomentumExtensions\src\ImportableMomentumExtensions.Extensions\ImportableMomentumExtensions.Extensions.csproj"/>
         <!--#endif -->
         <!--#if (libs == generators) -->
-        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.csproj"
+        <ProjectReference Include="..\..\libs\ImportableMomentumSourceGenerators\src\ImportableMomentumSourceGenerators.Extensions.SourceGenerators\ImportableMomentumSourceGenerators.Extensions.SourceGenerators.csproj"
                           OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
         <!--#endif -->
     </ItemGroup>
+    <!--#endif -->
 
-    <ItemGroup>
-        <!--#if (libs == ext) -->
-        <Import Project="..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.props" />
-        <!--#endif -->
-        <!--#if (libs == generators) -->
-        <Import Project="..\..\libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.props" />
-        <!--#endif -->
-    </ItemGroup>
-
+    <!--#if (libs == ext) -->
+    <Import Project="..\..\libs\ImportableMomentumExtensions\src\ImportableMomentumExtensions.Extensions\ImportableMomentumExtensions.Extensions.props" />
+    <!--#endif -->
+    <!--#if (libs == generators) -->
+    <Import Project="..\..\libs\ImportableMomentumSourceGenerators\src\ImportableMomentumSourceGenerators.Extensions.SourceGenerators\ImportableMomentumSourceGenerators.Extensions.SourceGenerators.props" />
     <!--#endif -->
 </Project>

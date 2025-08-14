@@ -1,4 +1,3 @@
-< !--#if (INCLUDE_SAMPLE)-->
 // Copyright (c) ORG_NAME. All rights reserved.
 
 namespace AppDomain.Tests.Architecture;
@@ -32,4 +31,3 @@ public class DomainIsolationRulesTests : ArchitectureTestBase
         }
     }
 }
-<!--#endif-->

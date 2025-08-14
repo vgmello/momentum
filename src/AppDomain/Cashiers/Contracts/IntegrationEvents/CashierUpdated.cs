@@ -1,4 +1,3 @@
-< !--#if (INCLUDE_SAMPLE)-->
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Cashiers.Contracts.Models;
@@ -33,4 +32,3 @@ public record CashierUpdated(
     [PartitionKey(Order = 1)] int PartitionKeyTest,
     Cashier Cashier
 );
-<!--#endif-->

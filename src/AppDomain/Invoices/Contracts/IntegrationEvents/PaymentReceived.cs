@@ -1,4 +1,3 @@
-< !--#if (INCLUDE_SAMPLE)-->
 // Copyright (c) ORG_NAME. All rights reserved.
 
 namespace AppDomain.Invoices.Contracts.IntegrationEvents;
@@ -40,4 +39,3 @@ public record PaymentReceived(
     DateTime PaymentDate,
     string? PaymentMethod
 );
-<!--#endif-->

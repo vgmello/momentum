@@ -1,4 +1,3 @@
-< !--#if (INCLUDE_SAMPLE)-->
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Invoices.Contracts.Models;
@@ -34,4 +33,3 @@ public record InvoicePaid(
     [PartitionKey(Order = 1)] int PartitionKeyTest,
     Invoice Invoice
 );
-<!--#endif-->

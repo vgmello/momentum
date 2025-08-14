@@ -1,4 +1,3 @@
-< !--#if (INCLUDE_SAMPLE)-->
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Cashiers.Grpc;
@@ -80,4 +79,3 @@ public class GetCashiersIntegrationTests(IntegrationTestFixture fixture) : Integ
         response.Cashiers.Count.ShouldBeLessThanOrEqualTo(1);
     }
 }
-<!--#endif-->

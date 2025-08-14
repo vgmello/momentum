@@ -12,6 +12,10 @@ builder.AddApiServices();
 // Add domain services
 builder.AddAppDomainServices();
 
+//#if (USE_KAFKA)
+builder.Services.AddKafkaMessaging(builder.Configuration);
+//#endif
+
 var app = builder.Build();
 
 app.UseServiceDefaults();

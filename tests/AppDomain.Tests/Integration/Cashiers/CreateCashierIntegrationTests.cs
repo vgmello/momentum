@@ -1,4 +1,3 @@
-< !--#if (INCLUDE_SAMPLE)-->
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Cashiers.Grpc;
@@ -29,4 +28,3 @@ public class CreateCashierIntegrationTests(IntegrationTestFixture fixture) : Int
         Guid.Parse(response.CashierId).ShouldNotBe(Guid.Empty);
     }
 }
-<!--#endif-->

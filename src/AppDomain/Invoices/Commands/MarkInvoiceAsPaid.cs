@@ -1,4 +1,3 @@
-< !--#if (INCLUDE_SAMPLE)-->
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Invoices.Contracts.IntegrationEvents;
@@ -119,4 +118,3 @@ public static class MarkInvoiceAsPaidCommandHandler
             .FirstOrDefaultAsync(i => i.TenantId == command.TenantId && i.InvoiceId == command.InvoiceId, cancellationToken);
     }
 }
-<!--#endif-->

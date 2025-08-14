@@ -52,7 +52,9 @@ var AppDomainApi = builder
     .WithReference(database)
     .WithReference(serviceBusDb)
 #endif
+#if (USE_KAFKA)
     .WithReference(kafka)
+#endif
 #if (USE_DB)
     .WaitFor(database)
 #endif
@@ -67,7 +69,9 @@ builder
     .WithReference(database)
     .WithReference(serviceBusDb)
 #endif
+#if (USE_KAFKA)
     .WithReference(kafka)
+#endif
 #if (USE_DB)
     .WaitFor(database)
 #endif
@@ -85,7 +89,9 @@ builder
     .WithReference(database)
     .WithReference(serviceBusDb)
 #endif
+#if (USE_KAFKA)
     .WithReference(kafka)
+#endif
 #if (USE_DB)
     .WaitFor(pgsql)
 #endif

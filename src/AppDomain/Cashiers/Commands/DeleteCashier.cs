@@ -1,4 +1,3 @@
-< !--#if (INCLUDE_SAMPLE)-->
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Cashiers.Contracts.IntegrationEvents;
@@ -87,4 +86,3 @@ public static class DeleteCashierCommandHandler
         return deletedCount > 0;
     }
 }
-<!--#endif-->

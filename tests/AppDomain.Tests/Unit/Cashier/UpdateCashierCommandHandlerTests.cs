@@ -1,4 +1,3 @@
-< !--#if (INCLUDE_SAMPLE)-->
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Cashiers.Commands;
@@ -157,4 +156,3 @@ public class UpdateCashierCommandHandlerTests
             Arg.Any<CancellationToken>());
     }
 }
-<!--#endif-->

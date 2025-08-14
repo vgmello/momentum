@@ -1,4 +1,3 @@
-< !--#if (INCLUDE_SAMPLE)-->
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Invoices.Grpc;
@@ -148,4 +147,3 @@ public class CreateInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
         createdInvoice.CashierId.ShouldBeNullOrEmpty();
     }
 }
-<!--#endif-->

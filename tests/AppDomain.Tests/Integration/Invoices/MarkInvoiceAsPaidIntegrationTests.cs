@@ -1,4 +1,3 @@
-< !--#if (INCLUDE_SAMPLE)-->
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Invoices.Grpc;
@@ -201,4 +200,3 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
         exception.Status.Detail.ShouldContain("Invoice not found, already paid, or was modified by another user");
     }
 }
-<!--#endif-->

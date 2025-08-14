@@ -1,4 +1,3 @@
-< !--#if (INCLUDE_SAMPLE)-->
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Api.Cashiers.Mappers;
@@ -136,4 +135,3 @@ public class CashiersController(IMessageBus bus) : ControllerBase
         return NoContent();
     }
 }
-<!--#endif-->

@@ -1,4 +1,3 @@
-< !--#if (INCLUDE_SAMPLE)-->
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Invoices.Grpc;
@@ -63,4 +62,3 @@ public class GetInvoiceIntegrationTests(IntegrationTestFixture fixture) : Integr
         exception.StatusCode.ShouldBe(StatusCode.NotFound);
     }
 }
-<!--#endif-->

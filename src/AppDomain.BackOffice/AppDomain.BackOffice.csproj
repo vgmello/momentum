@@ -7,20 +7,28 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\AppDomain\AppDomain.csproj"/>
-        <ProjectReference Include="..\AppDomain.Contracts\AppDomain.Contracts.csproj"/>
+        <!--#if (libs != defaults) -->
+        <PackageReference Include="ImportableMomentumServiceDefaults.ServiceDefaults"/>
+        <!--#endif -->
+        <!--#if (USE_KAFKA) -->
+        <PackageReference Include="ImportableMomentumKafka.Extensions.Messaging.Kafka"/>
+        <PackageReference Include="Wolverine.Kafka"/>
+        <!--#endif -->
     </ItemGroup>
 
-    <!-- Conditional ServiceDefaults library -->
-    <!--#if (includeLibDefaults) -->
     <ItemGroup>
-        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
+        <ProjectReference Include="..\AppDomain\AppDomain.csproj"/>
+        <ProjectReference Include="..\AppDomain.Contracts\AppDomain.Contracts.csproj"/>
+        <!--#if (libs == defaults) -->
+        <ProjectReference Include="..\..\libs\ImportableMomentumServiceDefaults\src\ImportableMomentumServiceDefaults.ServiceDefaults\ImportableMomentumServiceDefaults.ServiceDefaults.csproj"/>
+        <!--#endif -->
+        <!--#if (libs == kafka) -->
+        <ProjectReference Include="..\..\libs\ImportableMomentumKafka\src\ImportableMomentumKafka.Extensions.Messaging.Kafka\ImportableMomentumKafka.Extensions.Messaging.Kafka.csproj"/>
+        <!--#endif -->
     </ItemGroup>
-    <Import Project="..\..\libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.props"/>
-    <!--#else -->
-    <ItemGroup>
-        <PackageReference Include="Momentum.ServiceDefaults"/>
-    </ItemGroup>
+
+    <!--#if (libs == defaults) -->
+    <Import Project="..\..\libs\ImportableMomentumServiceDefaults\src\ImportableMomentumServiceDefaults.ServiceDefaults\ImportableMomentumServiceDefaults.ServiceDefaults.props"/>
     <!--#endif -->
 
 </Project>

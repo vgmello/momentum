@@ -1,4 +1,3 @@
-< !--#if (INCLUDE_SAMPLE)-->
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Invoices.Grpc;
@@ -129,4 +128,3 @@ public class GetInvoicesIntegrationTests(IntegrationTestFixture fixture) : Integ
         response.Invoices.All(i => i.Status == "Cancelled").ShouldBeTrue();
     }
 }
-<!--#endif-->

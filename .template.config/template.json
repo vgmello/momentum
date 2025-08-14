@@ -95,7 +95,7 @@
     "no-sample": {
       "type": "parameter",
       "datatype": "bool",
-      "description": "Skip generating sample code",
+      "description": "Skip generating sample code"
     },
     "project-only": {
       "type": "parameter",
@@ -140,8 +140,123 @@
       "type": "parameter",
       "datatype": "string",
       "description": "Name prefix to replace 'Momentum' in library names and namespaces",
-      "defaultValue": "Momentum",
-      "replaces": "Momentum"
+      "defaultValue": "Momentum"
+    },
+    "ImportableMomentumServiceDefaults": {
+      "type": "derived",
+      "valueSource": "lib-name",
+      "valueTransform": "identity",
+      "replaces": "ImportableMomentumServiceDefaults"
+    },
+    "ImportableMomentumServiceDefaultsApi": {
+      "type": "derived",
+      "valueSource": "lib-name",
+      "valueTransform": "identity",
+      "replaces": "ImportableMomentumServiceDefaultsApi"
+    },
+    "ImportableMomentumExtensions": {
+      "type": "derived",
+      "valueSource": "lib-name",
+      "valueTransform": "identity",
+      "replaces": "ImportableMomentumExtensions"
+    },
+    "ImportableMomentumSourceGenerators": {
+      "type": "derived",
+      "valueSource": "lib-name",
+      "valueTransform": "identity",
+      "replaces": "ImportableMomentumSourceGenerators"
+    },
+    "ImportableMomentumKafka": {
+      "type": "derived",
+      "valueSource": "lib-name",
+      "valueTransform": "identity",
+      "replaces": "ImportableMomentumKafka"
+    },
+    "MomentumServiceDefaultsNamespace": {
+      "type": "generated",
+      "generator": "join",
+      "parameters": {
+        "symbols": [
+          {
+            "type": "ref",
+            "value": "lib-name"
+          },
+          {
+            "type": "const",
+            "value": ".ServiceDefaults"
+          }
+        ]
+      },
+      "replaces": "Momentum.ServiceDefaults;"
+    },
+    "MomentumServiceDefaultsApiNamespace": {
+      "type": "generated", 
+      "generator": "join",
+      "parameters": {
+        "symbols": [
+          {
+            "type": "ref",
+            "value": "lib-name"
+          },
+          {
+            "type": "const",
+            "value": ".ServiceDefaults.Api"
+          }
+        ]
+      },
+      "replaces": "Momentum.ServiceDefaults.Api;"
+    },
+    "MomentumExtensionsNamespace": {
+      "type": "generated",
+      "generator": "join",
+      "parameters": {
+        "symbols": [
+          {
+            "type": "ref", 
+            "value": "lib-name"
+          },
+          {
+            "type": "const",
+            "value": ".Extensions"
+          }
+        ]
+      },
+      "replaces": "Momentum.Extensions;"
+    },
+    "MomentumExtensionsDataNamespace": {
+      "type": "generated",
+      "generator": "join", 
+      "parameters": {
+        "symbols": [
+          {
+            "type": "ref",
+            "value": "lib-name"
+          },
+          {
+            "type": "const",
+            "value": ".Extensions.Data"
+          }
+        ]
+      },
+      "replaces": "Momentum.Extensions.Data"
+    },
+    "MomentumExtensionsSourceGenerators": {
+      "type": "derived",
+      "valueSource": "lib-name",
+      "valueTransform": "identity",
+      "replaces": "Momentum.Extensions.SourceGenerators"
+    },
+    "MomentumExtensionsMessagingKafka": {
+      "type": "derived",
+      "valueSource": "lib-name",
+      "valueTransform": "identity",
+      "replaces": "Momentum.Extensions.Messaging.Kafka"
+    },
+    "MomentumExtensionsXmlDocs": {
+      "type": "derived",
+      "valueSource": "lib-name",
+      "valueTransform": "identity",
+      "replaces": "Momentum.Extensions.XmlDocs"
     },
     "ALL": {
       "type": "computed",
@@ -352,7 +467,22 @@
             "src/AppDomain.BackOffice/Invoices/**/*",
             "src/AppDomain.BackOffice/Messaging/AppDomainInboxHandler/**/*",
             "src/AppDomain/Cashiers/**/*",
-            "src/AppDomain/Invoices/**/*"
+            "src/AppDomain/Invoices/**/*",
+            "src/AppDomain/Core/Data/AppDomainDb.cs",
+            "src/AppDomain/Infrastructure/DependencyInjection.cs",
+            "src/AppDomain/Core/Data/DbEntity.cs",
+            "tests/AppDomain.Tests/Unit/Cashier/**/*",
+            "tests/AppDomain.Tests/Unit/Invoices/**/*",
+            "tests/AppDomain.Tests/Integration/Cashiers/**/*",
+            "tests/AppDomain.Tests/Integration/Invoices/**/*",
+            "tests/AppDomain.Tests/Integration/IntegrationTestFixture.cs",
+            "tests/AppDomain.Tests/Integration/_Internal/Containers/LiquibaseMigrationContainer.cs",
+            "tests/AppDomain.Tests/Integration/_Internal/IntegrationTest.cs",
+            "tests/AppDomain.Tests/Integration/_Internal/Extensions/DatabaseContainerExtensions.cs",
+            "tests/AppDomain.Tests/Integration/_Internal/Extensions/ServiceCollectionExtensions.cs",
+            "tests/AppDomain.Tests/Integration/_Internal/XUnitSink.cs",
+            "tests/AppDomain.Tests/Architecture/DomainIsolationRulesTests.cs",
+            "tests/AppDomain.Tests/Architecture/MultiTenancyRulesTests.cs"
           ]
         },
         {
@@ -541,16 +671,6 @@
             "wholeLine": "true",
             "evaluator": "C++"
           }
-        },
-        {
-          "type": "balancednesting",
-          "configuration": {
-            "startToken": "<!--",
-            "realEndToken": "-->",
-            "pseudoEndToken": "-- >",
-            "id": "fixPseudoNestedComments",
-            "resetFlag": "_TestResetFlag_"
-          }
         }
       ]
     },
@@ -577,9 +697,39 @@
           }
         }
       ]
+    },
+    "**.csproj": {
+      "operations": [
+        {
+          "type": "conditional",
+          "configuration": {
+            "if": [
+              "<!--#if"
+            ],
+            "else": [
+              "<!--#else"
+            ],
+            "elseif": [
+              "<!--#elseif",
+              "<!--#elif"
+            ],
+            "endif": [
+              "<!--#endif"
+            ],
+            "trim": "true",
+            "wholeLine": "true",
+            "evaluator": "C++"
+          }
+        }
+      ]
     }
   },
   "forms": {
+    "identity": {
+      "identifier": "replace",
+      "pattern": "^(.*)$",
+      "replacement": "$1"
+    },
     "kebab-case": {
       "identifier": "kebabCase"
     },

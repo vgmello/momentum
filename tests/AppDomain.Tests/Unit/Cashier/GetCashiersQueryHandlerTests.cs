@@ -1,4 +1,3 @@
-< !--#if (INCLUDE_SAMPLE)-->
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Cashiers.Queries;
@@ -132,4 +131,3 @@ public class GetCashiersQueryHandlerTests
             await GetCashiersQueryHandler.Handle(query, messagingMock, CancellationToken.None));
     }
 }
-<!--#endif-->

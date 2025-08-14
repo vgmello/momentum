@@ -1,4 +1,3 @@
-< !--#if (INCLUDE_SAMPLE)-->
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Cashiers.Grpc;
@@ -49,4 +48,3 @@ public class GetCashierIntegrationTests(IntegrationTestFixture fixture) : Integr
             await _client.GetCashierAsync(request, cancellationToken: TestContext.Current.CancellationToken));
     }
 }
-<!--#endif-->
