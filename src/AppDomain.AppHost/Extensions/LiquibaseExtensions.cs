@@ -21,8 +21,8 @@ public static class LiquibaseExtensions
             .WithEntrypoint("/bin/sh")
             .WithArgs("-c",
                 """
-                liquibase --url=jdbc:postgresql://AppDomain-db:5432/service_bus update --changelog-file=service_bus/changelog.xml && \
-                liquibase --url=jdbc:postgresql://AppDomain-db:5432/AppDomain update --changelog-file=AppDomain/changelog.xml
+                liquibase --url=jdbc:postgresql://app-domain-db:5432/service_bus update --changelog-file=service_bus/changelog.xml && \
+                liquibase --url=jdbc:postgresql://app-domain-db:5432/app_domain update --changelog-file=app_domain/changelog.xml
                 """);
     }
 }

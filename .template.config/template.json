@@ -53,13 +53,13 @@
       "datatype": "bool",
       "description": "Generate Orleans-based BackOffice project (stateful processing)"
     },
-    "db": {
+    "db-config": {
       "type": "parameter",
       "datatype": "choice",
       "allowMultipleValues": true,
       "enableQuotelessLiterals": true,
-      "description": "Data access setup configuration",
-      "defaultValue": "npgsql|liquibase",
+      "description": "Data access setup configuration (Default: npgsql|liquibase)",
+      "defaultValue": "null",
       "choices": [
         {
           "choice": "npgsql",
@@ -145,51 +145,80 @@
     },
     "ALL": {
       "type": "computed",
-      "value": "!(aspire || web-api || back-office || docs)"
+      "value": "!(aspire || web-api || back-office || docs) && !project-only"
     },
     "INCLUDE_ASPIRE": {
       "type": "computed",
-      "value": "(aspire || ALL)"
+      "value": "aspire || ALL"
     },
     "INCLUDE_API": {
       "type": "computed",
-      "value": "(web-api || ALL)"
+      "value": "web-api || ALL"
     },
     "INCLUDE_BACK_OFFICE": {
       "type": "computed",
-      "value": "(back-office || ALL)"
+      "value": "back-office || ALL"
     },
     "INCLUDE_DOCS": {
       "type": "computed",
-      "value": "(docs || ALL)"
+      "value": "docs || ALL"
     },
     "INCLUDE_ORLEANS": {
       "type": "computed",
-      "value": "(orleans)"
-    },
-    "INCLUDE_INFRA_DB": {
-      "type": "computed",
-      "value": "(db == liquibase)"
+      "value": "orleans"
     },
     "INCLUDE_SAMPLE": {
       "type": "computed",
-      "value": "(!no-sample)"
+      "value": "!no-sample"
     },
     "INCLUDE_LIBS": {
       "type": "computed",
-      "value": "(libs != none)"
+      "value": "libs != none"
     },
     "HAS_BACKEND": {
       "type": "computed",
-      "value": "(INCLUDE_API || INCLUDE_BACK_OFFICE || INCLUDE_ORLEANS)"
+      "value": "INCLUDE_API || INCLUDE_BACK_OFFICE || INCLUDE_ORLEANS"
+    },
+    "AUTO_INCLUDE_DB": {
+      "type": "computed",
+      "value": "ALL || HAS_BACKEND"
+    },
+    "DEFAULT_DB_VALUE": {
+      "type": "generated",
+      "generator": "switch",
+      "parameters": {
+        "evaluator": "C++",
+        "cases": [
+          {
+            "condition": "AUTO_INCLUDE_DB",
+            "value": "npgsql|liquibase"
+          },
+          {
+            "condition": "true",
+            "value": "none"
+          }
+        ]
+      }
+    },
+    "DB": {
+      "type": "generated",
+      "generator": "coalesce",
+      "parameters": {
+        "sourceVariableName": "db-config",
+        "fallbackVariableName": "DEFAULT_DB_VALUE"
+      }
+    },
+    "INCLUDE_INFRA_DB": {
+      "type": "computed",
+      "value": "DB == liquibase"
     },
     "USE_DB": {
       "type": "computed",
-      "value": "(db == npgsql)"
+      "value": "DB == npgsql"
     },
     "USE_KAFKA": {
       "type": "computed",
-      "value": "(kafka && HAS_BACKEND)"
+      "value": "kafka && HAS_BACKEND"
     },
     "DefaultOrgName": {
       "type": "generated",
@@ -248,7 +277,13 @@
         "**/*.user",
         "**/*.lock.json",
         "**/.vitepress/cache",
-        "**/.vitepress/dist"
+        "**/.vitepress/dist",
+        "libs/Momentum/*",
+        "libs/Momentum/assets/**",
+        "libs/Momentum/docs/**",
+        "libs/Momentum/src/Momentum.Extensions.Abstractions/**",
+        "libs/Momentum/src/Momentum.Extensions.EventMarkdownGenerator/**",
+        "libs/Momentum/tests/**"
       ],
       "modifiers": [
         {
@@ -304,6 +339,18 @@
           ]
         },
         {
+          "condition": "(DB != liquibase)",
+          "exclude": [
+            "src/AppDomain.AppHost/Extensions/LiquibaseExtensions.cs"
+          ]
+        },
+        {
+          "condition": "(DB == liquibase)",
+          "exclude": [
+            "src/AppDomain.AppHost/Extensions/LiquibaseExtensions.cs"
+          ]
+        },
+        {
           "condition": "(!HAS_BACKEND || project-only)",
           "exclude": [
             "src/AppDomain/**/*",
@@ -326,10 +373,34 @@
           ]
         },
         {
-          "condition": "libs == 'defaults'",
-          "include": [
-            "libs/Momentum/src/Momentum.ServiceDefaults/**/*",
-            "libs/Momentum/src/Momentum.ServiceDefaults.Api/**/*"
+          "condition": "libs != defaults",
+          "exclude": [
+            "libs/Momentum/src/Momentum.ServiceDefaults/**/*"
+          ]
+        },
+        {
+          "condition": "libs != api",
+          "exclude": [
+            "libs/Momentum/src/Momentum.ServiceDefaults.Api/**/*",
+            "libs/Momentum/src/Momentum.Extensions.XmlDocs/**/*"
+          ]
+        },
+        {
+          "condition": "libs != ext",
+          "exclude": [
+            "libs/Momentum/src/Momentum.Extensions/**/*"
+          ]
+        },
+        {
+          "condition": "libs != generators",
+          "exclude": [
+            "libs/Momentum/src/Momentum.Extensions.SourceGenerators/**/*"
+          ]
+        },
+        {
+          "condition": "libs != kafka",
+          "exclude": [
+            "libs/Momentum/src/Momentum.Extensions.Messaging.Kafka/**/*"
           ]
         }
       ]
@@ -337,6 +408,7 @@
     {
       "source": "./",
       "target": "./",
+      "condition": "(!project-only)",
       "include": [
         "ProjectREADME.md"
       ],
@@ -347,7 +419,7 @@
   ],
   "postActions": [
     {
-      "condition": "(INCLUDE_API && !project-only)",
+      "condition": "(INCLUDE_API && project-only)",
       "description": "Add API project to .slnx",
       "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
       "applyFileRenamesToArgs": [
@@ -365,7 +437,7 @@
       "continueOnError": true
     },
     {
-      "condition": "(INCLUDE_BACK_OFFICE && !project-only)",
+      "condition": "(INCLUDE_BACK_OFFICE && project-only)",
       "description": "Add BackOffice project to .slnx",
       "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
       "applyFileRenamesToArgs": [
@@ -383,7 +455,7 @@
       "continueOnError": true
     },
     {
-      "condition": "(INCLUDE_ORLEANS && !project-only)",
+      "condition": "(INCLUDE_ORLEANS && project-only)",
       "description": "Add Orleans BackOffice project to .slnx",
       "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
       "applyFileRenamesToArgs": [
@@ -401,7 +473,7 @@
       "continueOnError": true
     },
     {
-      "condition": "(INCLUDE_ASPIRE && !project-only)",
+      "condition": "(INCLUDE_ASPIRE && project-only)",
       "description": "Add AppHost project to .slnx",
       "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
       "applyFileRenamesToArgs": [
@@ -419,7 +491,7 @@
       "continueOnError": true
     },
     {
-      "condition": "(INCLUDE_INFRA_DB && !project-only)",
+      "condition": "(INCLUDE_INFRA_DB && project-only)",
       "description": "Add Database project to .slnx",
       "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
       "applyFileRenamesToArgs": [
@@ -432,42 +504,6 @@
       "manualInstructions": [
         {
           "text": "Run: dotnet sln <YourSolution>.slnx add infra/<YourSolution>.Database/<YourSolution>.Database.csproj"
-        }
-      ],
-      "continueOnError": true
-    },
-    {
-      "condition": "(HAS_BACKEND && !project-only)",
-      "description": "Add Contracts project to .slnx",
-      "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
-      "applyFileRenamesToArgs": [
-        "args"
-      ],
-      "args": {
-        "executable": "dotnet",
-        "args": "sln AppDomain.slnx add \"src/AppDomain.Contracts/AppDomain.Contracts.csproj\""
-      },
-      "manualInstructions": [
-        {
-          "text": "Run: dotnet sln <YourSolution>.slnx add src/<YourSolution>.Contracts/<YourSolution>.Contracts.csproj"
-        }
-      ],
-      "continueOnError": true
-    },
-    {
-      "condition": "(HAS_BACKEND && !project-only)",
-      "description": "Add Domain Core project to .slnx",
-      "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
-      "applyFileRenamesToArgs": [
-        "args"
-      ],
-      "args": {
-        "executable": "dotnet",
-        "args": "sln AppDomain.slnx add \"src/AppDomain/AppDomain.csproj\""
-      },
-      "manualInstructions": [
-        {
-          "text": "Run: dotnet sln <YourSolution>.slnx add src/<YourSolution>/<YourSolution>.csproj"
         }
       ],
       "continueOnError": true

@@ -4,12 +4,12 @@ using AppDomain.AppHost.Extensions;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-#if (db == npgsql)
+#if (DB == npgsql)
 var dbPassword = builder.AddParameter("DbPassword", secret: true);
 var pgsql = builder
-    .AddPostgres("AppDomain-db", password: dbPassword, port: 54320)
+    .AddPostgres("app-domain-db", password: dbPassword, port: 54320)
     .WithImage("postgres", "17-alpine")
-    .WithContainerName("AppDomain-db")
+    .WithContainerName("app-domain-db")
     .WithEndpointProxySupport(false)
     .WithPgAdmin(pgAdmin => pgAdmin
         .WithHostPort(port: 54321)
@@ -21,7 +21,7 @@ var pgsql = builder
 
 var database = pgsql.AddDatabase(name: "AppDomainDb", databaseName: "app_domain");
 var serviceBusDb = pgsql.AddDatabase(name: "ServiceBus", databaseName: "service_bus");
-#if (db == liquibase)
+#if (DB == liquibase)
 builder.AddLiquibaseMigrations(pgsql, dbPassword);
 #endif
 
@@ -35,19 +35,19 @@ kafka.WithKafkaUI(resource => resource
 
 #endif
 #if (INCLUDE_ORLEANS)
-var storage = builder.AddAzureStorage("AppDomain-azure-storage").RunAsEmulator();
+var storage = builder.AddAzureStorage("app-domain-azure-storage").RunAsEmulator();
 var clustering = storage.AddTables("OrleansClustering");
 var grainTables = storage.AddTables("OrleansGrainState");
 
 var orleans = builder
-    .AddOrleans("AppDomain-orleans")
+    .AddOrleans("app-domain-orleans")
     .WithClustering(clustering)
     .WithGrainStorage("Default", grainTables);
 
 #endif
 #if (INCLUDE_API)
 var AppDomainApi = builder
-    .AddProject<Projects.AppDomain_Api>("AppDomain-api")
+    .AddProject<Projects.AppDomain_Api>("app-domain-api")
     .WithEnvironment("ServiceName", "AppDomain")
     .WithKestrelLaunchProfileEndpoints()
 #if (USE_DB)
@@ -63,7 +63,7 @@ var AppDomainApi = builder
 #endif
 #if (INCLUDE_BACK_OFFICE)
 builder
-    .AddProject<Projects.AppDomain_BackOffice>("AppDomain-backoffice")
+    .AddProject<Projects.AppDomain_BackOffice>("app-domain-backoffice")
     .WithEnvironment("ServiceName", "AppDomain")
 #if (USE_DB)
     .WithReference(database)
@@ -78,7 +78,7 @@ builder
 #endif
 #if (INCLUDE_ORLEANS)
 builder
-    .AddProject<Projects.AppDomain_BackOffice_Orleans>("AppDomain-backoffice-orleans")
+    .AddProject<Projects.AppDomain_BackOffice_Orleans>("app-domain-backoffice-orleans")
     .WithEnvironment("ServiceName", "AppDomain")
     .WithEnvironment("Orleans__UseLocalhostClustering", "false")
     .WithEnvironment("Aspire__Azure__Data__Tables__DisableHealthChecks", "true")
@@ -100,8 +100,9 @@ builder
     .WithHttpHealthCheck("/health/internal");
 
 #endif
+#if (INCLUDE_DOCS)
 builder
-    .AddContainer("AppDomain-docs", "AppDomain-docfx")
+    .AddContainer("app-domain-docs", "app-domain-docs")
     .WithDockerfile("../../", "docs/Dockerfile")
     .WithBindMount("../../", "/app")
     .WithVolume("/app/docs/node_modules")
@@ -112,4 +113,5 @@ builder
 #endif
     .WithHttpHealthCheck("/");
 
+#endif
 await builder.Build().RunAsync();

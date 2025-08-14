@@ -21,7 +21,7 @@
       "longName": "orleans",
       "shortName": ""
     },
-    "db": {
+    "db-config": {
       "longName": "db",
       "shortName": ""
     },
