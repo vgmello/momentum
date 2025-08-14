@@ -243,12 +243,6 @@
       "replaces": "app-domain",
       "fileRename": "app-domain"
     },
-    "IncludeLibsFlag": {
-      "type": "derived",
-      "valueSource": "INCLUDE_LIBS",
-      "valueTransform": "kebab-case",
-      "replaces": "__INCLUDE_LIBS__"
-    },
     "UsePgsql": {
       "type": "derived",
       "valueSource": "USE_PGSQL",
@@ -285,35 +279,41 @@
       "valueTransform": "firstUpperCase",
       "replaces": "$(IncludeDocs)"
     },
-    "LibsExt": {
+    "IncludeLibs": {
+      "type": "derived",
+      "valueSource": "INCLUDE_LIBS",
+      "valueTransform": "kebab-case",
+      "replaces": "__INCLUDE_LIBS__"
+    },
+    "IncludeLibsExt": {
       "type": "derived",
       "valueSource": "libs == ext",
       "valueTransform": "firstUpperCase",
-      "replaces": "$(LibsExt)"
+      "replaces": "$(IncludeLibsExt)"
     },
-    "LibsGenerators": {
+    "IncludeLibsGenerators": {
       "type": "derived",
       "valueSource": "libs == generators",
       "valueTransform": "firstUpperCase",
-      "replaces": "$(LibsGenerators)"
+      "replaces": "$(IncludeLibsGenerators)"
     },
-    "LibsDefaults": {
+    "IncludeLibsDefaults": {
       "type": "derived",
       "valueSource": "libs == defaults",
       "valueTransform": "firstUpperCase",
-      "replaces": "$(LibsDefaults)"
+      "replaces": "$(IncludeLibsDefaults)"
     },
-    "LibsApi": {
+    "IncludeLibsApi": {
       "type": "derived",
       "valueSource": "libs == api",
       "valueTransform": "firstUpperCase",
-      "replaces": "$(LibsApi)"
+      "replaces": "$(IncludeLibsApi)"
     },
-    "LibsKafka": {
+    "IncludeLibsKafka": {
       "type": "derived",
       "valueSource": "libs == kafka",
       "valueTransform": "firstUpperCase",
-      "replaces": "$(LibsKafka)"
+      "replaces": "$(IncludeLibsKafka)"
     },
     "LibsNone": {
       "type": "derived",

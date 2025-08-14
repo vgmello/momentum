@@ -4,8 +4,11 @@
         <IsAspireSharedProject>true</IsAspireSharedProject>
         <IsPackable>true</IsPackable>
         <PackageId>Momentum.ServiceDefaults.Api</PackageId>
-        <PackageDescription>API-specific service defaults for Momentum platform extending the base ServiceDefaults with gRPC, OpenAPI documentation (Scalar), and API-focused configurations. Essential for Momentum API projects.</PackageDescription>
-        <PackageProjectUrl>https://github.com/vgmello/momentum-sample/blob/main/libs/Momentum/src/Momentum.ServiceDefaults.Api/README.md</PackageProjectUrl>
+        <PackageDescription>API-specific service defaults for Momentum platform extending the base
+            ServiceDefaults with gRPC, OpenAPI documentation (Scalar), and API-focused
+            configurations. Essential for Momentum API projects.
+        </PackageDescription>
+        <PackageProjectUrl>https://github.com/vgmello/momentum/blob/main/libs/Momentum/src/Momentum.ServiceDefaults.Api/README.md</PackageProjectUrl>
     </PropertyGroup>
 
     <ItemGroup>
@@ -17,18 +20,20 @@
         <PackageReference Include="Grpc.AspNetCore.Server.Reflection"/>
         <PackageReference Include="Grpc.AspNetCore.Web"/>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi"/>
-        <PackageReference Include="OpenTelemetry.Extensions.Hosting" />
+        <PackageReference Include="OpenTelemetry.Extensions.Hosting"/>
         <PackageReference Include="Scalar.AspNetCore"/>
-        <PackageReference Include="Momentum.ServiceDefaults" Condition="'$(LibsApi)' == 'True' And '$(LibsDefaults)' == 'False'"/>
+        <PackageReference Include="Momentum.Extensions.XmlDocs" Condition="'$(IncludeLibsApi)' == 'True'"/>
+        <PackageReference Include="Momentum.ServiceDefaults" Condition="'$(IncludeLibsDefaults)' == 'False'"/>
     </ItemGroup>
 
-    <ItemGroup Condition="'$(LibsApi)' == 'False' Or '$(LibsDefaults)' == 'True'">
-        <ProjectReference Include="..\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
+    <ItemGroup Condition="'$(IncludeLibsDefaults)' == 'True'">
+        <ProjectReference Include="..\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj" Condition="''$(IncludeLibsDefaults)' == 'True'"/>
     </ItemGroup>
 
-    <ItemGroup>
+    <ItemGroup Condition="'$(IncludeLibsApi)' == ''">
         <ProjectReference Include="..\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
         <ProjectReference Include="..\Momentum.Extensions.XmlDocs\Momentum.Extensions.XmlDocs.csproj"/>
+        <ProjectReference Include="..\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
     </ItemGroup>
 
 </Project>

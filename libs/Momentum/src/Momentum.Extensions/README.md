@@ -22,19 +22,19 @@ Install-Package Momentum.Extensions
 
 ## Key Features
 
-- **Result Types**: Robust result handling for success/failure states without exceptions
-- **Messaging Infrastructure**: Base classes and interfaces for message-based architectures
-- **Data Access Helpers**: Enhanced Dapper extensions and utilities
-- **Validation Integration**: FluentValidation helpers and extensions
-- **Discriminated Unions**: OneOf support for type-safe union types
-- **LINQ2DB Integration**: Database mapping and query utilities
+-   **Result Types**: Robust result handling for success/failure states without exceptions
+-   **Messaging Infrastructure**: Base classes and interfaces for message-based architectures
+-   **Data Access Helpers**: Enhanced Dapper extensions and utilities
+-   **Validation Integration**: FluentValidation helpers and extensions
+-   **Discriminated Unions**: OneOf support for type-safe union types
+-   **LINQ2DB Integration**: Database mapping and query utilities
 
 ## Getting Started
 
 ### Prerequisites
 
-- .NET 9.0 or later
-- C# 12.0 or later
+-   .NET 9.0 or later
+-   C# 12.0 or later
 
 ### Basic Usage
 
@@ -48,7 +48,7 @@ public class UserService
     public Result<User> GetUser(int id)
     {
         var user = userRepository.Find(id);
-        
+
         return user switch
         {
             null => Result<User>.Failure("User not found"),
@@ -96,10 +96,10 @@ public class CreateUserHandler
     {
         var user = new User(command.Name, command.Email);
         await userRepository.SaveAsync(user);
-        
+
         // Publish integration event
         await messageBus.PublishAsync(new UserCreated(user.Id, user.Name, user.Email));
-        
+
         return Result<User>.Success(user);
     }
 }
@@ -200,7 +200,7 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> GetUser(int id)
     {
         var result = await userService.GetUserAsync(id);
-        
+
         return result.Match<IActionResult>(
             success: user => Ok(user),
             validationError: error => BadRequest(error.Errors),
@@ -214,14 +214,14 @@ public class UsersController : ControllerBase
 
 This package includes and configures the following dependencies:
 
-| Package | Purpose |
-|---------|---------|
-| **FluentValidation** | Object validation with fluent syntax |
-| **OneOf & OneOf.SourceGenerator** | Discriminated union types |
-| **Dapper** | Lightweight ORM for data access |
-| **linq2db** | LINQ to database provider |
-| **WolverineFx** | Messaging infrastructure and CQRS support |
-| **Momentum.Extensions.Abstractions** | Core abstractions and contracts |
+| Package                              | Purpose                                   |
+| ------------------------------------ | ----------------------------------------- |
+| **FluentValidation**                 | Object validation with fluent syntax      |
+| **OneOf & OneOf.SourceGenerator**    | Discriminated union types                 |
+| **Dapper**                           | Lightweight ORM for data access           |
+| **linq2db**                          | LINQ to database provider                 |
+| **WolverineFx**                      | Messaging infrastructure and CQRS support |
+| **Momentum.Extensions.Abstractions** | Core abstractions and contracts           |
 
 ## Configuration
 
@@ -231,7 +231,7 @@ The package provides MSBuild properties for common configuration:
 <PropertyGroup>
   <!-- Enable nullable reference types -->
   <Nullable>enable</Nullable>
-  
+
   <!-- Enable OneOf source generation -->
   <OneOf_GenerateSourceGenerator>true</OneOf_GenerateSourceGenerator>
 </PropertyGroup>
@@ -273,19 +273,19 @@ public class OrderCreatedHandler
 
 ## Target Frameworks
 
-- **.NET 9.0**: Primary target framework
-- Compatible with ASP.NET Core 9.0 and later
+-   **.NET 9.0**: Primary target framework
+-   Compatible with ASP.NET Core 9.0 and later
 
 ## Related Packages
 
-- [Momentum.Extensions.Abstractions](../Momentum.Extensions.Abstractions/README.md) - Core abstractions
-- [Momentum.ServiceDefaults](../Momentum.ServiceDefaults/README.md) - Service configuration
-- [Momentum.Extensions.SourceGenerators](../Momentum.Extensions.SourceGenerators/README.md) - Code generators
+-   [Momentum.Extensions.Abstractions](../Momentum.Extensions.Abstractions/README.md) - Core abstractions
+-   [Momentum.ServiceDefaults](../Momentum.ServiceDefaults/README.md) - Service configuration
+-   [Momentum.Extensions.SourceGenerators](../Momentum.Extensions.SourceGenerators/README.md) - Code generators
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](https://github.com/vgmello/momentum-sample/blob/main/LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](https://github.com/vgmello/momentum/blob/main/LICENSE) file for details.
 
 ## Contributing
 
-For contribution guidelines and more information about the Momentum platform, visit the [main repository](https://github.com/vgmello/momentum-sample).
+For contribution guidelines and more information about the Momentum platform, visit the [main repository](https://github.com/vgmello/momentum).

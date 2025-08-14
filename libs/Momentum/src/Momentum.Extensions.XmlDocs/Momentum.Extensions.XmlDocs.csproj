@@ -3,8 +3,11 @@
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <PackageId>Momentum.Extensions.XmlDocs</PackageId>
-    <PackageDescription>XML documentation utilities for Momentum platform providing parsing, processing, and generation capabilities for XML documentation files. Essential for code analysis and documentation tooling.</PackageDescription>
-    <PackageProjectUrl>https://github.com/vgmello/momentum-sample/blob/main/libs/Momentum/src/Momentum.Extensions.XmlDocs/README.md</PackageProjectUrl>
+    <PackageDescription>XML documentation utilities for Momentum platform providing parsing,
+      processing, and generation capabilities for XML documentation files. Essential for code
+      analysis and documentation tooling.</PackageDescription>
+    <PackageProjectUrl>
+      https://github.com/vgmello/momentum/blob/main/libs/Momentum/src/Momentum.Extensions.XmlDocs/README.md</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>

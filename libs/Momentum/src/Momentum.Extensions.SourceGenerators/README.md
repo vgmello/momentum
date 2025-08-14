@@ -22,19 +22,19 @@ Install-Package Momentum.Extensions.SourceGenerators
 
 ## Key Features
 
-- **Compile-Time Generation**: Code generation happens during compilation with zero runtime overhead
-- **Pattern-Based**: Automatically detects and implements common coding patterns
-- **Roslyn Integration**: Built on the robust Roslyn compiler platform
-- **IDE Support**: Generated code is available in IntelliSense and debugging
-- **MSBuild Integration**: Seamlessly integrates with the build process
+-   **Compile-Time Generation**: Code generation happens during compilation with zero runtime overhead
+-   **Pattern-Based**: Automatically detects and implements common coding patterns
+-   **Roslyn Integration**: Built on the robust Roslyn compiler platform
+-   **IDE Support**: Generated code is available in IntelliSense and debugging
+-   **MSBuild Integration**: Seamlessly integrates with the build process
 
 ## Getting Started
 
 ### Prerequisites
 
-- .NET Standard 2.1 compatible project
-- C# compiler with source generator support (C# 9.0+)
-- Visual Studio 2019 16.9+ or VS Code with C# extension
+-   .NET Standard 2.1 compatible project
+-   C# compiler with source generator support (C# 9.0+)
+-   Visual Studio 2019 16.9+ or VS Code with C# extension
 
 ### Basic Usage
 
@@ -45,15 +45,18 @@ Once installed, the source generators automatically activate during compilation.
 During development, you can view generated code in several ways:
 
 **In Visual Studio:**
+
 1. **Solution Explorer** → **Dependencies** → **Analyzers** → **Momentum.Extensions.SourceGenerators**
 2. Expand to see generated files
 
 **File System Location:**
+
 ```
 obj/Debug/net9.0/generated/Momentum.Extensions.SourceGenerators/
 ```
 
 **Enable Generated File Output:**
+
 ```xml
 <!-- Add to your .csproj to emit generated files -->
 <PropertyGroup>
@@ -100,7 +103,7 @@ public interface IUserQueries
 {
     [GenerateQuery("SELECT * FROM Users WHERE Id = @Id")]
     Task<User?> GetByIdAsync(int id);
-    
+
     [GenerateQuery("SELECT * FROM Users WHERE IsActive = @IsActive ORDER BY Name")]
     Task<IEnumerable<User>> GetActiveUsersAsync(bool isActive = true);
 }
@@ -109,19 +112,19 @@ public interface IUserQueries
 public class UserQueries : IUserQueries
 {
     private readonly IDbConnection connection;
-    
+
     public UserQueries(IDbConnection connection)
     {
         this.connection = connection;
     }
-    
+
     public async Task<User?> GetByIdAsync(int id)
     {
         return await connection.QuerySingleOrDefaultAsync<User>(
-            "SELECT * FROM Users WHERE Id = @Id", 
+            "SELECT * FROM Users WHERE Id = @Id",
             new { Id = id });
     }
-    
+
     // Additional generated methods...
 }
 ```
@@ -139,14 +142,14 @@ public record ValidationResult<T>(T Value, List<ValidationError> Errors);
 public static class ValidationResultExtensions
 {
     public static ValidationResult<TResult> Map<T, TResult>(
-        this ValidationResult<T> result, 
+        this ValidationResult<T> result,
         Func<T, TResult> mapper)
     {
         // Generated implementation
     }
-    
+
     public static async Task<ValidationResult<TResult>> MapAsync<T, TResult>(
-        this ValidationResult<T> result, 
+        this ValidationResult<T> result,
         Func<T, Task<TResult>> mapper)
     {
         // Generated implementation
@@ -166,7 +169,7 @@ Control generator behavior with MSBuild properties:
   <MomentumGenerateHandlers>true</MomentumGenerateHandlers>
   <MomentumGenerateQueries>true</MomentumGenerateQueries>
   <MomentumGenerateResults>true</MomentumGenerateResults>
-  
+
   <!-- Output generated files for debugging -->
   <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
   <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
@@ -229,19 +232,22 @@ public class PerformanceCriticalQueries
 ### Common Issues
 
 **Generator Not Running**
-- Ensure the package is properly referenced
-- Check that you're using a supported C# version
-- Rebuild the solution to trigger generation
+
+-   Ensure the package is properly referenced
+-   Check that you're using a supported C# version
+-   Rebuild the solution to trigger generation
 
 **Generated Code Not Visible**
-- Enable `EmitCompilerGeneratedFiles` in your project file
-- Check the output path: `obj/Debug/[framework]/generated/`
-- In Visual Studio, expand **Dependencies** → **Analyzers**
+
+-   Enable `EmitCompilerGeneratedFiles` in your project file
+-   Check the output path: `obj/Debug/[framework]/generated/`
+-   In Visual Studio, expand **Dependencies** → **Analyzers**
 
 **Compilation Errors**
-- Verify that generated code dependencies are available
-- Check that partial classes are properly declared
-- Ensure attributes are correctly applied
+
+-   Verify that generated code dependencies are available
+-   Check that partial classes are properly declared
+-   Ensure attributes are correctly applied
 
 ### Debugging Generated Code
 
@@ -254,6 +260,7 @@ Enable detailed logging:
 ```
 
 View detailed MSBuild output:
+
 ```bash
 dotnet build -v diagnostic
 ```
@@ -262,27 +269,27 @@ dotnet build -v diagnostic
 
 As a Roslyn component package, this has a specialized structure:
 
-- **Analyzer DLL**: Packaged in `analyzers/dotnet/cs/`
-- **Dependencies**: Momentum.Extensions.Abstractions included
-- **No Runtime Output**: Generators don't add runtime dependencies
-- **Build Integration**: MSBuild props/targets for configuration
+-   **Analyzer DLL**: Packaged in `analyzers/dotnet/cs/`
+-   **Dependencies**: Momentum.Extensions.Abstractions included
+-   **No Runtime Output**: Generators don't add runtime dependencies
+-   **Build Integration**: MSBuild props/targets for configuration
 
 ## Target Frameworks
 
-- **.NET Standard 2.1**: Ensures compatibility with all generator hosts
-- **C# 9.0+**: Required for source generator support
-- Compatible with .NET Core 3.1+, .NET 5+, and .NET Framework 4.8
+-   **.NET Standard 2.1**: Ensures compatibility with all generator hosts
+-   **C# 9.0+**: Required for source generator support
+-   Compatible with .NET Core 3.1+, .NET 5+, and .NET Framework 4.8
 
 ## Related Packages
 
-- [Momentum.Extensions.Abstractions](../Momentum.Extensions.Abstractions/README.md) - Core abstractions and attributes
-- [Momentum.Extensions](../Momentum.Extensions/README.md) - Runtime utilities and helpers
-- [Momentum.ServiceDefaults](../Momentum.ServiceDefaults/README.md) - Service configuration
+-   [Momentum.Extensions.Abstractions](../Momentum.Extensions.Abstractions/README.md) - Core abstractions and attributes
+-   [Momentum.Extensions](../Momentum.Extensions/README.md) - Runtime utilities and helpers
+-   [Momentum.ServiceDefaults](../Momentum.ServiceDefaults/README.md) - Service configuration
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](https://github.com/vgmello/momentum-sample/blob/main/LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](https://github.com/vgmello/momentum/blob/main/LICENSE) file for details.
 
 ## Contributing
 
-For contribution guidelines and more information about the Momentum platform, visit the [main repository](https://github.com/vgmello/momentum-sample).
+For contribution guidelines and more information about the Momentum platform, visit the [main repository](https://github.com/vgmello/momentum).

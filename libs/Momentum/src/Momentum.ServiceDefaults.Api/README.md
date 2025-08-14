@@ -22,19 +22,19 @@ Install-Package Momentum.ServiceDefaults.Api
 
 ## Key Features
 
-- **All ServiceDefaults Features**: Inherits complete observability, messaging, and database capabilities
-- **gRPC Support**: Full gRPC server configuration with reflection and web support
-- **OpenAPI Integration**: Automatic OpenAPI 3.0 specification generation
-- **Scalar Documentation**: Modern, interactive API documentation interface
-- **Enhanced Telemetry**: API-specific metrics, tracing, and monitoring
+-   **All ServiceDefaults Features**: Inherits complete observability, messaging, and database capabilities
+-   **gRPC Support**: Full gRPC server configuration with reflection and web support
+-   **OpenAPI Integration**: Automatic OpenAPI 3.0 specification generation
+-   **Scalar Documentation**: Modern, interactive API documentation interface
+-   **Enhanced Telemetry**: API-specific metrics, tracing, and monitoring
 
 ## Getting Started
 
 ### Prerequisites
 
-- .NET 9.0 or later
-- ASP.NET Core 9.0 or later
-- All prerequisites from Momentum.ServiceDefaults
+-   .NET 9.0 or later
+-   ASP.NET Core 9.0 or later
+-   All prerequisites from Momentum.ServiceDefaults
 
 ### Basic Usage
 
@@ -111,35 +111,39 @@ app.Run();
 In addition to all `Momentum.ServiceDefaults` features, this package automatically configures:
 
 ### 1. gRPC Services
-- **gRPC Server**: Full ASP.NET Core gRPC support
-- **Server Reflection**: gRPC reflection for tool support
-- **gRPC-Web**: Browser-compatible gRPC over HTTP
+
+-   **gRPC Server**: Full ASP.NET Core gRPC support
+-   **Server Reflection**: gRPC reflection for tool support
+-   **gRPC-Web**: Browser-compatible gRPC over HTTP
 
 ### 2. OpenAPI Documentation
-- **Specification Generation**: Automatic OpenAPI 3.0 spec generation
-- **Endpoint Discovery**: Automatic API endpoint documentation
-- **Schema Generation**: Request/response model documentation
+
+-   **Specification Generation**: Automatic OpenAPI 3.0 spec generation
+-   **Endpoint Discovery**: Automatic API endpoint documentation
+-   **Schema Generation**: Request/response model documentation
 
 ### 3. Scalar API Documentation
-- **Interactive UI**: Modern API documentation interface
-- **Try It Out**: Built-in API testing capabilities
-- **Automatic Discovery**: Works with your OpenAPI specification
+
+-   **Interactive UI**: Modern API documentation interface
+-   **Try It Out**: Built-in API testing capabilities
+-   **Automatic Discovery**: Works with your OpenAPI specification
 
 ### 4. Enhanced Observability
-- **gRPC Telemetry**: Metrics and tracing for gRPC calls
-- **API Metrics**: Request rates, latencies, and error rates
-- **Documentation Metrics**: API documentation usage tracking
+
+-   **gRPC Telemetry**: Metrics and tracing for gRPC calls
+-   **API Metrics**: Request rates, latencies, and error rates
+-   **Documentation Metrics**: API documentation usage tracking
 
 ## Available Endpoints
 
 When you call `app.MapDefaultEndpoints()`, you get:
 
-| Endpoint | Purpose |
-|----------|---------|
-| `/health` | Detailed health checks |
-| `/alive` | Simple liveness check |
-| `/metrics` | Prometheus metrics (if configured) |
-| `/scalar/v1` | Interactive API documentation |
+| Endpoint     | Purpose                            |
+| ------------ | ---------------------------------- |
+| `/health`    | Detailed health checks             |
+| `/alive`     | Simple liveness check              |
+| `/metrics`   | Prometheus metrics (if configured) |
+| `/scalar/v1` | Interactive API documentation      |
 
 ## Configuration
 
@@ -148,13 +152,13 @@ When you call `app.MapDefaultEndpoints()`, you get:
 ```json
 // appsettings.json
 {
-  "OpenApi": {
-    "Document": {
-      "Title": "My API",
-      "Version": "v1",
-      "Description": "API for my application"
+    "OpenApi": {
+        "Document": {
+            "Title": "My API",
+            "Version": "v1",
+            "Description": "API for my application"
+        }
     }
-  }
 }
 ```
 
@@ -163,11 +167,11 @@ When you call `app.MapDefaultEndpoints()`, you get:
 ```json
 // appsettings.json
 {
-  "Grpc": {
-    "EnableDetailedErrors": true,
-    "MaxReceiveMessageSize": 4194304,
-    "MaxSendMessageSize": 4194304
-  }
+    "Grpc": {
+        "EnableDetailedErrors": true,
+        "MaxReceiveMessageSize": 4194304,
+        "MaxSendMessageSize": 4194304
+    }
 }
 ```
 
@@ -210,42 +214,42 @@ builder.Services.AddGrpc(options =>
 
 This package includes:
 
-| Package | Purpose |
-|---------|---------|
-| **Grpc.AspNetCore** | gRPC server framework |
-| **Grpc.AspNetCore.Server.Reflection** | gRPC reflection support |
-| **Grpc.AspNetCore.Web** | gRPC-Web support for browsers |
-| **Microsoft.AspNetCore.OpenApi** | OpenAPI 3.0 specification generation |
-| **Scalar.AspNetCore** | Modern API documentation UI |
-| **OpenTelemetry.Extensions.Hosting** | Enhanced telemetry |
-| **Momentum.Extensions.Abstractions** | Core abstractions |
-| **Momentum.Extensions.XmlDocs** | XML documentation processing |
+| Package                               | Purpose                              |
+| ------------------------------------- | ------------------------------------ |
+| **Grpc.AspNetCore**                   | gRPC server framework                |
+| **Grpc.AspNetCore.Server.Reflection** | gRPC reflection support              |
+| **Grpc.AspNetCore.Web**               | gRPC-Web support for browsers        |
+| **Microsoft.AspNetCore.OpenApi**      | OpenAPI 3.0 specification generation |
+| **Scalar.AspNetCore**                 | Modern API documentation UI          |
+| **OpenTelemetry.Extensions.Hosting**  | Enhanced telemetry                   |
+| **Momentum.Extensions.Abstractions**  | Core abstractions                    |
+| **Momentum.Extensions.XmlDocs**       | XML documentation processing         |
 
 ## Target Frameworks
 
-- **.NET 9.0**: Primary target framework
-- **ASP.NET Core 9.0**: Includes framework reference
+-   **.NET 9.0**: Primary target framework
+-   **ASP.NET Core 9.0**: Includes framework reference
 
 ## Use Cases
 
 This package is ideal for:
 
-- **REST APIs**: Traditional HTTP APIs with OpenAPI documentation
-- **gRPC Services**: High-performance RPC services
-- **Hybrid APIs**: Services supporting both REST and gRPC protocols
-- **API Gateways**: Services that aggregate other APIs
-- **Microservice APIs**: Services in event-driven architectures
+-   **REST APIs**: Traditional HTTP APIs with OpenAPI documentation
+-   **gRPC Services**: High-performance RPC services
+-   **Hybrid APIs**: Services supporting both REST and gRPC protocols
+-   **API Gateways**: Services that aggregate other APIs
+-   **Microservice APIs**: Services in event-driven architectures
 
 ## Related Packages
 
-- [Momentum.ServiceDefaults](../Momentum.ServiceDefaults/README.md) - Base service configuration
-- [Momentum.Extensions.Messaging.Kafka](../Momentum.Extensions.Messaging.Kafka/README.md) - Kafka messaging
-- [Momentum.Extensions.Abstractions](../Momentum.Extensions.Abstractions/README.md) - Core abstractions
+-   [Momentum.ServiceDefaults](../Momentum.ServiceDefaults/README.md) - Base service configuration
+-   [Momentum.Extensions.Messaging.Kafka](../Momentum.Extensions.Messaging.Kafka/README.md) - Kafka messaging
+-   [Momentum.Extensions.Abstractions](../Momentum.Extensions.Abstractions/README.md) - Core abstractions
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](https://github.com/vgmello/momentum-sample/blob/main/LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](https://github.com/vgmello/momentum/blob/main/LICENSE) file for details.
 
 ## Contributing
 
-For contribution guidelines and more information about the Momentum platform, visit the [main repository](https://github.com/vgmello/momentum-sample).
+For contribution guidelines and more information about the Momentum platform, visit the [main repository](https://github.com/vgmello/momentum).

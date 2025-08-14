@@ -14,7 +14,7 @@ public class XmlDocumentationParserTests
     {
         // Arrange
         var parser = new XmlDocumentationParser();
-        var xmlPath = "/home/vgmello/shared/repos/momentum-sample/libs/Momentum/tests/TestEvents/bin/Debug/net9.0/TestEvents.xml";
+        var xmlPath = "../TestEvents/bin/Debug/net9.0/TestEvents.xml";
 
         // Act
         var result = await parser.LoadMultipleDocumentationAsync([xmlPath]);
@@ -23,9 +23,7 @@ public class XmlDocumentationParserTests
         result.ShouldBeTrue();
 
         // Load the actual CashierCreated type
-        var assembly =
-            Assembly.LoadFrom(
-                "/home/vgmello/shared/repos/momentum-sample/libs/Momentum/tests/TestEvents/bin/Debug/net9.0/TestEvents.dll");
+        var assembly = Assembly.LoadFrom("../TestEvents/bin/Debug/net9.0/TestEvents.dll");
         var cashierCreatedType = assembly.GetType("AppDomain.Cashiers.Contracts.IntegrationEvents.CashierCreated");
         cashierCreatedType.ShouldNotBeNull();
 

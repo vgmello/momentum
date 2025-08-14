@@ -1,3 +1,5 @@
+// Copyright (c) ORG_NAME. All rights reserved.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -31,6 +33,7 @@ public class PortConfigurationAction
         foreach (var filePath in filesToUpdate)
         {
             processedFiles++;
+
             if (UpdatePortsInFile(filePath, portMappings, projectDir))
             {
                 changedFiles++;
@@ -60,20 +63,20 @@ public class PortConfigurationAction
     {
         return new Dictionary<string, int>
         {
-            {"8100", basePort},                 // Aspire Resource Service HTTP
-            {"8110", basePort + 10},            // Aspire Resource Service HTTPS
-            {"8101", basePort + 1},             // Main API HTTP
-            {"8111", basePort + 11},            // Main API HTTPS
-            {"8102", basePort + 2},             // Main API gRPC
-            {"8103", basePort + 3},             // BackOffice HTTP
-            {"8113", basePort + 13},            // BackOffice HTTPS
-            {"8104", basePort + 4},             // Orleans HTTP
-            {"8114", basePort + 14},            // Orleans HTTPS
-            {"8105", basePort + 5},             // UI/Frontend HTTP
-            {"8115", basePort + 15},            // UI/Frontend HTTPS
-            {"8119", basePort + 19},            // Documentation
-            {"18100", basePort + 10000},        // Aspire Dashboard HTTP
-            {"18110", basePort + 10010}         // Aspire Dashboard HTTPS
+            { "8100", basePort }, // Aspire Resource Service HTTP
+            { "8110", basePort + 10 }, // Aspire Resource Service HTTPS
+            { "8101", basePort + 1 }, // Main API HTTP
+            { "8111", basePort + 11 }, // Main API HTTPS
+            { "8102", basePort + 2 }, // Main API gRPC
+            { "8103", basePort + 3 }, // BackOffice HTTP
+            { "8113", basePort + 13 }, // BackOffice HTTPS
+            { "8104", basePort + 4 }, // Orleans HTTP
+            { "8114", basePort + 14 }, // Orleans HTTPS
+            { "8105", basePort + 5 }, // UI/Frontend HTTP
+            { "8115", basePort + 15 }, // UI/Frontend HTTPS
+            { "8119", basePort + 19 }, // Documentation
+            { "18100", basePort + 10000 }, // Aspire Dashboard HTTP
+            { "18110", basePort + 10010 } // Aspire Dashboard HTTPS
         };
     }
 
@@ -104,8 +107,9 @@ public class PortConfigurationAction
     private bool IsExcludedPath(string filePath)
     {
         var excludedDirs = new[] { "bin", "obj", ".git", ".vs", "node_modules", ".local" };
+
         return excludedDirs.Any(dir => filePath.Contains($"{Path.DirectorySeparatorChar}{dir}{Path.DirectorySeparatorChar}") ||
-                                      filePath.Contains($"{Path.DirectorySeparatorChar}{dir}"));
+                                       filePath.Contains($"{Path.DirectorySeparatorChar}{dir}"));
     }
 
     private bool UpdatePortsInFile(string filePath, Dictionary<string, int> portMappings, string projectDir)

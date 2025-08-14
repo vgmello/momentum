@@ -12,11 +12,16 @@
         <PackageReference Include="CloudNative.CloudEvents.Kafka"/>
         <PackageReference Include="WolverineFx.Kafka"/>
         <PackageReference Include="Confluent.Kafka.Extensions.OpenTelemetry"/>
-        <PackageReference Include="Momentum.ServiceDefaults" Condition="'$(LibsKafka)' == 'True' And '$(LibsDefaults)' == 'False'"/>
+        <PackageReference Include="Momentum.ServiceDefaults" Condition="'$(IncludeLibsDefaults)' == 'False'"/>
     </ItemGroup>
 
-    <ItemGroup Condition="'$(LibsKafka)' == 'False' Or '$(LibsDefaults)' == 'True'">
+    <ItemGroup Condition="'$(IncludeLibsKafka)' == ''">
+        <ProjectReference Include="..\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
         <ProjectReference Include="..\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(IncludeLibsDefaults)' == 'True'">
+        <ProjectReference Include="..\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj" Condition="'$(IncludeLibsDefaults)' == 'True'"/>
     </ItemGroup>
 
 </Project>

@@ -1,3 +1,5 @@
+// Copyright (c) ORG_NAME. All rights reserved.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,13 +22,14 @@ public class LibraryRenameAction
         public string SkipReason { get; set; } = string.Empty;
     }
 
-    public LibraryRenameResult ProcessMomentumLibImport(string projectDir, JsonElement config)
+    public static LibraryRenameResult ProcessMomentumLibImport(string projectDir, JsonElement config)
     {
         var result = new LibraryRenameResult();
 
         if (!config.TryGetProperty("momentumLibImport", out var importConfig))
         {
             result.SkipReason = "No momentumLibImport configuration found";
+
             return result;
         }
 
@@ -34,6 +37,7 @@ public class LibraryRenameAction
             !enabledElement.GetBoolean())
         {
             result.SkipReason = "Momentum library import is disabled";
+
             return result;
         }
 
@@ -42,13 +46,16 @@ public class LibraryRenameAction
         if (!importConfig.TryGetProperty("libName", out var libNameElement))
         {
             result.SkipReason = "libName not specified in momentumLibImport config";
+
             return result;
         }
 
         var libPrefix = libNameElement.GetString() ?? "";
+
         if (string.IsNullOrEmpty(libPrefix) || libPrefix == "Momentum")
         {
             result.SkipReason = "Library prefix is empty or unchanged (Momentum)";
+
             return result;
         }
 
@@ -62,6 +69,7 @@ public class LibraryRenameAction
         if (importedTokens.Count == 0)
         {
             result.SkipReason = "No imported Momentum libraries found";
+
             return result;
         }
 
@@ -71,20 +79,23 @@ public class LibraryRenameAction
         var changedFiles = 0;
         var regex = BuildMomentumLibraryRegex(importedTokens);
 
-        var scanRoots = GetStringArrayFromConfig(importConfig, "scanRoots", new[] { "src", "infra", "libs", "tests" });
-        var fileExtensions = GetStringArrayFromConfig(importConfig, "fileExtensions", new[] { ".cs", ".csproj" });
-        var excludeDirs = GetStringArrayFromConfig(importConfig, "excludeDirs", new[] { ".git", "bin", "obj" });
+        var scanRoots = GetStringArrayFromConfig(importConfig, "scanRoots", ["src", "infra", "libs", "tests"]);
+        var fileExtensions = GetStringArrayFromConfig(importConfig, "fileExtensions", [".cs", ".csproj"]);
+        var excludeDirs = GetStringArrayFromConfig(importConfig, "excludeDirs", [".git", "bin", "obj"]);
         var maxBytes = GetIntFromConfig(importConfig, "maxBytes", 2097152);
 
         foreach (var root in scanRoots)
         {
             var rootPath = Path.Combine(projectDir, root);
+
             if (!Directory.Exists(rootPath)) continue;
 
             var files = FindFilesToProcess(rootPath, fileExtensions, excludeDirs, maxBytes);
+
             foreach (var filePath in files)
             {
                 processedFiles++;
+
                 if (ProcessFileContent(filePath, regex, libPrefix, projectDir))
                 {
                     changedFiles++;
@@ -98,7 +109,7 @@ public class LibraryRenameAction
         return result;
     }
 
-    private List<string> BuildImportedTokensWhitelist(string projectDir, string libPrefix)
+    private static List<string> BuildImportedTokensWhitelist(string projectDir, string libPrefix)
     {
         var tokens = new List<string>();
         var libsPath = Path.Combine(projectDir, "libs");
@@ -117,19 +128,17 @@ public class LibraryRenameAction
             .Where(f => Path.GetFileNameWithoutExtension(f).StartsWith($"{libPrefix}."))
             .ToList();
 
-        var allItems = directories.Concat(projectFiles).Select(Path.GetFileNameWithoutExtension).Distinct();
+        var allItems = directories
+            .Concat(projectFiles)
+            .Select(Path.GetFileNameWithoutExtension)
+            .Distinct()
+            .Where(i => i is not null);
 
         foreach (var item in allItems)
         {
-            if (item.StartsWith($"{libPrefix}.") && item.Length > libPrefix.Length + 1)
+            if (item!.StartsWith($"{libPrefix}.") && item.Length > libPrefix.Length + 1)
             {
-                var token = item.Substring(libPrefix.Length + 1);
-
-                // Exclude Extensions.Abstractions - it should never be renamed
-                if (token == "Extensions.Abstractions" || token.StartsWith("Extensions.Abstractions."))
-                {
-                    continue;
-                }
+                var token = item[(libPrefix.Length + 1)..];
 
                 if (!tokens.Contains(token))
                 {
@@ -138,20 +147,20 @@ public class LibraryRenameAction
             }
         }
 
-        return tokens.OrderByDescending(t => t.Length).ToList(); // Longer tokens first for proper matching
+        return tokens.OrderByDescending(t => t.Length).ToList();
     }
 
-    private Regex BuildMomentumLibraryRegex(List<string> tokens)
+    private static Regex BuildMomentumLibraryRegex(List<string> tokens)
     {
-        var escapedTokens = tokens.Select(t => Regex.Escape(t));
+        var escapedTokens = tokens.Select(Regex.Escape);
         var alternation = string.Join("|", escapedTokens);
-        // Use negative lookahead to exclude .Abstractions
         // This ensures we don't match Momentum.Extensions.Abstractions when we want to rename Momentum.Extensions
         var pattern = $@"\bMomentum\.(?<token>{alternation})(?!\.Abstractions)";
+
         return new Regex(pattern, RegexOptions.Compiled);
     }
 
-    private List<string> FindFilesToProcess(string rootPath, string[] extensions, string[] excludeDirs, int maxBytes)
+    private static List<string> FindFilesToProcess(string rootPath, string[] extensions, string[] excludeDirs, int maxBytes)
     {
         var files = new List<string>();
 
@@ -174,30 +183,30 @@ public class LibraryRenameAction
         return files;
     }
 
-    private bool IsExcludedFile(string filePath, string[] excludeDirs)
+    private static bool IsExcludedFile(string filePath, string[] excludeDirs)
     {
         return excludeDirs.Any(dir => filePath.Contains($"{Path.DirectorySeparatorChar}{dir}{Path.DirectorySeparatorChar}") ||
-                                     filePath.Contains($"{Path.DirectorySeparatorChar}{dir}"));
+                                      filePath.Contains($"{Path.DirectorySeparatorChar}{dir}"));
     }
 
-    private bool ProcessFileContent(string filePath, Regex regex, string libPrefix, string projectDir)
+    private static bool ProcessFileContent(string filePath, Regex regex, string libPrefix, string projectDir)
     {
         try
         {
-            string originalContent;
-            Encoding encoding = Encoding.UTF8;
+            var encoding = Encoding.UTF8;
 
-            // Detect BOM and preserve it
             var bytes = File.ReadAllBytes(filePath);
-            if (bytes.Length >= 3 && bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF)
+
+            if (bytes is [0xEF, 0xBB, 0xBF, ..])
             {
                 encoding = new UTF8Encoding(true); // UTF-8 with BOM
             }
 
-            originalContent = encoding.GetString(bytes);
+            var originalContent = encoding.GetString(bytes);
             var modifiedContent = regex.Replace(originalContent, match =>
             {
                 var token = match.Groups["token"].Value;
+
                 return $"{libPrefix}.{token}";
             });
 
@@ -211,14 +220,12 @@ public class LibraryRenameAction
 
             if (modifiedContent != originalContent)
             {
-                // Write atomically: write to temp file, then replace
                 var tempFile = filePath + ".tmp";
                 File.WriteAllText(tempFile, modifiedContent, encoding);
+                File.Move(tempFile, filePath, overwrite: true);
 
-                // Delete the original file, then move temp file to original location
-                File.Delete(filePath);
-                File.Move(tempFile, filePath);
                 Console.WriteLine($"  → Updated library references in: {Path.GetRelativePath(projectDir, filePath)}");
+
                 return true;
             }
         }
@@ -230,21 +237,19 @@ public class LibraryRenameAction
         return false;
     }
 
-    private string[] GetStringArrayFromConfig(JsonElement config, string propertyName, string[] defaultValue)
+    private static string[] GetStringArrayFromConfig(JsonElement config, string propertyName, string[] defaultValue)
     {
         if (config.TryGetProperty(propertyName, out var arrayElement) && arrayElement.ValueKind == JsonValueKind.Array)
-        {
             return arrayElement.EnumerateArray().Select(e => e.GetString() ?? "").ToArray();
-        }
+
         return defaultValue;
     }
 
-    private int GetIntFromConfig(JsonElement config, string propertyName, int defaultValue)
+    private static int GetIntFromConfig(JsonElement config, string propertyName, int defaultValue)
     {
         if (config.TryGetProperty(propertyName, out var intElement) && intElement.TryGetInt32(out var value))
-        {
             return value;
-        }
+
         return defaultValue;
     }
 }

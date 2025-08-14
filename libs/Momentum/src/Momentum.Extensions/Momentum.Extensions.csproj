@@ -3,25 +3,29 @@
     <PropertyGroup>
         <IsPackable>true</IsPackable>
         <PackageId>Momentum.Extensions</PackageId>
-        <PackageDescription>Core extensions library for Momentum .NET providing common utilities, result types, messaging abstractions, and data access helpers. Includes integrations with Dapper, FluentValidation, OneOf, and WolverineFx.</PackageDescription>
-        <PackageProjectUrl>https://github.com/vgmello/momentum-sample/blob/main/libs/Momentum/src/Momentum.Extensions/README.md</PackageProjectUrl>
+        <PackageDescription>Core extensions library for Momentum .NET providing common utilities,
+            result types, messaging abstractions, and data access helpers. Includes integrations
+            with Dapper, FluentValidation, OneOf, and WolverineFx.
+        </PackageDescription>
+        <PackageProjectUrl>https://github.com/vgmello/momentum/blob/main/libs/Momentum/src/Momentum.Extensions/README.md</PackageProjectUrl>
     </PropertyGroup>
 
-    <ItemGroup Condition="'$(LibsExt)' == 'False'">
-        <None Include="Momentum.Extensions.props" Pack="true" PackagePath="build/" />
+    <ItemGroup Condition="'$(IncludeLibsExt)' == ''">
+        <None Include="Momentum.Extensions.props" Pack="true" PackagePath="build/"/>
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="FluentValidation"/>
-        <PackageReference Include="linq2db" />
+        <PackageReference Include="linq2db"/>
         <PackageReference Include="OneOf"/>
         <PackageReference Include="OneOf.SourceGenerator"/>
         <PackageReference Include="Dapper"/>
         <PackageReference Include="WolverineFx"/>
-        <PackageReference Include="Momentum.Extensions.Abstractions" Condition="'$(LibsExt)' == 'True'"/>
+        <PackageReference Include="Momentum.Extensions.Abstractions" Condition="'$(IncludeLibsExt)' == 'True'"/>
     </ItemGroup>
 
-    <ItemGroup Condition="'$(LibsExt)' == 'False'">
+    <ItemGroup Condition="'$(IncludeLibsExt)' == ''">
         <ProjectReference Include="..\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
     </ItemGroup>
+
 </Project>

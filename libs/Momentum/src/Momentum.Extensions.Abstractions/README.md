@@ -22,18 +22,18 @@ Install-Package Momentum.Extensions.Abstractions
 
 ## Key Features
 
-- **Framework Contracts**: Core interfaces that define framework behavior
-- **Base Types**: Abstract base classes for implementing custom behaviors  
-- **Dependency-Free**: No external dependencies to avoid version conflicts
-- **Broad Compatibility**: Targets .NET Standard 2.1 for maximum compatibility
-- **Extensibility**: Designed for loose coupling and testability
+-   **Framework Contracts**: Core interfaces that define framework behavior
+-   **Base Types**: Abstract base classes for implementing custom behaviors
+-   **Dependency-Free**: No external dependencies to avoid version conflicts
+-   **Broad Compatibility**: Targets .NET Standard 2.1 for maximum compatibility
+-   **Extensibility**: Designed for loose coupling and testability
 
 ## Getting Started
 
 ### Prerequisites
 
-- .NET Standard 2.1 compatible runtime
-- C# 7.3 or later
+-   .NET Standard 2.1 compatible runtime
+-   C# 7.3 or later
 
 ### Basic Usage
 
@@ -81,7 +81,7 @@ public Result<Customer> ValidateCustomer(CustomerData data)
     {
         return Result<Customer>.Failure("Email is required");
     }
-    
+
     var customer = new Customer(data.Email, data.Name);
     return Result<Customer>.Success(customer);
 }
@@ -101,28 +101,28 @@ Application Code
 
 ## Design Principles
 
-- **Zero Dependencies**: No external package references to prevent version conflicts
-- **Stable APIs**: Contracts designed for long-term stability
-- **Performance First**: Minimal overhead abstractions
-- **Extensibility**: Every component supports customization and extension
+-   **Zero Dependencies**: No external package references to prevent version conflicts
+-   **Stable APIs**: Contracts designed for long-term stability
+-   **Performance First**: Minimal overhead abstractions
+-   **Extensibility**: Every component supports customization and extension
 
 ## Target Frameworks
 
-- **.NET Standard 2.1**: Compatible with:
-  - .NET Core 3.0 and later
-  - .NET 5.0 and later
-  - .NET Framework 4.8
+-   **.NET Standard 2.1**: Compatible with:
+    -   .NET Core 3.0 and later
+    -   .NET 5.0 and later
+    -   .NET Framework 4.8
 
 ## Related Packages
 
-- [Momentum.Extensions](../Momentum.Extensions/README.md) - Core utilities and implementations
-- [Momentum.ServiceDefaults](../Momentum.ServiceDefaults/README.md) - Service configuration defaults
-- [Momentum.Extensions.SourceGenerators](../Momentum.Extensions.SourceGenerators/README.md) - Code generation utilities
+-   [Momentum.Extensions](../Momentum.Extensions/README.md) - Core utilities and implementations
+-   [Momentum.ServiceDefaults](../Momentum.ServiceDefaults/README.md) - Service configuration defaults
+-   [Momentum.Extensions.SourceGenerators](../Momentum.Extensions.SourceGenerators/README.md) - Code generation utilities
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](https://github.com/vgmello/momentum-sample/blob/main/LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](https://github.com/vgmello/momentum/blob/main/LICENSE) file for details.
 
 ## Contributing
 
-For contribution guidelines and more information about the Momentum platform, visit the [main repository](https://github.com/vgmello/momentum-sample).
+For contribution guidelines and more information about the Momentum platform, visit the [main repository](https://github.com/vgmello/momentum).

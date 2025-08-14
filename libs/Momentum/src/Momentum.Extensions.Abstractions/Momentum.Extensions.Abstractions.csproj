@@ -6,8 +6,7 @@
         <IsPackable>true</IsPackable>
         <PackageId>Momentum.Extensions.Abstractions</PackageId>
         <PackageDescription>Core abstractions and interfaces for the Momentum platform. This foundational package defines contracts, base types, and abstractions used across all Momentum libraries. Essential for extensibility and loose coupling.</PackageDescription>
-        <PackageProjectUrl>https://github.com/vgmello/momentum-sample/blob/main/libs/Momentum/src/Momentum.Extensions.Abstractions/README.md</PackageProjectUrl>
+        <PackageProjectUrl>https://github.com/vgmello/momentum/blob/main/libs/Momentum/src/Momentum.Extensions.Abstractions/README.md</PackageProjectUrl>
     </PropertyGroup>
-
 
 </Project>

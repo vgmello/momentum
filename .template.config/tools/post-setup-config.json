@@ -1,5 +1,5 @@
 {
-  "projectName": "sourceName",
+  "projectName": "AppDomain",
   "basePort": SERVICE_BASE_PORT,
   "momentumLibImport": {
     "enabled": __INCLUDE_LIBS__,

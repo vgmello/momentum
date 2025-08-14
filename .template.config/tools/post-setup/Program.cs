@@ -1,3 +1,5 @@
+// Copyright (c) ORG_NAME. All rights reserved.
+
 using System;
 using System.IO;
 using System.Linq;
@@ -20,8 +22,8 @@ public static class Program
 
             var config = LoadConfig(projectDir);
 
-            config.TryGetProperty("projectName", out var domainName);
-            domainName ??= "{Domain}";
+            config.TryGetProperty("projectName", out var projectNameProp);
+            var domainName = projectNameProp.GetString() ?? "{Domain}";
 
             // Action 1: Port Configuration
             Console.WriteLine();
@@ -44,7 +46,7 @@ public static class Program
             Console.WriteLine("📚 Action 2: Library Rename");
             Console.WriteLine("═══════════════════════════════");
             var libraryAction = new LibraryRenameAction();
-            var libraryResult = libraryAction.ProcessMomentumLibImport(projectDir, config);
+            var libraryResult = LibraryRenameAction.ProcessMomentumLibImport(projectDir, config);
 
             if (!libraryResult.Enabled)
             {
@@ -53,7 +55,8 @@ public static class Program
             else if (libraryResult.ChangedFiles > 0)
             {
                 Console.WriteLine($"✅ Library rename completed: {libraryResult.ChangedFiles}/{libraryResult.ProcessedFiles} files updated");
-                Console.WriteLine($"   → Renamed {libraryResult.ImportedTokens.Count} library tokens to use '{libraryResult.LibPrefix}' prefix");
+                Console.WriteLine(
+                    $"   → Renamed {libraryResult.ImportedTokens.Count} library tokens to use '{libraryResult.LibPrefix}' prefix");
             }
             else
             {
@@ -78,7 +81,8 @@ public static class Program
                 Console.WriteLine($"   Base port: {portResult.BasePort}");
                 Console.WriteLine($"   - Aspire Dashboard: {portResult.BasePort + 10000} (HTTP) / {portResult.BasePort + 10010} (HTTPS)");
                 Console.WriteLine($"   - Aspire Resource Service: {portResult.BasePort} (HTTP) / {portResult.BasePort + 10} (HTTPS)");
-                Console.WriteLine($"   - Main API: {portResult.BasePort + 1} (HTTP) / {portResult.BasePort + 11} (HTTPS) / {portResult.BasePort + 2} (gRPC)");
+                Console.WriteLine(
+                    $"   - Main API: {portResult.BasePort + 1} (HTTP) / {portResult.BasePort + 11} (HTTPS) / {portResult.BasePort + 2} (gRPC)");
                 Console.WriteLine($"   - BackOffice: {portResult.BasePort + 3} (HTTP) / {portResult.BasePort + 13} (HTTPS)");
                 Console.WriteLine($"   - Orleans: {portResult.BasePort + 4} (HTTP) / {portResult.BasePort + 14} (HTTPS)");
                 Console.WriteLine($"   - UI/Frontend: {portResult.BasePort + 5} (HTTP) / {portResult.BasePort + 15} (HTTPS)");
@@ -109,10 +113,12 @@ public static class Program
         {
             Console.WriteLine();
             Console.WriteLine($"❌ Post-setup failed: {ex.Message}");
+
             if (ex.InnerException != null)
             {
                 Console.WriteLine($"   Inner exception: {ex.InnerException.Message}");
             }
+
             return 1;
         }
     }
@@ -120,6 +126,7 @@ public static class Program
     private static JsonElement LoadConfig(string projectDir)
     {
         var configFile = Path.Combine(projectDir, ".local", "tools", "post-setup-config.json");
+
         if (!File.Exists(configFile))
         {
             throw new InvalidOperationException($"Post-setup config file not found: {configFile}");
@@ -129,6 +136,7 @@ public static class Program
         {
             var configContent = File.ReadAllText(configFile);
             var configDoc = JsonDocument.Parse(configContent);
+
             return configDoc.RootElement;
         }
         catch (Exception ex)
@@ -156,6 +164,7 @@ public static class Program
 
                 // Delete config file if it exists
                 var configFile = Path.Combine(toolsDir, "post-setup-config.json");
+
                 if (File.Exists(configFile))
                 {
                     File.Delete(configFile);

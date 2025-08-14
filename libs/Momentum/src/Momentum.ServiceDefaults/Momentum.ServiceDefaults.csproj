@@ -4,11 +4,16 @@
         <IsAspireSharedProject>true</IsAspireSharedProject>
         <IsPackable>true</IsPackable>
         <PackageId>Momentum.ServiceDefaults</PackageId>
-        <PackageDescription>Service defaults for Momentum platform providing common configurations for Aspire-based services including Kafka, PostgreSQL, OpenTelemetry, Serilog, resilience patterns, and service discovery. Essential for all Momentum host projects.</PackageDescription>
-        <PackageProjectUrl>https://github.com/vgmello/momentum-sample/blob/main/libs/Momentum/src/Momentum.ServiceDefaults/README.md</PackageProjectUrl>
+        <PackageDescription>Service defaults for Momentum platform providing common configurations
+            for Aspire-based services including Kafka, PostgreSQL, OpenTelemetry, Serilog,
+            resilience patterns, and service discovery. Essential for all Momentum host projects.
+        </PackageDescription>
+        <PackageProjectUrl>
+            https://github.com/vgmello/momentum/blob/main/libs/Momentum/src/Momentum.ServiceDefaults/README.md
+        </PackageProjectUrl>
     </PropertyGroup>
 
-    <ItemGroup>
+    <ItemGroup Condition="'$(IncludeLibsDefaults)' != 'True'">
         <None Include="Momentum.ServiceDefaults.props" Pack="true" PackagePath="build/"/>
     </ItemGroup>
 
@@ -17,8 +22,10 @@
     </ItemGroup>
 
     <!--
-        IMPORTANT Reminder: All the dependencies in this project should be needed by all the Host projects (Api, Backoffice, Orleans, etc.).
-        We want to avoid adding a dependency to a specific Host project type, as it would not be used by the others.
+        IMPORTANT Reminder: All the dependencies in this project should be needed by all the Host projects
+    (Api, Backoffice, Orleans, etc.).
+        We want to avoid adding a dependency to a specific Host project type, as it would not be used by
+    the others.
     -->
 
     <ItemGroup>
@@ -38,11 +45,15 @@
         <PackageReference Include="Serilog.Sinks.OpenTelemetry"/>
         <PackageReference Include="WolverineFx"/>
         <PackageReference Include="WolverineFx.Postgresql"/>
-        <PackageReference Include="Momentum.Extensions" Condition="'$(LibsDefaults)' == 'True' And '$(LibsExt)' == 'False'"/>
+        <PackageReference Include="Momentum.Extensions" Condition="'$(IncludeLibsExt)' == 'False'"/>
     </ItemGroup>
 
-    <ItemGroup Condition="'$(LibsDefaults)' == 'False' Or '$(LibsExt)' == 'True'">
+    <ItemGroup Condition="'$(IncludeLibsDefaults)' == ''">
         <ProjectReference Include="..\Momentum.Extensions\Momentum.Extensions.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(IncludeLibsExt)' == 'True'">
+        <ProjectReference Include="..\Momentum.Extensions\Momentum.Extensions.csproj" Condition="'$(IncludeLibsExt)' == 'True'"/>
     </ItemGroup>
 
 </Project>

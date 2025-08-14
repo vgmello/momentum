@@ -7,18 +7,21 @@
     <File Path="Momentum.slnx.DotSettings" />
     <File Path="version.txt" />
   </Folder>
+  <Folder Name="/Template/">
+    <Project Path="..\..\.template.config\tools\post-setup\PostSetup.csproj" Type="Classic C#" />
+  </Folder>
   <Folder Name="/Tests/">
     <Project Path="tests\Momentum.Extensions.EventMarkdownGenerator.Tests\Momentum.Extensions.EventMarkdownGenerator.Tests.csproj" />
     <Project Path="tests\Momentum.Extensions.SourceGenerators.Tests\Momentum.Extensions.SourceGenerators.Tests.csproj" />
     <Project Path="tests\Momentum.Extensions.Tests\Momentum.Extensions.Tests.csproj" />
     <Project Path="tests\TestEvents\TestEvents.csproj" />
   </Folder>
-  <Project Path="src\Momentum.Extensions\Momentum.Extensions.csproj" />
   <Project Path="src\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj" />
   <Project Path="src\Momentum.Extensions.EventMarkdownGenerator\Momentum.Extensions.EventMarkdownGenerator.csproj" />
   <Project Path="src\Momentum.Extensions.Messaging.Kafka\Momentum.Extensions.Messaging.Kafka.csproj" Type="Classic C#" />
   <Project Path="src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.csproj" />
   <Project Path="src\Momentum.Extensions.XmlDocs\Momentum.Extensions.XmlDocs.csproj" />
+  <Project Path="src\Momentum.Extensions\Momentum.Extensions.csproj" />
   <Project Path="src\Momentum.ServiceDefaults.Api\Momentum.ServiceDefaults.Api.csproj" />
   <Project Path="src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj" />
 </Solution>
