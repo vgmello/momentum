@@ -15,27 +15,17 @@
         <PackageReference Include="Microsoft.Orleans.Persistence.AzureStorage"/>
         <PackageReference Include="Microsoft.Orleans.Server"/>
         <PackageReference Include="OrleansDashboard"/>
-<!--#if (libs == none) -->
-        <PackageReference Include="Momentum.ServiceDefaults"/>
-<!--#endif -->
-<!--#if (USE_KAFKA && libs == none) -->
-        <PackageReference Include="Momentum.Extensions.Messaging.Kafka"/>
-        <PackageReference Include="Wolverine.Kafka"/>
-<!--#endif -->
+        <PackageReference Include="Momentum.ServiceDefaults" Condition="'$(LibsDefaults)' == 'False'"/>
+        <PackageReference Include="Momentum.Extensions.Messaging.Kafka" Condition="'$(UseKafka)' == 'True' And '$(LibsKafka)' == 'False'"/>
+        <PackageReference Include="Wolverine.Kafka" Condition="'$(UseKafka)' == 'True'"/>
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\AppDomain\AppDomain.csproj"/>
-<!--#if (libs == defaults) -->
-        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
-<!--#endif -->
-<!--#if (libs == kafka) -->
-        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.Messaging.Kafka\Momentum.Extensions.Messaging.Kafka.csproj"/>
-<!--#endif -->
+        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj" Condition="'$(LibsDefaults)' == 'True'"/>
+        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.Messaging.Kafka\Momentum.Extensions.Messaging.Kafka.csproj" Condition="'$(LibsKafka)' == 'True'"/>
     </ItemGroup>
 
-<!--#if (libs == defaults) -->
-    <Import Project="..\..\libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.props"/>
-<!--#endif -->
+    <Import Project="..\..\libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.props" Condition="'$(LibsDefaults)' == 'True'"/>
 
 </Project>

@@ -23,7 +23,7 @@ namespace AppDomain.Invoices.Contracts.IntegrationEvents;
 ///
 /// This event can be used by other services to:
 /// - Update accounting systems
-/// - Trigger billing workflows
+/// - Trigger app_domain workflows
 /// - Send notifications to relevant stakeholders
 /// - Update customer portals with new invoice information
 /// </remarks>

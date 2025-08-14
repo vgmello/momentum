@@ -38,9 +38,10 @@
         <PackageReference Include="Serilog.Sinks.OpenTelemetry"/>
         <PackageReference Include="WolverineFx"/>
         <PackageReference Include="WolverineFx.Postgresql"/>
+        <PackageReference Include="Momentum.Extensions" Condition="'$(LibsDefaults)' == 'True' And '$(LibsExt)' == 'False'"/>
     </ItemGroup>
 
-    <ItemGroup>
+    <ItemGroup Condition="'$(LibsDefaults)' == 'False' Or '$(LibsExt)' == 'True'">
         <ProjectReference Include="..\Momentum.Extensions\Momentum.Extensions.csproj"/>
     </ItemGroup>
 

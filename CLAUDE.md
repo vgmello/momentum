@@ -134,3 +134,37 @@ Additional guidelines:
 -   Check if expected projects were created with `ls -la` after generation
 
 - Use -allow-scripts yes to run the template without needing a post action confirmation
+
+## Library Conditional Dependencies Pattern
+
+When updating library project files in `libs/Momentum/src/`, follow this pattern to ensure they work both standalone and in template context:
+
+### Key Principles:
+1. **ItemGroup separation by type** - PackageReferences and ProjectReferences are in separate ItemGroups
+2. **Standalone compatibility** - Libraries work both standalone (with ProjectReferences) and in template context
+3. **MSBuild condition for standalone** - Use `Condition="'$(libs)' == 'libname'"` on ProjectReference
+
+### Pattern Example:
+```xml
+<ItemGroup>
+    <PackageReference Include="ExternalPackage"/>
+    <!--#if (libs == libname) -->
+    <PackageReference Include="Momentum.Dependency"/>
+    <!--#endif -->
+</ItemGroup>
+
+<!--#if (libs != libname) -->
+<ItemGroup>
+    <ProjectReference Include="..\Momentum.Dependency\Momentum.Dependency.csproj" Condition="'$(libs)' == 'libname'"/>
+</ItemGroup>
+<!--#endif -->
+```
+
+This ensures:
+- When template processes with `libs != libname`: The ProjectReference ItemGroup is removed entirely
+- When template processes with `libs == libname`: The ItemGroup stays but ProjectReference has a false condition
+- When building standalone (no template): The ItemGroup stays and condition is undefined/empty, so ProjectReference is included
+
+### Special Cases:
+- **Extensions.Abstractions and Extensions.XmlDocs**: Always NuGet packages, never project references when imported
+- **libs/Momentum folder must work standalone**: Always include ProjectReferences with MSBuild conditions for standalone builds

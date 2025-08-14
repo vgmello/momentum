@@ -179,9 +179,9 @@ public class TestScenarioBuilder
             "amount" or "unitprice" or "totalprice" or "totalamount" => "System.Decimal",
             "quantity" => "System.Int32",
             "registrationdate" or "completedat" => "System.DateTime",
-            "customer" => "Billing.Orders.Contracts.Models.Customer",
-            "items" => "System.Collections.Generic.List{Billing.Orders.Contracts.Models.OrderItem}",
-            "billingaddress" => "Billing.Orders.Contracts.Models.Address",
+            "customer" => "AppDomain.Orders.Contracts.Models.Customer",
+            "items" => "System.Collections.Generic.List{AppDomain.Orders.Contracts.Models.OrderItem}",
+            "billingaddress" => "AppDomain.Orders.Contracts.Models.Address",
             _ => "System.String"
         };
     }

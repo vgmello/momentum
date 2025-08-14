@@ -9,27 +9,17 @@
     <ItemGroup>
         <PackageReference Include="Grpc.AspNetCore"/>
         <PackageReference Include="Grpc.Tools"/>
-        <!--#if (libs != defaults) -->
-        <PackageReference Include="Momentum.ServiceDefaults"/>
-                <!--#endif -->
-        <!--#if (libs != api) -->
-        <PackageReference Include="Momentum.ServiceDefaults.Api"/>
-<!--#endif -->
+        <PackageReference Include="Momentum.ServiceDefaults" Condition="'$(LibsDefaults)' == 'False'"/>
+        <PackageReference Include="Momentum.ServiceDefaults.Api" Condition="'$(LibsApi)' == 'False'"/>
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\AppDomain\AppDomain.csproj"/>
-<!--#if (libs == api) -->
-        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.ServiceDefaults.Api\Momentum.ServiceDefaults.Api.csproj"/>
-<!--#endif -->
-<!--#if (libs == defaults) -->
-        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
-<!--#endif -->
+        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.ServiceDefaults.Api\Momentum.ServiceDefaults.Api.csproj" Condition="'$(LibsApi)' == 'True'"/>
+        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj" Condition="'$(LibsDefaults)' == 'True'"/>
     </ItemGroup>
 
-<!--#if (libs == defaults) -->
-    <Import Project="..\..\libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.props"/>
-<!--#endif -->
+    <Import Project="..\..\libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.props" Condition="'$(LibsDefaults)' == 'True'"/>
     <ItemGroup>
         <Protobuf Include="**/Protos/**/*.proto" ProtoRoot="." GrpcServices="Server"/>
     </ItemGroup>

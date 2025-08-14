@@ -20,16 +20,18 @@
         <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all"/>
     </ItemGroup>
 
-    <!--#if (!LocalLibs) -->
-    <ItemGroup>
+    <ItemGroup Condition="'$(LocalLibs)' != 'true'">
         <!-- Used for nuget packaging -->
         <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false"/>
         <None Include="$(ProjectDir)\..\Momentum.Extensions.Abstractions\$(OutputPath)\Momentum.Extensions.Abstractions.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false"/>
         <None Include="Momentum.Extensions.SourceGenerators.props" Pack="true" PackagePath="build" />
     </ItemGroup>
-    <!--#endif -->
 
     <ItemGroup>
+        <PackageReference Include="Momentum.Extensions.Abstractions" PrivateAssets="all" Condition="'$(LibsGenerators)' == 'True'"/>
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(LibsGenerators)' == 'False'">
         <ProjectReference Include="..\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj" PrivateAssets="all"/>
     </ItemGroup>
 

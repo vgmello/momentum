@@ -139,124 +139,10 @@
     "lib-name": {
       "type": "parameter",
       "datatype": "string",
-      "description": "Name prefix to replace 'Momentum' in library names and namespaces",
-      "defaultValue": "Momentum"
-    },
-    "ImportableMomentumServiceDefaults": {
-      "type": "derived",
-      "valueSource": "lib-name",
-      "valueTransform": "identity",
-      "replaces": "ImportableMomentumServiceDefaults"
-    },
-    "ImportableMomentumServiceDefaultsApi": {
-      "type": "derived",
-      "valueSource": "lib-name",
-      "valueTransform": "identity",
-      "replaces": "ImportableMomentumServiceDefaultsApi"
-    },
-    "ImportableMomentumExtensions": {
-      "type": "derived",
-      "valueSource": "lib-name",
-      "valueTransform": "identity",
-      "replaces": "ImportableMomentumExtensions"
-    },
-    "ImportableMomentumSourceGenerators": {
-      "type": "derived",
-      "valueSource": "lib-name",
-      "valueTransform": "identity",
-      "replaces": "ImportableMomentumSourceGenerators"
-    },
-    "ImportableMomentumKafka": {
-      "type": "derived",
-      "valueSource": "lib-name",
-      "valueTransform": "identity",
-      "replaces": "ImportableMomentumKafka"
-    },
-    "MomentumServiceDefaultsNamespace": {
-      "type": "generated",
-      "generator": "join",
-      "parameters": {
-        "symbols": [
-          {
-            "type": "ref",
-            "value": "lib-name"
-          },
-          {
-            "type": "const",
-            "value": ".ServiceDefaults"
-          }
-        ]
-      },
-      "replaces": "Momentum.ServiceDefaults;"
-    },
-    "MomentumServiceDefaultsApiNamespace": {
-      "type": "generated",
-      "generator": "join",
-      "parameters": {
-        "symbols": [
-          {
-            "type": "ref",
-            "value": "lib-name"
-          },
-          {
-            "type": "const",
-            "value": ".ServiceDefaults.Api"
-          }
-        ]
-      },
-      "replaces": "Momentum.ServiceDefaults.Api;"
-    },
-    "MomentumExtensionsNamespace": {
-      "type": "generated",
-      "generator": "join",
-      "parameters": {
-        "symbols": [
-          {
-            "type": "ref",
-            "value": "lib-name"
-          },
-          {
-            "type": "const",
-            "value": ".Extensions"
-          }
-        ]
-      },
-      "replaces": "Momentum.Extensions;"
-    },
-    "MomentumExtensionsDataNamespace": {
-      "type": "generated",
-      "generator": "join",
-      "parameters": {
-        "symbols": [
-          {
-            "type": "ref",
-            "value": "lib-name"
-          },
-          {
-            "type": "const",
-            "value": ".Extensions.Data"
-          }
-        ]
-      },
-      "replaces": "Momentum.Extensions.Data"
-    },
-    "MomentumExtensionsSourceGenerators": {
-      "type": "derived",
-      "valueSource": "lib-name",
-      "valueTransform": "identity",
-      "replaces": "Momentum.Extensions.SourceGenerators"
-    },
-    "MomentumExtensionsMessagingKafka": {
-      "type": "derived",
-      "valueSource": "lib-name",
-      "valueTransform": "identity",
-      "replaces": "Momentum.Extensions.Messaging.Kafka"
-    },
-    "MomentumExtensionsXmlDocs": {
-      "type": "derived",
-      "valueSource": "lib-name",
-      "valueTransform": "identity",
-      "replaces": "Momentum.Extensions.XmlDocs"
+      "description": "Name prefix to replace 'Momentum' in library names",
+      "defaultValue": "Momentum",
+      "fileRename": "Momentum",
+      "replaces": "__LIB_NAME__"
     },
     "ALL": {
       "type": "computed",
@@ -356,6 +242,84 @@
       "valueTransform": "kebab-case",
       "replaces": "app-domain",
       "fileRename": "app-domain"
+    },
+    "IncludeLibsFlag": {
+      "type": "derived",
+      "valueSource": "INCLUDE_LIBS",
+      "valueTransform": "kebab-case",
+      "replaces": "__INCLUDE_LIBS__"
+    },
+    "UsePgsql": {
+      "type": "derived",
+      "valueSource": "USE_PGSQL",
+      "valueTransform": "firstUpperCase",
+      "replaces": "$(UsePgsql)"
+    },
+    "UseKafka": {
+      "type": "derived",
+      "valueSource": "USE_KAFKA",
+      "valueTransform": "firstUpperCase",
+      "replaces": "$(UseKafka)"
+    },
+    "IncludeApi": {
+      "type": "derived",
+      "valueSource": "INCLUDE_API",
+      "valueTransform": "firstUpperCase",
+      "replaces": "$(IncludeApi)"
+    },
+    "IncludeBackOffice": {
+      "type": "derived",
+      "valueSource": "INCLUDE_BACK_OFFICE",
+      "valueTransform": "firstUpperCase",
+      "replaces": "$(IncludeBackOffice)"
+    },
+    "IncludeOrleans": {
+      "type": "derived",
+      "valueSource": "INCLUDE_ORLEANS",
+      "valueTransform": "firstUpperCase",
+      "replaces": "$(IncludeOrleans)"
+    },
+    "IncludeDocs": {
+      "type": "derived",
+      "valueSource": "INCLUDE_DOCS",
+      "valueTransform": "firstUpperCase",
+      "replaces": "$(IncludeDocs)"
+    },
+    "LibsExt": {
+      "type": "derived",
+      "valueSource": "libs == ext",
+      "valueTransform": "firstUpperCase",
+      "replaces": "$(LibsExt)"
+    },
+    "LibsGenerators": {
+      "type": "derived",
+      "valueSource": "libs == generators",
+      "valueTransform": "firstUpperCase",
+      "replaces": "$(LibsGenerators)"
+    },
+    "LibsDefaults": {
+      "type": "derived",
+      "valueSource": "libs == defaults",
+      "valueTransform": "firstUpperCase",
+      "replaces": "$(LibsDefaults)"
+    },
+    "LibsApi": {
+      "type": "derived",
+      "valueSource": "libs == api",
+      "valueTransform": "firstUpperCase",
+      "replaces": "$(LibsApi)"
+    },
+    "LibsKafka": {
+      "type": "derived",
+      "valueSource": "libs == kafka",
+      "valueTransform": "firstUpperCase",
+      "replaces": "$(LibsKafka)"
+    },
+    "LibsNone": {
+      "type": "derived",
+      "valueSource": "libs == none",
+      "valueTransform": "firstUpperCase",
+      "replaces": "$(LibsNone)"
     }
   },
   "sources": [
@@ -374,14 +338,16 @@
         "**/*.filelist",
         "**/*.user",
         "**/*.lock.json",
+        "**/_temp/**/*",
+        "**/.local/**/*",
         "**/.vitepress/cache",
         "**/.vitepress/dist",
-        "libs/Momentum/*",
-        "libs/Momentum/assets/**",
-        "libs/Momentum/docs/**",
-        "libs/Momentum/src/Momentum.Extensions.Abstractions/**",
-        "libs/Momentum/src/Momentum.Extensions.EventMarkdownGenerator/**",
-        "libs/Momentum/tests/**"
+        "libs/Momentum/**/*",
+        "libs/Momentum/assets/**/*",
+        "libs/Momentum/docs/**/*",
+        "libs/Momentum/src/Momentum.Extensions.Abstractions/**/*",
+        "libs/Momentum/src/Momentum.Extensions.EventMarkdownGenerator/**/*",
+        "libs/Momentum/tests/**/*"
       ],
       "modifiers": [
         {
@@ -477,7 +443,10 @@
             "tests/AppDomain.Tests/Integration/Cashiers/**/*",
             "tests/AppDomain.Tests/Integration/Invoices/**/*",
             "tests/AppDomain.Tests/Architecture/DomainIsolationRulesTests.cs",
-            "tests/AppDomain.Tests/Architecture/MultiTenancyRulesTests.cs"
+            "tests/AppDomain.Tests/Architecture/MultiTenancyRulesTests.cs",
+            "docs/guide/cashiers/**/*",
+            "docs/guide/invoices/**/*",
+            "docs/guide/bills/**/*"
           ]
         },
         {
@@ -517,7 +486,8 @@
       "source": "./.template.config/tools",
       "target": "./.local/tools",
       "include": [
-        "**/*"
+        "post-setup-config.json",
+        "post-setup/**/*"
       ]
     },
     {
@@ -537,7 +507,7 @@
       "description": "Run post-setup configuration",
       "manualInstructions": [
         {
-          "text": "Run post-setup manually if this fails: dotnet run --project .local/tools/post-setup -- --basePort [PORT]"
+          "text": "Run post-setup manually if this fails: dotnet run --project .local/tools/post-setup"
         }
       ],
       "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",

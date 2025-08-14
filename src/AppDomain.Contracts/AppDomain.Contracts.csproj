@@ -26,11 +26,9 @@
     <ItemGroup>
         <Compile Include="..\AppDomain\**\Contracts\IntegrationEvents\*.cs" Link="%(RecursiveDir)%(Filename)%(Extension)"/>
         <Compile Include="..\AppDomain\**\Contracts\Models\*.cs" Link="%(RecursiveDir)%(Filename)%(Extension)"/>
-        <!--#if (INCLUDE_API) -->
-        <Content Include="..\AppDomain.Api\**\Protos\**\*.proto" Link="%(RecursiveDir)%(Filename)%(Extension)" Pack="true">
+        <Content Include="..\AppDomain.Api\**\Protos\**\*.proto" Link="%(RecursiveDir)%(Filename)%(Extension)" Pack="true" Condition="'$(INCLUDE_API)' == 'true'">
             <PackagePath>Protos</PackagePath>
         </Content>
-        <!--#endif -->
     </ItemGroup>
 
     <ItemGroup>

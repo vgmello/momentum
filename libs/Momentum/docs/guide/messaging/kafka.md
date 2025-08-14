@@ -135,7 +135,7 @@ Momentum uses a **structured naming convention** that ensures clarity and preven
 
 ```
 dev.appdomain.public.cashiers        # Development cashier events
-prod.billing.public.invoices.v2      # Production billing events v2
+prod.app_domain.public.invoices.v2   # Production AppDomain events v2
 test.notifications.internal.emails   # Test internal email events
 ```
 
@@ -147,7 +147,7 @@ Override default naming with explicit configuration:
 // Custom topic configuration
 [EventTopic<Invoice>(
     Topic = "invoice-events",           // Custom topic name
-    Domain = "billing",                 // Custom domain
+    Domain = "app_domain_gov",          // Custom domain
     Version = "v2",                     // Specific version
     Internal = false,                   // Public scope
     ShouldPluralizeTopicName = false    // Don't pluralize
@@ -157,7 +157,7 @@ public record InvoiceUpdated(
     Invoice Invoice
 );
 
-// Results in topic: dev.billing.public.invoice-events.v2
+// Results in topic: dev.app_domain.public.invoice-events.v2
 ```
 
 ### Topic Configuration Examples

@@ -19,14 +19,16 @@
         <PackageReference Include="Microsoft.AspNetCore.OpenApi"/>
         <PackageReference Include="OpenTelemetry.Extensions.Hosting" />
         <PackageReference Include="Scalar.AspNetCore"/>
+        <PackageReference Include="Momentum.ServiceDefaults" Condition="'$(LibsApi)' == 'True' And '$(LibsDefaults)' == 'False'"/>
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(LibsApi)' == 'False' Or '$(LibsDefaults)' == 'True'">
+        <ProjectReference Include="..\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj" />
-      <ProjectReference Include="..\Momentum.Extensions.XmlDocs\Momentum.Extensions.XmlDocs.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
+        <ProjectReference Include="..\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
+        <ProjectReference Include="..\Momentum.Extensions.XmlDocs\Momentum.Extensions.XmlDocs.csproj"/>
     </ItemGroup>
 
 </Project>

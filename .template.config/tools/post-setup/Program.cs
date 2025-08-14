@@ -1,8 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
+using System.Text.Json;
+using PostSetup.Actions;
 
 namespace PostSetup;
 
@@ -12,166 +12,129 @@ public static class Program
     {
         try
         {
-            Console.WriteLine("Running Momentum .NET post-setup tasks...");
+            Console.WriteLine("🚀 Running Momentum .NET post-setup tasks...");
+            Console.WriteLine();
 
             var projectDir = Environment.CurrentDirectory;
-            Console.WriteLine($"Project directory: {projectDir}");
+            Console.WriteLine($"📁 Project directory: {projectDir}");
 
-            var basePort = GetBasePortFromArgs(args);
-            Console.WriteLine($"Configuring ports with base port: {basePort}");
+            var config = LoadConfig(projectDir);
 
-            ConfigurePorts(projectDir, basePort);
+            config.TryGetProperty("projectName", out var domainName);
+            domainName ??= "{Domain}";
 
-            Console.WriteLine("Momentum .NET post-setup completed successfully!");
+            // Action 1: Port Configuration
             Console.WriteLine();
-            Console.WriteLine("Port Configuration:");
-            Console.WriteLine($"- Aspire Dashboard: {basePort + 10000} (HTTP) / {basePort + 10010} (HTTPS)");
-            Console.WriteLine($"- Aspire Resource Service: {basePort} (HTTP) / {basePort + 10} (HTTPS)");
-            Console.WriteLine($"- Main API: {basePort + 1} (HTTP) / {basePort + 11} (HTTPS) / {basePort + 2} (gRPC)");
-            Console.WriteLine($"- BackOffice: {basePort + 3} (HTTP) / {basePort + 13} (HTTPS)");
-            Console.WriteLine($"- Orleans: {basePort + 4} (HTTP) / {basePort + 14} (HTTPS)");
-            Console.WriteLine($"- UI/Frontend: {basePort + 5} (HTTP) / {basePort + 15} (HTTPS)");
-            Console.WriteLine($"- Documentation: {basePort + 19}");
+            Console.WriteLine("🔧 Action 1: Port Configuration");
+            Console.WriteLine("═══════════════════════════════");
+            var portAction = new PortConfigurationAction();
+            var portResult = portAction.ConfigurePorts(projectDir, config, args);
+
+            if (portResult.ChangedFiles > 0)
+            {
+                Console.WriteLine($"✅ Port configuration completed: {portResult.ChangedFiles}/{portResult.ProcessedFiles} files updated");
+            }
+            else
+            {
+                Console.WriteLine("ℹ️  No port configuration changes required");
+            }
+
+            // Action 2: Library Rename
             Console.WriteLine();
-            Console.WriteLine("Next steps:");
-            Console.WriteLine("1. Run 'dotnet build' to verify the solution builds correctly");
-            Console.WriteLine("2. For Aspire projects, run 'dotnet run --project src/{YourProjectName}.AppHost'");
+            Console.WriteLine("📚 Action 2: Library Rename");
+            Console.WriteLine("═══════════════════════════════");
+            var libraryAction = new LibraryRenameAction();
+            var libraryResult = libraryAction.ProcessMomentumLibImport(projectDir, config);
+
+            if (!libraryResult.Enabled)
+            {
+                Console.WriteLine($"⏭️  Skipped: {libraryResult.SkipReason}");
+            }
+            else if (libraryResult.ChangedFiles > 0)
+            {
+                Console.WriteLine($"✅ Library rename completed: {libraryResult.ChangedFiles}/{libraryResult.ProcessedFiles} files updated");
+                Console.WriteLine($"   → Renamed {libraryResult.ImportedTokens.Count} library tokens to use '{libraryResult.LibPrefix}' prefix");
+            }
+            else
+            {
+                Console.WriteLine("ℹ️  Library rename enabled but no changes required");
+            }
+
+            // Final summary
+            Console.WriteLine();
+            Console.WriteLine("🎉 Post-setup Actions Summary");
+            Console.WriteLine("═══════════════════════════════");
+
+            var totalFilesChanged = portResult.ChangedFiles + libraryResult.ChangedFiles;
+            var totalFilesProcessed = portResult.ProcessedFiles + libraryResult.ProcessedFiles;
+
+            Console.WriteLine($"Total files processed: {totalFilesProcessed}");
+            Console.WriteLine($"Total files changed: {totalFilesChanged}");
+
+            if (portResult.ChangedFiles > 0)
+            {
+                Console.WriteLine();
+                Console.WriteLine("🌐 Port Configuration:");
+                Console.WriteLine($"   Base port: {portResult.BasePort}");
+                Console.WriteLine($"   - Aspire Dashboard: {portResult.BasePort + 10000} (HTTP) / {portResult.BasePort + 10010} (HTTPS)");
+                Console.WriteLine($"   - Aspire Resource Service: {portResult.BasePort} (HTTP) / {portResult.BasePort + 10} (HTTPS)");
+                Console.WriteLine($"   - Main API: {portResult.BasePort + 1} (HTTP) / {portResult.BasePort + 11} (HTTPS) / {portResult.BasePort + 2} (gRPC)");
+                Console.WriteLine($"   - BackOffice: {portResult.BasePort + 3} (HTTP) / {portResult.BasePort + 13} (HTTPS)");
+                Console.WriteLine($"   - Orleans: {portResult.BasePort + 4} (HTTP) / {portResult.BasePort + 14} (HTTPS)");
+                Console.WriteLine($"   - UI/Frontend: {portResult.BasePort + 5} (HTTP) / {portResult.BasePort + 15} (HTTPS)");
+                Console.WriteLine($"   - Documentation: {portResult.BasePort + 19}");
+            }
+
+            if (libraryResult.Enabled && libraryResult.ImportedTokens.Count > 0)
+            {
+                Console.WriteLine();
+                Console.WriteLine($"📦 Library Configuration:");
+                Console.WriteLine($"   Prefix: {libraryResult.LibPrefix}");
+                Console.WriteLine($"   Imported libraries: {string.Join(", ", libraryResult.ImportedTokens)}");
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("📋 Next steps:");
+            Console.WriteLine("   1. Run 'dotnet build' to verify the solution builds correctly");
+            Console.WriteLine($"   2. For Aspire projects, run 'dotnet run --project src/{domainName}.AppHost'");
 
             CleanupPostSetupTools(projectDir);
+
+            Console.WriteLine();
+            Console.WriteLine("✨ All post-setup actions completed successfully!");
 
             return 0;
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Post-setup failed: {ex.Message}");
+            Console.WriteLine();
+            Console.WriteLine($"❌ Post-setup failed: {ex.Message}");
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine($"   Inner exception: {ex.InnerException.Message}");
+            }
             return 1;
         }
     }
 
-    private static int GetBasePortFromArgs(string[] args)
+    private static JsonElement LoadConfig(string projectDir)
     {
-        // Check command line arguments first
-        for (int i = 0; i < args.Length - 1; i++)
+        var configFile = Path.Combine(projectDir, ".local", "tools", "post-setup-config.json");
+        if (!File.Exists(configFile))
         {
-            if (args[i] == "--basePort" && int.TryParse(args[i + 1], out var port))
-            {
-                return port;
-            }
+            throw new InvalidOperationException($"Post-setup config file not found: {configFile}");
         }
 
-        // Try to read from config file (created by template with substituted values)
         try
         {
-            var configFile = Path.Combine(Environment.CurrentDirectory, ".local", "tools", "post-setup-config.json");
-            if (File.Exists(configFile))
-            {
-                var configContent = File.ReadAllText(configFile);
-                var configJson = System.Text.Json.JsonDocument.Parse(configContent);
-                if (configJson.RootElement.TryGetProperty("basePort", out var basePortElement) &&
-                    basePortElement.TryGetInt32(out var configPort))
-                {
-                    return configPort;
-                }
-            }
+            var configContent = File.ReadAllText(configFile);
+            var configDoc = JsonDocument.Parse(configContent);
+            return configDoc.RootElement;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Warning: Could not read post-setup config: {ex.Message}");
+            throw new InvalidOperationException($"Failed to parse post-setup config: {ex.Message}", ex);
         }
-
-        return 8100;
-    }
-
-    private static void ConfigurePorts(string projectDir, int basePort)
-    {
-        Console.WriteLine("Configuring ports in project files...");
-
-        var portMappings = new Dictionary<string, int>
-        {
-            {"8100", basePort},                 // Aspire Resource Service HTTP
-            {"8110", basePort + 10},            // Aspire Resource Service HTTPS
-            {"8101", basePort + 1},             // Main API HTTP
-            {"8111", basePort + 11},            // Main API HTTPS
-            {"8102", basePort + 2},             // Main API gRPC
-            {"8103", basePort + 3},             // BackOffice HTTP
-            {"8113", basePort + 13},            // BackOffice HTTPS
-            {"8104", basePort + 4},             // Orleans HTTP
-            {"8114", basePort + 14},            // Orleans HTTPS
-            {"8105", basePort + 5},             // UI/Frontend HTTP
-            {"8115", basePort + 15},            // UI/Frontend HTTPS
-            {"8119", basePort + 19},            // Documentation
-            {"18100", basePort + 10000},        // Aspire Dashboard HTTP
-            {"18110", basePort + 10010}         // Aspire Dashboard HTTPS
-        };
-
-        var filesToUpdate = FindFilesToUpdate(projectDir);
-
-        foreach (var filePath in filesToUpdate)
-        {
-            try
-            {
-                var content = File.ReadAllText(filePath);
-                var originalContent = content;
-
-                foreach (var mapping in portMappings)
-                {
-                    var patterns = new[]
-                    {
-                        $@"\b{mapping.Key}\b",
-                        $@":{mapping.Key}\b",
-                        $@"localhost:{mapping.Key}\b",
-                        $@"https?://[^:\s]+:{mapping.Key}\b"
-                    };
-
-                    foreach (var pattern in patterns)
-                    {
-                        content = Regex.Replace(content, pattern,
-                            match => match.Value.Replace(mapping.Key.ToString(), mapping.Value.ToString()));
-                    }
-                }
-
-                if (content != originalContent)
-                {
-                    File.WriteAllText(filePath, content);
-                    Console.WriteLine($"Updated ports in: {Path.GetRelativePath(projectDir, filePath)}");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Warning: Could not update ports in {filePath}: {ex.Message}");
-            }
-        }
-    }
-
-    private static List<string> FindFilesToUpdate(string projectDir)
-    {
-        var files = new List<string>();
-        var extensions = new[] { ".cs", ".json", ".yml", ".yaml", ".xml", ".config" };
-
-        foreach (var extension in extensions)
-        {
-            try
-            {
-                var pattern = "*" + extension;
-                var foundFiles = Directory.GetFiles(projectDir, pattern, SearchOption.AllDirectories)
-                    .Where(f => !IsExcludedPath(f))
-                    .ToArray();
-                files.AddRange(foundFiles);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Warning: Error searching for {extension} files: {ex.Message}");
-            }
-        }
-
-        return files;
-    }
-
-    private static bool IsExcludedPath(string filePath)
-    {
-        var excludedDirs = new[] { "bin", "obj", ".git", ".vs", "node_modules", ".local" };
-        return excludedDirs.Any(dir => filePath.Contains($"{Path.DirectorySeparatorChar}{dir}{Path.DirectorySeparatorChar}") ||
-                                      filePath.Contains($"{Path.DirectorySeparatorChar}{dir}"));
     }
 
     private static void CleanupPostSetupTools(string projectDir)
@@ -184,12 +147,13 @@ public static class Program
 
             if (Directory.Exists(postSetupDir))
             {
-                Console.WriteLine("Cleaning up post-setup tools...");
+                Console.WriteLine();
+                Console.WriteLine("🧹 Cleaning up post-setup tools...");
 
                 System.Threading.Thread.Sleep(100);
 
                 Directory.Delete(postSetupDir, recursive: true);
-                
+
                 // Delete config file if it exists
                 var configFile = Path.Combine(toolsDir, "post-setup-config.json");
                 if (File.Exists(configFile))
@@ -210,8 +174,8 @@ public static class Program
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Warning: Could not remove post-setup tools: {ex.Message}");
-            Console.WriteLine("You can safely delete the '.local/tools' directory manually.");
+            Console.WriteLine($"⚠️  Warning: Could not remove post-setup tools: {ex.Message}");
+            Console.WriteLine("   You can safely delete the '.local/tools' directory manually.");
         }
     }
 }

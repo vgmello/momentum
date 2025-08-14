@@ -7,11 +7,9 @@
         <PackageProjectUrl>https://github.com/vgmello/momentum-sample/blob/main/libs/Momentum/src/Momentum.Extensions/README.md</PackageProjectUrl>
     </PropertyGroup>
 
-    <!-- if (!LocalLibs) -->
-    <ItemGroup>
+    <ItemGroup Condition="'$(LibsExt)' == 'False'">
         <None Include="Momentum.Extensions.props" Pack="true" PackagePath="build/" />
     </ItemGroup>
-    <!-- endif -->
 
     <ItemGroup>
         <PackageReference Include="FluentValidation"/>
@@ -20,10 +18,10 @@
         <PackageReference Include="OneOf.SourceGenerator"/>
         <PackageReference Include="Dapper"/>
         <PackageReference Include="WolverineFx"/>
+        <PackageReference Include="Momentum.Extensions.Abstractions" Condition="'$(LibsExt)' == 'True'"/>
     </ItemGroup>
 
-    <ItemGroup>
+    <ItemGroup Condition="'$(LibsExt)' == 'False'">
         <ProjectReference Include="..\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
     </ItemGroup>
-
 </Project>
