@@ -11,10 +11,39 @@
         <NoWarn>$(NoWarn);CS1591</NoWarn>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-        <VersionSuffix>$([System.DateTime]::UtcNow.ToString("yyyyMMdd-HHmmss"))</VersionSuffix>
+    <PropertyGroup Condition=" '$(IsTestProject)' != 'True' ">
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <MomentumVersion>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)version.txt').Trim())</MomentumVersion>
+        <VersionPrefix>$(MomentumVersion)</VersionPrefix>
+        <VersionSuffix Condition=" '$(Configuration)' == 'Debug' ">$([System.DateTime]::UtcNow.ToString("yyyyMMdd-HHmmss"))</VersionSuffix>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Authors>Momentum Contributors</Authors>
+        <Company>Momentum .NET</Company>
+        <Copyright>Copyright © $([System.DateTime]::Now.Year) Momentum</Copyright>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/vgmello/momentum</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageIcon>icon.png</PackageIcon>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageReleaseNotes>https://github.com/vgmello/momentum/releases/tag/v$(PackageVersion)</PackageReleaseNotes>
+        <PackageTags>momentum;mmt;</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup Condition=" '$(IsTestProject)' != 'True' ">
+        <PackageReference Include="Microsoft.SourceLink.GitHub"/>
+        <None Include="..\..\assets\icon.png" Pack="true" PackagePath="" Visible="false"/>
+        <None Include="README.md" Pack="true" PackagePath="\" Visible="false" Condition="Exists('README.md')"/>
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="SonarAnalyzer.CSharp" developmentDependency="true">
@@ -22,5 +51,10 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
     </ItemGroup>
+
+    <Target Name="ValidateMomentumVersion" BeforeTargets="Build">
+        <Error Text="MomentumVersion property is not set. Check version.txt file." Condition="'$(MomentumVersion)' == ''" />
+        <Message Text="Building Momentum Libraries version: $(MomentumVersion)" Importance="high" />
+    </Target>
 
 </Project>

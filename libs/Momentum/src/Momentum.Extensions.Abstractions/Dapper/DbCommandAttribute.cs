@@ -3,31 +3,140 @@
 namespace Momentum.Extensions.Abstractions.Dapper;
 
 /// <summary>
-///     Attribute to define database command properties and behavior for a class.
-///     Triggers generation of a ToDbParams() method. If 'sp', 'sql', or 'fn' is provided,
-///     also triggers generation of a command handler method.
+///     Marks a class for database command code generation, creating efficient data access patterns with minimal boilerplate.
 /// </summary>
-/// <remarks>
-///     Initializes a new instance of the <see cref="DbCommandAttribute" /> class.
-/// </remarks>
-/// <param name="sp">The name of the stored procedure. Mutually exclusive with <paramref name="sql" /> and <paramref name="fn" />.</param>
-/// <param name="sql">The SQL query text. Mutually exclusive with <paramref name="sp" /> and <paramref name="fn" />.</param>
+/// <param name="sp">The name of the stored procedure to execute. Mutually exclusive with <paramref name="sql" /> and <paramref name="fn" />.</param>
+/// <param name="sql">The SQL query text to execute. Mutually exclusive with <paramref name="sp" /> and <paramref name="fn" />.</param>
 /// <param name="fn">
-///     The function SQL query text. Parameters will be auto-generated based on record properties. Mutually exclusive with
-///     <paramref name="sp" /> and <paramref name="sql" />. The '$' prefix on the function name is replaced with 'select * from'
+///     The database function name to call. Parameters are auto-generated from record properties. Mutually exclusive with
+///     <paramref name="sp" /> and <paramref name="sql" />. Use '$' prefix (e.g., "$get_user_orders") to generate "SELECT * FROM get_user_orders(...)" syntax.
 /// </param>
-/// <param name="paramsCase">DB params case</param>
+/// <param name="paramsCase">Specifies how property names are converted to database parameter names. Defaults to global MSBuild configuration.</param>
 /// <param name="nonQuery">
-///     Indicates the nature of the command, with its primary effect on commands implementing ICommand&lt;int&gt;.
-///     Default is true.
+///     Controls the execution strategy for database commands. Default is false.
 ///     <para>
-///         If true: For ICommand&lt;int&gt;, the generated handler uses ExecuteAsync (rows affected). For other ICommand&lt;TResult&gt;, a
-///         diagnostic may be issued.
-///         If false: For ICommand&lt;int&gt;, the generated handler uses ExecuteScalarAsync&lt;int&gt;. For other ICommand&lt;TResult&gt;, a
-///         query is performed.
+///         If true: Uses Dapper's ExecuteAsync() for commands returning row counts (INSERT/UPDATE/DELETE operations).
+///         If false: Uses appropriate query methods (QueryAsync, QueryFirstOrDefaultAsync, ExecuteScalarAsync) based on the return type.
 ///     </para>
 /// </param>
-/// <param name="dataSource">Indicates which datasource to use, which when provided a keyed service will be resolved</param>
+/// <param name="dataSource">The keyed data source name for dependency injection. If null, uses the default registered data source.</param>
+/// <remarks>
+/// <para><strong>Generated Code Behavior:</strong></para>
+/// <para>This attribute triggers the source generator to create:</para>
+/// <list type="number">
+///   <item><strong>ToDbParams() Extension Method:</strong> Converts class properties to Dapper-compatible parameter objects</item>
+///   <item><strong>Command Handler Method:</strong> Static async method that executes the database command (when sp/sql/fn provided)</item>
+/// </list>
+/// 
+/// <para><strong>Command Handler Generation:</strong></para>
+/// <para>Handlers are generated as static methods in a companion class (e.g., CreateUserCommandHandler.HandleAsync) that:</para>
+/// <list type="bullet">
+///   <item>Accept the command object, DbDataSource, and CancellationToken</item>
+///   <item>Open database connections automatically</item>
+///   <item>Map parameters using the generated ToDbParams() method</item>
+///   <item>Execute appropriate Dapper methods based on return type and nonQuery setting</item>
+///   <item>Handle connection disposal and async patterns correctly</item>
+/// </list>
+/// 
+/// <para><strong>Parameter Mapping Rules:</strong></para>
+/// <list type="bullet">
+///   <item>Record properties and primary constructor parameters are automatically mapped</item>
+///   <item>Parameter names follow the paramsCase setting (None, SnakeCase, or global default)</item>
+///   <item>Use [Column("custom_name")] attribute to override specific parameter names</item>
+///   <item>MSBuild property DbCommandParamPrefix adds global prefixes to all parameters</item>
+/// </list>
+/// 
+/// <para><strong>Return Type Handling:</strong></para>
+/// <list type="bullet">
+///   <item><c>ICommand&lt;int/long&gt;</c>: Returns row count (ExecuteAsync) or scalar value (ExecuteScalarAsync)</item>
+///   <item><c>ICommand&lt;TResult&gt;</c>: Returns single object (QueryFirstOrDefaultAsync&lt;TResult&gt;)</item>
+///   <item><c>ICommand&lt;IEnumerable&lt;TResult&gt;&gt;</c>: Returns collection (QueryAsync&lt;TResult&gt;)</item>
+///   <item><c>ICommand</c> (no return type): Executes command without returning data (ExecuteAsync)</item>
+/// </list>
+/// 
+/// <para><strong>MSBuild Integration:</strong></para>
+/// <para>Global configuration through MSBuild properties:</para>
+/// <list type="bullet">
+///   <item><c>DbCommandDefaultParamCase</c>: Sets default parameter case conversion (None, SnakeCase)</item>
+///   <item><c>DbCommandParamPrefix</c>: Adds prefix to all generated parameter names</item>
+/// </list>
+/// 
+/// <para><strong>Requirements:</strong></para>
+/// <list type="bullet">
+///   <item>Target class must implement ICommand&lt;TResult&gt; or IQuery&lt;TResult&gt; (or parameterless versions)</item>
+///   <item>Class must be partial if nested within another type</item>
+///   <item>Only one of sp, sql, or fn can be specified per command</item>
+///   <item>Assembly must reference Momentum.Extensions.SourceGenerators</item>
+/// </list>
+/// </remarks>
+/// <example>
+/// <para><strong>Basic Stored Procedure Command:</strong></para>
+/// <code>
+/// [DbCommand(sp: "create_user")]
+/// public record CreateUserCommand(string Name, string Email) : ICommand&lt;int&gt;;
+/// 
+/// // Generated usage:
+/// var command = new CreateUserCommand("John Doe", "john@example.com");
+/// var userId = await CreateUserCommandHandler.HandleAsync(command, dataSource, cancellationToken);
+/// </code>
+/// 
+/// <para><strong>SQL Query with Custom Parameter Names:</strong></para>
+/// <code>
+/// [DbCommand(sql: "SELECT * FROM users WHERE created_date >= @from_date AND status = @user_status", 
+///           paramsCase: DbParamsCase.SnakeCase)]
+/// public record GetRecentUsersQuery(
+///     [Column("from_date")] DateTime Since,
+///     [Column("user_status")] string Status) : IQuery&lt;IEnumerable&lt;User&gt;&gt;;
+/// 
+/// // Generated ToDbParams() creates: { from_date = Since, user_status = Status }
+/// </code>
+/// 
+/// <para><strong>Database Function Call:</strong></para>
+/// <code>
+/// [DbCommand(fn: "$get_user_orders")]
+/// public record GetUserOrdersQuery(int UserId, bool IncludeInactive = false) : IQuery&lt;IEnumerable&lt;Order&gt;&gt;;
+/// 
+/// // Generated SQL: "SELECT * FROM get_user_orders(@UserId, @IncludeInactive)"
+/// </code>
+/// 
+/// <para><strong>Non-Query Command (INSERT/UPDATE/DELETE):</strong></para>
+/// <code>
+/// [DbCommand(sql: "UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = @UserId", nonQuery: true)]
+/// public record UpdateLastLoginCommand(int UserId) : ICommand&lt;int&gt;;
+/// 
+/// // Returns number of affected rows
+/// </code>
+/// 
+/// <para><strong>Repository Integration Pattern:</strong></para>
+/// <code>
+/// public class UserRepository
+/// {
+///     private readonly DbDataSource _dataSource;
+///     
+///     public UserRepository(DbDataSource dataSource) => _dataSource = dataSource;
+///     
+///     public async Task&lt;int&gt; CreateUserAsync(string name, string email, CancellationToken ct = default)
+///     {
+///         var command = new CreateUserCommand(name, email);
+///         return await CreateUserCommandHandler.HandleAsync(command, _dataSource, ct);
+///     }
+///     
+///     public async Task&lt;IEnumerable&lt;User&gt;&gt; GetRecentUsersAsync(DateTime since, string status, CancellationToken ct = default)
+///     {
+///         var query = new GetRecentUsersQuery(since, status);
+///         return await GetRecentUsersQueryHandler.HandleAsync(query, _dataSource, ct);
+///     }
+/// }
+/// </code>
+/// 
+/// <para><strong>Dependency Injection with Named Data Sources:</strong></para>
+/// <code>
+/// [DbCommand(sp: "archive_old_orders", dataSource: "ArchiveDatabase")]
+/// public record ArchiveOldOrdersCommand(DateTime OlderThan) : ICommand&lt;int&gt;;
+/// 
+/// // Generated handler will resolve keyed service: [FromKeyedServices("ArchiveDatabase")] DbDataSource dataSource
+/// </code>
+/// </example>
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
 public sealed class DbCommandAttribute(
     string? sp = null,
