@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
         <IsTestProject>true</IsTestProject>
     </PropertyGroup>
@@ -27,5 +26,4 @@
             <HintPath>..\..\src\Momentum.Extensions.SourceGenerators\bin\$(Configuration)\netstandard2.1\Momentum.Extensions.SourceGenerators.dll</HintPath>
         </Reference>
     </ItemGroup>
-
 </Project>

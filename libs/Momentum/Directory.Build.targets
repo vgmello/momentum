@@ -1,5 +1,4 @@
 <Project>
-
     <Target Name="CleanOldPackages" AfterTargets="Build" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' ">
         <ItemGroup>
             <OldPackagesToDelete Include="$(MSBuildProjectDirectory)/$(PackageOutputPath)*.nupkg"/>
@@ -14,5 +13,4 @@
         <MakeDir Directories="$(SolutionDir).local/nuget"/>
         <Exec Command="dotnet nuget push &quot;$(PackageOutputPath)$(PackageId).$(PackageVersion).nupkg&quot; --source &quot;$(SolutionDir).local/nuget&quot; --skip-duplicate"/>
     </Target>
-
 </Project>

@@ -9,6 +9,7 @@
   </Folder>
   <Folder Name="/Template/">
     <Project Path="..\..\.template.config\tools\post-setup\PostSetup.csproj" Type="Classic C#" />
+    <Project Path="Momentum.Template.csproj" Type="Classic C#" />
   </Folder>
   <Folder Name="/Tests/">
     <Project Path="tests\Momentum.Extensions.EventMarkdownGenerator.Tests\Momentum.Extensions.EventMarkdownGenerator.Tests.csproj" />

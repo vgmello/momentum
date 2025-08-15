@@ -1,5 +1,4 @@
 <Project>
-
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
@@ -41,7 +40,7 @@
 
     <ItemGroup Condition=" '$(IsTestProject)' != 'True' ">
         <PackageReference Include="Microsoft.SourceLink.GitHub"/>
-        <None Include="..\..\assets\icon.png" Pack="true" PackagePath="" Visible="false"/>
+        <None Include="..\..\assets\icon.png" Pack="true" PackagePath="" Visible="false" Condition="Exists('..\..\assets\icon.png')"/>
         <None Include="README.md" Pack="true" PackagePath="\" Visible="false" Condition="Exists('README.md')"/>
     </ItemGroup>
 
@@ -53,8 +52,7 @@
     </ItemGroup>
 
     <Target Name="ValidateMomentumVersion" BeforeTargets="Build">
-        <Error Text="MomentumVersion property is not set. Check version.txt file." Condition="'$(MomentumVersion)' == ''" />
-        <Message Text="Building Momentum Libraries version: $(MomentumVersion)" Importance="high" />
+        <Error Text="MomentumVersion property is not set. Check version.txt file." Condition="'$(MomentumVersion)' == ''"/>
+        <Message Text="Building Momentum Libraries version: $(MomentumVersion)" Importance="high"/>
     </Target>
-
 </Project>

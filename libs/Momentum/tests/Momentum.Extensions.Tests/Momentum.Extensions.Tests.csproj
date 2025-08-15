@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
         <IsTestProject>true</IsTestProject>
     </PropertyGroup>
@@ -19,5 +18,4 @@
         <ProjectReference Include="..\..\src\Momentum.Extensions\Momentum.Extensions.csproj"/>
         <ProjectReference Include="..\..\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
     </ItemGroup>
-
 </Project>
