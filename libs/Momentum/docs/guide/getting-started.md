@@ -235,7 +235,9 @@ curl https://localhost:7001/orders/{order-id}
 curl https://localhost:7001/health
 ```
 
-**Congratulations!** You now have a working API with:
+## Conclusion
+
+Congratulations! You now have a working API with:
 
 -   ✅ Structured error handling with Result types
 -   ✅ Built-in health checks and metrics
@@ -255,7 +257,7 @@ In just a few minutes, you added powerful capabilities to your application:
 -   **Resilience**: HTTP client retry and circuit breaker patterns
 -   **Service Discovery**: Automatic endpoint resolution in distributed systems
 
-### Result Types (`Result<T>`)
+### Result Types (`ResultOfT`)
 
 -   **Error Handling**: No more try-catch blocks for business logic
 -   **Type Safety**: Compile-time guarantees about success/failure states
@@ -283,7 +285,7 @@ dotnet add package Momentum.Extensions
 
 **Key Features:**
 
--   **Result<T> Types**: Elegant error handling without exceptions
+-   **ResultOfT Types**: Elegant error handling without exceptions
 -   **Validation Integration**: FluentValidation helpers and extensions
 -   **Data Access**: Enhanced Dapper extensions and LINQ2DB support
 -   **Messaging Abstractions**: Base interfaces for CQRS and event-driven design
