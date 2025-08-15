@@ -18,14 +18,14 @@
         <PackageReference Include="Confluent.Kafka.Extensions.OpenTelemetry"/>
         <!--#if (libs != defaults)
         <PackageReference Include="Momentum.ServiceDefaults"/>
-        -->
+        #endif -->
     </ItemGroup>
 
     <!--#if (libs == defaults) -->
     <ItemGroup>
         <!--#if (libs == defaults)
         <ProjectReference Include="..\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
-        -->
+        #endif -->
     </ItemGroup>
     <!--#endif -->
 

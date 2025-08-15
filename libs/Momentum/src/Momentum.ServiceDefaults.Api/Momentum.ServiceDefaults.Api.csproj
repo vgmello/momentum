@@ -23,17 +23,17 @@
         <PackageReference Include="Scalar.AspNetCore"/>
         <!--#if (libs == api)
         <PackageReference Include="Momentum.Extensions.XmlDocs"/>
-        -->
+        #endif -->
         <!--#if (libs != defaults)
         <PackageReference Include="Momentum.ServiceDefaults"/>
-        -->
+        #endif -->
     </ItemGroup>
 
     <!--#if (libs == defaults) -->
     <ItemGroup>
         <!--#if (libs == defaults)
         <ProjectReference Include="..\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
-        -->
+        #endif -->
     </ItemGroup>
     <!--#endif -->
 

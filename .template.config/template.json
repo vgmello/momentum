@@ -261,7 +261,7 @@
       "include": [
         "docs/**/*",
         "infra/**/*",
-        "libs/**/*",
+        "libs/Momentum/src/**/*",
         "src/**/*",
         "tests/**/*"
       ],
@@ -276,12 +276,8 @@
         "**/.local/**/*",
         "**/.vitepress/cache",
         "**/.vitepress/dist",
-        "libs/Momentum/**/*",
-        "libs/Momentum/assets/**/*",
-        "libs/Momentum/docs/**/*",
         "libs/Momentum/src/Momentum.Extensions.Abstractions/**/*",
-        "libs/Momentum/src/Momentum.Extensions.EventMarkdownGenerator/**/*",
-        "libs/Momentum/tests/**/*"
+        "libs/Momentum/src/Momentum.Extensions.EventMarkdownGenerator/**/*"
       ],
       "modifiers": [
         {

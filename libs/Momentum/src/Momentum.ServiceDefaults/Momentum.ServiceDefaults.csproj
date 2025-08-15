@@ -12,19 +12,19 @@
         </PackageProjectUrl>
     </PropertyGroup>
 
-    <ItemGroup Condition="'$(IncludeLibsDefaults)' != 'True'">
+    <!--#if (libs == none) -->
+    <ItemGroup>
         <None Include="Momentum.ServiceDefaults.props" Pack="true" PackagePath="build/"/>
     </ItemGroup>
+    <!--#endif -->
 
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App"/>
     </ItemGroup>
 
     <!--
-        IMPORTANT Reminder: All the dependencies in this project should be needed by all the Host projects
-    (Api, Backoffice, Orleans, etc.).
-        We want to avoid adding a dependency to a specific Host project type, as it would not be used by
-    the others.
+        IMPORTANT Reminder: All the dependencies in this project should be needed by all the Host projects (Api, Backoffice, Orleans, etc.).
+        We want to avoid adding a dependency to a specific Host project type, as it would not be used by the others.
     -->
 
     <ItemGroup>
@@ -46,7 +46,7 @@
         <PackageReference Include="WolverineFx.Postgresql"/>
         <!--#if (libs != ext)
         <PackageReference Include="Momentum.Extensions"/>
-        -->
+        #endif -->
     </ItemGroup>
 
     <!--#if (libs == none) -->
@@ -59,7 +59,7 @@
     <ItemGroup>
         <!--#if (libs == ext)
         <ProjectReference Include="..\Momentum.Extensions\Momentum.Extensions.csproj"/>
-        -->
+        #endif -->
     </ItemGroup>
     <!--#endif -->
 </Project>
