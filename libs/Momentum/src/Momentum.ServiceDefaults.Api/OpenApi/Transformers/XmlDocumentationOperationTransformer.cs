@@ -14,14 +14,7 @@ namespace Momentum.ServiceDefaults.Api.OpenApi.Transformers;
 ///     Transforms OpenAPI Momentum by enriching them with XML documentation from action methods.
 /// </summary>
 /// <remarks>
-///     This transformer enhances operation specifications with:
-///     <list type="bullet">
-///         <item>Method XML documentation as operation summary and description</item>
-///         <item>Parameter documentation including examples and default values</item>
-///         <item>Response documentation from XML response tags</item>
-///         <item>Return type documentation for successful responses</item>
-///         <item>Default response descriptions for common HTTP status codes</item>
-///     </list>
+///     <!--@include: @code/api/xml-operation-transformer-detailed.md#transformer-overview -->
 /// </remarks>
 public class XmlDocumentationOperationTransformer(
     ILogger<XmlDocumentationOperationTransformer> logger,
@@ -138,10 +131,7 @@ public class XmlDocumentationOperationTransformer(
     }
 
     /// <summary>
-    ///     This method checks if the operation has an auto-produced successful response (e.g., 200 OK) added by the
-    ///     <see cref="AutoProducesResponseTypeConvention" /> (only added if no other 2XX already exists) and replaces
-    ///     the status code with the actual documented successful response code from the XML documentation.
-    ///     If there are no documented successful response code, the auto-produced response is removed.
+    ///     <!--@include: @code/api/xml-operation-transformer-detailed.md#auto-produced-response -->
     /// </summary>
     private static void ReplaceAutoProducedResponseToOperation(OpenApiOperation operation, XmlDocumentationInfo xmlDocs)
     {

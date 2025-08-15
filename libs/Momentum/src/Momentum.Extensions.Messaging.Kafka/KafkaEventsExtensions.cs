@@ -34,24 +34,7 @@ public class KafkaEventsExtensions(
     ///     Sets up distributed event routing for Kafka based on event attributes.
     /// </summary>
     /// <remarks>
-    ///     Features:
-    ///     <list type="bullet">
-    ///         <item>Discovers all distributed event types from domain assemblies</item>
-    ///         <item>Configures Kafka topic routing based on EventTopicAttribute</item>
-    ///         <item>Sets up partition key routing using PartitionKeyAttribute or IDistributedEvent.GetPartitionKey()</item>
-    ///         <item>Generates environment-specific topic names (dev, test, prod)</item>
-    ///         <item>Automatically configures subscriptions based on integration event handlers</item>
-    ///     </list>
-    ///     Integration events are identified by:
-    ///     <list type="bullet">
-    ///         <item>Having their namespace end with "IntegrationEvents"</item>
-    ///         <item>Being decorated with EventTopicAttribute</item>
-    ///     </list>
-    ///     Integration events are identified by:
-    ///     <list type="bullet">
-    ///         <item>Having their namespace end with "DomainEvents"</item>
-    ///         <item>Being decorated with EventTopicAttribute</item>
-    ///     </list>
+    /// <!--@include: @code/messaging/kafka-events-detailed.md -->
     /// </remarks>
     public void Configure(WolverineOptions options)
     {

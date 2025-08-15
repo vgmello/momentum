@@ -28,35 +28,7 @@ public static partial class HealthCheckSetupExtensions
     ///     Configures default health check endpoints for the application.
     /// </summary>
     /// <remarks>
-    ///     This method sets up the following health check endpoints:
-    ///     <list type="table">
-    ///         <item>
-    ///             <term>
-    ///                 <c>/status</c>
-    ///             </term>
-    ///             <description>
-    ///                 A lightweight endpoint returning the status string of the last health check. Used for liveness probes.
-    ///                 <br />
-    ///                 Note: This endpoint does not actually execute any health checks
-    ///             </description>
-    ///         </item>
-    ///         <item>
-    ///             <term>
-    ///                 <c>/health/internal</c>
-    ///             </term>
-    ///             <description>
-    ///                 A container-only endpoint that returns simplified version health status information. Used for readiness
-    ///                 probes in cloud environments.<br />
-    ///                 Locally, this endpoint will return the same information as the <c>/health</c> endpoint.
-    ///             </description>
-    ///         </item>
-    ///         <item>
-    ///             <term>
-    ///                 <c>/health</c>
-    ///             </term>
-    ///             <description>A public endpoint requiring authorization that returns detailed health status information.</description>
-    ///         </item>
-    ///     </list>
+    ///     <!--@include: @code/health/health-check-setup-detailed.md#default-endpoints -->
     /// </remarks>
     public static WebApplication MapDefaultHealthCheckEndpoints(this WebApplication app)
     {

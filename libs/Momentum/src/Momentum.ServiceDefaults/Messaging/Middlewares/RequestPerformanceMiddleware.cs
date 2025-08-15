@@ -12,14 +12,7 @@ namespace Momentum.ServiceDefaults.Messaging.Middlewares;
 ///     Wolverine middleware that tracks message processing performance and logs execution metrics.
 /// </summary>
 /// <remarks>
-///     This middleware:
-///     <list type="bullet">
-///         <item>Records message processing start and end times</item>
-///         <item>Logs message receipt, completion, and failures</item>
-///         <item>Updates messaging metrics for monitoring</item>
-///         <item>Tracks message processing duration</item>
-///     </list>
-///     The middleware is automatically applied to all message handlers via the messaging policy.
+///     <!--@include: @code/messaging/performance-middleware-detailed.md#middleware-overview -->
 /// </remarks>
 public partial class RequestPerformanceMiddleware
 {
@@ -34,8 +27,7 @@ public partial class RequestPerformanceMiddleware
     /// <param name="envelope">The message envelope containing metadata.</param>
     /// <param name="meterStore">The metrics store for recording telemetry.</param>
     /// <remarks>
-    ///     This method captures the start time, logs message receipt, and increments
-    ///     the message received counter in the metrics system.
+    ///     <!--@include: @code/messaging/performance-middleware-detailed.md#pre-processing-setup -->
     /// </remarks>
     public void Before(ILogger logger, Envelope envelope, MessagingMeterStore meterStore)
     {
@@ -56,8 +48,7 @@ public partial class RequestPerformanceMiddleware
     /// <param name="logger">The logger instance.</param>
     /// <param name="envelope">The message envelope containing metadata and failure information.</param>
     /// <remarks>
-    ///     This method calculates the elapsed time, logs the outcome (success or failure),
-    ///     and records the processing duration and any exceptions in the metrics system.
+    ///     <!--@include: @code/messaging/performance-middleware-detailed.md#post-processing-analysis -->
     /// </remarks>
     public void Finally(ILogger logger, Envelope envelope)
     {

@@ -10,15 +10,7 @@ namespace Momentum.Extensions.SourceGenerators.DbCommand;
 ///     Source generator that creates database command handlers and parameter providers for types marked with DbCommandAttribute.
 /// </summary>
 /// <remarks>
-///     This generator:
-///     <list type="bullet">
-///         <item>Generates ToDbParams() extension methods for parameter mapping</item>
-///         <item>Creates Wolverine command handlers for database Momentum</item>
-///         <item>Supports stored procedures, SQL queries, and functions</item>
-///         <item>Handles parameter case conversion (None, SnakeCase)</item>
-///         <item>Respects Column attributes for custom parameter names</item>
-///     </list>
-///     The default parameter case can be configured via MSBuild property: DbCommandDefaultParamCase
+///     <!--@include: @code/source-generation/dbcommand-generator-detailed.md#generator-capabilities -->
 /// </remarks>
 [Generator]
 public class DbCommandSourceGenerator : IIncrementalGenerator

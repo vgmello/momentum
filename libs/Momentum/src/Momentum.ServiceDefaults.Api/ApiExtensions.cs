@@ -22,16 +22,7 @@ public static class ApiExtensions
     /// <param name="builder">The web application builder to configure.</param>
     /// <returns>The configured host application builder for method chaining.</returns>
     /// <remarks>
-    ///     This method configures the following services:
-    ///     <list type="bullet">
-    ///         <item>MVC Controllers with endpoint API explorer</item>
-    ///         <item>Problem Details for standardized error responses</item>
-    ///         <item>OpenAPI with XML documentation support</item>
-    ///         <item>HTTP request/response logging</item>
-    ///         <item>gRPC services with reflection support</item>
-    ///         <item>Authentication and authorization services</item>
-    ///         <item>Kestrel server configuration (removes server header)</item>
-    ///     </list>
+    ///     <!--@include: @code/api/api-extensions-detailed.md#service-configuration -->
     /// </remarks>
     public static IHostApplicationBuilder AddApiServiceDefaults(this WebApplicationBuilder builder)
     {
@@ -70,16 +61,7 @@ public static class ApiExtensions
     /// </param>
     /// <returns>The configured web application for method chaining.</returns>
     /// <remarks>
-    ///     This method configures the following middleware and endpoints:
-    ///     <list type="bullet">
-    ///         <item>HTTP logging middleware</item>
-    ///         <item>Routing, authentication, and authorization middleware</item>
-    ///         <item>gRPC-Web support with default enablement</item>
-    ///         <item>HSTS and exception handling in production</item>
-    ///         <item>OpenAPI, Scalar documentation, and gRPC reflection in development</item>
-    ///         <item>Controller endpoints with optional authorization requirement</item>
-    ///         <item>gRPC service endpoints</item>
-    ///     </list>
+    ///     <!--@include: @code/api/api-extensions-detailed.md#application-configuration -->
     /// </remarks>
     public static WebApplication ConfigureApiUsingDefaults(this WebApplication app, bool requireAuth = true)
     {

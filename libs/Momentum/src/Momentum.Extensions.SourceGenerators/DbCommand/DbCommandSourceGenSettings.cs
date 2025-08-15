@@ -14,50 +14,7 @@ namespace Momentum.Extensions.SourceGenerators.DbCommand;
 ///     Column attribute overrides. Useful for database systems that require parameter prefixes.
 /// </param>
 /// <remarks>
-/// <para><strong>MSBuild Integration:</strong></para>
-/// <para>These settings are configured through MSBuild properties in the project file:</para>
-/// <code>
-/// &lt;Project Sdk="Microsoft.NET.Sdk"&gt;
-///   &lt;PropertyGroup&gt;
-///     &lt;DbCommandDefaultParamCase&gt;SnakeCase&lt;/DbCommandDefaultParamCase&gt;
-///     &lt;DbCommandParamPrefix&gt;p_&lt;/DbCommandParamPrefix&gt;
-///   &lt;/PropertyGroup&gt;
-/// &lt;/Project&gt;
-/// </code>
-/// 
-/// <para><strong>Parameter Name Generation Order:</strong></para>
-/// <list type="number">
-///   <item><strong>Base Name:</strong> Start with C# property name (e.g., "FirstName")</item>
-///   <item><strong>Column Override:</strong> Apply [Column("custom")] if present → "custom"</item>
-///   <item><strong>Case Conversion:</strong> Apply DbCommandDefaultParamCase if no Column attribute → "first_name"</item>
-///   <item><strong>Global Prefix:</strong> Apply DbCommandParamPrefix → "p_first_name"</item>
-/// </list>
-/// 
-/// <para><strong>Configuration Precedence:</strong></para>
-/// <list type="bullet">
-///   <item><strong>Highest:</strong> [Column("name")] attribute on individual properties</item>
-///   <item><strong>Medium:</strong> DbCommandAttribute.ParamsCase on individual commands</item>
-///   <item><strong>Lowest:</strong> Global MSBuild settings (DbCommandDefaultParamCase, DbCommandParamPrefix)</item>
-/// </list>
-/// 
-/// <para><strong>Parameter Case Options:</strong></para>
-/// <list type="bullet">
-///   <item><strong>None:</strong> Use property names as-is (e.g., "FirstName" → "@FirstName")</item>
-///   <item><strong>SnakeCase:</strong> Convert to snake_case (e.g., "FirstName" → "@first_name")</item>
-/// </list>
-/// 
-/// <para><strong>Global Prefix Usage:</strong></para>
-/// <para>The DbCommandParamPrefix is useful for:</para>
-/// <list type="bullet">
-///   <item><strong>Stored Procedure Conventions:</strong> Some teams prefix all SP parameters (e.g., "p_user_id")</item>
-///   <item><strong>Avoiding Keywords:</strong> Prefix to avoid SQL reserved words (e.g., "p_order" instead of "order")</item>
-///   <item><strong>Multi-Tenant Systems:</strong> Different prefixes for different tenant databases</item>
-///   <item><strong>Legacy System Integration:</strong> Match existing database parameter naming conventions</item>
-/// </list>
-/// 
-/// <para><strong>Build-Time Resolution:</strong></para>
-/// <para>These settings are resolved during compilation from the MSBuild context, allowing different
-/// configurations for different build environments (Development, Staging, Production).</para>
+/// <!--@include: @code/source-generation/dbcommand-settings-detailed.md -->
 /// </remarks>
 /// <example>
 /// <para><strong>Example Configuration Effects:</strong></para>

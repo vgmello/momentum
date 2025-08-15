@@ -27,7 +27,9 @@ public static class DistributedEventsDiscovery
     ///     Discovers and retrieves types that represent integration event types
     ///     within the application's domain assemblies.
     /// </summary>
-    /// <remarks>This only applies to "local" domain assemblies</remarks>
+    /// <remarks>
+    ///     <!--@include: @code/messaging/events-discovery-detailed.md#local-domain-discovery -->
+    /// </remarks>
     public static IEnumerable<Type> GetIntegrationEventTypes()
     {
         Assembly[] appAssemblies = [.. DomainAssemblyAttribute.GetDomainAssemblies(), ServiceDefaultsExtensions.EntryAssembly];
@@ -60,8 +62,7 @@ public static class DistributedEventsDiscovery
     ///     focusing specifically on those that have associated handlers.
     /// </summary>
     /// <remarks>
-    ///     This method identifies distributed events by analyzing handler method parameters
-    ///     and ensures that only events with corresponding handlers are included.
+    ///     <!--@include: @code/messaging/events-discovery-detailed.md#handler-associated-events -->
     /// </remarks>
     public static IEnumerable<Type> GetIntegrationEventTypesWithHandlers()
     {

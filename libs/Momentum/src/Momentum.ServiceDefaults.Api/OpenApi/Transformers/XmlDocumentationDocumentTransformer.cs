@@ -14,13 +14,7 @@ namespace Momentum.ServiceDefaults.Api.OpenApi.Transformers;
 ///     Transforms OpenAPI documents by enriching them with XML documentation and assembly metadata.
 /// </summary>
 /// <remarks>
-///     This transformer enhances the OpenAPI specification with:
-///     <list type="bullet">
-///         <item>Controller documentation as tag descriptions</item>
-///         <item>Assembly company information as contact details</item>
-///         <item>Assembly copyright as license information</item>
-///         <item>Assembly version as custom metadata</item>
-///     </list>
+///     <!--@include: @code/api/xml-doc-transformer-detailed.md#transformer-overview -->
 /// </remarks>
 public class XmlDocumentationDocumentTransformer(
     ILogger<XmlDocumentationDocumentTransformer> logger,

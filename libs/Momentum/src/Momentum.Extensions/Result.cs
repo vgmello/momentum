@@ -10,10 +10,7 @@ namespace Momentum.Extensions;
 /// </summary>
 /// <typeparam name="T">The type of the success value.</typeparam>
 /// <remarks>
-///     This class uses the OneOf library to provide a discriminated union pattern,
-///     allowing methods to return either a successful result of type <typeparamref name="T" />
-///     or a list of validation failures. This is particularly useful for command handlers
-///     and other Momentum that need to communicate validation errors without throwing exceptions.
+///     <!--@include: @code/patterns/result-detailed.md#overview -->
 /// </remarks>
 /// <example>
 ///     <code>

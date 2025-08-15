@@ -17,12 +17,7 @@ public static class PartitionKeyProviderFactory
     /// </summary>
     /// <typeparam name="TMessage">The type of the object containing the partition key properties.</typeparam>
     /// <remarks>
-    ///     This method is called on every event published, therefore performance is important, that is why I'm using expression trees
-    ///     instead of reflection.
-    ///     <para>
-    ///         Generated Code:
-    ///         <code>instance => {partitionKeyProperty1}.ToString() + "-" +  {partitionKeyProperty2}.ToString()...</code>
-    ///     </para>
+    ///     <!--@include: @code/messaging/partition-key-provider-detailed.md#performance-optimized -->
     /// </remarks>
     public static Func<TMessage, string>? GetPartitionKeyFunction<TMessage>()
     {

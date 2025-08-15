@@ -12,54 +12,10 @@ namespace Momentum.ServiceDefaults.Messaging;
 ///     Configuration options for the Wolverine service bus and messaging infrastructure.
 /// </summary>
 /// <remarks>
-///     <para>This class configures the core messaging infrastructure used for CQRS patterns,
-///     event-driven architecture, and cross-service communication. It integrates with
-///     PostgreSQL for message persistence and supports CloudEvents for standardized messaging.</para>
-///     
-///     <para>The configuration automatically derives service names and URNs from the application
-///     assembly name, following domain-driven design patterns where the assembly name reflects
-///     the business domain.</para>
+/// <!--@include: @code/service-configuration/service-bus-options-detailed.md -->
 /// </remarks>
 /// <example>
-///     <para><strong>Basic Configuration in appsettings.json:</strong></para>
-///     <code>
-/// {
-///   "ServiceBus": {
-///     "Domain": "ECommerce",
-///     "PublicServiceName": "order-service",
-///     "CloudEvents": {
-///       "Source": "https://api.mystore.com/orders",
-///       "DefaultType": "com.mystore.orders"
-///     }
-///   },
-///   "ConnectionStrings": {
-///     "ServiceBus": "Host=postgres;Database=order_messaging;Username=app;Password=secret"
-///   }
-/// }
-/// </code>
-///     
-///     <para><strong>Multi-Environment Configuration:</strong></para>
-///     <code>
-/// // appsettings.Development.json
-/// {
-///   "ServiceBus": {
-///     "Domain": "ECommerce",
-///     "PublicServiceName": "order-service-dev"
-///   }
-/// }
-/// 
-/// // appsettings.Production.json
-/// {
-///   "ServiceBus": {
-///     "Domain": "ECommerce", 
-///     "PublicServiceName": "order-service",
-///     "CloudEvents": {
-///       "Source": "https://api.production.mystore.com/orders",
-///       "Subject": "orders"
-///     }
-///   }
-/// }
-/// </code>
+/// <!--@include: @code/examples/service-bus-options-examples.md -->
 /// </example>
 public class ServiceBusOptions
 {
@@ -79,8 +35,7 @@ public class ServiceBusOptions
     ///     For example, if the assembly is "ECommerce.OrderService", the domain defaults to "ECommerce".
     /// </value>
     /// <remarks>
-    ///     This property is used to group related services and organize message routing.
-    ///     It should represent the business domain rather than technical concerns.
+    /// See <see cref="ServiceBusOptions"/> for detailed configuration information.
     /// </remarks>
     public string Domain { get; set; } = GetDomainName();
 
@@ -92,16 +47,7 @@ public class ServiceBusOptions
     ///     application name converted to lowercase with dots replaced by hyphens.
     /// </value>
     /// <remarks>
-    ///     <para>This name is used for:</para>
-    ///     <list type="bullet">
-    ///         <item>Message routing and topic naming</item>
-    ///         <item>Service discovery and registration</item>
-    ///         <item>CloudEvents source identification</item>
-    ///         <item>Database schema naming for message persistence</item>
-    ///     </list>
-    ///     
-    ///     <para>The name should be stable across deployments and follow DNS naming conventions
-    ///     (lowercase, hyphens, no underscores).</para>
+    /// See <see cref="ServiceBusOptions"/> for detailed configuration information.
     /// </remarks>
     /// <example>
     ///     <para>Examples of good service names:</para>
@@ -122,26 +68,10 @@ public class ServiceBusOptions
     ///     identifies this service within the messaging infrastructure.
     /// </value>
     /// <remarks>
-    ///     <para>This URN is automatically generated during configuration and used for:</para>
-    ///     <list type="bullet">
-    ///         <item>Message routing and subscription patterns</item>
-    ///         <item>Service identification in distributed tracing</item>
-    ///         <item>Dead letter queue naming</item>
-    ///         <item>Health check endpoint registration</item>
-    ///     </list>
-    ///     
-    ///     <para>The URN format ensures uniqueness across different domains and services
-    ///     while maintaining readability and following URI conventions.</para>
+    /// See <see cref="ServiceBusOptions"/> for detailed configuration information.
     /// </remarks>
     /// <example>
-    ///     <para>Example URNs generated from configuration:</para>
-    ///     <code>
-    /// // Domain: "ECommerce", PublicServiceName: "order-service"
-    /// // Generated URN: "/e_commerce/order-service"
-    /// 
-    /// // Domain: "CustomerManagement", PublicServiceName: "customer-api"  
-    /// // Generated URN: "/customer_management/customer-api"
-    /// </code>
+    /// See class-level examples in <see cref="ServiceBusOptions"/>.
     /// </example>
     public Uri ServiceUrn { get; private set; } = null!;
 
@@ -153,50 +83,10 @@ public class ServiceBusOptions
     ///     settings for event formatting and routing.
     /// </value>
     /// <remarks>
-    ///     <para>CloudEvents provides a standardized format for event data, enabling
-    ///     interoperability between different services and platforms. This configuration
-    ///     controls how events are formatted when published to external systems.</para>
-    ///     
-    ///     <para>Key CloudEvents properties configured:</para>
-    ///     <list type="bullet">
-    ///         <item><strong>Source:</strong> URI identifying the event producer</item>
-    ///         <item><strong>Type:</strong> Event type for categorization and routing</item>
-    ///         <item><strong>Subject:</strong> Subject of the event for filtering</item>
-    ///         <item><strong>DataContentType:</strong> Format of the event data</item>
-    ///     </list>
+    /// See <see cref="ServiceBusOptions"/> for detailed configuration information.
     /// </remarks>
     /// <example>
-    ///     <para><strong>CloudEvents Configuration:</strong></para>
-    ///     <code>
-    /// {
-    ///   "ServiceBus": {
-    ///     "CloudEvents": {
-    ///       "Source": "https://api.mystore.com/orders",
-    ///       "DefaultType": "com.mystore.orders",
-    ///       "Subject": "orders",
-    ///       "DataContentType": "application/json"
-    ///     }
-    ///   }
-    /// }
-    /// </code>
-    ///     
-    ///     <para><strong>Generated CloudEvent Example:</strong></para>
-    ///     <code>
-    /// {
-    ///   "specversion": "1.0",
-    ///   "type": "com.mystore.orders.order-created",
-    ///   "source": "https://api.mystore.com/orders",
-    ///   "subject": "orders/12345",
-    ///   "id": "550e8400-e29b-41d4-a716-446655440000",
-    ///   "time": "2024-01-15T10:30:00Z",
-    ///   "datacontenttype": "application/json",
-    ///   "data": {
-    ///     "orderId": "12345",
-    ///     "customerId": "67890",
-    ///     "totalAmount": 99.99
-    ///   }
-    /// }
-    /// </code>
+    /// See class-level examples in <see cref="ServiceBusOptions"/>.
     /// </example>
     public CloudEventsSettings CloudEvents { get; set; } = new();
 
@@ -209,16 +99,10 @@ public class ServiceBusOptions
     ///     DNS naming, Kubernetes services, and message routing.
     /// </returns>
     /// <remarks>
-    ///     This method ensures service names are compatible with various infrastructure
-    ///     components that require DNS-compliant names, including Kubernetes services,
-    ///     Docker containers, and message broker topics.
+    /// See <see cref="ServiceBusOptions"/> for detailed configuration information.
     /// </remarks>
     /// <example>
-    ///     <code>
-    /// GetServiceName("ECommerce.OrderService") // Returns: "ecommerce-orderservice"
-    /// GetServiceName("Customer.API") // Returns: "customer-api"
-    /// GetServiceName("payment-processor") // Returns: "payment-processor"
-    /// </code>
+    /// See class-level examples in <see cref="ServiceBusOptions"/>.
     /// </example>
     public static string GetServiceName(string appName) => appName.ToLowerInvariant().Replace('.', '-');
 
@@ -235,18 +119,7 @@ public class ServiceBusOptions
     ///     Post-configuration processor that validates and completes ServiceBus configuration after binding.
     /// </summary>
     /// <remarks>
-    ///     <para>This configurator runs after the options have been bound from configuration
-    ///     and performs final setup including:</para>
-    ///     <list type="bullet">
-    ///         <item>Setting default PublicServiceName if not provided</item>
-    ///         <item>Generating the service URN from domain and service name</item>
-    ///         <item>Validating required connection strings</item>
-    ///         <item>Logging configuration warnings for missing dependencies</item>
-    ///     </list>
-    ///     
-    ///     <para>The configurator follows the .NET options pattern for post-configuration
-    ///     processing, ensuring all derived values are computed correctly even when
-    ///     base configuration is incomplete.</para>
+    /// See <see cref="ServiceBusOptions"/> for detailed configuration information.
     /// </remarks>
     public class Configurator(ILogger<Configurator> logger, IHostEnvironment env, IConfiguration config)
         : IPostConfigureOptions<ServiceBusOptions>
@@ -257,44 +130,10 @@ public class ServiceBusOptions
         /// <param name="name">The name of the options instance being configured.</param>
         /// <param name="options">The options instance to post-configure.</param>
         /// <remarks>
-        ///     <para>This method performs the following configuration steps:</para>
-        ///     <list type="number">
-        ///         <item>Sets PublicServiceName to a default derived from the application name if not specified</item>
-        ///         <item>Generates the ServiceUrn by combining the domain (in snake_case) with the service name</item>
-        ///         <item>Validates that required connection strings are present</item>
-        ///         <item>Logs appropriate warnings for missing or incomplete configuration</item>
-        ///     </list>
-        ///     
-        ///     <para>Configuration validation includes checking for the ServiceBus connection string,
-        ///     which is required for message persistence, transactional inbox/outbox patterns,
-        ///     and reliable message delivery.</para>
+        /// See <see cref="ServiceBusOptions"/> for detailed configuration information.
         /// </remarks>
         /// <example>
-        ///     <para><strong>Automatic Configuration Example:</strong></para>
-        ///     <code>
-        /// // Given application name: "ECommerce.OrderService"
-        /// // And configuration:
-        /// {
-        ///   "ServiceBus": {
-        ///     "Domain": "ECommerce"
-        ///     // PublicServiceName not specified
-        ///   }
-        /// }
-        /// 
-        /// // After post-configuration:
-        /// // PublicServiceName = "ecommerce-orderservice" (derived from app name)
-        /// // ServiceUrn = "/e_commerce/ecommerce-orderservice" (generated URN)
-        /// </code>
-        ///     
-        ///     <para><strong>Warning Scenarios:</strong></para>
-        ///     <code>
-        /// // Missing connection string warning:
-        /// // "ConnectionStrings:ServiceBus is not set. Transactional Inbox/Outbox 
-        /// //  and Message Persistence features disabled"
-        /// 
-        /// // This allows the application to start without messaging persistence
-        /// // but logs a clear warning about reduced functionality
-        /// </code>
+        /// See class-level examples in <see cref="ServiceBusOptions"/>.
         /// </example>
         public void PostConfigure(string? name, ServiceBusOptions options)
         {

@@ -12,9 +12,7 @@ namespace Momentum.Extensions.XmlDocs;
 ///     Provides services for loading and retrieving XML documentation comments from compiled assemblies.
 /// </summary>
 /// <remarks>
-///     This service parses XML documentation files generated during compilation and provides
-///     methods to retrieve documentation for types, methods, properties, and other members.
-///     Documentation is cached for performance after initial loading.
+///     <!--@include: @code/xml-docs/xml-documentation-service-detailed.md#service-overview -->
 /// </remarks>
 public class XmlDocumentationService(ILogger<XmlDocumentationService> logger) : IXmlDocumentationService
 {

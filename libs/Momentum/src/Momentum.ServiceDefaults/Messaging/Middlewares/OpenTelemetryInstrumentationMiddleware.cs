@@ -11,13 +11,7 @@ namespace Momentum.ServiceDefaults.Messaging.Middlewares;
 ///     Wolverine middleware that provides OpenTelemetry distributed tracing for message processing.
 /// </summary>
 /// <remarks>
-///     This middleware creates activity spans for each message being processed, enabling:
-///     <list type="bullet">
-///         <item>Distributed tracing across service boundaries</item>
-///         <item>Message type and operation type tagging</item>
-///         <item>Error tracking and status reporting</item>
-///         <item>Correlation of message processing in observability platforms</item>
-///     </list>
+///     <!--@include: @code/messaging/telemetry-middleware-detailed.md#middleware-overview -->
 /// </remarks>
 public static class OpenTelemetryInstrumentationMiddleware
 {
@@ -28,13 +22,7 @@ public static class OpenTelemetryInstrumentationMiddleware
     /// <param name="envelope">The message envelope containing metadata.</param>
     /// <returns>The started activity, or null if tracing is not enabled.</returns>
     /// <remarks>
-    ///     This method creates an activity with tags for:
-    ///     <list type="bullet">
-    ///         <item>message.id - The unique message identifier</item>
-    ///         <item>message.name - The full type name of the message</item>
-    ///         <item>operation.type - Whether it's a command or query</item>
-    ///         <item>message.source - The source of the message (if available)</item>
-    ///     </list>
+    ///     <!--@include: @code/messaging/telemetry-middleware-detailed.md#activity-creation -->
     /// </remarks>
     public static Activity? Before(ActivitySource activitySource, Envelope envelope)
     {
@@ -77,8 +65,7 @@ public static class OpenTelemetryInstrumentationMiddleware
     /// <param name="activity">The activity to complete.</param>
     /// <param name="envelope">The message envelope containing processing results.</param>
     /// <remarks>
-    ///     Sets the activity status to OK for successful processing or Error with
-    ///     exception details if the message processing failed.
+    ///     <!--@include: @code/messaging/telemetry-middleware-detailed.md#activity-completion -->
     /// </remarks>
     public static void Finally(Activity? activity, Envelope envelope)
     {

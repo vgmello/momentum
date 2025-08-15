@@ -14,16 +14,7 @@ namespace Momentum.ServiceDefaults.Api.OpenApi;
 ///     Middleware that caches OpenAPI documentation to improve performance.
 /// </summary>
 /// <remarks>
-///     This middleware:
-///     <list type="bullet">
-///         <item>Intercepts OpenAPI document requests</item>
-///         <item>Loads XML documentation on first request</item>
-///         <item>Caches generated OpenAPI documents to disk</item>
-///         <item>Serves cached responses with proper ETag headers</item>
-///         <item>Supports both JSON and YAML formats</item>
-///         <item>Handles conditional requests (304 Not Modified)</item>
-///     </list>
-///     The cache is stored in the system temp directory and persists across application restarts.
+///     <!--@include: @code/api/openapi-caching-detailed.md#middleware-overview -->
 /// </remarks>
 public class OpenApiCachingMiddleware(
     ILogger<OpenApiCachingMiddleware> logger,
