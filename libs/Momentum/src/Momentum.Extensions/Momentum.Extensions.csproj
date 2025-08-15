@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
         <IsPackable>true</IsPackable>
         <PackageId>Momentum.Extensions</PackageId>
@@ -10,9 +9,11 @@
         <PackageProjectUrl>https://github.com/vgmello/momentum/blob/main/libs/Momentum/src/Momentum.Extensions/README.md</PackageProjectUrl>
     </PropertyGroup>
 
-    <ItemGroup Condition="'$(IncludeLibsExt)' == ''">
+    <!--#if (libs == none) -->
+    <ItemGroup>
         <None Include="Momentum.Extensions.props" Pack="true" PackagePath="build/"/>
     </ItemGroup>
+    <!--#endif -->
 
     <ItemGroup>
         <PackageReference Include="FluentValidation"/>
@@ -21,11 +22,14 @@
         <PackageReference Include="OneOf.SourceGenerator"/>
         <PackageReference Include="Dapper"/>
         <PackageReference Include="WolverineFx"/>
-        <PackageReference Include="Momentum.Extensions.Abstractions" Condition="'$(IncludeLibsExt)' == 'True'"/>
+        <!--#if (libs == ext)
+        <PackageReference Include="Momentum.Extensions.Abstractions"/>
+        #endif -->
     </ItemGroup>
 
-    <ItemGroup Condition="'$(IncludeLibsExt)' == ''">
+    <!--#if (libs == none) -->
+    <ItemGroup>
         <ProjectReference Include="..\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
     </ItemGroup>
-
+    <!--#endif -->
 </Project>

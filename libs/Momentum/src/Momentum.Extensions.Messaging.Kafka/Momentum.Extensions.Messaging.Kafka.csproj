@@ -1,10 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
         <IsPackable>true</IsPackable>
         <PackageId>Momentum.Extensions.Messaging.Kafka</PackageId>
-        <PackageDescription>Kafka messaging integration for Momentum platform providing event-driven communication through Apache Kafka with CloudEvents, WolverineFx, and OpenTelemetry support.</PackageDescription>
-        <PackageProjectUrl>https://github.com/vgmello/momentum/blob/main/libs/Momentum/src/Momentum.Extensions.Messaging.Kafka/README.md</PackageProjectUrl>
+        <PackageDescription>Kafka messaging integration for Momentum platform providing event-driven
+            communication through Apache Kafka with CloudEvents, WolverineFx, and OpenTelemetry
+            support.
+        </PackageDescription>
+        <PackageProjectUrl>
+            https://github.com/vgmello/momentum/blob/main/libs/Momentum/src/Momentum.Extensions.Messaging.Kafka/README.md
+        </PackageProjectUrl>
     </PropertyGroup>
 
     <ItemGroup>
@@ -12,16 +16,23 @@
         <PackageReference Include="CloudNative.CloudEvents.Kafka"/>
         <PackageReference Include="WolverineFx.Kafka"/>
         <PackageReference Include="Confluent.Kafka.Extensions.OpenTelemetry"/>
-        <PackageReference Include="Momentum.ServiceDefaults" Condition="'$(IncludeLibsDefaults)' == 'False'"/>
+        <!--#if (libs != defaults)
+        <PackageReference Include="Momentum.ServiceDefaults"/>
+        -->
     </ItemGroup>
 
-    <ItemGroup Condition="'$(IncludeLibsKafka)' == ''">
+    <!--#if (libs == defaults) -->
+    <ItemGroup>
+        <!--#if (libs == defaults)
+        <ProjectReference Include="..\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
+        -->
+    </ItemGroup>
+    <!--#endif -->
+
+    <!--#if (libs == none) -->
+    <ItemGroup>
         <ProjectReference Include="..\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
         <ProjectReference Include="..\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
     </ItemGroup>
-
-    <ItemGroup Condition="'$(IncludeLibsDefaults)' == 'True'">
-        <ProjectReference Include="..\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj" Condition="'$(IncludeLibsDefaults)' == 'True'"/>
-    </ItemGroup>
-
+    <!--#endif -->
 </Project>

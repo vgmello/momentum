@@ -10,21 +10,34 @@
 
     <ItemGroup>
         <PackageReference Include="Aspire.Hosting.AppHost"/>
-        <PackageReference Include="Aspire.Hosting.Kafka" Condition="'$(UseKafka)' == 'True'"/>
-        <PackageReference Include="Aspire.Hosting.PostgreSQL" Condition="'$(UsePgsql)' == 'True'"/>
-        <PackageReference Include="Aspire.Hosting.Azure.Storage" Condition="'$(IncludeOrleans)' == 'True'"/>
-        <PackageReference Include="Aspire.Hosting.Orleans" Condition="'$(IncludeOrleans)' == 'True'"/>
-        <PackageReference Include="Aspire.Hosting.NodeJS" Condition="'$(IncludeDocs)' == 'True'"/>
+        <!--#if (USE_KAFKA) -->
+        <PackageReference Include="Aspire.Hosting.Kafka"/>
+        <!--#endif -->
+        <!--#if (USE_PGSQL) -->
+        <PackageReference Include="Aspire.Hosting.PostgreSQL"/>
+        <!--#endif -->
+        <!--#if (INCLUDE_ORLEANS) -->
+        <PackageReference Include="Aspire.Hosting.Azure.Storage"/>
+        <PackageReference Include="Aspire.Hosting.Orleans"/>
+        <!--#endif -->
+        <!--#if (INCLUDE_DOCS) -->
+        <PackageReference Include="Aspire.Hosting.NodeJS"/>
+        <!--#endif -->
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\AppDomain.Api\AppDomain.Api.csproj" Condition="'$(IncludeApi)' == 'True'"/>
-        <ProjectReference Include="..\AppDomain.BackOffice\AppDomain.BackOffice.csproj" Condition="'$(IncludeBackOffice)' == 'True'"/>
-        <ProjectReference Include="..\AppDomain.BackOffice.Orleans\AppDomain.BackOffice.Orleans.csproj" Condition="'$(IncludeOrleans)' == 'True'"/>
+        <!--#if (INCLUDE_API) -->
+        <ProjectReference Include="..\AppDomain.Api\AppDomain.Api.csproj"/>
+        <!--#endif -->
+        <!--#if (INCLUDE_BACK_OFFICE) -->
+        <ProjectReference Include="..\AppDomain.BackOffice\AppDomain.BackOffice.csproj"/>
+        <!--#endif -->
+        <!--#if (INCLUDE_ORLEANS) -->
+        <ProjectReference Include="..\AppDomain.BackOffice.Orleans\AppDomain.BackOffice.Orleans.csproj"/>
+        <!--#endif -->
     </ItemGroup>
 
     <ItemGroup>
         <Using Include="AppDomain.AppHost.Extensions"/>
     </ItemGroup>
-
 </Project>

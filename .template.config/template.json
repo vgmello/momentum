@@ -204,6 +204,12 @@
       "type": "computed",
       "value": "kafka && HAS_BACKEND"
     },
+    "IncludeLibs": {
+      "type": "derived",
+      "valueSource": "INCLUDE_LIBS",
+      "valueTransform": "kebab-case",
+      "replaces": "__INCLUDE_LIBS__"
+    },
     "DefaultOrgName": {
       "type": "generated",
       "generator": "join",
@@ -243,83 +249,11 @@
       "replaces": "app-domain",
       "fileRename": "app-domain"
     },
-    "UsePgsql": {
-      "type": "derived",
-      "valueSource": "USE_PGSQL",
-      "valueTransform": "firstUpperCase",
-      "replaces": "$(UsePgsql)"
-    },
-    "UseKafka": {
-      "type": "derived",
-      "valueSource": "USE_KAFKA",
-      "valueTransform": "firstUpperCase",
-      "replaces": "$(UseKafka)"
-    },
-    "IncludeApi": {
-      "type": "derived",
-      "valueSource": "INCLUDE_API",
-      "valueTransform": "firstUpperCase",
-      "replaces": "$(IncludeApi)"
-    },
-    "IncludeBackOffice": {
-      "type": "derived",
-      "valueSource": "INCLUDE_BACK_OFFICE",
-      "valueTransform": "firstUpperCase",
-      "replaces": "$(IncludeBackOffice)"
-    },
-    "IncludeOrleans": {
-      "type": "derived",
-      "valueSource": "INCLUDE_ORLEANS",
-      "valueTransform": "firstUpperCase",
-      "replaces": "$(IncludeOrleans)"
-    },
-    "IncludeDocs": {
-      "type": "derived",
-      "valueSource": "INCLUDE_DOCS",
-      "valueTransform": "firstUpperCase",
-      "replaces": "$(IncludeDocs)"
-    },
-    "IncludeLibs": {
-      "type": "derived",
-      "valueSource": "INCLUDE_LIBS",
-      "valueTransform": "kebab-case",
-      "replaces": "__INCLUDE_LIBS__"
-    },
-    "IncludeLibsExt": {
-      "type": "derived",
-      "valueSource": "libs == ext",
-      "valueTransform": "firstUpperCase",
-      "replaces": "$(IncludeLibsExt)"
-    },
-    "IncludeLibsGenerators": {
-      "type": "derived",
-      "valueSource": "libs == generators",
-      "valueTransform": "firstUpperCase",
-      "replaces": "$(IncludeLibsGenerators)"
-    },
-    "IncludeLibsDefaults": {
-      "type": "derived",
-      "valueSource": "libs == defaults",
-      "valueTransform": "firstUpperCase",
-      "replaces": "$(IncludeLibsDefaults)"
-    },
-    "IncludeLibsApi": {
-      "type": "derived",
-      "valueSource": "libs == api",
-      "valueTransform": "firstUpperCase",
-      "replaces": "$(IncludeLibsApi)"
-    },
-    "IncludeLibsKafka": {
-      "type": "derived",
-      "valueSource": "libs == kafka",
-      "valueTransform": "firstUpperCase",
-      "replaces": "$(IncludeLibsKafka)"
-    },
-    "LibsNone": {
-      "type": "derived",
-      "valueSource": "libs == none",
-      "valueTransform": "firstUpperCase",
-      "replaces": "$(LibsNone)"
+    "MomentumVersion": {
+      "type": "bind",
+      "binding": "msbuild:MomentumVersion",
+      "replaces": "$(MomentumVersion)",
+      "defaultValue": "0.0.0"
     }
   },
   "sources": [
@@ -414,7 +348,7 @@
           "condition": "(!USE_LIQUIBASE)",
           "exclude": [
             "src/AppDomain.AppHost/Extensions/LiquibaseExtensions.cs",
-            "tests/AppDomain.Tests/Integration/_Internal/Containers/LiquibaseMigrationContainer.cs",
+            "tests/AppDomain.Tests/Integration/_Internal/Containers/LiquibaseMigrationContainer.cs"
           ]
         },
         {
@@ -517,96 +451,6 @@
         "args": "run --project .local/tools/post-setup"
       },
       "continueOnError": true
-    },
-    {
-      "condition": "(INCLUDE_API && project-only)",
-      "description": "Add API project to .slnx",
-      "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
-      "applyFileRenamesToArgs": [
-        "args"
-      ],
-      "args": {
-        "executable": "dotnet",
-        "args": "sln AppDomain.slnx add \"src/AppDomain.Api/AppDomain.Api.csproj\""
-      },
-      "manualInstructions": [
-        {
-          "text": "Run: dotnet sln <YourSolution>.slnx add src/<YourSolution>.Api/<YourSolution>.Api.csproj"
-        }
-      ],
-      "continueOnError": true
-    },
-    {
-      "condition": "(INCLUDE_BACK_OFFICE && project-only)",
-      "description": "Add BackOffice project to .slnx",
-      "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
-      "applyFileRenamesToArgs": [
-        "args"
-      ],
-      "args": {
-        "executable": "dotnet",
-        "args": "sln AppDomain.slnx add \"src/AppDomain.BackOffice/AppDomain.BackOffice.csproj\""
-      },
-      "manualInstructions": [
-        {
-          "text": "Run: dotnet sln <YourSolution>.slnx add src/<YourSolution>.BackOffice/<YourSolution>.BackOffice.csproj"
-        }
-      ],
-      "continueOnError": true
-    },
-    {
-      "condition": "(INCLUDE_ORLEANS && project-only)",
-      "description": "Add Orleans BackOffice project to .slnx",
-      "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
-      "applyFileRenamesToArgs": [
-        "args"
-      ],
-      "args": {
-        "executable": "dotnet",
-        "args": "sln AppDomain.slnx add \"src/AppDomain.BackOffice.Orleans/AppDomain.BackOffice.Orleans.csproj\""
-      },
-      "manualInstructions": [
-        {
-          "text": "Run: dotnet sln <YourSolution>.slnx add src/<YourSolution>.BackOffice.Orleans/<YourSolution>.BackOffice.Orleans.csproj"
-        }
-      ],
-      "continueOnError": true
-    },
-    {
-      "condition": "(INCLUDE_ASPIRE && project-only)",
-      "description": "Add AppHost project to .slnx",
-      "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
-      "applyFileRenamesToArgs": [
-        "args"
-      ],
-      "args": {
-        "executable": "dotnet",
-        "args": "sln AppDomain.slnx add \"src/AppDomain.AppHost/AppDomain.AppHost.csproj\""
-      },
-      "manualInstructions": [
-        {
-          "text": "Run: dotnet sln <YourSolution>.slnx add src/<YourSolution>.AppHost/<YourSolution>.AppHost.csproj"
-        }
-      ],
-      "continueOnError": true
-    },
-    {
-      "condition": "(INCLUDE_INFRA_DB && project-only)",
-      "description": "Add Database project to .slnx",
-      "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
-      "applyFileRenamesToArgs": [
-        "args"
-      ],
-      "args": {
-        "executable": "dotnet",
-        "args": "sln AppDomain.slnx add \"infra/AppDomain.Database/AppDomain.Database.csproj\""
-      },
-      "manualInstructions": [
-        {
-          "text": "Run: dotnet sln <YourSolution>.slnx add infra/<YourSolution>.Database/<YourSolution>.Database.csproj"
-        }
-      ],
-      "continueOnError": true
     }
   ],
   "SpecialCustomOperations": {
@@ -662,39 +506,9 @@
           }
         }
       ]
-    },
-    "**.csproj": {
-      "operations": [
-        {
-          "type": "conditional",
-          "configuration": {
-            "if": [
-              "<!--#if"
-            ],
-            "else": [
-              "<!--#else"
-            ],
-            "elseif": [
-              "<!--#elseif",
-              "<!--#elif"
-            ],
-            "endif": [
-              "<!--#endif"
-            ],
-            "trim": "true",
-            "wholeLine": "true",
-            "evaluator": "C++"
-          }
-        }
-      ]
     }
   },
   "forms": {
-    "identity": {
-      "identifier": "replace",
-      "pattern": "^(.*)$",
-      "replacement": "$1"
-    },
     "kebab-case": {
       "identifier": "kebabCase"
     },

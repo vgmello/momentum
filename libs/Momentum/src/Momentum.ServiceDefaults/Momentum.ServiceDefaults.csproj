@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
         <IsAspireSharedProject>true</IsAspireSharedProject>
         <IsPackable>true</IsPackable>
@@ -45,15 +44,22 @@
         <PackageReference Include="Serilog.Sinks.OpenTelemetry"/>
         <PackageReference Include="WolverineFx"/>
         <PackageReference Include="WolverineFx.Postgresql"/>
-        <PackageReference Include="Momentum.Extensions" Condition="'$(IncludeLibsExt)' == 'False'"/>
+        <!--#if (libs != ext)
+        <PackageReference Include="Momentum.Extensions"/>
+        -->
     </ItemGroup>
 
-    <ItemGroup Condition="'$(IncludeLibsDefaults)' == ''">
+    <!--#if (libs == none) -->
+    <ItemGroup>
         <ProjectReference Include="..\Momentum.Extensions\Momentum.Extensions.csproj"/>
     </ItemGroup>
+    <!--#endif -->
 
-    <ItemGroup Condition="'$(IncludeLibsExt)' == 'True'">
-        <ProjectReference Include="..\Momentum.Extensions\Momentum.Extensions.csproj" Condition="'$(IncludeLibsExt)' == 'True'"/>
+    <!--#if (libs == ext) -->
+    <ItemGroup>
+        <!--#if (libs == ext)
+        <ProjectReference Include="..\Momentum.Extensions\Momentum.Extensions.csproj"/>
+        -->
     </ItemGroup>
-
+    <!--#endif -->
 </Project>

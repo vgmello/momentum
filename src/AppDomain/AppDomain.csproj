@@ -1,16 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
-        <DbCommandDefaultParamCase Condition="'$(UsePgsql)' == 'True'">SnakeCase</DbCommandDefaultParamCase>
-        <DbCommandParamPrefix Condition="'$(UsePgsql)' == 'True'">p_</DbCommandParamPrefix>
+        <!--#if (USE_PGSQL) -->
+        <DbCommandDefaultParamCase>SnakeCase</DbCommandDefaultParamCase>
+        <DbCommandParamPrefix>p_</DbCommandParamPrefix>
+        <!--#endif -->
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Aspire.Npgsql" Condition="'$(UsePgsql)' == 'True'" />
-        <PackageReference Include="Npgsql" Condition="'$(UsePgsql)' == 'True'" />
-        <PackageReference Include="Riok.Mapperly" />
-        <PackageReference Include="linq2db.AspNet" />
+        <!--#if (USE_PGSQL) -->
+        <PackageReference Include="Aspire.Npgsql"/>
+        <PackageReference Include="Npgsql"/>
+        <!--#endif -->
+        <PackageReference Include="Riok.Mapperly"/>
+        <PackageReference Include="linq2db.AspNet"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -21,28 +24,30 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Momentum.Extensions.Abstractions" />
-        <PackageReference Include="Momentum.Extensions.Extensions"
-            Condition="'$(IncludeLibsExt)' == 'False'" />
-        <PackageReference
-            Include="Momentum.SourceGeneratorsSourceGenerators.Extensions.SourceGenerators"
-            Condition="'$(IncludeLibsGenerators)' == 'False'" />
+        <PackageReference Include="Momentum.Extensions.Abstractions"/>
+        <!--#if (libs != ext) -->
+        <PackageReference Include="Momentum.Extensions"/>
+        <!--#endif -->
+        <!--#if (libs != generators) -->
+        <PackageReference Include="Momentum.SourceGeneratorsSourceGenerators.Extensions.SourceGenerators"/>
+        <!--#endif -->
     </ItemGroup>
 
-    <ItemGroup Condition="'$(IncludeLibsNone)' == 'False'">
+    <ItemGroup>
+        <!--#if (libs == ext) -->
+        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.csproj"/>
+        <!--#endif -->
+        <!--#if (libs == generators) -->
         <ProjectReference
-            Include="..\..\libs\Momentum.Extensions\src\Momentum.Extensions.Extensions\Momentum.Extensions.Extensions.csproj"
-            Condition="'$(LibsExt)' == 'True'" />
-        <ProjectReference
-            Include="..\..\libs\Momentum.SourceGeneratorsSourceGenerators\src\Momentum.SourceGeneratorsSourceGenerators.Extensions.SourceGenerators\Momentum.SourceGeneratorsSourceGenerators.Extensions.SourceGenerators.csproj"
-            OutputItemType="Analyzer" ReferenceOutputAssembly="false"
-            Condition="'$(LibsGenerators)' == 'True'" />
+            Include="..\..\libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.csproj"
+            OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
+        <!--#endif -->
     </ItemGroup>
 
-    <Import
-        Project="..\..\libs\Momentum.Extensions\src\Momentum.Extensions.Extensions\Momentum.Extensions.Extensions.props"
-        Condition="'$(LibsExt)' == 'True'" />
-    <Import
-        Project="..\..\libs\Momentum.SourceGeneratorsSourceGenerators\src\Momentum.SourceGeneratorsSourceGenerators.Extensions.SourceGenerators\Momentum.SourceGeneratorsSourceGenerators.Extensions.SourceGenerators.props"
-        Condition="'$(LibsGenerators)' == 'True'" />
+    <!--#if (libs == ext) -->
+    <Import Project="..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.props"/>
+    <!--#endif -->
+    <!--#if (libs == generators) -->
+    <Import Project="..\..\libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.props"/>
+    <!--#endif -->
 </Project>

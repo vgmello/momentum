@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <PackAsTool>true</PackAsTool>
@@ -48,5 +47,4 @@
             <Content Include="$(ToolsOutputPath)**\*" Pack="true" PackagePath="tools\net9.0\"/>
         </ItemGroup>
     </Target>
-
 </Project>

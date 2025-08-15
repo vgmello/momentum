@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
         <IsAspireSharedProject>true</IsAspireSharedProject>
         <IsPackable>true</IsPackable>
@@ -22,18 +21,27 @@
         <PackageReference Include="Microsoft.AspNetCore.OpenApi"/>
         <PackageReference Include="OpenTelemetry.Extensions.Hosting"/>
         <PackageReference Include="Scalar.AspNetCore"/>
-        <PackageReference Include="Momentum.Extensions.XmlDocs" Condition="'$(IncludeLibsApi)' == 'True'"/>
-        <PackageReference Include="Momentum.ServiceDefaults" Condition="'$(IncludeLibsDefaults)' == 'False'"/>
+        <!--#if (libs == api)
+        <PackageReference Include="Momentum.Extensions.XmlDocs"/>
+        -->
+        <!--#if (libs != defaults)
+        <PackageReference Include="Momentum.ServiceDefaults"/>
+        -->
     </ItemGroup>
 
-    <ItemGroup Condition="'$(IncludeLibsDefaults)' == 'True'">
-        <ProjectReference Include="..\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj" Condition="''$(IncludeLibsDefaults)' == 'True'"/>
+    <!--#if (libs == defaults) -->
+    <ItemGroup>
+        <!--#if (libs == defaults)
+        <ProjectReference Include="..\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
+        -->
     </ItemGroup>
+    <!--#endif -->
 
-    <ItemGroup Condition="'$(IncludeLibsApi)' == ''">
+    <!--#if (libs == none) -->
+    <ItemGroup>
         <ProjectReference Include="..\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
         <ProjectReference Include="..\Momentum.Extensions.XmlDocs\Momentum.Extensions.XmlDocs.csproj"/>
         <ProjectReference Include="..\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
     </ItemGroup>
-
+    <!--#endif -->
 </Project>
