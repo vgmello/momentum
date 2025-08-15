@@ -3,6 +3,7 @@
 using AppDomain.BackOffice.Orleans;
 using AppDomain.BackOffice.Orleans.Infrastructure.Extensions;
 using AppDomain.BackOffice.Orleans.Invoices.Grains;
+using Momentum.Extensions.Messaging.Kafka;
 using Momentum.ServiceDefaults;
 using Momentum.ServiceDefaults.HealthChecks;
 
@@ -11,6 +12,9 @@ using Momentum.ServiceDefaults.HealthChecks;
 var builder = WebApplication.CreateSlimBuilder(args);
 
 builder.AddServiceDefaults();
+//#if (USE_KAFKA)
+builder.AddKafkaMessagingExtensions();
+//#endif
 builder.AddOrleans();
 
 // Application Services

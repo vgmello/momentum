@@ -2,6 +2,7 @@
 
 using AppDomain.BackOffice;
 using AppDomain.Infrastructure;
+using Momentum.Extensions.Messaging.Kafka;
 using Momentum.ServiceDefaults;
 using Momentum.ServiceDefaults.HealthChecks;
 
@@ -10,6 +11,9 @@ using Momentum.ServiceDefaults.HealthChecks;
 var builder = WebApplication.CreateSlimBuilder(args);
 
 builder.AddServiceDefaults();
+//#if (USE_KAFKA)
+builder.AddKafkaMessagingExtensions();
+//#endif
 
 // Application Services
 builder.AddAppDomainServices();

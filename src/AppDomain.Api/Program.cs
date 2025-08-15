@@ -1,6 +1,7 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Infrastructure;
+using Momentum.Extensions.Messaging.Kafka;
 using Momentum.ServiceDefaults;
 using Momentum.ServiceDefaults.Api;
 using Momentum.ServiceDefaults.HealthChecks;
@@ -12,7 +13,7 @@ var builder = WebApplication.CreateSlimBuilder(args);
 builder.AddServiceDefaults();
 builder.AddApiServiceDefaults();
 //#if (USE_KAFKA)
-builder.Services.AddKafkaMessaging(builder.Configuration);
+builder.AddKafkaMessagingExtensions();
 //#endif
 
 // Application Services
