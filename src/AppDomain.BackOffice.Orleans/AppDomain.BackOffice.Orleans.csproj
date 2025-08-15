@@ -21,7 +21,7 @@
         <!--#if (libs != kafka) -->
         <PackageReference Include="Momentum.Extensions.Messaging.Kafka"/>
         <!--#endif -->
-        <PackageReference Include="Wolverine.Kafka"/>
+        <PackageReference Include="WolverineFx.Kafka"/>
         <!--#endif -->
     </ItemGroup>
 

@@ -87,8 +87,8 @@
     <PackageVersion Include="Testcontainers" Version="4.6.0" />
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.6.0" />
     <PackageVersion Include="WolverineFx" Version="4.9.3" />
-    <PackageVersion Include="WolverineFx.Http" Version="3.10.4" />
-    <PackageVersion Include="WolverineFx.Http.FluentValidation" Version="3.10.4" />
+    <PackageVersion Include="WolverineFx.Http" Version="4.9.3" />
+    <PackageVersion Include="WolverineFx.Http.FluentValidation" Version="4.9.3" />
     <PackageVersion Include="WolverineFx.Kafka" Version="4.9.3" />
     <PackageVersion Include="WolverineFx.Postgresql" Version="4.9.3" />
     <PackageVersion Include="Riok.Mapperly" Version="4.2.1" />
