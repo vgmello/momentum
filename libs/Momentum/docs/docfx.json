@@ -5,7 +5,16 @@
       "src": [
         {
           "src": "../src",
-          "files": ["**/bin/Debug/**/Momentum.**.dll", "**/bin/Release/**/Momentum.**.dll"]
+          "files": [
+            "Momentum.Extensions/bin/*/net9.0/Momentum.Extensions.dll",
+            "Momentum.Extensions.Abstractions/bin/*/net9.0/Momentum.Extensions.Abstractions.dll",
+            "Momentum.Extensions.EventMarkdownGenerator/bin/*/net9.0/Momentum.Extensions.EventMarkdownGenerator.dll",
+            "Momentum.Extensions.Messaging.Kafka/bin/*/net9.0/Momentum.Extensions.Messaging.Kafka.dll",
+            "Momentum.Extensions.SourceGenerators/bin/*/net9.0/Momentum.Extensions.SourceGenerators.dll",
+            "Momentum.Extensions.XmlDocs/bin/*/net9.0/Momentum.Extensions.XmlDocs.dll",
+            "Momentum.ServiceDefaults/bin/*/net9.0/Momentum.ServiceDefaults.dll",
+            "Momentum.ServiceDefaults.Api/bin/*/net9.0/Momentum.ServiceDefaults.Api.dll"
+          ]
         }
       ],
       "output": "reference/",
