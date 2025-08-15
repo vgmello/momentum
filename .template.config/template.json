@@ -360,12 +360,13 @@
         {
           "condition": "(!INCLUDE_SAMPLE)",
           "exclude": [
-            "infra/AppDomain.Database/Liquibase/AppDomain/cashiers/**/*",
-            "infra/AppDomain.Database/Liquibase/AppDomain/invoices/**/*",
+            "infra/AppDomain.Database/Liquibase/app_domain/cashiers/**/*",
+            "infra/AppDomain.Database/Liquibase/app_domain/invoices/**/*",
             "src/AppDomain.Api/Cashiers/**/*",
             "src/AppDomain.Api/Invoices/**/*",
             "src/AppDomain.BackOffice.Orleans/Invoices/**/*",
             "src/AppDomain.BackOffice/Invoices/**/*",
+            "src/AppDomain.BackOffice/Messaging/AccountingInboxHandler/**/*",
             "src/AppDomain.BackOffice/Messaging/AppDomainInboxHandler/**/*",
             "src/AppDomain/Cashiers/**/*",
             "src/AppDomain/Invoices/**/*",

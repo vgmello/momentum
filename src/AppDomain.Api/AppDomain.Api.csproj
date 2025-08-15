@@ -28,8 +28,8 @@
 
     <!--#if (libs == defaults) -->
     <Import Project="..\..\libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.props"/>
-    <!--#endif -->
 
+    <!--#endif -->
     <ItemGroup>
         <Protobuf Include="**/Protos/**/*.proto" ProtoRoot="." GrpcServices="Server"/>
     </ItemGroup>

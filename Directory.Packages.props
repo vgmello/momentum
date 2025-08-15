@@ -102,8 +102,8 @@
         <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="4.14.0"/>
         <PackageVersion Include="System.CommandLine" Version="2.0.0-beta4.22272.1"/>
         <PackageVersion Include="System.Text.Json" Version="8.0.0"/>
-        <PackageVersion Include="Momentum.Extensions.Abstractions" Version="$(MomentumVersion)"/>
         <PackageVersion Include="Momentum.Extensions" Version="$(MomentumVersion)"/>
+        <PackageVersion Include="Momentum.Extensions.Abstractions" Version="$(MomentumVersion)"/>
         <PackageVersion Include="Momentum.Extensions.SourceGenerators" Version="$(MomentumVersion)"/>
         <PackageVersion Include="Momentum.ServiceDefaults" Version="$(MomentumVersion)"/>
         <PackageVersion Include="Momentum.ServiceDefaults.Api" Version="$(MomentumVersion)"/>

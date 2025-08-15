@@ -44,7 +44,7 @@ var orleans = builder
 
 #endif
 #if (INCLUDE_API)
-var AppDomainApi = builder
+var app_domainApi = builder
     .AddProject<Projects.AppDomain_Api>("app-domain-api")
     .WithEnvironment("ServiceName", "AppDomain")
     .WithKestrelLaunchProfileEndpoints()
@@ -113,7 +113,7 @@ builder
     .WithHttpEndpoint(port: 8119, targetPort: 5173, name: "http")
     .WithUrlForEndpoint("http", url => url.DisplayText = "App Documentation")
 #if (INCLUDE_API)
-    .WaitFor(AppDomainApi)
+    .WaitFor(app_domainApi)
 #endif
     .WithHttpHealthCheck("/");
 

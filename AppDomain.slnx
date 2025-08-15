@@ -1,30 +1,29 @@
 <Solution>
-<!--#if (INCLUDE_INFRA_DB) -->
+    <!--#if (INCLUDE_INFRA_DB) -->
     <Folder Name="/Infra/">
         <Project Path="infra\AppDomain.Database\AppDomain.Database.csproj"/>
     </Folder>
-<!--#endif -->
-<!--#if (INCLUDE_LIBS) -->
+    <!--#endif -->
+    <!--#if (INCLUDE_LIBS) -->
     <Folder Name="/Libs/">
-    <!--#if (libs == kafka) -->
+        <!--#if (libs == kafka) -->
         <Project Path="libs\Momentum\src\Momentum.Extensions.Messaging.Kafka\Momentum.Extensions.Messaging.Kafka.csproj"/>
-    <!--#endif -->
-    <!--#if (libs == generators) -->
+        <!--#endif -->
+        <!--#if (libs == generators) -->
         <Project Path="libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.csproj"/>
-    <!--#endif -->
-    <!--#if (libs == ext) -->
+        <!--#endif -->
+        <!--#if (libs == ext) -->
         <Project Path="libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.csproj"/>
-    <!--#endif -->
-    <!--#if (libs == api) -->
+        <!--#endif -->
+        <!--#if (libs == api) -->
         <Project Path="libs\Momentum\src\Momentum.ServiceDefaults.Api\Momentum.ServiceDefaults.Api.csproj"/>
-        <Project Path="libs\Momentum\src\Momentum.Extensions.XmlDocs\Momentum.Extensions.XmlDocs.csproj"/>
-    <!--#endif -->
-    <!--#if (libs == defaults) -->
+        <!--#endif -->
+        <!--#if (libs == defaults) -->
         <Project Path="libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
-    <!--#endif -->
+        <!--#endif -->
     </Folder>
     <Folder Name="/Libs/Tests/"/>
-<!--#endif -->
+    <!--#endif -->
     <Folder Name="/Solution Items/">
         <File Path=".dockerignore"/>
         <File Path=".editorconfig"/>
@@ -35,27 +34,27 @@
         <File Path="Directory.Build.props"/>
         <File Path="Directory.Packages.props"/>
         <File Path="README.md"/>
-<!--#if (INCLUDE_DOCS) -->
+        <!--#if (INCLUDE_DOCS) -->
         <Project Path="docs\AppDomain.Docs.csproj"/>
-<!--#endif -->
+        <!--#endif -->
     </Folder>
-<!--#if (HAS_BACKEND) -->
+    <!--#if (HAS_BACKEND) -->
     <Folder Name="/Tests/">
         <Project Path="tests\AppDomain.Tests\AppDomain.Tests.csproj"/>
     </Folder>
     <Project Path="src\AppDomain\AppDomain.csproj"/>
     <Project Path="src\AppDomain.Contracts\AppDomain.Contracts.csproj"/>
-<!--#endif -->
-<!--#if (INCLUDE_API) -->
+    <!--#endif -->
+    <!--#if (INCLUDE_API) -->
     <Project Path="src\AppDomain.Api\AppDomain.Api.csproj"/>
-<!--#endif -->
-<!--#if (INCLUDE_ASPIRE) -->
+    <!--#endif -->
+    <!--#if (INCLUDE_ASPIRE) -->
     <Project Path="src\AppDomain.AppHost\AppDomain.AppHost.csproj"/>
-<!--#endif -->
-<!--#if (INCLUDE_ORLEANS) -->
+    <!--#endif -->
+    <!--#if (INCLUDE_ORLEANS) -->
     <Project Path="src\AppDomain.BackOffice.Orleans\AppDomain.BackOffice.Orleans.csproj"/>
-<!--#endif -->
-<!--#if (INCLUDE_BACK_OFFICE) -->
+    <!--#endif -->
+    <!--#if (INCLUDE_BACK_OFFICE) -->
     <Project Path="src\AppDomain.BackOffice\AppDomain.BackOffice.csproj"/>
-<!--#endif -->
+    <!--#endif -->
 </Solution>
