@@ -1,40 +1,40 @@
-name: 'Calculate Version'
-description: 'Calculate version for releases and pre-releases'
+name: "Calculate Version"
+description: "Calculate version for releases and pre-releases"
 
 inputs:
   version-file:
-    description: 'Path to version file'
+    description: "Path to version file"
     required: false
-    default: 'libs/version.txt'
+    default: "libs/Momentum/version.txt"
   release-type:
-    description: 'Type of release (stable/prerelease)'
+    description: "Type of release (stable/prerelease)"
     required: false
-    default: 'stable'
+    default: "stable"
   check-changes:
-    description: 'Check for consumer-visible changes'
+    description: "Check for consumer-visible changes"
     required: false
-    default: 'false'
+    default: "false"
   change-path:
-    description: 'Path to check for changes'
+    description: "Path to check for changes"
     required: false
-    default: 'libs/'
+    default: "libs/"
 
 outputs:
   version:
-    description: 'Calculated version'
+    description: "Calculated version"
     value: ${{ steps.calculate.outputs.version }}
   tag:
-    description: 'Version tag'
+    description: "Version tag"
     value: ${{ steps.calculate.outputs.tag }}
   skip:
-    description: 'Whether to skip release'
+    description: "Whether to skip release"
     value: ${{ steps.skip-check.outputs.skip }}
   has-prerelease:
-    description: 'Whether pre-releases exist for this version'
+    description: "Whether pre-releases exist for this version"
     value: ${{ steps.check-prerelease.outputs.has_prerelease }}
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - name: Check for consumer-visible changes
       id: changes
@@ -42,25 +42,25 @@ runs:
       shell: bash
       run: |
         echo "🔍 Checking for consumer-visible changes in ${{ inputs.change-path }}..."
-        
+
         # Get changed files
         CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD | grep "^${{ inputs.change-path }}" || true)
-        
+
         if [ -z "$CHANGED_FILES" ]; then
           echo "No changes in ${{ inputs.change-path }}, skipping release"
           echo "skip=true" >> $GITHUB_OUTPUT
           exit 0
         fi
-        
+
         # Filter to consumer-visible changes only
         CONSUMER_CHANGES=$(echo "$CHANGED_FILES" | grep -E '\.(cs|csproj|props|targets)$' | grep -v -E '(Test|\.Tests\.|\.md$|\.gitignore$|\.editorconfig$)' || true)
-        
+
         if [ -z "$CONSUMER_CHANGES" ]; then
           echo "No consumer-visible changes, skipping release"
           echo "skip=true" >> $GITHUB_OUTPUT
           exit 0
         fi
-        
+
         echo "✅ Consumer-visible changes detected"
         echo "skip=false" >> $GITHUB_OUTPUT
 
@@ -83,14 +83,14 @@ runs:
           echo "❌ Error: ${{ inputs.version-file }} not found"
           exit 1
         fi
-        
+
         FILE_VERSION=$(cat ${{ inputs.version-file }} | tr -d '[:space:]')
-        
+
         if ! [[ $FILE_VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
           echo "❌ Error: Invalid version format: $FILE_VERSION"
           exit 1
         fi
-        
+
         echo "📋 File version: $FILE_VERSION"
         echo "version=$FILE_VERSION" >> $GITHUB_OUTPUT
 
@@ -101,12 +101,12 @@ runs:
       run: |
         # Find latest regular release tag
         PREV_TAG=$(git tag -l "v*.*.*" --sort=-v:refname | grep -v 'pre' | head -1)
-        
+
         if [ -z "$PREV_TAG" ]; then
           echo "No previous regular release found"
           PREV_TAG="v0.0.0"
         fi
-        
+
         echo "Previous regular release: $PREV_TAG"
         echo "prev_tag=$PREV_TAG" >> $GITHUB_OUTPUT
         echo "prev_version=$(echo $PREV_TAG | sed 's/^v//')" >> $GITHUB_OUTPUT
@@ -117,15 +117,15 @@ runs:
       shell: bash
       run: |
         FILE_VERSION="${{ steps.file-version.outputs.version }}"
-        
+
         # Check for pre-releases of the target version
         LATEST_PRERELEASE=$(git tag -l "v${FILE_VERSION}-pre.*" --sort=-v:refname | head -1)
-        
+
         if [ -n "$LATEST_PRERELEASE" ]; then
           echo "Found pre-release: $LATEST_PRERELEASE"
           echo "has_prerelease=true" >> $GITHUB_OUTPUT
           echo "latest_prerelease=$LATEST_PRERELEASE" >> $GITHUB_OUTPUT
-          
+
           # Extract sequence number
           SEQUENCE=$(echo $LATEST_PRERELEASE | sed -n 's/.*-pre\.\([0-9]\+\)$/\1/p')
           echo "prerelease_sequence=$SEQUENCE" >> $GITHUB_OUTPUT
@@ -144,12 +144,12 @@ runs:
         HAS_PRERELEASE="${{ steps.check-prerelease.outputs.has_prerelease }}"
         PRERELEASE_SEQUENCE="${{ steps.check-prerelease.outputs.prerelease_sequence }}"
         RELEASE_TYPE="${{ inputs.release-type }}"
-        
+
         # Version comparison function
         version_greater() {
             [ "$(printf '%s\n' "$1" "$2" | sort -V | tail -n1)" = "$1" ]
         }
-        
+
         if [ "$RELEASE_TYPE" == "prerelease" ]; then
           # Calculate pre-release version
           if [ "$HAS_PRERELEASE" == "true" ]; then
@@ -179,11 +179,11 @@ runs:
             echo "ℹ️  Incrementing patch: $PREV_VERSION → $CALCULATED_VERSION"
           fi
         fi
-        
+
         CALCULATED_TAG="v$CALCULATED_VERSION"
-        
+
         echo "📋 Calculated version: $CALCULATED_VERSION"
         echo "📋 Calculated tag: $CALCULATED_TAG"
-        
+
         echo "version=$CALCULATED_VERSION" >> $GITHUB_OUTPUT
         echo "tag=$CALCULATED_TAG" >> $GITHUB_OUTPUT
