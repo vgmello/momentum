@@ -45,9 +45,12 @@ public class DomainAssemblyAttribute(params Type[] typeMarkers) : Attribute
     {
         var targetAssembly = applicationAssembly ?? ServiceDefaultsExtensions.EntryAssembly;
 
-        return targetAssembly.GetCustomAttribute<DomainAssemblyAttribute>()?
-            .DomainAssemblyTypeMarkers
+        var attributes = targetAssembly.GetCustomAttributes<DomainAssemblyAttribute>();
+
+        return attributes
+            .SelectMany(a => a.DomainAssemblyTypeMarkers)
             .Select(t => t.Assembly)
-            .ToImmutableList() ?? [];
+            .Distinct()
+            .ToImmutableList();
     }
 }

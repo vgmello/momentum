@@ -50,6 +50,8 @@ public static class ServiceDefaultsExtensions
     /// </example>
     public static IHostApplicationBuilder AddServiceDefaults(this WebApplicationBuilder builder)
     {
+        builder.UseInitializationLogger();
+
         builder.WebHost.UseKestrelHttpsConfiguration();
 
         builder.AddLogging();
@@ -79,10 +81,10 @@ public static class ServiceDefaultsExtensions
     ///         <item>The entry assembly (your main application assembly)</item>
     ///         <item>All assemblies marked with <see cref="DomainAssemblyAttribute" /></item>
     ///     </list>
-    ///     
+    ///
     ///     Validators are registered as scoped services and integrated with Wolverine's
     ///     message handling pipeline for automatic validation of commands and queries.
-    ///     
+    ///
     ///     This approach supports the Domain-Driven Design pattern where validation
     ///     rules are defined close to the domain entities and business logic.
     /// </remarks>
@@ -112,7 +114,7 @@ public static class ServiceDefaultsExtensions
     ///         <item>Proper log flushing on application shutdown</item>
     ///         <item>Support for containerized environments and orchestrators</item>
     ///     </list>
-    ///     
+    ///
     ///     <para><strong>Supported Wolverine Commands:</strong></para>
     ///     <list type="table">
     ///         <item>
@@ -138,13 +140,12 @@ public static class ServiceDefaultsExtensions
     /// </example>
     public static async Task RunAsync(this WebApplication app, string[] args)
     {
-        app.UseInitializationLogger();
-
         try
         {
             if (args.Length > 0 && WolverineCommands.Contains(args[0]))
             {
                 await app.RunJasperFxCommands(args);
+                return;
             }
 
             await app.RunAsync();
@@ -177,6 +178,6 @@ public static class ServiceDefaultsExtensions
     {
         return Assembly.GetEntryAssembly() ??
                throw new InvalidOperationException(
-                   "Unable to identify entry assembly. Please provide an assembly via the Extensions.AssemblyMarker property.");
+                   "Unable to identify entry assembly. Please provide an assembly via the ServiceDefaultsExtensions.EntryAssembly property.");
     }
 }

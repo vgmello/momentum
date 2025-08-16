@@ -15,10 +15,10 @@ public static class LoggingSetupExtensions
     ///     This ensures that any exceptions or log events during host setup are captured and reported.
     ///     See: https://github.com/serilog/serilog-aspnetcore?tab=readme-ov-file#two-stage-initialization
     /// </summary>
-    public static void UseInitializationLogger(this WebApplication app)
+    public static void UseInitializationLogger(this WebApplicationBuilder builder)
     {
         Log.Logger = new LoggerConfiguration()
-            .ReadFrom.Configuration(app.Configuration)
+            .ReadFrom.Configuration(builder.Configuration)
             .Enrich.FromLogContext()
             .WriteTo.OpenTelemetry()
             .CreateBootstrapLogger();

@@ -108,11 +108,11 @@ public class ServiceBusOptions
 
     private static string GetDomainName()
     {
-        //TODO: make this better, potentially extract an assembly attribute/csproj config
-        var assemblyName = ServiceDefaultsExtensions.EntryAssembly.FullName!;
-        var mainNamespaceIndex = assemblyName.IndexOf('.');
+        // TODO: consider a dedicated assembly attribute or csproj property to override explicitly if needed
+        var simpleName = ServiceDefaultsExtensions.EntryAssembly.GetName().Name!;
+        var mainNamespaceIndex = simpleName.IndexOf('.');
 
-        return mainNamespaceIndex >= 0 ? assemblyName[..mainNamespaceIndex] : assemblyName;
+        return mainNamespaceIndex >= 0 ? simpleName[..mainNamespaceIndex] : simpleName;
     }
 
     /// <summary>

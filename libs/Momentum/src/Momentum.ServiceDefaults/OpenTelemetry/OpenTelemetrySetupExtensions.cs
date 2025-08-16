@@ -71,11 +71,14 @@ public static class OpenTelemetrySetupExtensions
                 {
                     options.Filter = ctx =>
                     {
-                        if (ctx.Request.Path.Value?.StartsWith("/health/") == true)
-                            return false;
+                        var path = ctx.Request.Path.Value;
 
-                        return true;
+                        if (string.IsNullOrEmpty(path)) return true;
+
+                        return !(path.StartsWith("/health", StringComparison.OrdinalIgnoreCase)
+                                 || path.StartsWith("/status", StringComparison.OrdinalIgnoreCase));
                     };
+
                     options.RecordException = true;
                 })
                 .AddHttpClientInstrumentation(options =>
@@ -84,10 +87,7 @@ public static class OpenTelemetrySetupExtensions
                     {
                         var requestPath = message.RequestUri?.AbsolutePath;
 
-                        if (requestPath is null)
-                            return true;
-
-                        return !ExcludedClientPaths.Any(requestPath.Contains);
+                        return requestPath is null || !ExcludedClientPaths.Any(requestPath.Contains);
                     };
 
                     options.RecordException = true;
