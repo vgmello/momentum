@@ -14,6 +14,12 @@
         <!--#if (libs != api) -->
         <PackageReference Include="Momentum.ServiceDefaults.Api"/>
         <!--#endif -->
+        <!--#if (libs != kafka) -->
+        <PackageReference Include="Momentum.Extensions.Messaging.Kafka"/>
+        <!--#endif -->
+        <!--#if (USE_KAFKA) -->
+        <PackageReference Include="WolverineFx.Kafka"/>
+        <!--#endif -->
     </ItemGroup>
 
     <ItemGroup>
@@ -23,6 +29,9 @@
         <!--#endif -->
         <!--#if (libs == api) -->
         <ProjectReference Include="..\..\libs\Momentum\src\Momentum.ServiceDefaults.Api\Momentum.ServiceDefaults.Api.csproj"/>
+        <!--#endif -->
+        <!--#if (libs == kafka) -->
+        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.Messaging.Kafka\Momentum.Extensions.Messaging.Kafka.csproj"/>
         <!--#endif -->
     </ItemGroup>
 

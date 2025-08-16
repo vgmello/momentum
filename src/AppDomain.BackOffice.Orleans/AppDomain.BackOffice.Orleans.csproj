@@ -17,10 +17,10 @@
         <!--#if (libs != defaults) -->
         <PackageReference Include="Momentum.ServiceDefaults"/>
         <!--#endif -->
-        <!--#if (USE_KAFKA) -->
         <!--#if (libs != kafka) -->
         <PackageReference Include="Momentum.Extensions.Messaging.Kafka"/>
         <!--#endif -->
+        <!--#if (USE_KAFKA) -->
         <PackageReference Include="WolverineFx.Kafka"/>
         <!--#endif -->
     </ItemGroup>
