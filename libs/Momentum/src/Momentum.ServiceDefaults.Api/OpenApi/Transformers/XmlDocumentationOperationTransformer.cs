@@ -143,6 +143,10 @@ public class XmlDocumentationOperationTransformer(
             {
                 operation.Responses[successXmlResponse.Key] = autoProducedResponse;
             }
+            else
+            {
+                operation.Responses["200"] = autoProducedResponse;
+            }
 
             operation.Responses.Remove(AutoProducesStatusCode);
         }

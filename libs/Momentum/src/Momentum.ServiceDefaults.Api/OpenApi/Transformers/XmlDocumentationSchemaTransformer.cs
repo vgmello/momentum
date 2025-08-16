@@ -100,7 +100,9 @@ public class XmlDocumentationSchemaTransformer(
 
             if (enumValues.Length > 0)
             {
-                propertySchema.Enum = enumValues.Select(IOpenApiAny (e) => new OpenApiString(e)).ToList();
+                propertySchema.Enum = enumValues
+                    .Select(e => (IOpenApiAny)new OpenApiString(e))
+                    .ToList();
             }
         }
     }

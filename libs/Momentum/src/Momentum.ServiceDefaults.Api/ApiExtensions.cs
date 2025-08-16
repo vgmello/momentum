@@ -80,9 +80,9 @@ public static class ApiExtensions
 
         if (app.Environment.IsDevelopment())
         {
+            app.UseMiddleware<OpenApiCachingMiddleware>();
             app.MapOpenApi();
             app.MapScalarApiReference(options => options.WithTitle($"{app.Environment.ApplicationName} OpenAPI"));
-            app.UseMiddleware<OpenApiCachingMiddleware>();
 
             app.MapGrpcReflectionService();
         }

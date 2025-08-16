@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Momentum.Extensions.XmlDocs;
+using System.Collections.Concurrent;
 using System.Net.Mime;
 using System.Reflection;
 using System.Security.Cryptography;
@@ -21,11 +22,11 @@ public class OpenApiCachingMiddleware(
     IXmlDocumentationService xmlDocService,
     RequestDelegate next)
 {
-    private const int MaxOpenApiRequestPathLenght = 500;
+    private const int MaxOpenApiRequestPathLength = 500;
     private const int BufferSize = 8192;
 
     private readonly SemaphoreSlim _fileLock = new(1, 1);
-    private readonly Dictionary<string, bool> _cacheInitialized = [];
+    private readonly ConcurrentDictionary<string, bool> _cacheInitialized = new();
 
     internal static string CacheDirectory { get; } = GetCacheDirectory();
 
@@ -74,6 +75,13 @@ public class OpenApiCachingMiddleware(
 
         try
         {
+            // Double-check: if another request generated the cache while waiting for the lock, serve it instead of regenerating
+            if (await TryServeCachedResponseAsync(context, filePath))
+            {
+                _cacheInitialized[cacheKey] = true;
+                return;
+            }
+
             await xmlDocService.LoadDocumentationAsync(GetXmlDocLocation());
 
             var originalResponseBodyStream = context.Response.Body;
@@ -126,7 +134,7 @@ public class OpenApiCachingMiddleware(
             return true;
         }
 
-        context.Response.StatusCode = 200;
+        context.Response.StatusCode = StatusCodes.Status200OK;
 
         await using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, BufferSize, useAsync: true);
         await fileStream.CopyToAsync(context.Response.Body);
@@ -144,11 +152,12 @@ public class OpenApiCachingMiddleware(
         response.ContentType ??= GetContentType(httpContext);
         response.Headers.ETag = GenerateETag(fileInfo);
         response.Headers.LastModified = fileInfo.LastWriteTimeUtc.ToString("R");
+        response.Headers.CacheControl = "public, max-age=60";
     }
 
     private static bool IsOpenApiRequest(HttpRequest request)
     {
-        if (!request.Path.HasValue || request.Path.Value.Length > MaxOpenApiRequestPathLenght)
+        if (!request.Path.HasValue || request.Path.Value.Length > MaxOpenApiRequestPathLength)
             return false;
 
         return request.Path.Value.Contains("/openapi", StringComparison.OrdinalIgnoreCase);

@@ -17,10 +17,9 @@ public static class OpenApiDocExtensions
 
         return Type.GetTypeCode(underlyingType) switch
         {
-            TypeCode.String => new OpenApiString(value),
-            TypeCode.Char => new OpenApiString(value),
+            TypeCode.String or TypeCode.Char => new OpenApiString(value),
             TypeCode.Boolean => Parse<bool>(bool.TryParse, r => new OpenApiBoolean(r), value),
-            TypeCode.Int16 => Parse<int>(int.TryParse, r => new OpenApiInteger(r), value),
+            TypeCode.Int16 => Parse<short>(short.TryParse, r => new OpenApiInteger(r), value),
             TypeCode.Int32 => Parse<int>(int.TryParse, r => new OpenApiInteger(r), value),
             TypeCode.Int64 => Parse<long>(long.TryParse, r => new OpenApiLong(r), value),
             TypeCode.Single => Parse<float>(float.TryParse, r => new OpenApiFloat(r), value),
