@@ -1,43 +1,59 @@
 ---
-title: Getting Started with Momentum Libraries
-description: Learn how to use Momentum Libraries to build production-ready .NET 9 microservices with minimal ceremony and maximum productivity. Includes service defaults, extensions, source generators, and messaging infrastructure.
+title: Getting Started with Momentum
+description: Learn how to build production-ready .NET 9 microservices with Momentum - featuring a comprehensive dotnet template system and powerful supporting libraries. Get up and running in minutes with Orleans, gRPC, Kafka, and PostgreSQL.
 date: 2025-01-15
 ---
 
 # Getting Started with Momentum
 
-Welcome to **Momentum Libraries** - a collection of .NET 9 libraries that provide platform services, extensions, and source generators for building production-ready microservices. Whether you're creating new applications or enhancing existing ones, these libraries offer battle-tested patterns that reduce boilerplate and accelerate development.
+Welcome to **Momentum** - a comprehensive .NET 9 template system that generates complete, production-ready microservices solutions. Whether you're building APIs, event-driven backends, or stateful processing systems, Momentum provides the architecture, patterns, and infrastructure you need to get productive immediately.
 
-## Overview
+## Two Ways to Use Momentum
 
-**Momentum Libraries** provide essential building blocks for modern .NET applications:
+### **🚀 Template System (Recommended)**
 
--   **🚀 Minimal Setup**: Get productive in minutes with comprehensive service defaults
--   **🔧 Production-Ready**: Battle-tested patterns used in high-scale applications
--   **⚡ Modern Stack**: Built for .NET 9 with Aspire, OpenTelemetry, and async-first design
--   **🎯 Focused Libraries**: Use only what you need - each library has a specific purpose
--   **📖 Excellent Documentation**: Clear examples and comprehensive guides
+The fastest way to get started - generates complete microservices solutions with everything configured and ready to run:
 
-## Why Choose Momentum Libraries?
+-   **Instant Setup**: Complete application in one command
+-   **Best Practices**: Domain-driven design with CQRS patterns
+-   **Full Stack**: APIs, background processing, and documentation
+-   **Modern Architecture**: .NET 9, Aspire orchestration, real-world patterns
 
-### **Template-Independent Usage**
+### **📚 Individual Libraries**
 
-Unlike the full Momentum template system, these libraries work with **any .NET 9 application**. Add them incrementally to existing projects or use them as the foundation for new ones.
+For existing projects or custom architectures - add Momentum capabilities incrementally:
 
-### **Modern Development Patterns**
+-   **Modular Approach**: Use only what you need
+-   **Any .NET 9 App**: Works with existing applications
+-   **Incremental Adoption**: Add features as you grow
+-   **Custom Integration**: Full control over implementation
 
--   **Result Types**: Elegant error handling without exceptions
--   **CQRS Abstractions**: Clean command/query separation
--   **Source Generation**: Compile-time code generation for database commands
--   **Observability**: Built-in OpenTelemetry, Serilog, and health checks
--   **Event-Driven**: Kafka integration with CloudEvents standard
+## Technology Stack
 
-### **Developer Experience**
+Momentum is built on modern, production-proven technologies:
 
--   **IntelliSense Support**: Full IDE integration with source generators
--   **Minimal Configuration**: Sensible defaults that just work
--   **Extensible**: Configure and customize to fit your needs
--   **Testing-Friendly**: Designed for easy unit and integration testing
+-   **🎯 .NET 9**: Latest framework with performance optimizations
+-   **🏗️ .NET Aspire**: Local development orchestration and observability
+-   **🎭 Orleans**: Stateful actor-based processing for complex workflows
+-   **⚡ Wolverine**: CQRS/MediatR pattern with message handling
+-   **🚀 gRPC + REST**: Dual API protocols for performance and compatibility
+-   **📡 Apache Kafka**: Event streaming and reliable messaging
+-   **🗄️ PostgreSQL**: Robust relational database with JSON support
+-   **🔄 Liquibase**: Version-controlled database migrations
+-   **📊 OpenTelemetry**: Distributed tracing and observability
+-   **🧪 Testcontainers**: Real infrastructure for integration testing
+
+## Template System Overview
+
+**Momentum Template** (`dotnet new mmt`) generates customized microservices solutions that mirror real-world business operations. The template leverages Wolverine for CQRS patterns and supports multiple architectures from simple APIs to complex event-driven systems with Orleans actors.
+
+### **Core Architecture Principles**
+
+-   **🎯 Real-World Mirroring**: Code structure corresponds to business operations
+-   **🚫 No Smart Objects**: Entities are data records, not self-modifying objects
+-   **🏢 Front/Back Office**: Synchronous APIs vs Asynchronous processing
+-   **📡 Event-Driven**: Integration events via Kafka with Wolverine message handling
+-   **🧪 Testing First**: Comprehensive testing with real infrastructure
 
 ## Prerequisites
 
@@ -45,11 +61,170 @@ Before getting started, ensure you have:
 
 -   **.NET 9 SDK** - [Download here](https://dotnet.microsoft.com/download/dotnet/9.0)
 -   **IDE**: Visual Studio 2022 17.8+, VS Code with C# Dev Kit, or JetBrains Rider
--   **Docker Desktop** (optional) - For running databases and Kafka locally
+-   **Docker Desktop** - Required for databases, Kafka, and local development
 
-## Quick Start (5 Minutes)
+## Quick Start with Template (2 Minutes)
 
-Let's build a simple API service using Momentum Libraries. This example demonstrates the core concepts and shows you how the libraries work together.
+Get a complete microservices solution running in under 2 minutes:
+
+### 1. Install the Template
+
+```bash
+# Clone the repository and install the template
+git clone https://github.com/vgmello/momentum.git
+cd momentum
+dotnet new install .
+```
+
+### 2. Generate Your Solution
+
+```bash
+# Create a complete microservices solution
+dotnet new mmt -n OrderService --allow-scripts yes
+cd OrderService
+```
+
+### 3. Start Everything with Aspire
+
+```bash
+# Launch the complete application stack
+dotnet run --project src/OrderService.AppHost
+
+# Access the Aspire Dashboard: https://localhost:18110
+# API endpoints: https://localhost:8101
+# Documentation: http://localhost:8119
+```
+
+**That's it!** You now have a running microservices solution with:
+
+-   ✅ REST and gRPC APIs with sample endpoints
+-   ✅ Background event processing with Wolverine
+-   ✅ PostgreSQL database with migrations
+-   ✅ Apache Kafka messaging
+-   ✅ Comprehensive observability
+-   ✅ Live documentation
+-   ✅ Sample business domain (Cashiers/Invoices)
+
+## Template Configuration Options
+
+The template supports extensive customization through parameters. Here are the most common configurations:
+
+### **Simple API Service**
+
+```bash
+# Generate API-only service
+dotnet new mmt -n PaymentService --api --back-office false --orleans false --docs false
+```
+
+### **Orleans Processing Engine**
+
+```bash
+# Generate stateful processing service
+dotnet new mmt -n WorkflowEngine --orleans --api false --port 9000
+```
+
+### **Full Stack Solution**
+
+```bash
+# Generate complete solution with custom settings
+dotnet new mmt -n EcommercePlatform --org "Acme Corp" --port 7000 --kafka true
+```
+
+### **Minimal Setup**
+
+```bash
+# Clean slate without sample code
+dotnet new mmt -n CleanService --sample false --project-only
+```
+
+### **Available Template Parameters**
+
+The template offers comprehensive configuration options:
+
+**Core Components:**
+-   `--api`: REST/gRPC API project (default: true)
+-   `--back-office`: Background processing project (default: true)
+-   `--orleans`: Orleans stateful processing project (default: false)
+-   `--aspire`: .NET Aspire orchestration project (default: true)
+-   `--docs`: VitePress documentation project (default: true)
+
+**Infrastructure:**
+-   `--kafka`: Apache Kafka messaging (default: true)
+-   `--db`: Database setup (default, npgsql, liquibase, none)
+-   `--port`: Base port number (default: 8100)
+
+**Customization:**
+-   `--org`: Organization name for copyright headers
+-   `--sample`: Include sample Cashiers/Invoices code (default: true, use `--sample false` to skip)
+-   `--project-only`: Generate only projects without solution files
+-   `--libs`: Include Momentum libraries as project references
+-   `--lib-name`: Custom prefix to replace "Momentum" in library names
+
+[!NOTE]
+For complete parameter documentation and all available combinations, see the [`template.json`](/libs/Momentum/.template.config/template.json) file and the [Template Options Guide](./template-options/) for detailed use cases and examples.
+
+## Understanding the Generated Solution
+
+The template generates a production-ready solution with clear separation of concerns:
+
+### **Project Structure**
+
+```
+OrderService/
+├── src/
+│   ├── OrderService.Api/              # REST & gRPC endpoints
+│   ├── OrderService.BackOffice/        # Event processing
+│   ├── OrderService.BackOffice.Orleans/ # Stateful processing (if enabled)
+│   ├── OrderService.AppHost/           # Aspire orchestration
+│   ├── OrderService/                   # Core domain logic
+│   └── OrderService.Contracts/         # Integration events
+├── infra/
+│   └── OrderService.Database/          # Liquibase migrations
+├── tests/
+│   └── OrderService.Tests/             # Comprehensive testing
+├── docs/                               # VitePress documentation
+└── compose.yml                         # Docker Compose for services
+```
+
+### **Business Domain Organization**
+
+Generated code follows Domain-Driven Design principles with Wolverine CQRS patterns:
+
+```
+src/OrderService/
+├── Cashiers/                  # Sample business domain
+│   ├── Commands/              # Business actions (Wolverine handlers)
+│   ├── Queries/               # Information retrieval (Wolverine handlers)
+│   ├── Data/                  # Database operations
+│   └── Contracts/             # Domain events
+└── Invoices/                  # Another sample domain
+    ├── Commands/              # Commands with validation
+    ├── Queries/               # Queries for data retrieval
+    ├── Data/                  # Database access layer
+    └── Contracts/             # Integration events
+```
+
+### **Port Configuration**
+
+Services use a base port system (default: 8100):
+
+| Service | HTTP | HTTPS | gRPC | Purpose |
+|---------|------|-------|------|----------|
+| Aspire Dashboard | 18100 | 18110 | - | Development dashboard |
+| API | 8101 | 8111 | 8102 | REST & gRPC endpoints |
+| BackOffice | 8103 | 8113 | - | Background processing |
+| Orleans | 8104 | 8114 | - | Stateful processing |
+| Documentation | 8119 | - | - | VitePress docs |
+| PostgreSQL | 54320 | - | - | Database |
+| Kafka | 59092 | - | - | Message broker |
+
+Customize the base port with `--port 9000` to use 9100, 9101, etc.
+
+## Individual Libraries Approach
+
+For existing projects or custom architectures, use Momentum Libraries individually:
+
+Build a simple API service using individual Momentum Libraries when you need to add capabilities to existing projects:
 
 ### 1. Create New Project
 
@@ -235,9 +410,9 @@ curl https://localhost:7001/orders/{order-id}
 curl https://localhost:7001/health
 ```
 
-## Conclusion
+## Library Integration Results
 
-Congratulations! You now have a working API with:
+Congratulations! You've added powerful capabilities to your application:
 
 -   ✅ Structured error handling with Result types
 -   ✅ Built-in health checks and metrics
@@ -271,9 +446,9 @@ In just a few minutes, you added powerful capabilities to your application:
 -   **Tracing**: Request tracking across service boundaries
 -   **Health Monitoring**: Automated health check endpoints
 
-## Core Libraries Introduction
+## Individual Libraries Overview
 
-Momentum Libraries are designed to work independently or together. Here's what each library provides:
+When using libraries individually (rather than the template), each library serves a specific purpose and can be used independently:
 
 ### **Momentum.Extensions** - Core Foundation
 
@@ -288,7 +463,7 @@ dotnet add package Momentum.Extensions
 -   **ResultOfT Types**: Elegant error handling without exceptions
 -   **Validation Integration**: FluentValidation helpers and extensions
 -   **Data Access**: Enhanced Dapper extensions and LINQ2DB support
--   **Messaging Abstractions**: Base interfaces for CQRS and event-driven design
+-   **Messaging Abstractions**: Base interfaces for CQRS and event-driven design with Wolverine integration
 
 **Use When:** You want robust error handling and core utilities in any .NET project.
 
@@ -361,9 +536,9 @@ dotnet add package Momentum.Extensions.Messaging.Kafka
 
 **Use When:** Building event-driven microservices that need reliable messaging.
 
-## Your First Real Application
+## Advanced Library Integration Example
 
-Let's build a more complete example that demonstrates how the libraries work together. We'll create an e-commerce order service with database persistence, validation, and events.
+When using individual libraries, here's how to build a more complete application that demonstrates library integration:
 
 ### 1. Setup Project
 
@@ -865,24 +1040,28 @@ builder.Services.AddOptions<OrderServiceOptions>()
 
 ## Next Steps
 
-Now that you've built your first Momentum Libraries application, explore these advanced topics:
+Choose your path based on how you're using Momentum:
 
-### **Essential Reading**
+### **If You Used the Template**
+
+1. **[Explore the Generated Solution](./template-walkthrough/)** - Understand what was created
+2. **[Add Your Business Domain](./adding-domains/)** - Replace sample code with your logic
+3. **[Deploy to Production](./deployment/)** - Deploy your microservices
+4. **[Template Options Reference](./template-options/)** - Complete parameter guide
+
+### **If You're Using Individual Libraries**
 
 1. **[Service Configuration Guide](./service-configuration/)** - Deep dive into observability, health checks, and resilience
 2. **[Error Handling Patterns](./error-handling)** - Master the Result pattern and validation
 3. **[Database Operations](./database/)** - Learn DbCommand source generation and best practices
-
-### **Advanced Integration**
-
 4. **[Event-Driven Messaging](./messaging/)** - Build robust event-driven architectures with Kafka
 5. **[Testing Strategies](./testing/)** - Comprehensive testing patterns for Momentum applications
-6. **[Best Practices](./best-practices)** - Production-ready patterns and guidelines
 
-### **Specialized Topics**
+### **Advanced Topics for Both Approaches**
 
-7. **[CQRS Implementation](./cqrs/)** - Command/Query separation patterns
-8. **[Architecture Decisions](./arch/)** - Design patterns and architectural guidance
+6. **[CQRS Implementation](./cqrs/)** - Command/Query separation patterns
+7. **[Architecture Decisions](./arch/)** - Design patterns and architectural guidance
+8. **[Best Practices](./best-practices)** - Production-ready patterns and guidelines
 9. **[Troubleshooting](./troubleshooting)** - Common issues and solutions
 
 ### **Community and Support**
@@ -954,13 +1133,26 @@ app.MapGet("/orders/{id:guid}", async (Guid id, IMessageBus bus) =>
 });
 ```
 
-**Ready to build amazing applications?** Choose your path:
+**Ready to build amazing applications?** 
+
+### **Template Users (Recommended)**
+
+-   **[Template Walkthrough](./template-walkthrough/)** - Understand your generated solution
+-   **[Adding Business Domains](./adding-domains/)** - Build your application logic
+-   **[Template Options Guide](./template-options/)** - Master all configuration options
+
+### **Library Users**
 
 -   **[Service Configuration](./service-configuration/)** - Configure observability and infrastructure
 -   **[Database Integration](./database/)** - Add database operations with source generation
 -   **[Event Messaging](./messaging/)** - Build event-driven microservices
--   **[API Reference](/reference/Momentum)** - Explore the complete API surface
+
+### **Reference & Examples**
+
+-   **[API Reference](/reference/Momentum)** - Complete library documentation
+-   **[Sample Applications](https://github.com/vgmello/momentum/tree/main/examples)** - Real-world examples
+-   **[GitHub Discussions](https://github.com/vgmello/momentum/discussions)** - Community support
 
 ---
 
-_Momentum Libraries: Minimal ceremony, maximum productivity. Build better services faster._
+_Momentum: Real-world microservices. Modern architecture. Production-ready from day one._
