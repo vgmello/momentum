@@ -23,6 +23,43 @@
 **/values.dev.yaml
 LICENSE
 README.md
+CLAUDE.md
+*.md
 
+# Documentation and test files
 **/docs/.vitepress/cache
+**/tests
+**/*.Tests
+**/*.Test
+
+# Build artifacts and temporary files
+**/.local
+**/artifacts
+**/publish
+**/.nuget
+**/packages
+**/TestResults
+**/*.log
+**/.tmp
+**/temp
+
+# Development configuration
+**/.env.*
+**/appsettings.Development.json
+**/appsettings.Local.json
+
+# IDE and editor files
+**/.editorconfig
+**/.gitattributes
+**/*.DotSettings
+**/*.sln.iml
+
+# CI/CD files
+**/.github
+**/.gitlab-ci.yml
+**/azure-pipelines.yml
+
+# Template system files (for Momentum template)
+**/.template.config
+**/template.json
 

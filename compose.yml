@@ -5,8 +5,8 @@ services:
     image: postgres:17-alpine
     profiles: ["db", "api", "backoffice"]
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password@
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password@}
     ports:
       - "54320:5432"
     healthcheck:
@@ -71,7 +71,10 @@ services:
       - "18890:18890"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=true
+      - ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=${ASPIRE_ALLOW_ANONYMOUS:-false}
+      - ASPIRE_DASHBOARD_FRONTEND_AUTH=none
+      - ASPIRE_DASHBOARD_OTLP_AUTH_MODE=${ASPIRE_OTLP_AUTH_MODE:-api-key}
+      - ASPIRE_DASHBOARD_OTLP_PRIMARY_API_KEY=${ASPIRE_OTLP_API_KEY:-development-key}
     restart: unless-stopped
 
   # #if (INCLUDE_API)
@@ -91,8 +94,8 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ServiceName=AppDomain
       # #if (USE_DB)
-      - ConnectionStrings__AppDomainDb=Host=app-domain-db;Port=5432;Database=app_domain;Username=postgres;Password=password@
-      - ConnectionStrings__ServiceBus=Host=app-domain-db;Port=5432;Database=service_bus;Username=postgres;Password=password@
+      - ConnectionStrings__AppDomainDb=Host=app-domain-db;Port=5432;Database=app_domain;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-password@}
+      - ConnectionStrings__ServiceBus=Host=app-domain-db;Port=5432;Database=service_bus;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-password@}
       - ConnectionStrings__Messaging=kafka:9092
       # #endif
       - Kestrel__Endpoints__Http__Protocols=Http1
@@ -127,8 +130,8 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ServiceName=AppDomain
       # #if (USE_DB)
-      - ConnectionStrings__AppDomainDb=Host=app-domain-db;Port=5432;Database=app_domain;Username=postgres;Password=password@
-      - ConnectionStrings__ServiceBus=Host=app-domain-db;Port=5432;Database=service_bus;Username=postgres;Password=password@
+      - ConnectionStrings__AppDomainDb=Host=app-domain-db;Port=5432;Database=app_domain;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-password@}
+      - ConnectionStrings__ServiceBus=Host=app-domain-db;Port=5432;Database=service_bus;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-password@}
       - ConnectionStrings__Messaging=kafka:9092
       # #endif
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://aspire-dashboard:18890
