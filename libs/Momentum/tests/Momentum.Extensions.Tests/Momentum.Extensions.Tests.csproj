@@ -11,11 +11,16 @@
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <PackageReference Include="Shouldly"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Memory"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Testing"/>
+        <PackageReference Include="NSubstitute"/>
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
         <ProjectReference Include="..\..\src\Momentum.Extensions\Momentum.Extensions.csproj"/>
         <ProjectReference Include="..\..\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
+        <ProjectReference Include="..\..\src\Momentum.Extensions.Messaging.Kafka\Momentum.Extensions.Messaging.Kafka.csproj"/>
     </ItemGroup>
 </Project>

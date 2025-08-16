@@ -34,12 +34,12 @@ Install-Package Momentum.Extensions.Messaging.Kafka
 
 This package includes the following key dependencies:
 
-| Package                                      | Purpose                                              |
-| -------------------------------------------- | ---------------------------------------------------- |
-| **Aspire.Confluent.Kafka**                   | .NET Aspire Kafka integration with service discovery |
-| **CloudNative.CloudEvents.Kafka**            | CloudEvents specification implementation for Kafka   |
-| **WolverineFx.Kafka**                        | Message bus framework with Kafka transport           |
-| **Confluent.Kafka.Extensions.OpenTelemetry** | OpenTelemetry instrumentation for Kafka clients      |
+| Package                           | Purpose                                              |
+| --------------------------------- | ---------------------------------------------------- |
+| **Aspire.Confluent.Kafka**        | .NET Aspire Kafka integration with service discovery |
+| **CloudNative.CloudEvents.Kafka** | CloudEvents specification implementation for Kafka   |
+| **WolverineFx.Kafka**             | Message bus framework with Kafka transport           |
+| **WolverineFx**                   | Message bus framework with pattern matching          |
 
 ## Getting Started
 
@@ -248,12 +248,9 @@ Example CloudEvent structure:
 
 ## Error Handling
 
-The package includes built-in error handling and resilience:
+The package provides error handling through WolverineFx:
 
--   **Automatic Retry**: Failed message processing with exponential backoff
--   **Dead Letter Queues**: Poison message handling
--   **Circuit Breaker**: Protection against downstream failures
--   **Telemetry**: Comprehensive error tracking and metrics
+-   **Basic Error Logging**: Failed message processing is logged for monitoring
 
 ## Observability
 
@@ -261,16 +258,11 @@ Built-in observability includes:
 
 ### Metrics
 
--   Message publish/consume rates
--   Processing latency
--   Error rates
--   Topic partition metrics
+-   TBD
 
 ### Tracing
 
--   End-to-end message flow tracking
--   Cross-service correlation
--   Performance bottleneck identification
+-   TBD
 
 ### Logging
 

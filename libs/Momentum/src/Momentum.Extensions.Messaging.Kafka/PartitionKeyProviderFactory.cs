@@ -51,7 +51,7 @@ public static class PartitionKeyProviderFactory
             return Expression.Lambda<Func<TMessage, string>>(stringValueExpressions[0], parameter).Compile();
         }
 
-        const string separator = "-";
+        const string separator = "|";
 
         var concatMethod = typeof(string).GetMethod(nameof(string.Concat), [typeof(string[])])!;
 

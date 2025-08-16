@@ -40,19 +40,37 @@ public class KafkaEventsExtensions(
     {
         var kafkaConnectionString = configuration.GetConnectionString(ConnectionStringName)!;
         var cloudEventMapper = new CloudEventMapper(serviceBusOptions);
+        var consumerGroupId = $"{options.ServiceName}-{GetEnvNameShort(environment.EnvironmentName)}";
 
-        options
+        var autoProvisionEnabled = configuration.GetValue("Kafka:AutoProvision", false);
+
+        logger.LogInformation("Configuring Kafka messaging for service {ServiceName} in environment {Environment}",
+            options.ServiceName, environment.EnvironmentName);
+        logger.LogInformation("Kafka bootstrap servers: {BootstrapServers}", kafkaConnectionString);
+        logger.LogInformation("Consumer group ID: {GroupId}", consumerGroupId);
+        logger.LogInformation("Auto-provision enabled: {AutoProvisionEnabled}", autoProvisionEnabled);
+
+        var kafkaConfig = options
             .UseKafka(kafkaConnectionString)
             .ConfigureSenders(cfg => cfg.UseInterop(cloudEventMapper))
             .ConfigureListeners(cfg => cfg.UseInterop(cloudEventMapper))
             .ConfigureConsumers(consumer =>
             {
-                consumer.GroupId = options.ServiceName;
+                consumer.GroupId = consumerGroupId;
                 consumer.AutoOffsetReset = Confluent.Kafka.AutoOffsetReset.Latest;
                 consumer.EnableAutoCommit = true;
                 consumer.EnableAutoOffsetStore = false;
-            })
-            .AutoProvision();
+            });
+
+        if (autoProvisionEnabled)
+        {
+            kafkaConfig.AutoProvision();
+            logger.LogDebug("Kafka auto-provisioning enabled - topics will be created automatically");
+        }
+        else
+        {
+            logger.LogDebug("Kafka auto-provisioning disabled - topics must be created manually");
+        }
 
         SetupPublisher(options);
         SetupSubscribers(options);
@@ -61,6 +79,9 @@ public class KafkaEventsExtensions(
     private void SetupPublisher(WolverineOptions options)
     {
         var integrationEventTypes = DistributedEventsDiscovery.GetIntegrationEventTypes();
+        var publisherTopics = new List<string>();
+
+        logger.LogDebug("Setting up Kafka publishers for integration events");
 
         foreach (var messageType in integrationEventTypes)
         {
@@ -69,15 +90,26 @@ public class KafkaEventsExtensions(
             if (topicAttribute is null)
             {
                 logger.LogWarning("IntegrationEvent {IntegrationEventType} does not have an EventTopicAttribute", messageType.Name);
-
                 continue;
             }
 
             var topicName = GetTopicName(messageType, topicAttribute, environment.EnvironmentName);
+            publisherTopics.Add(topicName);
 
             var setupKafkaRouteMethodInfo = SetupKafkaPublisherRouteMethodInfo.MakeGenericMethod(messageType);
-
             setupKafkaRouteMethodInfo.Invoke(null, [options, topicName]);
+
+            logger.LogDebug("Configured publisher for {EventType} to topic {TopicName}", messageType.Name, topicName);
+        }
+
+        if (publisherTopics.Count > 0)
+        {
+            logger.LogInformation("Configured Kafka publishers for {TopicCount} topics: {Topics}",
+                publisherTopics.Count, string.Join(", ", publisherTopics));
+        }
+        else
+        {
+            logger.LogInformation("No Kafka publishers configured - no integration events found");
         }
     }
 
@@ -110,8 +142,12 @@ public class KafkaEventsExtensions(
 
         if (topicsToSubscribe.Count > 0)
         {
-            logger.LogInformation("Configured Kafka subscriptions for {TopicCount} topics with consumer group {ConsumerGroup}",
-                topicsToSubscribe.Count, options.ServiceName);
+            logger.LogInformation("Configured Kafka subscriptions for {TopicCount} topics with consumer group {ConsumerGroup}: {Topics}",
+                topicsToSubscribe.Count, options.ServiceName, string.Join(", ", topicsToSubscribe));
+        }
+        else
+        {
+            logger.LogInformation("No Kafka subscriptions configured - no event handlers found");
         }
     }
 
@@ -144,14 +180,7 @@ public class KafkaEventsExtensions(
     /// <returns>A topic name in the format: {env}.{domain}.{scope}.{topic}.{version}</returns>
     private static string GetTopicName(Type messageType, EventTopicAttribute topicAttribute, string env)
     {
-        var envName = env switch
-        {
-            "Development" => "dev",
-            "Production" => "prod",
-            "Test" => "test",
-            _ => env.ToLowerInvariant()
-        };
-
+        var envName = GetEnvNameShort(env);
         var domainName = !string.IsNullOrWhiteSpace(topicAttribute.Domain)
             ? topicAttribute.Domain
             : messageType.Assembly.GetAttribute<DefaultDomainAttribute>()!.Domain;
@@ -163,5 +192,15 @@ public class KafkaEventsExtensions(
         var versionSuffix = string.IsNullOrWhiteSpace(topicAttribute.Version) ? null : $".{topicAttribute.Version}";
 
         return $"{envName}.{domainName}.{scope}.{topicName}{versionSuffix}".ToLowerInvariant();
+    }
+
+    private static string GetEnvNameShort(string env)
+    {
+        var envLower = env.ToLowerInvariant();
+        return envLower switch
+        {
+            "development" => "dev",
+            _ => envLower[..4]
+        };
     }
 }
