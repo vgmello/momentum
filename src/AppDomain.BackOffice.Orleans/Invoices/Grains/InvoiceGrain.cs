@@ -8,7 +8,6 @@ namespace AppDomain.BackOffice.Orleans.Invoices.Grains;
 /// <summary>
 /// Orleans grain implementation for managing invoice state and processing.
 /// </summary>
-[UsedImplicitly]
 public class InvoiceGrain : Grain, IInvoiceGrain
 {
     private readonly IPersistentState<InvoiceState> _invoiceState;
@@ -37,12 +36,12 @@ public class InvoiceGrain : Grain, IInvoiceGrain
 
         _invoiceState.State.Invoice = invoice;
         _invoiceState.State.LastUpdated = DateTime.UtcNow;
-        
+
         await _invoiceState.WriteStateAsync();
-        
-        _logger.LogInformation("Created invoice {InvoiceId} for tenant {TenantId}", 
+
+        _logger.LogInformation("Created invoice {InvoiceId} for tenant {TenantId}",
             invoice.InvoiceId, invoice.TenantId);
-            
+
         // Publish integration event
         await PublishIntegrationEventAsync(new InvoiceCreated(
             invoice.TenantId,
@@ -81,10 +80,10 @@ public class InvoiceGrain : Grain, IInvoiceGrain
 
         _invoiceState.State.Invoice = updatedInvoice;
         _invoiceState.State.LastUpdated = DateTime.UtcNow;
-        
+
         await _invoiceState.WriteStateAsync();
-        
-        _logger.LogInformation("Marked invoice {InvoiceId} as paid with amount {Amount}", 
+
+        _logger.LogInformation("Marked invoice {InvoiceId} as paid with amount {Amount}",
             updatedInvoice.InvoiceId, amountPaid);
 
         // Publish integration event
@@ -113,10 +112,10 @@ public class InvoiceGrain : Grain, IInvoiceGrain
 
         _invoiceState.State.Invoice = updatedInvoice;
         _invoiceState.State.LastUpdated = DateTime.UtcNow;
-        
+
         await _invoiceState.WriteStateAsync();
-        
-        _logger.LogInformation("Updated invoice {InvoiceId} status to {Status}", 
+
+        _logger.LogInformation("Updated invoice {InvoiceId} status to {Status}",
             updatedInvoice.InvoiceId, newStatus);
 
         return updatedInvoice;
@@ -131,11 +130,11 @@ public class InvoiceGrain : Grain, IInvoiceGrain
         }
 
         var invoice = _invoiceState.State.Invoice;
-        
+
         // Business logic for payment processing
         if (amount <= 0)
         {
-            _logger.LogWarning("Invalid payment amount {Amount} for invoice {InvoiceId}", 
+            _logger.LogWarning("Invalid payment amount {Amount} for invoice {InvoiceId}",
                 amount, invoice.InvoiceId);
             return false;
         }
@@ -148,8 +147,8 @@ public class InvoiceGrain : Grain, IInvoiceGrain
 
         // Process payment
         await MarkAsPaidAsync(amount, DateTime.UtcNow);
-        
-        _logger.LogInformation("Processed payment of {Amount} via {PaymentMethod} for invoice {InvoiceId}", 
+
+        _logger.LogInformation("Processed payment of {Amount} via {PaymentMethod} for invoice {InvoiceId}",
             amount, paymentMethod, invoice.InvoiceId);
 
         // Publish payment event
@@ -167,7 +166,7 @@ public class InvoiceGrain : Grain, IInvoiceGrain
     {
         // TODO: Implement integration event publishing via Kafka/Wolverine
         // This would typically use the messaging infrastructure to publish events
-        _logger.LogDebug("Publishing integration event {EventType}: {Event}", 
+        _logger.LogDebug("Publishing integration event {EventType}: {Event}",
             typeof(T).Name, integrationEvent);
         return Task.CompletedTask;
     }

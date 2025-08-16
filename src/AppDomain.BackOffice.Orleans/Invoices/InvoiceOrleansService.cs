@@ -8,7 +8,6 @@ namespace AppDomain.BackOffice.Orleans.Invoices;
 /// <summary>
 /// Service for managing invoices using Orleans grains.
 /// </summary>
-[UsedImplicitly]
 public class InvoiceOrleansService
 {
     private readonly IGrainFactory _grainFactory;

@@ -166,7 +166,12 @@ public class OpenApiCachingMiddleware(
         return MediaTypeNames.Application.Json;
     }
 
-    private static string GetCacheKey(HttpRequest request) => Convert.ToBase64String(Encoding.UTF8.GetBytes(request.Path));
+    private static string GetCacheKey(HttpRequest request)
+    {
+        var bytes = Encoding.UTF8.GetBytes(request.Path);
+        var b64 = Convert.ToBase64String(bytes);
+        return b64.Replace('+', '-').Replace('/', '_').TrimEnd('=');
+    }
 
     private static string GenerateETag(FileInfo fileInfo)
     {
