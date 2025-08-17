@@ -28,7 +28,7 @@ app.MapDefaultHealthCheckEndpoints();
 app.MapPost("/invoices/{id:guid}/pay", async (Guid id, decimal amount, IGrainFactory grains) =>
 {
     var grain = grains.GetGrain<IInvoiceGrain>(id);
-    await grain.Pay(amount);
+    await grain.MarkAsPaidAsync(amount, DateTime.UtcNow);
 
     return Results.Accepted();
 });
@@ -37,7 +37,7 @@ app.MapGet("/invoices/{id:guid}", async (Guid id, IGrainFactory grains) =>
 {
     var grain = grains.GetGrain<IInvoiceGrain>(id);
 
-    return Results.Ok(await grain.GetState());
+    return Results.Ok(await grain.GetInvoiceAsync());
 });
 
 await app.RunAsync(args);

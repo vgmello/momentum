@@ -16,7 +16,23 @@ public class BusinessDayEndedHandler(ILogger<BusinessDayEndedHandler> logger, IM
         var invoiceId = Guid.CreateVersion7();
         var customerId = Guid.CreateVersion7();
 
-        await messageBus.PublishAsync(new InvoiceGenerated(tenantId, invoiceId, 500.75m));
+        var invoice = new AppDomain.Invoices.Contracts.Models.Invoice(
+            TenantId: tenantId,
+            InvoiceId: invoiceId,
+            Name: $"Invoice for {businessDayEnded.BusinessDate:yyyy-MM-dd}",
+            Status: "Generated",
+            Amount: 500.75m,
+            Currency: "USD",
+            DueDate: DateTime.UtcNow.AddDays(30),
+            CashierId: null,
+            AmountPaid: 0m,
+            PaymentDate: null,
+            CreatedDateUtc: DateTime.UtcNow,
+            UpdatedDateUtc: DateTime.UtcNow,
+            Version: 1
+        );
+
+        await messageBus.PublishAsync(new InvoiceGenerated(tenantId, invoice, DateTime.UtcNow));
 
         await messageBus.PublishAsync(new InvoiceFinalized(
             tenantId,

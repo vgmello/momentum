@@ -47,12 +47,7 @@ public class InvoiceGrain : Grain, IInvoiceGrain
         await PublishIntegrationEventAsync(new InvoiceCreated(
             invoice.TenantId,
             invoice.InvoiceId,
-            invoice.Name,
-            invoice.Amount,
-            invoice.Currency ?? "USD",
-            invoice.DueDate,
-            invoice.CashierId,
-            invoice.CreatedDateUtc));
+            invoice));
 
         return invoice;
     }

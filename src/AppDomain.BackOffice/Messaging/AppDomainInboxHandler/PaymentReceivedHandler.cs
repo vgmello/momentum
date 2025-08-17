@@ -28,8 +28,8 @@ public static class PaymentReceivedHandler
             tenantId,
             @event.InvoiceId,
             invoice.Version,
-            @event.Amount,
-            @event.ReceivedDate
+            @event.PaymentAmount,
+            @event.PaymentDate
         );
 
         await messaging.InvokeCommandAsync(markPaidCommand, cancellationToken);

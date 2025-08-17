@@ -1,5 +1,7 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
+using FluentValidation.Results;
+
 namespace AppDomain.Api.Extensions;
 
 /// <summary>
@@ -18,5 +20,11 @@ public static class ValidationExtensions
         // Placeholder implementation - replace with actual tenant resolution logic
         // This could come from JWT claims, headers, route parameters, etc.
         return Guid.Parse("00000000-0000-0000-0000-000000000001");
+    }
+
+    public static bool IsConcurrencyConflict(this IEnumerable<ValidationFailure> errors)
+    {
+        return errors.Any(e => e.PropertyName == "Version" &&
+                               e.ErrorMessage.Contains("modified by another user"));
     }
 }
