@@ -86,8 +86,7 @@ public class InvoiceGrain : Grain, IInvoiceGrain
         await PublishIntegrationEventAsync(new InvoicePaid(
             updatedInvoice.TenantId,
             updatedInvoice.InvoiceId,
-            amountPaid,
-            paymentDate));
+            updatedInvoice));
 
         return updatedInvoice;
     }
