@@ -6,7 +6,7 @@ using AppDomain.Invoices.Contracts.Models;
 namespace AppDomain.BackOffice.Orleans.Invoices.Grains;
 
 /// <summary>
-/// Orleans grain implementation for managing invoice state and processing.
+///     Orleans grain implementation for managing invoice state and processing.
 /// </summary>
 public class InvoiceGrain : Grain, IInvoiceGrain
 {
@@ -14,12 +14,13 @@ public class InvoiceGrain : Grain, IInvoiceGrain
     private readonly ILogger<InvoiceGrain> _logger;
 
     /// <summary>
-    /// Initializes a new instance of the InvoiceGrain class.
+    ///     Initializes a new instance of the InvoiceGrain class.
     /// </summary>
     /// <param name="invoiceState">The persistent state for the invoice</param>
     /// <param name="logger">Logger instance</param>
     public InvoiceGrain(
-        [PersistentState("invoice", "Default")] IPersistentState<InvoiceState> invoiceState,
+        [PersistentState("invoice", "Default")]
+        IPersistentState<InvoiceState> invoiceState,
         ILogger<InvoiceGrain> logger)
     {
         _invoiceState = invoiceState;
@@ -136,12 +137,14 @@ public class InvoiceGrain : Grain, IInvoiceGrain
         {
             _logger.LogWarning("Invalid payment amount {Amount} for invoice {InvoiceId}",
                 amount, invoice.InvoiceId);
+
             return false;
         }
 
         if (invoice.Status == "Paid")
         {
             _logger.LogWarning("Invoice {InvoiceId} is already paid", invoice.InvoiceId);
+
             return false;
         }
 
@@ -168,23 +171,24 @@ public class InvoiceGrain : Grain, IInvoiceGrain
         // This would typically use the messaging infrastructure to publish events
         _logger.LogDebug("Publishing integration event {EventType}: {Event}",
             typeof(T).Name, integrationEvent);
+
         return Task.CompletedTask;
     }
 
     /// <summary>
-    /// State class for persisting invoice data in Orleans grain storage.
+    ///     State class for persisting invoice data in Orleans grain storage.
     /// </summary>
     [GenerateSerializer]
     public class InvoiceState
     {
         /// <summary>
-        /// Gets or sets the invoice data.
+        ///     Gets or sets the invoice data.
         /// </summary>
         [Id(0)]
         public Invoice? Invoice { get; set; }
 
         /// <summary>
-        /// Gets or sets the last updated timestamp.
+        ///     Gets or sets the last updated timestamp.
         /// </summary>
         [Id(1)]
         public DateTime LastUpdated { get; set; }

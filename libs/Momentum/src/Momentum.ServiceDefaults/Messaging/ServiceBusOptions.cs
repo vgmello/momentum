@@ -12,10 +12,10 @@ namespace Momentum.ServiceDefaults.Messaging;
 ///     Configuration options for the Wolverine service bus and messaging infrastructure.
 /// </summary>
 /// <remarks>
-/// <!--@include: @code/service-configuration/service-bus-options-detailed.md -->
+///     <!--@include: @code/service-configuration/service-bus-options-detailed.md -->
 /// </remarks>
 /// <example>
-/// <!--@include: @code/examples/service-bus-options-examples.md -->
+///     <!--@include: @code/examples/service-bus-options-examples.md -->
 /// </example>
 public class ServiceBusOptions
 {
@@ -35,7 +35,7 @@ public class ServiceBusOptions
     ///     For example, if the assembly is "ECommerce.OrderService", the domain defaults to "ECommerce".
     /// </value>
     /// <remarks>
-    /// See <see cref="ServiceBusOptions"/> for detailed configuration information.
+    ///     See <see cref="ServiceBusOptions" /> for detailed configuration information.
     /// </remarks>
     public string Domain { get; set; } = GetDomainName();
 
@@ -47,7 +47,7 @@ public class ServiceBusOptions
     ///     application name converted to lowercase with dots replaced by hyphens.
     /// </value>
     /// <remarks>
-    /// See <see cref="ServiceBusOptions"/> for detailed configuration information.
+    ///     See <see cref="ServiceBusOptions" /> for detailed configuration information.
     /// </remarks>
     /// <example>
     ///     <para>Examples of good service names:</para>
@@ -68,10 +68,10 @@ public class ServiceBusOptions
     ///     identifies this service within the messaging infrastructure.
     /// </value>
     /// <remarks>
-    /// See <see cref="ServiceBusOptions"/> for detailed configuration information.
+    ///     See <see cref="ServiceBusOptions" /> for detailed configuration information.
     /// </remarks>
     /// <example>
-    /// See class-level examples in <see cref="ServiceBusOptions"/>.
+    ///     See class-level examples in <see cref="ServiceBusOptions" />.
     /// </example>
     public Uri ServiceUrn { get; private set; } = null!;
 
@@ -79,14 +79,14 @@ public class ServiceBusOptions
     ///     Gets or sets the CloudEvents configuration for standardized cross-service messaging.
     /// </summary>
     /// <value>
-    ///     A <see cref="CloudEventsSettings"/> instance containing CloudEvents specification
+    ///     A <see cref="CloudEventsSettings" /> instance containing CloudEvents specification
     ///     settings for event formatting and routing.
     /// </value>
     /// <remarks>
-    /// See <see cref="ServiceBusOptions"/> for detailed configuration information.
+    ///     See <see cref="ServiceBusOptions" /> for detailed configuration information.
     /// </remarks>
     /// <example>
-    /// See class-level examples in <see cref="ServiceBusOptions"/>.
+    ///     See class-level examples in <see cref="ServiceBusOptions" />.
     /// </example>
     public CloudEventsSettings CloudEvents { get; set; } = new();
 
@@ -99,10 +99,10 @@ public class ServiceBusOptions
     ///     DNS naming, Kubernetes services, and message routing.
     /// </returns>
     /// <remarks>
-    /// See <see cref="ServiceBusOptions"/> for detailed configuration information.
+    ///     See <see cref="ServiceBusOptions" /> for detailed configuration information.
     /// </remarks>
     /// <example>
-    /// See class-level examples in <see cref="ServiceBusOptions"/>.
+    ///     See class-level examples in <see cref="ServiceBusOptions" />.
     /// </example>
     public static string GetServiceName(string appName) => appName.ToLowerInvariant().Replace('.', '-');
 
@@ -119,7 +119,7 @@ public class ServiceBusOptions
     ///     Post-configuration processor that validates and completes ServiceBus configuration after binding.
     /// </summary>
     /// <remarks>
-    /// See <see cref="ServiceBusOptions"/> for detailed configuration information.
+    ///     See <see cref="ServiceBusOptions" /> for detailed configuration information.
     /// </remarks>
     public class Configurator(ILogger<Configurator> logger, IHostEnvironment env, IConfiguration config)
         : IPostConfigureOptions<ServiceBusOptions>
@@ -130,10 +130,10 @@ public class ServiceBusOptions
         /// <param name="name">The name of the options instance being configured.</param>
         /// <param name="options">The options instance to post-configure.</param>
         /// <remarks>
-        /// See <see cref="ServiceBusOptions"/> for detailed configuration information.
+        ///     See <see cref="ServiceBusOptions" /> for detailed configuration information.
         /// </remarks>
         /// <example>
-        /// See class-level examples in <see cref="ServiceBusOptions"/>.
+        ///     See class-level examples in <see cref="ServiceBusOptions" />.
         /// </example>
         public void PostConfigure(string? name, ServiceBusOptions options)
         {

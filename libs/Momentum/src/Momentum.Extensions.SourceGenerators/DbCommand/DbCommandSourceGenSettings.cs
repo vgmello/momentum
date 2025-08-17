@@ -14,11 +14,13 @@ namespace Momentum.Extensions.SourceGenerators.DbCommand;
 ///     Column attribute overrides. Useful for database systems that require parameter prefixes.
 /// </param>
 /// <remarks>
-/// <!--@include: @code/source-generation/dbcommand-settings-detailed.md -->
+///     <!--@include: @code/source-generation/dbcommand-settings-detailed.md -->
 /// </remarks>
 /// <example>
-/// <para><strong>Example Configuration Effects:</strong></para>
-/// <code>
+///     <para>
+///         <strong>Example Configuration Effects:</strong>
+///     </para>
+///     <code>
 /// // MSBuild configuration:
 /// // &lt;DbCommandDefaultParamCase&gt;SnakeCase&lt;/DbCommandDefaultParamCase&gt;
 /// // &lt;DbCommandParamPrefix&gt;sp_&lt;/DbCommandParamPrefix&gt;
@@ -43,8 +45,10 @@ namespace Momentum.Extensions.SourceGenerators.DbCommand;
 /// }
 /// </code>
 /// 
-/// <para><strong>Environment-Specific Configuration:</strong></para>
-/// <code>
+///     <para>
+///         <strong>Environment-Specific Configuration:</strong>
+///     </para>
+///     <code>
 /// &lt;!-- Development environment --&gt;
 /// &lt;PropertyGroup Condition="'$(Configuration)' == 'Debug'"&gt;
 ///   &lt;DbCommandDefaultParamCase&gt;None&lt;/DbCommandDefaultParamCase&gt;

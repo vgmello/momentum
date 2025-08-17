@@ -3,6 +3,6 @@
 namespace AppDomain.Api;
 
 /// <summary>
-/// Public program class for testing.
+///     Public program class for testing.
 /// </summary>
 public partial class Program;

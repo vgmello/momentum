@@ -34,7 +34,7 @@ public class KafkaEventsExtensions(
     ///     Sets up distributed event routing for Kafka based on event attributes.
     /// </summary>
     /// <remarks>
-    /// <!--@include: @code/messaging/kafka-events-detailed.md -->
+    ///     <!--@include: @code/messaging/kafka-events-detailed.md -->
     /// </remarks>
     public void Configure(WolverineOptions options)
     {

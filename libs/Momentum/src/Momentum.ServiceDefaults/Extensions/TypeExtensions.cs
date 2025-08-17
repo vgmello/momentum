@@ -27,7 +27,7 @@ public static class TypeExtensions
     ///     <!--@include: @code/reflection/type-extensions-detailed.md#get-properties-with-attribute -->
     /// </remarks>
     /// <example>
-    /// <!--@include: @code/examples/type-extensions-examples.md#GetPropertiesWithAttribute Examples -->
+    ///     <!--@include: @code/examples/type-extensions-examples.md#GetPropertiesWithAttribute Examples -->
     /// </example>
     public static IReadOnlySet<PropertyInfo> GetPropertiesWithAttribute<TAttribute>(this Type type)
         where TAttribute : Attribute
@@ -65,7 +65,10 @@ public static class TypeExtensions
     /// </summary>
     /// <typeparam name="TAttribute">The type of attribute to retrieve.</typeparam>
     /// <param name="propertyInfo">The property to examine for the attribute.</param>
-    /// <param name="primaryConstructor">The primary constructor to check for parameter attributes, if the property doesn't have the attribute directly.</param>
+    /// <param name="primaryConstructor">
+    ///     The primary constructor to check for parameter attributes, if the property doesn't have the attribute
+    ///     directly.
+    /// </param>
     /// <returns>
     ///     The attribute instance if found on the property or corresponding constructor parameter;
     ///     otherwise, <c>null</c>.
@@ -74,7 +77,7 @@ public static class TypeExtensions
     ///     <!--@include: @code/reflection/type-extensions-detailed.md#get-custom-attribute -->
     /// </remarks>
     /// <example>
-    /// <!--@include: @code/examples/type-extensions-examples.md#GetCustomAttribute Examples -->
+    ///     <!--@include: @code/examples/type-extensions-examples.md#GetCustomAttribute Examples -->
     /// </example>
     public static TAttribute? GetCustomAttribute<TAttribute>(this PropertyInfo propertyInfo, ConstructorInfo? primaryConstructor)
         where TAttribute : Attribute
@@ -96,14 +99,14 @@ public static class TypeExtensions
     /// </summary>
     /// <param name="type">The type to examine for a primary constructor.</param>
     /// <returns>
-    ///     The <see cref="ConstructorInfo"/> for the primary constructor if found;
+    ///     The <see cref="ConstructorInfo" /> for the primary constructor if found;
     ///     otherwise, <c>null</c> if no primary constructor pattern is detected.
     /// </returns>
     /// <remarks>
     ///     <!--@include: @code/reflection/type-extensions-detailed.md#get-primary-constructor -->
     /// </remarks>
     /// <example>
-    /// <!--@include: @code/examples/type-extensions-examples.md#GetPrimaryConstructor Examples -->
+    ///     <!--@include: @code/examples/type-extensions-examples.md#GetPrimaryConstructor Examples -->
     /// </example>
     public static ConstructorInfo? GetPrimaryConstructor(this Type type)
     {
@@ -144,7 +147,7 @@ public static class TypeExtensions
     ///     <!--@include: @code/reflection/type-extensions-detailed.md#is-init-only -->
     /// </remarks>
     /// <example>
-    /// <!--@include: @code/examples/type-extensions-examples.md#IsInitOnly Examples -->
+    ///     <!--@include: @code/examples/type-extensions-examples.md#IsInitOnly Examples -->
     /// </example>
     public static bool IsInitOnly(this PropertyInfo property)
     {

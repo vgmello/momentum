@@ -20,15 +20,16 @@ namespace Momentum.ServiceDefaults.OpenTelemetry;
 public static class OpenTelemetrySetupExtensions
 {
     /// <summary>
-    ///     Adds comprehensive OpenTelemetry instrumentation for production-ready observability including logging, metrics, and distributed tracing.
+    ///     Adds comprehensive OpenTelemetry instrumentation for production-ready observability including logging, metrics, and distributed
+    ///     tracing.
     /// </summary>
     /// <param name="builder">The host application builder to configure.</param>
     /// <returns>The configured host application builder for method chaining.</returns>
     /// <remarks>
-    /// <!--@include: @code/service-configuration/opentelemetry-setup-detailed.md -->
+    ///     <!--@include: @code/service-configuration/opentelemetry-setup-detailed.md -->
     /// </remarks>
     /// <example>
-    /// <!--@include: @code/examples/opentelemetry-setup-examples.md -->
+    ///     <!--@include: @code/examples/opentelemetry-setup-examples.md -->
     /// </example>
     public static IHostApplicationBuilder AddOpenTelemetry(this IHostApplicationBuilder builder)
     {

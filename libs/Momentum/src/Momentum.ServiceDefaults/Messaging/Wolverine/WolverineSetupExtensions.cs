@@ -32,10 +32,10 @@ public static class WolverineSetupExtensions
     /// <param name="configure">Optional action to configure Wolverine options for specific business requirements.</param>
     /// <returns>The configured host application builder for method chaining.</returns>
     /// <remarks>
-    /// <!--@include: @code/messaging/wolverine-setup-detailed.md -->
+    ///     <!--@include: @code/messaging/wolverine-setup-detailed.md -->
     /// </remarks>
     /// <example>
-    /// <!--@include: @code/examples/wolverine-setup-examples.md -->
+    ///     <!--@include: @code/examples/wolverine-setup-examples.md -->
     /// </example>
     public static IHostApplicationBuilder AddWolverine(this IHostApplicationBuilder builder, Action<WolverineOptions>? configure = null)
     {
@@ -58,24 +58,30 @@ public static class WolverineSetupExtensions
     /// <param name="configure">Optional action to customize Wolverine options for specific business requirements.</param>
     /// <remarks>
     ///     <para>This method provides a complete messaging infrastructure configuration including:</para>
-    ///     
-    ///     <para><strong>Persistence and Reliability:</strong></para>
+    /// 
+    ///     <para>
+    ///         <strong>Persistence and Reliability:</strong>
+    ///     </para>
     ///     <list type="bullet">
     ///         <item>PostgreSQL persistence for message durability and transaction support</item>
     ///         <item>Reliable messaging with inbox/outbox patterns for guaranteed delivery</item>
     ///         <item>Automatic transaction scoping for consistency across business operations</item>
     ///         <item>Dead letter queue handling for failed message processing</item>
     ///     </list>
-    ///     
-    ///     <para><strong>Integration and Transport:</strong></para>
+    /// 
+    ///     <para>
+    ///         <strong>Integration and Transport:</strong>
+    ///     </para>
     ///     <list type="bullet">
     ///         <item>Kafka integration for high-throughput event streaming</item>
     ///         <item>CloudEvents standard support for interoperability</item>
     ///         <item>System.Text.Json serialization with performance optimization</item>
     ///         <item>Cross-service message routing and topic management</item>
     ///     </list>
-    ///     
-    ///     <para><strong>Quality and Observability:</strong></para>
+    /// 
+    ///     <para>
+    ///         <strong>Quality and Observability:</strong>
+    ///     </para>
     ///     <list type="bullet">
     ///         <item>FluentValidation integration for automatic message validation</item>
     ///         <item>Structured exception handling with retry policies</item>
@@ -83,8 +89,10 @@ public static class WolverineSetupExtensions
     ///         <item>Performance monitoring and request tracking middleware</item>
     ///         <item>Health checks for messaging infrastructure components</item>
     ///     </list>
-    ///     
-    ///     <para><strong>Development and Deployment:</strong></para>
+    /// 
+    ///     <para>
+    ///         <strong>Development and Deployment:</strong>
+    ///     </para>
     ///     <list type="bullet">
     ///         <item>Resource setup on startup for database migrations</item>
     ///         <item>Convention-based handler discovery from domain assemblies</item>
@@ -92,7 +100,7 @@ public static class WolverineSetupExtensions
     ///     </list>
     /// </remarks>
     /// <example>
-    /// See <see cref="AddWolverine"/> for examples.
+    ///     See <see cref="AddWolverine" /> for examples.
     /// </example>
     public static void AddWolverineWithDefaults(
         this IServiceCollection services, IHostEnvironment env, IConfiguration configuration, Action<WolverineOptions>? configure)

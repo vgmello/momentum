@@ -9,7 +9,8 @@ namespace Momentum.Extensions.Abstractions.Dapper;
 /// <param name="sql">The SQL query text to execute. Mutually exclusive with <paramref name="sp" /> and <paramref name="fn" />.</param>
 /// <param name="fn">
 ///     The database function name to call. Parameters are auto-generated from record properties. Mutually exclusive with
-///     <paramref name="sp" /> and <paramref name="sql" />. Use '$' prefix (e.g., "$get_user_orders") to generate "SELECT * FROM get_user_orders(...)" syntax.
+///     <paramref name="sp" /> and <paramref name="sql" />. Use '$' prefix (e.g., "$get_user_orders") to generate "SELECT * FROM
+///     get_user_orders(...)" syntax.
 /// </param>
 /// <param name="paramsCase">Specifies how property names are converted to database parameter names. Defaults to global MSBuild configuration.</param>
 /// <param name="nonQuery">
@@ -21,10 +22,10 @@ namespace Momentum.Extensions.Abstractions.Dapper;
 /// </param>
 /// <param name="dataSource">The keyed data source name for dependency injection. If null, uses the default registered data source.</param>
 /// <remarks>
-/// <!--@include: @code/database/db-command-attribute-detailed.md -->
+///     <!--@include: @code/database/db-command-attribute-detailed.md -->
 /// </remarks>
 /// <example>
-/// <!--@include: @code/examples/dbcommand-examples.md -->
+///     <!--@include: @code/examples/dbcommand-examples.md -->
 /// </example>
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
 public sealed class DbCommandAttribute(

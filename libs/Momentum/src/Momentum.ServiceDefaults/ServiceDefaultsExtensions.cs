@@ -43,10 +43,10 @@ public static class ServiceDefaultsExtensions
     /// <param name="builder">The web application builder to configure.</param>
     /// <returns>The configured host application builder for method chaining.</returns>
     /// <remarks>
-    /// <!--@include: @code/service-configuration/service-defaults-detailed.md -->
+    ///     <!--@include: @code/service-configuration/service-defaults-detailed.md -->
     /// </remarks>
     /// <example>
-    /// <!--@include: @code/examples/service-defaults-examples.md -->
+    ///     <!--@include: @code/examples/service-defaults-examples.md -->
     /// </example>
     public static IHostApplicationBuilder AddServiceDefaults(this WebApplicationBuilder builder)
     {
@@ -81,15 +81,14 @@ public static class ServiceDefaultsExtensions
     ///         <item>The entry assembly (your main application assembly)</item>
     ///         <item>All assemblies marked with <see cref="DomainAssemblyAttribute" /></item>
     ///     </list>
-    ///
     ///     Validators are registered as scoped services and integrated with Wolverine's
     ///     message handling pipeline for automatic validation of commands and queries.
-    ///
+    /// 
     ///     This approach supports the Domain-Driven Design pattern where validation
     ///     rules are defined close to the domain entities and business logic.
     /// </remarks>
     /// <example>
-    /// See <see cref="AddServiceDefaults"/> for examples.
+    ///     See <see cref="AddServiceDefaults" /> for examples.
     /// </example>
     public static void AddValidators(this WebApplicationBuilder builder)
     {
@@ -114,8 +113,10 @@ public static class ServiceDefaultsExtensions
     ///         <item>Proper log flushing on application shutdown</item>
     ///         <item>Support for containerized environments and orchestrators</item>
     ///     </list>
-    ///
-    ///     <para><strong>Supported Wolverine Commands:</strong></para>
+    /// 
+    ///     <para>
+    ///         <strong>Supported Wolverine Commands:</strong>
+    ///     </para>
     ///     <list type="table">
     ///         <item>
     ///             <term>check-env</term>
@@ -136,7 +137,7 @@ public static class ServiceDefaultsExtensions
     ///     </list>
     /// </remarks>
     /// <example>
-    /// See <see cref="AddServiceDefaults"/> for examples.
+    ///     See <see cref="AddServiceDefaults" /> for examples.
     /// </example>
     public static async Task RunAsync(this WebApplication app, string[] args)
     {
@@ -145,6 +146,7 @@ public static class ServiceDefaultsExtensions
             if (args.Length > 0 && WolverineCommands.Contains(args[0]))
             {
                 await app.RunJasperFxCommands(args);
+
                 return;
             }
 

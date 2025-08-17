@@ -79,6 +79,7 @@ public class OpenApiCachingMiddleware(
             if (await TryServeCachedResponseAsync(context, filePath))
             {
                 _cacheInitialized[cacheKey] = true;
+
                 return;
             }
 
@@ -179,6 +180,7 @@ public class OpenApiCachingMiddleware(
     {
         var bytes = Encoding.UTF8.GetBytes(request.Path);
         var b64 = Convert.ToBase64String(bytes);
+
         return b64.Replace('+', '-').Replace('/', '_').TrimEnd('=');
     }
 

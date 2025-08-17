@@ -3,7 +3,7 @@
 namespace AppDomain.Invoices.Contracts.Models;
 
 /// <summary>
-/// Domain model representing an invoice in the AppDomain system.
+///     Domain model representing an invoice in the AppDomain system.
 /// </summary>
 /// <param name="TenantId">Unique identifier for the tenant</param>
 /// <param name="InvoiceId">Unique identifier for the invoice</param>
