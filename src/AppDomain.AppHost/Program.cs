@@ -1,9 +1,19 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
+/// <summary>
+/// .NET Aspire orchestration host for AppDomain microservices.
+/// Configures and manages the complete application stack including databases,
+/// messaging infrastructure, and service dependencies for local development.
+/// </summary>
+
+// Create the distributed application builder for orchestrating services
 var builder = DistributedApplication.CreateBuilder(args);
 
 #if (USE_PGSQL)
+// Configure PostgreSQL database with secure password parameter
 var dbPassword = builder.AddParameter("DbPassword", secret: true);
+
+// Add PostgreSQL server with PgAdmin management UI
 var pgsql = builder
     .AddPostgres("app-domain-db", password: dbPassword, port: 54320)
     .WithImage("postgres", "17-alpine")
@@ -17,15 +27,21 @@ var pgsql = builder
         .WithUrlForEndpoint("http", url => url.DisplayText = "PgAdmin (DB Management)"))
     .WithLifetime(ContainerLifetime.Persistent);
 
+// Create application and service bus databases
 var database = pgsql.AddDatabase(name: "AppDomainDb", databaseName: "app_domain");
 var serviceBusDb = pgsql.AddDatabase(name: "ServiceBus", databaseName: "service_bus");
+
 #if (USE_LIQUIBASE)
+// Configure database migrations using Liquibase
 builder.AddLiquibaseMigrations(pgsql, dbPassword);
 #endif
 
 #endif
 #if (USE_KAFKA)
+// Add Apache Kafka for event streaming and messaging
 var kafka = builder.AddKafka("messaging", port: 59092);
+
+// Configure Kafka UI for message monitoring and management
 kafka.WithKafkaUI(resource => resource
     .WithHostPort(port: 59093)
     .WaitFor(kafka)
@@ -33,10 +49,12 @@ kafka.WithKafkaUI(resource => resource
 
 #endif
 #if (INCLUDE_ORLEANS)
+// Configure Azure Storage emulator for Orleans clustering and grain persistence
 var storage = builder.AddAzureStorage("app-domain-azure-storage").RunAsEmulator();
 var clustering = storage.AddTables("OrleansClustering");
 var grainTables = storage.AddTables("OrleansGrainState");
 
+// Add Orleans for stateful actor-based processing
 var orleans = builder
     .AddOrleans("app-domain-orleans")
     .WithClustering(clustering)
@@ -44,6 +62,7 @@ var orleans = builder
 
 #endif
 #if (INCLUDE_API)
+// Configure the main API service with REST and gRPC endpoints
 var app_domainApi = builder
     .AddProject<Projects.AppDomain_Api>("app-domain-api")
     .WithEnvironment("ServiceName", "AppDomain")
@@ -62,6 +81,7 @@ var app_domainApi = builder
 
 #endif
 #if (INCLUDE_BACK_OFFICE)
+// Configure the back office service for asynchronous event processing
 builder
     .AddProject<Projects.AppDomain_BackOffice>("app-domain-backoffice")
     .WithEnvironment("ServiceName", "AppDomain")
@@ -79,6 +99,7 @@ builder
 
 #endif
 #if (INCLUDE_ORLEANS)
+// Configure Orleans-based back office service with clustering and grain storage
 builder
     .AddProject<Projects.AppDomain_BackOffice_Orleans>("app-domain-backoffice-orleans")
     .WithEnvironment("ServiceName", "AppDomain")
@@ -105,6 +126,7 @@ builder
 
 #endif
 #if (INCLUDE_DOCS)
+// Configure VitePress documentation container for developer documentation
 builder
     .AddContainer("app-domain-docs", "app-domain-docs")
     .WithDockerfile("../../", "docs/Dockerfile")
@@ -118,4 +140,6 @@ builder
     .WithHttpHealthCheck("/");
 
 #endif
+
+// Build and run the distributed application with all configured services
 await builder.Build().RunAsync();

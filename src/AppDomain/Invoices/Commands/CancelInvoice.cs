@@ -6,8 +6,17 @@ using AppDomain.Invoices.Data;
 
 namespace AppDomain.Invoices.Commands;
 
+/// <summary>
+/// Command to cancel an existing invoice.
+/// </summary>
+/// <param name="TenantId">Unique identifier for the tenant</param>
+/// <param name="InvoiceId">Unique identifier for the invoice to cancel</param>
+/// <param name="Version">Version number for optimistic concurrency control</param>
 public record CancelInvoiceCommand(Guid TenantId, Guid InvoiceId, int Version) : ICommand<Result<Invoice>>;
 
+/// <summary>
+/// Validator for the CancelInvoiceCommand.
+/// </summary>
 public class CancelInvoiceValidator : AbstractValidator<CancelInvoiceCommand>
 {
     public CancelInvoiceValidator()
@@ -18,12 +27,22 @@ public class CancelInvoiceValidator : AbstractValidator<CancelInvoiceCommand>
     }
 }
 
+/// <summary>
+/// Handler for the CancelInvoiceCommand.
+/// </summary>
 public static partial class CancelInvoiceCommandHandler
 {
     //TODO: Document this similar as the GetCashiersQueryHandler.DbQuery
     [DbCommand(fn: "$app_domain.invoices_cancel")]
     public partial record DbCommand(Guid TenantId, Guid InvoiceId, int Version) : ICommand<Data.Entities.Invoice?>;
 
+    /// <summary>
+    /// Handles the CancelInvoiceCommand and returns the cancelled invoice with integration event.
+    /// </summary>
+    /// <param name="command">The cancel invoice command</param>
+    /// <param name="messaging">The message bus for database operations</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>A tuple containing the result and integration event</returns>
     public static async Task<(Result<Invoice>, InvoiceCancelled?)> Handle(CancelInvoiceCommand command, IMessageBus messaging,
         CancellationToken cancellationToken)
     {

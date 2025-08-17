@@ -159,6 +159,12 @@ public class InvoiceGrain : Grain, IInvoiceGrain
         return true;
     }
 
+    /// <summary>
+    /// Publishes an integration event to the messaging infrastructure.
+    /// </summary>
+    /// <typeparam name="T">The type of integration event to publish</typeparam>
+    /// <param name="integrationEvent">The integration event to publish</param>
+    /// <returns>A task representing the asynchronous operation</returns>
     private Task PublishIntegrationEventAsync<T>(T integrationEvent) where T : class
     {
         // TODO: Implement integration event publishing via Kafka/Wolverine

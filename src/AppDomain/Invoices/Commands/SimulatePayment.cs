@@ -1,9 +1,21 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Invoices.Contracts.IntegrationEvents;
+using FluentValidation;
+using Momentum.Extensions;
 
 namespace AppDomain.Invoices.Commands;
 
+/// <summary>
+/// Command to simulate a payment for testing purposes.
+/// </summary>
+/// <param name="TenantId">Unique identifier for the tenant</param>
+/// <param name="InvoiceId">Unique identifier for the invoice</param>
+/// <param name="Version">Version number for optimistic concurrency control</param>
+/// <param name="Amount">Payment amount to simulate</param>
+/// <param name="Currency">Currency code for the payment amount</param>
+/// <param name="PaymentMethod">Method used for the simulated payment</param>
+/// <param name="PaymentReference">Reference identifier for the simulated payment</param>
 public record SimulatePaymentCommand(
     Guid TenantId,
     Guid InvoiceId,
@@ -14,6 +26,9 @@ public record SimulatePaymentCommand(
     string PaymentReference = "SIM-REF"
 ) : ICommand<Result<bool>>;
 
+/// <summary>
+/// Validator for the SimulatePaymentCommand.
+/// </summary>
 public class SimulatePaymentValidator : AbstractValidator<SimulatePaymentCommand>
 {
     public SimulatePaymentValidator()
@@ -28,8 +43,16 @@ public class SimulatePaymentValidator : AbstractValidator<SimulatePaymentCommand
     }
 }
 
+/// <summary>
+/// Handler for the SimulatePaymentCommand.
+/// </summary>
 public static class SimulatePaymentCommandHandler
 {
+    /// <summary>
+    /// Handles the SimulatePaymentCommand and generates a payment received event for testing.
+    /// </summary>
+    /// <param name="command">The simulate payment command</param>
+    /// <returns>A tuple containing the success result and payment received event</returns>
     public static Task<(Result<bool>, PaymentReceived)> Handle(SimulatePaymentCommand command)
     {
         var paymentReceivedEvent = new PaymentReceived(

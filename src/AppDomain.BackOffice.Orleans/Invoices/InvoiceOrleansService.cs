@@ -16,8 +16,8 @@ public class InvoiceOrleansService
     /// <summary>
     ///     Initializes a new instance of the InvoiceOrleansService class.
     /// </summary>
-    /// <param name="grainFactory">Orleans grain factory</param>
-    /// <param name="logger">Logger instance</param>
+    /// <param name="grainFactory">The Orleans grain factory used to create and access invoice grains.</param>
+    /// <param name="logger">The logger instance for recording service operations.</param>
     public InvoiceOrleansService(IGrainFactory grainFactory, ILogger<InvoiceOrleansService> logger)
     {
         _grainFactory = grainFactory;
@@ -27,8 +27,8 @@ public class InvoiceOrleansService
     /// <summary>
     ///     Creates a new invoice using Orleans grain.
     /// </summary>
-    /// <param name="invoice">Invoice to create</param>
-    /// <returns>The created invoice</returns>
+    /// <param name="invoice">The invoice data to create.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the created invoice.</returns>
     public async Task<Invoice> CreateInvoiceAsync(Invoice invoice)
     {
         var grain = _grainFactory.GetGrain<IInvoiceGrain>(invoice.InvoiceId);
@@ -39,8 +39,8 @@ public class InvoiceOrleansService
     /// <summary>
     ///     Gets an invoice by its ID.
     /// </summary>
-    /// <param name="invoiceId">Invoice ID</param>
-    /// <returns>The invoice if found, otherwise null</returns>
+    /// <param name="invoiceId">The unique identifier of the invoice to retrieve.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the invoice if found; otherwise, <c>null</c>.</returns>
     public async Task<Invoice?> GetInvoiceAsync(Guid invoiceId)
     {
         var grain = _grainFactory.GetGrain<IInvoiceGrain>(invoiceId);
@@ -51,10 +51,10 @@ public class InvoiceOrleansService
     /// <summary>
     ///     Processes a payment for an invoice.
     /// </summary>
-    /// <param name="invoiceId">Invoice ID</param>
-    /// <param name="amount">Payment amount</param>
-    /// <param name="paymentMethod">Payment method</param>
-    /// <returns>True if payment was processed successfully</returns>
+    /// <param name="invoiceId">The unique identifier of the invoice to process payment for.</param>
+    /// <param name="amount">The payment amount to process.</param>
+    /// <param name="paymentMethod">The payment method used for the transaction.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains <c>true</c> if the payment was processed successfully; otherwise, <c>false</c>.</returns>
     public async Task<bool> ProcessPaymentAsync(Guid invoiceId, decimal amount, string paymentMethod)
     {
         var grain = _grainFactory.GetGrain<IInvoiceGrain>(invoiceId);
@@ -65,9 +65,9 @@ public class InvoiceOrleansService
     /// <summary>
     ///     Updates the status of an invoice.
     /// </summary>
-    /// <param name="invoiceId">Invoice ID</param>
-    /// <param name="newStatus">New status</param>
-    /// <returns>The updated invoice</returns>
+    /// <param name="invoiceId">The unique identifier of the invoice to update.</param>
+    /// <param name="newStatus">The new status to set for the invoice.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the updated invoice.</returns>
     public async Task<Invoice> UpdateInvoiceStatusAsync(Guid invoiceId, string newStatus)
     {
         var grain = _grainFactory.GetGrain<IInvoiceGrain>(invoiceId);

@@ -6,8 +6,19 @@ using AppDomain.Invoices.Queries;
 
 namespace AppDomain.BackOffice.Messaging.AppDomainInboxHandler;
 
+/// <summary>
+/// Handles payment received integration events by marking invoices as paid.
+/// </summary>
 public static class PaymentReceivedHandler
 {
+    /// <summary>
+    /// Processes a payment received event by retrieving the associated invoice and marking it as paid.
+    /// </summary>
+    /// <param name="event">The payment received integration event containing payment details.</param>
+    /// <param name="messaging">Message bus for executing commands and queries.</param>
+    /// <param name="cancellationToken">Cancellation token for async operations.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when the associated invoice cannot be retrieved.</exception>
     public static async Task Handle(PaymentReceived @event, IMessageBus messaging, CancellationToken cancellationToken)
     {
         // TODO: Get TenantId from the invoice or event

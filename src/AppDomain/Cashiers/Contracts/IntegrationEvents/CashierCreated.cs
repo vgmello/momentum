@@ -12,14 +12,20 @@ namespace AppDomain.Cashiers.Contracts.IntegrationEvents;
 /// <param name="TenantId">Unique identifier for the tenant</param>
 /// <param name="Cashier">Cashier object containing all cashier data and configuration</param>
 /// <remarks>
-///     ## When It's Triggered
+/// ## When It's Triggered
 ///
-///     This event is published when:
-///     -   The cashier creation process completes successfully
+/// This event is published when:
+/// - The cashier creation process completes successfully
+/// - All validation rules pass for the new cashier data
+/// - The cashier has been persisted to the database
 ///
-///     ## Some other event data
+/// ## Event Usage
 ///
-///     Some other event data text
+/// This event can be used by other services to:
+/// - Initialize cashier profiles in external systems
+/// - Set up authentication and authorization
+/// - Configure related business processes
+/// - Update reporting and analytics systems
 /// </remarks>
 [EventTopic<Cashier>]
 public record CashierCreated(

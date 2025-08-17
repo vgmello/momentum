@@ -40,7 +40,7 @@ public class InvoicesController(IMessageBus bus) : ControllerBase
     /// <param name="id">The unique identifier of the invoice</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>The invoice details if found</returns>
-    /// <response code="200" />
+    /// <response code="200">Returns the invoice details</response>
     /// <response code="404">If the invoice is not found</response>
     /// <response code="400">If the provided ID is invalid</response>
     [HttpGet("{id:guid}")]

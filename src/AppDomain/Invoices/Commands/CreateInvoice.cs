@@ -85,6 +85,11 @@ public static class CreateInvoiceCommandHandler
         return inserted;
     }
 
+    /// <summary>
+    /// Creates a database command from the create invoice command.
+    /// </summary>
+    /// <param name="command">The create invoice command</param>
+    /// <returns>A database command with the invoice entity</returns>
     private static DbCommand CreateInsertCommand(CreateInvoiceCommand command) =>
         new(new Data.Entities.Invoice
         {

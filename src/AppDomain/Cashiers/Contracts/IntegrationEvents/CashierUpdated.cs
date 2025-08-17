@@ -1,6 +1,7 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Cashiers.Contracts.Models;
+using Momentum.Extensions.Abstractions.Messaging;
 
 namespace AppDomain.Cashiers.Contracts.IntegrationEvents;
 
@@ -29,4 +30,4 @@ namespace AppDomain.Cashiers.Contracts.IntegrationEvents;
 public record CashierUpdated(
     [PartitionKey] Guid TenantId,
     Cashier Cashier
-);
+) : IDistributedEvent;
