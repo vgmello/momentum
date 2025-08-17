@@ -23,7 +23,11 @@
         </AssemblyAttribute>
     </ItemGroup>
 
+    <!--#if (false) -->
+    <ItemGroup Condition="false">
+        <!--#else
     <ItemGroup>
+        #endif-->
         <PackageReference Include="Momentum.Extensions.Abstractions"/>
         <!--#if (libs != ext) -->
         <PackageReference Include="Momentum.Extensions"/>
@@ -49,7 +53,7 @@
     <Import Project="..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.props"/>
     <!--#endif -->
     <!--#if (libs == generators) -->
-    <Import Project="..\..\libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.props"/>
+    <!--    <Import Project="..\..\libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.props"/>-->
     <!--#endif -->
     <!--#endif -->
     <!--#if (false) -->
