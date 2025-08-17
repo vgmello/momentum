@@ -44,11 +44,17 @@
             OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
         <!--#endif -->
     </ItemGroup>
+
     <!--#if (libs == ext) -->
     <Import Project="..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.props"/>
     <!--#endif -->
     <!--#if (libs == generators) -->
     <Import Project="..\..\libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.props"/>
     <!--#endif -->
+    <!--#endif -->
+    <!--#if (false) -->
+    <ItemGroup>
+        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
+    </ItemGroup>
     <!--#endif -->
 </Project>

@@ -256,6 +256,23 @@
       "defaultValue": "0.0.0"
     }
   },
+  "forms": {
+    "kebab-case": {
+      "identifier": "kebabCase"
+    },
+    "dash-to-underscore": {
+      "identifier": "replace",
+      "pattern": "-",
+      "replacement": "_"
+    },
+    "snake_case": {
+      "identifier": "chain",
+      "steps": [
+        "kebab-case",
+        "dash-to-underscore"
+      ]
+    }
+  },
   "sources": [
     {
       "include": [
@@ -502,23 +519,6 @@
             "evaluator": "C++"
           }
         }
-      ]
-    }
-  },
-  "forms": {
-    "kebab-case": {
-      "identifier": "kebabCase"
-    },
-    "dash-to-underscore": {
-      "identifier": "replace",
-      "pattern": "-",
-      "replacement": "_"
-    },
-    "snake_case": {
-      "identifier": "chain",
-      "steps": [
-        "kebab-case",
-        "dash-to-underscore"
       ]
     }
   }

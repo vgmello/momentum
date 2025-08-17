@@ -3,14 +3,14 @@
         <ItemGroup>
             <OldPackagesToDelete Include="$(MSBuildProjectDirectory)/$(PackageOutputPath)*.nupkg"/>
             <OldPackagesToDelete Include="$(BaseIntermediateOutputPath)**/*.nuspec"/>
-            <OldPackagesToDelete Include="$(SolutionDir).local/nuget/$(PackageId).*.nupkg"/>
+            <OldPackagesToDelete Include="$(MSBuildThisFileDirectory).local/nuget/$(PackageId).*.nupkg"/>
         </ItemGroup>
         <Message Text="Cleaning up nupkg/nuspec files" Importance="high"/>
         <Delete Files="@(OldPackagesToDelete)"/>
     </Target>
 
     <Target Name="PushToLocalFeed" AfterTargets="Pack" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' and '$(SolutionDir)' != '*Undefined*' ">
-        <MakeDir Directories="$(SolutionDir).local/nuget"/>
-        <Exec Command="dotnet nuget push &quot;$(PackageOutputPath)$(PackageId).$(PackageVersion).nupkg&quot; --source &quot;$(SolutionDir).local/nuget&quot; --skip-duplicate"/>
+        <MakeDir Directories="$(MSBuildThisFileDirectory).local/nuget"/>
+        <Exec Command="dotnet nuget push &quot;$(PackageOutputPath)$(PackageId).$(PackageVersion).nupkg&quot; --source &quot;$(MSBuildThisFileDirectory).local/nuget&quot;"/>
     </Target>
 </Project>

@@ -14,7 +14,7 @@
 
     <ItemGroup>
         <EmbeddedResource Include="Templates\**\*.liquid"/>
-        <None Include="Momentum.Extensions.EventMarkdownGenerator.props" Pack="true" PackagePath="build/"/>
+        <None Include="Momentum.Extensions.EventMarkdownGenerator.props" Pack="true" PackagePath="\build"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -44,7 +44,7 @@
         <Copy SourceFiles="@(ToolFiles)" DestinationFolder="$(ToolsOutputPath)"/>
 
         <ItemGroup>
-            <Content Include="$(ToolsOutputPath)**\*" Pack="true" PackagePath="tools\net9.0\"/>
+            <Content Include="$(ToolsOutputPath)**\*" Pack="true" PackagePath="\tools\net9.0\"/>
         </ItemGroup>
     </Target>
 </Project>

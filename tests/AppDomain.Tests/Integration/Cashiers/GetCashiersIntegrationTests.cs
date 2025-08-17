@@ -1,8 +1,6 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
-using AppDomain.Cashiers.Grpc;
 using AppDomain.Tests.Integration._Internal;
-using Dapper;
 using System.Data.Common;
 
 namespace AppDomain.Tests.Integration.Cashiers;

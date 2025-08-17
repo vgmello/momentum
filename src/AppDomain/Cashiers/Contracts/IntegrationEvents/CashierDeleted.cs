@@ -7,7 +7,6 @@ namespace AppDomain.Cashiers.Contracts.IntegrationEvents;
 /// This event contains the deleted cashier identifier and partition key information for proper message routing.
 /// </summary>
 /// <param name="TenantId">Unique identifier for the tenant</param>
-/// <param name="PartitionKeyTest">Additional partition key for message routing</param>
 /// <param name="CashierId">Unique identifier of the deleted cashier</param>
 /// <param name="DeletedAt">Date and time when the cashier was deleted (UTC)</param>
 /// <remarks>
@@ -27,9 +26,4 @@ namespace AppDomain.Cashiers.Contracts.IntegrationEvents;
 /// - Notify dependent services of cashier removal
 /// </remarks>
 [EventTopic<Guid>]
-public record CashierDeleted(
-    [PartitionKey(Order = 0)] Guid TenantId,
-    [PartitionKey(Order = 1)] int PartitionKeyTest,
-    Guid CashierId,
-    DateTime DeletedAt
-);
+public record CashierDeleted([PartitionKey] Guid TenantId, Guid CashierId, DateTime DeletedAt);

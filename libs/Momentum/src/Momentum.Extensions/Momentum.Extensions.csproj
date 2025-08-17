@@ -11,7 +11,7 @@
 
     <!--#if (libs == none) -->
     <ItemGroup>
-        <None Include="Momentum.Extensions.props" Pack="true" PackagePath="build/"/>
+        <None Include="Momentum.Extensions.props" Pack="true" PackagePath="\build"/>
     </ItemGroup>
     <!--#endif -->
 

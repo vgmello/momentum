@@ -2,15 +2,11 @@
 
 using AppDomain.Cashiers.Contracts.Models;
 using AppDomain.Cashiers.Data;
-using AppDomain.Core.Data;
-using LinqToDB;
-using Momentum.Extensions;
-using Momentum.Extensions.Abstractions.Messaging;
 
 namespace AppDomain.Cashiers.Queries;
 
 /// <summary>
-/// Query to retrieve a single cashier by its identifier.
+///     Query to retrieve a single cashier by its identifier.
 /// </summary>
 /// <param name="TenantId">Unique identifier for the tenant</param>
 /// <param name="CashierId">Unique identifier for the cashier</param>
@@ -20,12 +16,12 @@ public record GetCashierQuery(
 ) : IQuery<Result<Cashier>>;
 
 /// <summary>
-/// Handler for the GetCashierQuery.
+///     Handler for the GetCashierQuery.
 /// </summary>
 public static class GetCashierQueryHandler
 {
     /// <summary>
-    /// Handles the GetCashierQuery and returns the requested cashier.
+    ///     Handles the GetCashierQuery and returns the requested cashier.
     /// </summary>
     /// <param name="query">The get cashier query</param>
     /// <param name="db">The database context</param>

@@ -1,26 +1,32 @@
 # AppDomain Microservices Solution
 
-A comprehensive .NET 9 microservices solution implementing Domain-Driven Design principles with event-driven architecture. The solution mirrors real-world business operations with separate front office (synchronous APIs) and back office (asynchronous event processing) components.
+A comprehensive .NET 9 microservices solution implementing Domain-Driven Design principles with event-driven architecture. The solution
+mirrors real-world business operations with separate front office (synchronous APIs) and back office (asynchronous event processing)
+components.
 
 ## Overview
 
 The AppDomain solution demonstrates modern enterprise architecture patterns including:
 
--   **Domain-Driven Design (DDD)** with clear bounded contexts
--   **Event-driven architecture** using Apache Kafka
--   **CQRS pattern** with separate command and query handling
--   **Microservices architecture** with proper service boundaries
-<!--#if (INCLUDE_ORLEANS)-->
--   **Orleans-based stateful processing** for complex business workflows
-<!--#endif-->
--   **Comprehensive testing strategy** with unit and integration tests
+- **Domain-Driven Design (DDD)** with clear bounded contexts
+- **Event-driven architecture** using Apache Kafka
+- **CQRS pattern** with separate command and query handling
+- **Microservices architecture** with proper service boundaries
 
-<!--#if (!INCLUDE_SAMPLE)-->
+<!--#if (INCLUDE_ORLEANS)-->
+
+- **Orleans-based stateful processing** for complex business workflows
+
+<!--#endif-->
+
+- **Comprehensive testing strategy** with unit and integration tests
+
+<!--#if (!INCLUDE_SAMPLE) -->
 
 ### Key Business Domains
 
--   **Cashiers**: Management of cashier entities and their payment capabilities
--   **Invoices**: Invoice lifecycle management with state transitions and payment processing
+- **Cashiers**: Management of cashier entities and their payment capabilities
+- **Invoices**: Invoice lifecycle management with state transitions and payment processing
 
 <!--#endif-->
 
@@ -96,34 +102,36 @@ graph TB
 
 ## Project Structure
 
-    <!--#if (INCLUDE_API)-->
-
--   **AppDomain.Api**: REST and gRPC endpoints for synchronous operations
-    <!--#endif-->
-    <!--#if (INCLUDE_BACK_OFFICE)-->
--   **AppDomain.BackOffice**: Background event processing and integration workflows
-    <!--#endif-->
-    <!--#if (INCLUDE_ORLEANS)-->
--   **AppDomain.BackOffice.Orleans**: Stateful processing using Microsoft Orleans
-    <!--#endif-->
-    <!--#if (INCLUDE_ASPIRE)-->
--   **AppDomain.AppHost**: .NET Aspire orchestration for local development
-    <!--#endif-->
--   **AppDomain**: Core domain logic with commands, queries, and events
--   **AppDomain.Contracts**: Shared contracts and integration events
-    <!--#if (db == "liquibase")-->
--   **infra/AppDomain.Database**: Liquibase database migrations
-    <!--#endif-->
-    <!--#if (INCLUDE_DOCS)-->
--   **docs**: VitePress documentation site with auto-generated event docs
-    <!--#endif-->
+<!-- prettier-ignore-start -->
+<!--#if (INCLUDE_API)-->
+- **AppDomain.Api**: REST and gRPC endpoints for synchronous operations
+<!--#endif-->
+<!--#if (INCLUDE_BACK_OFFICE)-->
+- **AppDomain.BackOffice**: Background event processing and integration workflows
+<!--#endif-->
+<!--#if (INCLUDE_ORLEANS)-->
+- **AppDomain.BackOffice.Orleans**: Stateful processing using Microsoft Orleans
+<!--#endif-->
+<!--#if (INCLUDE_ASPIRE)-->
+- **AppDomain.AppHost**: .NET Aspire orchestration for local development
+<!--#endif-->
+- **AppDomain**: Core domain logic with commands, queries, and events
+- **AppDomain.Contracts**: Shared contracts and integration events
+<!--#if (db == "liquibase")-->
+- **infra/AppDomain.Database**: Liquibase database migrations
+<!--#endif-->
+<!--#if (INCLUDE_DOCS)-->
+- **docs**: VitePress documentation site with auto-generated event docs
+<!--#endif-->
+<!-- prettier-ignore-end -->
 
 ## Port Allocations
 
 The solution uses the following port allocations (default base port: SERVICE_BASE_PORT):
 
+<!-- prettier-ignore-start -->
 | Service | HTTP Port | HTTPS Port | Description |
-| ------- | --------- | ---------- | ----------- |
+|---------|-----------|------------|-------------|
 
 <!--#if (INCLUDE_API)-->
 
@@ -162,27 +170,30 @@ The solution uses the following port allocations (default base port: SERVICE_BAS
 | Kafka | 59092 | - | Kafka broker |
 
 <!--#endif-->
+<!-- prettier-ignore-end -->
 
 ## Prerequisites
 
--   **.NET 9 SDK** or later
--   **Docker Desktop** with Docker Compose
-    <!--#if (USE_PGSQL)-->
--   **PostgreSQL** (handled by Docker Compose)
-    <!--#endif-->
-    <!--#if (USE_KAFKA)-->
--   **Apache Kafka** (handled by Docker Compose)
-    <!--#endif-->
--   **Git** for version control
+<!-- prettier-ignore-start -->
+- **.NET 9 SDK** or later
+- **Docker Desktop** with Docker Compose
+<!--#if (USE_PGSQL)-->
+- **PostgreSQL** (handled by Docker Compose)
+<!--#endif-->
+<!--#if (USE_KAFKA)-->
+- **Apache Kafka** (handled by Docker Compose)
+<!--#endif-->
+- **Git** for version control
 
 ### Optional Tools
 
 <!--#if (USE_PGSQL)-->
-
--   **pgAdmin** (included in Docker setup)
+- **pgAdmin** (included in Docker setup)
 <!--#endif-->
--   **Visual Studio 2022** or **JetBrains Rider**
--   **Postman** or similar for API testing
+
+- **Visual Studio 2022** or **JetBrains Rider**
+- **Postman** or similar for API testing
+<!-- prettier-ignore-end -->
 
 ## Getting Started
 
@@ -203,10 +214,10 @@ dotnet run --project src/AppDomain.AppHost
 
 This will:
 
--   Start all services with proper orchestration
--   Launch the Aspire dashboard at https://localhost:[SERVICE_BASE_PORT + 10010]
--   Set up service discovery and health monitoring
--   Configure distributed tracing with OpenTelemetry
+- Start all services with proper orchestration
+- Launch the Aspire dashboard at https://localhost:[SERVICE_BASE_PORT + 10010]
+- Set up service discovery and health monitoring
+- Configure distributed tracing with OpenTelemetry
 
 <!--#endif-->
 
@@ -251,8 +262,8 @@ docker compose up AppDomain-db AppDomain-db-migrations
 
 #### Accessing the Database
 
--   **Connection String**: `Host=localhost;Port=54320;Database=app_domain;Username=postgres;Password=password@`
--   **pgAdmin**: http://localhost:54321 (admin@example.com / admin)
+- **Connection String**: `Host=localhost;Port=54320;Database=app_domain;Username=postgres;Password=password@`
+- **pgAdmin**: http://localhost:54321 (admin@example.com / admin)
 
 <!--#endif-->
 
@@ -283,16 +294,20 @@ dotnet test tests/AppDomain.Tests
 
 ### Adding New Features
 
+<!-- prettier-ignore-start -->
 1. **Define the Command/Query** in `src/AppDomain/[Domain]/Commands/` or `Queries/`
 2. **Implement the Handler** using Wolverine's handler pattern
 3. **Create Integration Events** in `src/AppDomain.Contracts/IntegrationEvents/`
- <!--#if (INCLUDE_API)-->
+
+<!--#if (INCLUDE_API)-->
 4. **Add API Endpoints** in `src/AppDomain.Api/[Domain]/Controller.cs`
-    <!--#endif-->
-    <!--#if (db == "liquibase")-->
+<!--#endif-->
+<!--#if (db == "liquibase")-->
 5. **Create Database Migrations** in `infra/AppDomain.Database/Liquibase/`
- <!--#endif-->
+<!--#endif-->
+
 6. **Write Tests** in `tests/AppDomain.Tests/`
+<!-- prettier-ignore-end -->
 
 <!--#if (INCLUDE_API)-->
 
@@ -300,9 +315,9 @@ dotnet test tests/AppDomain.Tests
 
 ### Accessing API Documentation
 
--   **Scalar UI**: http://localhost:[SERVICE_BASE_PORT + 1]/scalar
--   **OpenAPI Spec**: http://localhost:[SERVICE_BASE_PORT + 1]/openapi/v1.json
--   **gRPC Reflection**: Enabled on port [SERVICE_BASE_PORT + 2]
+- **Scalar UI**: http://localhost:[SERVICE_BASE_PORT + 1]/scalar
+- **OpenAPI Spec**: http://localhost:[SERVICE_BASE_PORT + 1]/openapi/v1.json
+- **gRPC Reflection**: Enabled on port [SERVICE_BASE_PORT + 2]
 
 ### API Endpoints
 
@@ -311,7 +326,7 @@ dotnet test tests/AppDomain.Tests
 #### Cashiers API
 
 | Method | Endpoint             | Description        |
-| ------ | -------------------- | ------------------ |
+|--------|----------------------|--------------------|
 | GET    | `/api/cashiers`      | List all cashiers  |
 | GET    | `/api/cashiers/{id}` | Get cashier by ID  |
 | POST   | `/api/cashiers`      | Create new cashier |
@@ -321,7 +336,7 @@ dotnet test tests/AppDomain.Tests
 #### Invoices API
 
 | Method | Endpoint                 | Description          |
-| ------ | ------------------------ | -------------------- |
+|--------|--------------------------|----------------------|
 | GET    | `/api/invoices`          | List all invoices    |
 | GET    | `/api/invoices/{id}`     | Get invoice by ID    |
 | POST   | `/api/invoices`          | Create new invoice   |
@@ -333,9 +348,9 @@ dotnet test tests/AppDomain.Tests
 
 The API supports multiple authentication schemes:
 
--   **API Key**: Pass via `X-API-Key` header
--   **JWT Bearer**: Standard OAuth 2.0 bearer tokens
--   **Basic Auth**: For development/testing only
+- **API Key**: Pass via `X-API-Key` header
+- **JWT Bearer**: Standard OAuth 2.0 bearer tokens
+- **Basic Auth**: For development/testing only
 
 <!--#endif-->
 
@@ -350,7 +365,7 @@ The solution uses Apache Kafka for event streaming:
 <!--#if (INCLUDE_SAMPLE)-->
 
 | Event           | Producer   | Consumers           | Description                 |
-| --------------- | ---------- | ------------------- | --------------------------- |
+|-----------------|------------|---------------------|-----------------------------|
 | CashierCreated  | API        | BackOffice          | New cashier registered      |
 | CashierUpdated  | API        | BackOffice          | Cashier details modified    |
 | InvoiceCreated  | API        | BackOffice, Orleans | New invoice generated       |
@@ -372,7 +387,7 @@ Example: `app_domain.cashiers.created`, `app_domain.invoices.paid`
 ### Environment Variables
 
 | Variable               | Default     | Description         |
-| ---------------------- | ----------- | ------------------- |
+|------------------------|-------------|---------------------|
 | ASPNETCORE_ENVIRONMENT | Development | Runtime environment |
 
 <!--#if (USE_DB)-->
@@ -397,9 +412,9 @@ Example: `app_domain.cashiers.created`, `app_domain.invoices.paid`
 
 Configuration files follow the standard .NET pattern:
 
--   `appsettings.json` - Base configuration
--   `appsettings.Development.json` - Development overrides
--   `appsettings.Production.json` - Production settings
+- `appsettings.json` - Base configuration
+- `appsettings.Development.json` - Development overrides
+- `appsettings.Production.json` - Production settings
 
 ## Deployment
 
@@ -450,9 +465,9 @@ kubectl apply -f k8s/services/
 
 All services expose health endpoints:
 
--   `/health/live` - Liveness probe
--   `/health/ready` - Readiness probe
--   `/health/internal` - Detailed health status
+- `/health/live` - Liveness probe
+- `/health/ready` - Readiness probe
+- `/health/internal` - Detailed health status
 
 ### Metrics
 
@@ -470,10 +485,10 @@ Traces can be exported to:
 
 <!--#endif-->
 
--   Jaeger
--   Zipkin
--   Azure Application Insights
--   AWS X-Ray
+- Jaeger
+- Zipkin
+- Azure Application Insights
+- AWS X-Ray
 
 ## Troubleshooting
 

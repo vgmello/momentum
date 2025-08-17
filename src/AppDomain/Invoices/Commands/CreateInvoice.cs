@@ -3,17 +3,11 @@
 using AppDomain.Invoices.Contracts.IntegrationEvents;
 using AppDomain.Invoices.Contracts.Models;
 using AppDomain.Invoices.Data;
-using AppDomain.Core.Data;
-using FluentValidation;
-using LinqToDB;
-using Momentum.Extensions;
-using Momentum.Extensions.Abstractions.Messaging;
-using Wolverine;
 
 namespace AppDomain.Invoices.Commands;
 
 /// <summary>
-/// Command to create a new invoice in the system.
+///     Command to create a new invoice in the system.
 /// </summary>
 /// <param name="TenantId">Unique identifier for the tenant</param>
 /// <param name="Name">Invoice name or description</param>
@@ -31,12 +25,12 @@ public record CreateInvoiceCommand(
 ) : ICommand<Result<Invoice>>;
 
 /// <summary>
-/// Validator for the CreateInvoiceCommand.
+///     Validator for the CreateInvoiceCommand.
 /// </summary>
 public class CreateInvoiceValidator : AbstractValidator<CreateInvoiceCommand>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="CreateInvoiceValidator"/> class.
+    ///     Initializes a new instance of the <see cref="CreateInvoiceValidator" /> class.
     /// </summary>
     public CreateInvoiceValidator()
     {
@@ -50,18 +44,18 @@ public class CreateInvoiceValidator : AbstractValidator<CreateInvoiceCommand>
 }
 
 /// <summary>
-/// Handler for the CreateInvoiceCommand.
+///     Handler for the CreateInvoiceCommand.
 /// </summary>
 public static class CreateInvoiceCommandHandler
 {
     /// <summary>
-    /// Database command for inserting an invoice.
+    ///     Database command for inserting an invoice.
     /// </summary>
     /// <param name="Invoice">The invoice entity to insert</param>
     public record DbCommand(Data.Entities.Invoice Invoice) : ICommand<Data.Entities.Invoice>;
 
     /// <summary>
-    /// Handles the CreateInvoiceCommand and returns the created invoice with integration event.
+    ///     Handles the CreateInvoiceCommand and returns the created invoice with integration event.
     /// </summary>
     /// <param name="command">The create invoice command</param>
     /// <param name="messaging">The message bus for database operations</param>
@@ -80,7 +74,7 @@ public static class CreateInvoiceCommandHandler
     }
 
     /// <summary>
-    /// Handles the database command for inserting an invoice.
+    ///     Handles the database command for inserting an invoice.
     /// </summary>
     /// <param name="command">The database command</param>
     /// <param name="db">The database context</param>

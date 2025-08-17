@@ -1,7 +1,6 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Cashiers.Queries;
-using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using Momentum.Extensions.Messaging;
 using Wolverine;

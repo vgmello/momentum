@@ -4,7 +4,6 @@
 using AppDomain.Cashiers.Data.Entities;
 using AppDomain.Invoices.Data.Entities;
 //#endif
-using LinqToDB;
 using LinqToDB.Data;
 
 namespace AppDomain.Core.Data;
@@ -13,6 +12,7 @@ public class AppDomainDb(DataOptions<AppDomainDb> options) : DataConnection(opti
 {
     //#if (INCLUDE_SAMPLE)
     public ITable<Cashier> Cashiers => this.GetTable<Cashier>();
+
     public ITable<Invoice> Invoices => this.GetTable<Invoice>();
     //#else
     // Add your domain entities here when not using samples

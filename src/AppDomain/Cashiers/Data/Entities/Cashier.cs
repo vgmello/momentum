@@ -1,6 +1,5 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
-using AppDomain.Core.Data;
 using LinqToDB.Mapping;
 
 namespace AppDomain.Cashiers.Data.Entities;

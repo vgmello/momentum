@@ -3,12 +3,6 @@
 using AppDomain.Cashiers.Contracts.IntegrationEvents;
 using AppDomain.Cashiers.Contracts.Models;
 using AppDomain.Cashiers.Data;
-using AppDomain.Core.Data;
-using FluentValidation;
-using LinqToDB;
-using Momentum.Extensions;
-using Momentum.Extensions.Abstractions.Messaging;
-using Wolverine;
 
 namespace AppDomain.Cashiers.Commands;
 
@@ -27,6 +21,9 @@ public class CreateCashierValidator : AbstractValidator<CreateCashierCommand>
 
 public static class CreateCashierCommandHandler
 {
+    /// <summary>
+    ///     Storage / persistence request
+    /// </summary>
     public record DbCommand(Data.Entities.Cashier Cashier) : ICommand<Data.Entities.Cashier>;
 
     public static async Task<(Result<Cashier>, CashierCreated?)> Handle(CreateCashierCommand command, IMessageBus messaging,
@@ -36,7 +33,7 @@ public static class CreateCashierCommandHandler
         var insertedCashier = await messaging.InvokeCommandAsync(dbCommand, cancellationToken);
 
         var result = insertedCashier.ToModel();
-        var createdEvent = new CashierCreated(result.TenantId, PartitionKeyTest: 0, result);
+        var createdEvent = new CashierCreated(result.TenantId, result);
 
         return (result, createdEvent);
     }

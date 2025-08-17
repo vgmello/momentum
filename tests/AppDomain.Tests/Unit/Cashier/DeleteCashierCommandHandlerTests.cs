@@ -2,7 +2,6 @@
 
 using AppDomain.Cashiers.Commands;
 using AppDomain.Cashiers.Contracts.IntegrationEvents;
-using NSubstitute;
 using Momentum.Extensions.Messaging;
 using Wolverine;
 

@@ -1,10 +1,7 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
-using AppDomain.Invoices.Grpc;
 using AppDomain.Tests.Integration._Internal;
-using Dapper;
 using System.Data.Common;
-using Grpc.Core;
 
 namespace AppDomain.Tests.Integration.Invoices;
 

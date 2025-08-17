@@ -1,6 +1,6 @@
 # Momentum.ServiceDefaults
 
-Service defaults for Momentum platform providing common configurations for Aspire-based services including Kafka, PostgreSQL, OpenTelemetry, Serilog, resilience patterns, and service discovery. Essential for all Momentum host projects.
+Service defaults for Momentum apps providing common configurations for Aspire-based services including Kafka, PostgreSQL, OpenTelemetry, Serilog, resilience patterns, and service discovery. Essential for all Momentum host projects.
 
 ## Overview
 

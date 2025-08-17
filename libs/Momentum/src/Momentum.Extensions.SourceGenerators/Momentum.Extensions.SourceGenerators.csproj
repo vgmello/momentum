@@ -29,11 +29,11 @@
     <!--#if (libs == none) -->
     <ItemGroup>
         <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true"
-            PackagePath="analyzers/dotnet/cs" Visible="false" />
+            PackagePath="\analyzers\dotnet\cs" Visible="false" />
         <None
             Include="$(ProjectDir)\..\Momentum.Extensions.Abstractions\$(OutputPath)\Momentum.Extensions.Abstractions.dll"
-            Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-        <None Include="Momentum.Extensions.SourceGenerators.props" Pack="true" PackagePath="build" />
+            Pack="true" PackagePath="\analyzers\dotnet\cs" Visible="false" />
+        <None Include="Momentum.Extensions.SourceGenerators.props" Pack="true" PackagePath="\build" />
     </ItemGroup>
 
     <ItemGroup>

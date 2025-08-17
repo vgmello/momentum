@@ -3,17 +3,11 @@
 using AppDomain.Invoices.Contracts.IntegrationEvents;
 using AppDomain.Invoices.Contracts.Models;
 using AppDomain.Invoices.Data;
-using AppDomain.Core.Data;
-using FluentValidation;
-using LinqToDB;
-using Momentum.Extensions;
-using Momentum.Extensions.Abstractions.Messaging;
-using Wolverine;
 
 namespace AppDomain.Invoices.Commands;
 
 /// <summary>
-/// Command to mark an existing invoice as paid.
+///     Command to mark an existing invoice as paid.
 /// </summary>
 /// <param name="TenantId">Unique identifier for the tenant</param>
 /// <param name="InvoiceId">Unique identifier for the invoice to mark as paid</param>
@@ -29,12 +23,12 @@ public record MarkInvoiceAsPaidCommand(
 ) : ICommand<Result<Invoice>>;
 
 /// <summary>
-/// Validator for the MarkInvoiceAsPaidCommand.
+///     Validator for the MarkInvoiceAsPaidCommand.
 /// </summary>
 public class MarkInvoiceAsPaidValidator : AbstractValidator<MarkInvoiceAsPaidCommand>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="MarkInvoiceAsPaidValidator"/> class.
+    ///     Initializes a new instance of the <see cref="MarkInvoiceAsPaidValidator" /> class.
     /// </summary>
     public MarkInvoiceAsPaidValidator()
     {
@@ -46,12 +40,12 @@ public class MarkInvoiceAsPaidValidator : AbstractValidator<MarkInvoiceAsPaidCom
 }
 
 /// <summary>
-/// Handler for the MarkInvoiceAsPaidCommand.
+///     Handler for the MarkInvoiceAsPaidCommand.
 /// </summary>
 public static class MarkInvoiceAsPaidCommandHandler
 {
     /// <summary>
-    /// Database command for marking an invoice as paid.
+    ///     Database command for marking an invoice as paid.
     /// </summary>
     /// <param name="TenantId">Unique identifier for the tenant</param>
     /// <param name="InvoiceId">Unique identifier for the invoice</param>
@@ -65,13 +59,14 @@ public static class MarkInvoiceAsPaidCommandHandler
     ) : ICommand<Data.Entities.Invoice?>;
 
     /// <summary>
-    /// Handles the MarkInvoiceAsPaidCommand and returns the updated invoice with integration events.
+    ///     Handles the MarkInvoiceAsPaidCommand and returns the updated invoice with integration events.
     /// </summary>
     /// <param name="command">The mark invoice as paid command</param>
     /// <param name="messaging">The message bus for database operations</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>A tuple containing the result and integration events</returns>
-    public static async Task<(Result<Invoice>, InvoicePaid?, PaymentReceived?)> Handle(MarkInvoiceAsPaidCommand command, IMessageBus messaging,
+    public static async Task<(Result<Invoice>, InvoicePaid?, PaymentReceived?)> Handle(MarkInvoiceAsPaidCommand command,
+        IMessageBus messaging,
         CancellationToken cancellationToken)
     {
         var dbCommand = new MarkInvoiceAsPaidDbCommand(command.TenantId, command.InvoiceId, command.AmountPaid, command.PaymentDate);
@@ -91,13 +86,14 @@ public static class MarkInvoiceAsPaidCommandHandler
     }
 
     /// <summary>
-    /// Handles the database command for marking an invoice as paid.
+    ///     Handles the database command for marking an invoice as paid.
     /// </summary>
     /// <param name="command">The database command</param>
     /// <param name="db">The database context</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>The updated invoice entity, or null if not found</returns>
-    public static async Task<Data.Entities.Invoice?> Handle(MarkInvoiceAsPaidDbCommand command, AppDomainDb db, CancellationToken cancellationToken)
+    public static async Task<Data.Entities.Invoice?> Handle(MarkInvoiceAsPaidDbCommand command, AppDomainDb db,
+        CancellationToken cancellationToken)
     {
         var updated = await db.Invoices
             .Where(i => i.TenantId == command.TenantId && i.InvoiceId == command.InvoiceId)

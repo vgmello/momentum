@@ -2,16 +2,17 @@
     <PropertyGroup>
         <IsPackable>True</IsPackable>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-        <VersionSuffix Condition="'$(Configuration)' == 'Debug'">pre</VersionSuffix>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <VersionPrefix>0.0.1</VersionPrefix>
+        <VersionSuffix Condition="'$(Configuration)' == 'Debug'">pre</VersionSuffix>
     </PropertyGroup>
 
     <PropertyGroup>
-        <PackageTags>app_domain.contracts</PackageTags>
-        <IncludeSource>true</IncludeSource>
         <Authors>ORG_NAME</Authors>
         <Company>ORG_NAME</Company>
         <Copyright>Copyright (c) ORG_NAME. All rights reserved.</Copyright>
+        <PackageTags>app_domain;app_domain.contracts</PackageTags>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
         <RepositoryUrl>https://github.com/ORG_NAME/AppDomain</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
     </PropertyGroup>
@@ -23,16 +24,21 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Include="..\AppDomain\**\Contracts\IntegrationEvents\*.cs" Link="%(RecursiveDir)%(Filename)%(Extension)"/>
-        <Compile Include="..\AppDomain\**\Contracts\Models\*.cs" Link="%(RecursiveDir)%(Filename)%(Extension)"/>
+        <Compile Include="..\AppDomain\**\Contracts\IntegrationEvents\*.cs" Link="%(RecursiveDir)%(Filename)%(Extension)" />
+        <Compile Include="..\AppDomain\**\Contracts\Models\*.cs" Link="%(RecursiveDir)%(Filename)%(Extension)" />
         <!--#if (INCLUDE_API) -->
-        <Content Include="..\AppDomain.Api\**\Protos\**\*.proto" Link="%(RecursiveDir)%(Filename)%(Extension)" Pack="true">
+        <None Include="..\AppDomain.Api\**\Protos\**\*.proto" Link="%(RecursiveDir)%(Filename)%(Extension)" Pack="true">
             <PackagePath>Protos</PackagePath>
-        </Content>
+        </None>
         <!--#endif -->
+        <None Include="README.md" Pack="true" PackagePath="\" />
+        <None Include="AppDomain.Contracts.props" Pack="true" PackagePath="\build" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Momentum.Extensions.Abstractions"/>
+        <PackageReference Include="Momentum.Extensions.Abstractions" />
+        <!--#if (false) -->
+        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
+        <!--#endif -->
     </ItemGroup>
 </Project>

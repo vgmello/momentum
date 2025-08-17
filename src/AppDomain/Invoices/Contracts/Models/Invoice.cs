@@ -17,6 +17,7 @@ namespace AppDomain.Invoices.Contracts.Models;
 /// <param name="PaymentDate">Date when the invoice was paid</param>
 /// <param name="CreatedDateUtc">Date and time when the invoice was created (UTC)</param>
 /// <param name="UpdatedDateUtc">Date and time when the invoice was last updated (UTC)</param>
+/// <param name="Version">Invoice Version (used for concurrency checks)</param>
 public record Invoice(
     Guid TenantId,
     Guid InvoiceId,
@@ -29,5 +30,6 @@ public record Invoice(
     decimal? AmountPaid,
     DateTime? PaymentDate,
     DateTime CreatedDateUtc,
-    DateTime UpdatedDateUtc
+    DateTime UpdatedDateUtc,
+    int Version
 );

@@ -2,7 +2,6 @@
 
 using AppDomain.Invoices.Commands;
 using AppDomain.Invoices.Contracts.IntegrationEvents;
-using NSubstitute;
 using Momentum.Extensions.Messaging;
 using Wolverine;
 

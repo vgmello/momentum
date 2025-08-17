@@ -1,10 +1,7 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
-using AppDomain.Core.Data;
 using AppDomain.Invoices.Contracts.Models;
 using AppDomain.Invoices.Data;
-using FluentValidation.Results;
-using LinqToDB;
 
 namespace AppDomain.Invoices.Queries;
 
