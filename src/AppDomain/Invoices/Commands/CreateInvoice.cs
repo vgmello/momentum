@@ -1,5 +1,6 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
+using AppDomain.Invoices.Contracts.DomainEvents;
 using AppDomain.Invoices.Contracts.IntegrationEvents;
 using AppDomain.Invoices.Contracts.Models;
 using AppDomain.Invoices.Data;
@@ -29,9 +30,6 @@ public record CreateInvoiceCommand(
 /// </summary>
 public class CreateInvoiceValidator : AbstractValidator<CreateInvoiceCommand>
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="CreateInvoiceValidator" /> class.
-    /// </summary>
     public CreateInvoiceValidator()
     {
         RuleFor(c => c.TenantId).NotEmpty();
@@ -39,7 +37,7 @@ public class CreateInvoiceValidator : AbstractValidator<CreateInvoiceCommand>
         RuleFor(c => c.Name).MinimumLength(2);
         RuleFor(c => c.Name).MaximumLength(200);
         RuleFor(c => c.Amount).GreaterThan(0);
-        RuleFor(c => c.Currency).MaximumLength(3);
+        RuleFor(c => c.Currency).MaximumLength(3).When(c => !string.IsNullOrEmpty(c.Currency));
     }
 }
 
@@ -49,9 +47,8 @@ public class CreateInvoiceValidator : AbstractValidator<CreateInvoiceCommand>
 public static class CreateInvoiceCommandHandler
 {
     /// <summary>
-    ///     Database command for inserting an invoice.
+    ///     Storage / persistence request
     /// </summary>
-    /// <param name="Invoice">The invoice entity to insert</param>
     public record DbCommand(Data.Entities.Invoice Invoice) : ICommand<Data.Entities.Invoice>;
 
     /// <summary>
@@ -60,21 +57,22 @@ public static class CreateInvoiceCommandHandler
     /// <param name="command">The create invoice command</param>
     /// <param name="messaging">The message bus for database operations</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>A tuple containing the result and integration event</returns>
-    public static async Task<(Result<Invoice>, InvoiceCreated?)> Handle(CreateInvoiceCommand command, IMessageBus messaging,
-        CancellationToken cancellationToken)
+    /// <returns>A tuple containing the result and MULTIPLE events</returns>
+    public static async Task<(Result<Invoice>, InvoiceCreated?, InvoiceGenerated?)> Handle(CreateInvoiceCommand command,
+        IMessageBus messaging, CancellationToken cancellationToken)
     {
         var dbCommand = CreateInsertCommand(command);
         var insertedInvoice = await messaging.InvokeCommandAsync(dbCommand, cancellationToken);
 
         var result = insertedInvoice.ToModel();
-        var createdEvent = new InvoiceCreated(result.TenantId, PartitionKeyTest: 0, result);
+        var createdEvent = new InvoiceCreated(command.TenantId, result.InvoiceId, result);
+        var invoiceGenerated = new InvoiceGenerated(result.TenantId, result, result.CreatedDateUtc);
 
-        return (result, createdEvent);
+        return (result, createdEvent, invoiceGenerated);
     }
 
     /// <summary>
-    ///     Handles the database command for inserting an invoice.
+    ///     Database logic for creating a new invoice.
     /// </summary>
     /// <param name="command">The database command</param>
     /// <param name="db">The database context</param>

@@ -1,6 +1,6 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-namespace Momentum.Extensions.Abstractions.Dapper;
+namespace Momentum.Extensions.Abstractions.Dapper.MetadataAttributes;
 
 /// <summary>
 ///     Specifies the database column name for a parameter in a database command.

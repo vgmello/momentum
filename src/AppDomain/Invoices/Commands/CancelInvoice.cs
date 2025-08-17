@@ -3,7 +3,6 @@
 using AppDomain.Invoices.Contracts.IntegrationEvents;
 using AppDomain.Invoices.Contracts.Models;
 using AppDomain.Invoices.Data;
-using Momentum.Extensions.Abstractions.Dapper;
 
 namespace AppDomain.Invoices.Commands;
 
@@ -21,6 +20,7 @@ public class CancelInvoiceValidator : AbstractValidator<CancelInvoiceCommand>
 
 public static partial class CancelInvoiceCommandHandler
 {
+    //TODO: Document this similar as the GetCashiersQueryHandler.DbQuery
     [DbCommand(fn: "$app_domain.invoices_cancel")]
     public partial record DbCommand(Guid TenantId, Guid InvoiceId, int Version) : ICommand<Data.Entities.Invoice?>;
 
@@ -42,7 +42,7 @@ public static partial class CancelInvoiceCommandHandler
         }
 
         var result = updatedInvoice.ToModel();
-        var cancelledEvent = new InvoiceCancelled(command.TenantId, command.InvoiceId);
+        var cancelledEvent = new InvoiceCancelled(command.TenantId, command.InvoiceId, result);
 
         return (result, cancelledEvent);
     }

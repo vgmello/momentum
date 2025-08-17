@@ -12,9 +12,18 @@ public record GetCashiersQuery(Guid TenantId, int Offset = 0, int Limit = 1000) 
 public static partial class GetCashiersQueryHandler
 {
     /// <summary>
-    ///     If the function name starts with a $, the function gets executed as `select * from {dbFunction}`
+    ///     Storage / persistence request
     /// </summary>
-    [DbCommand(fn: "$AppDomain.cashiers_get_all")]
+    /// <remarks>
+    ///     This DbCommand/DbQuery leverages the Momentum
+    ///     <see cref="Momentum.Extensions.Abstractions.Dapper.DbCommandAttribute">DbCommandAttribute</see>,
+    ///     which creates a source generated handler for the DB call.
+    ///     <para>
+    ///         > Notes:
+    ///         - If the function name starts with a $, the function gets executed as `select * from {dbFunction}`
+    ///     </para>
+    /// </remarks>
+    [DbCommand(fn: "$app_domain.cashiers_get_all")]
     public partial record DbQuery(Guid TenantId, int Limit, int Offset) : IQuery<IEnumerable<Data.Entities.Cashier>>;
 
     /// <summary>

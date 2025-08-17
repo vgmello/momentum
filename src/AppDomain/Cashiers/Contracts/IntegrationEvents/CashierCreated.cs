@@ -5,7 +5,8 @@ using AppDomain.Cashiers.Contracts.Models;
 namespace AppDomain.Cashiers.Contracts.IntegrationEvents;
 
 /// <summary>
-///     Published when a new cashier is successfully created in the AppDomain system. This event contains the complete cashier data and partition
+///     Published when a new cashier is successfully created in the AppDomain system. This event contains the complete cashier data and
+///     partition
 ///     key information for proper message routing.
 /// </summary>
 /// <param name="TenantId">Unique identifier for the tenant</param>
@@ -21,4 +22,7 @@ namespace AppDomain.Cashiers.Contracts.IntegrationEvents;
 ///     Some other event data text
 /// </remarks>
 [EventTopic<Cashier>]
-public record CashierCreated([PartitionKey] Guid TenantId, Cashier Cashier);
+public record CashierCreated(
+    [PartitionKey] Guid TenantId,
+    Cashier Cashier
+);

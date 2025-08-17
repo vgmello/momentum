@@ -4,6 +4,7 @@
         <Using Include="FluentValidation"/>
         <Using Include="FluentValidation.Results"/>
         <Using Include="Momentum.Extensions"/>
+        <Using Include="Momentum.Extensions.Abstractions.Dapper"/>
         <Using Include="Momentum.Extensions.Abstractions.Extensions"/>
         <Using Include="Momentum.Extensions.Abstractions.Messaging"/>
         <Using Include="Momentum.Extensions.Messaging"/>

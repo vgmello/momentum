@@ -11,38 +11,34 @@ namespace AppDomain.Invoices.Commands;
 /// </summary>
 /// <param name="TenantId">Unique identifier for the tenant</param>
 /// <param name="InvoiceId">Unique identifier for the invoice to mark as paid</param>
+/// <param name="Version">TODO</param>
 /// <param name="AmountPaid">Amount that was paid</param>
 /// <param name="PaymentDate">Date when the payment was received</param>
-/// <param name="PaymentMethod">Method used for payment</param>
 public record MarkInvoiceAsPaidCommand(
     Guid TenantId,
     Guid InvoiceId,
+    int Version,
     decimal AmountPaid,
-    DateTime PaymentDate,
-    string? PaymentMethod = null
-) : ICommand<Result<Invoice>>;
+    DateTime? PaymentDate = null) : ICommand<Result<Invoice>>;
 
 /// <summary>
 ///     Validator for the MarkInvoiceAsPaidCommand.
 /// </summary>
 public class MarkInvoiceAsPaidValidator : AbstractValidator<MarkInvoiceAsPaidCommand>
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="MarkInvoiceAsPaidValidator" /> class.
-    /// </summary>
     public MarkInvoiceAsPaidValidator()
     {
         RuleFor(c => c.TenantId).NotEmpty();
         RuleFor(c => c.InvoiceId).NotEmpty();
         RuleFor(c => c.AmountPaid).GreaterThan(0);
-        RuleFor(c => c.PaymentDate).NotEmpty();
+        RuleFor(c => c.PaymentDate).NotEmpty().When(c => c.PaymentDate.HasValue);
     }
 }
 
 /// <summary>
 ///     Handler for the MarkInvoiceAsPaidCommand.
 /// </summary>
-public static class MarkInvoiceAsPaidCommandHandler
+public static partial class MarkInvoiceAsPaidCommandHandler
 {
     /// <summary>
     ///     Database command for marking an invoice as paid.
@@ -51,9 +47,11 @@ public static class MarkInvoiceAsPaidCommandHandler
     /// <param name="InvoiceId">Unique identifier for the invoice</param>
     /// <param name="AmountPaid">Amount that was paid</param>
     /// <param name="PaymentDate">Date when payment was received</param>
-    public record MarkInvoiceAsPaidDbCommand(
+    [DbCommand(fn: "$billing.invoices_mark_paid")]
+    public partial record DbCommand(
         Guid TenantId,
         Guid InvoiceId,
+        int Version,
         decimal AmountPaid,
         DateTime PaymentDate
     ) : ICommand<Data.Entities.Invoice?>;
@@ -65,52 +63,28 @@ public static class MarkInvoiceAsPaidCommandHandler
     /// <param name="messaging">The message bus for database operations</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>A tuple containing the result and integration events</returns>
-    public static async Task<(Result<Invoice>, InvoicePaid?, PaymentReceived?)> Handle(MarkInvoiceAsPaidCommand command,
-        IMessageBus messaging,
-        CancellationToken cancellationToken)
+    public static async Task<(Result<Invoice>, InvoicePaid?)> Handle(
+        MarkInvoiceAsPaidCommand command, IMessageBus messaging, CancellationToken cancellationToken)
     {
-        var dbCommand = new MarkInvoiceAsPaidDbCommand(command.TenantId, command.InvoiceId, command.AmountPaid, command.PaymentDate);
+        var paymentDate = command.PaymentDate ?? DateTime.UtcNow;
+        var dbCommand = new DbCommand(command.TenantId, command.InvoiceId, command.Version, command.AmountPaid, paymentDate);
+
         var updatedInvoice = await messaging.InvokeCommandAsync(dbCommand, cancellationToken);
 
-        if (updatedInvoice == null)
+        if (updatedInvoice is null)
         {
-            return (Result<Invoice>.Failure("Invoice not found"), null, null);
+            var failures = new List<ValidationFailure>
+            {
+                new("Version", "Invoice not found, already paid, or was modified by another user. " +
+                               "Please refresh and try again.")
+            };
+
+            return (failures, null);
         }
 
         var result = updatedInvoice.ToModel();
-        var paidEvent = new InvoicePaid(result.TenantId, PartitionKeyTest: 0, result);
-        var paymentEvent = new PaymentReceived(result.TenantId, PartitionKeyTest: 0, result.InvoiceId,
-            command.AmountPaid, result.Currency ?? "USD", command.PaymentDate, command.PaymentMethod);
+        var paidEvent = new InvoicePaid(updatedInvoice.TenantId, result.InvoiceId, result);
 
-        return (result, paidEvent, paymentEvent);
-    }
-
-    /// <summary>
-    ///     Handles the database command for marking an invoice as paid.
-    /// </summary>
-    /// <param name="command">The database command</param>
-    /// <param name="db">The database context</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>The updated invoice entity, or null if not found</returns>
-    public static async Task<Data.Entities.Invoice?> Handle(MarkInvoiceAsPaidDbCommand command, AppDomainDb db,
-        CancellationToken cancellationToken)
-    {
-        var updated = await db.Invoices
-            .Where(i => i.TenantId == command.TenantId && i.InvoiceId == command.InvoiceId)
-            .UpdateAsync(_ => new Data.Entities.Invoice
-            {
-                Status = "Paid",
-                AmountPaid = command.AmountPaid,
-                PaymentDate = command.PaymentDate,
-                UpdatedDateUtc = DateTime.UtcNow
-            }, cancellationToken);
-
-        if (updated == 0)
-        {
-            return null;
-        }
-
-        return await db.Invoices
-            .FirstOrDefaultAsync(i => i.TenantId == command.TenantId && i.InvoiceId == command.InvoiceId, cancellationToken);
+        return (result, paidEvent);
     }
 }

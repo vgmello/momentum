@@ -31,7 +31,7 @@ public class MarkInvoiceAsPaidCommandHandlerTests
             UpdatedDateUtc = DateTime.UtcNow
         };
 
-        messagingMock.InvokeCommandAsync(Arg.Any<MarkInvoiceAsPaidCommandHandler.MarkInvoiceAsPaidDbCommand>(),
+        messagingMock.InvokeCommandAsync(Arg.Any<MarkInvoiceAsPaidCommandHandler.DbCommand>(),
                 Arg.Any<CancellationToken>())
             .Returns(mockInvoice);
 
@@ -56,7 +56,7 @@ public class MarkInvoiceAsPaidCommandHandlerTests
 
         // Verify that messaging was called with correct parameters
         await messagingMock.Received(1).InvokeCommandAsync(
-            Arg.Is<MarkInvoiceAsPaidCommandHandler.MarkInvoiceAsPaidDbCommand>(cmd =>
+            Arg.Is<MarkInvoiceAsPaidCommandHandler.DbCommand>(cmd =>
                 cmd.InvoiceId == invoiceId &&
                 cmd.Version == 1 &&
                 cmd.AmountPaid == amountPaid &&
@@ -86,7 +86,7 @@ public class MarkInvoiceAsPaidCommandHandlerTests
         };
 
         messagingMock.InvokeCommandAsync(
-                Arg.Any<MarkInvoiceAsPaidCommandHandler.MarkInvoiceAsPaidDbCommand>(),
+                Arg.Any<MarkInvoiceAsPaidCommandHandler.DbCommand>(),
                 Arg.Any<CancellationToken>())
             .Returns(mockInvoice);
 
@@ -109,7 +109,7 @@ public class MarkInvoiceAsPaidCommandHandlerTests
         var tenantId = Guid.NewGuid();
         var invoiceId = Guid.NewGuid();
 
-        messagingMock.InvokeCommandAsync(Arg.Any<MarkInvoiceAsPaidCommandHandler.MarkInvoiceAsPaidDbCommand>(),
+        messagingMock.InvokeCommandAsync(Arg.Any<MarkInvoiceAsPaidCommandHandler.DbCommand>(),
                 Arg.Any<CancellationToken>())
             .Returns((AppDomain.Invoices.Data.Entities.Invoice?)null); // Simulate not found
 

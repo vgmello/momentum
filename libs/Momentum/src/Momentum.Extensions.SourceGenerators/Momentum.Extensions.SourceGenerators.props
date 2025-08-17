@@ -9,6 +9,7 @@
     <ItemGroup Condition="'$(MomentumExtensionsSourceGeneratorsPropsImported)' == 'true'">
         <!-- Makes the DbCommandDefaultParamCase property visible to the C# compiler and to source generators. -->
         <CompilerVisibleProperty Include="DbCommandDefaultParamCase"/>
+        <CompilerVisibleProperty Include="DbCommandParamPrefix"/>
     </ItemGroup>
 
 </Project>

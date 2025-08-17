@@ -33,13 +33,13 @@ public static class SimulatePaymentCommandHandler
     public static Task<(Result<bool>, PaymentReceived)> Handle(SimulatePaymentCommand command)
     {
         var paymentReceivedEvent = new PaymentReceived(
-            command.TenantId,
-            command.InvoiceId,
-            command.Amount,
-            command.Currency,
-            command.PaymentMethod,
-            command.PaymentReference,
-            DateTime.UtcNow
+            TenantId: command.TenantId,
+            InvoiceId: command.InvoiceId,
+            Currency: command.Currency,
+            PaymentAmount: command.Amount,
+            PaymentDate: DateTime.UtcNow,
+            PaymentMethod: command.PaymentMethod,
+            PaymentReference: command.PaymentReference
         );
 
         return Task.FromResult<(Result<bool>, PaymentReceived)>((true, paymentReceivedEvent));
