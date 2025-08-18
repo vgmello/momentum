@@ -181,8 +181,6 @@ jobs:
         if: steps.options.outputs.release == 'true'
         uses: ./.github/actions/nuget-publish
         with:
-          project-path: libs/Momentum/src
-          configuration: Release
           package-version: ${{ steps.release-version.outputs.version }}
           nuget-api-key: ${{ steps.options.outputs.test == 'true' && secrets.NUGET_TEST_API_KEY || secrets.NUGET_API_KEY }}
           nuget-source: ${{ steps.options.outputs.nuget_source }}
