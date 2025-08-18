@@ -15,7 +15,7 @@ The Cashier model represents these real-world AppDomain personnel digitally, tra
 
 ## Domain Model
 
-The Cashier entity is defined in [`src/AppDomain/Cashiers/Contracts/Models/Cashier.cs:5-16`](https://github.com/yourusername/AppDomain/blob/main/src/AppDomain/Cashiers/Contracts/Models/Cashier.cs#L5-L16):
+The Cashier entity is defined in [`src/AppDomain/Cashiers/Contracts/Models/Cashier.cs:5-16`](https://github.com/org-name/app-domain/blob/main/src/AppDomain/Cashiers/Contracts/Models/Cashier.cs#L5-L16):
 
 <<< @/../src/AppDomain/Cashiers/Contracts/Models/Cashier.cs
 
@@ -36,7 +36,7 @@ curl -X POST http://localhost:8101/api/cashiers \
   }'
 ```
 
-**Command**: [`src/AppDomain/Cashiers/Commands/CreateCashier.cs`](https://github.com/yourusername/AppDomain/blob/main/src/AppDomain/Cashiers/Commands/CreateCashier.cs)
+**Command**: [`src/AppDomain/Cashiers/Commands/CreateCashier.cs`](https://github.com/org-name/app-domain/blob/main/src/AppDomain/Cashiers/Commands/CreateCashier.cs)
 
 This operation:
 
@@ -55,7 +55,7 @@ Retrieves a specific cashier's details.
 curl http://localhost:8101/api/cashiers/csh_123456
 ```
 
-**Query**: [`src/AppDomain/Cashiers/Queries/GetCashier.cs`](https://github.com/yourusername/AppDomain/blob/main/src/AppDomain/Cashiers/Queries/GetCashier.cs)
+**Query**: [`src/AppDomain/Cashiers/Queries/GetCashier.cs`](https://github.com/org-name/app-domain/blob/main/src/AppDomain/Cashiers/Queries/GetCashier.cs)
 
 ### List All Cashiers
 
@@ -67,7 +67,7 @@ Returns a paginated list of all cashiers.
 curl http://localhost:8101/api/cashiers?page=1&pageSize=20
 ```
 
-**Query**: [`src/AppDomain/Cashiers/Queries/GetCashiers.cs`](https://github.com/yourusername/AppDomain/blob/main/src/AppDomain/Cashiers/Queries/GetCashiers.cs)
+**Query**: [`src/AppDomain/Cashiers/Queries/GetCashiers.cs`](https://github.com/org-name/app-domain/blob/main/src/AppDomain/Cashiers/Queries/GetCashiers.cs)
 
 ### Update Cashier
 
@@ -84,7 +84,7 @@ curl -X PUT http://localhost:8101/api/cashiers/csh_123456 \
   }'
 ```
 
-**Command**: [`src/AppDomain/Cashiers/Commands/UpdateCashier.cs`](https://github.com/yourusername/AppDomain/blob/main/src/AppDomain/Cashiers/Commands/UpdateCashier.cs)
+**Command**: [`src/AppDomain/Cashiers/Commands/UpdateCashier.cs`](https://github.com/org-name/app-domain/blob/main/src/AppDomain/Cashiers/Commands/UpdateCashier.cs)
 
 ### Delete Cashier
 
@@ -96,7 +96,7 @@ Removes a cashier from the system.
 curl -X DELETE http://localhost:8101/api/cashiers/csh_123456
 ```
 
-**Command**: [`src/AppDomain/Cashiers/Commands/DeleteCashier.cs`](https://github.com/yourusername/AppDomain/blob/main/src/AppDomain/Cashiers/Commands/DeleteCashier.cs)
+**Command**: [`src/AppDomain/Cashiers/Commands/DeleteCashier.cs`](https://github.com/org-name/app-domain/blob/main/src/AppDomain/Cashiers/Commands/DeleteCashier.cs)
 
 ## Event Workflows
 
@@ -136,7 +136,7 @@ When an invoice is paid:
 
 The cashiers data is stored in PostgreSQL:
 
-**Table**: [`AppDomain.cashiers`](https://github.com/yourusername/AppDomain/blob/main/infra/AppDomain.Database/Liquibase/AppDomain/tables/cashiers.sql)
+**Table**: [`AppDomain.cashiers`](https://github.com/org-name/app-domain/blob/main/infra/AppDomain.Database/Liquibase/AppDomain/tables/cashiers.sql)
 
 **Stored Procedures**:
 
@@ -152,7 +152,7 @@ The Cashiers domain includes comprehensive test coverage:
 
 ### Unit Tests
 
-Location: [`tests/AppDomain.Tests/Unit/Cashiers/`](https://github.com/yourusername/AppDomain/tree/main/tests/AppDomain.Tests/Unit/Cashiers)
+Location: [`tests/AppDomain.Tests/Unit/Cashiers/`](https://github.com/org-name/app-domain/tree/main/tests/AppDomain.Tests/Unit/Cashiers)
 
 Example test structure:
 <<< @/../tests/AppDomain.Tests/Unit/Cashier/CreateCashierCommandHandlerTests.cs

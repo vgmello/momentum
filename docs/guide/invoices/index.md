@@ -14,7 +14,7 @@ Invoices are the core financial documents in the AppDomain system that:
 
 ## Domain Model
 
-The Invoice entity is defined in [`src/AppDomain/Invoices/Contracts/Models/Invoice.cs:5-26`](https://github.com/yourusername/AppDomain/blob/main/src/AppDomain/Invoices/Contracts/Models/Invoice.cs#L5-L26):
+The Invoice entity is defined in [`src/AppDomain/Invoices/Contracts/Models/Invoice.cs:5-26`](https://github.com/org-name/app-domain/blob/main/src/AppDomain/Invoices/Contracts/Models/Invoice.cs#L5-L26):
 
 <<< @/../src/AppDomain/Invoices/Contracts/Models/Invoice.cs
 
@@ -60,7 +60,7 @@ curl -X POST http://localhost:8101/api/invoices \
   }'
 ```
 
-**Command**: [`src/AppDomain/Invoices/Commands/CreateInvoice.cs`](https://github.com/yourusername/AppDomain/blob/main/src/AppDomain/Invoices/Commands/CreateInvoice.cs)
+**Command**: [`src/AppDomain/Invoices/Commands/CreateInvoice.cs`](https://github.com/org-name/app-domain/blob/main/src/AppDomain/Invoices/Commands/CreateInvoice.cs)
 
 ### Get Invoice
 
@@ -72,7 +72,7 @@ Retrieves invoice details including current status.
 curl http://localhost:8101/api/invoices/inv_789012
 ```
 
-**Query**: [`src/AppDomain/Invoices/Queries/GetInvoice.cs`](https://github.com/yourusername/AppDomain/blob/main/src/AppDomain/Invoices/Queries/GetInvoice.cs)
+**Query**: [`src/AppDomain/Invoices/Queries/GetInvoice.cs`](https://github.com/org-name/app-domain/blob/main/src/AppDomain/Invoices/Queries/GetInvoice.cs)
 
 ### List Invoices
 
@@ -84,7 +84,7 @@ Returns paginated invoice list with filtering options.
 curl "http://localhost:8101/api/invoices?status=Finalized&page=1&pageSize=50"
 ```
 
-**Query**: [`src/AppDomain/Invoices/Queries/GetInvoices.cs`](https://github.com/yourusername/AppDomain/blob/main/src/AppDomain/Invoices/Queries/GetInvoices.cs)
+**Query**: [`src/AppDomain/Invoices/Queries/GetInvoices.cs`](https://github.com/org-name/app-domain/blob/main/src/AppDomain/Invoices/Queries/GetInvoices.cs)
 
 ### Cancel Invoice
 
@@ -96,7 +96,7 @@ Cancels an invoice (allowed from Draft or Finalized status).
 curl -X POST http://localhost:8101/api/invoices/inv_789012/cancel
 ```
 
-**Command**: [`src/AppDomain/Invoices/Commands/CancelInvoice.cs`](https://github.com/yourusername/AppDomain/blob/main/src/AppDomain/Invoices/Commands/CancelInvoice.cs)
+**Command**: [`src/AppDomain/Invoices/Commands/CancelInvoice.cs`](https://github.com/org-name/app-domain/blob/main/src/AppDomain/Invoices/Commands/CancelInvoice.cs)
 
 ### Process Payment
 
@@ -113,7 +113,7 @@ curl -X POST http://localhost:8101/api/invoices/inv_789012/payment \
   }'
 ```
 
-**Command**: [`src/AppDomain/Invoices/Commands/SimulatePayment.cs`](https://github.com/yourusername/AppDomain/blob/main/src/AppDomain/Invoices/Commands/SimulatePayment.cs)
+**Command**: [`src/AppDomain/Invoices/Commands/SimulatePayment.cs`](https://github.com/org-name/app-domain/blob/main/src/AppDomain/Invoices/Commands/SimulatePayment.cs)
 
 ## Payment Processing Workflow
 
@@ -141,7 +141,7 @@ sequenceDiagram
 
 ### Payment Handler
 
-The [`PaymentReceivedHandler`](https://github.com/yourusername/AppDomain/blob/main/src/AppDomain.BackOffice/Messaging/Invoices/PaymentReceivedHandler.cs) processes payments asynchronously:
+The [`PaymentReceivedHandler`](https://github.com/org-name/app-domain/blob/main/src/AppDomain.BackOffice/Messaging/AppDomainInboxHandler/PaymentReceivedHandler.cs) processes payments asynchronously:
 
 <<< @/../src/AppDomain.BackOffice/Messaging/AppDomainInboxHandler/PaymentReceivedHandler.cs{11-18}
 
@@ -175,7 +175,7 @@ Published to trigger payment processing.
 
 Invoice data is stored in PostgreSQL:
 
-**Table**: [`AppDomain.invoices`](https://github.com/yourusername/AppDomain/blob/main/infra/AppDomain.Database/Liquibase/AppDomain/tables/invoices.sql)
+**Table**: [`AppDomain.invoices`](https://github.com/org-name/app-domain/blob/main/infra/AppDomain.Database/Liquibase/AppDomain/tables/invoices.sql)
 
 **Key Stored Procedures**:
 
@@ -189,9 +189,9 @@ Invoice data is stored in PostgreSQL:
 
 ### Unit Tests
 
-Location: [`tests/AppDomain.Tests/Unit/Invoices/`](https://github.com/yourusername/AppDomain/tree/main/tests/AppDomain.Tests/Unit/Invoices)
+Location: [`tests/AppDomain.Tests/Unit/Invoices/`](https://github.com/org-name/app-domain/tree/main/tests/AppDomain.Tests/Unit/Invoices)
 
-Example from [`CreateInvoiceCommandHandlerTests.cs:14-59`](https://github.com/yourusername/AppDomain/blob/main/tests/AppDomain.Tests/Unit/Invoices/CreateInvoiceCommandHandlerTests.cs#L14-L59):
+Example from [`CreateInvoiceCommandHandlerTests.cs:14-59`](https://github.com/org-name/app-domain/blob/main/tests/AppDomain.Tests/Unit/Invoices/CreateInvoiceCommandHandlerTests.cs#L14-L59):
 
 <<< @/../tests/AppDomain.Tests/Unit/Invoices/CreateInvoiceCommandHandlerTests.cs{24-44}
 

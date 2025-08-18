@@ -235,6 +235,12 @@
       },
       "replaces": "ORG_NAME"
     },
+    "OrgNameKebab": {
+      "type": "derived",
+      "valueSource": "OrgName",
+      "valueTransform": "kebab-case",
+      "replaces": "org-name"
+    },
     "AppDomainSnakeCase": {
       "type": "derived",
       "valueSource": "name",
