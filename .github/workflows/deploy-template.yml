@@ -67,6 +67,8 @@ jobs:
         uses: ./.github/actions/deployment-config
         with:
           deploy-type: ${{ github.event.inputs.deploy-type }}
+          nuget-api-key: ${{ secrets.NUGET_API_KEY }}
+          nuget-test-api-key: ${{ secrets.NUGET_TEST_API_KEY }}
 
       - name: Calculate pre-release version
         if: steps.config.outputs.deploy-prerelease == 'true'

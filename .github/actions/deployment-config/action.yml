@@ -10,6 +10,12 @@ inputs:
     description: 'Custom NuGet source (for testing)'
     required: false
     default: ''
+  nuget-api-key:
+    description: 'NuGet API key for production'
+    required: true
+  nuget-test-api-key:
+    description: 'NuGet API key for testing'
+    required: true
 
 outputs:
   deploy-prerelease:
@@ -65,9 +71,9 @@ runs:
 
         # API key selection
         if [[ "$IS_TEST" == "true" ]]; then
-          NUGET_API_KEY="${{ secrets.NUGET_TEST_API_KEY }}"
+          NUGET_API_KEY="${{ inputs.nuget-test-api-key }}"
         else
-          NUGET_API_KEY="${{ secrets.NUGET_API_KEY }}"
+          NUGET_API_KEY="${{ inputs.nuget-api-key }}"
         fi
 
         # Output configuration

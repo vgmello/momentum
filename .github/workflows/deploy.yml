@@ -65,6 +65,8 @@ jobs:
         with:
           deploy-type: ${{ github.event.inputs.deploy-type }}
           nuget-source-override: ${{ github.event.inputs.nuget-source }}
+          nuget-api-key: ${{ secrets.NUGET_API_KEY }}
+          nuget-test-api-key: ${{ secrets.NUGET_TEST_API_KEY }}
 
       - name: Build .NET projects
         uses: ./.github/actions/build
