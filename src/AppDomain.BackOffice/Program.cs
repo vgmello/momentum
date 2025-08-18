@@ -28,7 +28,6 @@ builder.AddServiceDefaults();
 builder.AddKafkaMessagingExtensions();
 //#endif
 
-// Application Services
 builder.AddAppDomainServices();
 builder.AddApplicationServices();
 
