@@ -252,8 +252,8 @@
     "MomentumVersion": {
       "type": "bind",
       "binding": "msbuild:MomentumVersion",
-      "replaces": "$(MomentumVersion)",
-      "defaultValue": "0.0.0"
+      "replaces": "$(TemplateMomentumVersion)",
+      "defaultValue": "0.0.1"
     }
   },
   "forms": {
