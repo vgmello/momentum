@@ -2,10 +2,6 @@ name: "Build .NET Projects"
 description: "Build .NET projects with caching"
 
 inputs:
-  dotnet-version:
-    description: ".NET SDK version to use"
-    required: false
-    default: "9.0.x"
   configuration:
     description: "Build configuration (Debug/Release)"
     required: false

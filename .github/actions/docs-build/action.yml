@@ -2,10 +2,6 @@ name: "Build Documentation"
 description: "Build VitePress documentation"
 
 inputs:
-  dotnet-version:
-    description: ".NET SDK version"
-    required: false
-    default: "9.0.x"
   node-version:
     description: "Node.js version"
     required: false
@@ -47,7 +43,6 @@ runs:
       if: inputs.build-dotnet == 'true'
       uses: ./.github/actions/build
       with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
         build-target: libs/Momentum/Momentum.slnx
 
     - name: Install DocFX
