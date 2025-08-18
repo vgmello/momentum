@@ -9,13 +9,17 @@
         <IncludeSymbols>false</IncludeSymbols>
         <ContentTargetFolders>content</ContentTargetFolders>
         <CodeAnalysisRuleSet/>
+        <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <IsPackable>false</IsPackable>
+        <IsPackable Condition="'$(PackTemplate)' == 'true'">true</IsPackable>
     </PropertyGroup>
 
     <PropertyGroup>
         <PackageType>Template</PackageType>
         <PackageId>Momentum.Template</PackageId>
         <Title>Momentum .NET Template</Title>
-        <Description>A comprehensive template for creating domain-driven microservices following standard architecture patterns</Description>
+        <Description>Momentum .NET, a comprehensive template - Create production-ready microservices with Orleans, gRPC, Kafka, and PostgreSQL using Domain-Driven Design patterns</Description>
         <PackageProjectUrl>https://github.com/vgmello/momentum</PackageProjectUrl>
     </PropertyGroup>
 

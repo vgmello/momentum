@@ -1,0 +1,84 @@
+name: 'Configure Deployment'
+description: 'Configure deployment settings for both templates and libraries'
+
+inputs:
+  deploy-type:
+    description: 'Type of deployment from workflow_dispatch'
+    required: false
+    default: ''
+  nuget-source-override:
+    description: 'Custom NuGet source (for testing)'
+    required: false
+    default: ''
+
+outputs:
+  deploy-prerelease:
+    description: 'Whether to deploy a prerelease (false = release)'
+    value: ${{ steps.config.outputs.deploy-prerelease }}
+  deploy-docs:
+    description: 'Whether to deploy documentation'
+    value: ${{ steps.config.outputs.deploy-docs }}
+  is-test:
+    description: 'Whether this is a test deployment'
+    value: ${{ steps.config.outputs.is-test }}
+  nuget-source:
+    description: 'NuGet source URL to use'
+    value: ${{ steps.config.outputs.nuget-source }}
+  nuget-api-key:
+    description: 'NuGet API key to use'
+    value: ${{ steps.config.outputs.nuget-api-key }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Configure deployment
+      id: config
+      shell: bash
+      run: |
+        # Initialize variables (defaults)
+        DEPLOY_PRERELEASE=false
+        DEPLOY_DOCS=false
+        IS_TEST=false
+        NUGET_SOURCE="https://api.nuget.org/v3/index.json"
+
+        # Test deployments
+        if [[ "${{ inputs.deploy-type }}" == "test-"* ]]; then
+          IS_TEST=true
+          NUGET_SOURCE="https://int.nugettest.org/v3/index.json"
+          if [ -n "${{ inputs.nuget-source-override }}" ]; then
+            NUGET_SOURCE="${{ inputs.nuget-source-override }}"
+          fi
+        fi
+
+        # Set prerelease flag (only when explicitly needed)
+        if [[ ("${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main") || 
+              ("${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.deploy-type }}" == *"prerelease") ]]; then
+          DEPLOY_PRERELEASE=true
+        fi
+
+        # Set docs flag for library releases
+        if [[ ("${{ github.ref }}" =~ ^refs/tags/v || "${{ github.ref_name }}" == "release" || 
+               ("${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.deploy-type }}" == *"release")) &&
+              ("${{ github.repository }}" == *"libs"* || "$GITHUB_WORKFLOW" == *"Libraries"* || "${{ inputs.deploy-type }}" == "docs-only") ]]; then
+          DEPLOY_DOCS=true
+        fi
+
+        # API key selection
+        if [[ "$IS_TEST" == "true" ]]; then
+          NUGET_API_KEY="${{ secrets.NUGET_TEST_API_KEY }}"
+        else
+          NUGET_API_KEY="${{ secrets.NUGET_API_KEY }}"
+        fi
+
+        # Output configuration
+        echo "deploy-prerelease=$DEPLOY_PRERELEASE" >> $GITHUB_OUTPUT
+        echo "deploy-docs=$DEPLOY_DOCS" >> $GITHUB_OUTPUT
+        echo "is-test=$IS_TEST" >> $GITHUB_OUTPUT
+        echo "nuget-source=$NUGET_SOURCE" >> $GITHUB_OUTPUT
+        echo "nuget-api-key=$NUGET_API_KEY" >> $GITHUB_OUTPUT
+
+        # Debug logging
+        echo "### Deployment Configuration"
+        echo "- Prerelease: $DEPLOY_PRERELEASE | Docs: $DEPLOY_DOCS | Test: $IS_TEST"
+        echo "- Source: $NUGET_SOURCE"
+        echo "- Trigger: ${{ github.event_name }} | Ref: ${{ github.ref }} | Type: ${{ inputs.deploy-type }}"
