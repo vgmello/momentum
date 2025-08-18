@@ -1,8 +1,7 @@
 <Project>
     <Target Name="CleanOldPackages" AfterTargets="Build" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' ">
         <ItemGroup>
-            <OldPackagesToDelete Include="$(MSBuildProjectDirectory)/$(PackageOutputPath)*.nupkg"/>
-            <OldPackagesToDelete Include="$(BaseIntermediateOutputPath)**/*.nuspec"/>
+            <OldPackagesToDelete Include="$(TargetDir)../*.*upkg"/>
             <OldPackagesToDelete Include="$(MSBuildThisFileDirectory).local/nuget/$(PackageId).*.nupkg"/>
         </ItemGroup>
         <Message Text="Cleaning up nupkg/nuspec files" Importance="high"/>
