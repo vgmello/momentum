@@ -1,0 +1,1158 @@
+---
+title: Getting Started with Momentum
+description: Learn how to build production-ready .NET 9 microservices with Momentum - featuring a comprehensive dotnet template system and powerful supporting libraries. Get up and running in minutes with Orleans, gRPC, Kafka, and PostgreSQL.
+date: 2025-01-15
+---
+
+# Getting Started with Momentum
+
+Welcome to **Momentum** - a comprehensive .NET 9 template system that generates complete, production-ready microservices solutions. Whether you're building APIs, event-driven backends, or stateful processing systems, Momentum provides the architecture, patterns, and infrastructure you need to get productive immediately.
+
+## Two Ways to Use Momentum
+
+### **🚀 Template System (Recommended)**
+
+The fastest way to get started - generates complete microservices solutions with everything configured and ready to run:
+
+-   **Instant Setup**: Complete application in one command
+-   **Best Practices**: Domain-driven design with CQRS patterns
+-   **Full Stack**: APIs, background processing, and documentation
+-   **Modern Architecture**: .NET 9, Aspire orchestration, real-world patterns
+
+### **📚 Individual Libraries**
+
+For existing projects or custom architectures - add Momentum capabilities incrementally:
+
+-   **Modular Approach**: Use only what you need
+-   **Any .NET 9 App**: Works with existing applications
+-   **Incremental Adoption**: Add features as you grow
+-   **Custom Integration**: Full control over implementation
+
+## Technology Stack
+
+Momentum is built on modern, production-proven technologies:
+
+-   **🎯 .NET 9**: Latest framework with performance optimizations
+-   **🏗️ .NET Aspire**: Local development orchestration and observability
+-   **🎭 Orleans**: Stateful actor-based processing for complex workflows
+-   **⚡ Wolverine**: CQRS/MediatR pattern with message handling
+-   **🚀 gRPC + REST**: Dual API protocols for performance and compatibility
+-   **📡 Apache Kafka**: Event streaming and reliable messaging
+-   **🗄️ PostgreSQL**: Robust relational database with JSON support
+-   **🔄 Liquibase**: Version-controlled database migrations
+-   **📊 OpenTelemetry**: Distributed tracing and observability
+-   **🧪 Testcontainers**: Real infrastructure for integration testing
+
+## Template System Overview
+
+**Momentum Template** (`dotnet new mmt`) generates customized microservices solutions that mirror real-world business operations. The template leverages Wolverine for CQRS patterns and supports multiple architectures from simple APIs to complex event-driven systems with Orleans actors.
+
+### **Core Architecture Principles**
+
+-   **🎯 Real-World Mirroring**: Code structure corresponds to business operations
+-   **🚫 No Smart Objects**: Entities are data records, not self-modifying objects
+-   **🏢 Front/Back Office**: Synchronous APIs vs Asynchronous processing
+-   **📡 Event-Driven**: Integration events via Kafka with Wolverine message handling
+-   **🧪 Testing First**: Comprehensive testing with real infrastructure
+
+## Prerequisites
+
+Before getting started, ensure you have:
+
+-   **.NET 9 SDK** - [Download here](https://dotnet.microsoft.com/download/dotnet/9.0)
+-   **IDE**: Visual Studio 2022 17.8+, VS Code with C# Dev Kit, or JetBrains Rider
+-   **Docker Desktop** - Required for databases, Kafka, and local development
+
+## Quick Start with Template (2 Minutes)
+
+Get a complete microservices solution running in under 2 minutes:
+
+### 1. Install the Template
+
+```bash
+# Clone the repository and install the template
+git clone https://github.com/vgmello/momentum.git
+cd momentum
+dotnet new install .
+```
+
+### 2. Generate Your Solution
+
+```bash
+# Create a complete microservices solution
+dotnet new mmt -n OrderService --allow-scripts yes
+cd OrderService
+```
+
+### 3. Start Everything with Aspire
+
+```bash
+# Launch the complete application stack
+dotnet run --project src/OrderService.AppHost
+
+# Access the Aspire Dashboard: https://localhost:18110
+# API endpoints: https://localhost:8101
+# Documentation: http://localhost:8119
+```
+
+**That's it!** You now have a running microservices solution with:
+
+-   ✅ REST and gRPC APIs with sample endpoints
+-   ✅ Background event processing with Wolverine
+-   ✅ PostgreSQL database with migrations
+-   ✅ Apache Kafka messaging
+-   ✅ Comprehensive observability
+-   ✅ Live documentation
+-   ✅ Sample business domain (Cashiers/Invoices)
+
+## Template Configuration Options
+
+The template supports extensive customization through parameters. Here are the most common configurations:
+
+### **Simple API Service**
+
+```bash
+# Generate API-only service
+dotnet new mmt -n PaymentService --api --back-office false --orleans false --docs false
+```
+
+### **Orleans Processing Engine**
+
+```bash
+# Generate stateful processing service
+dotnet new mmt -n WorkflowEngine --orleans --api false --port 9000
+```
+
+### **Full Stack Solution**
+
+```bash
+# Generate complete solution with custom settings
+dotnet new mmt -n EcommercePlatform --org "Acme Corp" --port 7000 --kafka true
+```
+
+### **Minimal Setup**
+
+```bash
+# Clean slate without sample code
+dotnet new mmt -n CleanService --sample false --project-only
+```
+
+### **Available Template Parameters**
+
+The template offers comprehensive configuration options:
+
+**Core Components:**
+-   `--api`: REST/gRPC API project (default: true)
+-   `--back-office`: Background processing project (default: true)
+-   `--orleans`: Orleans stateful processing project (default: false)
+-   `--aspire`: .NET Aspire orchestration project (default: true)
+-   `--docs`: VitePress documentation project (default: true)
+
+**Infrastructure:**
+-   `--kafka`: Apache Kafka messaging (default: true)
+-   `--db`: Database setup (default, npgsql, liquibase, none)
+-   `--port`: Base port number (default: 8100)
+
+**Customization:**
+-   `--org`: Organization name for copyright headers
+-   `--sample`: Include sample Cashiers/Invoices code (default: true, use `--sample false` to skip)
+-   `--project-only`: Generate only projects without solution files
+-   `--libs`: Include Momentum libraries as project references
+-   `--lib-name`: Custom prefix to replace "Momentum" in library names
+
+[!NOTE]
+For complete parameter documentation and all available combinations, see the [`template.json`](/libs/Momentum/.template.config/template.json) file and the [Template Options Guide](./template-options/) for detailed use cases and examples.
+
+## Understanding the Generated Solution
+
+The template generates a production-ready solution with clear separation of concerns:
+
+### **Project Structure**
+
+```
+OrderService/
+├── src/
+│   ├── OrderService.Api/              # REST & gRPC endpoints
+│   ├── OrderService.BackOffice/        # Event processing
+│   ├── OrderService.BackOffice.Orleans/ # Stateful processing (if enabled)
+│   ├── OrderService.AppHost/           # Aspire orchestration
+│   ├── OrderService/                   # Core domain logic
+│   └── OrderService.Contracts/         # Integration events
+├── infra/
+│   └── OrderService.Database/          # Liquibase migrations
+├── tests/
+│   └── OrderService.Tests/             # Comprehensive testing
+├── docs/                               # VitePress documentation
+└── compose.yml                         # Docker Compose for services
+```
+
+### **Business Domain Organization**
+
+Generated code follows Domain-Driven Design principles with Wolverine CQRS patterns:
+
+```
+src/OrderService/
+├── Cashiers/                  # Sample business domain
+│   ├── Commands/              # Business actions (Wolverine handlers)
+│   ├── Queries/               # Information retrieval (Wolverine handlers)
+│   ├── Data/                  # Database operations
+│   └── Contracts/             # Domain events
+└── Invoices/                  # Another sample domain
+    ├── Commands/              # Commands with validation
+    ├── Queries/               # Queries for data retrieval
+    ├── Data/                  # Database access layer
+    └── Contracts/             # Integration events
+```
+
+### **Port Configuration**
+
+Services use a base port system (default: 8100):
+
+| Service | HTTP | HTTPS | gRPC | Purpose |
+|---------|------|-------|------|----------|
+| Aspire Dashboard | 18100 | 18110 | - | Development dashboard |
+| API | 8101 | 8111 | 8102 | REST & gRPC endpoints |
+| BackOffice | 8103 | 8113 | - | Background processing |
+| Orleans | 8104 | 8114 | - | Stateful processing |
+| Documentation | 8119 | - | - | VitePress docs |
+| PostgreSQL | 54320 | - | - | Database |
+| Kafka | 59092 | - | - | Message broker |
+
+Customize the base port with `--port 9000` to use 9100, 9101, etc.
+
+## Individual Libraries Approach
+
+For existing projects or custom architectures, use Momentum Libraries individually:
+
+Build a simple API service using individual Momentum Libraries when you need to add capabilities to existing projects:
+
+### 1. Create New Project
+
+```bash
+# Create a new ASP.NET Core API project
+dotnet new webapi -n OrderService
+cd OrderService
+
+# Add the essential Momentum packages
+dotnet add package Momentum.ServiceDefaults --version 0.0.1
+dotnet add package Momentum.Extensions --version 0.0.1
+```
+
+### 2. Configure Service Defaults
+
+Replace the content of `Program.cs`:
+
+```csharp
+using Momentum.Extensions;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add Momentum service defaults (observability, health checks, validation)
+builder.AddServiceDefaults();
+
+// Add your application services
+builder.Services.AddScoped<IOrderService, OrderService>();
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline
+app.MapDefaultEndpoints(); // Health checks, metrics
+
+// Add your API endpoints
+app.MapPost("/orders", async (CreateOrderCommand command, IOrderService orderService) =>
+{
+    var result = await orderService.CreateOrderAsync(command);
+
+    return result.IsSuccess
+        ? Results.Created($"/orders/{result.Value.Id}", result.Value)
+        : Results.BadRequest(result.Errors);
+});
+
+app.MapGet("/orders/{id:guid}", async (Guid id, IOrderService orderService) =>
+{
+    var result = await orderService.GetOrderAsync(id);
+
+    return result.IsSuccess
+        ? Results.Ok(result.Value)
+        : Results.NotFound();
+});
+
+await app.RunAsync();
+```
+
+### 3. Define Commands and Models
+
+Create `Models/Order.cs`:
+
+```csharp
+namespace OrderService.Models;
+
+public record Order(
+    Guid Id,
+    string CustomerName,
+    string ProductName,
+    decimal Amount,
+    DateTime CreatedAt
+);
+
+public record CreateOrderCommand(
+    string CustomerName,
+    string ProductName,
+    decimal Amount
+);
+```
+
+### 4. Implement Service with Result Types
+
+Create `Services/IOrderService.cs`:
+
+```csharp
+using Momentum.Extensions;
+using OrderService.Models;
+
+namespace OrderService.Services;
+
+public interface IOrderService
+{
+    Task<Result<Order>> CreateOrderAsync(CreateOrderCommand command);
+    Task<Result<Order>> GetOrderAsync(Guid id);
+}
+```
+
+Create `Services/OrderService.cs`:
+
+```csharp
+using Momentum.Extensions;
+using OrderService.Models;
+using FluentValidation.Results;
+
+namespace OrderService.Services;
+
+public class OrderService : IOrderService
+{
+    private static readonly Dictionary<Guid, Order> _orders = new();
+
+    public Task<Result<Order>> CreateOrderAsync(CreateOrderCommand command)
+    {
+        // Validate input (in real apps, use FluentValidation)
+        if (string.IsNullOrWhiteSpace(command.CustomerName))
+        {
+            var errors = new List<ValidationFailure>
+            {
+                new("CustomerName", "Customer name is required")
+            };
+            return Task.FromResult(Result<Order>.Failure(errors));
+        }
+
+        if (command.Amount <= 0)
+        {
+            var errors = new List<ValidationFailure>
+            {
+                new("Amount", "Amount must be greater than zero")
+            };
+            return Task.FromResult(Result<Order>.Failure(errors));
+        }
+
+        // Create the order
+        var order = new Order(
+            Id: Guid.CreateVersion7(),
+            CustomerName: command.CustomerName,
+            ProductName: command.ProductName,
+            Amount: command.Amount,
+            CreatedAt: DateTime.UtcNow
+        );
+
+        _orders[order.Id] = order;
+
+        return Task.FromResult(Result<Order>.Success(order));
+    }
+
+    public Task<Result<Order>> GetOrderAsync(Guid id)
+    {
+        if (_orders.TryGetValue(id, out var order))
+        {
+            return Task.FromResult(Result<Order>.Success(order));
+        }
+
+        var errors = new List<ValidationFailure>
+        {
+            new("Id", "Order not found")
+        };
+        return Task.FromResult(Result<Order>.Failure(errors));
+    }
+}
+```
+
+### 5. Test Your Service
+
+```bash
+# Run the application
+dotnet run
+
+# The service starts with:
+# - API endpoints: https://localhost:7001
+# - Health check: https://localhost:7001/health
+# - Metrics: https://localhost:7001/metrics
+
+# Test creating an order
+curl -X POST https://localhost:7001/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "customerName": "John Doe",
+    "productName": "Laptop",
+    "amount": 1299.99
+  }'
+
+# Test retrieving an order (use the ID from the response above)
+curl https://localhost:7001/orders/{order-id}
+
+# Check health status
+curl https://localhost:7001/health
+```
+
+## Library Integration Results
+
+Congratulations! You've added powerful capabilities to your application:
+
+-   ✅ Structured error handling with Result types
+-   ✅ Built-in health checks and metrics
+-   ✅ OpenTelemetry observability
+-   ✅ Structured logging with Serilog
+-   ✅ Production-ready service defaults
+
+## Understanding What Happened
+
+In just a few minutes, you added powerful capabilities to your application:
+
+### Service Defaults (`builder.AddServiceDefaults()`)
+
+-   **Health Checks**: `/health` (detailed) and `/alive` (simple) endpoints
+-   **OpenTelemetry**: Metrics, tracing, and logging correlation
+-   **Serilog**: Structured logging with exception details
+-   **Resilience**: HTTP client retry and circuit breaker patterns
+-   **Service Discovery**: Automatic endpoint resolution in distributed systems
+
+### Result Types (`ResultOfT`)
+
+-   **Error Handling**: No more try-catch blocks for business logic
+-   **Type Safety**: Compile-time guarantees about success/failure states
+-   **Validation**: Built-in support for FluentValidation results
+-   **API Friendly**: Easy conversion to HTTP status codes
+
+### Observability Out-of-the-Box
+
+-   **Structured Logs**: JSON format with correlation IDs
+-   **Metrics**: Application and infrastructure metrics
+-   **Tracing**: Request tracking across service boundaries
+-   **Health Monitoring**: Automated health check endpoints
+
+## Individual Libraries Overview
+
+When using libraries individually (rather than the template), each library serves a specific purpose and can be used independently:
+
+### **Momentum.Extensions** - Core Foundation
+
+Essential utilities and patterns for any .NET application.
+
+```bash
+dotnet add package Momentum.Extensions
+```
+
+**Key Features:**
+
+-   **ResultOfT Types**: Elegant error handling without exceptions
+-   **Validation Integration**: FluentValidation helpers and extensions
+-   **Data Access**: Enhanced Dapper extensions and LINQ2DB support
+-   **Messaging Abstractions**: Base interfaces for CQRS and event-driven design with Wolverine integration
+
+**Use When:** You want robust error handling and core utilities in any .NET project.
+
+### **Momentum.ServiceDefaults** - Production Readiness
+
+Complete service configuration for Aspire-based applications.
+
+```bash
+dotnet add package Momentum.ServiceDefaults
+```
+
+**Key Features:**
+
+-   **Aspire Integration**: Full .NET Aspire service defaults implementation
+-   **Observability Stack**: OpenTelemetry + Serilog for monitoring
+-   **Health Checks**: Built-in application health monitoring
+-   **Resilience**: HTTP client resilience patterns
+-   **Service Discovery**: Automatic service resolution
+
+**Use When:** Building microservices, APIs, or any distributed application that needs production-ready configuration.
+
+### **Momentum.ServiceDefaults.Api** - API Enhancements
+
+Additional features specifically for REST and gRPC APIs.
+
+```bash
+dotnet add package Momentum.ServiceDefaults.Api
+```
+
+**Key Features:**
+
+-   **OpenAPI**: Enhanced Swagger documentation with XML docs
+-   **gRPC Support**: Service registration and health checks
+-   **Route Conventions**: Kebab-case URL transformations
+-   **Response Types**: Automatic response type generation
+
+**Use When:** Building REST APIs or gRPC services that need enhanced documentation and conventions.
+
+### **Momentum.Extensions.SourceGenerators** - Code Generation
+
+Compile-time code generation for common patterns.
+
+```bash
+dotnet add package Momentum.Extensions.SourceGenerators
+```
+
+**Key Features:**
+
+-   **DbCommand Generation**: Type-safe database command handlers
+-   **Zero Runtime Overhead**: All generation happens at compile time
+-   **IDE Integration**: Generated code appears in IntelliSense
+-   **Customizable**: Configure generation through attributes and MSBuild properties
+
+**Use When:** You want to eliminate boilerplate code and ensure type safety for database operations.
+
+### **Momentum.Extensions.Messaging.Kafka** - Event-Driven Architecture
+
+Kafka integration with CloudEvents standard support.
+
+```bash
+dotnet add package Momentum.Extensions.Messaging.Kafka
+```
+
+**Key Features:**
+
+-   **CloudEvents**: Standards-compliant event serialization
+-   **Kafka Integration**: Producer and consumer patterns
+-   **Partition Key Support**: Automatic partitioning strategies
+-   **Observability**: Built-in metrics and tracing
+
+**Use When:** Building event-driven microservices that need reliable messaging.
+
+## Advanced Library Integration Example
+
+When using individual libraries, here's how to build a more complete application that demonstrates library integration:
+
+### 1. Setup Project
+
+```bash
+# Create new project
+dotnet new webapi -n EcommerceService
+cd EcommerceService
+
+# Add comprehensive Momentum packages
+dotnet add package Momentum.ServiceDefaults
+dotnet add package Momentum.Extensions
+dotnet add package Momentum.Extensions.SourceGenerators
+dotnet add package Npgsql  # For PostgreSQL
+dotnet add package FluentValidation.DependencyInjectionExtensions
+```
+
+### 2. Database Models and Commands
+
+Create `Domain/Orders/Order.cs`:
+
+```csharp
+namespace EcommerceService.Domain.Orders;
+
+// Database entity
+public class OrderEntity
+{
+    public Guid Id { get; set; }
+    public string CustomerName { get; set; } = string.Empty;
+    public string ProductName { get; set; } = string.Empty;
+    public decimal Amount { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+}
+
+// Public model
+public record Order(
+    Guid Id,
+    string CustomerName,
+    string ProductName,
+    decimal Amount,
+    DateTime CreatedAt
+);
+
+// Extension for conversion
+public static class OrderExtensions
+{
+    public static Order ToModel(this OrderEntity entity) => new(
+        entity.Id,
+        entity.CustomerName,
+        entity.ProductName,
+        entity.Amount,
+        entity.CreatedAt
+    );
+}
+```
+
+### 3. Commands with Validation
+
+Create `Domain/Orders/Commands/CreateOrder.cs`:
+
+```csharp
+using FluentValidation;
+using Momentum.Extensions;
+
+namespace EcommerceService.Domain.Orders.Commands;
+
+public record CreateOrderCommand(
+    string CustomerName,
+    string ProductName,
+    decimal Amount
+) : ICommand<Result<Order>>;
+
+public class CreateOrderValidator : AbstractValidator<CreateOrderCommand>
+{
+    public CreateOrderValidator()
+    {
+        RuleFor(x => x.CustomerName)
+            .NotEmpty()
+            .WithMessage("Customer name is required")
+            .MinimumLength(2)
+            .WithMessage("Customer name must be at least 2 characters")
+            .MaximumLength(100)
+            .WithMessage("Customer name cannot exceed 100 characters");
+
+        RuleFor(x => x.ProductName)
+            .NotEmpty()
+            .WithMessage("Product name is required")
+            .MaximumLength(200)
+            .WithMessage("Product name cannot exceed 200 characters");
+
+        RuleFor(x => x.Amount)
+            .GreaterThan(0)
+            .WithMessage("Amount must be greater than zero")
+            .LessThanOrEqualTo(1000000)
+            .WithMessage("Amount cannot exceed $1,000,000");
+    }
+}
+```
+
+### 4. Database Commands with Source Generation
+
+Create `Domain/Orders/Data/OrderDbCommands.cs`:
+
+```csharp
+using Dapper;
+using Momentum.Extensions.Abstractions.Dapper;
+using System.Data;
+
+namespace EcommerceService.Domain.Orders.Data;
+
+public static class CreateOrderDbCommandHandler
+{
+    [DbCommand]
+    public record DbCommand(OrderEntity Order) : ICommand<OrderEntity>;
+
+    public static async Task<OrderEntity> Handle(
+        DbCommand command,
+        IDbConnection db,
+        CancellationToken cancellationToken)
+    {
+        const string sql = """
+            INSERT INTO orders (id, customer_name, product_name, amount, created_at, updated_at)
+            VALUES (@Id, @CustomerName, @ProductName, @Amount, @CreatedAt, @UpdatedAt)
+            RETURNING *;
+            """;
+
+        var order = command.Order;
+        return await db.QuerySingleAsync<OrderEntity>(sql, new
+        {
+            order.Id,
+            order.CustomerName,
+            order.ProductName,
+            order.Amount,
+            order.CreatedAt,
+            order.UpdatedAt
+        });
+    }
+}
+
+public static class GetOrderDbCommandHandler
+{
+    [DbCommand]
+    public record DbCommand(Guid OrderId) : ICommand<OrderEntity?>;
+
+    public static async Task<OrderEntity?> Handle(
+        DbCommand command,
+        IDbConnection db,
+        CancellationToken cancellationToken)
+    {
+        const string sql = "SELECT * FROM orders WHERE id = @OrderId";
+        return await db.QuerySingleOrDefaultAsync<OrderEntity>(sql, new { command.OrderId });
+    }
+}
+```
+
+### 5. Business Logic Handler
+
+Create `Domain/Orders/Commands/CreateOrderHandler.cs`:
+
+```csharp
+using EcommerceService.Domain.Orders.Data;
+using FluentValidation;
+using Momentum.Extensions;
+
+namespace EcommerceService.Domain.Orders.Commands;
+
+public static class CreateOrderCommandHandler
+{
+    public static async Task<Result<Order>> Handle(
+        CreateOrderCommand command,
+        IValidator<CreateOrderCommand> validator,
+        IMessageBus messageBus,
+        CancellationToken cancellationToken)
+    {
+        // Validate input
+        var validationResult = await validator.ValidateAsync(command, cancellationToken);
+        if (!validationResult.IsValid)
+        {
+            return Result<Order>.Failure(validationResult.Errors);
+        }
+
+        // Create database entity
+        var orderEntity = new OrderEntity
+        {
+            Id = Guid.CreateVersion7(),
+            CustomerName = command.CustomerName,
+            ProductName = command.ProductName,
+            Amount = command.Amount,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        // Save to database using generated command
+        var dbCommand = new CreateOrderDbCommandHandler.DbCommand(orderEntity);
+        var savedOrder = await messageBus.InvokeAsync(dbCommand, cancellationToken);
+
+        return Result<Order>.Success(savedOrder.ToModel());
+    }
+}
+```
+
+### 6. API Configuration
+
+Update `Program.cs`:
+
+```csharp
+using EcommerceService.Domain.Orders.Commands;
+using FluentValidation;
+using Momentum.Extensions;
+using Npgsql;
+using System.Data;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add Momentum service defaults
+builder.AddServiceDefaults();
+
+// Add database connection
+builder.Services.AddScoped<IDbConnection>(provider =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+        ?? "Host=localhost;Database=ecommerce;Username=postgres;Password=password";
+    return new NpgsqlConnection(connectionString);
+});
+
+// Add FluentValidation
+builder.Services.AddValidatorsFromAssemblyContaining<CreateOrderValidator>();
+
+// Add custom services
+builder.Services.AddScoped<IOrderService, OrderService>();
+
+var app = builder.Build();
+
+// Configure pipeline
+app.MapDefaultEndpoints();
+
+// Add API endpoints
+app.MapPost("/orders", async (
+    CreateOrderCommand command,
+    IValidator<CreateOrderCommand> validator,
+    IMessageBus messageBus,
+    CancellationToken cancellationToken) =>
+{
+    var result = await CreateOrderCommandHandler.Handle(command, validator, messageBus, cancellationToken);
+
+    return result.IsSuccess
+        ? Results.Created($"/orders/{result.Value.Id}", result.Value)
+        : Results.BadRequest(result.Errors.Select(e => new { e.PropertyName, e.ErrorMessage }));
+});
+
+app.MapGet("/orders/{id:guid}", async (
+    Guid id,
+    IMessageBus messageBus,
+    CancellationToken cancellationToken) =>
+{
+    var dbCommand = new GetOrderDbCommandHandler.DbCommand(id);
+    var orderEntity = await messageBus.InvokeAsync(dbCommand, cancellationToken);
+
+    return orderEntity is not null
+        ? Results.Ok(orderEntity.ToModel())
+        : Results.NotFound();
+});
+
+await app.RunAsync();
+```
+
+### 7. Database Setup
+
+Create a simple migration script `setup.sql`:
+
+```sql
+-- Create orders table
+CREATE TABLE IF NOT EXISTS orders (
+    id UUID PRIMARY KEY,
+    customer_name VARCHAR(100) NOT NULL,
+    product_name VARCHAR(200) NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL
+);
+
+-- Create index for performance
+CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at);
+```
+
+### 8. Configuration
+
+Create `appsettings.Development.json`:
+
+```json
+{
+    "ConnectionStrings": {
+        "DefaultConnection": "Host=localhost;Database=ecommerce;Username=postgres;Password=password"
+    },
+    "Logging": {
+        "LogLevel": {
+            "Default": "Information",
+            "Microsoft.AspNetCore": "Warning"
+        }
+    }
+}
+```
+
+### 9. Run and Test
+
+```bash
+# Start PostgreSQL (using Docker)
+docker run --name postgres-ecommerce -e POSTGRES_PASSWORD=password -e POSTGRES_DB=ecommerce -p 5432:5432 -d postgres:15
+
+# Run the setup script
+psql -h localhost -U postgres -d ecommerce -f setup.sql
+
+# Start the application
+dotnet run
+
+# Test creating orders
+curl -X POST https://localhost:7001/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "customerName": "Alice Johnson",
+    "productName": "Gaming Laptop",
+    "amount": 1899.99
+  }'
+
+# Test validation errors
+curl -X POST https://localhost:7001/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "customerName": "",
+    "productName": "Invalid Product",
+    "amount": -100
+  }'
+```
+
+## Integration Patterns
+
+### Combining Multiple Libraries
+
+The power of Momentum Libraries comes from how they work together:
+
+```csharp
+var builder = WebApplication.CreateBuilder(args);
+
+// Foundation: Service defaults for observability and health
+builder.AddServiceDefaults();
+
+// API enhancements: OpenAPI, gRPC, route conventions
+builder.AddApiDefaults();
+
+// Extensions: Result types, validation, data access
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+
+// Source generators: Automatic DbCommand handling
+// (Automatically activated when package is referenced)
+
+// Messaging: Event-driven capabilities
+builder.AddKafkaMessaging(builder.Configuration);
+
+var app = builder.Build();
+
+// All the endpoints and middleware are configured
+app.MapDefaultEndpoints();
+app.MapApiEndpoints();
+
+await app.RunAsync();
+```
+
+### Error Handling Patterns
+
+Consistent error handling across your application:
+
+```csharp
+// Service layer
+public async Task<Result<Customer>> GetCustomerAsync(Guid id)
+{
+    var customer = await customerRepository.GetByIdAsync(id);
+
+    return customer switch
+    {
+        null => Result<Customer>.NotFound("Customer", id.ToString()),
+        _ => Result<Customer>.Success(customer)
+    };
+}
+
+// API layer
+app.MapGet("/customers/{id:guid}", async (Guid id, ICustomerService service) =>
+{
+    var result = await service.GetCustomerAsync(id);
+
+    return result.Match(
+        onSuccess: customer => Results.Ok(customer),
+        onFailure: errors => Results.BadRequest(errors)
+    );
+});
+```
+
+### Event-Driven Integration
+
+Publish and consume events across services:
+
+```csharp
+// Domain event
+[EventTopic("ecommerce.orders.order-created")]
+public record OrderCreated(
+    [PartitionKey] Guid CustomerId,
+    Order Order
+);
+
+// Command handler that publishes events
+public static async Task<(Result<Order>, OrderCreated?)> Handle(
+    CreateOrderCommand command,
+    IMessageBus messageBus)
+{
+    // Business logic...
+    var order = await CreateOrderInDatabase(command);
+
+    // Create integration event
+    var orderCreated = new OrderCreated(order.CustomerId, order);
+
+    return (Result<Order>.Success(order), orderCreated);
+}
+
+// Event handler in another service
+public class OrderCreatedHandler
+{
+    public async Task Handle(OrderCreated orderCreated, CancellationToken cancellationToken)
+    {
+        // Process the order creation in inventory service
+        await inventoryService.ReserveItemsAsync(orderCreated.Order.Items, cancellationToken);
+    }
+}
+```
+
+## Best Practices
+
+### 1. **Start Small, Scale Up**
+
+```csharp
+// Begin with essentials
+builder.AddServiceDefaults();
+builder.Services.AddScoped<IMyService, MyService>();
+
+// Add capabilities as needed
+builder.AddApiDefaults();        // When you need enhanced APIs
+builder.AddKafkaMessaging();     // When you need events
+// Source generators activate automatically
+```
+
+### 2. **Consistent Error Handling**
+
+```csharp
+// Always use Result<T> for business operations
+public async Task<Result<Customer>> CreateCustomerAsync(CreateCustomerCommand command)
+{
+    // Validation
+    var validationResult = await validator.ValidateAsync(command);
+    if (!validationResult.IsValid)
+        return Result<Customer>.Failure(validationResult.Errors);
+
+    // Business logic
+    try
+    {
+        var customer = await customerRepository.CreateAsync(command.ToEntity());
+        return Result<Customer>.Success(customer.ToModel());
+    }
+    catch (Exception ex) when (ex is not ValidationException)
+    {
+        logger.LogError(ex, "Failed to create customer");
+        return Result<Customer>.Failure("An error occurred while creating the customer");
+    }
+}
+```
+
+### 3. **Leverage Source Generation**
+
+```csharp
+// Mark database commands for generation
+[DbCommand]
+public record GetCustomersQuery(int Page, int PageSize) : IQuery<IEnumerable<Customer>>;
+
+// The source generator creates the handler automatically
+// Use dependency injection to access the generated handler
+```
+
+### 4. **Configuration Patterns**
+
+```csharp
+// Use configuration sections for complex settings
+builder.Services.Configure<OrderServiceOptions>(
+    builder.Configuration.GetSection("OrderService"));
+
+// Validate configuration at startup
+builder.Services.AddOptions<OrderServiceOptions>()
+    .Bind(builder.Configuration.GetSection("OrderService"))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+```
+
+## Next Steps
+
+Choose your path based on how you're using Momentum:
+
+### **If You Used the Template**
+
+1. **[Explore the Generated Solution](./template-walkthrough/)** - Understand what was created
+2. **[Add Your Business Domain](./adding-domains/)** - Replace sample code with your logic
+3. **[Deploy to Production](./deployment/)** - Deploy your microservices
+4. **[Template Options Reference](./template-options/)** - Complete parameter guide
+
+### **If You're Using Individual Libraries**
+
+1. **[Service Configuration Guide](./service-configuration/)** - Deep dive into observability, health checks, and resilience
+2. **[Error Handling Patterns](./error-handling)** - Master the Result pattern and validation
+3. **[Database Operations](./database/)** - Learn DbCommand source generation and best practices
+4. **[Event-Driven Messaging](./messaging/)** - Build robust event-driven architectures with Kafka
+5. **[Testing Strategies](./testing/)** - Comprehensive testing patterns for Momentum applications
+
+### **Advanced Topics for Both Approaches**
+
+6. **[CQRS Implementation](./cqrs/)** - Command/Query separation patterns
+7. **[Architecture Decisions](./arch/)** - Design patterns and architectural guidance
+8. **[Best Practices](./best-practices)** - Production-ready patterns and guidelines
+9. **[Troubleshooting](./troubleshooting)** - Common issues and solutions
+
+### **Community and Support**
+
+-   **API Reference**: Browse the complete [API documentation](/reference/Momentum)
+-   **Sample Applications**: See [real-world examples](https://github.com/vgmello/momentum/tree/main/examples)
+-   **GitHub Discussions**: Ask questions and share experiences
+-   **Contributing**: Help improve the libraries for everyone
+
+## Common Patterns Quick Reference
+
+### Result Type Usage
+
+```csharp
+// Success
+return Result<Customer>.Success(customer);
+
+// Single error
+return Result<Customer>.Failure("Customer not found");
+
+// Multiple errors (validation)
+return Result<Customer>.Failure(validationResult.Errors);
+
+// Chaining operations
+var result = await GetCustomerAsync(id);
+if (result.IsFailure) return result;
+
+return await UpdateCustomerAsync(result.Value);
+```
+
+### Service Registration
+
+```csharp
+// Essential services
+builder.AddServiceDefaults();
+
+// API services
+builder.AddApiDefaults();
+
+// Database
+builder.Services.AddScoped<IDbConnection>(_ =>
+    new NpgsqlConnection(connectionString));
+
+// Validation
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+
+// Custom services
+builder.Services.AddScoped<IOrderService, OrderService>();
+```
+
+### API Endpoint Patterns
+
+```csharp
+// Command endpoint with validation
+app.MapPost("/orders", async (CreateOrderCommand command, IMessageBus bus) =>
+{
+    var result = await bus.InvokeAsync(command);
+    return result.IsSuccess
+        ? Results.Created($"/orders/{result.Value.Id}", result.Value)
+        : Results.BadRequest(result.Errors);
+});
+
+// Query endpoint
+app.MapGet("/orders/{id:guid}", async (Guid id, IMessageBus bus) =>
+{
+    var query = new GetOrderQuery(id);
+    var result = await bus.InvokeAsync(query);
+    return result.IsSuccess ? Results.Ok(result.Value) : Results.NotFound();
+});
+```
+
+**Ready to build amazing applications?** 
+
+### **Template Users (Recommended)**
+
+-   **[Template Walkthrough](./template-walkthrough/)** - Understand your generated solution
+-   **[Adding Business Domains](./adding-domains/)** - Build your application logic
+-   **[Template Options Guide](./template-options/)** - Master all configuration options
+
+### **Library Users**
+
+-   **[Service Configuration](./service-configuration/)** - Configure observability and infrastructure
+-   **[Database Integration](./database/)** - Add database operations with source generation
+-   **[Event Messaging](./messaging/)** - Build event-driven microservices
+
+### **Reference & Examples**
+
+-   **[API Reference](/reference/Momentum)** - Complete library documentation
+-   **[Sample Applications](https://github.com/vgmello/momentum/tree/main/examples)** - Real-world examples
+-   **[GitHub Discussions](https://github.com/vgmello/momentum/discussions)** - Community support
+
+---
+
+_Momentum: Real-world microservices. Modern architecture. Production-ready from day one._

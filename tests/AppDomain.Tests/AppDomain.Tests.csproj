@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <IsTestProject>true</IsTestProject>
+        <IsPackable>false</IsPackable>
+        <OutputType>Exe</OutputType>
+        <EnableDefaultContentItems>false</EnableDefaultContentItems>
+        <NoWarn>$(NoWarn);CS0436;</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="coverlet.collector">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Grpc.Tools" Condition="'$(IncludeApi)' == 'True'"/>
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Condition="'$(IncludeApi)' == 'True'"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk"/>
+        <PackageReference Include="NetArchTest.Rules"/>
+        <PackageReference Include="NSubstitute"/>
+        <PackageReference Include="Shouldly"/>
+        <PackageReference Include="Testcontainers.PostgreSql" Condition="'$(UsePgsql)' == 'True'"/>
+        <PackageReference Include="Testcontainers"/>
+        <PackageReference Include="xunit.runner.visualstudio"/>
+        <PackageReference Include="xunit.v3"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\AppDomain\AppDomain.csproj"/>
+        <ProjectReference Include="..\..\src\AppDomain.Api\AppDomain.Api.csproj" Condition="'$(IncludeApi)' == 'True'"/>
+        <ProjectReference Include="..\..\src\AppDomain.BackOffice\AppDomain.BackOffice.csproj" Condition="'$(IncludeBackOffice)' == 'True'"/>
+        <ProjectReference Include="..\..\libs\Momentum.Extensions\src\Momentum.Extensions.Extensions\Momentum.Extensions.Extensions.csproj" Condition="'$(LibsExt)' == 'True'"/>
+        <ProjectReference Include="..\..\libs\Momentum.SourceGeneratorsKafka\src\Momentum.SourceGeneratorsKafka.Extensions.Messaging.Kafka\Momentum.SourceGeneratorsKafka.Extensions.Messaging.Kafka.csproj" Condition="'$(LibsKafka)' == 'True'"/>
+        <ProjectReference Include="..\..\libs\Momentum.SourceGeneratorsSourceGenerators\src\Momentum.SourceGeneratorsSourceGenerators.Extensions.SourceGenerators\Momentum.SourceGeneratorsSourceGenerators.Extensions.SourceGenerators.csproj" Condition="'$(LibsGenerators)' == 'True'"/>
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(IncludeApi)' == 'True'">
+        <Protobuf Include="..\..\src\AppDomain.Api\**\Protos\**\*.proto"
+                  ProtoRoot="..\..\src\AppDomain.Api\"
+                  GrpcServices="Client"
+                  Link="Integration\%(RecursiveDir)%(Filename)%(Extension)"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit"/>
+        <Using Include="Shouldly"/>
+    </ItemGroup>
+
+</Project>

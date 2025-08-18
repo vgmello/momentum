@@ -1,0 +1,55 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+    <PropertyGroup>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <UserSecretsId>4d1e9d4f-ee8a-4d91-8c2b-11e09987ac0b</UserSecretsId>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Grpc.AspNetCore"/>
+        <PackageReference Include="Grpc.Tools"/>
+        <!--#if (libs != defaults) -->
+        <PackageReference Include="Momentum.ServiceDefaults"/>
+        <!--#endif -->
+        <!--#if (libs != api) -->
+        <PackageReference Include="Momentum.ServiceDefaults.Api"/>
+        <!--#endif -->
+        <!--#if (libs != kafka) -->
+        <PackageReference Include="Momentum.Extensions.Messaging.Kafka"/>
+        <!--#endif -->
+        <!--#if (USE_KAFKA) -->
+        <PackageReference Include="WolverineFx.Kafka"/>
+        <!--#endif -->
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\AppDomain\AppDomain.csproj"/>
+        <!--#if (libs == defaults) -->
+        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
+        <!--#endif -->
+        <!--#if (libs == api) -->
+        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.ServiceDefaults.Api\Momentum.ServiceDefaults.Api.csproj"/>
+        <!--#endif -->
+        <!--#if (libs == kafka) -->
+        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.Messaging.Kafka\Momentum.Extensions.Messaging.Kafka.csproj"/>
+        <!--#endif -->
+    </ItemGroup>
+
+    <!--#if (libs == defaults) -->
+    <Import Project="..\..\libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.props"/>
+
+    <!--#endif -->
+    <ItemGroup>
+        <Protobuf Include="**/Protos/**/*.proto" ProtoRoot="." GrpcServices="Server"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="AppDomain.Tests"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Update="Program.Public.cs">
+            <DependentUpon>Program.cs</DependentUpon>
+        </Compile>
+    </ItemGroup>
+</Project>

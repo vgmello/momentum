@@ -1,0 +1,10 @@
+{
+  "strictFileMatching": true,
+  "ignoreFiles": [],
+  "customAssertions": {
+    "order-completed.md": "Should contain reference schemas section",
+    "sidebar.json": "Should group schemas by domain"
+  },
+  "generateSchemas": true,
+  "generateSidebar": true
+}

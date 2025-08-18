@@ -1,0 +1,129 @@
+name: 'Publish NuGet Packages'
+description: 'Pack and publish NuGet packages'
+
+inputs:
+  project-path:
+    description: 'Path to the project or solution to pack'
+    required: false
+    default: 'libs/Momentum/src'
+  configuration:
+    description: 'Build configuration'
+    required: false
+    default: 'Release'
+  package-version:
+    description: 'Version to use for the packages'
+    required: true
+  nuget-api-key:
+    description: 'NuGet API key for publishing'
+    required: true
+  nuget-source:
+    description: 'NuGet source URL'
+    required: false
+    default: 'https://api.nuget.org/v3/index.json'
+  skip-duplicate:
+    description: 'Skip duplicate packages'
+    required: false
+    default: 'true'
+  dry-run:
+    description: 'Perform a dry run without actually publishing'
+    required: false
+    default: 'false'
+
+outputs:
+  published-packages:
+    description: 'List of published packages'
+    value: ${{ steps.publish.outputs.packages }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Pack NuGet packages
+      shell: bash
+      run: |
+        echo "📦 Packing NuGet packages with version ${{ inputs.package-version }}..."
+        dotnet pack ${{ inputs.project-path }} \
+          --configuration ${{ inputs.configuration }} \
+          --no-build \
+          --verbosity minimal \
+          -p:PackageVersion=${{ inputs.package-version }}
+        
+        if [ $? -ne 0 ]; then
+          echo "❌ Package creation failed"
+          exit 1
+        fi
+        echo "✅ Packages created successfully"
+
+    - name: Find packages
+      id: find-packages
+      shell: bash
+      run: |
+        echo "🔍 Finding NuGet packages..."
+        PACKAGES=$(find ${{ inputs.project-path }} -name "*.nupkg" -not -path "*/bin/Debug/*")
+        
+        if [ -z "$PACKAGES" ]; then
+          echo "❌ No packages found to publish"
+          exit 1
+        fi
+        
+        echo "Found packages:"
+        echo "$PACKAGES"
+        
+        # Save package list for output
+        echo "packages<<EOF" >> $GITHUB_OUTPUT
+        echo "$PACKAGES" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
+    - name: Publish to NuGet
+      id: publish
+      if: inputs.dry-run != 'true'
+      shell: bash
+      run: |
+        SOURCE_NAME=""
+        if [[ "${{ inputs.nuget-source }}" == *"nugettest.org"* ]]; then
+          SOURCE_NAME="NuGet Test"
+        else
+          SOURCE_NAME="NuGet.org"
+        fi
+        
+        echo "🚀 Publishing packages to $SOURCE_NAME..."
+        echo "   Source: ${{ inputs.nuget-source }}"
+        
+        PACKAGES="${{ steps.find-packages.outputs.packages }}"
+        PUBLISHED_LIST=""
+        
+        for package in $PACKAGES; do
+          echo "Publishing $(basename $package)..."
+          
+          SKIP_FLAG=""
+          if [ "${{ inputs.skip-duplicate }}" == "true" ]; then
+            SKIP_FLAG="--skip-duplicate"
+          fi
+          
+          dotnet nuget push "$package" \
+            --api-key ${{ inputs.nuget-api-key }} \
+            --source ${{ inputs.nuget-source }} \
+            $SKIP_FLAG
+          
+          if [ $? -eq 0 ]; then
+            echo "✅ Successfully published $(basename $package)"
+            PUBLISHED_LIST="$PUBLISHED_LIST$(basename $package)\n"
+          else
+            echo "❌ Failed to publish $(basename $package)"
+            exit 1
+          fi
+        done
+        
+        echo "🎉 All packages published successfully to $SOURCE_NAME!"
+        echo "packages<<EOF" >> $GITHUB_OUTPUT
+        echo -e "$PUBLISHED_LIST" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
+    - name: Dry run summary
+      if: inputs.dry-run == 'true'
+      shell: bash
+      run: |
+        echo "🔍 DRY RUN - The following packages would be published:"
+        PACKAGES="${{ steps.find-packages.outputs.packages }}"
+        for package in $PACKAGES; do
+          echo "  - $(basename $package)"
+        done

@@ -1,0 +1,9 @@
+{
+  "strictFileMatching": true,
+  "ignoreFiles": [],
+  "customAssertions": {
+    "minimal-event.md": "Should handle minimal documentation gracefully without partition keys or structured remarks"
+  },
+  "generateSchemas": false,
+  "generateSidebar": false
+}

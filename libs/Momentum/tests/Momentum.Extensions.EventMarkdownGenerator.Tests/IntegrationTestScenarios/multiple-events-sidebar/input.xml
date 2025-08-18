@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TestEvents</name>
+    </assembly>
+    <members>
+        <!-- User Management Events -->
+        <member name="T:Platform.Users.Contracts.IntegrationEvents.UserCreated">
+            <summary>Published when a new user account is created</summary>
+        </member>
+        <member name="M:Platform.Users.Contracts.IntegrationEvents.UserCreated.#ctor(System.Guid,System.String,System.String)">
+            <param name="tenantId">Tenant identifier</param>
+            <param name="userId">User identifier</param>
+            <param name="email">User email address</param>
+        </member>
+        
+        <member name="T:Platform.Users.Contracts.IntegrationEvents.UserDeleted">
+            <summary>Published when a user account is permanently deleted</summary>
+        </member>
+        <member name="M:Platform.Users.Contracts.IntegrationEvents.UserDeleted.#ctor(System.Guid,System.String,System.DateTime)">
+            <param name="tenantId">Tenant identifier</param>
+            <param name="userId">User identifier</param>
+            <param name="deletedAt">Deletion timestamp</param>
+        </member>
+        
+        <!-- Subscription Events -->
+        <member name="T:Platform.Subscriptions.Contracts.IntegrationEvents.SubscriptionActivated">
+            <summary>Published when a subscription becomes active</summary>
+        </member>
+        <member name="M:Platform.Subscriptions.Contracts.IntegrationEvents.SubscriptionActivated.#ctor(System.Guid,System.String,System.String)">
+            <param name="tenantId">Tenant identifier</param>
+            <param name="subscriptionId">Subscription identifier</param>
+            <param name="planName">Subscription plan name</param>
+        </member>
+        
+        <member name="T:Platform.Subscriptions.Contracts.IntegrationEvents.SubscriptionCancelled">
+            <summary>Published when a subscription is cancelled</summary>
+        </member>
+        <member name="M:Platform.Subscriptions.Contracts.IntegrationEvents.SubscriptionCancelled.#ctor(System.Guid,System.String,System.String,System.DateTime)">
+            <param name="tenantId">Tenant identifier</param>
+            <param name="subscriptionId">Subscription identifier</param>
+            <param name="reason">Cancellation reason</param>
+            <param name="cancelledAt">Cancellation timestamp</param>
+        </member>
+        
+        <!-- AppDomain Events -->
+        <member name="T:Platform.AppDomain.Invoices.Contracts.IntegrationEvents.InvoiceGenerated">
+            <summary>Published when an invoice is generated for a customer</summary>
+        </member>
+        <member name="M:Platform.AppDomain.Invoices.Contracts.IntegrationEvents.InvoiceGenerated.#ctor(System.Guid,System.String,System.Decimal)">
+            <param name="tenantId">Tenant identifier</param>
+            <param name="invoiceId">Invoice identifier</param>
+            <param name="amount">Invoice amount</param>
+        </member>
+        
+        <member name="T:Platform.AppDomain.Payments.Contracts.IntegrationEvents.PaymentProcessed">
+            <summary>Published when a payment is successfully processed</summary>
+        </member>
+        <member name="M:Platform.AppDomain.Payments.Contracts.IntegrationEvents.PaymentProcessed.#ctor(System.Guid,System.String,System.Decimal)">
+            <param name="tenantId">Tenant identifier</param>
+            <param name="paymentId">Payment identifier</param>
+            <param name="amount">Payment amount</param>
+        </member>
+    </members>
+</doc>

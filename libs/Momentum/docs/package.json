@@ -1,0 +1,28 @@
+{
+  "name": "docs",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm install && pnpm docs:dev",
+    "docs:pre": "pnpm docs:dotnet && pnpm docs:adr",
+    "docs:dev": "pnpm docs:pre && vitepress dev",
+    "docs:build": "pnpm docs:pre && vitepress build",
+    "docs:preview": "vitepress preview",
+    "docs:dotnet": "tsx .vitepress/scripts/docs-dotnet.ts",
+    "docs:adr": "tsx .vitepress/scripts/adrlogs-table-gen.ts"
+  },
+  "dependencies": {
+    "glob": "^10.4.5",
+    "gray-matter": "^4.0.3",
+    "yaml": "^2.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.14",
+    "markdown-it": "^14.1.0",
+    "mermaid": "^11.9.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3",
+    "vitepress": "^1.6.3"
+  }
+}

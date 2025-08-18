@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <IsPackable>True</IsPackable>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <VersionPrefix>0.0.1</VersionPrefix>
+        <VersionSuffix Condition="'$(Configuration)' == 'Debug'">pre</VersionSuffix>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Authors>ORG_NAME</Authors>
+        <Company>ORG_NAME</Company>
+        <Copyright>Copyright (c) ORG_NAME. All rights reserved.</Copyright>
+        <PackageTags>app_domain;app_domain.contracts</PackageTags>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <RepositoryUrl>https://github.com/ORG_NAME/AppDomain</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="Momentum.Extensions.Abstractions.Messaging.DefaultDomainAttribute">
+            <Domain>AppDomain</Domain>
+        </AssemblyAttribute>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Include="..\AppDomain\**\Contracts\IntegrationEvents\*.cs" Link="%(RecursiveDir)%(Filename)%(Extension)" />
+        <Compile Include="..\AppDomain\**\Contracts\Models\*.cs" Link="%(RecursiveDir)%(Filename)%(Extension)" />
+        <!--#if (INCLUDE_API) -->
+        <None Include="..\AppDomain.Api\**\Protos\**\*.proto" Link="%(RecursiveDir)%(Filename)%(Extension)" Pack="true">
+            <PackagePath>Protos</PackagePath>
+        </None>
+        <!--#endif -->
+        <None Include="README.md" Pack="true" PackagePath="\" />
+        <None Include="AppDomain.Contracts.props" Pack="true" PackagePath="\build" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Momentum.Extensions.Abstractions" />
+        <!--#if (false) -->
+        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
+        <!--#endif -->
+    </ItemGroup>
+</Project>

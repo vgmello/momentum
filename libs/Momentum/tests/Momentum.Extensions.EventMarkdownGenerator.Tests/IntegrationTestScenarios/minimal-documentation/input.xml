@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TestEvents</name>
+    </assembly>
+    <members>
+        <member name="T:Events.Core.MinimalEvent">
+            <summary>Simple event with minimal documentation</summary>
+        </member>
+        <member name="M:Events.Core.MinimalEvent.#ctor(System.Guid)">
+            <param name="id">Event identifier</param>
+        </member>
+    </members>
+</doc>

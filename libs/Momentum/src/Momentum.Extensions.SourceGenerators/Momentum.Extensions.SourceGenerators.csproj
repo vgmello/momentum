@@ -1,0 +1,61 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <IsRoslynComponent>true</IsRoslynComponent>
+        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+        <CompilerGeneratedFilesOutputPath>Internal/Generated</CompilerGeneratedFilesOutputPath>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+        <LangVersion>Latest</LangVersion>
+        <NoWarn>$(NoWarn);RS1041;RS2007;RS1036;NU5128</NoWarn>
+        <IsPackable>true</IsPackable>
+        <PackageId>Momentum.Extensions.SourceGenerators</PackageId>
+        <PackageDescription>Source generators for the Momentum platform providing compile-time code
+            generation utilities to reduce boilerplate and improve developer productivity. Includes
+            generators for common patterns used across Momentum libraries.
+        </PackageDescription>
+        <PackageProjectUrl>https://github.com/vgmello/momentum/blob/main/libs/Momentum/src/Momentum.Extensions.SourceGenerators/README.md</PackageProjectUrl>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all"/>
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all"/>
+        <!--#if (libs == generators)
+        <PackageReference Include="Momentum.Extensions.Abstractions" PrivateAssets="all"
+        GeneratePathProperty="true"/>
+        #endif -->
+    </ItemGroup>
+
+    <!--#if (libs == none) -->
+    <ItemGroup>
+        <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="\analyzers\dotnet\cs" Visible="false"/>
+        <None
+            Include="$(ProjectDir)..\Momentum.Extensions.Abstractions\$(OutputPath)\Momentum.Extensions.Abstractions.dll"
+            Pack="true" PackagePath="\analyzers\dotnet\cs" Visible="false"/>
+        <None Include="Momentum.Extensions.SourceGenerators.props" Pack="true" PackagePath="\build"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj" PrivateAssets="all"/>
+    </ItemGroup>
+    <!--#endif -->
+
+    <PropertyGroup>
+        <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
+    </PropertyGroup>
+
+    <Target Name="GetDependencyTargetPaths">
+        <ItemGroup>
+            <!--#if (libs == none) -->
+            <TargetPathWithTargetPlatformMoniker
+                Include="$(ProjectDir)..\Momentum.Extensions.Abstractions\$(OutputPath)\Momentum.Extensions.Abstractions.dll"
+                IncludeRuntimeDependency="false"/>
+            <!--#endif -->
+            <!--#if (libs == generators)
+            <TargetPathWithTargetPlatformMoniker
+                Include="$(PKGMomentum_Extensions_Abstractions)analyzers\dotnet\cs\Momentum.Extensions.Abstractions.dll"
+                IncludeRuntimeDependency="false"/>
+            #endif -->
+        </ItemGroup>
+    </Target>
+</Project>

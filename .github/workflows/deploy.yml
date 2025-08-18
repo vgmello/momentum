@@ -1,0 +1,260 @@
+name: Deploy Momentum Libraries
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "libs/**"
+    tags:
+      - "release"
+      - "v*.*.*"
+
+  workflow_dispatch:
+    inputs:
+      deploy-type:
+        description: "Type of deployment"
+        required: true
+        default: "prerelease"
+        type: choice
+        options:
+          - prerelease
+          - release
+          - docs-only
+          - test-prerelease
+          - test-release
+      nuget-source:
+        description: "NuGet source (for testing)"
+        required: false
+        default: "https://api.nuget.org/v3/index.json"
+
+env:
+  DOTNET_VERSION: "9.0.x"
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ (startsWith(github.ref, 'refs/tags/v') || github.ref_name == 'release' || (github.event_name == 'workflow_dispatch' && (github.event.inputs['deploy-type'] == 'release' || github.event.inputs['deploy-type'] == 'docs-only'))) && 'github-pages' || 'production' }}
+      url: ${{ steps.docs-deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set deployment options
+        id: options
+        run: |
+          DEPLOY_PRERELEASE=false
+          DEPLOY_RELEASE=false
+          DEPLOY_DOCS=false
+          IS_TEST=false
+          NUGET_SOURCE="https://api.nuget.org/v3/index.json"
+
+          # Check for test deployments
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && ("${{ github.event.inputs.deploy-type }}" == "test-prerelease" || "${{ github.event.inputs.deploy-type }}" == "test-release") ]]; then
+            IS_TEST=true
+            NUGET_SOURCE="https://int.nugettest.org/v3/index.json"
+            if [ -n "${{ github.event.inputs.nuget-source }}" ]; then
+              NUGET_SOURCE="${{ github.event.inputs.nuget-source }}"
+            fi
+          fi
+
+          # Set deployment flags
+          if [[ ("${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main") || ("${{ github.event_name }}" == "workflow_dispatch" && ("${{ github.event.inputs.deploy-type }}" == "prerelease" || "${{ github.event.inputs.deploy-type }}" == "test-prerelease")) ]]; then
+            DEPLOY_PRERELEASE=true
+          fi
+
+          if [[ "${{ github.ref_name }}" == "release" || ("${{ github.event_name }}" == "workflow_dispatch" && ("${{ github.event.inputs.deploy-type }}" == "release" || "${{ github.event.inputs.deploy-type }}" == "test-release")) ]]; then
+            DEPLOY_RELEASE=true
+          fi
+
+          if [[ "${{ github.ref }}" == refs/tags/v* || "${{ github.ref_name }}" == "release" || ("${{ github.event_name }}" == "workflow_dispatch" && ("${{ github.event.inputs.deploy-type }}" == "release" || "${{ github.event.inputs.deploy-type }}" == "docs-only")) ]]; then
+            DEPLOY_DOCS=true
+          fi
+
+          echo "prerelease=$DEPLOY_PRERELEASE" >> $GITHUB_OUTPUT
+          echo "release=$DEPLOY_RELEASE" >> $GITHUB_OUTPUT
+          echo "docs=$DEPLOY_DOCS" >> $GITHUB_OUTPUT
+          echo "test=$IS_TEST" >> $GITHUB_OUTPUT
+          echo "nuget_source=$NUGET_SOURCE" >> $GITHUB_OUTPUT
+
+      - name: Build .NET projects
+        if: steps.options.outputs.prerelease == 'true' || steps.options.outputs.release == 'true' || steps.options.outputs.docs == 'true'
+        uses: ./.github/actions/build
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+          configuration: Release
+          project-path: libs/Momentum/src
+
+      - name: Calculate pre-release version
+        if: steps.options.outputs.prerelease == 'true'
+        id: prerelease-version
+        uses: ./.github/actions/version-calculate
+        with:
+          version-file: libs/Momentum/version.txt
+          release-type: prerelease
+          check-changes: true
+          change-path: libs/
+
+      - name: Generate pre-release notes
+        if: steps.options.outputs.prerelease == 'true' && steps.prerelease-version.outputs.skip != 'true'
+        uses: ./.github/actions/generate-release-notes
+        with:
+          version: ${{ steps.prerelease-version.outputs.version }}
+          tag: ${{ steps.prerelease-version.outputs.tag }}
+          release-type: prerelease
+          output-file: prerelease_notes.md
+
+      - name: Create GitHub pre-release
+        if: steps.options.outputs.prerelease == 'true' && steps.prerelease-version.outputs.skip != 'true' && steps.options.outputs.test != 'true'
+        run: |
+          gh release create ${{ steps.prerelease-version.outputs.tag }} \
+            --title "Momentum Libraries ${{ steps.prerelease-version.outputs.tag }} (Pre-release)" \
+            --notes-file prerelease_notes.md \
+            --prerelease \
+            --target main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish pre-release packages
+        if: steps.options.outputs.prerelease == 'true' && steps.prerelease-version.outputs.skip != 'true'
+        uses: ./.github/actions/nuget-publish
+        with:
+          project-path: libs/Momentum/src
+          configuration: Release
+          package-version: ${{ steps.prerelease-version.outputs.version }}
+          nuget-api-key: ${{ steps.options.outputs.test == 'true' && secrets.NUGET_TEST_API_KEY || secrets.NUGET_API_KEY }}
+          nuget-source: ${{ steps.options.outputs.nuget_source }}
+
+      - name: Verify main branch for release
+        if: steps.options.outputs.release == 'true'
+        run: |
+          CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          if [ "$CURRENT_BRANCH" != "main" ]; then
+            echo "❌ Release must be created from main branch. Current: $CURRENT_BRANCH"
+            exit 1
+          fi
+          echo "✅ Confirmed on main branch"
+
+      - name: Calculate release version
+        if: steps.options.outputs.release == 'true'
+        id: release-version
+        uses: ./.github/actions/version-calculate
+        with:
+          version-file: libs/Momentum/version.txt
+          release-type: stable
+          check-changes: false
+
+      - name: Generate release notes
+        if: steps.options.outputs.release == 'true'
+        uses: ./.github/actions/generate-release-notes
+        with:
+          version: ${{ steps.release-version.outputs.version }}
+          tag: ${{ steps.release-version.outputs.tag }}
+          release-type: stable
+          output-file: release_notes.md
+
+      - name: Create GitHub release
+        if: steps.options.outputs.release == 'true' && steps.options.outputs.test != 'true'
+        run: |
+          gh release create ${{ steps.release-version.outputs.tag }} \
+            --title "Momentum Libraries ${{ steps.release-version.outputs.tag }}" \
+            --notes-file release_notes.md \
+            --target main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish release packages
+        if: steps.options.outputs.release == 'true'
+        uses: ./.github/actions/nuget-publish
+        with:
+          project-path: libs/Momentum/src
+          configuration: Release
+          package-version: ${{ steps.release-version.outputs.version }}
+          nuget-api-key: ${{ steps.options.outputs.test == 'true' && secrets.NUGET_TEST_API_KEY || secrets.NUGET_API_KEY }}
+          nuget-source: ${{ steps.options.outputs.nuget_source }}
+
+      - name: Setup Pages
+        if: steps.options.outputs.docs == 'true'
+        uses: actions/configure-pages@v4
+
+      - name: Build documentation
+        if: steps.options.outputs.docs == 'true'
+        uses: ./.github/actions/docs-build
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+          docs-path: libs/Momentum/docs
+          build-dotnet: false
+
+      - name: Upload to GitHub Pages
+        if: steps.options.outputs.docs == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: libs/Momentum/docs/.vitepress/dist
+
+      - name: Deploy to GitHub Pages
+        if: steps.options.outputs.docs == 'true'
+        id: docs-deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Deployment Summary
+        run: |
+          echo "# 📊 Deployment Summary"
+          echo ""
+
+          if [ "${{ steps.options.outputs.test }}" == "true" ]; then
+            echo "🧪 **Test Deployment Mode**"
+            echo "   - NuGet Source: ${{ steps.options.outputs.nuget_source }}"
+            echo ""
+          fi
+
+          if [ "${{ steps.options.outputs.prerelease }}" == "true" ]; then
+            if [ "${{ steps.prerelease-version.outputs.skip }}" == "true" ]; then
+              echo "⏭️ Pre-release skipped (no consumer-visible changes)"
+            elif [ -n "${{ steps.prerelease-version.outputs.version }}" ]; then
+              echo "✅ **Pre-release deployed**"
+              echo "   - Version: ${{ steps.prerelease-version.outputs.version }}"
+              echo "   - Tag: ${{ steps.prerelease-version.outputs.tag }}"
+              echo "   - NuGet: ${{ steps.options.outputs.nuget_source }}"
+              if [ "${{ steps.options.outputs.test }}" != "true" ]; then
+                echo "   - GitHub Release: Created"
+              fi
+            else
+              echo "❌ **Pre-release failed**"
+            fi
+          fi
+
+          if [ "${{ steps.options.outputs.release }}" == "true" ]; then
+            if [ -n "${{ steps.release-version.outputs.version }}" ]; then
+              echo "✅ **Release deployed**"
+              echo "   - Version: ${{ steps.release-version.outputs.version }}"
+              echo "   - Tag: ${{ steps.release-version.outputs.tag }}"
+              echo "   - NuGet: ${{ steps.options.outputs.nuget_source }}"
+              if [ "${{ steps.options.outputs.test }}" != "true" ]; then
+                echo "   - GitHub Release: Created"
+              fi
+            else
+              echo "❌ **Release failed**"
+            fi
+          fi
+
+          if [ "${{ steps.options.outputs.docs }}" == "true" ]; then
+            if [ -n "${{ steps.docs-deployment.outputs.page_url }}" ]; then
+              echo "✅ **Documentation deployed**"
+              echo "   - URL: ${{ steps.docs-deployment.outputs.page_url }}"
+            else
+              echo "❌ **Documentation failed**"
+            fi
+          fi

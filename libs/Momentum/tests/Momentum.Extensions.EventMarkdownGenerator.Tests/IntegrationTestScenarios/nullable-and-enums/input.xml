@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TestEvents</name>
+    </assembly>
+    <members>
+        <member name="T:AppDomain.Types.Contracts.IntegrationEvents.PaymentStatusChanged">
+            <summary>Published when payment status transitions occur with optional metadata and enum values</summary>
+            <remarks>
+            ## When It's Triggered
+            
+            This event is published when:
+            - Payment status changes from one state to another
+            - Optional payment metadata is updated
+            - Nullable fields are conditionally populated
+            
+            ## Type System Features
+            
+            This event demonstrates:
+            - Nullable reference types with proper nullability annotations
+            - Enum types for type-safe status representation
+            - Optional nullable value types for conditional data
+            - Mixed required and optional fields
+            </remarks>
+        </member>
+        <member name="M:AppDomain.Types.Contracts.IntegrationEvents.PaymentStatusChanged.#ctor(System.Guid,System.String,AppDomain.Types.Contracts.Enums.PaymentStatus,AppDomain.Types.Contracts.Enums.PaymentStatus,System.Nullable{System.DateTime},System.String,System.Nullable{System.Decimal},AppDomain.Types.Contracts.Enums.PaymentMethod,System.Nullable{AppDomain.Types.Contracts.Enums.FailureReason})">
+            <param name="tenantId">Identifier of the tenant that owns the payment</param>
+            <param name="paymentId">Unique identifier for the payment being updated</param>
+            <param name="previousStatus">The payment status before this change occurred</param>
+            <param name="newStatus">The new payment status after the change</param>
+            <param name="processedAt">Optional timestamp when payment processing completed (null for pending statuses)</param>
+            <param name="notes">Optional notes about the status change (null if no additional information)</param>
+            <param name="amount">Optional payment amount (null for status changes that don't involve amounts)</param>
+            <param name="paymentMethod">The method used for payment processing</param>
+            <param name="failureReason">Optional reason for payment failure (null for successful payments)</param>
+        </member>
+        <member name="T:AppDomain.Types.Contracts.Enums.PaymentStatus">
+            <summary>Enumeration of possible payment status values</summary>
+        </member>
+        <member name="F:AppDomain.Types.Contracts.Enums.PaymentStatus.Pending">
+            <summary>Payment is awaiting processing</summary>
+        </member>
+        <member name="F:AppDomain.Types.Contracts.Enums.PaymentStatus.Processing">
+            <summary>Payment is currently being processed</summary>
+        </member>
+        <member name="F:AppDomain.Types.Contracts.Enums.PaymentStatus.Completed">
+            <summary>Payment processing completed successfully</summary>
+        </member>
+        <member name="F:AppDomain.Types.Contracts.Enums.PaymentStatus.Failed">
+            <summary>Payment processing failed</summary>
+        </member>
+        <member name="F:AppDomain.Types.Contracts.Enums.PaymentStatus.Cancelled">
+            <summary>Payment was cancelled before processing</summary>
+        </member>
+        <member name="T:AppDomain.Types.Contracts.Enums.PaymentMethod">
+            <summary>Enumeration of supported payment methods</summary>
+        </member>
+        <member name="F:AppDomain.Types.Contracts.Enums.PaymentMethod.CreditCard">
+            <summary>Payment via credit card</summary>
+        </member>
+        <member name="F:AppDomain.Types.Contracts.Enums.PaymentMethod.BankTransfer">
+            <summary>Payment via bank transfer</summary>
+        </member>
+        <member name="F:AppDomain.Types.Contracts.Enums.PaymentMethod.DigitalWallet">
+            <summary>Payment via digital wallet service</summary>
+        </member>
+        <member name="T:AppDomain.Types.Contracts.Enums.FailureReason">
+            <summary>Enumeration of possible payment failure reasons</summary>
+        </member>
+        <member name="F:AppDomain.Types.Contracts.Enums.FailureReason.InsufficientFunds">
+            <summary>Insufficient funds in the payment source</summary>
+        </member>
+        <member name="F:AppDomain.Types.Contracts.Enums.FailureReason.InvalidPaymentMethod">
+            <summary>Payment method is invalid or expired</summary>
+        </member>
+        <member name="F:AppDomain.Types.Contracts.Enums.FailureReason.NetworkError">
+            <summary>Network connectivity issues during processing</summary>
+        </member>
+        <member name="F:AppDomain.Types.Contracts.Enums.FailureReason.SecurityViolation">
+            <summary>Security checks failed during payment processing</summary>
+        </member>
+    </members>
+</doc>

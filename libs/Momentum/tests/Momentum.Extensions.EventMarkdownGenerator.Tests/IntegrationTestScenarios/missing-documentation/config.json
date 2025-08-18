@@ -1,0 +1,12 @@
+{
+  "strictFileMatching": true,
+  "ignoreFiles": [],
+  "customAssertions": {
+    "undocumented-event.md": "Should gracefully handle completely missing documentation",
+    "empty-summary-event.md": "Should handle empty summary elements",
+    "missing-param-docs-event.md": "Should show 'No description available' for missing parameter docs",
+    "malformed-xml-event.md": "Should handle malformed XML gracefully without breaking generation"
+  },
+  "generateSchemas": false,
+  "generateSidebar": false
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://raw.githubusercontent.com/dotnet/docfx/main/schemas/docfx.schema.json",
+  "metadata": [
+    {
+      "src": [
+        {
+          "src": "../src",
+          "files": [
+            "AppDomain/bin/Debug/**/AppDomain.dll",
+            "AppDomain.Api/bin/Debug/**/AppDomain.Api.dll",
+            "AppDomain.BackOffice/bin/Debug/**/AppDomain.BackOffice.dll",
+            "AppDomain.BackOffice.Orleans/bin/Debug/**/AppDomain.BackOffice.Orleans.dll"
+          ]
+        }
+      ],
+      "output": "reference/",
+      "outputFormat": "markdown",
+      "namespaceLayout": "nested",
+      "categoryLayout": "nested"
+    }
+  ]
+}

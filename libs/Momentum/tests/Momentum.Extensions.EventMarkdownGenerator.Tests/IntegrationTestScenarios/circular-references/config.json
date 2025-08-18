@@ -1,0 +1,11 @@
+{
+  "strictFileMatching": true,
+  "ignoreFiles": [],
+  "customAssertions": {
+    "node-relationship-created.md": "Should handle circular references without infinite loops",
+    "schemas/Graph.Nodes.Contracts.Models.GraphNode.md": "Should reference NodeMetadata without creating infinite schema nesting",
+    "schemas/Graph.Nodes.Contracts.Models.NodeMetadata.md": "Should reference GraphNode without creating infinite schema nesting"
+  },
+  "generateSchemas": true,
+  "generateSidebar": false
+}
