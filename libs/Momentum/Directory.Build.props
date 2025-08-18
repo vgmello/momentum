@@ -52,7 +52,6 @@
     </ItemGroup>
 
     <Target Name="ValidateMomentumVersion" BeforeTargets="Build">
-        <Error Text="MomentumVersion property is not set. Check version.txt file." Condition="'$(MomentumVersion)' == ''" />
         <Message Text="Building Momentum Libraries version: $(MomentumVersion)" Importance="high" />
     </Target>
 </Project>

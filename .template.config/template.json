@@ -340,7 +340,8 @@
         {
           "condition": "(!INCLUDE_ORLEANS)",
           "exclude": [
-            "src/AppDomain.BackOffice.Orleans/**/*"
+            "src/AppDomain.BackOffice.Orleans/**/*",
+            "src/AppDomain.Api/Extensions/OrleansExtensions.cs"
           ]
         },
         {

@@ -5,7 +5,8 @@
         <MomentumVersion>$(TemplateMomentumVersion)</MomentumVersion>
     </PropertyGroup>
     <ItemGroup>
-        <PackageVersion Include="Aspire.Azure.Data.Tables" Version="9.4"/>
+        <PackageVersion Include="Aspire.Azure.Data.Tables" Version="9.4" />
+        <PackageVersion Include="Aspire.Azure.Storage.Blobs" Version="9.4" />
         <PackageVersion Include="Aspire.Confluent.Kafka" Version="9.4.1"/>
         <PackageVersion Include="Aspire.Hosting.AppHost" Version="9.4"/>
         <PackageVersion Include="Aspire.Hosting.Azure.Storage" Version="9.4"/>
@@ -57,6 +58,7 @@
         <PackageVersion Include="Microsoft.Orleans.Persistence.AdoNet" Version="9.2.1"/>
         <PackageVersion Include="Microsoft.Orleans.Reminders.AdoNet" Version="9.2.1"/>
         <PackageVersion Include="Microsoft.Orleans.Server" Version="9.2.1"/>
+        <PackageVersion Include="Microsoft.Orleans.Client" Version="9.2.1" />
         <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

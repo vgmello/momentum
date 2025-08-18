@@ -1,5 +1,6 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
+using AppDomain.Api.Infrastructure.Extensions;
 using AppDomain.Infrastructure;
 using Momentum.Extensions.Messaging.Kafka;
 using Momentum.ServiceDefaults;
@@ -22,6 +23,9 @@ builder.AddApiServiceDefaults();
 //#if (USE_KAFKA)
 // Add Kafka messaging extensions for event publishing and consuming
 builder.AddKafkaMessagingExtensions();
+//#endif
+//#if (INCLUDE_ORLEANS)
+builder.AddOrleansClient();
 //#endif
 
 // Configure domain and application services
