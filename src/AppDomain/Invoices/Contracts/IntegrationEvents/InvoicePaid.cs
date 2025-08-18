@@ -9,6 +9,7 @@ namespace AppDomain.Invoices.Contracts.IntegrationEvents;
 ///     This event contains the updated invoice data with payment information for proper message routing.
 /// </summary>
 /// <param name="TenantId">Unique identifier for the tenant</param>
+/// <param name="InvoiceId">Unique identifier for the invoice</param>
 /// <param name="Invoice">Updated invoice object with payment information</param>
 /// <remarks>
 ///     ## When It's Triggered

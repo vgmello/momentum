@@ -43,10 +43,6 @@ public static partial class MarkInvoiceAsPaidCommandHandler
     /// <summary>
     ///     Database command for marking an invoice as paid.
     /// </summary>
-    /// <param name="TenantId">Unique identifier for the tenant</param>
-    /// <param name="InvoiceId">Unique identifier for the invoice</param>
-    /// <param name="AmountPaid">Amount that was paid</param>
-    /// <param name="PaymentDate">Date when payment was received</param>
     [DbCommand(fn: "$billing.invoices_mark_paid")]
     public partial record DbCommand(
         Guid TenantId,

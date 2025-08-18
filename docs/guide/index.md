@@ -78,7 +78,146 @@ The Bills domain provides comprehensive bill management functionality (coming so
 
 ### Vertical Slice Architecture
 
--   TODO: Fill the details
+Momentum implements **Vertical Slice Architecture**, a powerful architectural pattern that organizes code by feature rather than by technical layers. This approach dramatically improves maintainability, reduces coupling, and makes the codebase more intuitive for both developers and business stakeholders.
+
+#### What is Vertical Slice Architecture?
+
+Instead of organizing code horizontally by technical concerns (Controllers, Services, Repositories), Vertical Slice Architecture organizes code vertically by business features or use cases. Each "slice" contains everything needed for a specific business operation.
+
+**Traditional Layered Architecture:**
+
+```
+├── Controllers/           # All controllers
+├── Services/             # All business logic
+├── Repositories/         # All data access
+└── Models/               # All data models
+```
+
+**Vertical Slice Architecture:**
+
+```
+├── Cashiers/             # Complete cashier domain
+│   ├── Commands/         # Actions (CreateCashier, UpdateCashier)
+│   ├── Queries/          # Information retrieval (GetCashier, GetCashiers)
+│   ├── Data/             # Domain-specific data access
+│   └── Contracts/        # Events and models
+└── Invoices/             # Complete invoice domain
+    ├── Commands/         # Actions (CreateInvoice, CancelInvoice)
+    ├── Queries/          # Information retrieval (GetInvoice, GetInvoices)
+    ├── Data/             # Domain-specific data access
+    └── Contracts/        # Events and models
+```
+
+#### Benefits in Microservices Context
+
+**1. Feature Cohesion**
+
+-   All code related to a business feature lives together
+-   Changes to a feature are localized to a single directory
+-   Easy to understand the complete flow of a business operation
+
+**2. Team Autonomy**
+
+-   Teams can own entire vertical slices without stepping on each other
+-   Independent deployment and development cycles
+-   Clear boundaries for code ownership
+
+**3. Reduced Coupling**
+
+-   Each slice is self-contained with minimal dependencies
+-   Changes in one domain rarely affect another
+-   Natural boundaries for microservice decomposition
+
+**4. Business Alignment**
+
+-   Code structure mirrors business operations
+-   Non-technical stakeholders can navigate the codebase
+-   Features map directly to business capabilities
+
+#### Momentum's Implementation
+
+**CQRS Pattern Integration**
+Each domain slice follows the Command Query Responsibility Segregation (CQRS) pattern:
+
+-   **Commands/**: Actions that change system state (CreateCashier, CancelInvoice)
+-   **Queries/**: Read operations that retrieve information (GetCashier, GetInvoices)
+-   **Data/**: Domain-specific database access and entity mapping
+-   **Contracts/**: Events and models for communication
+
+**Example: Cashiers Domain Structure**
+
+```
+src/AppDomain/Cashiers/
+├── Commands/
+│   ├── CreateCashier.cs      # Business action: hire new cashier
+│   ├── UpdateCashier.cs      # Business action: update cashier info
+│   └── DeleteCashier.cs      # Business action: remove cashier
+├── Queries/
+│   ├── GetCashier.cs         # Retrieve single cashier
+│   └── GetCashiers.cs        # List all cashiers
+├── Data/
+│   ├── DbMapper.cs           # Database mapping logic
+│   └── Entities/             # Database entities
+└── Contracts/
+    ├── IntegrationEvents/    # Cross-service events
+    └── Models/               # Public models
+```
+
+**Cross-Cutting Concerns**
+While business logic is vertically sliced, infrastructure concerns are handled separately:
+
+-   **Core/**: Shared database infrastructure and base entities
+-   **Infrastructure/**: Dependency injection and service registration
+-   **libs/Momentum/**: Platform libraries for messaging, validation, etc.
+
+#### Practical Example: Invoice Creation Flow
+
+When creating an invoice, all related code lives in the `Invoices/` slice:
+
+1. **API Endpoint** calls `CreateInvoice` command
+2. **Command Handler** in `Commands/CreateInvoice.cs` contains business logic
+3. **Database Access** via `Data/DbMapper.cs` handles persistence
+4. **Integration Event** `InvoiceCreated` notifies other services
+5. **Query Handlers** in `Queries/` provide read access to created invoices
+
+This entire flow is contained within the Invoices slice, making it easy to understand, test, and modify.
+
+#### Comparison to Traditional Layered Architecture
+
+| Aspect                | Layered Architecture            | Vertical Slice Architecture |
+| --------------------- | ------------------------------- | --------------------------- |
+| **Code Organization** | By technical concern            | By business feature         |
+| **Change Impact**     | Spreads across multiple layers  | Contained within slice      |
+| **Team Boundaries**   | Artificial technical boundaries | Natural business boundaries |
+| **Testing**           | Complex setup across layers     | Focused feature testing     |
+| **Understanding**     | Requires mental mapping         | Direct business alignment   |
+| **Coupling**          | High between layers             | Low between slices          |
+
+#### Best Practices in Momentum
+
+**1. Keep Slices Independent**
+
+-   Minimize dependencies between domains
+-   Use integration events for cross-domain communication
+-   Avoid shared business logic between slices
+
+**2. Embrace Duplication**
+
+-   Prefer duplication over coupling
+-   Each slice can have its own models and validation
+-   Shared infrastructure only, not business logic
+
+**3. Clear Boundaries**
+
+-   Each slice represents a distinct business capability
+-   Use domain events for internal coordination
+-   Integration events for external communication
+
+**4. Consistent Structure**
+
+-   Every slice follows the same Commands/Queries/Data/Contracts pattern
+-   Predictable structure improves maintainability
+-   New team members can quickly understand any domain
 
 [Explore the Architecture →](/arch/)
 

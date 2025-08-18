@@ -9,6 +9,7 @@ namespace AppDomain.Invoices.Contracts.IntegrationEvents;
 ///     This event contains the complete invoice data and partition key information for proper message routing.
 /// </summary>
 /// <param name="TenantId">Unique identifier for the tenant</param>
+/// <param name="InvoiceId">Unique identifier for the invoice</param>
 /// <param name="Invoice">Invoice object containing all invoice data and configuration</param>
 /// <remarks>
 ///     ## When It's Triggered

@@ -125,8 +125,6 @@ The template uses a systematic port allocation pattern for consistent service en
 
 ### Port Assignment Pattern
 
-<!--- TODO: Replace the ports with the template variables --->
-
 #### **Aspire Dashboard Ports**
 
 -   **HTTP**: Service base + 10,000 (e.g., 8100 → 18100)

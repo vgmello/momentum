@@ -9,6 +9,7 @@ namespace AppDomain.Invoices.Contracts.IntegrationEvents;
 ///     This event contains the cancelled invoice data for proper message routing.
 /// </summary>
 /// <param name="TenantId">Unique identifier for the tenant</param>
+/// <param name="InvoiceId">Unique identifier for the invoice</param>
 /// <param name="Invoice">Cancelled invoice object with updated status</param>
 /// <remarks>
 ///     ## When It's Triggered

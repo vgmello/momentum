@@ -32,7 +32,18 @@ public class CancelInvoiceValidator : AbstractValidator<CancelInvoiceCommand>
 /// </summary>
 public static partial class CancelInvoiceCommandHandler
 {
-    //TODO: Document this similar as the GetCashiersQueryHandler.DbQuery
+    /// <summary>
+    ///     Storage / persistence request
+    /// </summary>
+    /// <remarks>
+    ///     This DbCommand/DbQuery leverages the Momentum
+    ///     <see cref="Momentum.Extensions.Abstractions.Dapper.DbCommandAttribute">DbCommandAttribute</see>,
+    ///     which creates a source generated handler for the DB call.
+    ///     <para>
+    ///         > Notes:
+    ///         - If the function name starts with a $, the function gets executed as `select * from {dbFunction}`
+    ///     </para>
+    /// </remarks>
     [DbCommand(fn: "$app_domain.invoices_cancel")]
     public partial record DbCommand(Guid TenantId, Guid InvoiceId, int Version) : ICommand<Data.Entities.Invoice?>;
 
