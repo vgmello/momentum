@@ -54,7 +54,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment:
-      name: ${{ (startsWith(github.ref, 'refs/tags/template-v') || (github.event_name == 'workflow_dispatch' && (github.event.inputs['deploy-type'] == 'release' || github.event.inputs['deploy-type'] == 'test-release'))) && 'production' || 'production' }}
+      name: production
 
     steps:
       - name: Checkout code

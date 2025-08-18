@@ -50,7 +50,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment:
-      name: ${{ (startsWith(github.ref, 'refs/tags/v') || github.ref_name == 'release' || (github.event_name == 'workflow_dispatch' && (github.event.inputs['deploy-type'] == 'release' || github.event.inputs['deploy-type'] == 'docs-only'))) && 'github-pages' || 'production' }}
+      name: production
       url: ${{ steps.docs-deployment.outputs.page_url }}
 
     steps:

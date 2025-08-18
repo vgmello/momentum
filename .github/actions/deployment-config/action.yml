@@ -62,10 +62,9 @@ runs:
           DEPLOY_PRERELEASE=true
         fi
 
-        # Set docs flag for library releases
-        if [[ ("${{ github.ref }}" =~ ^refs/tags/v || "${{ github.ref_name }}" == "release" || 
-               ("${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.deploy-type }}" == *"release")) &&
-              ("${{ github.repository }}" == *"libs"* || "$GITHUB_WORKFLOW" == *"Libraries"* || "${{ inputs.deploy-type }}" == "docs-only") ]]; then
+        # Set docs flag for library releases (only for version tags, release tag, or docs-only workflow)
+        if [[ "${{ github.ref }}" =~ ^refs/tags/v || "${{ github.ref_name }}" == "release" || 
+              "${{ inputs.deploy-type }}" == "docs-only" ]]; then
           DEPLOY_DOCS=true
         fi
 
