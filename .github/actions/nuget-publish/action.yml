@@ -42,7 +42,7 @@ runs:
       run: |
         echo "📦 Packing NuGet packages with version ${{ inputs.package-version }}..."
         dotnet pack ${{ inputs.path }} \
-          --configuration ${{ inputs.configuration }} \
+          -c ${{ inputs.configuration }} \
           --no-build \
           --verbosity minimal \
           -p:PackageVersion=${{ inputs.package-version }}

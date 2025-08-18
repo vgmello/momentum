@@ -1,16 +1,9 @@
 <Project>
 
   <PropertyGroup>
-    <!-- Default output directory for individual event markdown files -->
-    <EventMarkdownOutput Condition="'$(EventMarkdownOutput)' == ''">$(MSBuildProjectDirectory)/docs/events</EventMarkdownOutput>
-
-    <!-- Default filename for the generated JSON sidebar -->
-    <EventSidebarFileName Condition="'$(EventSidebarFileName)' == ''">events-sidebar.json</EventSidebarFileName>
-
-    <!-- Enable/disable individual event markdown generation -->
     <GenerateEventMarkdown Condition="'$(GenerateEventMarkdown)' == ''">true</GenerateEventMarkdown>
-
-    <!-- Enable verbose output -->
+    <EventMarkdownOutput Condition="'$(EventMarkdownOutput)' == ''">$(MSBuildProjectDirectory)/docs/events</EventMarkdownOutput>
+    <EventSidebarFileName Condition="'$(EventSidebarFileName)' == ''">events-sidebar.json</EventSidebarFileName>
     <EventMarkdownVerbose Condition="'$(EventMarkdownVerbose)' == ''">false</EventMarkdownVerbose>
   </PropertyGroup>
 
@@ -20,13 +13,11 @@
           Condition="'$(GenerateEventMarkdown)' == 'true' AND '$(TargetPath)' != '' AND '$(MSBuildProjectName)' != 'Momentum.Extensions.EventMarkdownGenerator'">
 
     <PropertyGroup>
-      <!-- Construct the command line arguments -->
       <EventMarkdownGenArgs>--assemblies "$(TargetPath)" --output "$(EventMarkdownOutput)" --sidebar-file "$(EventSidebarFileName)"</EventMarkdownGenArgs>
       <EventMarkdownGenArgs Condition="'$(DocumentationFile)' != ''">$(EventMarkdownGenArgs) --xml-docs "$(DocumentationFile)"</EventMarkdownGenArgs>
       <EventMarkdownGenArgs Condition="'$(EventMarkdownVerbose)' == 'true'">$(EventMarkdownGenArgs) --verbose</EventMarkdownGenArgs>
     </PropertyGroup>
 
-    <!-- Ensure output directory exists -->
     <MakeDir Directories="$(EventMarkdownOutput)" Condition="!Exists('$(EventMarkdownOutput)')" />
 
     <!-- Execute the event markdown generator -->
@@ -45,9 +36,7 @@
       <EventMarkdownFiles Include="$(EventMarkdownOutput)/*.md" />
       <EventMarkdownFiles Include="$(EventMarkdownOutput)/$(EventSidebarFileName)" />
     </ItemGroup>
-
     <Delete Files="@(EventMarkdownFiles)" ContinueOnError="true" />
-
     <Message Text="Cleaned individual event markdown files" Importance="normal" />
   </Target>
 

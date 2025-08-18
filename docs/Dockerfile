@@ -27,7 +27,7 @@ COPY libs/Momentum/src/Momentum.Extensions.Abstractions ./libs/Momentum/src/Mome
 COPY libs/Momentum/src/Momentum.Extensions.XmlDocs ./libs/Momentum/src/Momentum.Extensions.XmlDocs
 
 RUN dotnet build libs/Momentum/src/Momentum.Extensions.EventMarkdownGenerator \
-    -c Debug -p:IsPackable=false -p:TreatWarningsAsErrors=false -p:RunCodeAnalysis=false
+    -p:IsPackable=false -p:TreatWarningsAsErrors=false -p:RunCodeAnalysis=false
 
 WORKDIR /app/docs
 CMD ["pnpm", "dev", "--host"]
