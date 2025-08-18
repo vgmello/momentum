@@ -67,7 +67,14 @@ runs:
       shell: bash
       run: |
         echo "📦 Installing DocFX..."
-        dotnet tool install -g docfx
+        dotnet tool install -g docfx --verbosity normal
+        echo "📋 Verifying DocFX installation..."
+        docfx --version || {
+          echo "❌ DocFX installation failed or not in PATH"
+          echo "PATH: $PATH"
+          which docfx || echo "DocFX not found in PATH"
+          exit 1
+        }
 
     - name: Install npm dependencies
       shell: bash

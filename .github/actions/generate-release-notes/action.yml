@@ -46,16 +46,18 @@ runs:
         
         echo "🔍 Auto-detected project type: $PROJECT_TYPE (from tag: $TAG)"
         
-        # Find the last release tag
-        LAST_RELEASE=$(git tag -l "${TAG_PATTERN}" --sort=-v:refname | grep -v "$TAG" | head -1)
+        # Find the last release tag (exclude current tag if it exists)
+        set +o pipefail  # Allow grep to fail if no matches
+        LAST_RELEASE=$(git tag -l "${TAG_PATTERN}" --sort=-v:refname | grep -v "^${TAG}$" | head -1)
+        set -o pipefail
         
         # Get commit information
         if [ -n "$LAST_RELEASE" ]; then
-          COMMITS=$(git log --pretty=format:"- %s (%an)" ${LAST_RELEASE}..HEAD --no-merges | grep -v "skip ci" | head -20)
+          COMMITS=$(git log --pretty=format:"- %s (%an)" ${LAST_RELEASE}..HEAD --no-merges | grep -v "skip ci" | head -20 || echo "No commits found")
           COMMIT_COUNT=$(git rev-list --count ${LAST_RELEASE}..HEAD --no-merges)
           FILES_CHANGED=$(git diff --name-only ${LAST_RELEASE}..HEAD | wc -l)
         else
-          COMMITS=$(git log --pretty=format:"- %s (%an)" --no-merges | grep -v "skip ci" | head -20)
+          COMMITS=$(git log --pretty=format:"- %s (%an)" --no-merges | grep -v "skip ci" | head -20 || echo "No commits found")
           COMMIT_COUNT=$(git rev-list --count HEAD --no-merges)
           FILES_CHANGED="N/A"
         fi
