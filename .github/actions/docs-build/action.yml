@@ -50,6 +50,7 @@ runs:
         cache-dependency-path: ${{ inputs.docs-path }}/pnpm-lock.yaml
 
     - name: Build .NET projects
+      if: inputs.build-dotnet == 'true'
       uses: ./.github/actions/build
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
