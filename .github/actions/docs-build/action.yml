@@ -50,29 +50,27 @@ runs:
         cache-dependency-path: ${{ inputs.docs-path }}/pnpm-lock.yaml
 
     - name: Build .NET projects
-      if: inputs.build-dotnet == 'true'
-      shell: bash
-      working-directory: ${{ inputs.docs-path }}
-      run: |
-        echo "🔨 Building .NET projects..."
-        dotnet build ../src --configuration Release --verbosity minimal
-
-        if [ $? -ne 0 ]; then
-          echo "❌ .NET build failed"
-          exit 1
-        fi
-        echo "✅ .NET build successful"
+      uses: ./.github/actions/build
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+        build-target: libs/Momentum/Momentum.slnx
 
     - name: Install DocFX
       shell: bash
       run: |
         echo "📦 Installing DocFX..."
         dotnet tool install -g docfx --verbosity normal
+
+        # Ensure .NET tools are in PATH
+        export PATH="$PATH:$HOME/.dotnet/tools"
+        echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+
         echo "📋 Verifying DocFX installation..."
         docfx --version || {
           echo "❌ DocFX installation failed or not in PATH"
           echo "PATH: $PATH"
-          which docfx || echo "DocFX not found in PATH"
+          echo "HOME: $HOME"
+          ls -la $HOME/.dotnet/tools/ || echo "Tools directory not found"
           exit 1
         }
 
