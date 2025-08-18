@@ -1,0 +1,127 @@
+name: 'Pack Template as NuGet'
+description: 'Packs the repository template (.template.config) into a NuGet template package'
+
+inputs:
+  package-id:
+    description: 'NuGet package ID (e.g., Momentum.Templates)'
+    required: true
+  package-version:
+    description: 'Package version'
+    required: true
+  momentum-version:
+    description: 'Momentum library version to use in the template'
+    required: false
+    default: ''
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+
+    - name: Prepare artifacts dir
+      shell: bash
+      run: |
+        mkdir -p ./artifacts/template
+
+    - name: Set MomentumVersion in Directory.Build.props
+      if: inputs.momentum-version != ''
+      shell: bash
+      run: |
+        echo "Setting MomentumVersion to ${{ inputs.momentum-version }}"
+        
+        # Update Directory.Build.props with MomentumVersion
+        if [ -f "Directory.Build.props" ]; then
+          # Check if MomentumVersion already exists
+          if grep -q "<MomentumVersion>" Directory.Build.props; then
+            # Update existing version
+            sed -i "s|<MomentumVersion>.*</MomentumVersion>|<MomentumVersion>${{ inputs.momentum-version }}</MomentumVersion>|" Directory.Build.props
+          else
+            # Add MomentumVersion property if it doesn't exist
+            sed -i '/<PropertyGroup>/a\    <MomentumVersion>${{ inputs.momentum-version }}</MomentumVersion>' Directory.Build.props
+          fi
+          echo "Updated Directory.Build.props with MomentumVersion=${{ inputs.momentum-version }}"
+        fi
+        
+        # Also update Directory.Packages.props if it exists
+        if [ -f "Directory.Packages.props" ]; then
+          # Update all Momentum.* package references to use the specified version
+          sed -i "s|<PackageVersion Include=\"Momentum\.\([^\"]*\)\" Version=\"[^\"]*\"|<PackageVersion Include=\"Momentum.\1\" Version=\"${{ inputs.momentum-version }}\"|g" Directory.Packages.props
+          echo "Updated Directory.Packages.props with Momentum package versions=${{ inputs.momentum-version }}"
+        fi
+
+    - name: Create nuspec
+      id: nuspec
+      shell: bash
+      run: |
+        PKG_ID='${{ inputs.package-id }}'
+        PKG_VERSION='${{ inputs.package-version }}'
+        MOMENTUM_VERSION='${{ inputs.momentum-version }}'
+        NUSPEC_PATH='./artifacts/template/template.nuspec'
+
+        # Create metadata section with Momentum version info
+        METADATA_DESC="Momentum .NET project template."
+        if [ -n "$MOMENTUM_VERSION" ]; then
+          METADATA_DESC="Momentum .NET project template. (Using Momentum libraries v$MOMENTUM_VERSION)"
+        fi
+
+        cat > "$NUSPEC_PATH" << EOF
+        <?xml version="1.0"?>
+        <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+          <metadata>
+            <id>$PKG_ID</id>
+            <version>$PKG_VERSION</version>
+            <authors>Momentum .NET</authors>
+            <owners>Momentum .NET</owners>
+            <requireLicenseAcceptance>false</requireLicenseAcceptance>
+            <license type="expression">MIT</license>
+            <projectUrl>https://github.com/vgmello/momentum</projectUrl>
+            <description>$METADATA_DESC</description>
+            <packageTypes>
+              <packageType name="Template" />
+            </packageTypes>
+            <tags>dotnet-new;template;momentum</tags>
+          </metadata>
+          <files>
+            <!-- Include template configuration -->
+            <file src=".template.config/**" target="content/" />
+
+            <!-- Include your solution skeleton files/directories -->
+            <file src="src/**" target="content/" />
+            <file src="docs/**" target="content/" />
+            <file src="compose.yml" target="content/" />
+            <file src="README.md" target="content/" />
+            <file src="ProjectREADME.md" target="content/" />
+            <file src="Directory.Build.props" target="content/" />
+            <file src="Directory.Packages.props" target="content/" />
+            <file src="AppDomain.slnx" target="content/" />
+            <file src="AppDomain.ruleset" target="content/" />
+
+            <!-- Include libs sources in template content -->
+            <file src="libs/src/**" target="content/libs/src/" />
+
+            <!-- General include with excludes to avoid CI/dev artifacts -->
+            <file src="**/*" target="content/" exclude=".git/**;**/bin/**;**/obj/**;.github/**;.idea/**;.vscode/**;tests/**;.local/**" />
+          </files>
+        </package>
+        EOF
+
+        echo "nuspec=$NUSPEC_PATH" >> $GITHUB_OUTPUT
+
+    - name: Pack
+      shell: bash
+      run: |
+        dotnet tool install --global nuget-command-line && export PATH="$PATH:$HOME/.dotnet/tools"
+        nuget pack "${{ steps.nuspec.outputs.nuspec }}" -OutputDirectory ./artifacts/template -NoPackageAnalysis
+        echo "📦 Packed template:"
+        ls -la ./artifacts/template
+
+    - name: Restore original files
+      if: inputs.momentum-version != ''
+      shell: bash
+      run: |
+        # Restore the original files after packing
+        git checkout -- Directory.Build.props Directory.Packages.props 2>/dev/null || true
+        echo "Restored original Directory.Build.props and Directory.Packages.props"
