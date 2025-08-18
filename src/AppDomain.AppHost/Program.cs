@@ -1,11 +1,5 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
-/// <summary>
-/// .NET Aspire orchestration host for AppDomain microservices.
-/// Configures and manages the complete application stack including databases,
-/// messaging infrastructure, and service dependencies for local development.
-/// </summary>
-
 var builder = DistributedApplication.CreateBuilder(args);
 
 #if (USE_PGSQL)
