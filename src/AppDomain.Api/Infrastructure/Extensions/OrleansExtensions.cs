@@ -12,7 +12,11 @@ public static class OrleansExtensions
             .AddOpenTelemetry()
             .WithMetrics(opt => opt.AddMeter("Microsoft.Orleans"));
 
-        builder.UseOrleansClient();
+        builder.Services.AddOrleansClient(client =>
+        {
+            client.UseAzureStorageClustering(options =>
+                options.ConfigureTableServiceClient(builder.Configuration.GetConnectionString("OrleansClustering")));
+        });
 
         return builder;
     }

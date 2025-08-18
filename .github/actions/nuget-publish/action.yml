@@ -5,7 +5,7 @@ inputs:
   project-path:
     description: 'Path to the project or solution to pack'
     required: false
-    default: 'libs/Momentum/src'
+    default: 'libs/Momentum'
   configuration:
     description: 'Build configuration'
     required: false
@@ -46,7 +46,7 @@ runs:
           --no-build \
           --verbosity minimal \
           -p:PackageVersion=${{ inputs.package-version }}
-        
+
         if [ $? -ne 0 ]; then
           echo "❌ Package creation failed"
           exit 1
@@ -59,15 +59,15 @@ runs:
       run: |
         echo "🔍 Finding NuGet packages..."
         PACKAGES=$(find ${{ inputs.project-path }} -name "*.nupkg" -not -path "*/bin/Debug/*")
-        
+
         if [ -z "$PACKAGES" ]; then
           echo "❌ No packages found to publish"
           exit 1
         fi
-        
+
         echo "Found packages:"
         echo "$PACKAGES"
-        
+
         # Save package list for output
         echo "packages<<EOF" >> $GITHUB_OUTPUT
         echo "$PACKAGES" >> $GITHUB_OUTPUT
@@ -84,26 +84,26 @@ runs:
         else
           SOURCE_NAME="NuGet.org"
         fi
-        
+
         echo "🚀 Publishing packages to $SOURCE_NAME..."
         echo "   Source: ${{ inputs.nuget-source }}"
-        
+
         PACKAGES="${{ steps.find-packages.outputs.packages }}"
         PUBLISHED_LIST=""
-        
+
         for package in $PACKAGES; do
           echo "Publishing $(basename $package)..."
-          
+
           SKIP_FLAG=""
           if [ "${{ inputs.skip-duplicate }}" == "true" ]; then
             SKIP_FLAG="--skip-duplicate"
           fi
-          
+
           dotnet nuget push "$package" \
             --api-key ${{ inputs.nuget-api-key }} \
             --source ${{ inputs.nuget-source }} \
             $SKIP_FLAG
-          
+
           if [ $? -eq 0 ]; then
             echo "✅ Successfully published $(basename $package)"
             PUBLISHED_LIST="$PUBLISHED_LIST$(basename $package)\n"
@@ -112,7 +112,7 @@ runs:
             exit 1
           fi
         done
-        
+
         echo "🎉 All packages published successfully to $SOURCE_NAME!"
         echo "packages<<EOF" >> $GITHUB_OUTPUT
         echo -e "$PUBLISHED_LIST" >> $GITHUB_OUTPUT

@@ -37,7 +37,7 @@ public class CreateInvoiceCommandHandlerTests
         var command = new CreateInvoiceCommand(tenantId, "Test Invoice", 100.50m, "USD", dueDate, cashierId);
 
         // Act
-        var (result, integrationEvent) = await CreateInvoiceCommandHandler.Handle(command, messagingMock, CancellationToken.None);
+        var (result, createdEvent, generatedEvent) = await CreateInvoiceCommandHandler.Handle(command, messagingMock, CancellationToken.None);
 
         // Assert
         var invoice = result.Match(success => success, _ => null!);
@@ -53,10 +53,10 @@ public class CreateInvoiceCommandHandlerTests
         invoice.Version.ShouldBe(1);
 
         // Verify integration event
-        integrationEvent.ShouldNotBeNull();
-        integrationEvent.ShouldBeOfType<InvoiceCreated>();
-        integrationEvent.Invoice.InvoiceId.ShouldBe(invoice.InvoiceId);
-        integrationEvent.Invoice.Name.ShouldBe(invoice.Name);
+        createdEvent.ShouldNotBeNull();
+        createdEvent.ShouldBeOfType<InvoiceCreated>();
+        createdEvent!.Invoice.InvoiceId.ShouldBe(invoice.InvoiceId);
+        createdEvent.Invoice.Name.ShouldBe(invoice.Name);
 
         // Verify that messaging was called with correct parameters
         await messagingMock.Received(1).InvokeCommandAsync(
@@ -94,7 +94,7 @@ public class CreateInvoiceCommandHandlerTests
             });
 
         var tenantId = Guid.NewGuid();
-        var command = new CreateInvoiceCommand(tenantId, "Test Invoice", 50.00m);
+        var command = new CreateInvoiceCommand(tenantId, "Test Invoice", 50.00m, "USD", DateTime.Now.AddDays(30), null);
 
         // Act
         var handlerResult = await CreateInvoiceCommandHandler.Handle(command, messagingMock, CancellationToken.None);
@@ -130,8 +130,8 @@ public class CreateInvoiceCommandHandlerTests
             });
 
         var tenantId = Guid.NewGuid();
-        var command1 = new CreateInvoiceCommand(tenantId, "Invoice 1", 100.00m);
-        var command2 = new CreateInvoiceCommand(tenantId, "Invoice 2", 200.00m);
+        var command1 = new CreateInvoiceCommand(tenantId, "Invoice 1", 100.00m, "USD", DateTime.Now.AddDays(30), null);
+        var command2 = new CreateInvoiceCommand(tenantId, "Invoice 2", 200.00m, "USD", DateTime.Now.AddDays(30), null);
 
         // Act
         var handlerResult1 = await CreateInvoiceCommandHandler.Handle(command1, messagingMock, CancellationToken.None);

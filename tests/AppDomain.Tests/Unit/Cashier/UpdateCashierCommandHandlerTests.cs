@@ -47,7 +47,7 @@ public class UpdateCashierCommandHandlerTests
         integrationEvent.ShouldNotBeNull();
         integrationEvent.ShouldBeOfType<CashierUpdated>();
         integrationEvent.TenantId.ShouldBe(tenantId);
-        integrationEvent.CashierId.ShouldBe(cashierId);
+        integrationEvent.Cashier.CashierId.ShouldBe(cashierId);
 
         // Verify that messaging was called with correct parameters
         await messagingMock.Received(1).InvokeCommandAsync(

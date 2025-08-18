@@ -39,11 +39,11 @@ public class SimulatePaymentCommandHandlerTests
         integrationEvent.ShouldBeOfType<PaymentReceived>();
         integrationEvent.TenantId.ShouldBe(tenantId);
         integrationEvent.InvoiceId.ShouldBe(invoiceId);
-        integrationEvent.Amount.ShouldBe(amount);
+        integrationEvent.PaymentAmount.ShouldBe(amount);
         integrationEvent.Currency.ShouldBe(currency);
         integrationEvent.PaymentMethod.ShouldBe(paymentMethod);
         integrationEvent.PaymentReference.ShouldBe(paymentReference);
-        integrationEvent.ReceivedDate.ShouldBeInRange(DateTime.UtcNow.AddSeconds(-5), DateTime.UtcNow.AddSeconds(5));
+        integrationEvent.PaymentDate.ShouldBeInRange(DateTime.UtcNow.AddSeconds(-5), DateTime.UtcNow.AddSeconds(5));
 
         // Verify that messaging was NOT called (since this handler doesn't interact with DB)
         await messagingMock.DidNotReceiveWithAnyArgs()
