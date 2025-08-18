@@ -3,8 +3,10 @@
         <EnableDefaultItems>false</EnableDefaultItems>
         <NoWarn>$(NoWarn);NU5128</NoWarn>
         <NoDefaultExcludes>true</NoDefaultExcludes>
+        <GenerateDocumentationFile>false</GenerateDocumentationFile>
         <IncludeContentInPack>true</IncludeContentInPack>
         <IncludeBuildOutput>false</IncludeBuildOutput>
+        <IncludeSymbols>false</IncludeSymbols>
         <ContentTargetFolders>content</ContentTargetFolders>
         <CodeAnalysisRuleSet/>
     </PropertyGroup>
