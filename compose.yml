@@ -3,7 +3,7 @@ services:
   # Database services
   app-domain-db:
     image: postgres:17-alpine
-    profiles: ["db", "api", "backoffice"]
+    profiles: [ "db", "api", "backoffice" ]
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password@}
@@ -18,7 +18,7 @@ services:
   # #if (USE_LIQUIBASE)
   app-domain-db-migrations:
     image: liquibase/liquibase:4.32-alpine
-    profiles: ["db", "api", "backoffice"]
+    profiles: [ "db", "api", "backoffice" ]
     volumes:
       - ./infra/AppDomain.Database:/app
     depends_on:
@@ -41,7 +41,7 @@ services:
   # Kafka Infrastructure
   kafka:
     image: confluentinc/cp-kafka:7.6.0
-    profiles: ["messaging", "api", "backoffice"]
+    profiles: [ "messaging", "api", "backoffice" ]
     ports:
       - "9092:9092"
       - "29092:29092"
@@ -81,7 +81,7 @@ services:
   app-domain-api:
     build:
       dockerfile: ./src/AppDomain.Api/Dockerfile
-    profiles: ["api"]
+    profiles: [ "api" ]
     ports:
       - "8101:8080"
       - "8102:8102" # GRPC HttpPort
@@ -97,6 +97,9 @@ services:
       - ConnectionStrings__AppDomainDb=Host=app-domain-db;Port=5432;Database=app_domain;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-password@}
       - ConnectionStrings__ServiceBus=Host=app-domain-db;Port=5432;Database=service_bus;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-password@}
       - ConnectionStrings__Messaging=kafka:9092
+      # #endif
+      # #if (INCLUDE_ORLEANS)
+      - ConnectionStrings__OrleansClustering=UseDevelopmentStorage=true
       # #endif
       - Kestrel__Endpoints__Http__Protocols=Http1
       - Kestrel__Endpoints__Http__Url=http://+:8080
@@ -118,7 +121,7 @@ services:
   app-domain-backoffice:
     build:
       dockerfile: ./src/AppDomain.BackOffice/Dockerfile
-    profiles: ["backoffice"]
+    profiles: [ "backoffice" ]
     ports:
       - "8103:8080"
     depends_on:
@@ -150,7 +153,7 @@ services:
   app-domain-orleans:
     build:
       dockerfile: ./src/AppDomain.BackOffice.Orleans/Dockerfile
-    profiles: ["backoffice"]
+    profiles: [ "backoffice" ]
     ports:
       - "8104:8080"
       - "8114:11111"
@@ -176,13 +179,13 @@ services:
     build:
       context: ./
       dockerfile: docs/Dockerfile
-    profiles: ["docs"]
+    profiles: [ "docs" ]
     ports:
       - "8119:5173"
     volumes:
       - ./:/app
       - pnpm_node_modules:/app/docs/node_modules
-    command: ["pnpm", "dev", "--host"]
+    command: [ "pnpm", "dev", "--host" ]
     healthcheck:
       test: [ "CMD-SHELL", "curl -f http://localhost:5173/index.html || exit 1" ]
       interval: 30s
@@ -192,5 +195,4 @@ services:
   # #endif
 volumes:
   # #if (INCLUDE_DOCS)
-  pnpm_node_modules:
-  # #endif
+  pnpm_node_modules: # #endif

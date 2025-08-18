@@ -6,10 +6,10 @@
         {
           "src": "../src",
           "files": [
-            "AppDomain/bin/Debug/**/AppDomain.dll",
-            "AppDomain.Api/bin/Debug/**/AppDomain.Api.dll",
-            "AppDomain.BackOffice/bin/Debug/**/AppDomain.BackOffice.dll",
-            "AppDomain.BackOffice.Orleans/bin/Debug/**/AppDomain.BackOffice.Orleans.dll"
+            "AppDomain/bin/**/**/AppDomain.dll",
+            "AppDomain.Api/bin/**/**/AppDomain.Api.dll",
+            "AppDomain.BackOffice/bin/**/**/AppDomain.BackOffice.dll",
+            "AppDomain.BackOffice.Orleans/bin/**/**/AppDomain.BackOffice.Orleans.dll"
           ]
         }
       ],

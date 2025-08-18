@@ -30,7 +30,7 @@ public class InvoiceValidationTests
     {
         // Arrange
         var validator = new CreateInvoiceValidator();
-        var command = new CreateInvoiceCommand(Guid.NewGuid(), name, 100.50m, "USD");
+        var command = new CreateInvoiceCommand(Guid.NewGuid(), name, 100.50m, "USD", DateTime.Now.AddDays(30), null);
 
         // Act
         var result = validator.TestValidate(command);
@@ -45,7 +45,7 @@ public class InvoiceValidationTests
     {
         // Arrange
         var validator = new CreateInvoiceValidator();
-        var command = new CreateInvoiceCommand(Guid.NewGuid(), "A", 100.50m, "USD");
+        var command = new CreateInvoiceCommand(Guid.NewGuid(), "A", 100.50m, "USD", DateTime.Now.AddDays(30), null);
 
         // Act
         var result = validator.TestValidate(command);
@@ -61,7 +61,7 @@ public class InvoiceValidationTests
         // Arrange
         var validator = new CreateInvoiceValidator();
         var longName = new string('A', 101); // 101 characters
-        var command = new CreateInvoiceCommand(Guid.NewGuid(), longName, 100.50m, "USD");
+        var command = new CreateInvoiceCommand(Guid.NewGuid(), longName, 100.50m, "USD", DateTime.Now.AddDays(30), null);
 
         // Act
         var result = validator.TestValidate(command);
@@ -79,7 +79,7 @@ public class InvoiceValidationTests
     {
         // Arrange
         var validator = new CreateInvoiceValidator();
-        var command = new CreateInvoiceCommand(Guid.NewGuid(), "Test Invoice", amount, "USD");
+        var command = new CreateInvoiceCommand(Guid.NewGuid(), "Test Invoice", amount, "USD", DateTime.Now.AddDays(30), null);
 
         // Act
         var result = validator.TestValidate(command);
@@ -94,7 +94,7 @@ public class InvoiceValidationTests
     {
         // Arrange
         var validator = new CreateInvoiceValidator();
-        var command = new CreateInvoiceCommand(Guid.NewGuid(), "Test Invoice", 0.01m, "USD");
+        var command = new CreateInvoiceCommand(Guid.NewGuid(), "Test Invoice", 0.01m, "USD", DateTime.Now.AddDays(30), null);
 
         // Act
         var result = validator.TestValidate(command);
@@ -108,7 +108,7 @@ public class InvoiceValidationTests
     {
         // Arrange
         var validator = new CreateInvoiceValidator();
-        var command = new CreateInvoiceCommand(Guid.NewGuid(), "Test Invoice", 100.50m, "USDX"); // 4 characters
+        var command = new CreateInvoiceCommand(Guid.NewGuid(), "Test Invoice", 100.50m, "USDX", DateTime.Now.AddDays(30), null); // 4 characters
 
         // Act
         var result = validator.TestValidate(command);
@@ -127,7 +127,7 @@ public class InvoiceValidationTests
     {
         // Arrange
         var validator = new CreateInvoiceValidator();
-        var command = new CreateInvoiceCommand(Guid.NewGuid(), "Test Invoice", 100.50m, currency);
+        var command = new CreateInvoiceCommand(Guid.NewGuid(), "Test Invoice", 100.50m, currency, DateTime.Now.AddDays(30), null);
 
         // Act
         var result = validator.TestValidate(command);
@@ -142,8 +142,8 @@ public class InvoiceValidationTests
         // Arrange
         var validator = new CreateInvoiceValidator();
 
-        var minLengthCommand = new CreateInvoiceCommand(Guid.NewGuid(), "Ab", 100.50m, "USD"); // 2 characters
-        var maxLengthCommand = new CreateInvoiceCommand(Guid.NewGuid(), new string('A', 100), 100.50m, "USD"); // 100 characters
+        var minLengthCommand = new CreateInvoiceCommand(Guid.NewGuid(), "Ab", 100.50m, "USD", DateTime.Now.AddDays(30), null); // 2 characters
+        var maxLengthCommand = new CreateInvoiceCommand(Guid.NewGuid(), new string('A', 100), 100.50m, "USD", DateTime.Now.AddDays(30), null); // 100 characters
 
         // Act
         var minResult = validator.TestValidate(minLengthCommand);

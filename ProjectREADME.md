@@ -8,26 +8,21 @@ components.
 
 The AppDomain solution demonstrates modern enterprise architecture patterns including:
 
-- **Domain-Driven Design (DDD)** with clear bounded contexts
-- **Event-driven architecture** using Apache Kafka
-- **CQRS pattern** with separate command and query handling
-- **Microservices architecture** with proper service boundaries
-
+-   **Domain-Driven Design (DDD)** with clear bounded contexts
+-   **Event-driven architecture** using Apache Kafka
+-   **CQRS pattern** with separate command and query handling
+-   **Microservices architecture** with proper service boundaries
 <!--#if (INCLUDE_ORLEANS)-->
-
-- **Orleans-based stateful processing** for complex business workflows
-
+-   **Orleans-based stateful processing** for complex business workflows
 <!--#endif-->
+-   **Comprehensive testing strategy** with unit and integration tests
 
-- **Comprehensive testing strategy** with unit and integration tests
-
-<!--#if (!INCLUDE_SAMPLE) -->
+<!--#if (INCLUDE_SAMPLE)-->
 
 ### Key Business Domains
 
-- **Cashiers**: Management of cashier entities and their payment capabilities
-- **Invoices**: Invoice lifecycle management with state transitions and payment processing
-
+-   **Cashiers**: Management of cashier entities and their payment capabilities
+-   **Invoices**: Invoice lifecycle management with state transitions and payment processing
 <!--#endif-->
 
 ## Architecture
@@ -127,72 +122,60 @@ graph TB
 
 ## Port Allocations
 
-The solution uses the following port allocations (default base port: SERVICE_BASE_PORT):
+The solution uses the following port allocations (default base port: 8100):
 
 <!-- prettier-ignore-start -->
 | Service | HTTP Port | HTTPS Port | Description |
 |---------|-----------|------------|-------------|
-
 <!--#if (INCLUDE_API)-->
-
-| API (HTTP) | SERVICE_BASE_PORT + 1 | SERVICE_BASE_PORT + 11 | REST API endpoints |
-| API (gRPC) | SERVICE_BASE_PORT + 2 | - | gRPC service endpoints |
-
+| API (HTTP) | 8101 | 8111 | REST API endpoints |
+| API (gRPC) | 8102 | - | gRPC service endpoints |
 <!--#endif-->
 <!--#if (INCLUDE_BACK_OFFICE)-->
-
-| BackOffice | SERVICE_BASE_PORT + 3 | SERVICE_BASE_PORT + 13 | Background processing service |
-
+| BackOffice | 8103 | 8113 | Background processing service |
 <!--#endif-->
 <!--#if (INCLUDE_ORLEANS)-->
-
-| Orleans | SERVICE_BASE_PORT + 4 | SERVICE_BASE_PORT + 14 | Orleans silo endpoints |
-
+| Orleans | 8104 | 8114 | Orleans silo endpoints |
 <!--#endif-->
 <!--#if (INCLUDE_ASPIRE)-->
-
-| Aspire Dashboard | SERVICE_BASE_PORT + 10000 | SERVICE_BASE_PORT + 10010 | .NET Aspire dashboard |
-
+| Aspire Dashboard | 18100 | 18110 | .NET Aspire dashboard |
 <!--#endif-->
 <!--#if (INCLUDE_DOCS)-->
-
-| Documentation | SERVICE_BASE_PORT + 19 | - | VitePress documentation site |
-
+| Documentation | 8119 | - | VitePress documentation site |
 <!--#endif-->
 <!--#if (USE_DB)-->
-
 | PostgreSQL | 54320 | - | Database server |
 | pgAdmin | 54321 | - | Database management UI |
-
 <!--#endif-->
 <!--#if (USE_KAFKA)-->
-
 | Kafka | 59092 | - | Kafka broker |
-
 <!--#endif-->
 <!-- prettier-ignore-end -->
 
 ## Prerequisites
 
 <!-- prettier-ignore-start -->
-- **.NET 9 SDK** or later
-- **Docker Desktop** with Docker Compose
+
+-   **.NET 9 SDK** or later
+-   **Docker Desktop** with Docker Compose
 <!--#if (USE_PGSQL)-->
-- **PostgreSQL** (handled by Docker Compose)
+-   **PostgreSQL** (handled by Docker Compose)
+    <!--#endif-->
+    <!--#if (USE_KAFKA)-->
+-   **Apache Kafka** (handled by Docker Compose)
 <!--#endif-->
-<!--#if (USE_KAFKA)-->
-- **Apache Kafka** (handled by Docker Compose)
-<!--#endif-->
-- **Git** for version control
+-   **Git** for version control
+<!-- prettier-ignore-end -->
 
 ### Optional Tools
 
+<!-- prettier-ignore-start -->
 <!--#if (USE_PGSQL)-->
-- **pgAdmin** (included in Docker setup)
-<!--#endif-->
 
-- **Visual Studio 2022** or **JetBrains Rider**
-- **Postman** or similar for API testing
+-   **pgAdmin** (included in Docker setup)
+<!--#endif-->
+-   **Visual Studio 2022** or **JetBrains Rider**
+-   **Postman** or similar for API testing
 <!-- prettier-ignore-end -->
 
 ## Getting Started
@@ -214,11 +197,10 @@ dotnet run --project src/AppDomain.AppHost
 
 This will:
 
-- Start all services with proper orchestration
-- Launch the Aspire dashboard at https://localhost:[SERVICE_BASE_PORT + 10010]
-- Set up service discovery and health monitoring
-- Configure distributed tracing with OpenTelemetry
-
+-   Start all services with proper orchestration
+-   Launch the Aspire dashboard at https://localhost:18110
+-   Set up service discovery and health monitoring
+-   Configure distributed tracing with OpenTelemetry
 <!--#endif-->
 
 ### Option 2: Using Docker Compose
@@ -229,17 +211,14 @@ Run specific service profiles:
 <!--#if (INCLUDE_API)-->
 # Run API services
 docker compose --profile api up
-
 <!--#endif-->
 <!--#if (INCLUDE_BACK_OFFICE)-->
 # Run BackOffice services
 docker compose --profile backoffice up
-
 <!--#endif-->
 <!--#if (INCLUDE_ORLEANS)-->
 # Run Orleans services
 docker compose --profile orleans up
-
 <!--#endif-->
 # Run all services
 docker compose up
@@ -262,9 +241,8 @@ docker compose up AppDomain-db AppDomain-db-migrations
 
 #### Accessing the Database
 
-- **Connection String**: `Host=localhost;Port=54320;Database=app_domain;Username=postgres;Password=password@`
-- **pgAdmin**: http://localhost:54321 (admin@example.com / admin)
-
+-   **Connection String**: `Host=localhost;Port=54320;Database=app_domain;Username=postgres;Password=password@`
+-   **pgAdmin**: http://localhost:54321 (admin@example.com / admin)
 <!--#endif-->
 
 ## Development Workflow
@@ -295,19 +273,18 @@ dotnet test tests/AppDomain.Tests
 ### Adding New Features
 
 <!-- prettier-ignore-start -->
+
 1. **Define the Command/Query** in `src/AppDomain/[Domain]/Commands/` or `Queries/`
 2. **Implement the Handler** using Wolverine's handler pattern
 3. **Create Integration Events** in `src/AppDomain.Contracts/IntegrationEvents/`
-
-<!--#if (INCLUDE_API)-->
+ <!--#if (INCLUDE_API)-->
 4. **Add API Endpoints** in `src/AppDomain.Api/[Domain]/Controller.cs`
-<!--#endif-->
-<!--#if (db == "liquibase")-->
+    <!--#endif-->
+    <!--#if (db == "liquibase")-->
 5. **Create Database Migrations** in `infra/AppDomain.Database/Liquibase/`
-<!--#endif-->
-
+ <!--#endif-->
 6. **Write Tests** in `tests/AppDomain.Tests/`
-<!-- prettier-ignore-end -->
+ <!-- prettier-ignore-end -->
 
 <!--#if (INCLUDE_API)-->
 
@@ -315,9 +292,9 @@ dotnet test tests/AppDomain.Tests
 
 ### Accessing API Documentation
 
-- **Scalar UI**: http://localhost:[SERVICE_BASE_PORT + 1]/scalar
-- **OpenAPI Spec**: http://localhost:[SERVICE_BASE_PORT + 1]/openapi/v1.json
-- **gRPC Reflection**: Enabled on port [SERVICE_BASE_PORT + 2]
+-   **Scalar UI**: http://localhost:8101/scalar
+-   **OpenAPI Spec**: http://localhost:8101/openapi/v1.json
+-   **gRPC Reflection**: Enabled on port 8102
 
 ### API Endpoints
 
@@ -326,7 +303,7 @@ dotnet test tests/AppDomain.Tests
 #### Cashiers API
 
 | Method | Endpoint             | Description        |
-|--------|----------------------|--------------------|
+| ------ | -------------------- | ------------------ |
 | GET    | `/api/cashiers`      | List all cashiers  |
 | GET    | `/api/cashiers/{id}` | Get cashier by ID  |
 | POST   | `/api/cashiers`      | Create new cashier |
@@ -336,7 +313,7 @@ dotnet test tests/AppDomain.Tests
 #### Invoices API
 
 | Method | Endpoint                 | Description          |
-|--------|--------------------------|----------------------|
+| ------ | ------------------------ | -------------------- |
 | GET    | `/api/invoices`          | List all invoices    |
 | GET    | `/api/invoices/{id}`     | Get invoice by ID    |
 | POST   | `/api/invoices`          | Create new invoice   |
@@ -348,10 +325,9 @@ dotnet test tests/AppDomain.Tests
 
 The API supports multiple authentication schemes:
 
-- **API Key**: Pass via `X-API-Key` header
-- **JWT Bearer**: Standard OAuth 2.0 bearer tokens
-- **Basic Auth**: For development/testing only
-
+-   **API Key**: Pass via `X-API-Key` header
+-   **JWT Bearer**: Standard OAuth 2.0 bearer tokens
+-   **Basic Auth**: For development/testing only
 <!--#endif-->
 
 <!--#if (USE_KAFKA)-->
@@ -365,7 +341,7 @@ The solution uses Apache Kafka for event streaming:
 <!--#if (INCLUDE_SAMPLE)-->
 
 | Event           | Producer   | Consumers           | Description                 |
-|-----------------|------------|---------------------|-----------------------------|
+| --------------- | ---------- | ------------------- | --------------------------- |
 | CashierCreated  | API        | BackOffice          | New cashier registered      |
 | CashierUpdated  | API        | BackOffice          | Cashier details modified    |
 | InvoiceCreated  | API        | BackOffice, Orleans | New invoice generated       |
@@ -387,7 +363,7 @@ Example: `app_domain.cashiers.created`, `app_domain.invoices.paid`
 ### Environment Variables
 
 | Variable               | Default     | Description         |
-|------------------------|-------------|---------------------|
+| ---------------------- | ----------- | ------------------- |
 | ASPNETCORE_ENVIRONMENT | Development | Runtime environment |
 
 <!--#if (USE_DB)-->
@@ -412,9 +388,9 @@ Example: `app_domain.cashiers.created`, `app_domain.invoices.paid`
 
 Configuration files follow the standard .NET pattern:
 
-- `appsettings.json` - Base configuration
-- `appsettings.Development.json` - Development overrides
-- `appsettings.Production.json` - Production settings
+-   `appsettings.json` - Base configuration
+-   `appsettings.Development.json` - Development overrides
+-   `appsettings.Production.json` - Production settings
 
 ## Deployment
 
@@ -424,17 +400,14 @@ Configuration files follow the standard .NET pattern:
 <!--#if (INCLUDE_API)-->
 # Build API image
 docker build -f src/AppDomain.Api/Dockerfile -t appdomain-api .
-
 <!--#endif-->
 <!--#if (INCLUDE_BACK_OFFICE)-->
 # Build BackOffice image
 docker build -f src/AppDomain.BackOffice/Dockerfile -t appdomain-backoffice .
-
 <!--#endif-->
 <!--#if (INCLUDE_ORLEANS)-->
 # Build Orleans image
 docker build -f src/AppDomain.BackOffice.Orleans/Dockerfile -t appdomain-orleans .
-
 <!--#endif-->
 ```
 
@@ -465,9 +438,9 @@ kubectl apply -f k8s/services/
 
 All services expose health endpoints:
 
-- `/health/live` - Liveness probe
-- `/health/ready` - Readiness probe
-- `/health/internal` - Detailed health status
+-   `/health/live` - Liveness probe
+-   `/health/ready` - Readiness probe
+-   `/health/internal` - Detailed health status
 
 ### Metrics
 
@@ -485,10 +458,10 @@ Traces can be exported to:
 
 <!--#endif-->
 
-- Jaeger
-- Zipkin
-- Azure Application Insights
-- AWS X-Ray
+-   Jaeger
+-   Zipkin
+-   Azure Application Insights
+-   AWS X-Ray
 
 ## Troubleshooting
 
@@ -527,7 +500,7 @@ docker exec -it <kafka-container> kafka-topics.sh --list --bootstrap-server loca
 docker logs appdomain-api
 
 # Verify port binding
-netstat -an | grep [SERVICE_BASE_PORT + 1]
+netstat -an | grep 8101
 ```
 
 <!--#endif-->

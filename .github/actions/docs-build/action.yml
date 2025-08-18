@@ -74,7 +74,7 @@ runs:
       working-directory: ${{ inputs.docs-path }}
       run: |
         echo "📦 Installing npm dependencies..."
-        pnpm install
+        pnpm install --no-frozen-lockfile
 
     - name: Build documentation
       shell: bash

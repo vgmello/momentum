@@ -38,12 +38,12 @@ kafka.WithKafkaUI(resource => resource
 #if (INCLUDE_ORLEANS)
 var storage = builder.AddAzureStorage("app-domain-azure-storage").RunAsEmulator();
 var clustering = storage.AddTables("OrleansClustering");
-var grainTables = storage.AddTables("OrleansGrainState");
+var grainStorage = storage.AddBlobs("OrleansGrainState");
 
 var orleans = builder
     .AddOrleans("app-domain-orleans")
     .WithClustering(clustering)
-    .WithGrainStorage("Default", grainTables);
+    .WithGrainStorage("Default", grainStorage);
 
 #endif
 #if (INCLUDE_API)
@@ -57,6 +57,9 @@ var app_domainApi = builder
 #endif
 #if (USE_KAFKA)
     .WithReference(kafka)
+#endif
+#if (INCLUDE_ORLEANS)
+    .WithReference(orleans.AsClient())
 #endif
 #if (USE_DB)
     .WaitFor(database)

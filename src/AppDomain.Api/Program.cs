@@ -1,5 +1,6 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
+using AppDomain.Api.Infrastructure.Extensions;
 using AppDomain.Infrastructure;
 using Momentum.Extensions.Messaging.Kafka;
 using Momentum.ServiceDefaults;
@@ -14,6 +15,9 @@ builder.AddServiceDefaults();
 builder.AddApiServiceDefaults();
 //#if (USE_KAFKA)
 builder.AddKafkaMessagingExtensions();
+//#endif
+//#if (INCLUDE_ORLEANS)
+builder.AddOrleansClient();
 //#endif
 
 builder.AddAppDomainServices();

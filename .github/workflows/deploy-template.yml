@@ -8,6 +8,10 @@ on:
       - '.template.config/**'
       - 'src/**'
       - 'docs/**'
+      - 'infra/**'
+      - 'tests/**'
+      - 'libs/Momentum/src/**'
+      - 'libs/Momentum/Momentum.Template.csproj'
       - 'compose.yml'
       - 'README.md'
       - 'ProjectREADME.md'
@@ -15,14 +19,14 @@ on:
       - 'Directory.Packages.props'
       - 'AppDomain.slnx'
       - 'AppDomain.ruleset'
-      - 'libs/src/**'
+      - '.gitignore'
+      - '.vscode/**'
     tags:
-      - 'template'
-      - 't*.*.*'
+      - 'template-v*.*.*'
   workflow_dispatch:
     inputs:
       deploy-type:
-        description: 'Type of deployment'
+        description: 'Deployment type'
         required: true
         default: 'prerelease'
         type: choice
@@ -31,13 +35,12 @@ on:
           - release
           - test-prerelease
           - test-release
-      nuget-source:
-        description: 'NuGet source (for testing)'
-        required: false
-        default: 'https://api.nuget.org/v3/index.json'
 
 env:
   DOTNET_VERSION: '9.0.x'
+  DOTNET_NOLOGO: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
 
 concurrency:
   group: deploy-template-${{ github.ref }}
@@ -45,50 +48,30 @@ concurrency:
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
+  packages: write
 
 jobs:
-  deploy-template:
+  deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: production
+
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Set deployment options
-        id: options
-        shell: bash
-        run: |
-          DEPLOY_PRERELEASE=false
-          DEPLOY_RELEASE=false
-          IS_TEST=false
-          NUGET_SOURCE="https://api.nuget.org/v3/index.json"
-
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" && ("${{ github.event.inputs.deploy-type }}" == "test-prerelease" || "${{ github.event.inputs.deploy-type }}" == "test-release") ]]; then
-            IS_TEST=true
-            NUGET_SOURCE="https://int.nugettest.org/v3/index.json"
-            if [ -n "${{ github.event.inputs.nuget-source }}" ]; then
-              NUGET_SOURCE="${{ github.event.inputs.nuget-source }}"
-            fi
-          fi
-
-          if [[ ("${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main") || ("${{ github.event_name }}" == "workflow_dispatch" && ("${{ github.event.inputs.deploy-type }}" == "prerelease" || "${{ github.event.inputs.deploy-type }}" == "test-prerelease")) ]]; then
-            DEPLOY_PRERELEASE=true
-          fi
-
-          if [[ "${{ github.ref_name }}" == "template" || ("${{ github.event_name }}" == "workflow_dispatch" && ("${{ github.event.inputs.deploy-type }}" == "release" || "${{ github.event.inputs.deploy-type }}" == "test-release")) ]]; then
-            DEPLOY_RELEASE=true
-          fi
-
-          echo "prerelease=$DEPLOY_PRERELEASE" >> $GITHUB_OUTPUT
-          echo "release=$DEPLOY_RELEASE" >> $GITHUB_OUTPUT
-          echo "test=$IS_TEST" >> $GITHUB_OUTPUT
-          echo "nuget_source=$NUGET_SOURCE" >> $GITHUB_OUTPUT
+      - name: Configure deployment
+        id: config
+        uses: ./.github/actions/deployment-config
+        with:
+          deploy-type: ${{ github.event.inputs.deploy-type }}
+          nuget-api-key: ${{ secrets.NUGET_API_KEY }}
+          nuget-test-api-key: ${{ secrets.NUGET_TEST_API_KEY }}
 
       - name: Calculate pre-release version
-        if: steps.options.outputs.prerelease == 'true'
+        if: steps.config.outputs.deploy-prerelease == 'true'
         id: prerelease-version
         uses: ./.github/actions/version-calculate
         with:
@@ -96,45 +79,38 @@ jobs:
           release-type: prerelease
           check-changes: false
 
-      - name: Generate pre-release notes (Template)
-        if: steps.options.outputs.prerelease == 'true' && steps.prerelease-version.outputs.skip != 'true'
-        uses: ./.github/actions/generate-template-release-notes
+      - name: Generate pre-release notes
+        if: steps.config.outputs.deploy-prerelease == 'true' && steps.prerelease-version.outputs.skip != 'true'
+        uses: ./.github/actions/generate-release-notes
         with:
           version: ${{ steps.prerelease-version.outputs.version }}
-          tag: ${{ steps.prerelease-version.outputs.tag }}
+          tag: template-${{ steps.prerelease-version.outputs.tag }}
           release-type: prerelease
           output-file: prerelease_notes.md
 
-      - name: Create GitHub pre-release (Template)
-        if: steps.options.outputs.prerelease == 'true' && steps.prerelease-version.outputs.skip != 'true' && steps.options.outputs.test != 'true'
+      - name: Create GitHub pre-release
+        if: steps.config.outputs.deploy-prerelease == 'true' && steps.prerelease-version.outputs.skip != 'true' && steps.config.outputs.is-test != 'true'
         run: |
-          gh release create ${{ steps.prerelease-version.outputs.tag }} \
-            --title "Momentum Template ${{ steps.prerelease-version.outputs.tag }} (Pre-release)" \
+          gh release create "template-${{ steps.prerelease-version.outputs.tag }}" \
+            --title "Momentum Template ${{ steps.prerelease-version.outputs.version }}" \
             --notes-file prerelease_notes.md \
             --prerelease \
             --target main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Pack Template (Pre-release)
-        if: steps.options.outputs.prerelease == 'true' && steps.prerelease-version.outputs.skip != 'true'
-        uses: ./.github/actions/template-pack
+      - name: Publish pre-release packages
+        if: steps.config.outputs.deploy-prerelease == 'true' && steps.prerelease-version.outputs.skip != 'true'
+        uses: ./.github/actions/nuget-publish
         with:
-          package-id: Momentum.Templates
+          path: libs/Momentum/Momentum.Template.csproj
           package-version: ${{ steps.prerelease-version.outputs.version }}
-
-      - name: Publish Template (Pre-release)
-        if: steps.options.outputs.prerelease == 'true' && steps.prerelease-version.outputs.skip != 'true'
-        shell: bash
-        run: |
-          dotnet nuget push ./artifacts/template/*.nupkg \
-            --api-key ${{ steps.options.outputs.test == 'true' && secrets.NUGET_TEST_API_KEY || secrets.NUGET_API_KEY }} \
-            --source ${{ steps.options.outputs.nuget_source }} \
-            --skip-duplicate
+          pack-args: -p:PackTemplate=true --restore
+          nuget-api-key: ${{ steps.config.outputs.nuget-api-key }}
+          nuget-source: ${{ steps.config.outputs.nuget-source }}
 
       - name: Verify main branch for release
-        if: steps.options.outputs.release == 'true'
-        shell: bash
+        if: steps.config.outputs.deploy-prerelease == 'false'
         run: |
           CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
           if [ "$CURRENT_BRANCH" != "main" ]; then
@@ -144,7 +120,7 @@ jobs:
           echo "✅ Confirmed on main branch"
 
       - name: Calculate release version
-        if: steps.options.outputs.release == 'true'
+        if: steps.config.outputs.deploy-prerelease == 'false'
         id: release-version
         uses: ./.github/actions/version-calculate
         with:
@@ -152,62 +128,75 @@ jobs:
           release-type: stable
           check-changes: false
 
-      - name: Generate release notes (Template)
-        if: steps.options.outputs.release == 'true'
-        uses: ./.github/actions/generate-template-release-notes
+      - name: Generate release notes
+        if: steps.config.outputs.deploy-prerelease == 'false'
+        uses: ./.github/actions/generate-release-notes
         with:
           version: ${{ steps.release-version.outputs.version }}
-          tag: ${{ steps.release-version.outputs.tag }}
+          tag: template-${{ steps.release-version.outputs.tag }}
           release-type: stable
           output-file: release_notes.md
 
-      - name: Create GitHub release (Template)
-        if: steps.options.outputs.release == 'true' && steps.options.outputs.test != 'true'
+      - name: Create GitHub release
+        if: steps.config.outputs.deploy-prerelease == 'false' && steps.config.outputs.is-test != 'true'
         run: |
-          gh release create ${{ steps.release-version.outputs.tag }} \
-            --title "Momentum Template ${{ steps.release-version.outputs.tag }}" \
+          gh release create "template-${{ steps.release-version.outputs.tag }}" \
+            --title "Momentum Template v${{ steps.release-version.outputs.version }}" \
             --notes-file release_notes.md \
             --target main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Pack Template (Release)
-        if: steps.options.outputs.release == 'true'
-        uses: ./.github/actions/template-pack
+      - name: Publish release packages
+        if: steps.config.outputs.deploy-prerelease == 'false'
+        uses: ./.github/actions/nuget-publish
         with:
-          package-id: Momentum.Templates
+          path: libs/Momentum/Momentum.Template.csproj
           package-version: ${{ steps.release-version.outputs.version }}
+          pack-args: -p:PackTemplate=true --restore
+          nuget-api-key: ${{ steps.config.outputs.nuget-api-key }}
+          nuget-source: ${{ steps.config.outputs.nuget-source }}
 
-      - name: Publish Template (Release)
-        if: steps.options.outputs.release == 'true'
+      - name: Update version file
+        if: steps.config.outputs.deploy-prerelease == 'false' && steps.config.outputs.is-test != 'true'
         shell: bash
         run: |
-          dotnet nuget push ./artifacts/template/*.nupkg \
-            --api-key ${{ steps.options.outputs.test == 'true' && secrets.NUGET_TEST_API_KEY || secrets.NUGET_API_KEY }} \
-            --source ${{ steps.options.outputs.nuget_source }} \
-            --skip-duplicate
+          # Increment patch version for next development cycle
+          IFS='.' read -ra VERSION_PARTS <<< "${{ steps.release-version.outputs.version }}"
+          MAJOR="${VERSION_PARTS[0]}"
+          MINOR="${VERSION_PARTS[1]}"
+          PATCH="${VERSION_PARTS[2]}"
+          NEXT_PATCH=$((PATCH + 1))
+          NEXT_VERSION="${MAJOR}.${MINOR}.${NEXT_PATCH}"
+
+          echo "$NEXT_VERSION" > .template.config/version.txt
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .template.config/version.txt
+          git commit -m "chore: bump template version to $NEXT_VERSION [skip ci]"
+          git push
 
       - name: Deployment Summary
-        shell: bash
         run: |
-          echo "# 📊 Template Deployment Summary"
+          echo "# 📊 Deployment Summary"
           echo ""
 
-          if [ "${{ steps.options.outputs.test }}" == "true" ]; then
+          if [ "${{ steps.config.outputs.is-test }}" == "true" ]; then
             echo "🧪 **Test Deployment Mode**"
-            echo "   - NuGet Source: ${{ steps.options.outputs.nuget_source }}"
+            echo "   - NuGet Source: ${{ steps.config.outputs.nuget-source }}"
             echo ""
           fi
 
-          if [ "${{ steps.options.outputs.prerelease }}" == "true" ]; then
+          if [ "${{ steps.config.outputs.deploy-prerelease }}" == "true" ]; then
             if [ "${{ steps.prerelease-version.outputs.skip }}" == "true" ]; then
-              echo "⏭️ Pre-release skipped"
+              echo "⏭️ Pre-release skipped (no consumer-visible changes)"
             elif [ -n "${{ steps.prerelease-version.outputs.version }}" ]; then
               echo "✅ **Pre-release deployed**"
               echo "   - Version: ${{ steps.prerelease-version.outputs.version }}"
-              echo "   - Tag: ${{ steps.prerelease-version.outputs.tag }}"
-              echo "   - NuGet: ${{ steps.options.outputs.nuget_source }}"
-              if [ "${{ steps.options.outputs.test }}" != "true" ]; then
+              echo "   - Tag: template-${{ steps.prerelease-version.outputs.tag }}"
+              echo "   - NuGet: ${{ steps.config.outputs.nuget-source }}"
+              if [ "${{ steps.config.outputs.is-test }}" != "true" ]; then
                 echo "   - GitHub Release: Created"
               fi
             else
@@ -215,13 +204,13 @@ jobs:
             fi
           fi
 
-          if [ "${{ steps.options.outputs.release }}" == "true" ]; then
+          if [ "${{ steps.config.outputs.deploy-prerelease }}" == "false" ]; then
             if [ -n "${{ steps.release-version.outputs.version }}" ]; then
               echo "✅ **Release deployed**"
               echo "   - Version: ${{ steps.release-version.outputs.version }}"
-              echo "   - Tag: ${{ steps.release-version.outputs.tag }}"
-              echo "   - NuGet: ${{ steps.options.outputs.nuget_source }}"
-              if [ "${{ steps.options.outputs.test }}" != "true" ]; then
+              echo "   - Tag: template-${{ steps.release-version.outputs.tag }}"
+              echo "   - NuGet: ${{ steps.config.outputs.nuget-source }}"
+              if [ "${{ steps.config.outputs.is-test }}" != "true" ]; then
                 echo "   - GitHub Release: Created"
               fi
             else

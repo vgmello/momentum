@@ -1,5 +1,5 @@
 name: 'Generate Release Notes'
-description: 'Generate release notes for Momentum libraries'
+description: 'Generate release notes for Momentum projects (auto-detects type from tag)'
 
 inputs:
   version:
@@ -33,73 +33,84 @@ runs:
         RELEASE_TYPE="${{ inputs.release-type }}"
         OUTPUT_FILE="${{ inputs.output-file }}"
         
-        # Find the appropriate base for changelog
-        if [ "$RELEASE_TYPE" == "prerelease" ]; then
-          # For pre-releases, find last regular release
-          LAST_RELEASE=$(git tag -l "v*.*.*" --sort=-v:refname | grep -v 'pre' | head -1)
-          CHANGELOG_TITLE="Changes Since Last Release"
+        # Auto-detect project type from tag pattern
+        if [[ "$TAG" =~ ^template-v ]]; then
+          PROJECT_TYPE="template"
+          TAG_PATTERN="template-v*"
+          PROJECT_NAME="Momentum Template"
         else
-          # For stable releases, find previous release
-          LAST_RELEASE=$(git tag -l "v*.*.*" --sort=-v:refname | grep -v 'pre' | head -1)
-          CHANGELOG_TITLE="Changes"
+          PROJECT_TYPE="libraries"
+          TAG_PATTERN="v*"
+          PROJECT_NAME="Momentum Libraries"
         fi
         
-        # Generate commit list
+        echo "🔍 Auto-detected project type: $PROJECT_TYPE (from tag: $TAG)"
+        
+        # Find the last release tag
+        LAST_RELEASE=$(git tag -l "${TAG_PATTERN}" --sort=-v:refname | grep -v "$TAG" | head -1)
+        
+        # Get commit information
         if [ -n "$LAST_RELEASE" ]; then
-          COMMITS=$(git log --pretty=format:"- %s" ${LAST_RELEASE}..HEAD)
+          COMMITS=$(git log --pretty=format:"- %s (%an)" ${LAST_RELEASE}..HEAD --no-merges | grep -v "skip ci" | head -20)
+          COMMIT_COUNT=$(git rev-list --count ${LAST_RELEASE}..HEAD --no-merges)
+          FILES_CHANGED=$(git diff --name-only ${LAST_RELEASE}..HEAD | wc -l)
         else
-          COMMITS=$(git log --pretty=format:"- %s")
+          COMMITS=$(git log --pretty=format:"- %s (%an)" --no-merges | grep -v "skip ci" | head -20)
+          COMMIT_COUNT=$(git rev-list --count HEAD --no-merges)
+          FILES_CHANGED="N/A"
         fi
         
-        # Create release notes based on type
+        # Create release notes focused on changes
         if [ "$RELEASE_TYPE" == "prerelease" ]; then
           cat > "$OUTPUT_FILE" << EOF
-        # Momentum Libraries ${TAG} (Pre-release)
+        # ${PROJECT_NAME} ${VERSION}
         
-        🚧 **This is a pre-release version** - Use for testing purposes only
+        🚧 **Pre-release Version**
         
-        ## $CHANGELOG_TITLE
+        ## What's Changed
         
-        $COMMITS
+        ${COMMITS}
         
-        ## Pre-release Packages
+        **Full Changelog**: ${LAST_RELEASE:-beginning}...${TAG}
         
-        - Momentum.Extensions
-        - Momentum.ServiceDefaults
-        - Momentum.Extensions.SourceGenerators
-        - Momentum.Extensions.EventDocGenerator
-        - Momentum.ServiceDefaults.Api
-        - Momentum.Extensions.Abstractions
-        
-        Version: ${VERSION}
-        
-        ## Installation
-        
-        \`\`\`bash
-        dotnet add package Momentum.Extensions --version ${VERSION}
-        \`\`\`
+        ---
+        📊 **Statistics**: ${COMMIT_COUNT} commits | ${FILES_CHANGED} files changed
         EOF
         else
           cat > "$OUTPUT_FILE" << EOF
-        # Momentum Libraries ${TAG}
+        # ${PROJECT_NAME} v${VERSION}
+        EOF
         
-        ## $CHANGELOG_TITLE
-        
-        $COMMITS
+          # Add package list for libraries
+          if [ "$PROJECT_TYPE" == "libraries" ]; then
+            cat >> "$OUTPUT_FILE" << EOF
         
         ## Packages Published
         
         - Momentum.Extensions
         - Momentum.ServiceDefaults
         - Momentum.Extensions.SourceGenerators
-        - Momentum.Extensions.EventDocGenerator
+        - Momentum.Extensions.EventMarkdownGenerator
         - Momentum.ServiceDefaults.Api
         - Momentum.Extensions.Abstractions
+        - Momentum.Extensions.Messaging.Kafka
+        - Momentum.Extensions.XmlDocs
+        EOF
+          fi
         
-        Version: ${VERSION}
+          cat >> "$OUTPUT_FILE" << EOF
+        
+        ## What's Changed
+        
+        ${COMMITS}
+        
+        **Full Changelog**: ${LAST_RELEASE:-beginning}...${TAG}
+        
+        ---
+        📊 **Statistics**: ${COMMIT_COUNT} commits | ${FILES_CHANGED} files changed
         EOF
         fi
         
-        echo "📝 Generated release notes in $OUTPUT_FILE"
+        echo "📝 Generated ${PROJECT_TYPE} release notes in $OUTPUT_FILE"
         echo "Contents:"
         cat "$OUTPUT_FILE"

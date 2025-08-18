@@ -152,9 +152,11 @@ public class InvoiceGrain : Grain, IInvoiceGrain
         await PublishIntegrationEventAsync(new PaymentReceived(
             invoice.TenantId,
             invoice.InvoiceId,
+            invoice.Currency ?? "USD",
             amount,
+            DateTime.UtcNow,
             paymentMethod,
-            DateTime.UtcNow));
+            Guid.NewGuid().ToString()));
 
         return true;
     }

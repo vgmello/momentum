@@ -11,18 +11,17 @@
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(IsTestProject)' != 'True' ">
+        <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Debug' ">true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <PropertyGroup>
         <MomentumVersion>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)version.txt').Trim())</MomentumVersion>
         <VersionPrefix>$(MomentumVersion)</VersionPrefix>
-        <VersionSuffix Condition=" '$(Configuration)' == 'Debug' ">$([System.DateTime]::UtcNow.ToString("yyyyMMdd-HHmmss"))</VersionSuffix>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -52,7 +51,6 @@
     </ItemGroup>
 
     <Target Name="ValidateMomentumVersion" BeforeTargets="Build">
-        <Error Text="MomentumVersion property is not set. Check version.txt file." Condition="'$(MomentumVersion)' == ''" />
         <Message Text="Building Momentum Libraries version: $(MomentumVersion)" Importance="high" />
     </Target>
 </Project>

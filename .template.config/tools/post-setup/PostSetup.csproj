@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <AssemblyName>PostSetup</AssemblyName>
         <ImportDirectoryBuildProps>false</ImportDirectoryBuildProps>
+        <IsPackable>false</IsPackable>
     </PropertyGroup>
 
     <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk"/>

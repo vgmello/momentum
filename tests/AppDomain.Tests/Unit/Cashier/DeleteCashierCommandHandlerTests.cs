@@ -18,7 +18,7 @@ public class DeleteCashierCommandHandlerTests
         var cashierId = Guid.NewGuid();
 
         messagingMock.InvokeCommandAsync(Arg.Any<DeleteCashierCommandHandler.DbCommand>(), Arg.Any<CancellationToken>())
-            .Returns(1);
+            .Returns(true);
 
         var command = new DeleteCashierCommand(tenantId, cashierId);
 
@@ -53,7 +53,7 @@ public class DeleteCashierCommandHandlerTests
         var cashierId = Guid.NewGuid();
 
         messagingMock.InvokeCommandAsync(Arg.Any<DeleteCashierCommandHandler.DbCommand>(), Arg.Any<CancellationToken>())
-            .Returns(0); // Simulating non-existent cashier
+            .Returns(false); // Simulating non-existent cashier
 
         var command = new DeleteCashierCommand(tenantId, cashierId);
 

@@ -38,7 +38,10 @@
         <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore"/>
         <PackageReference Include="OpenTelemetry.Instrumentation.Http"/>
         <PackageReference Include="OpenTelemetry.Instrumentation.Runtime"/>
-        <PackageReference Include="OpenTelemetry.Instrumentation.GrpcNetClient"/>
+        <!-- Suppress prerelease warning - no stable version available for gRPC client instrumentation -->
+        <PackageReference Include="OpenTelemetry.Instrumentation.GrpcNetClient">
+            <NoWarn>NU5104</NoWarn>
+        </PackageReference>
         <PackageReference Include="Serilog.AspNetCore"/>
         <PackageReference Include="Serilog.Exceptions"/>
         <PackageReference Include="Serilog.Sinks.OpenTelemetry"/>

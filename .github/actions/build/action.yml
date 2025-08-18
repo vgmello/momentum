@@ -1,22 +1,22 @@
-name: 'Build .NET Projects'
-description: 'Build .NET projects with caching'
+name: "Build .NET Projects"
+description: "Build .NET projects with caching"
 
 inputs:
   dotnet-version:
-    description: '.NET SDK version to use'
+    description: ".NET SDK version to use"
     required: false
-    default: '9.0.x'
+    default: "9.0.x"
   configuration:
-    description: 'Build configuration (Debug/Release)'
+    description: "Build configuration (Debug/Release)"
     required: false
-    default: 'Release'
-  project-path:
-    description: 'Path to the project or solution to build'
+    default: "Release"
+  build-target:
+    description: "Solution or Project to build"
     required: false
-    default: 'libs/Momentum/src'
+    default: "*.slnx"
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
@@ -35,17 +35,17 @@ runs:
       shell: bash
       run: |
         echo "📦 Restoring dependencies..."
-        dotnet restore ${{ inputs.project-path }} --verbosity minimal
+        dotnet restore ${{ inputs.build-target }} --verbosity minimal
 
     - name: Build project
       shell: bash
       run: |
-        echo "🔨 Building ${{ inputs.project-path }}..."
-        dotnet build ${{ inputs.project-path }} \
+        echo "🔨 Building ${{ inputs.build-target }}..."
+        dotnet build ${{ inputs.build-target }} \
           --configuration ${{ inputs.configuration }} \
           --no-restore \
           --verbosity minimal
-        
+
         if [ $? -ne 0 ]; then
           echo "❌ Build failed"
           exit 1

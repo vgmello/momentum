@@ -68,7 +68,7 @@ graph TB
 
 ## Domain Layer
 
-Location: [`src/AppDomain/`](https://github.com/yourusername/AppDomain/tree/main/src/AppDomain)
+Location: [`src/AppDomain/`](https://github.com/org-name/app-domain/tree/main/src/AppDomain)
 
 ### Entities
 
@@ -106,7 +106,7 @@ public record InvoicePaid(Ulid InvoiceId, DateTime PaidAt, decimal Amount);
 
 ## Application Layer
 
-Location: [`src/AppDomain/*/Commands/`](https://github.com/yourusername/AppDomain/tree/main/src/AppDomain) and [`src/AppDomain/*/Queries/`](https://github.com/yourusername/AppDomain/tree/main/src/AppDomain)
+Location: [`src/AppDomain/*/Commands/`](https://github.com/org-name/app-domain/tree/main/src/AppDomain) and [`src/AppDomain/*/Queries/`](https://github.com/org-name/app-domain/tree/main/src/AppDomain)
 
 ### CQRS Implementation
 
@@ -191,7 +191,7 @@ public partial class CreateInvoiceCommandHandler : IRequestHandler<CreateInvoice
 
 ## Presentation Layer
 
-Location: [`src/AppDomain.Api/`](https://github.com/yourusername/AppDomain/tree/main/src/AppDomain.Api)
+Location: [`src/AppDomain.Api/`](https://github.com/org-name/app-domain/tree/main/src/AppDomain.Api)
 
 ### REST API
 

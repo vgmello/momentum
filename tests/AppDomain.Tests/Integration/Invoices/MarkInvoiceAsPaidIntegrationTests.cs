@@ -1,5 +1,6 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
+using AppDomain.Invoices.Grpc;
 using AppDomain.Tests.Integration._Internal;
 using System.Data.Common;
 

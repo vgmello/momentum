@@ -5,6 +5,7 @@
         <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
         <CompilerGeneratedFilesOutputPath>Internal/Generated</CompilerGeneratedFilesOutputPath>
         <IncludeBuildOutput>false</IncludeBuildOutput>
+        <IncludeSymbols>false</IncludeSymbols>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <LangVersion>Latest</LangVersion>
         <NoWarn>$(NoWarn);RS1041;RS2007;RS1036;NU5128</NoWarn>

@@ -235,6 +235,12 @@
       },
       "replaces": "ORG_NAME"
     },
+    "OrgNameKebab": {
+      "type": "derived",
+      "valueSource": "OrgName",
+      "valueTransform": "kebab-case",
+      "replaces": "org-name"
+    },
     "AppDomainSnakeCase": {
       "type": "derived",
       "valueSource": "name",
@@ -252,8 +258,8 @@
     "MomentumVersion": {
       "type": "bind",
       "binding": "msbuild:MomentumVersion",
-      "replaces": "$(MomentumVersion)",
-      "defaultValue": "0.0.0"
+      "replaces": "$(TemplateMomentumVersion)",
+      "defaultValue": "0.0.1"
     }
   },
   "forms": {
@@ -340,7 +346,8 @@
         {
           "condition": "(!INCLUDE_ORLEANS)",
           "exclude": [
-            "src/AppDomain.BackOffice.Orleans/**/*"
+            "src/AppDomain.BackOffice.Orleans/**/*",
+            "src/AppDomain.Api/Extensions/OrleansExtensions.cs"
           ]
         },
         {
