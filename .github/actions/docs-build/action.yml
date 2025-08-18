@@ -31,12 +31,6 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Setup .NET
-      if: inputs.build-dotnet == 'true'
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{ inputs.dotnet-version }}
-
     - name: Setup pnpm
       uses: pnpm/action-setup@v4
       with:

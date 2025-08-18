@@ -47,17 +47,14 @@ runs:
       id: pack
       shell: bash
       run: |
-        # Define fixed temp directory for packages
         NUGET_OUTPUT_DIR="./_tmp_nuget_output"
 
-        # Clean and create output directory
         echo "🧹 Cleaning output directory: $NUGET_OUTPUT_DIR"
         rm -rf "$NUGET_OUTPUT_DIR"
         mkdir -p "$NUGET_OUTPUT_DIR"
 
         echo "📦 Packing packages with version ${{ inputs.package-version }}..."
 
-        # Run dotnet pack with fixed output and no-build
         dotnet pack "${{ inputs.path }}" \
           --configuration ${{ inputs.config }} \
           --no-build \
@@ -81,7 +78,6 @@ runs:
 
         echo "🔍 Finding NuGet packages in '$NUGET_OUTPUT_DIR'..."
 
-        # Simple list of all nupkg files in the fixed directory
         PACKAGES=$(ls -1 "$NUGET_OUTPUT_DIR"/*.nupkg 2>/dev/null | sort)
 
         if [ -z "$PACKAGES" ]; then
@@ -96,7 +92,6 @@ runs:
           echo "  - $(basename $pkg)"
         done
 
-        # Save package list for output
         echo "packages<<EOF" >> $GITHUB_OUTPUT
         echo "$PACKAGES" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT

@@ -41,7 +41,3 @@ jobs:
           model: "claude-opus-4-1-20250805"
           assignee_trigger: "claude"
           allowed_tools: "Bash(dotnet:*)"
-
-          # Optional: Custom environment variables for Claude
-          # claude_env: |
-          #   NODE_ENV: test

@@ -43,7 +43,6 @@ runs:
       run: |
         echo "🔍 Checking for consumer-visible changes in ${{ inputs.change-path }}..."
 
-        # Get changed files
         CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD | grep "^${{ inputs.change-path }}" || true)
 
         if [ -z "$CHANGED_FILES" ]; then
@@ -52,7 +51,6 @@ runs:
           exit 0
         fi
 
-        # Filter to consumer-visible changes only
         CONSUMER_CHANGES=$(echo "$CHANGED_FILES" | grep -E '\.(cs|csproj|props|targets)$' | grep -v -E '(Test|\.Tests\.|\.md$|\.gitignore$|\.editorconfig$)' || true)
 
         if [ -z "$CONSUMER_CHANGES" ]; then
@@ -119,8 +117,6 @@ runs:
       shell: bash
       run: |
         FILE_VERSION="${{ steps.file-version.outputs.version }}"
-
-        # Check for pre-releases of the target version
         LATEST_PRERELEASE=$(git tag -l "v${FILE_VERSION}-pre.*" --sort=-v:refname | head -1)
 
         if [ -n "$LATEST_PRERELEASE" ]; then
@@ -128,7 +124,6 @@ runs:
           echo "has_prerelease=true" >> $GITHUB_OUTPUT
           echo "latest_prerelease=$LATEST_PRERELEASE" >> $GITHUB_OUTPUT
 
-          # Extract sequence number
           SEQUENCE=$(echo $LATEST_PRERELEASE | sed -n 's/.*-pre\.\([0-9]\+\)$/\1/p')
           echo "prerelease_sequence=$SEQUENCE" >> $GITHUB_OUTPUT
         else

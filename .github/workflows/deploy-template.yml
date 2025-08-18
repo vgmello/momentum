@@ -57,6 +57,11 @@ jobs:
       name: production
 
     steps:
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ inputs.dotnet-version }}
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
@@ -156,26 +161,6 @@ jobs:
           pack-args: -p:PackTemplate=true --restore
           nuget-api-key: ${{ steps.config.outputs.nuget-api-key }}
           nuget-source: ${{ steps.config.outputs.nuget-source }}
-
-      - name: Update version file
-        if: steps.config.outputs.deploy-prerelease == 'false' && steps.config.outputs.is-test != 'true'
-        shell: bash
-        run: |
-          # Increment patch version for next development cycle
-          IFS='.' read -ra VERSION_PARTS <<< "${{ steps.release-version.outputs.version }}"
-          MAJOR="${VERSION_PARTS[0]}"
-          MINOR="${VERSION_PARTS[1]}"
-          PATCH="${VERSION_PARTS[2]}"
-          NEXT_PATCH=$((PATCH + 1))
-          NEXT_VERSION="${MAJOR}.${MINOR}.${NEXT_PATCH}"
-
-          echo "$NEXT_VERSION" > .template.config/version.txt
-
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add .template.config/version.txt
-          git commit -m "chore: bump template version to $NEXT_VERSION [skip ci]"
-          git push
 
       - name: Deployment Summary
         run: |
