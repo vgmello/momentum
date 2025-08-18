@@ -60,7 +60,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ inputs.dotnet-version }}
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Checkout code
         uses: actions/checkout@v4
