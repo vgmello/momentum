@@ -6,7 +6,7 @@ public static class OrleansExtensions
 {
     public static IHostApplicationBuilder AddOrleansClient(this IHostApplicationBuilder builder)
     {
-        builder.AddKeyedAzureTableClient("OrleansClustering");
+        builder.AddKeyedAzureTableServiceClient("OrleansClustering");
 
         builder.Services
             .AddOpenTelemetry()

@@ -1,5 +1,6 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
+using AppDomain.Api;
 using AppDomain.Tests.Integration._Internal;
 using AppDomain.Tests.Integration._Internal.Containers;
 using AppDomain.Tests.Integration._Internal.Extensions;
@@ -19,7 +20,7 @@ using Testcontainers.PostgreSql;
 namespace AppDomain.Tests.Integration;
 
 [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
-public class IntegrationTestFixture : WebApplicationFactory<Program>, IAsyncLifetime
+public class IntegrationTestFixture : WebApplicationFactory<AppDomain.Api.Program>, IAsyncLifetime
 {
     private readonly INetwork _containerNetwork = new NetworkBuilder().Build();
 
@@ -67,7 +68,7 @@ public class IntegrationTestFixture : WebApplicationFactory<Program>, IAsyncLife
         builder.UseSetting("ConnectionStrings:ServiceBus", _postgres.GetDbConnectionString("service_bus"));
 
         WolverineSetupExtensions.SkipServiceRegistration = true;
-        ServiceDefaultsExtensions.EntryAssembly = typeof(Program).Assembly;
+        ServiceDefaultsExtensions.EntryAssembly = typeof(AppDomain.Api.Program).Assembly;
 
         builder.ConfigureServices((ctx, services) =>
         {
@@ -79,13 +80,13 @@ public class IntegrationTestFixture : WebApplicationFactory<Program>, IAsyncLife
                 .AddSerilog(CreateTestLogger(nameof(AppDomain))));
 
             services.AddWolverineWithDefaults(ctx.HostingEnvironment, ctx.Configuration,
-                opt => opt.ApplicationAssembly = typeof(Program).Assembly);
+                opt => opt.ApplicationAssembly = typeof(AppDomain.Api.Program).Assembly);
         });
 
         builder.Configure(app =>
         {
             app.UseRouting();
-            app.UseEndpoints(endpoints => endpoints.MapGrpcServices(typeof(Program)));
+            app.UseEndpoints(endpoints => endpoints.MapGrpcServices(typeof(AppDomain.Api.Program)));
         });
     }
 

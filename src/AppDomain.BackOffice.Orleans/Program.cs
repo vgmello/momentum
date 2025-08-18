@@ -1,5 +1,6 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
+using AppDomain.BackOffice.Orleans;
 using AppDomain.BackOffice.Orleans.Infrastructure.Extensions;
 using AppDomain.BackOffice.Orleans.Invoices.Grains;
 using Momentum.Extensions.Messaging.Kafka;

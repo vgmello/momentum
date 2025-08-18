@@ -23,6 +23,11 @@ on:
           - docs-only
           - test-prerelease
           - test-release
+      check-changes:
+        description: "Check for lib changes"
+        required: false
+        default: false
+        type: boolean
       nuget-source:
         description: "NuGet source (for testing)"
         required: false
@@ -105,7 +110,7 @@ jobs:
         with:
           version-file: libs/Momentum/version.txt
           release-type: prerelease
-          check-changes: true
+          check-changes: ${{ github.event.inputs.check-changes }}
           change-path: libs/
 
       - name: Generate pre-release notes
