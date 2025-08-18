@@ -8,6 +8,7 @@
     <Folder Name="/Libs/">
         <!--#if (false) -->
         <Project Path="libs\Momentum\src\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
+        <Project Path="libs\Momentum\src\Momentum.Extensions.XmlDocs\Momentum.Extensions.XmlDocs.csproj"/>
         <!--#endif -->
         <!--#if (libs == kafka) -->
         <Project Path="libs\Momentum\src\Momentum.Extensions.Messaging.Kafka\Momentum.Extensions.Messaging.Kafka.csproj"/>
