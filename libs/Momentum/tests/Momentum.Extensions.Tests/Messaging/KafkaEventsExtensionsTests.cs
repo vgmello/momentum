@@ -176,7 +176,7 @@ public class KafkaEventsExtensionsTests
         var result = InvokeGetTopicName(messageType, topicAttribute, environment);
 
         // Assert
-        result.ShouldBe($"{expectedPrefix}.test-domain.public.test-topic");
+        result.ShouldBe($"{expectedPrefix}.test-domain.public.test-topic.v1");
     }
 
     [Fact]
@@ -193,7 +193,7 @@ public class KafkaEventsExtensionsTests
         var result = InvokeGetTopicName(messageType, topicAttribute, "Development");
 
         // Assert
-        result.ShouldBe("dev.test-domain.internal.test-topic");
+        result.ShouldBe("dev.test-domain.internal.test-topic.v1");
     }
 
     [Fact]
@@ -208,7 +208,7 @@ public class KafkaEventsExtensionsTests
         var result = InvokeGetTopicName(messageType, topicAttribute, "Development");
 
         // Assert
-        result.ShouldBe("dev.sales.public.customers");
+        result.ShouldBe("dev.sales.public.customers.v1");
     }
 
     [Fact]
