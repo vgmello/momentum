@@ -13,7 +13,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <EmbeddedResource Include="Templates\**\*.liquid"/>
+        <Content Include="Templates\**\*.liquid" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="content\Templates"/>
         <None Include="Momentum.Extensions.EventMarkdownGenerator.props" Pack="true" PackagePath="\build"/>
     </ItemGroup>
 

@@ -79,6 +79,25 @@ public class FluidMarkdownGenerator
     }
 
 
+    public static void CopyDefaultTemplatesToDirectory(string targetDirectory)
+    {
+        if (string.IsNullOrEmpty(targetDirectory))
+        {
+            throw new ArgumentException("Target directory cannot be null or empty", nameof(targetDirectory));
+        }
+
+        Directory.CreateDirectory(targetDirectory);
+
+        var templateNames = new[] { "event.liquid", "schema.liquid" };
+
+        foreach (var templateName in templateNames)
+        {
+            var templateContent = GetEmbeddedTemplate(templateName);
+            var targetPath = Path.Combine(targetDirectory, templateName);
+            File.WriteAllText(targetPath, templateContent);
+        }
+    }
+
     private static string GetTemplate(string templateName, string? customTemplatesDirectory)
     {
         try
@@ -105,36 +124,34 @@ public class FluidMarkdownGenerator
         try
         {
             var assembly = Assembly.GetExecutingAssembly();
+            
+            // Try to read from filesystem first (as Content files)
+            var assemblyLocation = assembly.Location;
+
+            if (!string.IsNullOrEmpty(assemblyLocation))
+            {
+                var assemblyDir = Path.GetDirectoryName(assemblyLocation);
+
+                if (!string.IsNullOrEmpty(assemblyDir))
+                {
+                    var templatePath = Path.Combine(assemblyDir, "Templates", Path.GetFileName(templateName));
+
+                    if (File.Exists(templatePath))
+                    {
+                        return File.ReadAllText(templatePath);
+                    }
+                }
+            }
+
+            // Fallback to embedded resource for backward compatibility
             var resourceName = $"Momentum.Extensions.EventMarkdownGenerator.Templates.{templateName}";
 
             using var stream = assembly.GetManifestResourceStream(resourceName);
 
             if (stream == null)
             {
-                // Fallback to reading from filesystem during development
-                var assemblyLocation = assembly.Location;
-
-                if (string.IsNullOrEmpty(assemblyLocation))
-                {
-                    throw new InvalidOperationException($"Cannot determine assembly location for template '{templateName}'.");
-                }
-
-                var assemblyDir = Path.GetDirectoryName(assemblyLocation);
-
-                if (string.IsNullOrEmpty(assemblyDir))
-                {
-                    throw new InvalidOperationException($"Cannot determine assembly directory for template '{templateName}'.");
-                }
-
-                var templatePath = Path.Combine(assemblyDir, "Templates", Path.GetFileName(templateName));
-
-                if (File.Exists(templatePath))
-                {
-                    return File.ReadAllText(templatePath);
-                }
-
                 throw new FileNotFoundException(
-                    $"Template '{templateName}' not found as embedded resource or file. Searched in: {resourceName} and {templatePath}");
+                    $"Template '{templateName}' not found as content file or embedded resource. Expected location: Templates/{templateName}");
             }
 
             using var reader = new StreamReader(stream);
