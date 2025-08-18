@@ -2,6 +2,9 @@
     <PropertyGroup>
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
         <AspireAppHostSdkVersion>9.4</AspireAppHostSdkVersion>
+        <!--#if (false) -->
+        <TemplateMomentumVersion>0.0.1</TemplateMomentumVersion>
+        <!--#endif -->
         <MomentumVersion>$(TemplateMomentumVersion)</MomentumVersion>
     </PropertyGroup>
     <ItemGroup>
@@ -38,7 +41,7 @@
         <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.7"/>
         <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.7"/>
         <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.CodeRefactoring.Testing" Version="1.1.2"/>
-        <PackageVersion Include="Microsoft.Extensions.Configuration" Version="9.0.3"/>
+        <PackageVersion Include="Microsoft.Extensions.Configuration" Version="9.0.8"/>
         <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.3"/>
         <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="9.0.3"/>
         <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.3"/>
@@ -115,5 +118,7 @@
         <PackageVersion Include="Momentum.ServiceDefaults.Api" Version="$(MomentumVersion)"/>
         <PackageVersion Include="Momentum.Extensions.Messaging.Kafka" Version="$(MomentumVersion)"/>
         <PackageVersion Include="Microsoft.Orleans.Streaming" Version="9.2.1"/>
+        <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.7"/>
+        <PackageVersion Include="Microsoft.Extensions.Diagnostics.Testing" Version="9.7.0"/>
     </ItemGroup>
 </Project>

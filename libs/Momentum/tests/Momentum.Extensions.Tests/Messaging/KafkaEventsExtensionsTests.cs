@@ -25,10 +25,16 @@ public class KafkaEventsExtensionsTests
     public KafkaEventsExtensionsTests()
     {
         _logger = Substitute.For<ILogger<KafkaEventsExtensions>>();
-        _serviceBusOptions = Options.Create(new ServiceBusOptions 
+        var options = new ServiceBusOptions 
         { 
-            ServiceUrn = new Uri("urn:momentum:test-service") 
-        });
+            Domain = "TestDomain",
+            PublicServiceName = "test-service"
+        };
+        // Use reflection to set the private ServiceUrn property for testing
+        typeof(ServiceBusOptions)
+            .GetProperty(nameof(ServiceBusOptions.ServiceUrn))!
+            .SetValue(options, new Uri("/test-domain/test-service", UriKind.Relative));
+        _serviceBusOptions = Options.Create(options);
         _environment = Substitute.For<IHostEnvironment>();
         
         var configData = new Dictionary<string, string?>
@@ -152,7 +158,7 @@ public class KafkaEventsExtensionsTests
         // Assert
         _logger.Received().LogInformation(
             "Consumer group ID: {GroupId}",
-            "test-service-production");
+            "test-service-prod");
     }
 
     [Theory]
@@ -164,7 +170,7 @@ public class KafkaEventsExtensionsTests
     {
         // Arrange
         var messageType = typeof(TestEvent);
-        var topicAttribute = new EventTopicAttribute("test-topic") { Domain = "test-domain" };
+        var topicAttribute = new EventTopicAttribute("test-topic", domain: "test-domain");
 
         // Act
         var result = InvokeGetTopicName(messageType, topicAttribute, environment);
@@ -178,9 +184,8 @@ public class KafkaEventsExtensionsTests
     {
         // Arrange
         var messageType = typeof(TestEvent);
-        var topicAttribute = new EventTopicAttribute("test-topic") 
+        var topicAttribute = new EventTopicAttribute("test-topic", domain: "test-domain") 
         { 
-            Domain = "test-domain",
             Internal = true
         };
 
@@ -196,11 +201,8 @@ public class KafkaEventsExtensionsTests
     {
         // Arrange
         var messageType = typeof(TestEvent);
-        var topicAttribute = new EventTopicAttribute("customer") 
-        { 
-            Domain = "sales",
-            ShouldPluralizeTopicName = true
-        };
+        // Create a test attribute that overrides ShouldPluralizeTopicName
+        var topicAttribute = new TestPluralizeEventTopicAttribute("customer", domain: "sales");
 
         // Act
         var result = InvokeGetTopicName(messageType, topicAttribute, "Development");
@@ -214,11 +216,7 @@ public class KafkaEventsExtensionsTests
     {
         // Arrange
         var messageType = typeof(TestEvent);
-        var topicAttribute = new EventTopicAttribute("test-topic") 
-        { 
-            Domain = "test-domain",
-            Version = "v2"
-        };
+        var topicAttribute = new EventTopicAttribute("test-topic", domain: "test-domain", version: "v2");
 
         // Act
         var result = InvokeGetTopicName(messageType, topicAttribute, "Development");
@@ -232,8 +230,8 @@ public class KafkaEventsExtensionsTests
     {
         // This test would require creating a test assembly with DefaultDomainAttribute
         // For now, just verify the logic path exists
-        var messageType = typeof(TestEvent);
-        var topicAttribute = new EventTopicAttribute("test-topic"); // No domain specified
+        _ = typeof(TestEvent);
+        _ = new EventTopicAttribute("test-topic"); // No domain specified
 
         // The actual test would need to mock the assembly attribute resolution
         // This is a placeholder to document the expected behavior
@@ -249,4 +247,15 @@ public class KafkaEventsExtensionsTests
     }
 
     private record TestEvent;
+    
+    [AttributeUsage(AttributeTargets.Class)]
+    private class TestPluralizeEventTopicAttribute : EventTopicAttribute
+    {
+        public TestPluralizeEventTopicAttribute(string topic, string? domain = null, string version = "v1") 
+            : base(topic, domain, version)
+        {
+        }
+        
+        public override bool ShouldPluralizeTopicName => true;
+    }
 }
