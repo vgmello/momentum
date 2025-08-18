@@ -17,7 +17,7 @@ The AppDomain solution demonstrates modern enterprise architecture patterns incl
 <!--#endif-->
 -   **Comprehensive testing strategy** with unit and integration tests
 
-<!--#if (!INCLUDE_SAMPLE) -->
+<!--#if (INCLUDE_SAMPLE)-->
 
 ### Key Business Domains
 
