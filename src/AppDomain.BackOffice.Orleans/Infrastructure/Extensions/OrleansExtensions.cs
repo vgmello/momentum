@@ -1,6 +1,8 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
+using Microsoft.Extensions.Hosting;
 using Orleans.Configuration;
+using OrleansDashboard;
 
 namespace AppDomain.BackOffice.Orleans.Infrastructure.Extensions;
 
@@ -21,7 +23,7 @@ public static class OrleansExtensions
         if (!useLocalCluster)
         {
             builder.AddKeyedAzureTableClient("OrleansClustering");
-            builder.AddKeyedAzureTableClient("OrleansGrainState");
+            builder.AddKeyedAzureBlobClient("OrleansGrainState");
         }
 
         builder.Services

@@ -1,12 +1,5 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
-/// <summary>
-/// Entry point for the Orleans stateful processing service.
-/// This service provides actor-based stateful processing using Microsoft Orleans,
-/// handling long-running business processes and maintaining distributed state.
-/// </summary>
-
-using AppDomain.BackOffice.Orleans;
 using AppDomain.BackOffice.Orleans.Infrastructure.Extensions;
 using AppDomain.BackOffice.Orleans.Invoices.Grains;
 using Momentum.Extensions.Messaging.Kafka;
