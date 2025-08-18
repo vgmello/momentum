@@ -79,6 +79,7 @@
         <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.12.0"/>
         <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.12.0"/>
         <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.12.0"/>
+        <!-- Note: Using prerelease version as stable release not available for gRPC client instrumentation -->
         <PackageVersion Include="OpenTelemetry.Instrumentation.GrpcNetClient" Version="1.12.0-beta.1"/>
         <PackageVersion Include="Confluent.Kafka.Extensions.OpenTelemetry" Version="0.4.0"/>
         <PackageVersion Include="OrleansDashboard" Version="8.2.0"/>

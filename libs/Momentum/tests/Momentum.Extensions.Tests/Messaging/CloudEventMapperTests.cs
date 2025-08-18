@@ -209,13 +209,15 @@ public class CloudEventMapperTests
 
     private static Message<string, byte[]> CreateCloudEventMessage()
     {
-        var headers = new Headers();
-        headers.Add("ce_specversion", Encoding.UTF8.GetBytes("1.0"));
-        headers.Add("ce_id", Encoding.UTF8.GetBytes("123e4567-e89b-12d3-a456-426614174000"));
-        headers.Add("ce_type", Encoding.UTF8.GetBytes("TestEvent"));
-        headers.Add("ce_source", Encoding.UTF8.GetBytes("urn:momentum:test-service"));
-        headers.Add("ce_datacontenttype", Encoding.UTF8.GetBytes("application/json"));
-        headers.Add("ce_time", Encoding.UTF8.GetBytes("2024-01-15T10:30:00Z"));
+        var headers = new Headers
+        {
+            { "ce_specversion", Encoding.UTF8.GetBytes("1.0") },
+            { "ce_id", Encoding.UTF8.GetBytes("123e4567-e89b-12d3-a456-426614174000") },
+            { "ce_type", Encoding.UTF8.GetBytes("TestEvent") },
+            { "ce_source", Encoding.UTF8.GetBytes("urn:momentum:test-service") },
+            { "ce_datacontenttype", Encoding.UTF8.GetBytes("application/json") },
+            { "ce_time", Encoding.UTF8.GetBytes("2024-01-15T10:30:00Z") }
+        };
         
         return new Message<string, byte[]>
         {
