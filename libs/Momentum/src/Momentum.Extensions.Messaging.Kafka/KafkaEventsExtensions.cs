@@ -90,6 +90,7 @@ public class KafkaEventsExtensions(
             if (topicAttribute is null)
             {
                 logger.LogWarning("IntegrationEvent {IntegrationEventType} does not have an EventTopicAttribute", messageType.Name);
+
                 continue;
             }
 
@@ -197,6 +198,7 @@ public class KafkaEventsExtensions(
     private static string GetEnvNameShort(string env)
     {
         var envLower = env.ToLowerInvariant();
+
         return envLower switch
         {
             "development" => "dev",

@@ -5,12 +5,12 @@ using Orleans.Configuration;
 namespace AppDomain.BackOffice.Orleans.Infrastructure.Extensions;
 
 /// <summary>
-/// Provides extension methods for configuring Microsoft Orleans in the application.
+///     Provides extension methods for configuring Microsoft Orleans in the application.
 /// </summary>
 public static class OrleansExtensions
 {
     /// <summary>
-    /// Adds and configures Orleans silo with clustering, grain state persistence, and monitoring.
+    ///     Adds and configures Orleans silo with clustering, grain state persistence, and monitoring.
     /// </summary>
     /// <param name="builder">The host application builder.</param>
     /// <returns>The host application builder for method chaining.</returns>
@@ -48,7 +48,7 @@ public static class OrleansExtensions
     }
 
     /// <summary>
-    /// Maps the Orleans dashboard to the specified path for monitoring and debugging Orleans grains.
+    ///     Maps the Orleans dashboard to the specified path for monitoring and debugging Orleans grains.
     /// </summary>
     /// <param name="app">The web application.</param>
     /// <param name="path">The path to map the dashboard to. Defaults to "/dashboard".</param>

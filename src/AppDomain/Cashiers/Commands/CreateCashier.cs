@@ -7,7 +7,7 @@ using AppDomain.Cashiers.Data;
 namespace AppDomain.Cashiers.Commands;
 
 /// <summary>
-/// Command to create a new cashier in the system.
+///     Command to create a new cashier in the system.
 /// </summary>
 /// <param name="TenantId">Unique identifier for the tenant</param>
 /// <param name="Name">Cashier name</param>
@@ -15,7 +15,7 @@ namespace AppDomain.Cashiers.Commands;
 public record CreateCashierCommand(Guid TenantId, string Name, string Email) : ICommand<Result<Cashier>>;
 
 /// <summary>
-/// Validator for the CreateCashierCommand.
+///     Validator for the CreateCashierCommand.
 /// </summary>
 public class CreateCashierValidator : AbstractValidator<CreateCashierCommand>
 {
@@ -31,7 +31,7 @@ public class CreateCashierValidator : AbstractValidator<CreateCashierCommand>
 }
 
 /// <summary>
-/// Handler for the CreateCashierCommand.
+///     Handler for the CreateCashierCommand.
 /// </summary>
 public static class CreateCashierCommandHandler
 {
@@ -41,7 +41,7 @@ public static class CreateCashierCommandHandler
     public record DbCommand(Data.Entities.Cashier Cashier) : ICommand<Data.Entities.Cashier>;
 
     /// <summary>
-    /// Handles the CreateCashierCommand and returns the created cashier with integration event.
+    ///     Handles the CreateCashierCommand and returns the created cashier with integration event.
     /// </summary>
     /// <param name="command">The create cashier command</param>
     /// <param name="messaging">The message bus for database operations</param>
@@ -60,7 +60,7 @@ public static class CreateCashierCommandHandler
     }
 
     /// <summary>
-    /// Handles the database command for creating a cashier.
+    ///     Handles the database command for creating a cashier.
     /// </summary>
     /// <param name="command">The database command</param>
     /// <param name="db">The database context</param>

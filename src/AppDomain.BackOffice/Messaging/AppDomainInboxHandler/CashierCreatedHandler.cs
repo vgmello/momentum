@@ -5,12 +5,12 @@ using AppDomain.Cashiers.Contracts.IntegrationEvents;
 namespace AppDomain.BackOffice.Messaging.AppDomainInboxHandler;
 
 /// <summary>
-/// Handles cashier created integration events for back office processing.
+///     Handles cashier created integration events for back office processing.
 /// </summary>
 public static class CashierCreatedHandler
 {
     /// <summary>
-    /// Processes a cashier created event by logging the cashier information.
+    ///     Processes a cashier created event by logging the cashier information.
     /// </summary>
     /// <param name="event">The cashier created integration event.</param>
     /// <param name="logger">Logger for tracking event processing.</param>

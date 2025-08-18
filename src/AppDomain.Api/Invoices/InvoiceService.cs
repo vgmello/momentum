@@ -8,12 +8,12 @@ using InvoiceModel = AppDomain.Invoices.Grpc.Models.Invoice;
 namespace AppDomain.Api.Invoices;
 
 /// <summary>
-/// gRPC service for invoice operations including retrieval, creation, cancellation, and payment processing.
+///     gRPC service for invoice operations including retrieval, creation, cancellation, and payment processing.
 /// </summary>
 public class InvoiceService(IMessageBus bus) : InvoicesService.InvoicesServiceBase
 {
     /// <summary>
-    /// Retrieves a specific invoice by its unique identifier.
+    ///     Retrieves a specific invoice by its unique identifier.
     /// </summary>
     /// <param name="request">The gRPC request containing the invoice ID.</param>
     /// <param name="context">The gRPC server call context.</param>
@@ -30,7 +30,7 @@ public class InvoiceService(IMessageBus bus) : InvoicesService.InvoicesServiceBa
     }
 
     /// <summary>
-    /// Retrieves a list of invoices with optional filtering and pagination.
+    ///     Retrieves a list of invoices with optional filtering and pagination.
     /// </summary>
     /// <param name="request">The gRPC request containing filter criteria and pagination settings.</param>
     /// <param name="context">The gRPC server call context.</param>
@@ -49,7 +49,7 @@ public class InvoiceService(IMessageBus bus) : InvoicesService.InvoicesServiceBa
     }
 
     /// <summary>
-    /// Creates a new invoice in the system.
+    ///     Creates a new invoice in the system.
     /// </summary>
     /// <param name="request">The gRPC request containing invoice details like name, amount, currency, and due date.</param>
     /// <param name="context">The gRPC server call context.</param>
@@ -66,7 +66,7 @@ public class InvoiceService(IMessageBus bus) : InvoicesService.InvoicesServiceBa
     }
 
     /// <summary>
-    /// Cancels an existing invoice, preventing further modifications.
+    ///     Cancels an existing invoice, preventing further modifications.
     /// </summary>
     /// <param name="request">The gRPC request containing the invoice ID and version for optimistic concurrency.</param>
     /// <param name="context">The gRPC server call context.</param>
@@ -85,7 +85,7 @@ public class InvoiceService(IMessageBus bus) : InvoicesService.InvoicesServiceBa
     }
 
     /// <summary>
-    /// Marks an invoice as paid with the specified payment amount and date.
+    ///     Marks an invoice as paid with the specified payment amount and date.
     /// </summary>
     /// <param name="request">The gRPC request containing payment details including version, amount, and optional payment date.</param>
     /// <param name="context">The gRPC server call context.</param>
@@ -104,7 +104,7 @@ public class InvoiceService(IMessageBus bus) : InvoicesService.InvoicesServiceBa
     }
 
     /// <summary>
-    /// Simulates a payment for testing purposes, triggering payment processing workflow.
+    ///     Simulates a payment for testing purposes, triggering payment processing workflow.
     /// </summary>
     /// <param name="request">The gRPC request containing payment simulation details including version, amount, currency, method, and reference.</param>
     /// <param name="context">The gRPC server call context.</param>

@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 namespace AppDomain.Api.Invoices.Models;
 
 /// <summary>
-/// Request to mark an invoice as paid with payment details.
+///     Request to mark an invoice as paid with payment details.
 /// </summary>
 /// <param name="Version">The current version of the invoice for optimistic concurrency control.</param>
 /// <param name="AmountPaid">The amount that was paid (required).</param>

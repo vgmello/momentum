@@ -86,7 +86,7 @@ public static class CreateInvoiceCommandHandler
     }
 
     /// <summary>
-    /// Creates a database command from the create invoice command.
+    ///     Creates a database command from the create invoice command.
     /// </summary>
     /// <param name="command">The create invoice command</param>
     /// <returns>A database command with the invoice entity</returns>

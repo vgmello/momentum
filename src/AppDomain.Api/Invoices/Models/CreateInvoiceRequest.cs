@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 namespace AppDomain.Api.Invoices.Models;
 
 /// <summary>
-/// Request to create a new invoice in the system.
+///     Request to create a new invoice in the system.
 /// </summary>
 /// <param name="Name">The name or description of the invoice.</param>
 /// <param name="Amount">The invoice amount (required).</param>

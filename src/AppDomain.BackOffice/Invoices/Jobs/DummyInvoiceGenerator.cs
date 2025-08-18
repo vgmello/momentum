@@ -6,14 +6,14 @@ using AppDomain.Invoices.Contracts.Models;
 namespace AppDomain.BackOffice.Invoices.Jobs;
 
 /// <summary>
-/// Background service that generates dummy invoice paid events for testing and demonstration purposes.
-/// Publishes fake invoice events at regular intervals to simulate invoice processing activity.
+///     Background service that generates dummy invoice paid events for testing and demonstration purposes.
+///     Publishes fake invoice events at regular intervals to simulate invoice processing activity.
 /// </summary>
 /// <param name="bus">The message bus for publishing integration events.</param>
 public class DummyInvoiceGenerator(IMessageBus bus) : BackgroundService
 {
     /// <summary>
-    /// Executes the background job, continuously publishing dummy invoice paid events.
+    ///     Executes the background job, continuously publishing dummy invoice paid events.
     /// </summary>
     /// <param name="stoppingToken">Token to monitor for cancellation requests.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>

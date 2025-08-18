@@ -7,12 +7,12 @@ using AppDomain.Invoices.Queries;
 namespace AppDomain.BackOffice.Messaging.AppDomainInboxHandler;
 
 /// <summary>
-/// Handles payment received integration events by marking invoices as paid.
+///     Handles payment received integration events by marking invoices as paid.
 /// </summary>
 public static class PaymentReceivedHandler
 {
     /// <summary>
-    /// Processes a payment received event by retrieving the associated invoice and marking it as paid.
+    ///     Processes a payment received event by retrieving the associated invoice and marking it as paid.
     /// </summary>
     /// <param name="event">The payment received integration event containing payment details.</param>
     /// <param name="messaging">Message bus for executing commands and queries.</param>

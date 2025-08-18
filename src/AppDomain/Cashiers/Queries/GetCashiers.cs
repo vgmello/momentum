@@ -5,7 +5,7 @@ using Momentum.Extensions.Abstractions.Dapper;
 namespace AppDomain.Cashiers.Queries;
 
 /// <summary>
-/// Query to retrieve a paginated list of cashiers for a specific tenant.
+///     Query to retrieve a paginated list of cashiers for a specific tenant.
 /// </summary>
 /// <param name="TenantId">Unique identifier for the tenant</param>
 /// <param name="Offset">Number of records to skip for pagination (default: 0)</param>
@@ -13,7 +13,7 @@ namespace AppDomain.Cashiers.Queries;
 public record GetCashiersQuery(Guid TenantId, int Offset = 0, int Limit = 1000) : IQuery<IEnumerable<GetCashiersQuery.Result>>
 {
     /// <summary>
-    /// Represents a cashier result with essential information.
+    ///     Represents a cashier result with essential information.
     /// </summary>
     /// <param name="TenantId">Unique identifier for the tenant</param>
     /// <param name="CashierId">Unique identifier for the cashier</param>
@@ -23,7 +23,7 @@ public record GetCashiersQuery(Guid TenantId, int Offset = 0, int Limit = 1000) 
 }
 
 /// <summary>
-/// Handler for the GetCashiersQuery that retrieves cashiers using database functions.
+///     Handler for the GetCashiersQuery that retrieves cashiers using database functions.
 /// </summary>
 public static partial class GetCashiersQueryHandler
 {
@@ -43,7 +43,7 @@ public static partial class GetCashiersQueryHandler
     public partial record DbQuery(Guid TenantId, int Limit, int Offset) : IQuery<IEnumerable<Data.Entities.Cashier>>;
 
     /// <summary>
-    /// Handles the GetCashiersQuery by executing a database function and transforming results.
+    ///     Handles the GetCashiersQuery by executing a database function and transforming results.
     /// </summary>
     /// <param name="query">The get cashiers query</param>
     /// <param name="messaging">Message bus for executing database queries</param>

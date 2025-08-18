@@ -8,13 +8,13 @@ using CashierModel = AppDomain.Cashiers.Grpc.Models.Cashier;
 namespace AppDomain.Api.Cashiers;
 
 /// <summary>
-/// gRPC service for managing cashiers.
+///     gRPC service for managing cashiers.
 /// </summary>
 /// <param name="bus">The message bus for command and query handling</param>
 public class CashierService(IMessageBus bus) : CashiersService.CashiersServiceBase
 {
     /// <summary>
-    /// Gets a cashier by its identifier.
+    ///     Gets a cashier by its identifier.
     /// </summary>
     /// <param name="request">The get cashier request containing the cashier identifier</param>
     /// <param name="context">The server call context</param>
@@ -31,7 +31,7 @@ public class CashierService(IMessageBus bus) : CashiersService.CashiersServiceBa
     }
 
     /// <summary>
-    /// Gets a list of cashiers with pagination.
+    ///     Gets a list of cashiers with pagination.
     /// </summary>
     /// <param name="request">The get cashiers request containing pagination parameters</param>
     /// <param name="context">The server call context</param>
@@ -50,7 +50,7 @@ public class CashierService(IMessageBus bus) : CashiersService.CashiersServiceBa
     }
 
     /// <summary>
-    /// Creates a new cashier.
+    ///     Creates a new cashier.
     /// </summary>
     /// <param name="request">The create cashier request containing cashier details</param>
     /// <param name="context">The server call context</param>
@@ -67,7 +67,7 @@ public class CashierService(IMessageBus bus) : CashiersService.CashiersServiceBa
     }
 
     /// <summary>
-    /// Updates an existing cashier.
+    ///     Updates an existing cashier.
     /// </summary>
     /// <param name="request">The update cashier request containing updated cashier details and identifier</param>
     /// <param name="context">The server call context</param>
@@ -84,7 +84,7 @@ public class CashierService(IMessageBus bus) : CashiersService.CashiersServiceBa
     }
 
     /// <summary>
-    /// Deletes a cashier.
+    ///     Deletes a cashier.
     /// </summary>
     /// <param name="request">The delete cashier request containing the cashier identifier</param>
     /// <param name="context">The server call context</param>

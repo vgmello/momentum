@@ -160,7 +160,7 @@ public class InvoiceGrain : Grain, IInvoiceGrain
     }
 
     /// <summary>
-    /// Publishes an integration event to the messaging infrastructure.
+    ///     Publishes an integration event to the messaging infrastructure.
     /// </summary>
     /// <typeparam name="T">The type of integration event to publish</typeparam>
     /// <param name="integrationEvent">The integration event to publish</param>

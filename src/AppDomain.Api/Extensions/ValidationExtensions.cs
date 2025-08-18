@@ -16,8 +16,8 @@ public static class ValidationExtensions
     /// <param name="context">The HTTP context to extract the tenant ID from.</param>
     /// <returns>The tenant ID. Currently returns a placeholder value until proper tenant resolution is implemented.</returns>
     /// <remarks>
-    /// This is a placeholder implementation. In production scenarios, this would extract the tenant ID 
-    /// from JWT claims, request headers, route parameters, or other authentication mechanisms.
+    ///     This is a placeholder implementation. In production scenarios, this would extract the tenant ID
+    ///     from JWT claims, request headers, route parameters, or other authentication mechanisms.
     /// </remarks>
     public static Guid GetTenantId(this HttpContext context)
     {

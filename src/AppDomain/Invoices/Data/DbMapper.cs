@@ -6,13 +6,13 @@ using Riok.Mapperly.Abstractions;
 namespace AppDomain.Invoices.Data;
 
 /// <summary>
-/// Provides mapping functionality between database entities and domain models for invoices.
+///     Provides mapping functionality between database entities and domain models for invoices.
 /// </summary>
 [Mapper]
 public static partial class DbMapper
 {
     /// <summary>
-    /// Converts an invoice database entity to a domain model.
+    ///     Converts an invoice database entity to a domain model.
     /// </summary>
     /// <param name="invoice">The invoice database entity to convert.</param>
     /// <returns>The converted invoice domain model.</returns>

@@ -30,4 +30,4 @@ namespace AppDomain.Cashiers.Contracts.IntegrationEvents;
 public record CashierUpdated(
     [PartitionKey] Guid TenantId,
     Cashier Cashier
-) : IDistributedEvent;
+);

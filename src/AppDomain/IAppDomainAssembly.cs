@@ -3,6 +3,6 @@
 namespace AppDomain;
 
 /// <summary>
-/// Marker interface used to identify and reference the AppDomain assembly.
+///     Marker interface used to identify and reference the AppDomain assembly.
 /// </summary>
 public interface IAppDomainAssembly;

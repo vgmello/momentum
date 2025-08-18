@@ -3,21 +3,21 @@
 namespace AppDomain.AppHost.Extensions;
 
 /// <summary>
-/// Provides extension methods for configuring Liquibase database migrations in .NET Aspire orchestration.
+///     Provides extension methods for configuring Liquibase database migrations in .NET Aspire orchestration.
 /// </summary>
 public static class LiquibaseExtensions
 {
     /// <summary>
-    /// Adds a Liquibase container resource for running database migrations in Aspire orchestration.
+    ///     Adds a Liquibase container resource for running database migrations in Aspire orchestration.
     /// </summary>
     /// <param name="builder">The distributed application builder.</param>
     /// <param name="dbServerResource">The database server resource that migrations will target.</param>
     /// <param name="dbPassword">The database password parameter resource.</param>
     /// <returns>A container resource builder configured to run Liquibase migrations.</returns>
     /// <remarks>
-    /// This method configures a Liquibase container that will run migrations for both the 
-    /// service_bus and app_domain databases using changelog files from the mounted volume.
-    /// The container waits for the database server to be ready before executing migrations.
+    ///     This method configures a Liquibase container that will run migrations for both the
+    ///     service_bus and app_domain databases using changelog files from the mounted volume.
+    ///     The container waits for the database server to be ready before executing migrations.
     /// </remarks>
     public static IResourceBuilder<ContainerResource> AddLiquibaseMigrations(
         this IDistributedApplicationBuilder builder,

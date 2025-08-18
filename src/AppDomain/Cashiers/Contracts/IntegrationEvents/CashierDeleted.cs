@@ -32,4 +32,4 @@ public record CashierDeleted(
     [PartitionKey] Guid TenantId,
     Guid CashierId,
     DateTime DeletedAt
-) : IDistributedEvent;
+);

@@ -6,21 +6,21 @@ using System.Net.Sockets;
 namespace AppDomain.AppHost.Extensions;
 
 /// <summary>
-/// Provides extension methods for integrating launch profile endpoint configurations with .NET Aspire orchestration.
+///     Provides extension methods for integrating launch profile endpoint configurations with .NET Aspire orchestration.
 /// </summary>
 public static class LaunchProfileExtensions
 {
     private const string KestrelEndpointsPrefix = "KESTREL__ENDPOINTS__";
 
     /// <summary>
-    /// Configures Kestrel endpoints from launch profile settings for a project resource in Aspire orchestration.
+    ///     Configures Kestrel endpoints from launch profile settings for a project resource in Aspire orchestration.
     /// </summary>
     /// <param name="builder">The project resource builder to configure.</param>
     /// <returns>The configured project resource builder.</returns>
     /// <remarks>
-    /// This method extracts Kestrel endpoint configurations from launch profile environment variables,
-    /// maps them to Aspire endpoint annotations, and sets up the appropriate Kestrel configuration
-    /// environment variables for the project.
+    ///     This method extracts Kestrel endpoint configurations from launch profile environment variables,
+    ///     maps them to Aspire endpoint annotations, and sets up the appropriate Kestrel configuration
+    ///     environment variables for the project.
     /// </remarks>
     public static IResourceBuilder<ProjectResource> WithKestrelLaunchProfileEndpoints(this IResourceBuilder<ProjectResource> builder)
     {
@@ -82,7 +82,7 @@ public static class LaunchProfileExtensions
     }
 
     /// <summary>
-    /// Extracts Kestrel endpoint configurations from launch profile environment variables.
+    ///     Extracts Kestrel endpoint configurations from launch profile environment variables.
     /// </summary>
     /// <param name="envContext">The environment callback context containing environment variables.</param>
     /// <returns>A dictionary mapping endpoint names to their configuration settings.</returns>
@@ -129,17 +129,17 @@ public static class LaunchProfileExtensions
 
 
     /// <summary>
-    /// Represents a Kestrel endpoint configuration from launch settings.
+    ///     Represents a Kestrel endpoint configuration from launch settings.
     /// </summary>
     private sealed record KestrelLaunchSettingsEndpoint
     {
         /// <summary>
-        /// Gets or sets the binding address for the endpoint.
+        ///     Gets or sets the binding address for the endpoint.
         /// </summary>
         public BindingAddress? Url { get; set; }
 
         /// <summary>
-        /// Gets or sets the protocols supported by the endpoint (e.g., "http", "https", "http2").
+        ///     Gets or sets the protocols supported by the endpoint (e.g., "http", "https", "http2").
         /// </summary>
         public string? Protocols { get; set; }
     }

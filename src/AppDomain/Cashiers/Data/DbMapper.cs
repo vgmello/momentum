@@ -6,13 +6,13 @@ using Riok.Mapperly.Abstractions;
 namespace AppDomain.Cashiers.Data;
 
 /// <summary>
-/// Provides mapping functionality between database entities and domain models for Cashiers.
+///     Provides mapping functionality between database entities and domain models for Cashiers.
 /// </summary>
 [Mapper]
 public static partial class DbMapper
 {
     /// <summary>
-    /// Converts a Cashier database entity to a domain model.
+    ///     Converts a Cashier database entity to a domain model.
     /// </summary>
     /// <param name="cashier">The Cashier database entity to convert.</param>
     /// <returns>A Cashier domain model.</returns>
@@ -22,7 +22,7 @@ public static partial class DbMapper
     public static partial Cashier ToModel(this Entities.Cashier cashier);
 
     /// <summary>
-    /// Safely converts a nullable string to a non-null string.
+    ///     Safely converts a nullable string to a non-null string.
     /// </summary>
     /// <param name="value">The nullable string value.</param>
     /// <returns>The original value or an empty string if null.</returns>

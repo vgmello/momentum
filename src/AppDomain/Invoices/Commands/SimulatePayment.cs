@@ -7,7 +7,7 @@ using Momentum.Extensions;
 namespace AppDomain.Invoices.Commands;
 
 /// <summary>
-/// Command to simulate a payment for testing purposes.
+///     Command to simulate a payment for testing purposes.
 /// </summary>
 /// <param name="TenantId">Unique identifier for the tenant</param>
 /// <param name="InvoiceId">Unique identifier for the invoice</param>
@@ -27,7 +27,7 @@ public record SimulatePaymentCommand(
 ) : ICommand<Result<bool>>;
 
 /// <summary>
-/// Validator for the SimulatePaymentCommand.
+///     Validator for the SimulatePaymentCommand.
 /// </summary>
 public class SimulatePaymentValidator : AbstractValidator<SimulatePaymentCommand>
 {
@@ -44,12 +44,12 @@ public class SimulatePaymentValidator : AbstractValidator<SimulatePaymentCommand
 }
 
 /// <summary>
-/// Handler for the SimulatePaymentCommand.
+///     Handler for the SimulatePaymentCommand.
 /// </summary>
 public static class SimulatePaymentCommandHandler
 {
     /// <summary>
-    /// Handles the SimulatePaymentCommand and generates a payment received event for testing.
+    ///     Handles the SimulatePaymentCommand and generates a payment received event for testing.
     /// </summary>
     /// <param name="command">The simulate payment command</param>
     /// <returns>A tuple containing the success result and payment received event</returns>

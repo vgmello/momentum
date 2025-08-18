@@ -54,7 +54,10 @@ public class InvoiceOrleansService
     /// <param name="invoiceId">The unique identifier of the invoice to process payment for.</param>
     /// <param name="amount">The payment amount to process.</param>
     /// <param name="paymentMethod">The payment method used for the transaction.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains <c>true</c> if the payment was processed successfully; otherwise, <c>false</c>.</returns>
+    /// <returns>
+    ///     A task that represents the asynchronous operation. The task result contains <c>true</c> if the payment was processed successfully;
+    ///     otherwise, <c>false</c>.
+    /// </returns>
     public async Task<bool> ProcessPaymentAsync(Guid invoiceId, decimal amount, string paymentMethod)
     {
         var grain = _grainFactory.GetGrain<IInvoiceGrain>(invoiceId);

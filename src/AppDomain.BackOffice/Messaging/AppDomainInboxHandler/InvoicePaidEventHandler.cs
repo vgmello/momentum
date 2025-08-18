@@ -5,12 +5,12 @@ using AppDomain.Invoices.Contracts.IntegrationEvents;
 namespace AppDomain.BackOffice.Messaging.AppDomainInboxHandler;
 
 /// <summary>
-/// Handles invoice paid integration events for back office processing.
+///     Handles invoice paid integration events for back office processing.
 /// </summary>
 public static class InvoicePaidEventHandler
 {
     /// <summary>
-    /// Processes an invoice paid event by executing post-payment business logic.
+    ///     Processes an invoice paid event by executing post-payment business logic.
     /// </summary>
     /// <param name="message">The invoice paid integration event containing payment details.</param>
     /// <param name="logger">Logger for tracking event processing.</param>
