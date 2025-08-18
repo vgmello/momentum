@@ -96,7 +96,7 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
           configuration: Release
-          project-path: libs/Momentum/src
+          build-target: libs/Momentum/Momentum.slnx
 
       - name: Calculate pre-release version
         if: steps.options.outputs.prerelease == 'true'

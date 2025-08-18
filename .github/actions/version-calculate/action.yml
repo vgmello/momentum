@@ -100,7 +100,9 @@ runs:
       shell: bash
       run: |
         # Find latest regular release tag
+        set +o pipefail
         PREV_TAG=$(git tag -l "v*.*.*" --sort=-v:refname | grep -v 'pre' | head -1)
+        set -o pipefail
 
         if [ -z "$PREV_TAG" ]; then
           echo "No previous regular release found"

@@ -34,6 +34,7 @@ runs:
         OUTPUT_FILE="${{ inputs.output-file }}"
         
         # Find the appropriate base for changelog
+        set +o pipefail
         if [ "$RELEASE_TYPE" == "prerelease" ]; then
           # For pre-releases, find last regular release
           LAST_RELEASE=$(git tag -l "v*.*.*" --sort=-v:refname | grep -v 'pre' | head -1)
@@ -43,6 +44,7 @@ runs:
           LAST_RELEASE=$(git tag -l "v*.*.*" --sort=-v:refname | grep -v 'pre' | head -1)
           CHANGELOG_TITLE="Changes"
         fi
+        set -o pipefail
         
         # Generate commit list
         if [ -n "$LAST_RELEASE" ]; then
@@ -75,9 +77,9 @@ runs:
         
         ## Installation
         
-        \`\`\`bash
+        ```bash
         dotnet add package Momentum.Extensions --version ${VERSION}
-        \`\`\`
+        ```
         EOF
         else
           cat > "$OUTPUT_FILE" << EOF
