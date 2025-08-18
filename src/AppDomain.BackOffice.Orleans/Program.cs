@@ -23,7 +23,6 @@ builder.AddKafkaMessagingExtensions();
 //#endif
 builder.AddOrleans();
 
-// Application Services
 builder.AddApplicationServices();
 
 var app = builder.Build();
