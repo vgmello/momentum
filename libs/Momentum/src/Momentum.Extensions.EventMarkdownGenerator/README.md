@@ -46,7 +46,7 @@ dotnet tool install --global Momentum.Extensions.EventMarkdownGenerator
 Use the CLI tool:
 
 ```bash
-events-docsgen --assemblies "path/to/your.dll" --output "./docs/events/"
+events-docsgen generate --assemblies "path/to/your.dll" --output "./docs/events/"
 ```
 
 ## Usage
@@ -65,9 +65,15 @@ After adding the NuGet package, documentation is generated automatically during 
 
 ### Command Line Interface
 
-The CLI tool provides several options for customizing documentation generation:
+The CLI tool provides two commands for documentation generation and template management:
+
+#### Generate Command (Default)
+
+Generate markdown documentation from event assemblies:
 
 ```bash
+events-docsgen generate [OPTIONS]
+# or simply (generate is the default command)
 events-docsgen [OPTIONS]
 ```
 
@@ -90,10 +96,41 @@ events-docsgen [OPTIONS]
 events-docsgen --assemblies "MyApp.dll"
 
 # Multiple assemblies with custom output
-events-docsgen --assemblies "MyApp.dll,MyApp.Contracts.dll" --output "./documentation/events/"
+events-docsgen generate --assemblies "MyApp.dll,MyApp.Contracts.dll" --output "./documentation/events/"
 
 # With custom templates and verbose output
 events-docsgen --assemblies "MyApp.dll" --templates "./custom-templates/" --verbose
+```
+
+#### Copy Templates Command
+
+Copy default templates to a local directory for customization:
+
+```bash
+events-docsgen copy-templates [OPTIONS]
+```
+
+**Options:**
+
+-   `-o|--output <OUTPUT>`: Output directory for template files (default: `./templates`)
+-   `-f|--force`: Overwrite existing template files if they exist
+
+**Examples:**
+
+```bash
+# Copy templates to default location
+events-docsgen copy-templates
+
+# Copy to custom location
+events-docsgen copy-templates --output "./my-templates"
+
+# Overwrite existing templates
+events-docsgen copy-templates --force
+
+# Use custom templates for generation
+events-docsgen copy-templates --output "./my-templates"
+# Edit the templates in ./my-templates/ as needed
+events-docsgen generate --assemblies "MyApp.dll" --templates "./my-templates/"
 ```
 
 ## Configuration
@@ -158,7 +195,20 @@ Complex types referenced by events get their own schema documentation:
 
 ## Template Customization
 
-The tool uses the Liquid templating engine with embedded default templates. You can customize the output by providing your own templates.
+The tool uses the Liquid templating engine with default templates included as content files. You can customize the output by providing your own templates.
+
+### Getting Started with Custom Templates
+
+The easiest way to customize templates is to copy the default templates and modify them:
+
+```bash
+# Copy default templates to a local directory
+events-docsgen copy-templates --output "./my-templates"
+
+# Edit the templates as needed
+# Then use them for generation
+events-docsgen generate --assemblies "MyApp.dll" --templates "./my-templates/"
+```
 
 ### Template Variables
 
@@ -213,12 +263,24 @@ The following variables are available in schema templates:
 
 Override the default templates by creating custom templates and specifying the templates directory:
 
+**Method 1: Copy and Modify Default Templates (Recommended)**
+
+```bash
+# Copy default templates
+events-docsgen copy-templates --output "./my-templates"
+# Modify the templates as needed
+# Use them for generation
+events-docsgen generate --assemblies "MyApp.dll" --templates "./my-templates/"
+```
+
+**Method 2: Create Templates from Scratch**
+
 1. Create a directory for your custom templates
 2. Add `event.liquid` and/or `schema.liquid` files
 3. Use the `--templates` option to specify your custom templates directory
 
 ```bash
-events-docsgen --assemblies "MyApp.dll" --templates "./my-templates/"
+events-docsgen generate --assemblies "MyApp.dll" --templates "./my-templates/"
 ```
 
 ### Liquid Syntax Basics
