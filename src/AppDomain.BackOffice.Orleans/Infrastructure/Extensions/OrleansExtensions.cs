@@ -24,15 +24,6 @@ public static class OrleansExtensions
             builder.AddKeyedAzureBlobServiceClient("OrleansGrainState");
         }
 
-        builder.Services
-            .AddOpenTelemetry()
-            .WithMetrics(opt => opt.AddMeter("Microsoft.Orleans"))
-            .WithTracing(tracing =>
-            {
-                tracing.AddSource("Microsoft.Orleans.Runtime");
-                tracing.AddSource("Microsoft.Orleans.Application");
-            });
-
         builder.UseOrleans(siloBuilder =>
         {
             if (useLocalCluster)
@@ -48,6 +39,15 @@ public static class OrleansExtensions
                 options.Host = "*";
             });
         });
+
+        builder.Services
+            .AddOpenTelemetry()
+            .WithMetrics(opt => opt.AddMeter("Microsoft.Orleans"))
+            .WithTracing(tracing =>
+            {
+                tracing.AddSource("Microsoft.Orleans.Runtime");
+                tracing.AddSource("Microsoft.Orleans.Application");
+            });
 
         return builder;
     }

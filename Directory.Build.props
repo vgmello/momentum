@@ -24,4 +24,9 @@
         </Content>
     </ItemGroup>
 
+    <!--#if (false) -->
+    <PropertyGroup>
+        <DefineConstants>USE_PGSQL;USE_LIQUIBASE;USE_KAFKA;INCLUDE_ORLEANS;INCLUDE_API;USE_DB;USE_KAFKA;INCLUDE_DOCS;INCLUDE_BACK_OFFICE</DefineConstants>
+    </PropertyGroup>
+    <!--#endif -->
 </Project>

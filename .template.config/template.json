@@ -254,11 +254,21 @@
       "valueTransform": "kebab-case",
       "replaces": "app-domain",
       "fileRename": "app-domain"
+    },
+    "appDomainCamelCase": {
+      "type": "derived",
+      "valueSource": "name",
+      "valueTransform": "camelCase",
+      "replaces": "appDomain",
+      "fileRename": "appDomain"
     }
   },
   "forms": {
     "kebab-case": {
       "identifier": "kebabCase"
+    },
+    "camelCase": {
+      "identifier": "firstLowerCaseInvariant"
     },
     "dash-to-underscore": {
       "identifier": "replace",
