@@ -30,14 +30,14 @@ public class AppDomainDb : DataConnection
     {
         // Configure snake_case naming convention
         MappingSchema.SetNamingConvention(new SnakeCaseNamingConvention());
-        
+
         // Configure enum mappings
         MappingSchema.SetDefaultFromEnumType<InvoiceStatus>(typeof(int));
         MappingSchema.SetDefaultFromEnumType<CashierStatus>(typeof(int));
-        
+
         // Configure JSON converters for complex types
         SetupJsonConverters();
-        
+
         // Configure audit field behavior
         SetupAuditFields();
     }
@@ -53,18 +53,18 @@ public class AppDomainDb : DataConnection
         // JSON column support for complex types
         MappingSchema.SetConverter<InvoiceMetadata, string>(
             metadata => JsonSerializer.Serialize(metadata, JsonSerializerOptions.Default));
-            
+
         MappingSchema.SetConverter<string, InvoiceMetadata>(
-            json => string.IsNullOrEmpty(json) 
-                ? null 
+            json => string.IsNullOrEmpty(json)
+                ? null
                 : JsonSerializer.Deserialize<InvoiceMetadata>(json, JsonSerializerOptions.Default));
 
         MappingSchema.SetConverter<Dictionary<string, object>, string>(
             dict => JsonSerializer.Serialize(dict, JsonSerializerOptions.Default));
-            
+
         MappingSchema.SetConverter<string, Dictionary<string, object>>(
-            json => string.IsNullOrEmpty(json) 
-                ? new Dictionary<string, object>() 
+            json => string.IsNullOrEmpty(json)
+                ? new Dictionary<string, object>()
                 : JsonSerializer.Deserialize<Dictionary<string, object>>(json, JsonSerializerOptions.Default) ?? new());
     }
 
@@ -88,13 +88,13 @@ builder.AddServiceDefaults();
 builder.Services.AddLinqToDbContext<AppDomainDb>((provider, options) =>
 {
     var connectionString = builder.Configuration.GetConnectionString("AppDomain")!;
-    
+
     options
         .UsePostgreSQL(connectionString)
         .UseDefaultLogging(provider)
         .UseMappingSchema(CreateMappingSchema())
         .UseConnectionFactory<AppDomainDb>(
-            connectionString, 
+            connectionString,
             PostgreSQLTools.GetDataProvider());
 });
 
@@ -109,17 +109,17 @@ builder.Services.Configure<ConnectionPoolSettings>(settings =>
 static MappingSchema CreateMappingSchema()
 {
     var mappingSchema = new MappingSchema();
-    
+
     // Data type mappings
     mappingSchema.SetDataType<Guid>(DataType.Guid);
     mappingSchema.SetDataType<DateTime>(DataType.DateTime2);
     mappingSchema.SetDataType<DateOnly>(DataType.Date);
     mappingSchema.SetDataType<TimeOnly>(DataType.Time);
     mappingSchema.SetDataType<decimal>(DataType.Decimal);
-    
+
     // Configure snake_case naming
     mappingSchema.SetNamingConvention(new SnakeCaseNamingConvention());
-    
+
     return mappingSchema;
 }
 ```
@@ -292,7 +292,7 @@ public class AppDomainDbFactory : IAppDomainDbFactory
     public async Task<AppDomainDb> CreateConnectionAsync(CancellationToken cancellationToken = default)
     {
         var db = CreateConnection();
-        
+
         // Test connection
         try
         {
@@ -331,15 +331,15 @@ public class DatabaseHealthCheck : IHealthCheck
         try
         {
             using var db = await _dbFactory.CreateConnectionAsync(cancellationToken);
-            
+
             // Execute a simple query to test connectivity
             var result = await db.QueryAsync<int>("SELECT 1", cancellationToken);
-            
+
             if (result.First() == 1)
             {
                 return HealthCheckResult.Healthy("Database connection is healthy");
             }
-            
+
             return HealthCheckResult.Degraded("Database connection returned unexpected result");
         }
         catch (Exception ex)
@@ -369,8 +369,8 @@ public static class CashierDataAccess
         Cashier cashier,
         CancellationToken cancellationToken = default)
     {
-        cashier = cashier with 
-        { 
+        cashier = cashier with
+        {
             CreatedDateUtc = DateTime.UtcNow,
             UpdatedDateUtc = DateTime.UtcNow
         };
@@ -432,8 +432,8 @@ public static class CashierDataAccess
         CancellationToken cancellationToken = default)
     {
         return await db.Cashiers
-            .Where(c => c.TenantId == tenantId && 
-                       c.CashierId == cashierId && 
+            .Where(c => c.TenantId == tenantId &&
+                       c.CashierId == cashierId &&
                        c.Version == version)
             .UpdateWithOutputAsync(
                 _ => new Cashier
@@ -498,13 +498,13 @@ public static class AdvancedQueryPatterns
                         Email = c.Email,
                         Department = c.Department,
                         TotalInvoices = db.Invoices
-                            .Where(i => i.TenantId == tenantId && 
+                            .Where(i => i.TenantId == tenantId &&
                                        i.CashierId == c.CashierId &&
                                        (fromDate == null || i.CreatedDateUtc.Date >= fromDate.Value.ToDateTime(TimeOnly.MinValue)) &&
                                        (toDate == null || i.CreatedDateUtc.Date <= toDate.Value.ToDateTime(TimeOnly.MinValue)))
                             .Count(),
                         TotalAmount = db.Invoices
-                            .Where(i => i.TenantId == tenantId && 
+                            .Where(i => i.TenantId == tenantId &&
                                        i.CashierId == c.CashierId &&
                                        i.Status == InvoiceStatus.Paid &&
                                        (fromDate == null || i.CreatedDateUtc.Date >= fromDate.Value.ToDateTime(TimeOnly.MinValue)) &&
@@ -526,7 +526,7 @@ public static class AdvancedQueryPatterns
         CancellationToken cancellationToken = default)
     {
         var query = from i in db.Invoices
-                    where i.TenantId == tenantId && 
+                    where i.TenantId == tenantId &&
                           i.CreatedDateUtc.Year == year &&
                           i.Status != InvoiceStatus.Cancelled
                     group i by new { i.CreatedDateUtc.Month } into g
@@ -555,7 +555,7 @@ public static class AdvancedQueryPatterns
         CancellationToken cancellationToken = default)
     {
         return await db.Cashiers
-            .Where(c => c.TenantId == tenantId && 
+            .Where(c => c.TenantId == tenantId &&
                        c.Metadata != null &&
                        Sql.Property<string>(c.Metadata, metadataKey) == metadataValue)
             .ToListAsync(cancellationToken);
@@ -621,7 +621,7 @@ public static class TransactionalOperations
         CancellationToken cancellationToken)
     {
         // All operations below run in the same transaction
-        
+
         // 1. Verify cashier exists
         var cashier = await db.GetCashierAsync(command.TenantId, command.CashierId, cancellationToken);
         if (cashier == null)
@@ -675,7 +675,7 @@ public static class ManualTransactionExample
         CancellationToken cancellationToken)
     {
         using var transaction = await db.BeginTransactionAsync(cancellationToken);
-        
+
         try
         {
             var results = new List<InvoiceProcessResult>();
@@ -696,7 +696,7 @@ public static class ManualTransactionExample
                 };
 
                 var insertedInvoice = await db.Invoices.InsertWithOutputAsync(invoice, token: cancellationToken);
-                
+
                 results.Add(new InvoiceProcessResult
                 {
                     InvoiceId = insertedInvoice.InvoiceId,
@@ -711,7 +711,7 @@ public static class ManualTransactionExample
                 {
                     await transaction.CommitAsync(cancellationToken);
                     transaction = await db.BeginTransactionAsync(cancellationToken);
-                    
+
                     logger.LogInformation("Processed batch of 100 invoices, total: {Total}", totalProcessed);
                 }
             }
@@ -730,7 +730,7 @@ public static class ManualTransactionExample
         {
             await transaction.RollbackAsync(cancellationToken);
             logger.LogError(ex, "Batch processing failed, transaction rolled back");
-            
+
             return Result<BatchProcessResult>.Failure($"Batch processing failed: {ex.Message}");
         }
     }
@@ -784,12 +784,12 @@ public static class IndexingGuidance
 {
     /*
     Recommended indexes for the entities above:
-    
+
     -- Cashiers table
     CREATE INDEX IX_cashiers_tenant_id ON "AppDomain".cashiers(tenant_id);
     CREATE INDEX IX_cashiers_tenant_department ON "AppDomain".cashiers(tenant_id, department) WHERE is_active = true;
     CREATE INDEX IX_cashiers_email ON "AppDomain".cashiers(email) WHERE email IS NOT NULL;
-    
+
     -- Invoices table
     CREATE INDEX IX_invoices_tenant_id ON "AppDomain".invoices(tenant_id);
     CREATE INDEX IX_invoices_cashier_id ON "AppDomain".invoices(tenant_id, cashier_id);
@@ -797,7 +797,7 @@ public static class IndexingGuidance
     CREATE INDEX IX_invoices_due_date ON "AppDomain".invoices(due_date) WHERE due_date IS NOT NULL;
     CREATE INDEX IX_invoices_created_date ON "AppDomain".invoices(created_date_utc DESC);
     CREATE INDEX IX_invoices_invoice_number ON "AppDomain".invoices(tenant_id, invoice_number);
-    
+
     -- JSON indexes for metadata queries
     CREATE INDEX IX_invoices_metadata_gin ON "AppDomain".invoices USING GIN (metadata);
     CREATE INDEX IX_cashiers_metadata_gin ON "AppDomain".cashiers USING GIN (metadata);
@@ -821,7 +821,7 @@ public static class DatabaseResilience
             baseDelay = TimeSpan.FromMilliseconds(100);
 
         var attempt = 0;
-        
+
         while (true)
         {
             try
@@ -832,7 +832,7 @@ public static class DatabaseResilience
             {
                 attempt++;
                 var delay = TimeSpan.FromMilliseconds(baseDelay.TotalMilliseconds * Math.Pow(2, attempt - 1));
-                
+
                 await Task.Delay(delay, cancellationToken);
             }
         }
@@ -841,7 +841,7 @@ public static class DatabaseResilience
     private static bool IsTransientError(Exception ex)
     {
         return ex is Npgsql.NpgsqlException npgsqlEx &&
-               (npgsqlEx.IsTransient || 
+               (npgsqlEx.IsTransient ||
                 npgsqlEx.SqlState == "40001" || // deadlock_detected
                 npgsqlEx.SqlState == "40P01" || // deadlock_detected
                 npgsqlEx.SqlState == "53300");  // too_many_connections
@@ -916,8 +916,8 @@ public static class SecurityPatterns
     {
         // Use parameterized queries for raw SQL
         var sql = @"
-            SELECT * FROM ""AppDomain"".invoices 
-            WHERE tenant_id = @tenantId 
+            SELECT * FROM ""AppDomain"".invoices
+            WHERE tenant_id = @tenantId
             AND (invoice_number ILIKE @searchPattern OR description ILIKE @searchPattern)
             ORDER BY created_date_utc DESC";
 
@@ -941,7 +941,7 @@ public async Task GetCashierAsync_ValidIds_ReturnsCashier()
     // Arrange
     var tenantId = Guid.NewGuid();
     var cashierId = Guid.NewGuid();
-    
+
     var expectedCashier = new Cashier
     {
         TenantId = tenantId,
@@ -1092,7 +1092,7 @@ public class DatabaseIntegrationTests : IClassFixture<TestDatabaseFixture>
         <createIndex indexName="IX_cashiers_tenant_id" schemaName="AppDomain" tableName="cashiers">
             <column name="tenant_id"/>
         </createIndex>
-        
+
         <createIndex indexName="IX_cashiers_tenant_department" schemaName="AppDomain" tableName="cashiers">
             <column name="tenant_id"/>
             <column name="department"/>
@@ -1142,7 +1142,7 @@ public class DatabaseIntegrationTests : IClassFixture<TestDatabaseFixture>
         <createIndex indexName="IX_invoices_tenant_id" schemaName="AppDomain" tableName="invoices">
             <column name="tenant_id"/>
         </createIndex>
-        
+
         <createIndex indexName="IX_invoices_cashier_id" schemaName="AppDomain" tableName="invoices">
             <column name="tenant_id"/>
             <column name="cashier_id"/>
@@ -1161,7 +1161,7 @@ public class DatabaseIntegrationTests : IClassFixture<TestDatabaseFixture>
 public static class DatabaseObservability
 {
     private static readonly ActivitySource ActivitySource = new("AppDomain.Database");
-    
+
     public static async Task<T> TrackDatabaseOperation<T>(
         string operationName,
         Func<Task<T>> operation,
@@ -1169,7 +1169,7 @@ public static class DatabaseObservability
         Dictionary<string, object>? tags = null)
     {
         using var activity = ActivitySource.StartActivity(operationName);
-        
+
         if (tags != null)
         {
             foreach (var tag in tags)
@@ -1179,20 +1179,20 @@ public static class DatabaseObservability
         }
 
         var stopwatch = Stopwatch.StartNew();
-        
+
         try
         {
             logger.LogDebug("Starting database operation: {OperationName}", operationName);
-            
+
             var result = await operation();
-            
+
             stopwatch.Stop();
             activity?.SetStatus(ActivityStatusCode.Ok);
             activity?.SetTag("db.operation.duration_ms", stopwatch.ElapsedMilliseconds);
-            
-            logger.LogDebug("Database operation completed: {OperationName} in {Duration}ms", 
+
+            logger.LogDebug("Database operation completed: {OperationName} in {Duration}ms",
                 operationName, stopwatch.ElapsedMilliseconds);
-            
+
             return result;
         }
         catch (Exception ex)
@@ -1201,10 +1201,10 @@ public static class DatabaseObservability
             activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
             activity?.SetTag("db.operation.duration_ms", stopwatch.ElapsedMilliseconds);
             activity?.SetTag("db.operation.error", ex.GetType().Name);
-            
-            logger.LogError(ex, "Database operation failed: {OperationName} after {Duration}ms", 
+
+            logger.LogError(ex, "Database operation failed: {OperationName} after {Duration}ms",
                 operationName, stopwatch.ElapsedMilliseconds);
-            
+
             throw;
         }
     }
@@ -1246,7 +1246,7 @@ public static async Task<Cashier> CreateCashierWithTrackingAsync(
 Now that you understand RDBMS integration in Momentum, explore these related topics:
 
 - **[DbCommand Pattern](./database/dbcommand)** - Type-safe database operations with source generation
-- **[Entity Mapping](./database/entity-mapping)** - Advanced entity configuration and relationships  
+- **[Entity Mapping](./database/entity-mapping)** - Advanced entity configuration and relationships
 - **[Transactions](./database/transactions)** - Transaction management and the outbox pattern
 - **[Testing](./testing/)** - Comprehensive database testing strategies
 - **[Performance](./troubleshooting#performance)** - Query optimization and monitoring
