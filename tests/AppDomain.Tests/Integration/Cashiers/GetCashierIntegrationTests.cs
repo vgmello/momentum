@@ -2,7 +2,6 @@
 
 using AppDomain.Cashiers.Grpc;
 using AppDomain.Tests.Integration._Internal;
-using Grpc.Core;
 
 namespace AppDomain.Tests.Integration.Cashiers;
 

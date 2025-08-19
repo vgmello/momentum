@@ -1,6 +1,5 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
-using AppDomain.Api;
 using AppDomain.Tests.Integration._Internal;
 using AppDomain.Tests.Integration._Internal.Containers;
 using AppDomain.Tests.Integration._Internal.Extensions;
@@ -8,7 +7,6 @@ using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Networks;
 using Grpc.Net.Client;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.DependencyInjection;
 using Momentum.ServiceDefaults;
 using Momentum.ServiceDefaults.Api;
 using Momentum.ServiceDefaults.Messaging.Wolverine;
@@ -43,7 +41,7 @@ public class IntegrationTestFixture : WebApplicationFactory<AppDomain.Api.Progra
             .Build();
 
         _kafka = new KafkaBuilder()
-            .WithImage("confluentinc/cp-kafka:latest")
+            .WithImage("confluentinc/cp-kafka:7.6.0")
             .WithNetwork(_containerNetwork)
             .Build();
     }
@@ -51,7 +49,8 @@ public class IntegrationTestFixture : WebApplicationFactory<AppDomain.Api.Progra
     public async ValueTask InitializeAsync()
     {
         await _containerNetwork.CreateAsync();
-        await Task.WhenAll(_postgres.StartAsync(), _kafka.StartAsync());
+        await _postgres.StartAsync();
+        await _kafka.StartAsync();
 
         await using var liquibaseMigrationContainer = new LiquibaseMigrationContainer(_postgres.Name, _containerNetwork);
         await liquibaseMigrationContainer.StartAsync();
@@ -75,6 +74,7 @@ public class IntegrationTestFixture : WebApplicationFactory<AppDomain.Api.Progra
         builder.UseSetting("ConnectionStrings:AppDomainDb", _postgres.GetDbConnectionString("app_domain"));
         builder.UseSetting("ConnectionStrings:ServiceBus", _postgres.GetDbConnectionString("service_bus"));
         builder.UseSetting("ConnectionStrings:Messaging", _kafka.GetBootstrapAddress());
+        builder.UseSetting("Orleans:UseLocalhostClustering", "true");
 
         WolverineSetupExtensions.SkipServiceRegistration = true;
         ServiceDefaultsExtensions.EntryAssembly = typeof(AppDomain.Api.Program).Assembly;

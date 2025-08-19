@@ -174,7 +174,7 @@ public static class GetActiveUsersQueryHandler
 **Function with Auto-Generated Parameters:**
 
 ```csharp
-[DbCommand(fn: "select * from AppDomain.invoices_get")]
+[DbCommand(fn: "select * from app_domain.invoices_get")]
 public partial record GetInvoicesQuery(int Limit, int Offset, string Status) : IQuery<IEnumerable<Invoice>>;
 
 public record Invoice(int Id, string Status, decimal Amount);
@@ -194,7 +194,7 @@ public static class GetInvoicesQueryHandler
         var dbParams = command.ToDbParams();
         // Note: Function parameters are automatically appended
         return await SqlMapper.QueryAsync<Invoice>(connection,
-            new CommandDefinition("select * from AppDomain.invoices_get(@Limit, @Offset, @Status)",
+            new CommandDefinition("select * from app_domain.invoices_get(@Limit, @Offset, @Status)",
                 dbParams, commandType: CommandType.Text,
                 cancellationToken: cancellationToken));
     }

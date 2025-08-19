@@ -247,7 +247,7 @@ public static partial class GetCashiersQueryHandler
     /// <summary>
     /// If the function name starts with a $, the function gets executed as `select * from {dbFunction}`
     /// </summary>
-    [DbCommand(fn: "$AppDomain.cashiers_get_all")]
+    [DbCommand(fn: "$app_domain.cashiers_get_all")]
     public partial record DbQuery(
         Guid TenantId,
         int Limit,
@@ -284,7 +284,7 @@ public static partial class GetCashiersQueryHandler
 The corresponding PostgreSQL function:
 
 ```sql
--- SQL function: AppDomain.cashiers_get_all
+-- SQL function: app_domain.cashiers_get_all
 CREATE OR REPLACE FUNCTION "AppDomain".cashiers_get_all(
     p_tenant_id UUID,
     p_limit INTEGER,
@@ -684,7 +684,7 @@ public async Task Handle_SourceGeneratedDbQuery_ReturnsResults()
 
 ## Next Steps
 
-- Learn about [Entity Mapping](./entity-mapping) for database schema design
-- Understand [Transactions](./transactions) for complex operations
-- Explore [Best Practices](../best-practices) for performance optimization
-- See [Testing](../testing/) for comprehensive database testing strategies
+-   Learn about [Entity Mapping](./entity-mapping) for database schema design
+-   Understand [Transactions](./transactions) for complex operations
+-   Explore [Best Practices](../best-practices) for performance optimization
+-   See [Testing](../testing/) for comprehensive database testing strategies

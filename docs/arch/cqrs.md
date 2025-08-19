@@ -50,7 +50,7 @@ Commands represent work orders sent to departments. They follow a simple, consis
 <pre v-pre class="language-csharp"><code>
 public static partial class CreateCashierCommandHandler
 {
-    [DbCommand(sp: "AppDomain.cashiers_create", nonQuery: true)]
+    [DbCommand(sp: "app_domain.cashiers_create", nonQuery: true)]
     public partial record DbCommand(Guid CashierId, string Name, string? Email) : ICommand&lt;int&gt;;
 
     public static async Task&lt;(Result&lt;CashierModel&gt;, CashierCreated?)&gt; Handle(CreateCashierCommand command, IMessageBus messaging,
@@ -85,7 +85,7 @@ public static partial class CreateCashierCommandHandler
 ### Database Command
 
 <pre v-pre class="language-csharp"><code>
-[DbCommand(sp: "AppDomain.cashiers_create", nonQuery: true)]
+[DbCommand(sp: "app_domain.cashiers_create", nonQuery: true)]
 public partial record DbCommand(Guid CashierId, string Name, string? Email) : ICommand&lt;int&gt;;
 </code></pre>
 
@@ -123,7 +123,7 @@ public static partial class GetCashiersQueryHandler
 
         const string sql = """
                                SELECT null::uuid as tenant_id, cashier_id, name, email
-                               FROM AppDomain.cashiers
+                               FROM app_domain.cashiers
                                LIMIT @limit OFFSET @offset
                            """;
 
@@ -265,7 +265,7 @@ Database operations use the `[DbCommand]` attribute for automatic code generatio
 ### Command Database Operations
 
 <pre v-pre class="language-csharp"><code>
-[DbCommand(sp: "AppDomain.cashiers_create", nonQuery: true)]
+[DbCommand(sp: "app_domain.cashiers_create", nonQuery: true)]
 public partial record InsertCashierCommand(
     Guid TenantId,
     Guid CashierId,
@@ -277,7 +277,7 @@ public partial record InsertCashierCommand(
 ### Query Database Operations
 
 <pre v-pre class="language-csharp"><code>
-[DbCommand(fn: "SELECT * FROM AppDomain.cashiers_get")]
+[DbCommand(fn: "SELECT * FROM app_domain.cashiers_get")]
 public partial record GetCashiersDbQuery(
     int Limit,
     int Offset

@@ -158,7 +158,7 @@ public class DbCommandSourceGenHandlerTests : DbCommandSourceGenTestsBase
             name: "Function query with auto-generated parameters",
             source:
             """
-            [DbCommand(fn: "select * from AppDomain.invoices_get")]
+            [DbCommand(fn: "select * from app_domain.invoices_get")]
             public partial record GetInvoicesDbQuery(int Limit, int Offset, string Status) : IQuery<System.Collections.Generic.IEnumerable<Invoice>>;
 
             public record Invoice(int Id, string Status);
@@ -171,7 +171,7 @@ public class DbCommandSourceGenHandlerTests : DbCommandSourceGenTestsBase
                 {
                     await using var connection = await datasource.OpenConnectionAsync(cancellationToken);
                     var dbParams = command.ToDbParams();
-                    return await global::Dapper.SqlMapper.QueryAsync<global::TestNamespace.Invoice>(connection, new global::Dapper.CommandDefinition("select * from AppDomain.invoices_get(@Limit, @Offset, @Status)", dbParams, commandType: global::System.Data.CommandType.Text, cancellationToken: cancellationToken));
+                    return await global::Dapper.SqlMapper.QueryAsync<global::TestNamespace.Invoice>(connection, new global::Dapper.CommandDefinition("select * from app_domain.invoices_get(@Limit, @Offset, @Status)", dbParams, commandType: global::System.Data.CommandType.Text, cancellationToken: cancellationToken));
                 }
             }
             """
@@ -180,7 +180,7 @@ public class DbCommandSourceGenHandlerTests : DbCommandSourceGenTestsBase
             name: "Function query with snake_case parameters",
             source:
             """
-            [DbCommand(fn: "select * from AppDomain.invoices_get", paramsCase: DbParamsCase.SnakeCase)]
+            [DbCommand(fn: "select * from app_domain.invoices_get", paramsCase: DbParamsCase.SnakeCase)]
             public partial record GetInvoicesDbQuery(int Limit, int Offset, string Status) : IQuery<System.Collections.Generic.IEnumerable<Invoice>>;
 
             public record Invoice(int Id, string Status);
@@ -193,7 +193,7 @@ public class DbCommandSourceGenHandlerTests : DbCommandSourceGenTestsBase
                 {
                     await using var connection = await datasource.OpenConnectionAsync(cancellationToken);
                     var dbParams = command.ToDbParams();
-                    return await global::Dapper.SqlMapper.QueryAsync<global::TestNamespace.Invoice>(connection, new global::Dapper.CommandDefinition("select * from AppDomain.invoices_get(@limit, @offset, @status)", dbParams, commandType: global::System.Data.CommandType.Text, cancellationToken: cancellationToken));
+                    return await global::Dapper.SqlMapper.QueryAsync<global::TestNamespace.Invoice>(connection, new global::Dapper.CommandDefinition("select * from app_domain.invoices_get(@limit, @offset, @status)", dbParams, commandType: global::System.Data.CommandType.Text, cancellationToken: cancellationToken));
                 }
             }
             """
