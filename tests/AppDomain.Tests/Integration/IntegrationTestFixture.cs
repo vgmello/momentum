@@ -16,6 +16,7 @@ using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 using System.Diagnostics.CodeAnalysis;
+using Testcontainers.Kafka;
 using Testcontainers.PostgreSql;
 
 namespace AppDomain.Tests.Integration;
@@ -26,6 +27,7 @@ public class IntegrationTestFixture : WebApplicationFactory<AppDomain.Api.Progra
     private readonly INetwork _containerNetwork = new NetworkBuilder().Build();
 
     private readonly PostgreSqlContainer _postgres;
+    private readonly KafkaContainer _kafka;
 
     public GrpcChannel GrpcChannel { get; private set; } = null!;
 
@@ -39,12 +41,17 @@ public class IntegrationTestFixture : WebApplicationFactory<AppDomain.Api.Progra
             .WithPassword("postgres")
             .WithNetwork(_containerNetwork)
             .Build();
+
+        _kafka = new KafkaBuilder()
+            .WithImage("confluentinc/cp-kafka:latest")
+            .WithNetwork(_containerNetwork)
+            .Build();
     }
 
     public async ValueTask InitializeAsync()
     {
         await _containerNetwork.CreateAsync();
-        await _postgres.StartAsync();
+        await Task.WhenAll(_postgres.StartAsync(), _kafka.StartAsync());
 
         await using var liquibaseMigrationContainer = new LiquibaseMigrationContainer(_postgres.Name, _containerNetwork);
         await liquibaseMigrationContainer.StartAsync();
@@ -58,7 +65,7 @@ public class IntegrationTestFixture : WebApplicationFactory<AppDomain.Api.Progra
     public new async ValueTask DisposeAsync()
     {
         await base.DisposeAsync();
-        await _postgres.DisposeAsync();
+        await Task.WhenAll(_postgres.DisposeAsync().AsTask(), _kafka.DisposeAsync().AsTask());
         await _containerNetwork.DisposeAsync();
         await Log.CloseAndFlushAsync();
     }
@@ -67,7 +74,7 @@ public class IntegrationTestFixture : WebApplicationFactory<AppDomain.Api.Progra
     {
         builder.UseSetting("ConnectionStrings:AppDomainDb", _postgres.GetDbConnectionString("app_domain"));
         builder.UseSetting("ConnectionStrings:ServiceBus", _postgres.GetDbConnectionString("service_bus"));
-        builder.UseSetting("ConnectionStrings:Messaging", "localhost:9092");
+        builder.UseSetting("ConnectionStrings:Messaging", _kafka.GetBootstrapAddress());
 
         WolverineSetupExtensions.SkipServiceRegistration = true;
         ServiceDefaultsExtensions.EntryAssembly = typeof(AppDomain.Api.Program).Assembly;

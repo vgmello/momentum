@@ -96,6 +96,7 @@
     <PackageVersion Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageVersion Include="Testcontainers" Version="4.6.0" />
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.6.0" />
+    <PackageVersion Include="Testcontainers.Kafka" Version="4.6.0" />
     <PackageVersion Include="WolverineFx" Version="4.9.3" />
     <PackageVersion Include="WolverineFx.Http" Version="4.9.3" />
     <PackageVersion Include="WolverineFx.Http.FluentValidation" Version="4.9.3" />
