@@ -1,6 +1,6 @@
 # OpenTelemetry Instrumentation Middleware
 
-## Middleware Overview {#middleware-overview}
+## Middleware Overview
 
 This middleware creates activity spans for each message being processed, enabling:
 
@@ -10,12 +10,12 @@ This middleware creates activity spans for each message being processed, enablin
 - **Error Tracking**: Status reporting and exception details
 - **Correlation**: Message processing in observability platforms
 
-## Activity Creation and Tagging {#activity-creation}
+## Activity Creation and Tagging
 
 This method creates an activity with tags for:
 
 - **message.id**: The unique message identifier
-- **message.name**: The full type name of the message  
+- **message.name**: The full type name of the message
 - **operation.type**: Whether it's a command or query
 - **message.source**: The source of the message (if available)
 
@@ -50,15 +50,15 @@ Operations are classified based on interface implementations:
 
 ```csharp
 private static bool IsCommand(object message) =>
-    message.GetType().GetInterfaces().Any(i => 
+    message.GetType().GetInterfaces().Any(i =>
         i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ICommand<>));
 
 private static bool IsQuery(object message) =>
-    message.GetType().GetInterfaces().Any(i => 
+    message.GetType().GetInterfaces().Any(i =>
         i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IQuery<>));
 ```
 
-## Activity Completion and Status {#activity-completion}
+## Activity Completion and Status
 
 Sets the activity status to OK for successful processing or Error with exception details if the message processing failed.
 

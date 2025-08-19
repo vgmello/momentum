@@ -1,6 +1,6 @@
 # Partition Key Provider Factory
 
-## Performance-Optimized Key Generation {#performance-optimized}
+## Performance-Optimized Key Generation
 
 This method is called on every event published, therefore performance is important, that is why I'm using expression trees instead of reflection.
 
@@ -20,7 +20,7 @@ For messages with a single partition key property:
 
 ```csharp
 var singlePropertyExpression = Expression.Lambda<Func<TMessage, string>>(
-    Expression.Call(convertToString, 
+    Expression.Call(convertToString,
         Expression.Convert(Expression.Property(parameter, prop), typeof(object))),
     parameter
 ).Compile();
@@ -37,14 +37,14 @@ var expressionsWithSeparator = new List<Expression>();
 for (var i = 0; i < stringValueExpressions.Count; i++)
 {
     expressionsWithSeparator.Add(stringValueExpressions[i]);
-    
+
     if (i < stringValueExpressions.Count - 1)
     {
         expressionsWithSeparator.Add(Expression.Constant("-"));
     }
 }
 
-var combinedExpression = Expression.Call(concatMethod, 
+var combinedExpression = Expression.Call(concatMethod,
     Expression.NewArrayInit(typeof(string), expressionsWithSeparator));
 ```
 

@@ -1,11 +1,11 @@
 # DbCommand Source Generator
 
-## Generator Capabilities {#generator-capabilities}
+## Generator Capabilities
 
 This generator provides the following capabilities:
 
 - **Parameter Mapping**: Generates `ToDbParams()` extension methods for parameter mapping
-- **Command Handlers**: Creates Wolverine command handlers for database operations  
+- **Command Handlers**: Creates Wolverine command handlers for database operations
 - **Multiple Command Types**: Supports stored procedures, SQL queries, and functions
 - **Parameter Case Conversion**: Handles parameter case conversion (None, SnakeCase)
 - **Custom Parameter Names**: Respects Column attributes for custom parameter names
@@ -58,7 +58,7 @@ Control generation per type using the `DbCommandAttribute`:
 ```csharp
 [DbCommand(
     Sp = "sp_create_user",           // Stored procedure name
-    Sql = "INSERT INTO users...",    // Direct SQL query  
+    Sql = "INSERT INTO users...",    // Direct SQL query
     Fn = "fn_calculate_total",       // Function name
     ParamCase = DbParamsCase.SnakeCase // Parameter case override
 )]

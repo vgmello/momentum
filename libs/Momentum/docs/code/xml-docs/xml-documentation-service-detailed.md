@@ -1,6 +1,6 @@
 # XML Documentation Service
 
-## Service Overview {#service-overview}
+## Service Overview
 
 This service parses XML documentation files generated during compilation and provides methods to retrieve documentation for types, methods, properties, and other members. Documentation is cached for performance after initial loading.
 
@@ -36,7 +36,7 @@ public async Task<bool> LoadDocumentationAsync(string xmlFilePath)
 
         await ParseXmlDocumentationAsync(xmlReader);
 
-        logger.LogInformation("Loaded XML documentation from {FilePath} with {Count} entries", 
+        logger.LogInformation("Loaded XML documentation from {FilePath} with {Count} entries",
             xmlFilePath, _documentationCache.Count);
 
         return true;
@@ -149,7 +149,7 @@ private readonly ConcurrentDictionary<string, XmlDocumentationInfo> _documentati
 ### Cache Operations
 
 ```csharp
-public XmlDocumentationInfo? GetDocumentation(string memberName) => 
+public XmlDocumentationInfo? GetDocumentation(string memberName) =>
     _documentationCache.GetValueOrDefault(memberName);
 
 public void ClearCache() => _documentationCache.Clear();

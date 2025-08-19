@@ -1,6 +1,6 @@
 # Result Pattern Implementation
 
-## Overview {#overview}
+## Overview
 
 This class uses the OneOf library to provide a discriminated union pattern, allowing methods to return either a successful result of type `T` or a list of validation failures. This is particularly useful for command handlers and other operations that need to communicate validation errors without throwing exceptions.
 
@@ -9,7 +9,7 @@ The Result pattern provides a functional approach to error handling, making it e
 ## Key Benefits
 
 - **Explicit Error Handling**: Forces callers to handle both success and failure cases
-- **Performance**: Avoids the overhead of exceptions for expected validation failures  
+- **Performance**: Avoids the overhead of exceptions for expected validation failures
 - **Type Safety**: Compile-time guarantees about handling both success and error paths
 - **Functional Programming**: Enables functional composition and chaining of operations
 - **Clean Architecture**: Separates business rule violations from unexpected system errors
@@ -51,7 +51,7 @@ result.Match(
 public ActionResult<UserDto> CreateUser(CreateUserRequest request)
 {
     var result = userService.CreateUser(request);
-    
+
     return result.Match<ActionResult<UserDto>>(
         user => Ok(mapper.Map<UserDto>(user)),
         errors => BadRequest(errors.Select(e => e.ErrorMessage))

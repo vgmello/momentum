@@ -81,9 +81,9 @@ dotnet run --project src/BookStore.Api
 ```
 
 ### Access Points
-- **API**: https://localhost:8211 (or your configured port)
-- **Aspire Dashboard**: https://localhost:18210
-- **Documentation**: https://localhost:8219
+- **API**: https://localhost:8111 (or your configured port)
+- **Aspire Dashboard**: https://localhost:18110
+- **Documentation**: http://localhost:8119
 
 ## Step 5: Explore the Sample Domain
 
@@ -340,4 +340,4 @@ docker compose up
 - [Adding Domains](../adding-domains/index.md)
 - [CQRS](../cqrs/index.md)
 - [Testing](../testing/index.md)
-- [Deployment](../deployment/index.md)
+- [Best Practices](../best-practices.md)

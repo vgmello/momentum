@@ -532,4 +532,4 @@ Domain events are processed using the same infrastructure as integration events 
 - Learn about [Integration Events](./integration-events) for cross-service communication
 - Understand [Kafka Configuration](./kafka) for message broker setup
 - Explore [Wolverine](./wolverine) messaging framework details
-- See [Event Sourcing](../advanced/event-sourcing) patterns (if applicable)
+- Event Sourcing patterns (coming soon)

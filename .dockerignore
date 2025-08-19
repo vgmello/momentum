@@ -28,6 +28,8 @@ CLAUDE.md
 
 # Documentation and test files
 **/docs/.vitepress/cache
+**/docs/.vitepress/.temp
+
 **/tests
 **/*.Tests
 **/*.Test

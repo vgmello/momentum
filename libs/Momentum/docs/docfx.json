@@ -6,14 +6,14 @@
         {
           "src": "../src",
           "files": [
-            "Momentum.Extensions/bin/*/net9.0/Momentum.Extensions.dll",
-            "Momentum.Extensions.Abstractions/bin/*/netstandard2.1/Momentum.Extensions.Abstractions.dll",
-            "Momentum.Extensions.EventMarkdownGenerator/bin/*/net9.0/Momentum.Extensions.EventMarkdownGenerator.dll",
-            "Momentum.Extensions.Messaging.Kafka/bin/*/net9.0/Momentum.Extensions.Messaging.Kafka.dll",
-            "Momentum.Extensions.SourceGenerators/bin/*/netstandard2.1/Momentum.Extensions.SourceGenerators.dll",
-            "Momentum.Extensions.XmlDocs/bin/*/net9.0/Momentum.Extensions.XmlDocs.dll",
-            "Momentum.ServiceDefaults/bin/*/net9.0/Momentum.ServiceDefaults.dll",
-            "Momentum.ServiceDefaults.Api/bin/*/net9.0/Momentum.ServiceDefaults.Api.dll"
+            "Momentum.Extensions/bin/**/net9.0/Momentum.Extensions.dll",
+            "Momentum.Extensions.Abstractions/bin/**/netstandard2.1/Momentum.Extensions.Abstractions.dll",
+            "Momentum.Extensions.EventMarkdownGenerator/bin/**/net9.0/Momentum.Extensions.EventMarkdownGenerator.dll",
+            "Momentum.Extensions.Messaging.Kafka/bin/**/net9.0/Momentum.Extensions.Messaging.Kafka.dll",
+            "Momentum.Extensions.SourceGenerators/bin/**/netstandard2.1/Momentum.Extensions.SourceGenerators.dll",
+            "Momentum.Extensions.XmlDocs/bin/**/net9.0/Momentum.Extensions.XmlDocs.dll",
+            "Momentum.ServiceDefaults/bin/**/net9.0/Momentum.ServiceDefaults.dll",
+            "Momentum.ServiceDefaults.Api/bin/**/net9.0/Momentum.ServiceDefaults.Api.dll"
           ]
         }
       ],

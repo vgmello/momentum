@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "pnpm docs:dev",
-    "docs:pre": "pnpm docs:events && pnpm docs:dotnet && pnpm docs:adr",
-    "docs:dev": "pnpm docs:pre && vitepress dev",
-    "docs:build": "pnpm docs:pre && vitepress build",
+    "docs:prep": "pnpm docs:events && pnpm docs:dotnet && pnpm docs:adr",
+    "docs:dev": "pnpm docs:prep && vitepress dev",
+    "docs:build": "pnpm docs:prep && vitepress build",
     "docs:build:debug": "DEBUG=* pnpm docs:build",
     "docs:preview": "vitepress preview",
     "docs:dotnet": "tsx .vitepress/scripts/docs-dotnet.ts",
