@@ -8,18 +8,12 @@ namespace AppDomain.BackOffice.Orleans.Invoices;
 /// <summary>
 ///     Service for managing invoices using Orleans grains.
 /// </summary>
-public class InvoiceOrleansService
+/// <remarks>
+///     Initializes a new instance of the InvoiceOrleansService class.
+/// </remarks>
+/// <param name="grainFactory">The Orleans grain factory used to create and access invoice grains.</param>
+public class InvoiceOrleansService(IGrainFactory grainFactory)
 {
-    private readonly IGrainFactory _grainFactory;
-
-    /// <summary>
-    ///     Initializes a new instance of the InvoiceOrleansService class.
-    /// </summary>
-    /// <param name="grainFactory">The Orleans grain factory used to create and access invoice grains.</param>
-    public InvoiceOrleansService(IGrainFactory grainFactory)
-    {
-        _grainFactory = grainFactory;
-    }
 
     /// <summary>
     ///     Creates a new invoice using Orleans grain.
@@ -28,7 +22,7 @@ public class InvoiceOrleansService
     /// <returns>A task that represents the asynchronous operation. The task result contains the created invoice.</returns>
     public async Task<Invoice> CreateInvoiceAsync(Invoice invoice)
     {
-        var grain = _grainFactory.GetGrain<IInvoiceGrain>(invoice.InvoiceId);
+        var grain = grainFactory.GetGrain<IInvoiceGrain>(invoice.InvoiceId);
 
         return await grain.CreateInvoiceAsync(invoice);
     }
@@ -40,7 +34,7 @@ public class InvoiceOrleansService
     /// <returns>A task that represents the asynchronous operation. The task result contains the invoice if found; otherwise, <c>null</c>.</returns>
     public async Task<Invoice?> GetInvoiceAsync(Guid invoiceId)
     {
-        var grain = _grainFactory.GetGrain<IInvoiceGrain>(invoiceId);
+        var grain = grainFactory.GetGrain<IInvoiceGrain>(invoiceId);
 
         return await grain.GetInvoiceAsync();
     }
@@ -57,7 +51,7 @@ public class InvoiceOrleansService
     /// </returns>
     public async Task<bool> ProcessPaymentAsync(Guid invoiceId, decimal amount, string paymentMethod)
     {
-        var grain = _grainFactory.GetGrain<IInvoiceGrain>(invoiceId);
+        var grain = grainFactory.GetGrain<IInvoiceGrain>(invoiceId);
 
         return await grain.ProcessPaymentAsync(amount, paymentMethod);
     }
@@ -70,7 +64,7 @@ public class InvoiceOrleansService
     /// <returns>A task that represents the asynchronous operation. The task result contains the updated invoice.</returns>
     public async Task<Invoice> UpdateInvoiceStatusAsync(Guid invoiceId, string newStatus)
     {
-        var grain = _grainFactory.GetGrain<IInvoiceGrain>(invoiceId);
+        var grain = grainFactory.GetGrain<IInvoiceGrain>(invoiceId);
 
         return await grain.UpdateStatusAsync(newStatus);
     }

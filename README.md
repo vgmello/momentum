@@ -1,4 +1,9 @@
-# Getting Started with Momentum
+# Momentum .NET
+
+[![NuGet](https://img.shields.io/nuget/v/Momentum.Extensions.Abstractions?style=flat-square)](https://www.nuget.org/packages/Momentum.Extensions.Abstractions)
+[![NuGet Preview](https://img.shields.io/nuget/vpre/Momentum.Extensions.Abstractions?style=flat-square&label=nuget-preview)](https://www.nuget.org/packages/Momentum.Extensions.Abstractions)
+[![Downloads](https://img.shields.io/nuget/dt/Momentum.Extensions.Abstractions?style=flat-square)](https://www.nuget.org/packages/Momentum.Extensions.Abstractions)
+[![License](https://img.shields.io/github/license/vgmello/momentum?style=flat-square)](https://github.com/vgmello/momentum/blob/main/LICENSE)
 
 Welcome to **Momentum** - a comprehensive .NET 9 template system that generates complete, production-ready microservices solutions. Whether you're building APIs, event-driven backends, or stateful processing systems, Momentum provides the architecture, patterns, and infrastructure you need to get productive immediately.
 
@@ -114,6 +119,7 @@ dotnet new mmt -n CleanService --no-sample false --project-only
 The template offers comprehensive configuration options:
 
 **Core Components:**
+
 -   `--api`: REST/gRPC API project (default: true)
 -   `--back-office`: Background processing project (default: true)
 -   `--orleans`: Orleans stateful processing project (default: false)
@@ -121,11 +127,13 @@ The template offers comprehensive configuration options:
 -   `--docs`: VitePress documentation project (default: true)
 
 **Infrastructure:**
+
 -   `--kafka`: Apache Kafka messaging (default: true)
 -   `--db`: Database setup (default, npgsql, liquibase, none)
 -   `--port`: Base port number (default: 8100)
 
 **Customization:**
+
 -   `--org`: Organization name for copyright headers
 -   `--no-sample`: Include sample Cashiers/Invoices code (default: true, use `--no-sample false` to skip)
 -   `--project-only`: Generate only projects without solution files
@@ -180,15 +188,15 @@ src/OrderService/
 
 Services use a base port system (default: 8100):
 
-| Service | HTTP | HTTPS | gRPC | Purpose |
-|---------|------|-------|------|----------|
-| Aspire Dashboard | 18100 | 18110 | - | Development dashboard |
-| API | 8101 | 8111 | 8102 | REST & gRPC endpoints |
-| BackOffice | 8103 | 8113 | - | Background processing |
-| Orleans | 8104 | 8114 | - | Stateful processing |
-| Documentation | 8119 | - | - | VitePress docs |
-| PostgreSQL | 54320 | - | - | Database |
-| Kafka | 59092 | - | - | Message broker |
+| Service          | HTTP  | HTTPS | gRPC | Purpose               |
+| ---------------- | ----- | ----- | ---- | --------------------- |
+| Aspire Dashboard | 18100 | 18110 | -    | Development dashboard |
+| API              | 8101  | 8111  | 8102 | REST & gRPC endpoints |
+| BackOffice       | 8103  | 8113  | -    | Background processing |
+| Orleans          | 8104  | 8114  | -    | Stateful processing   |
+| Documentation    | 8119  | -     | -    | VitePress docs        |
+| PostgreSQL       | 54320 | -     | -    | Database              |
+| Kafka            | 59092 | -     | -    | Message broker        |
 
 Customize the base port with `--port 9000` to use 9100, 9101, etc.
 
@@ -1131,10 +1139,10 @@ app.MapGet("/orders/{id:guid}", async (Guid id, IMessageBus bus) =>
 
 We're continuously expanding Momentum to include even more production-ready technologies and patterns:
 
-- **SQL Server** - Additional database provider support alongside PostgreSQL
-- **k6 for Performance Testing** - Automated load testing and performance validation
-- **LGTM stack for improved observability** - Enhanced monitoring with Loki, Grafana, Tempo, and Mimir
-- **Maybe REDIS** - Caching and session management capabilities
+-   **SQL Server** - Additional database provider support alongside PostgreSQL
+-   **k6 for Performance Testing** - Automated load testing and performance validation
+-   **LGTM stack for improved observability** - Enhanced monitoring with Loki, Grafana, Tempo, and Mimir
+-   **Maybe REDIS** - Caching and session management capabilities
 
 ---
 
