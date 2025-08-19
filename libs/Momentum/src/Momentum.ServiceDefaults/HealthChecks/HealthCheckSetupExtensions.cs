@@ -1,7 +1,5 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http;
@@ -10,6 +8,8 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Momentum.ServiceDefaults.Api.EndpointFilters;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Momentum.ServiceDefaults.HealthChecks;
 

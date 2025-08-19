@@ -1,16 +1,16 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Diagnostics;
-using OpenTelemetry;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Trace;
-using OpenTelemetry.Context.Propagation;
 using Momentum.ServiceDefaults.Messaging.Telemetry;
-using System.Diagnostics.Metrics;
+using OpenTelemetry;
+using OpenTelemetry.Context.Propagation;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+using System.Diagnostics;
+using System.Diagnostics.Metrics;
 
 namespace Momentum.ServiceDefaults.OpenTelemetry;
 

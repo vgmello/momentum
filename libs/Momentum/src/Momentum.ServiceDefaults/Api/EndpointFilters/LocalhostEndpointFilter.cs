@@ -1,8 +1,8 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-using System.Net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using System.Net;
 
 namespace Momentum.ServiceDefaults.Api.EndpointFilters;
 

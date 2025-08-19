@@ -1,7 +1,6 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Cashiers.Contracts.Models;
-using Momentum.Extensions.Abstractions.Messaging;
 
 namespace AppDomain.Cashiers.Contracts.IntegrationEvents;
 

@@ -1,8 +1,6 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
-using Microsoft.Extensions.Hosting;
 using Orleans.Configuration;
-using OrleansDashboard;
 
 namespace AppDomain.BackOffice.Orleans.Infrastructure.Extensions;
 

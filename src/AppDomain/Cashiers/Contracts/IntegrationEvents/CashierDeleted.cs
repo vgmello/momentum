@@ -1,7 +1,5 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
-using Momentum.Extensions.Abstractions.Messaging;
-
 namespace AppDomain.Cashiers.Contracts.IntegrationEvents;
 
 /// <summary>

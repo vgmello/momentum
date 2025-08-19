@@ -1,7 +1,5 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
-using Momentum.Extensions.Abstractions.Dapper;
-
 namespace AppDomain.Cashiers.Queries;
 
 /// <summary>
