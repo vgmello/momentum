@@ -28,7 +28,7 @@ public class UpdateCashierIntegrationTests(IntegrationTestFixture fixture) : Int
 
         // Get the current version from database (xmin column)
         var currentVersion = await connection.QuerySingleAsync<int>(
-            "SELECT xmin FROM AppDomain.cashiers WHERE cashier_id = @Id",
+            "SELECT xmin FROM app_domain.cashiers WHERE cashier_id = @Id",
             new { Id = Guid.Parse(createdCashier.CashierId) });
 
         var updateRequest = new UpdateCashierRequest

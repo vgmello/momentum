@@ -48,7 +48,7 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
 
         // Verify in database
         var dbInvoice = await connection.QuerySingleOrDefaultAsync(
-            "SELECT status, amount_paid, payment_date FROM AppDomain.invoices WHERE invoice_id = @Id",
+            "SELECT status, amount_paid, payment_date FROM app_domain.invoices WHERE invoice_id = @Id",
             new { Id = Guid.Parse(createdInvoice.InvoiceId) });
 
         dbInvoice!.ShouldNotBeNull();
@@ -97,7 +97,7 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
 
         // Verify payment date is set to current time
         var dbInvoice = await connection.QuerySingleOrDefaultAsync(
-            "SELECT payment_date FROM AppDomain.invoices WHERE invoice_id = @Id",
+            "SELECT payment_date FROM app_domain.invoices WHERE invoice_id = @Id",
             new { Id = Guid.Parse(createdInvoice.InvoiceId) });
 
         dbInvoice!.ShouldNotBeNull();

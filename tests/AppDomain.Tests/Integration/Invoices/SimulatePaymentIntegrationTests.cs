@@ -47,7 +47,7 @@ public class SimulatePaymentIntegrationTests(IntegrationTestFixture fixture) : I
         // Note: SimulatePayment doesn't actually modify the invoice status in the database
         // It just triggers a payment event for processing. The invoice should still be in Draft status.
         var dbInvoice = await connection.QuerySingleOrDefaultAsync(
-            "SELECT status FROM AppDomain.invoices WHERE invoice_id = @Id",
+            "SELECT status FROM app_domain.invoices WHERE invoice_id = @Id",
             new { Id = Guid.Parse(createdInvoice.InvoiceId) });
 
         dbInvoice!.ShouldNotBeNull();

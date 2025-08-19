@@ -45,7 +45,7 @@ public class CancelInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
 
         // Verify in database
         var dbInvoice = await connection.QuerySingleOrDefaultAsync(
-            "SELECT status FROM AppDomain.invoices WHERE invoice_id = @Id",
+            "SELECT status FROM app_domain.invoices WHERE invoice_id = @Id",
             new { Id = Guid.Parse(createdInvoice.InvoiceId) });
 
         dbInvoice!.ShouldNotBeNull();
