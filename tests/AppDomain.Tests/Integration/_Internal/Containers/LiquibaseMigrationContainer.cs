@@ -27,7 +27,7 @@ public class LiquibaseMigrationContainer : IAsyncDisposable
             .WithCommand("-c", $"""
                                 liquibase --url=jdbc:postgresql://{dbServerSanitized}:5432/postgres update --contexts @setup && \
                                 liquibase --url=jdbc:postgresql://{dbServerSanitized}:5432/service_bus update --changelog-file=service_bus/changelog.xml && \
-                                liquibase --url=jdbc:postgresql://{dbServerSanitized}:5432/AppDomain update --changelog-file=AppDomain/changelog.xml && \
+                                liquibase --url=jdbc:postgresql://{dbServerSanitized}:5432/app_domain update --changelog-file=app_domain/changelog.xml && \
                                 echo Migration Complete
                                 """)
             .WithWaitStrategy(
@@ -38,18 +38,21 @@ public class LiquibaseMigrationContainer : IAsyncDisposable
 
     public async Task StartAsync()
     {
-        long result = -1;
-
         try
         {
             await _liquibaseContainer.StartAsync();
-            result = await _liquibaseContainer.GetExitCodeAsync();
+            var result = await _liquibaseContainer.GetExitCodeAsync();
+
+            if (result != 0)
+            {
+                var logs = await _liquibaseContainer.GetLogsAsync();
+                throw new InvalidOperationException($"Liquibase migration failed with exit code {result}. Logs: {logs}");
+            }
         }
-        catch (Exception e)
+        catch (Exception e) when (!(e is InvalidOperationException))
         {
             var logs = await _liquibaseContainer.GetLogsAsync();
-
-            throw new InvalidOperationException($"Liquibase migration failed with exit code {result}. Logs: {logs}", e);
+            throw new InvalidOperationException($"Liquibase migration failed. Logs: {logs}", e);
         }
     }
 

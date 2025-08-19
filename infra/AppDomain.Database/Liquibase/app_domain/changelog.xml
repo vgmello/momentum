@@ -6,9 +6,8 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <include file="app_domain/app_domain.sql"/>
-
 <!--#if (INCLUDE_SAMPLE) -->
-    <!-- Sample domain content - remove with --no-sample -->
+    <!-- Sample domain content - remove with no-sample -->
     <include file="app_domain/cashiers/tables/cashiers.sql"/>
     <include file="app_domain/cashiers/tables/cashier_currencies.sql"/>
     <include file="app_domain/cashiers/procedures/cashiers_get_all.sql"/>
