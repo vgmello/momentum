@@ -25,8 +25,8 @@ public class KafkaEventsExtensionsTests
     public KafkaEventsExtensionsTests()
     {
         _logger = Substitute.For<ILogger<KafkaEventsExtensions>>();
-        var options = new ServiceBusOptions 
-        { 
+        var options = new ServiceBusOptions
+        {
             Domain = "TestDomain",
             PublicServiceName = "test-service"
         };
@@ -36,14 +36,14 @@ public class KafkaEventsExtensionsTests
             .SetValue(options, new Uri("/test-domain/test-service", UriKind.Relative));
         _serviceBusOptions = Options.Create(options);
         _environment = Substitute.For<IHostEnvironment>();
-        
+
         var configData = new Dictionary<string, string?>
         {
             ["ConnectionStrings:Messaging"] = "localhost:9092",
             ["Kafka:AutoProvision"] = "false",
             ["Kafka:ConnectionStringName"] = "Messaging"
         };
-        
+
         _configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(configData)
             .Build();
@@ -94,14 +94,14 @@ public class KafkaEventsExtensionsTests
             ["ConnectionStrings:Messaging"] = "localhost:9092",
             ["Kafka:AutoProvision"] = "true"
         };
-        
+
         var config = new ConfigurationBuilder()
             .AddInMemoryCollection(configData)
             .Build();
 
         _environment.EnvironmentName.Returns("Production");
         _environment.IsDevelopment().Returns(false);
-        
+
         var extension = new KafkaEventsExtensions(_logger, config, _serviceBusOptions, _environment);
         var options = new WolverineOptions { ServiceName = "test-service" };
 
@@ -123,13 +123,13 @@ public class KafkaEventsExtensionsTests
             ["ConnectionStrings:CustomKafka"] = "localhost:9093",
             ["Kafka:ConnectionStringName"] = "CustomKafka"
         };
-        
+
         var config = new ConfigurationBuilder()
             .AddInMemoryCollection(configData)
             .Build();
 
         _environment.EnvironmentName.Returns("Development");
-        
+
         var extension = new KafkaEventsExtensions(_logger, config, _serviceBusOptions, _environment);
         var options = new WolverineOptions { ServiceName = "test-service" };
 
@@ -184,8 +184,8 @@ public class KafkaEventsExtensionsTests
     {
         // Arrange
         var messageType = typeof(TestEvent);
-        var topicAttribute = new EventTopicAttribute("test-topic", domain: "test-domain") 
-        { 
+        var topicAttribute = new EventTopicAttribute("test-topic", domain: "test-domain")
+        {
             Internal = true
         };
 
@@ -240,22 +240,22 @@ public class KafkaEventsExtensionsTests
 
     private static string InvokeGetTopicName(Type messageType, EventTopicAttribute topicAttribute, string environment)
     {
-        var method = typeof(KafkaEventsExtensions).GetMethod("GetTopicName", 
+        var method = typeof(KafkaEventsExtensions).GetMethod("GetTopicName",
             BindingFlags.NonPublic | BindingFlags.Static);
-        
+
         return (string)method!.Invoke(null, [messageType, topicAttribute, environment])!;
     }
 
     private record TestEvent;
-    
+
     [AttributeUsage(AttributeTargets.Class)]
     private class TestPluralizeEventTopicAttribute : EventTopicAttribute
     {
-        public TestPluralizeEventTopicAttribute(string topic, string? domain = null, string version = "v1") 
+        public TestPluralizeEventTopicAttribute(string topic, string? domain = null, string version = "v1")
             : base(topic, domain, version)
         {
         }
-        
+
         public override bool ShouldPluralizeTopicName => true;
     }
 }

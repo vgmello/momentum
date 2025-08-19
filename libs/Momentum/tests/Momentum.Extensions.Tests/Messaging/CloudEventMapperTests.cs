@@ -19,8 +19,8 @@ public class CloudEventMapperTests
 
     public CloudEventMapperTests()
     {
-        _serviceBusOptions = new ServiceBusOptions 
-        { 
+        _serviceBusOptions = new ServiceBusOptions
+        {
             Domain = "TestDomain",
             PublicServiceName = "test-service"
         };
@@ -28,7 +28,7 @@ public class CloudEventMapperTests
         typeof(ServiceBusOptions)
             .GetProperty(nameof(ServiceBusOptions.ServiceUrn))!
             .SetValue(_serviceBusOptions, new Uri("urn:momentum:test-service"));
-        
+
         var options = Options.Create(_serviceBusOptions);
         _mapper = new CloudEventMapper(options);
     }
@@ -62,7 +62,7 @@ public class CloudEventMapperTests
         outgoing.Key.ShouldBe("test-partition");
         outgoing.Value.ShouldNotBeNull();
         outgoing.Headers.ShouldNotBeEmpty();
-        
+
         // Verify CloudEvent headers
         GetHeaderValue(outgoing, "ce_id").ShouldBe("123e4567-e89b-12d3-a456-426614174000");
         GetHeaderValue(outgoing, "ce_type").ShouldBe("TestEvent");
@@ -146,7 +146,7 @@ public class CloudEventMapperTests
         // Arrange
         var incoming = CreateCloudEventMessage();
         incoming.Headers.Add("ce_traceparent", Encoding.UTF8.GetBytes("00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01"));
-        
+
         var envelope = new Envelope();
         // Initialize Headers using reflection since it's readonly
         var headersProperty = typeof(Envelope).GetProperty(nameof(Envelope.Headers))!;
@@ -168,7 +168,7 @@ public class CloudEventMapperTests
         {
             Headers = new Headers { { "regular-header", Encoding.UTF8.GetBytes("value") } }
         };
-        
+
         var envelope = new Envelope { MessageType = "OriginalType" };
 
         // Act
@@ -184,7 +184,7 @@ public class CloudEventMapperTests
         // Arrange
         var incoming = CreateCloudEventMessage();
         incoming.Headers.Add("ce_id", Encoding.UTF8.GetBytes("invalid-guid"));
-        
+
         var envelope = new Envelope();
         // Initialize Headers using reflection since it's readonly
         var headersProperty = typeof(Envelope).GetProperty(nameof(Envelope.Headers))!;
@@ -218,7 +218,7 @@ public class CloudEventMapperTests
             { "ce_datacontenttype", Encoding.UTF8.GetBytes("application/json") },
             { "ce_time", Encoding.UTF8.GetBytes("2024-01-15T10:30:00Z") }
         };
-        
+
         return new Message<string, byte[]>
         {
             Headers = headers,
@@ -228,8 +228,8 @@ public class CloudEventMapperTests
 
     private static string? GetHeaderValue(Message<string, byte[]> message, string headerName)
     {
-        return message.Headers?.TryGetLastBytes(headerName, out var value) == true 
-            ? Encoding.UTF8.GetString(value) 
+        return message.Headers?.TryGetLastBytes(headerName, out var value) == true
+            ? Encoding.UTF8.GetString(value)
             : null;
     }
 }
