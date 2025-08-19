@@ -1,12 +1,12 @@
 <Project>
-    <PropertyGroup>
-        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-        <AspireAppHostSdkVersion>9.4</AspireAppHostSdkVersion>
-        <!--#if (false) -->
-        <TemplateMomentumVersion>0.0.1</TemplateMomentumVersion>
-        <!--#endif -->
-        <MomentumVersion>$(TemplateMomentumVersion)</MomentumVersion>
-    </PropertyGroup>
+        <PropertyGroup>
+            <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+            <AspireAppHostSdkVersion>9.4</AspireAppHostSdkVersion>
+            <!--#if (false) -->
+            <TemplateMomentumVersion>0.0.1</TemplateMomentumVersion>
+            <!--#endif -->
+            <MomentumVersion>$(TemplateMomentumVersion)</MomentumVersion>
+        </PropertyGroup>
     <ItemGroup>
         <PackageVersion Include="Aspire.Azure.Data.Tables" Version="9.4" />
         <PackageVersion Include="Aspire.Azure.Storage.Blobs" Version="9.4" />

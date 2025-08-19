@@ -5,30 +5,30 @@ on:
     branches:
       - main
     paths:
-      - '.template.config/**'
-      - 'src/**'
-      - 'docs/**'
-      - 'infra/**'
-      - 'tests/**'
-      - 'libs/Momentum/src/**'
-      - 'libs/Momentum/Momentum.Template.csproj'
-      - 'compose.yml'
-      - 'README.md'
-      - 'ProjectREADME.md'
-      - 'Directory.Build.props'
-      - 'Directory.Packages.props'
-      - 'AppDomain.slnx'
-      - 'AppDomain.ruleset'
-      - '.gitignore'
-      - '.vscode/**'
+      - ".template.config/**"
+      - "src/**"
+      - "docs/**"
+      - "infra/**"
+      - "tests/**"
+      - "libs/Momentum/src/**"
+      - "libs/Momentum/Momentum.Template.csproj"
+      - "compose.yml"
+      - "README.md"
+      - "ProjectREADME.md"
+      - "Directory.Build.props"
+      - "Directory.Packages.props"
+      - "AppDomain.slnx"
+      - "AppDomain.ruleset"
+      - ".gitignore"
+      - ".vscode/**"
     tags:
-      - 'template-v*.*.*'
+      - "template-v*.*.*"
   workflow_dispatch:
     inputs:
       deploy-type:
-        description: 'Deployment type'
+        description: "Deployment type"
         required: true
-        default: 'prerelease'
+        default: "prerelease"
         type: choice
         options:
           - prerelease
@@ -37,7 +37,7 @@ on:
           - test-release
 
 env:
-  DOTNET_VERSION: '9.0.x'
+  DOTNET_VERSION: "9.0.x"
   DOTNET_NOLOGO: true
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
@@ -74,6 +74,44 @@ jobs:
           deploy-type: ${{ github.event.inputs.deploy-type }}
           nuget-api-key: ${{ secrets.NUGET_API_KEY }}
           nuget-test-api-key: ${{ secrets.NUGET_TEST_API_KEY }}
+
+      - name: Find latest release
+        id: latest-version
+        shell: bash
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/template-* ]]; then
+            TAG_PREFIX="template-v"
+            echo "Using template tag format"
+          else
+            TAG_PREFIX="v"
+            echo "Using standard tag format"
+          fi
+
+          if [[ "${{ steps.config.outputs.deploy-prerelease }}" == true ]]; then
+            TAG_SUFFIX="-pre"
+          else
+            TAG_SUFFIX=""
+          fi
+
+          # Find latest release tag
+          set +o pipefail
+          CURRENT_TAG=$(git tag -l "${TAG_PREFIX}*.*.*${TAG_SUFFIX}" --sort=-v:refname | grep -v 'pre' | head -1)
+          set -o pipefail
+
+          if [ -z "$CURRENT_TAG" ]; then
+            echo "No previous release found"
+            CURRENT_TAG="${TAG_PREFIX}0.0.1${TAG_SUFFIX}"
+          fi
+
+          echo "Current release: $CURRENT_TAG"
+          echo "current_version=$(echo $CURRENT_TAG | sed "s/^${TAG_PREFIX}//")" >> $GITHUB_OUTPUT
+
+      - name: Set Momentum lib for template
+        id: set-lib-version
+        shell: bash
+        run: |
+          sed -i 's/$(TemplateMomentumVersion)/'"${{ steps.latest-version.outputs.current_version }}"'/g' Directory.Packages.props
+          echo "Updated Directory.Packages.props with version: ${{ steps.latest-version.outputs.current_version }}"
 
       - name: Calculate pre-release version
         if: steps.config.outputs.deploy-prerelease == 'true'

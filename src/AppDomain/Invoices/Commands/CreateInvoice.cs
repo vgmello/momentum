@@ -35,7 +35,7 @@ public class CreateInvoiceValidator : AbstractValidator<CreateInvoiceCommand>
         RuleFor(c => c.TenantId).NotEmpty();
         RuleFor(c => c.Name).NotEmpty();
         RuleFor(c => c.Name).MinimumLength(2);
-        RuleFor(c => c.Name).MaximumLength(200);
+        RuleFor(c => c.Name).MaximumLength(100);
         RuleFor(c => c.Amount).GreaterThan(0);
         RuleFor(c => c.Currency).MaximumLength(3).When(c => !string.IsNullOrEmpty(c.Currency));
     }

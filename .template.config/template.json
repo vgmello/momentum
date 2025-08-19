@@ -254,12 +254,6 @@
       "valueTransform": "kebab-case",
       "replaces": "app-domain",
       "fileRename": "app-domain"
-    },
-    "MomentumVersion": {
-      "type": "bind",
-      "binding": "msbuild:MomentumVersion",
-      "replaces": "$(TemplateMomentumVersion)",
-      "defaultValue": "0.0.1"
     }
   },
   "forms": {

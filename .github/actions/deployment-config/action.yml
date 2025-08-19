@@ -57,13 +57,13 @@ runs:
         fi
 
         # Set prerelease flag (only when explicitly needed)
-        if [[ ("${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main") || 
+        if [[ ("${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main") ||
               ("${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.deploy-type }}" == *"prerelease") ]]; then
           DEPLOY_PRERELEASE=true
         fi
 
         # Set docs flag for library releases (only for version tags, release tag, or docs-only workflow)
-        if [[ "${{ github.ref }}" =~ ^refs/tags/v || "${{ github.ref_name }}" == "release" || 
+        if [[ "${{ github.ref }}" =~ ^refs/tags/v || "${{ github.ref }}" =~ ^refs/tags/template-v || "${{ github.ref_name }}" == "release" ||
               "${{ inputs.deploy-type }}" == "docs-only" ]]; then
           DEPLOY_DOCS=true
         fi

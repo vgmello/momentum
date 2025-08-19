@@ -11,17 +11,14 @@ namespace AppDomain.BackOffice.Orleans.Invoices;
 public class InvoiceOrleansService
 {
     private readonly IGrainFactory _grainFactory;
-    private readonly ILogger<InvoiceOrleansService> _logger;
 
     /// <summary>
     ///     Initializes a new instance of the InvoiceOrleansService class.
     /// </summary>
     /// <param name="grainFactory">The Orleans grain factory used to create and access invoice grains.</param>
-    /// <param name="logger">The logger instance for recording service operations.</param>
-    public InvoiceOrleansService(IGrainFactory grainFactory, ILogger<InvoiceOrleansService> logger)
+    public InvoiceOrleansService(IGrainFactory grainFactory)
     {
         _grainFactory = grainFactory;
-        _logger = logger;
     }
 
     /// <summary>

@@ -22,13 +22,18 @@ public static class OrleansExtensions
 
         if (!useLocalCluster)
         {
-            builder.AddKeyedAzureTableClient("OrleansClustering");
-            builder.AddKeyedAzureBlobClient("OrleansGrainState");
+            builder.AddKeyedAzureTableServiceClient("OrleansClustering");
+            builder.AddKeyedAzureBlobServiceClient("OrleansGrainState");
         }
 
         builder.Services
             .AddOpenTelemetry()
-            .WithMetrics(opt => opt.AddMeter("Microsoft.Orleans"));
+            .WithMetrics(opt => opt.AddMeter("Microsoft.Orleans"))
+            .WithTracing(tracing =>
+            {
+                tracing.AddSource("Microsoft.Orleans.Runtime");
+                tracing.AddSource("Microsoft.Orleans.Application");
+            });
 
         builder.UseOrleans(siloBuilder =>
         {
