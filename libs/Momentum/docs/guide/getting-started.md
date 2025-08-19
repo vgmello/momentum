@@ -69,7 +69,7 @@ Momentum is built on modern, production-proven technologies:
 
 ### **Core Architecture Principles**
 
--   **🎯 Real-World Mirroring**: Code structure corresponds to business operations
+-   **🎯 Real-World Mirroring**: Code structure corresponds to business operations and processes
 -   **🚫 No Smart Objects**: Entities are data records, not self-modifying objects
 -   **🏢 Front/Back Office**: Synchronous APIs vs Asynchronous processing
 -   **📡 Event-Driven**: Integration events via Kafka with Wolverine message handling
@@ -105,14 +105,14 @@ dotnet new mmt -n WorkflowEngine --orleans --api false --port 9000
 
 ```bash
 # Generate complete solution with custom settings
-dotnet new mmt -n EcommercePlatform --org "Acme Corp" --port 7000 --kafka true
+dotnet new mmt -n EcommercePlatform --org "Acme Corp" --port 7000
 ```
 
 ### **Minimal Setup**
 
 ```bash
 # Clean slate without sample code
-dotnet new mmt -n CleanService --sample false --project-only
+dotnet new mmt -n CleanService --no-sample false --project-only
 ```
 
 ### **Available Template Parameters**
@@ -133,7 +133,7 @@ The template offers comprehensive configuration options:
 
 **Customization:**
 -   `--org`: Organization name for copyright headers
--   `--sample`: Include sample Cashiers/Invoices code (default: true, use `--sample false` to skip)
+-   `--no-sample`: Include sample Cashiers/Invoices code (default: true, use `--no-sample false` to skip)
 -   `--project-only`: Generate only projects without solution files
 -   `--libs`: Include Momentum libraries as project references
 -   `--lib-name`: Custom prefix to replace "Momentum" in library names
@@ -1046,7 +1046,7 @@ Choose your path based on how you're using Momentum:
 
 ### **Community and Support**
 
--   **API Reference**: Browse the complete API documentation 
+-   **API Reference**: Browse the complete API documentation
 -   **Sample Applications**: See real-world examples
 -   **GitHub Discussions**: Ask questions and share experiences
 -   **Contributing**: Help improve the libraries for everyone
