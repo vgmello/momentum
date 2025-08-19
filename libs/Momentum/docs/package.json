@@ -8,6 +8,7 @@
     "docs:pre": "pnpm docs:dotnet && pnpm docs:adr",
     "docs:dev": "pnpm docs:pre && vitepress dev",
     "docs:build": "pnpm docs:pre && vitepress build",
+    "docs:build:debug": "DEBUG=* pnpm docs:build",
     "docs:preview": "vitepress preview",
     "docs:dotnet": "tsx .vitepress/scripts/docs-dotnet.ts",
     "docs:adr": "tsx .vitepress/scripts/adrlogs-table-gen.ts"

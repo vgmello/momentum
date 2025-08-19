@@ -1,12 +1,12 @@
 # XML Documentation Document Transformer
 
-## Transformer Overview {#transformer-overview}
+## Transformer Overview
 
 This transformer enhances the OpenAPI specification with:
 
 - **Controller Documentation**: As tag descriptions
 - **Assembly Company Information**: As contact details
-- **Assembly Copyright**: As license information  
+- **Assembly Copyright**: As license information
 - **Assembly Version**: As custom metadata
 
 ## Document Enhancement Process
@@ -93,14 +93,14 @@ private static void AddMetadata(Assembly assembly, OpenApiDocument document)
 ### Company Information
 
 ```csharp
-private static string? GetAssemblyCompany(Assembly assembly) => 
+private static string? GetAssemblyCompany(Assembly assembly) =>
     assembly.GetCustomAttribute<AssemblyCompanyAttribute>()?.Company;
 ```
 
 ### Copyright Information
 
 ```csharp
-private static string? GetAssemblyCopyright(Assembly assembly) => 
+private static string? GetAssemblyCopyright(Assembly assembly) =>
     assembly.GetCustomAttribute<AssemblyCopyrightAttribute>()?.Copyright;
 ```
 

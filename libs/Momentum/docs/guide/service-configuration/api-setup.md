@@ -1,3 +1,9 @@
+---
+title: API Setup
+description: Pre-configured patterns for building REST APIs and gRPC services with automatic endpoint discovery, validation, error handling, and OpenAPI documentation.
+date: 2024-01-15
+---
+
 # API Setup in Momentum
 
 Momentum provides pre-configured patterns for building REST APIs and gRPC services. The API setup includes automatic endpoint discovery, validation, error handling, and OpenAPI documentation.

@@ -1,6 +1,6 @@
 # OpenAPI Caching Middleware
 
-## Middleware Overview {#middleware-overview}
+## Middleware Overview
 
 This middleware:
 

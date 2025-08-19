@@ -2,7 +2,7 @@
 
 This file contains detailed documentation for the TypeExtensions class and its methods.
 
-## Class Overview {#class-overview}
+## Class Overview
 
 This class contains utilities specifically designed to work with modern C# language features
 including records, init-only properties, and primary constructors. These extensions are particularly
@@ -15,7 +15,7 @@ Key scenarios supported:
 - Init-only property identification for immutable data patterns
 - Reflection-based metadata extraction for validation and serialization
 
-## GetPropertiesWithAttribute Method {#get-properties-with-attribute}
+## GetPropertiesWithAttribute Method
 
 This method is essential for working with C# records where attributes can be applied
 to constructor parameters and are not automatically inherited by the generated properties.
@@ -31,7 +31,7 @@ This functionality is commonly used by validation frameworks, serializers,
 and other reflection-based libraries that need to discover metadata consistently
 across different property declaration styles.
 
-## GetCustomAttribute Method {#get-custom-attribute}
+## GetCustomAttribute Method
 
 This method implements a two-stage attribute lookup strategy:
 1. First, check if the attribute is directly applied to the property
@@ -44,7 +44,7 @@ a unified way to retrieve attributes regardless of where they were originally de
 The method matches constructor parameters to properties by name and type, ensuring
 that the correct parameter attribute is associated with the corresponding property.
 
-## GetPrimaryConstructor Method {#get-primary-constructor}
+## GetPrimaryConstructor Method
 
 This method implements a heuristic approach to identify primary constructors by:
 1. Finding all init-only properties on the type
@@ -62,7 +62,7 @@ This approach is particularly effective for:
 It may not work correctly for types with multiple constructors that could match the heuristics,
 or for types that don't follow standard immutable object patterns.
 
-## IsInitOnly Method {#is-init-only}
+## IsInitOnly Method
 
 This method detects init-only properties by examining the property's setter method
 for the presence of the `IsExternalInit` modifier. Init-only properties

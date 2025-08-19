@@ -1,3 +1,9 @@
+---
+title: Validation
+description: Input validation using FluentValidation, providing a consistent and powerful way to validate commands and queries before they reach handlers.
+date: 2024-01-15
+---
+
 # Validation in Momentum
 
 Momentum uses FluentValidation for input validation, providing a consistent and powerful way to validate commands and queries before they reach your handlers.

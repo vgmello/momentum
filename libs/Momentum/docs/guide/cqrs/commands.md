@@ -1,3 +1,9 @@
+---
+title: Commands
+description: Write operations in Momentum applications that change state, following specific patterns for consistency, validation, and event publishing.
+date: 2024-01-15
+---
+
 # Commands in Momentum
 
 Commands represent write operations in your application that change state. In Momentum, commands follow a specific pattern that ensures consistency, validation, and event publishing.

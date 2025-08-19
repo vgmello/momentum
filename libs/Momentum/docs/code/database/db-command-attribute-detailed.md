@@ -40,7 +40,7 @@ Global configuration through MSBuild properties:
 
 ## Requirements
 
-- Target class must implement ICommand<TResult> or IQuery<TResult> (or parameterless versions)
+- Target class must implement ICommand&lt;TResult&gt; or IQuery&lt;TResult&gt; (or parameterless versions)
 - Class must be partial if nested within another type
 - Only one of sp, sql, or fn can be specified per command
 - Assembly must reference Momentum.Extensions.SourceGenerators
