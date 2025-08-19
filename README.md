@@ -1127,6 +1127,15 @@ app.MapGet("/orders/{id:guid}", async (Guid id, IMessageBus bus) =>
 -   **Sample Applications** - Real-world examples
 -   **GitHub Discussions** - Community support
 
+## Coming Soon
+
+We're continuously expanding Momentum to include even more production-ready technologies and patterns:
+
+- **SQL Server** - Additional database provider support alongside PostgreSQL
+- **k6 for Performance Testing** - Automated load testing and performance validation
+- **LGTM stack for improved observability** - Enhanced monitoring with Loki, Grafana, Tempo, and Mimir
+- **Maybe REDIS** - Caching and session management capabilities
+
 ---
 
 _Momentum: Real-world microservices. Modern architecture. Production-ready from day one._
