@@ -8,6 +8,7 @@ using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Networks;
 using Grpc.Net.Client;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 using Momentum.ServiceDefaults;
 using Momentum.ServiceDefaults.Api;
 using Momentum.ServiceDefaults.Messaging.Wolverine;
@@ -64,8 +65,9 @@ public class IntegrationTestFixture : WebApplicationFactory<AppDomain.Api.Progra
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.UseSetting("ConnectionStrings:AppDomainDb", _postgres.GetDbConnectionString("AppDomain"));
+        builder.UseSetting("ConnectionStrings:AppDomainDb", _postgres.GetDbConnectionString("app_domain"));
         builder.UseSetting("ConnectionStrings:ServiceBus", _postgres.GetDbConnectionString("service_bus"));
+        builder.UseSetting("ConnectionStrings:Messaging", "localhost:9092");
 
         WolverineSetupExtensions.SkipServiceRegistration = true;
         ServiceDefaultsExtensions.EntryAssembly = typeof(AppDomain.Api.Program).Assembly;

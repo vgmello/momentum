@@ -6,14 +6,13 @@ const log = (message: string) => console.log(`[${new Date().toISOString()}] ${me
 
 function getGitHubUrl(): string | null {
     try {
-        // Get the git remote URL
         const remoteUrl = execSync('git remote get-url origin', {
             encoding: 'utf8',
-            cwd: path.resolve('..') // Run from the project root
+            cwd: path.resolve('..')
         }).trim();
 
-        // Convert SSH or HTTPS git URL to GitHub web URL
         let githubUrl: string;
+
         if (remoteUrl.startsWith('git@github.com:')) {
             // SSH format: git@github.com:user/repo.git
             const repoPath = remoteUrl.replace('git@github.com:', '').replace('.git', '');
@@ -26,19 +25,17 @@ function getGitHubUrl(): string | null {
             return null;
         }
 
-        // Add the blob/main/src path for source code links
         return `${githubUrl}/blob/main/src`;
 
     } catch (error) {
         log(`Could not get GitHub URL from git remote: ${error}`);
+
         return null;
     }
 }
 
 try {
     const startTime = Date.now();
-
-    // Get assembly paths from command line arguments
     const args = process.argv.slice(2);
     const assemblyPathsArg = args[0];
 
@@ -49,22 +46,6 @@ try {
         process.exit(1);
     }
 
-    // Look for the pre-built DLL in both local and Docker environments
-    const possibleDllPaths = [
-        '/generator/libs/Momentum/src/Momentum.Extensions.EventMarkdownGenerator/bin/Debug/net9.0/Momentum.Extensions.EventMarkdownGenerator.dll',
-        path.resolve('..', 'libs', 'Momentum', 'src', 'Momentum.Extensions.EventMarkdownGenerator', 'bin', 'Debug', 'net9.0', 'Momentum.Extensions.EventMarkdownGenerator.dll')
-    ];
-
-    const toolDllPath = possibleDllPaths.find(dllPath => fs.existsSync(dllPath));
-
-    if (!toolDllPath) {
-        log('Tool DLL not found. Tried paths:');
-        possibleDllPaths.forEach(p => log(`  - ${p}`));
-        log('Build the tool first.');
-        process.exit(1);
-    }
-
-    log(`Using tool at: ${toolDllPath}`);
     log('Generating events documentation...');
 
     // Parse comma-delimited assembly paths
@@ -76,7 +57,6 @@ try {
 
     log(`Processing ${assemblyPaths.length} assemblies:`);
 
-    // Check if assemblies exist
     const existingAssemblies = assemblyPaths.filter(assemblyPath => {
         const exists = fs.existsSync(assemblyPath);
         if (exists) {
@@ -97,11 +77,10 @@ try {
     const assembliesArg = existingAssemblies.join(',');
 
     try {
-        // Run the pre-built DLL directly
         const env = { ...process.env, 'SkipLocalFeedPush': 'true' };
         const githubUrl = getGitHubUrl();
 
-        let command = `dotnet "${toolDllPath}" --assemblies "${assembliesArg}" --output "${outputDir}"`;
+        let command = `events-docsgen --assemblies "${assembliesArg}" --output "${outputDir}"`;
         if (githubUrl) {
             log(`Using GitHub URL: ${githubUrl}`);
             command += ` --github-url "${githubUrl}"`;

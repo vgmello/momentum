@@ -6,8 +6,24 @@ public static class OrleansExtensions
 {
     public static IHostApplicationBuilder AddOrleansClient(this IHostApplicationBuilder builder)
     {
-        builder.AddKeyedAzureTableServiceClient("OrleansClustering");
-        builder.UseOrleansClient();
+        var useLocalCluster = builder.Configuration.GetValue<bool>("Orleans:UseLocalhostClustering");
+        var orleansConnectionString = builder.Configuration.GetConnectionString("OrleansClustering");
+
+        if (!useLocalCluster && string.IsNullOrEmpty(orleansConnectionString))
+            throw new InvalidOperationException("Orleans 'OrleansClustering' ConnectionString is missing");
+
+        if (!useLocalCluster)
+        {
+            builder.AddKeyedAzureTableServiceClient("OrleansClustering");
+        }
+
+        builder.UseOrleansClient(clientBuilder =>
+        {
+            if (useLocalCluster)
+            {
+                clientBuilder.UseLocalhostClustering();
+            }
+        });
 
         builder.Services
             .AddOpenTelemetry()

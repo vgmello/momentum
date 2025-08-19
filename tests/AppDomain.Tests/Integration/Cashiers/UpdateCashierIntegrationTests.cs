@@ -15,7 +15,7 @@ public class UpdateCashierIntegrationTests(IntegrationTestFixture fixture) : Int
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE AppDomain.cashiers;");
+        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.cashiers;");
 
         // Arrange - Create a cashier first
         var createRequest = new CreateCashierRequest
@@ -54,7 +54,7 @@ public class UpdateCashierIntegrationTests(IntegrationTestFixture fixture) : Int
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE AppDomain.cashiers;");
+        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.cashiers;");
 
         // Arrange - Create a cashier first
         var createRequest = new CreateCashierRequest

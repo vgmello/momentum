@@ -15,7 +15,7 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE AppDomain.invoices;");
+        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
 
         // Arrange - Create an invoice first
         var createRequest = new CreateInvoiceRequest
@@ -65,7 +65,7 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE AppDomain.invoices;");
+        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
 
         // Arrange - Create an invoice first
         var createRequest = new CreateInvoiceRequest
@@ -129,7 +129,7 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE AppDomain.invoices;");
+        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
 
         // Arrange - Create an invoice first
         var createRequest = new CreateInvoiceRequest
@@ -161,7 +161,7 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE AppDomain.invoices;");
+        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
 
         // Arrange - Create and pay an invoice
         var createRequest = new CreateInvoiceRequest

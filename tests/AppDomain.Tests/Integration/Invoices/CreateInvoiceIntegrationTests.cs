@@ -15,7 +15,7 @@ public class CreateInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE AppDomain.invoices;");
+        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
 
         // Arrange
         var createRequest = new CreateInvoiceRequest
@@ -59,8 +59,8 @@ public class CreateInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE AppDomain.invoices;");
-        await connection.ExecuteAsync("TRUNCATE TABLE AppDomain.cashiers;");
+        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
+        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.cashiers;");
 
         // Create a cashier first
         var cashierId = Guid.NewGuid();
@@ -124,7 +124,7 @@ public class CreateInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE AppDomain.invoices;");
+        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
 
         // Arrange
         var createRequest = new CreateInvoiceRequest
