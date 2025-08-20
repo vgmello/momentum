@@ -7,16 +7,28 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" />
-        <PackageReference Include="xunit.v3" />
-        <PackageReference Include="xunit.runner.visualstudio" />
-        <PackageReference Include="Shouldly" />
+        <PackageReference Include="Microsoft.Extensions.Configuration"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk"/>
+        <PackageReference Include="xunit.v3"/>
+        <PackageReference Include="xunit.runner.visualstudio"/>
+        <PackageReference Include="Shouldly"/>
+        <PackageReference Include="NSwag.MSBuild"/>
+        <PackageReference Include="System.Net.Http.Json"/>
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
-        <None Include="Configuration/TestSettings.cs" />
-        <None Include="appsettings.*.json" CopyToOutputDirectory="PreserveNewest" />
+        <None Include="appsettings.json" CopyToOutputDirectory="PreserveNewest"/>
+        <None Include="appsettings.*.json" CopyToOutputDirectory="PreserveNewest"/>
+        <None Include="OpenApi\app-domain-api.json"/>
     </ItemGroup>
+
+    <Target Name="NSwag" BeforeTargets="Build">
+        <Message Text="Generating OpenApiClient" Importance="high"/>
+        <Exec Command="$(NSwagExe_Net90) openapi2csclient /input:OpenApi/app-domain-api.json /classname:AppDomainApiClient /namespace:AppDomain.Tests.E2E.OpenApi.Generated /output:OpenApi/Generated/AppDomainApiClient.cs /generateResponseClasses:true /generateJsonMethods:true /useHttpClientCreationMethod:true" ContinueOnError="true"/>
+    </Target>
 
 </Project>
