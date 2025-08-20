@@ -255,10 +255,6 @@ public static class GetUserQueryHandler
 // Contracts/IntegrationEvents/UserCreated.cs
 using Momentum.ServiceDefaults.Messaging;
 
-/// <summary>
-/// Published when a new user is successfully created in the system.
-/// This event notifies other services that a user account is available.
-/// </summary>
 [EventTopic<User>]
 public record UserCreated(
     [PartitionKey] Guid TenantId,

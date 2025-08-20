@@ -286,11 +286,6 @@ dotnet build --verbosity diagnostic
 Events must have proper XML documentation:
 
 ```csharp
-/// <summary>
-/// Represents when a cashier is created in the system.
-/// </summary>
-/// <param name="CashierId">The unique identifier of the cashier</param>
-/// <param name="Name">The name of the cashier</param>
 [EventTopic("app_domain.cashiers.cashier-created")]
 public record CashierCreated(Guid CashierId, string Name);
 ```

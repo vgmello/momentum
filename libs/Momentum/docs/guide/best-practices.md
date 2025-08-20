@@ -142,10 +142,6 @@ public record SearchCashiersQuery(Guid TenantId, string SearchTerm)
 Think about who will consume your events and what they need:
 
 ```csharp
-/// <summary>
-/// Published when a cashier is created. Contains all necessary data for downstream services
-/// to update their views without additional queries.
-/// </summary>
 [EventTopic<Cashier>]
 public record CashierCreated(
     [PartitionKey] Guid TenantId,

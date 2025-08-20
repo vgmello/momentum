@@ -258,9 +258,6 @@ The `LiquibaseExtensions.cs` class provides a fluent API for configuring Liquiba
 ```csharp
 public static class LiquibaseExtensions
 {
-    /// <summary>
-    /// Adds a Liquibase container resource for running database migrations in Aspire orchestration.
-    /// </summary>
     public static IResourceBuilder<ContainerResource> AddLiquibaseMigrations(
         this IDistributedApplicationBuilder builder,
         IResourceBuilder<IResourceWithConnectionString> dbServerResource,

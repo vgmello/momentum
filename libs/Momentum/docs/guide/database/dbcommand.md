@@ -244,9 +244,6 @@ Momentum supports source-generated database commands for enhanced performance an
 ```csharp
 public static partial class GetCashiersQueryHandler
 {
-    /// <summary>
-    /// If the function name starts with a $, the function gets executed as `select * from {dbFunction}`
-    /// </summary>
     [DbCommand(fn: "$app_domain.cashiers_get_all")]
     public partial record DbQuery(
         Guid TenantId,

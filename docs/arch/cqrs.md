@@ -182,14 +182,6 @@ Events are notifications sent between departments when important things happen.
 ### Event Structure
 
 <pre v-pre class="language-csharp"><code>
-/// &lt;summary&gt;
-///     Published when a new cashier is successfully created in the AppDomain system. This event contains the complete cashier data and partition
-///     key information for proper message routing.
-/// &lt;/summary&gt;
-/// &lt;remarks&gt;
-///     - The cashier creation process completes successfully
-///     - Some other actions
-/// &lt;/remarks&gt;
 [EventTopic&lt;Cashier&gt;]
 public record CashierCreated([PartitionKey] Guid TenantId, [PartitionKey] int PartitionKeyTest, Cashier Cashier);
 </code></pre>
@@ -211,10 +203,6 @@ Controllers act as the front office reception desk, handling external requests.
 ### Controller Pattern
 
 <pre v-pre class="language-csharp"><code>
-/// &lt;returns&gt;The cashier details if found&lt;/returns&gt;
-/// &lt;response code="200" /&gt;
-/// &lt;response code="404"&gt;If the cashier is not found&lt;/response&gt;
-/// &lt;response code="400"&gt;If the provided ID is invalid&lt;/response&gt;
 [HttpGet("{id:guid}")]
 [ProducesResponseType(StatusCodes.Status404NotFound)]
 [ProducesResponseType&lt;object&gt;(StatusCodes.Status400BadRequest)]
@@ -225,18 +213,11 @@ public async Task&lt;ActionResult&lt;Cashier&gt;&gt; GetCashier([FromRoute] Guid
     return cashier;
 }
 
-/// &lt;summary&gt;
-///     Retrieves a list of cashiers with optional filtering
-/// &lt;/summary&gt;
-/// &lt;param name="query"&gt;Query parameters for filtering and pagination&lt;/param&gt;
-/// &lt;param name="cancellationToken"&gt;Cancellation token&lt;/param&gt;
-/// &lt;returns&gt;A list of cashiers matching the specified criteria&lt;/returns&gt;
 </code></pre>
 
 ### Result Handling
 
 <pre v-pre class="language-csharp"><code>
-/// &lt;response code="400"&gt;If query parameters are invalid&lt;/response&gt;
 [HttpGet]
 [ProducesResponseType&lt;object&gt;(StatusCodes.Status400BadRequest)]
 public async Task&lt;ActionResult&lt;IEnumerable&lt;GetCashiersQuery.Result&gt;&gt;&gt; GetCashiers([FromQuery] GetCashiersQuery query,
@@ -247,15 +228,6 @@ public async Task&lt;ActionResult&lt;IEnumerable&lt;GetCashiersQuery.Result&gt;&
     return Ok(cashiers);
 }
 
-/// &lt;summary&gt;
-///     Creates a new cashier in the system
-/// &lt;/summary&gt;
-/// &lt;param name="command"&gt;The cashier creation request containing name and email&lt;/param&gt;
-/// &lt;param name="cancellationToken"&gt;Cancellation token&lt;/param&gt;
-/// &lt;returns&gt;The created cashier details&lt;/returns&gt;
-/// &lt;response code="201" /&gt;
-/// &lt;response code="400"&gt;If the request data is invalid or validation fails&lt;/response&gt;
-/// &lt;response code="409"&gt;If a cashier with the same email already exists&lt;/response&gt;
 </code></pre>
 
 ## Database Interaction

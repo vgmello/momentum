@@ -15,9 +15,6 @@ Integration events are:
 Integration events are defined as records with specific attributes:
 
 ```csharp
-/// <summary>
-/// Published when a new cashier is successfully created in the AppDomain system.
-/// </summary>
 [EventTopic<Cashier>]
 public record CashierCreated(
     [PartitionKey] Guid TenantId,
@@ -88,9 +85,6 @@ public record ComplexEvent(
 ### Simple Event
 
 ```csharp
-/// <summary>
-/// Published when a cashier is successfully deleted from the system.
-/// </summary>
 [EventTopic<Guid>]
 public record CashierDeleted(
     [PartitionKey] Guid TenantId, 
@@ -101,13 +95,6 @@ public record CashierDeleted(
 ### Complex Event with Multiple Partition Keys
 
 ```csharp
-/// <summary>
-/// Published when a new cashier is successfully created in the AppDomain system. 
-/// This event contains the complete cashier data and partition key information for proper message routing.
-/// </summary>
-/// <param name="TenantId">Unique identifier for the tenant</param>
-/// <param name="PartitionKeyTest">Additional partition key for message routing</param>
-/// <param name="Cashier">Cashier object containing all cashier data and configuration</param>
 [EventTopic<Cashier>]
 public record CashierCreated(
     [PartitionKey(Order = 0)] Guid TenantId,
@@ -119,18 +106,12 @@ public record CashierCreated(
 ### Invoice Events
 
 ```csharp
-/// <summary>
-/// Published when an invoice is successfully created and ready for processing.
-/// </summary>
 [EventTopic<Invoice>]
 public record InvoiceCreated(
     [PartitionKey] Guid TenantId,
     Invoice Invoice
 );
 
-/// <summary>
-/// Published when an invoice payment has been processed and confirmed.
-/// </summary>
 [EventTopic<Guid>]
 public record InvoicePaid(
     [PartitionKey] Guid TenantId,

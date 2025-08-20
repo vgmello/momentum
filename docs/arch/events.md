@@ -110,17 +110,6 @@ public partial class CreateInvoiceCommandHandler : IRequestHandler<CreateInvoice
 **Event Schema Definition**:
 
 ```csharp
-/// <summary>
-/// Published when a new invoice is created in the system.
-/// Used by accounting and notification services for downstream processing.
-/// </summary>
-/// <param name="InvoiceId">Unique identifier for the created invoice</param>
-/// <param name="InvoiceNumber">Human-readable invoice number</param>
-/// <param name="Amount">Invoice total amount in base currency units</param>
-/// <param name="Currency">ISO 4217 currency code (e.g., "USD", "EUR")</param>
-/// <param name="CashierId">Identifier of the cashier who created the invoice</param>
-/// <param name="CreatedAt">Timestamp when the invoice was created (UTC)</param>
-/// <param name="DueDate">Payment due date for the invoice</param>
 public record InvoiceCreated(
     Ulid InvoiceId,
     string InvoiceNumber,
