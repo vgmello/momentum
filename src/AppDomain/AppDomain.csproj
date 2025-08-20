@@ -43,9 +43,12 @@
         <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.csproj"/>
         <!--#endif -->
         <!--#if (libs == generators) -->
-        <ProjectReference
-            Include="..\..\libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.csproj"
-            OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
+        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.csproj">
+            <OutputItemType>Analyzer</OutputItemType>
+            <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </ProjectReference>
         <!--#endif -->
     </ItemGroup>
 
