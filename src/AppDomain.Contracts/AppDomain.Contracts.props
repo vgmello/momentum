@@ -1,8 +1,0 @@
-<Project>
-    <ItemGroup>
-        <Protobuf Include="$(MSBuildThisFileDirectory)..\**\Protos\**\*.proto"
-                  Link="%(RecursiveDir)%(Filename)%(Extension)"
-                  ProtoRoot="$(MSBuildThisFileDirectory)..\Protos\"
-                  GrpcServices="Client"/>
-    </ItemGroup>
-</Project>
