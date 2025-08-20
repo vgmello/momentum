@@ -5,42 +5,40 @@ WORKDIR /app
 EXPOSE 8080
 EXPOSE 8443
 
-## Build stage
+# Build stage
 FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS build
 ARG BUILD_CONFIGURATION=Release
 
-## Grpc tools
+## Install gRPC tools
 RUN apk add --no-cache grpc-plugins
 ENV PROTOBUF_PROTOC=/usr/bin/protoc
 ENV GRPC_PROTOC_PLUGIN=/usr/bin/grpc_csharp_plugin
 
 WORKDIR /src
 
+## Copy all project files to restore dependencies
 COPY --parents **/**/**/*.csproj .
+COPY Directory.Build.props Directory.Packages.props ./
 
-# Copy global build configuration files first (changes rarely)
-COPY Directory.Packages.props .
-COPY Directory.Build.props .
+## Restore packages - this layer is cached unless dependencies change
+RUN dotnet restore "src/AppDomain.BackOffice.Orleans/AppDomain.BackOffice.Orleans.csproj"
 
-# Restore packages - this layer is cached unless dependencies change
-RUN dotnet restore "src/AppDomain.BackOffice.Orleans/AppDomain.BackOffice.Orleans.csproj" --verbosity minimal
-
-# Copy source code (this layer invalidates on any code change)
+## Copy source code (this layer invalidates on any code change)
 COPY . .
+WORKDIR /src/src/AppDomain.BackOffice.Orleans/
 
-# Build the Orleans application
-RUN dotnet build "src/AppDomain.BackOffice.Orleans/AppDomain.BackOffice.Orleans.csproj" -c "$BUILD_CONFIGURATION" --no-restore --verbosity minimal
+## Create Wolverine generated source files
+RUN dotnet run --no-restore -- codegen write & dotnet run --no-restore -- codegen test
 
-RUN dotnet publish "src/AppDomain.BackOffice.Orleans/AppDomain.BackOffice.Orleans.csproj" -c "$BUILD_CONFIGURATION" \
+## Build & Publish
+RUN dotnet publish \
+    -c "$BUILD_CONFIGURATION" \
     -o /app/publish \
-    --no-build \
     --no-restore \
-    /p:UseAppHost=false \
-    --verbosity minimal
+    /p:UseAppHost=false
 
+# Final stage
 FROM base AS final
-WORKDIR /app
-
 COPY --from=build /app/publish .
 
 ENTRYPOINT ["dotnet", "AppDomain.BackOffice.Orleans.dll"]

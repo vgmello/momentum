@@ -21,23 +21,24 @@ COPY --parents **/**/**/*.csproj .
 COPY Directory.Build.props Directory.Packages.props ./
 
 ## Restore packages - this layer is cached unless dependencies change
-RUN dotnet restore "src/AppDomain.BackOffice/AppDomain.BackOffice.csproj" --verbosity minimal
+RUN dotnet restore "src/AppDomain.BackOffice/AppDomain.BackOffice.csproj"
 
 ## Copy source code (this layer invalidates on any code change)
 COPY . .
+WORKDIR /src/src/AppDomain.BackOffice/
 
-# Build & Publish
-RUN dotnet publish "src/AppDomain.BackOffice/AppDomain.BackOffice.csproj" \
+## Create Wolverine generated source files
+RUN dotnet run --no-restore -- codegen write & dotnet run --no-restore -- codegen test
+
+## Build & Publish
+RUN dotnet publish \
     -c "$BUILD_CONFIGURATION" \
     -o /app/publish \
     --no-restore \
-    /p:UseAppHost=false \
-    --verbosity minimal
+    /p:UseAppHost=false
 
+# Final stage
 FROM base AS final
-WORKDIR /app
-
 COPY --from=build /app/publish .
-RUN dotnet AppDomain.BackOffice.dll codegen write || echo "Codegen failed"
 
 ENTRYPOINT ["dotnet", "AppDomain.BackOffice.dll"]

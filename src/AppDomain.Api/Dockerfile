@@ -25,19 +25,20 @@ RUN dotnet restore "src/AppDomain.Api/AppDomain.Api.csproj"
 
 ## Copy source code (this layer invalidates on any code change)
 COPY . .
-
-# Create Wolverine generated source files
 WORKDIR /src/src/AppDomain.Api/
-# RUN dotnet run -- codegen write & dotnet run -- codegen test
 
-# # Build & Publish
-# RUN dotnet publish "src/AppDomain.Api/AppDomain.Api.csproj" \
-#     -c "$BUILD_CONFIGURATION" \
-#     -o /app/publish \
-#     --no-restore \
-#     /p:UseAppHost=false
+## Create Wolverine generated source files
+RUN dotnet run --no-restore -- codegen write & dotnet run --no-restore -- codegen test
 
-# FROM base AS final
-# COPY --from=build /app/publish .
+## Build & Publish
+RUN dotnet publish \
+    -c "$BUILD_CONFIGURATION" \
+    -o /app/publish \
+    --no-restore \
+    /p:UseAppHost=false
 
-# ENTRYPOINT ["dotnet", "AppDomain.Api.dll"]
+# Final stage
+FROM base AS final
+COPY --from=build /app/publish .
+
+ENTRYPOINT ["dotnet", "AppDomain.Api.dll"]

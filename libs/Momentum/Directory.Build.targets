@@ -1,6 +1,5 @@
 <Project>
     <Target Name="CleanOldPackages" BeforeTargets="Build" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' ">
-        <MakeDir Directories="$(MSBuildThisFileDirectory).local/nuget"/>
         <ItemGroup>
             <OldPackagesToDelete Include="$(TargetDir)../*.*upkg"/>
             <OldPackagesToDelete Include="$(MSBuildThisFileDirectory).local/nuget/$(PackageId).*.nupkg"/>
@@ -14,10 +13,11 @@
             <VersionSuffix>$([System.DateTime]::UtcNow.ToString("yyyyMMdd-HHmmss"))</VersionSuffix>
             <PackageVersion>$(VersionPrefix)-$(VersionSuffix)</PackageVersion>
         </PropertyGroup>
-        <Message Text="Packaging version: $(PackageVersion)" Importance="high" />
+        <Message Text="Packaging version: $(PackageVersion)" Importance="high"/>
     </Target>
 
     <Target Name="PushToLocalFeed" AfterTargets="Pack" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' and '$(SolutionDir)' != '*Undefined*' ">
+        <MakeDir Directories="$(MSBuildThisFileDirectory).local/nuget"/>
         <Exec Command="dotnet nuget push &quot;$(PackageOutputPath)$(PackageId).$(PackageVersion).nupkg&quot; --source &quot;$(MSBuildThisFileDirectory).local/nuget&quot;"/>
     </Target>
 </Project>
