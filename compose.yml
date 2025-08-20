@@ -99,7 +99,7 @@ services:
       - ConnectionStrings__Messaging=kafka:9092
       # #endif
       # #if (INCLUDE_ORLEANS)
-      - ConnectionStrings__OrleansClustering=UseDevelopmentStorage=true
+      - Orleans__UseLocalhostClustering=true
       # #endif
       - Kestrel__Endpoints__Http__Protocols=Http1
       - Kestrel__Endpoints__Http__Url=http://+:8080
@@ -160,8 +160,12 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ServiceName=AppDomain
-      - ConnectionStrings__OrleansClustering=UseDevelopmentStorage=true
-      - ConnectionStrings__OrleansGrainState=UseDevelopmentStorage=true
+      - Orleans__UseLocalhostClustering=true
+      # #if (USE_DB)
+      - ConnectionStrings__AppDomainDb=Host=app-domain-db;Port=5432;Database=app_domain;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-password@}
+      - ConnectionStrings__ServiceBus=Host=app-domain-db;Port=5432;Database=service_bus;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-password@}
+      - ConnectionStrings__Messaging=kafka:9092
+      # #endif
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://aspire-dashboard:18890
       - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
       - OTEL_SERVICE_NAME=app-domain-orleans

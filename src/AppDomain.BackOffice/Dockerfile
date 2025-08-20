@@ -16,12 +16,12 @@ ENV GRPC_PROTOC_PLUGIN=/usr/bin/grpc_csharp_plugin
 
 WORKDIR /src
 
-## Copy all project and solution files to restore dependencies
+## Copy all project files to restore dependencies
 COPY --parents **/**/**/*.csproj .
-COPY *.slnx Directory.Build.props Directory.Packages.props ./
+COPY Directory.Build.props Directory.Packages.props ./
 
 ## Restore packages - this layer is cached unless dependencies change
-RUN dotnet restore --verbosity minimal
+RUN dotnet restore "src/AppDomain.BackOffice/AppDomain.BackOffice.csproj" --verbosity minimal
 
 ## Copy source code (this layer invalidates on any code change)
 COPY . .
@@ -38,5 +38,6 @@ FROM base AS final
 WORKDIR /app
 
 COPY --from=build /app/publish .
+RUN dotnet AppDomain.BackOffice.dll codegen write || echo "Codegen failed"
 
 ENTRYPOINT ["dotnet", "AppDomain.BackOffice.dll"]

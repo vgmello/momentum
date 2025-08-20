@@ -16,30 +16,28 @@ ENV GRPC_PROTOC_PLUGIN=/usr/bin/grpc_csharp_plugin
 
 WORKDIR /src
 
-## Copy all project and solution files to restore dependencies
+## Copy all project files to restore dependencies
 COPY --parents **/**/**/*.csproj .
-COPY *.slnx Directory.Build.props Directory.Packages.props ./
+COPY Directory.Build.props Directory.Packages.props ./
 
 ## Restore packages - this layer is cached unless dependencies change
-RUN dotnet restore --verbosity minimal
+RUN dotnet restore "src/AppDomain.Api/AppDomain.Api.csproj"
 
 ## Copy source code (this layer invalidates on any code change)
 COPY . .
 
-# Build & Publish
-RUN dotnet publish "src/AppDomain.Api/AppDomain.Api.csproj" \
-    -c "$BUILD_CONFIGURATION" \
-    -o /app/publish \
-    --no-restore \
-    /p:UseAppHost=false \
-    --verbosity minimal
+# Create Wolverine generated source files
+WORKDIR /src/src/AppDomain.Api/
+# RUN dotnet run -- codegen write & dotnet run -- codegen test
 
-FROM base AS final
-WORKDIR /app
+# # Build & Publish
+# RUN dotnet publish "src/AppDomain.Api/AppDomain.Api.csproj" \
+#     -c "$BUILD_CONFIGURATION" \
+#     -o /app/publish \
+#     --no-restore \
+#     /p:UseAppHost=false
 
-COPY --from=build /app/publish .
+# FROM base AS final
+# COPY --from=build /app/publish .
 
-# Run Wolverine code generation
-RUN dotnet AppDomain.Api.dll codegen write || echo "Codegen failed"
-
-ENTRYPOINT ["dotnet", "AppDomain.Api.dll"]
+# ENTRYPOINT ["dotnet", "AppDomain.Api.dll"]

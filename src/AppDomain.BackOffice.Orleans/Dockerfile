@@ -19,23 +19,17 @@ WORKDIR /src
 COPY --parents **/**/**/*.csproj .
 
 # Copy global build configuration files first (changes rarely)
-COPY *.slnx .
 COPY Directory.Packages.props .
 COPY Directory.Build.props .
-COPY Directory.Build.targets .
 
 # Restore packages - this layer is cached unless dependencies change
-RUN dotnet restore --verbosity minimal
+RUN dotnet restore "src/AppDomain.BackOffice.Orleans/AppDomain.BackOffice.Orleans.csproj" --verbosity minimal
 
 # Copy source code (this layer invalidates on any code change)
 COPY . .
 
-# Build and Test the application
-
-# TODO: Removing integration tests from docker build, for now since it needs docker socket to be passed in, 
-# ideally we need to add a arg to decide whether to run integration tests or not
-RUN dotnet build -c "$BUILD_CONFIGURATION" --no-restore --verbosity minimal && \
-    dotnet test  -c "$BUILD_CONFIGURATION" --no-build --filter FullyQualifiedName\!~Integration
+# Build the Orleans application
+RUN dotnet build "src/AppDomain.BackOffice.Orleans/AppDomain.BackOffice.Orleans.csproj" -c "$BUILD_CONFIGURATION" --no-restore --verbosity minimal
 
 RUN dotnet publish "src/AppDomain.BackOffice.Orleans/AppDomain.BackOffice.Orleans.csproj" -c "$BUILD_CONFIGURATION" \
     -o /app/publish \
