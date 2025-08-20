@@ -50,6 +50,9 @@ var orleans = builder
 var appDomainApi = builder
     .AddProject<Projects.AppDomain_Api>("app-domain-api")
     .WithEnvironment("ServiceName", "AppDomain")
+#if (INCLUDE_ORLEANS)
+    .WithEnvironment("Aspire__Azure__Data__Tables__DisableHealthChecks", "true")
+#endif
     .WithKestrelLaunchProfileEndpoints()
 #if (USE_DB)
     .WithReference(database)
