@@ -29,12 +29,18 @@ cd OrderService
 
 ### 3. Start Everything with Aspire
 
+Make sure you have the aspire workload installed:
+
+```bash
+dotnet workload install aspire
+```
+
 ```bash
 # Launch the complete application stack
 dotnet run --project src/OrderService.AppHost
 
 # Access the Aspire Dashboard: https://localhost:18110
-# API endpoints: https://localhost:8101
+# API endpoints: https://localhost:8111
 # Documentation: http://localhost:8119
 ```
 
@@ -112,7 +118,7 @@ dotnet new mmt -n EcommercePlatform --org "Acme Corp" --port 7000
 
 ```bash
 # Clean slate without sample code
-dotnet new mmt -n CleanService --no-sample false --project-only
+dotnet new mmt -n CleanService --no-sample
 ```
 
 ### **Available Template Parameters**
@@ -132,8 +138,8 @@ The template offers comprehensive configuration options:
 -   `--port`: Base port number (default: 8100)
 
 **Customization:**
--   `--org`: Organization name for copyright headers
--   `--no-sample`: Include sample Cashiers/Invoices code (default: true, use `--no-sample false` to skip)
+-   `--org`: Organization name for copyright headers, github, etc
+-   `--no-sample`: Exclude sample code (default: false, use `--no-sample` to skip)
 -   `--project-only`: Generate only projects without solution files
 -   `--libs`: Include Momentum libraries as project references
 -   `--lib-name`: Custom prefix to replace "Momentum" in library names
