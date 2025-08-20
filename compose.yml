@@ -109,6 +109,9 @@ services:
       - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
       - OTEL_SERVICE_NAME=app-domain-api
       - OTEL_SERVICE_VERSION=1.0.0
+      - Serilog__MinimumLevel__Default=Verbose
+      - Serilog__WriteTo__0__Name=Console
+
     healthcheck:
       test: [ "CMD-SHELL", "curl -f http://localhost:8080/health/internal || exit 1" ]
       interval: 30s
