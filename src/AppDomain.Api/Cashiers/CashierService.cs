@@ -1,6 +1,5 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
-using AppDomain.Api.Extensions;
 using AppDomain.Cashiers.Grpc;
 using Google.Protobuf.WellKnownTypes;
 using CashierModel = AppDomain.Cashiers.Grpc.Models.Cashier;

@@ -1,6 +1,5 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
-using AppDomain.Api.Extensions;
 using AppDomain.Api.Invoices.Mappers;
 using AppDomain.Invoices.Grpc;
 using InvoiceModel = AppDomain.Invoices.Grpc.Models.Invoice;

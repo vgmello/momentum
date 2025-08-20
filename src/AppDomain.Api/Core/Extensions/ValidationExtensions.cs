@@ -2,7 +2,7 @@
 
 using FluentValidation.Results;
 
-namespace AppDomain.Api.Extensions;
+namespace AppDomain.Api.Core.Extensions;
 
 /// <summary>
 ///     Extensions for validation operations.
