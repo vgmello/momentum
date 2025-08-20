@@ -48,8 +48,8 @@ public class MoneyTests
         var money = new Money(100.50m, Currency.USD);
 
         // Assert
-        money.Amount.Should().Be(100.50m);
-        money.Currency.Should().Be(Currency.USD);
+        money.Amount.ShouldBe(100.50m);
+        money.Currency.ShouldBe(Currency.USD);
     }
 
     [Test]
@@ -63,8 +63,8 @@ public class MoneyTests
         var result = money1 + money2;
 
         // Assert
-        result.Amount.Should().Be(76.00m);
-        result.Currency.Should().Be(Currency.USD);
+        result.Amount.ShouldBe(76.00m);
+        result.Currency.ShouldBe(Currency.USD);
     }
 
     [Test]
@@ -76,8 +76,8 @@ public class MoneyTests
 
         // Act & Assert
         var action = () => usdMoney + eurMoney;
-        action.Should().Throw<InvalidOperationException>()
-              .WithMessage("Cannot add money with different currencies*");
+        action.ShouldThrow<InvalidOperationException>()
+              .Message.ShouldContain("Cannot add money with different currencies");
     }
 }
 ```
@@ -107,11 +107,12 @@ public class CashierTests
         };
 
         // Assert
-        cashier.TenantId.Should().Be(tenantId);
-        cashier.CashierId.Should().Be(cashierId);
-        cashier.Name.Should().Be(name);
-        cashier.Email.Should().Be(email);
-        cashier.CashierPayments.Should().NotBeNull().And.BeEmpty();
+        cashier.TenantId.ShouldBe(tenantId);
+        cashier.CashierId.ShouldBe(cashierId);
+        cashier.Name.ShouldBe(name);
+        cashier.Email.ShouldBe(email);
+        cashier.CashierPayments.ShouldNotBeNull();
+        cashier.CashierPayments.ShouldBeEmpty();
     }
 
     [Test]
@@ -130,8 +131,8 @@ public class CashierTests
         cashier.CashierPayments.Add(payment);
 
         // Assert
-        cashier.CashierPayments.Should().HaveCount(1);
-        cashier.CashierPayments.First().Amount.Should().Be(150.00m);
+        cashier.CashierPayments.ShouldHaveCount(1);
+        cashier.CashierPayments.First().Amount.ShouldBe(150.00m);
     }
 
     private static Cashier CreateTestCashier() =>
@@ -202,9 +203,9 @@ public class CreateCashierCommandHandlerTests
         var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsSuccess.Should().BeTrue();
-        result.Value.Name.Should().Be(command.Name);
-        result.Value.Email.Should().Be(command.Email);
+        result.IsSuccess.ShouldBeTrue();
+        result.Value.Name.ShouldBe(command.Name);
+        result.Value.Email.ShouldBe(command.Email);
 
         // Verify integration event was published
         _publisherMock.Verify(x => x.PublishAsync(
@@ -238,8 +239,8 @@ public class CreateCashierCommandHandlerTests
         var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
-        result.Error.Should().Contain("database error");
+        result.IsSuccess.ShouldBeFalse();
+        result.Error.ShouldContain("database error");
 
         // Verify no integration event was published
         _publisherMock.Verify(x => x.PublishAsync(
@@ -279,8 +280,8 @@ public class CreateCashierValidatorTests
         var result = _validator.Validate(command);
 
         // Assert
-        result.IsValid.Should().BeTrue();
-        result.Errors.Should().BeEmpty();
+        result.IsValid.ShouldBeTrue();
+        result.Errors.ShouldBeEmpty();
     }
 
     [TestCase("")]
@@ -299,8 +300,8 @@ public class CreateCashierValidatorTests
         var result = _validator.Validate(command);
 
         // Assert
-        result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(e => 
+        result.IsValid.ShouldBeFalse();
+        result.Errors.ShouldContain(e => 
             e.PropertyName == nameof(CreateCashierCommand.Name) &&
             e.ErrorMessage.Contains("required"));
     }
@@ -322,8 +323,8 @@ public class CreateCashierValidatorTests
         var result = _validator.Validate(command);
 
         // Assert
-        result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(e => 
+        result.IsValid.ShouldBeFalse();
+        result.Errors.ShouldContain(e => 
             e.PropertyName == nameof(CreateCashierCommand.Email));
     }
 
@@ -341,8 +342,8 @@ public class CreateCashierValidatorTests
         var result = _validator.Validate(command);
 
         // Assert
-        result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(e => 
+        result.IsValid.ShouldBeFalse();
+        result.Errors.ShouldContain(e => 
             e.PropertyName == nameof(CreateCashierCommand.Name) &&
             e.ErrorMessage.Contains("100 characters"));
     }
@@ -409,7 +410,7 @@ public class CashierDatabaseIntegrationTests
         var createResult = await handler.Handle(createCommand, CancellationToken.None);
 
         // Assert - Verify creation
-        createResult.IsSuccess.Should().BeTrue();
+        createResult.IsSuccess.ShouldBeTrue();
         var createdCashier = createResult.Value;
 
         // Act - Retrieve cashier
@@ -418,12 +419,12 @@ public class CashierDatabaseIntegrationTests
         var getResult = await queryHandler.Handle(getQuery, CancellationToken.None);
 
         // Assert - Verify retrieval
-        getResult.IsSuccess.Should().BeTrue();
+        getResult.IsSuccess.ShouldBeTrue();
         var retrievedCashier = getResult.Value;
         
-        retrievedCashier.CashierId.Should().Be(createdCashier.CashierId);
-        retrievedCashier.Name.Should().Be(createCommand.Name);
-        retrievedCashier.Email.Should().Be(createCommand.Email);
+        retrievedCashier.CashierId.ShouldBe(createdCashier.CashierId);
+        retrievedCashier.Name.ShouldBe(createCommand.Name);
+        retrievedCashier.Email.ShouldBe(createCommand.Email);
     }
 
     [Test]
@@ -451,9 +452,9 @@ public class CashierDatabaseIntegrationTests
         var secondResult = await handler.Handle(secondCommand, CancellationToken.None);
 
         // Assert
-        firstResult.IsSuccess.Should().BeTrue();
-        secondResult.IsSuccess.Should().BeFalse();
-        secondResult.Error.Should().Contain("email already exists");
+        firstResult.IsSuccess.ShouldBeTrue();
+        secondResult.IsSuccess.ShouldBeFalse();
+        secondResult.Error.ShouldContain("email already exists");
     }
 
     [OneTimeTearDown]
@@ -593,12 +594,12 @@ public class CashiersControllerIntegrationTests : IClassFixture<AppDomainApiFact
         var response = await _client.PostAsJsonAsync("/api/cashiers", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        response.StatusCode.ShouldBe(HttpStatusCode.Created);
         
         var createdCashier = await response.Content.ReadFromJsonAsync<CashierResponse>();
-        createdCashier.Should().NotBeNull();
-        createdCashier.Name.Should().Be(request.Name);
-        createdCashier.Email.Should().Be(request.Email);
+        createdCashier.ShouldNotBeNull();
+        createdCashier.Name.ShouldBe(request.Name);
+        createdCashier.Email.ShouldBe(request.Email);
     }
 
     [Test]
@@ -611,11 +612,11 @@ public class CashiersControllerIntegrationTests : IClassFixture<AppDomainApiFact
         var response = await _client.PostAsJsonAsync("/api/cashiers", request);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
         
         var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
-        problemDetails.Should().NotBeNull();
-        problemDetails.Errors.Should().ContainKey("Email");
+        problemDetails.ShouldNotBeNull();
+        problemDetails.Errors.ShouldContainKey("Email");
     }
 
     [Test]
@@ -630,12 +631,12 @@ public class CashiersControllerIntegrationTests : IClassFixture<AppDomainApiFact
         var getResponse = await _client.GetAsync($"/api/cashiers/{createdCashier.CashierId}");
 
         // Assert
-        getResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        getResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
         
         var retrievedCashier = await getResponse.Content.ReadFromJsonAsync<CashierResponse>();
-        retrievedCashier.Should().NotBeNull();
-        retrievedCashier.CashierId.Should().Be(createdCashier.CashierId);
-        retrievedCashier.Name.Should().Be(createRequest.Name);
+        retrievedCashier.ShouldNotBeNull();
+        retrievedCashier.CashierId.ShouldBe(createdCashier.CashierId);
+        retrievedCashier.Name.ShouldBe(createRequest.Name);
     }
 
     [OneTimeTearDown]
@@ -708,8 +709,8 @@ public class EventIntegrationTests
         var processedEvents = await eventStore.GetEventsAsync($"cashier-{@event.CashierId}");
         var storedEvent = processedEvents.FirstOrDefault(e => e.EventType == nameof(CashierCreated));
         
-        storedEvent.Should().NotBeNull();
-        storedEvent.EventType.Should().Be(nameof(CashierCreated));
+        storedEvent.ShouldNotBeNull();
+        storedEvent.EventType.ShouldBe(nameof(CashierCreated));
     }
 
     [Test]
@@ -738,7 +739,7 @@ public class EventIntegrationTests
         // Assert
         // Verify the event was retried and eventually moved to dead letter queue
         var deadLetterEvents = await GetDeadLetterEvents();
-        deadLetterEvents.Should().Contain(e => e.EventType == nameof(InvoiceCreated));
+        deadLetterEvents.ShouldContain(e => e.EventType == nameof(InvoiceCreated));
     }
 
     private void ConfigureServices(IServiceCollection services)
@@ -813,7 +814,7 @@ public class ArchitectureTests
             .GetResult();
 
         // Assert
-        result.IsSuccessful.Should().BeTrue();
+        result.IsSuccessful.ShouldBeTrue();
     }
 
     [Test]
@@ -830,7 +831,7 @@ public class ArchitectureTests
             .GetResult();
 
         // Assert
-        result.IsSuccessful.Should().BeTrue();
+        result.IsSuccessful.ShouldBeTrue();
     }
 
     [Test]
@@ -847,7 +848,7 @@ public class ArchitectureTests
             .GetResult();
 
         // Assert
-        result.IsSuccessful.Should().BeTrue();
+        result.IsSuccessful.ShouldBeTrue();
     }
 
     [Test]
@@ -860,7 +861,7 @@ public class ArchitectureTests
             .GetResult();
 
         // Assert
-        result.IsSuccessful.Should().BeTrue();
+        result.IsSuccessful.ShouldBeTrue();
     }
 
     [Test]
@@ -877,7 +878,7 @@ public class ArchitectureTests
             .GetResult();
 
         // Assert
-        result.IsSuccessful.Should().BeTrue();
+        result.IsSuccessful.ShouldBeTrue();
     }
 
     [Test]
@@ -892,7 +893,7 @@ public class ArchitectureTests
             .GetTypes();
 
         // Assert
-        eventHandlerTypes.Should().NotBeEmpty();
+        eventHandlerTypes.ShouldNotBeEmpty();
         
         foreach (var handlerType in eventHandlerTypes)
         {
@@ -900,7 +901,7 @@ public class ArchitectureTests
                 .Where(m => m.Name == "Handle" && m.GetParameters().Length == 1)
                 .ToList();
                 
-            handleMethods.Should().NotBeEmpty($"{handlerType.Name} should have at least one Handle method");
+            handleMethods.ShouldNotBeEmpty($"{handlerType.Name} should have at least one Handle method");
         }
     }
 
@@ -916,7 +917,7 @@ public class ArchitectureTests
             .GetResult();
 
         // Assert
-        result.IsSuccessful.Should().BeTrue();
+        result.IsSuccessful.ShouldBeTrue();
     }
 
     [Test]
@@ -933,7 +934,7 @@ public class ArchitectureTests
             .GetResult();
 
         // Assert
-        result.IsSuccessful.Should().BeTrue();
+        result.IsSuccessful.ShouldBeTrue();
     }
 }
 ```
@@ -956,12 +957,12 @@ public class DomainArchitectureTests
             .GetTypes();
 
         // Assert
-        typesWithDbCommand.Should().NotBeEmpty();
+        typesWithDbCommand.ShouldNotBeEmpty();
         
         foreach (var type in typesWithDbCommand)
         {
-            type.Name.Should().EndWith("Command", $"{type.Name} should be a command");
-            type.Should().Implement(typeof(IRequest<>), $"{type.Name} should implement IRequest");
+            type.Name.ShouldEndWith("Command", $"{type.Name} should be a command");
+            type.ShouldImplement(typeof(IRequest<>), $"{type.Name} should implement IRequest");
         }
     }
 
@@ -985,7 +986,7 @@ public class DomainArchitectureTests
                 var typeDoc = xmlDoc.Descendants("member")
                     .FirstOrDefault(m => m.Attribute("name")?.Value == $"T:{eventType.FullName}");
                 
-                typeDoc.Should().NotBeNull($"{eventType.Name} should have XML documentation for event schema generation");
+                typeDoc.ShouldNotBeNull($"{eventType.Name} should have XML documentation for event schema generation");
             }
         }
     }
@@ -1007,7 +1008,7 @@ public class DomainArchitectureTests
                                     || type.IsRecord() 
                                     || (type.IsClass && HasOnlyDataProperties(type));
 
-            isValidContractType.Should().BeTrue($"{type.Name} in Contracts namespace should only contain data");
+            isValidContractType.ShouldBeTrue($"{type.Name} in Contracts namespace should only contain data");
         }
     }
 
@@ -1087,9 +1088,9 @@ public class CashierApiPerformanceTests
             .Run();
 
         // Assert
-        stats.AllOkCount.Should().BeGreaterThan(0);
-        stats.AllFailCount.Should().Be(0);
-        stats.ScenarioStats[0].Ok.Response.Mean.Should().BeLessThan(500); // Response time < 500ms
+        stats.AllOkCount.ShouldBeGreaterThan(0);
+        stats.AllFailCount.ShouldBe(0);
+        stats.ScenarioStats[0].Ok.Response.Mean.ShouldBeLessThan(500); // Response time < 500ms
     }
 
     [Test]
@@ -1130,9 +1131,9 @@ public class CashierApiPerformanceTests
             .Run();
 
         // Assert
-        stats.AllOkCount.Should().BeGreaterThan(0);
-        stats.AllFailCount.Should().BeLessThan(stats.AllOkCount * 0.01m); // Less than 1% failure rate
-        stats.ScenarioStats[0].Ok.Response.Mean.Should().BeLessThan(1000); // Response time < 1s under stress
+        stats.AllOkCount.ShouldBeGreaterThan(0);
+        stats.AllFailCount.ShouldBeLessThan(stats.AllOkCount * 0.01m); // Less than 1% failure rate
+        stats.ScenarioStats[0].Ok.Response.Mean.ShouldBeLessThan(1000); // Response time < 1s under stress
     }
 
     [OneTimeTearDown]
@@ -1193,7 +1194,7 @@ public class DatabasePerformanceTests
 
         // Assert
         var averageExecutionTime = stopwatch.ElapsedMilliseconds / (double)iterations;
-        averageExecutionTime.Should().BeLessThan(10, "Average query execution should be under 10ms");
+        averageExecutionTime.ShouldBeLessThan(10, "Average query execution should be under 10ms");
     }
 
     [Test]
@@ -1213,8 +1214,8 @@ public class DatabasePerformanceTests
 
         // Assert
         var results = cashiers.ToList();
-        results.Should().HaveCount(expectedRecords);
-        stopwatch.ElapsedMilliseconds.Should().BeLessThan(1000, "Large result set query should complete within 1 second");
+        results.ShouldHaveCount(expectedRecords);
+        stopwatch.ElapsedMilliseconds.ShouldBeLessThan(1000, "Large result set query should complete within 1 second");
     }
 
     private async Task SeedPerformanceTestData()
@@ -1267,20 +1268,24 @@ public class DatabasePerformanceTests
 **Test Execution Strategy**:
 
 ```bash
-# Run only unit tests (fast feedback)
+# Run all tests (default)
+dotnet test
+
+# Run tests by trait/category
 dotnet test --filter "Category=Unit"
-
-# Run integration tests (requires containers)
-dotnet test --filter "Category=Integration"
-
-# Run performance tests (long-running)
+dotnet test --filter "Category=Integration" 
+dotnet test --filter "Category=Architecture"
 dotnet test --filter "Category=Performance"
-
-# Run all tests except performance
-dotnet test --filter "Category!=Performance"
 
 # Run tests for specific domain
 dotnet test --filter "FullyQualifiedName~Cashiers"
+dotnet test --filter "FullyQualifiedName~Invoices"
+
+# Exclude slow-running tests
+dotnet test --filter "Category!=Performance"
+
+# Run with coverage collection
+dotnet test --collect:"XPlat Code Coverage"
 ```
 
 ### GitHub Actions CI Pipeline
@@ -1406,19 +1411,17 @@ public static class CreateCashierCommandExtensions
 ### Assertion Patterns
 
 ```csharp
-// Use FluentAssertions for better readability
-result.Should().NotBeNull();
-result.IsSuccess.Should().BeTrue();
-result.Value.Name.Should().Be("Expected Name");
+// Use Shouldly for better readability
+result.ShouldNotBeNull();
+result.IsSuccess.ShouldBeTrue();
+result.Value.Name.ShouldBe("Expected Name");
 
 // Group related assertions
-result.Should().BeEquivalentTo(expected, options =>
-    options.Excluding(x => x.CreatedAt)
-           .Excluding(x => x.Id));
+result.ShouldBeEquivalentTo(expected);
 
 // Custom assertions for domain concepts
-result.Should().BeSuccessful();
-result.Should().HaveError("Expected error message");
+result.IsSuccess.ShouldBeTrue();
+result.Errors.ShouldContain("Expected error message");
 ```
 
 ## Related Resources
@@ -1428,5 +1431,5 @@ result.Should().HaveError("Expected error message");
 - [Background Processing](/arch/background-processing) - Testing Orleans and async processing
 - [Debugging Tips](/guide/debugging) - Debugging failing tests
 - [TestContainers Documentation](https://testcontainers.com/) - Container-based testing
-- [FluentAssertions Documentation](https://fluentassertions.com/) - Better test assertions
-- [NBomber Documentation](https://nbomber.com/) - Load testing framework
+- [Shouldly Documentation](https://docs.shouldly.org/) - Better test assertions
+- [xUnit Documentation](https://xunit.net/) - Testing framework documentation

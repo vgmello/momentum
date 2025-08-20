@@ -1,3 +1,9 @@
+---
+title: Service Defaults
+description: Comprehensive set of pre-configured services and middleware that form the foundation of every Momentum application with consistency and best practices.
+date: 2024-01-15
+---
+
 # Service Defaults in Momentum
 
 Service defaults provide a comprehensive set of pre-configured services and middleware that form the foundation of every Momentum application. They ensure consistency, observability, and best practices across all services.

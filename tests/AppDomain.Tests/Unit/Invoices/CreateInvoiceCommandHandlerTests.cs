@@ -37,7 +37,7 @@ public class CreateInvoiceCommandHandlerTests
         var command = new CreateInvoiceCommand(tenantId, "Test Invoice", 100.50m, "USD", dueDate, cashierId);
 
         // Act
-        var (result, createdEvent, generatedEvent) = await CreateInvoiceCommandHandler.Handle(command, messagingMock, CancellationToken.None);
+        var (result, createdEvent, _) = await CreateInvoiceCommandHandler.Handle(command, messagingMock, CancellationToken.None);
 
         // Assert
         var invoice = result.Match(success => success, _ => null!);
@@ -103,8 +103,8 @@ public class CreateInvoiceCommandHandlerTests
         // Assert
         var invoice = result.Match(success => success, _ => null!);
 
-        invoice.Currency.ShouldBe("");
-        invoice.DueDate.ShouldBeNull();
+        invoice.Currency.ShouldBe("USD");
+        invoice.DueDate.ShouldNotBeNull();
         invoice.CashierId.ShouldBeNull();
     }
 

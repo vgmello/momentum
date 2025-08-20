@@ -1,6 +1,6 @@
 # XML Documentation Operation Transformer
 
-## Transformer Overview {#transformer-overview}
+## Transformer Overview
 
 This transformer enhances operation specifications with:
 
@@ -113,7 +113,7 @@ if (xmlDocs.Returns is not null)
 
 ## Auto-Produced Response Handling
 
-### Convention Integration {#auto-produced-response}
+### Convention Integration
 
 This method checks if the operation has an auto-produced successful response (e.g., 200 OK) added by the `AutoProducesResponseTypeConvention` (only added if no other 2XX already exists) and replaces the status code with the actual documented successful response code from the XML documentation. If there are no documented successful response code, the auto-produced response is removed.
 

@@ -1,5 +1,6 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
+using JasperFx.CodeGeneration;
 using JasperFx.Resources;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -58,7 +59,7 @@ public static class WolverineSetupExtensions
     /// <param name="configure">Optional action to customize Wolverine options for specific business requirements.</param>
     /// <remarks>
     ///     <para>This method provides a complete messaging infrastructure configuration including:</para>
-    /// 
+    ///
     ///     <para>
     ///         <strong>Persistence and Reliability:</strong>
     ///     </para>
@@ -68,7 +69,7 @@ public static class WolverineSetupExtensions
     ///         <item>Automatic transaction scoping for consistency across business operations</item>
     ///         <item>Dead letter queue handling for failed message processing</item>
     ///     </list>
-    /// 
+    ///
     ///     <para>
     ///         <strong>Integration and Transport:</strong>
     ///     </para>
@@ -78,7 +79,7 @@ public static class WolverineSetupExtensions
     ///         <item>System.Text.Json serialization with performance optimization</item>
     ///         <item>Cross-service message routing and topic management</item>
     ///     </list>
-    /// 
+    ///
     ///     <para>
     ///         <strong>Quality and Observability:</strong>
     ///     </para>
@@ -89,7 +90,7 @@ public static class WolverineSetupExtensions
     ///         <item>Performance monitoring and request tracking middleware</item>
     ///         <item>Health checks for messaging infrastructure components</item>
     ///     </list>
-    /// 
+    ///
     ///     <para>
     ///         <strong>Development and Deployment:</strong>
     ///     </para>
@@ -140,6 +141,9 @@ public static class WolverineSetupExtensions
             opts.Policies.ConventionalLocalRoutingIsAdditive();
 
             opts.ConfigureAppHandlers(opts.ApplicationAssembly);
+
+            var codegenEnabled = configuration.GetSection("Wolverine:CodegenEnabled").Get<bool>();
+            opts.CodeGeneration.TypeLoadMode = codegenEnabled ? TypeLoadMode.Auto : TypeLoadMode.Static;
 
             opts.Services.AddResourceSetupOnStartup();
 

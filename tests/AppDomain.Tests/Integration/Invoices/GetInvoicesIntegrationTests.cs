@@ -15,7 +15,7 @@ public class GetInvoicesIntegrationTests(IntegrationTestFixture fixture) : Integ
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE AppDomain.invoices;");
+        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
 
         // Arrange - Create a few invoices first
         var createRequests = new[]
@@ -64,7 +64,7 @@ public class GetInvoicesIntegrationTests(IntegrationTestFixture fixture) : Integ
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE AppDomain.invoices;");
+        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
 
         // Arrange - Create multiple invoices
         for (var i = 1; i <= 5; i++)
@@ -95,7 +95,7 @@ public class GetInvoicesIntegrationTests(IntegrationTestFixture fixture) : Integ
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE AppDomain.invoices;");
+        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
 
         // Arrange - Create invoices with different statuses
         var draftInvoice = await _client.CreateInvoiceAsync(new CreateInvoiceRequest

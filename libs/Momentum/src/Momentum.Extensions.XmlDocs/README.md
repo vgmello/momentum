@@ -612,24 +612,6 @@ public class DocumentationService
 Ensure your source code uses comprehensive XML documentation:
 
 ```csharp
-/// <summary>
-/// Processes an order and returns the confirmation details.
-/// </summary>
-/// <param name="orderId">The unique identifier for the order to process.</param>
-/// <param name="priority">The processing priority level from 1-10.</param>
-/// <returns>A confirmation object containing the processed order details.</returns>
-/// <response code="200">Order processed successfully.</response>
-/// <response code="400">Invalid order ID or priority level.</response>
-/// <response code="404">Order not found in the system.</response>
-/// <example>
-/// var result = await orderService.ProcessOrderAsync("ORD-123", 5);
-/// Console.WriteLine($"Order {result.OrderId} processed at {result.ProcessedAt}");
-/// </example>
-/// <remarks>
-/// This method performs validation checks before processing and updates
-/// the order status in the database. High priority orders (8-10) are
-/// processed immediately, while lower priority orders are queued.
-/// </remarks>
 public async Task<OrderConfirmation> ProcessOrderAsync(string orderId, int priority)
 {
     // Implementation

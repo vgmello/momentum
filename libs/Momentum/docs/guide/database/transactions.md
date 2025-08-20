@@ -1,3 +1,9 @@
+---
+title: Database Transactions
+description: Robust transaction handling with LinqToDB integration and outbox pattern for reliable event publishing and data consistency.
+date: 2024-01-15
+---
+
 # Database Transactions in Momentum
 
 Momentum provides robust transaction handling through LinqToDB integration and follows the outbox pattern for reliable event publishing. This ensures data consistency and reliable message delivery in distributed systems.

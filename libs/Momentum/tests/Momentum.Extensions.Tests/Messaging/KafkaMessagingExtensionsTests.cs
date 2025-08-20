@@ -19,7 +19,7 @@ public class KafkaMessagingExtensionsTests
         {
             ["ConnectionStrings:Messaging"] = "localhost:9092"
         };
-        
+
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(configData)
             .Build();
@@ -32,12 +32,12 @@ public class KafkaMessagingExtensionsTests
 
         // Assert
         result.ShouldBe(builder);
-        
+
         // Verify services are registered
-        var serviceDescriptor = builder.Services.FirstOrDefault(s => 
-            s.ServiceType == typeof(IWolverineExtension) && 
+        var serviceDescriptor = builder.Services.FirstOrDefault(s =>
+            s.ServiceType == typeof(IWolverineExtension) &&
             s.ImplementationType == typeof(KafkaEventsExtensions));
-        
+
         serviceDescriptor.ShouldNotBeNull();
         serviceDescriptor.Lifetime.ShouldBe(ServiceLifetime.Singleton);
     }
@@ -51,7 +51,7 @@ public class KafkaMessagingExtensionsTests
             ["ConnectionStrings:CustomKafka"] = "localhost:9093",
             ["Kafka:ConnectionStringName"] = "CustomKafka"
         };
-        
+
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(configData)
             .Build();
@@ -69,7 +69,7 @@ public class KafkaMessagingExtensionsTests
     {
         // Arrange
         var configData = new Dictionary<string, string?>();
-        
+
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(configData)
             .Build();
@@ -78,9 +78,9 @@ public class KafkaMessagingExtensionsTests
         builder.Configuration.AddConfiguration(configuration);
 
         // Act & Assert
-        var exception = Should.Throw<InvalidOperationException>(() => 
+        var exception = Should.Throw<InvalidOperationException>(() =>
             builder.AddKafkaMessagingExtensions());
-        
+
         exception.Message.ShouldBe("Kafka connection string 'Messaging' not found in configuration.");
     }
 
@@ -92,7 +92,7 @@ public class KafkaMessagingExtensionsTests
         {
             ["ConnectionStrings:Messaging"] = ""
         };
-        
+
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(configData)
             .Build();
@@ -101,9 +101,9 @@ public class KafkaMessagingExtensionsTests
         builder.Configuration.AddConfiguration(configuration);
 
         // Act & Assert
-        var exception = Should.Throw<InvalidOperationException>(() => 
+        var exception = Should.Throw<InvalidOperationException>(() =>
             builder.AddKafkaMessagingExtensions());
-        
+
         exception.Message.ShouldBe("Kafka connection string 'Messaging' not found in configuration.");
     }
 
@@ -116,7 +116,7 @@ public class KafkaMessagingExtensionsTests
             ["Kafka:ConnectionStringName"] = "CustomKafka"
             // Missing ConnectionStrings:CustomKafka
         };
-        
+
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(configData)
             .Build();
@@ -125,9 +125,9 @@ public class KafkaMessagingExtensionsTests
         builder.Configuration.AddConfiguration(configuration);
 
         // Act & Assert
-        var exception = Should.Throw<InvalidOperationException>(() => 
+        var exception = Should.Throw<InvalidOperationException>(() =>
             builder.AddKafkaMessagingExtensions());
-        
+
         exception.Message.ShouldBe("Kafka connection string 'CustomKafka' not found in configuration.");
     }
 
@@ -139,7 +139,7 @@ public class KafkaMessagingExtensionsTests
         {
             ["ConnectionStrings:Messaging"] = "localhost:9092"
         };
-        
+
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(configData)
             .Build();
@@ -151,9 +151,9 @@ public class KafkaMessagingExtensionsTests
         builder.AddKafkaMessagingExtensions();
 
         // Assert
-        var healthCheckService = builder.Services.FirstOrDefault(s => 
+        var healthCheckService = builder.Services.FirstOrDefault(s =>
             s.ServiceType.Name.Contains("HealthCheck"));
-        
+
         healthCheckService.ShouldNotBeNull();
     }
 }

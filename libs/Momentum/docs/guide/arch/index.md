@@ -86,9 +86,6 @@ public record GetUserQuery(Guid Id) : IQuery<Result<User>>;
 Integration events enable loosely coupled service communication:
 
 ```csharp
-/// <summary>
-/// Published when a new user is successfully created in the system.
-/// </summary>
 [EventTopic<User>]
 public record UserCreated(
     [PartitionKey] Guid TenantId,

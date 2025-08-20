@@ -24,8 +24,12 @@
 <!--#if (USE_PGSQL)-->
         <PackageReference Include="Testcontainers.PostgreSql"/>
 <!--#endif-->
+        <PackageReference Include="Testcontainers.Kafka"/>
         <PackageReference Include="Testcontainers"/>
-        <PackageReference Include="xunit.runner.visualstudio"/>
+        <PackageReference Include="xunit.runner.visualstudio">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="xunit.v3"/>
     </ItemGroup>
 

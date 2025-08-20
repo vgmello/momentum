@@ -27,8 +27,8 @@ Handlers are generated as static methods in a companion class (e.g., CreateUserC
 ## Return Type Handling
 
 - `ICommand<int/long>`: Returns row count (ExecuteAsync) or scalar value (ExecuteScalarAsync)
-- `ICommand<TResult>`: Returns single object (QueryFirstOrDefaultAsync<TResult>)
-- `ICommand<IEnumerable<TResult>>`: Returns collection (QueryAsync<TResult>)
+- `ICommand<TResult>`: Returns single object (`QueryFirstOrDefaultAsync<TResult>`)
+- `ICommand<IEnumerable<TResult>>`: Returns collection (`QueryAsync<TResult>`)
 - `ICommand` (no return type): Executes command without returning data (ExecuteAsync)
 
 ## MSBuild Integration
@@ -40,7 +40,7 @@ Global configuration through MSBuild properties:
 
 ## Requirements
 
-- Target class must implement ICommand<TResult> or IQuery<TResult> (or parameterless versions)
+- Target class must implement `ICommand<TResult>` or `IQuery<TResult>` (or parameterless versions)
 - Class must be partial if nested within another type
 - Only one of sp, sql, or fn can be specified per command
 - Assembly must reference Momentum.Extensions.SourceGenerators

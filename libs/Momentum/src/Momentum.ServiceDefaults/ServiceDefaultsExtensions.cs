@@ -64,8 +64,11 @@ public static class ServiceDefaultsExtensions
 
         builder.Services.ConfigureHttpClientDefaults(http =>
         {
-            // Turn on resilience by default
+            // Resilience by default
             http.AddStandardResilienceHandler();
+
+            // Service discovery by default
+            http.AddServiceDiscovery();
         });
 
         return builder;

@@ -30,10 +30,12 @@ public sealed class CopyTemplatesCommand : Command<CopyTemplatesCommand.Settings
             if (Directory.Exists(outputPath) && !settings.Force)
             {
                 var files = Directory.GetFiles(outputPath, "*.liquid");
+
                 if (files.Length > 0)
                 {
                     AnsiConsole.MarkupLine("[yellow]Warning:[/] Template directory already contains .liquid files.");
                     AnsiConsole.MarkupLine("Use --force to overwrite existing files.");
+
                     return 1;
                 }
             }
@@ -50,6 +52,7 @@ public sealed class CopyTemplatesCommand : Command<CopyTemplatesCommand.Settings
         catch (Exception ex)
         {
             AnsiConsole.MarkupLine($"[red]Error:[/] {ex.Message}");
+
             return 1;
         }
     }

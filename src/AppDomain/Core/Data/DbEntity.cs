@@ -9,7 +9,7 @@ namespace AppDomain.Core.Data;
 ///     Base record for all database entities in the AppDomain schema.
 ///     Provides common auditing fields and optimistic concurrency control.
 /// </summary>
-[Table(Schema = "AppDomain")]
+[Table(Schema = "app_domain")]
 public abstract record DbEntity
 {
     /// <summary>

@@ -1,6 +1,6 @@
 # Health Check Setup Extensions
 
-## Default Health Check Endpoints {#default-endpoints}
+## Default Health Check Endpoints
 
 This method sets up the following health check endpoints:
 

@@ -5,6 +5,7 @@ import SnippetPluginExt from "./plugins/snippet";
 import TocSidebar from "./plugins/tocSidebar";
 import AdrSidebar from "./plugins/adr/adrSidebar";
 import EventsSidebar from "./plugins/eventsSidebar";
+import CSharpGenericsPlugin from "./plugins/csharpGenerics";
 
 const REF_DIR = "reference/toc.yml";
 const ADR_DIR = "arch/adr";
@@ -17,6 +18,7 @@ const markdownOptions: MarkdownOptions = {
 
     preConfig: (md) => {
         SnippetPluginExt(md);
+        CSharpGenericsPlugin(md);
     },
 
     config: (md) => {

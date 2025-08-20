@@ -1,10 +1,10 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-using System.Reflection;
-using System.Diagnostics.CodeAnalysis;
 using Grpc.Core;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 namespace Momentum.ServiceDefaults.Api;
 

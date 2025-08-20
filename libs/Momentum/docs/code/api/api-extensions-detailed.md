@@ -1,6 +1,6 @@
 # API Extensions
 
-## Service Configuration {#service-configuration}
+## Service Configuration
 
 This method configures the following services:
 
@@ -55,7 +55,7 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 });
 ```
 
-## Application Configuration {#application-configuration}
+## Application Configuration
 
 This method configures the following middleware and endpoints:
 

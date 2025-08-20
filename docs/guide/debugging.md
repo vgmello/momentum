@@ -10,9 +10,9 @@ This guide provides practical debugging techniques and tools to help you diagnos
 
 ## Prerequisites
 
-- [Development environment setup](/guide/dev-setup)
-- Basic understanding of .NET debugging concepts
-- Familiarity with the AppDomain Solution architecture
+-   [Development environment setup](/guide/dev-setup)
+-   Basic understanding of .NET debugging concepts
+-   Familiarity with the AppDomain Solution architecture
 
 ## Local Development Debugging
 
@@ -28,11 +28,11 @@ dotnet run --project src/AppDomain.AppHost
 
 **Dashboard Features**:
 
-- **Services Overview**: Monitor health and status of all services
-- **Logs Aggregation**: View consolidated logs from all services
-- **Metrics**: Track performance counters and custom metrics
-- **Distributed Tracing**: Follow requests across service boundaries
-- **Resource Management**: Monitor database connections and external dependencies
+-   **Services Overview**: Monitor health and status of all services
+-   **Logs Aggregation**: View consolidated logs from all services
+-   **Metrics**: Track performance counters and custom metrics
+-   **Distributed Tracing**: Follow requests across service boundaries
+-   **Resource Management**: Monitor database connections and external dependencies
 
 [!TIP]
 Access the dashboard at `http://localhost:15888` when running the AppHost locally.
@@ -80,9 +80,9 @@ docker compose up AppDomain-db AppDomain-db-migrations
 
 ```json
 {
-  "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Port=54320;Database=AppDomain;Username=postgres;Password=password;"
-  }
+    "ConnectionStrings": {
+        "DefaultConnection": "Host=localhost;Port=54320;Database=AppDomain;Username=postgres;Password=password;"
+    }
 }
 ```
 
@@ -93,7 +93,7 @@ docker compose up AppDomain-db AppDomain-db-migrations
 **Debugging Command Handlers**:
 
 ```csharp
-[DbCommand(sp: "AppDomain.cashiers_create")]
+[DbCommand(sp: "app_domain.cashiers_create")]
 public record CreateCashierCommand : IRequest<Result<Cashier>>
 {
     // Set breakpoints in generated handlers
@@ -103,9 +103,9 @@ public record CreateCashierCommand : IRequest<Result<Cashier>>
 
 **Common Issues**:
 
-- **Missing Parameters**: Verify stored procedure parameter names match command properties
-- **Type Mismatches**: Ensure parameter types align with database expectations
-- **Null Values**: Check for required properties and nullable database columns
+-   **Missing Parameters**: Verify stored procedure parameter names match command properties
+-   **Type Mismatches**: Ensure parameter types align with database expectations
+-   **Null Values**: Check for required properties and nullable database columns
 
 ### Event-Driven Architecture Debugging
 
@@ -135,7 +135,7 @@ public class CashierCreatedHandler
     {
         // Add logging to track event processing
         _logger.LogInformation("Processing CashierCreated event for {CashierId}", @event.CashierId);
-        
+
         // Set breakpoints here to inspect event data
     }
 }
@@ -171,25 +171,25 @@ public class InvoiceGrain : Grain, IInvoiceGrain
 
 ```json
 {
-  "Serilog": {
-    "Using": ["Serilog.Sinks.Console"],
-    "MinimumLevel": {
-      "Default": "Information",
-      "Override": {
-        "Microsoft": "Warning",
-        "Microsoft.Hosting.Lifetime": "Information",
-        "AppDomain": "Debug"
-      }
-    },
-    "WriteTo": [
-      {
-        "Name": "Console",
-        "Args": {
-          "outputTemplate": "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}"
-        }
-      }
-    ]
-  }
+    "Serilog": {
+        "Using": ["Serilog.Sinks.Console"],
+        "MinimumLevel": {
+            "Default": "Information",
+            "Override": {
+                "Microsoft": "Warning",
+                "Microsoft.Hosting.Lifetime": "Information",
+                "AppDomain": "Debug"
+            }
+        },
+        "WriteTo": [
+            {
+                "Name": "Console",
+                "Args": {
+                    "outputTemplate": "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}"
+                }
+            }
+        ]
+    }
 }
 ```
 
@@ -201,9 +201,9 @@ public class CorrelationMiddleware
 {
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
-        var correlationId = context.Request.Headers["X-Correlation-ID"].FirstOrDefault() 
+        var correlationId = context.Request.Headers["X-Correlation-ID"].FirstOrDefault()
                           ?? Guid.NewGuid().ToString();
-        
+
         using (LogContext.PushProperty("CorrelationId", correlationId))
         {
             context.Response.Headers.Add("X-Correlation-ID", correlationId);
@@ -238,7 +238,7 @@ public async Task<Result<Cashier>> Handle(CreateCashierCommand request)
 {
     using var activity = ActivitySource.StartActivity("CreateCashier");
     activity?.SetTag("cashier.name", request.Name);
-    
+
     // Your handler logic here
 }
 ```
@@ -251,14 +251,14 @@ public async Task<Result<Cashier>> Handle(CreateCashierCommand request)
 
 ```json
 {
-  "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Port=54320;Database=AppDomain;Username=postgres;Password=password;Log Parameters=true;"
-  },
-  "Logging": {
-    "LogLevel": {
-      "Npgsql.EntityFrameworkCore.PostgreSQL": "Information"
+    "ConnectionStrings": {
+        "DefaultConnection": "Host=localhost;Port=54320;Database=AppDomain;Username=postgres;Password=password;Log Parameters=true;"
+    },
+    "Logging": {
+        "LogLevel": {
+            "Npgsql": "Information"
+        }
     }
-  }
 }
 ```
 
@@ -270,8 +270,8 @@ ALTER SYSTEM SET log_min_duration_statement = 100; -- Log queries taking > 100ms
 SELECT pg_reload_conf();
 
 -- Monitor active queries
-SELECT pid, query, state, query_start 
-FROM pg_stat_activity 
+SELECT pid, query, state, query_start
+FROM pg_stat_activity
 WHERE state = 'active';
 ```
 
@@ -324,7 +324,7 @@ public async Task Should_Create_Cashier_Successfully()
         .Build();
 
     await container.StartAsync();
-    
+
     // Verify container health
     var connectionString = container.GetConnectionString();
     // ... test implementation
@@ -360,14 +360,14 @@ public class CashierApiTests : IClassFixture<AppDomainApiFactory>
 
         var request = new CreateCashierRequest("John Doe", "john@example.com");
         var response = await client.PostAsJsonAsync("/api/cashiers", request);
-        
+
         // Debug response issues
         if (!response.IsSuccessStatusCode)
         {
             var errorContent = await response.Content.ReadAsStringAsync();
             _output.WriteLine($"Error Response: {errorContent}");
         }
-        
+
         response.EnsureSuccessStatusCode();
     }
 }
@@ -423,12 +423,12 @@ public class AppDomainInboxHandler
     public async Task Handle(CashierCreated @event)
     {
         _logger.LogDebug("Received CashierCreated event: {@Event}", @event);
-        
+
         try
         {
             // Process event
             await ProcessCashierCreated(@event);
-            
+
             _logger.LogInformation("Successfully processed CashierCreated for {CashierId}", @event.CashierId);
         }
         catch (Exception ex)
@@ -445,19 +445,22 @@ public class AppDomainInboxHandler
 ### Recommended Extensions
 
 **Visual Studio Code**:
-- C# Dev Kit
-- REST Client
-- Docker
-- PostgreSQL Explorer
+
+-   C# Dev Kit
+-   REST Client
+-   Docker
+-   PostgreSQL Explorer
 
 **Visual Studio**:
-- .NET Aspire Workload
-- Entity Framework Power Tools
-- ResXManager
+
+-   .NET Aspire Workload
+-   PostgreSQL Tools
+-   ResXManager
 
 ### Debugging Tools
 
 **Process Monitoring**:
+
 ```bash
 # Monitor running .NET processes
 dotnet-trace ps
@@ -467,6 +470,7 @@ dotnet-trace collect -p <process-id> --format speedscope
 ```
 
 **Network Debugging**:
+
 ```bash
 # Monitor HTTP traffic
 dotnet tool install -g dotnet-httprepl
@@ -516,14 +520,14 @@ public async Task<Result<Cashier>> Handle(CreateCashierCommand request)
 
 ## Next Steps
 
-- Learn about [Development Setup](/guide/dev-setup) for optimal debugging environment
-- Explore [Testing Strategies](/arch/testing) for comprehensive testing approaches
-- Review [Error Handling](/arch/error-handling) patterns for robust applications
-- Understand [Background Processing](/arch/background-processing) debugging techniques
+-   Learn about [Development Setup](/guide/dev-setup) for optimal debugging environment
+-   Explore [Testing Strategies](/arch/testing) for comprehensive testing approaches
+-   Review [Error Handling](/arch/error-handling) patterns for robust applications
+-   Understand [Background Processing](/arch/background-processing) debugging techniques
 
 ## Related Resources
 
-- [.NET Aspire Documentation](https://learn.microsoft.com/en-us/dotnet/aspire/)
-- [OpenTelemetry for .NET](https://opentelemetry.io/docs/languages/net/)
-- [Serilog Best Practices](https://serilog.net/)
-- [TestContainers Documentation](https://testcontainers.com/)
+-   [.NET Aspire Documentation](https://learn.microsoft.com/en-us/dotnet/aspire/)
+-   [OpenTelemetry for .NET](https://opentelemetry.io/docs/languages/net/)
+-   [Serilog Best Practices](https://serilog.net/)
+-   [TestContainers Documentation](https://testcontainers.com/)

@@ -2,10 +2,6 @@ name: "Build .NET Projects"
 description: "Build .NET projects with caching"
 
 inputs:
-  dotnet-version:
-    description: ".NET SDK version to use"
-    required: false
-    default: "9.0.x"
   configuration:
     description: "Build configuration (Debug/Release)"
     required: false
@@ -18,11 +14,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{ inputs.dotnet-version }}
-
     - name: Cache NuGet packages
       uses: actions/cache@v4
       with:

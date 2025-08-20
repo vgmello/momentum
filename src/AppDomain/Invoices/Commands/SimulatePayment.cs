@@ -1,8 +1,6 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Invoices.Contracts.IntegrationEvents;
-using FluentValidation;
-using Momentum.Extensions;
 
 namespace AppDomain.Invoices.Commands;
 

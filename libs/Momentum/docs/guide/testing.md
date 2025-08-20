@@ -763,21 +763,21 @@ For comprehensive coverage of specific testing topics, explore these detailed gu
 
 ### Core Testing Approaches
 
-1. **[Unit Testing](./testing/unit-tests)** - Deep dive into unit testing patterns, mocking strategies, and testing individual components
-2. **[Integration Testing](./testing/integration-tests)** - Complete guide to end-to-end testing with Testcontainers and real infrastructure
-3. **[Contract Testing](./testing/contract-tests)** - API contract verification and consumer-driven contract testing
+1. **Unit Testing** - Deep dive into unit testing patterns, mocking strategies, and testing individual components
+2. **Integration Testing** - Complete guide to end-to-end testing with Testcontainers and real infrastructure
+3. **Contract Testing** - API contract verification and consumer-driven contract testing
 
 ### Specialized Testing
 
-4. **[Performance Testing](./testing/performance-tests)** - Load testing, benchmarking, and performance validation
-5. **[Event Testing](./testing/event-tests)** - Testing integration events and messaging workflows
-6. **[Security Testing](./testing/security-tests)** - Authentication, authorization, and security validation
+4. **Performance Testing** - Load testing, benchmarking, and performance validation
+5. **Event Testing** - Testing integration events and messaging workflows
+6. **Security Testing** - Authentication, authorization, and security validation
 
 ### Advanced Topics
 
-7. **[Test Data Management](./testing/test-data)** - Strategies for creating, managing, and cleaning up test data
-8. **[Mocking Strategies](./testing/mocking-patterns)** - Advanced mocking patterns and best practices
-9. **[CI/CD Testing](./testing/ci-cd-integration)** - Continuous integration and deployment testing strategies
+7. **Test Data Management** - Strategies for creating, managing, and cleaning up test data
+8. **Mocking Strategies** - Advanced mocking patterns and best practices
+9. **CI/CD Testing** - Continuous integration and deployment testing strategies
 
 ## Testing Tools and Infrastructure
 
@@ -945,9 +945,9 @@ Now that you understand testing fundamentals, explore these areas:
 
 #### Testing Techniques
 
-1. **[Unit Testing](./testing/unit-tests)** - Master component-level testing patterns
-2. **[Integration Testing](./testing/integration-tests)** - End-to-end verification strategies
-3. **[Performance Testing](./testing/performance-tests)** - Load testing and benchmarking
+1. **Unit Testing** - Master component-level testing patterns
+2. **Integration Testing** - End-to-end verification strategies
+3. **Performance Testing** - Load testing and benchmarking
 
 #### Domain-Specific Testing
 

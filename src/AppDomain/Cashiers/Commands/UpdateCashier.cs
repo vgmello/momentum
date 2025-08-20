@@ -28,8 +28,8 @@ public class UpdateCashierValidator : AbstractValidator<UpdateCashierCommand>
         RuleFor(c => c.Name).NotEmpty();
         RuleFor(c => c.Name).MinimumLength(2);
         RuleFor(c => c.Name).MaximumLength(100);
-        RuleFor(c => c.Email).NotEmpty();
-        RuleFor(c => c.Email).EmailAddress();
+        RuleFor(c => c.Email).NotEmpty().When(c => c.Email != null);
+        RuleFor(c => c.Email).EmailAddress().When(c => !string.IsNullOrEmpty(c.Email));
     }
 }
 

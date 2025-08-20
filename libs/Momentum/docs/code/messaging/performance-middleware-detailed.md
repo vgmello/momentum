@@ -1,6 +1,6 @@
 # Request Performance Middleware
 
-## Middleware Overview {#middleware-overview}
+## Middleware Overview
 
 This middleware:
 
@@ -11,7 +11,7 @@ This middleware:
 
 The middleware is automatically applied to all message handlers via the messaging policy.
 
-## Pre-Processing Setup {#pre-processing-setup}
+## Pre-Processing Setup
 
 This method captures the start time, logs message receipt, and increments the message received counter in the metrics system.
 
@@ -36,7 +36,7 @@ _messagingMetrics = meterStore.GetOrCreateMetrics(metricName);
 _messagingMetrics.MessageReceived();
 ```
 
-## Post-Processing Analysis {#post-processing-analysis}
+## Post-Processing Analysis
 
 This method calculates the elapsed time, logs the outcome (success or failure), and records the processing duration and any exceptions in the metrics system.
 

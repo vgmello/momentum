@@ -58,12 +58,12 @@ public class DbCommandAttributeTests
     public void DbCommandAttribute_WithFnOnly_ShouldHaveCorrectProperties()
     {
         // Act
-        var attribute = new DbCommandAttribute(fn: "select * from AppDomain.invoices_get");
+        var attribute = new DbCommandAttribute(fn: "select * from app_domain.invoices_get");
 
         // Assert
         attribute.Sp.ShouldBeNull();
         attribute.Sql.ShouldBeNull();
-        attribute.Fn.ShouldBe("select * from AppDomain.invoices_get");
+        attribute.Fn.ShouldBe("select * from app_domain.invoices_get");
         attribute.ParamsCase.ShouldBe(DbParamsCase.Unset);
         attribute.NonQuery.ShouldBe(false);
         attribute.DataSource.ShouldBeNull();

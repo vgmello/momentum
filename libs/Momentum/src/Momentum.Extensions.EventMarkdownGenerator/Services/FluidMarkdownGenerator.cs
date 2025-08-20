@@ -124,7 +124,7 @@ public class FluidMarkdownGenerator
         try
         {
             var assembly = Assembly.GetExecutingAssembly();
-            
+
             // Try to read from filesystem first (as Content files)
             var assemblyLocation = assembly.Location;
 

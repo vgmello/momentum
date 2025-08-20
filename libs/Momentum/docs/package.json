@@ -4,10 +4,11 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "dev": "pnpm install && pnpm docs:dev",
-    "docs:pre": "pnpm docs:dotnet && pnpm docs:adr",
-    "docs:dev": "pnpm docs:pre && vitepress dev",
-    "docs:build": "pnpm docs:pre && vitepress build",
+    "dev": "pnpm docs:dev",
+    "docs:prep": "pnpm docs:dotnet && pnpm docs:adr",
+    "docs:dev": "pnpm docs:prep && vitepress dev",
+    "docs:build": "pnpm docs:prep && vitepress build",
+    "docs:build:debug": "DEBUG=* pnpm docs:build",
     "docs:preview": "vitepress preview",
     "docs:dotnet": "tsx .vitepress/scripts/docs-dotnet.ts",
     "docs:adr": "tsx .vitepress/scripts/adrlogs-table-gen.ts"
@@ -21,7 +22,7 @@
     "@types/node": "^24.0.14",
     "esbuild": ">=0.25.0",
     "markdown-it": "^14.1.0",
-    "mermaid": "^11.9.0",
+    "mermaid": "^11.10.0",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
     "vitepress": "^1.6.3"

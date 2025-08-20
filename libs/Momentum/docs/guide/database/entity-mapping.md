@@ -1,3 +1,9 @@
+---
+title: Entity Mapping
+description: Type-safe, high-performance database access with PostgreSQL using LinqToDB with conventions and customization options.
+date: 2024-01-15
+---
+
 # Entity Mapping in Momentum
 
 Entity mapping in Momentum uses LinqToDB to provide type-safe, high-performance database access with PostgreSQL. The mapping system follows conventions while allowing customization for complex scenarios.
@@ -653,5 +659,5 @@ public async Task Database_InsertAndRetrieve_MaintainsDataIntegrity()
 
 - Learn about [DbCommand](./dbcommand) patterns for database operations
 - Understand [Transactions](./transactions) for complex operations
-- Explore [Query Optimization](../performance/query-optimization) techniques
-- See [Migration Strategies](./migrations) for schema evolution
+- Explore [Best Practices](../best-practices) for performance optimization
+- See [RDBMS Migrations](../rdbms-migrations) for schema evolution

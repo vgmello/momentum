@@ -1,8 +1,6 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
-using Microsoft.Extensions.Hosting;
 using Orleans.Configuration;
-using OrleansDashboard;
 
 namespace AppDomain.BackOffice.Orleans.Infrastructure.Extensions;
 
@@ -22,13 +20,9 @@ public static class OrleansExtensions
 
         if (!useLocalCluster)
         {
-            builder.AddKeyedAzureTableClient("OrleansClustering");
-            builder.AddKeyedAzureBlobClient("OrleansGrainState");
+            builder.AddKeyedAzureTableServiceClient("OrleansClustering");
+            builder.AddKeyedAzureBlobServiceClient("OrleansGrainState");
         }
-
-        builder.Services
-            .AddOpenTelemetry()
-            .WithMetrics(opt => opt.AddMeter("Microsoft.Orleans"));
 
         builder.UseOrleans(siloBuilder =>
         {
@@ -45,6 +39,15 @@ public static class OrleansExtensions
                 options.Host = "*";
             });
         });
+
+        builder.Services
+            .AddOpenTelemetry()
+            .WithMetrics(opt => opt.AddMeter("Microsoft.Orleans"))
+            .WithTracing(tracing =>
+            {
+                tracing.AddSource("Microsoft.Orleans.Runtime");
+                tracing.AddSource("Microsoft.Orleans.Application");
+            });
 
         return builder;
     }

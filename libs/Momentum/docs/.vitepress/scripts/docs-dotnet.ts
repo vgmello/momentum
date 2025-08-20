@@ -193,10 +193,17 @@ async function getFileInfo(filePath: string): Promise<FileInfo | null> {
 function runDocfx(): void {
     log('Running docfx metadata...');
     try {
-        execSync('docfx metadata', { stdio: 'inherit' });
+        // Try global docfx first, then dotnet tool if installed locally
+        try {
+            execSync('docfx metadata', { stdio: 'inherit' });
+        } catch {
+            log('Global docfx not found, trying dotnet tool...');
+            execSync('dotnet tool run docfx metadata', { stdio: 'inherit' });
+        }
         log('Documentation generated successfully');
     } catch (error) {
         log(`Error running docfx: ${error}`);
+        log('Make sure DocFX is installed: dotnet tool install -g docfx');
         process.exit(1);
     }
 }

@@ -1,3 +1,9 @@
+---
+title: Observability
+description: Comprehensive observability through OpenTelemetry integration, structured logging, and health monitoring for production-ready applications.
+date: 2024-01-15
+---
+
 # Observability in Momentum
 
 Momentum provides comprehensive observability out-of-the-box through OpenTelemetry integration, structured logging, and health monitoring. This ensures your applications are production-ready with full visibility into their behavior and performance.

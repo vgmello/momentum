@@ -23,7 +23,7 @@ infra/AppDomain.Database/Liquibase/
 
 **Tables**: Use singular entity names within appropriate schemas
 
--   Domain tables: `AppDomain.{entity}` (e.g., `AppDomain.cashiers`, `AppDomain.invoices`)
+-   Domain tables: `AppDomain.{entity}` (e.g., `app_domain.cashiers`, `app_domain.invoices`)
 -   Infrastructure tables: `service_bus.{entity}` (e.g., `service_bus.outbox`)
 
 ### Migration Configuration Files
@@ -64,7 +64,7 @@ infra/AppDomain.Database/Liquibase/
 The service uses source generators for type-safe database operations with stored procedures:
 
 ```csharp
-[DbCommand(fn: "select * from AppDomain.cashiers_get")]
+[DbCommand(fn: "select * from app_domain.cashiers_get")]
 public partial record GetCashierDbQuery(Guid CashierId) : IQuery<Cashier?>;
 ```
 

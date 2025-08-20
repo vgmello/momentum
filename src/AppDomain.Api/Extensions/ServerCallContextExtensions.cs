@@ -1,7 +1,5 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
-using Grpc.Core;
-
 namespace AppDomain.Api.Extensions;
 
 /// <summary>

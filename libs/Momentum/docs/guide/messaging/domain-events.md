@@ -25,10 +25,6 @@ Domain events are:
 Domain events follow a similar pattern to integration events but are kept internal:
 
 ```csharp
-/// <summary>
-/// Published when an invoice is generated and ready for processing.
-/// This is an internal domain event that triggers various side effects within the service.
-/// </summary>
 [EventTopic<InvoiceGenerated>]
 public record InvoiceGenerated(
     [PartitionKey] Guid TenantId,
@@ -52,13 +48,6 @@ From the AppDomain reference implementation:
 // In AppDomain.Invoices.Contracts.DomainEvents namespace
 namespace AppDomain.Invoices.Contracts.DomainEvents;
 
-/// <summary>
-/// Published when an invoice is generated and ready for processing.
-/// Triggers various internal processes like notifications, auditing, and reporting.
-/// </summary>
-/// <param name="TenantId">The tenant identifier for proper partitioning</param>
-/// <param name="InvoiceId">The unique identifier of the generated invoice</param>
-/// <param name="InvoiceAmount">The total amount of the invoice</param>
 [EventTopic<InvoiceGenerated>(Internal = true)]
 public record InvoiceGenerated(
     [PartitionKey] Guid TenantId,
@@ -532,4 +521,4 @@ Domain events are processed using the same infrastructure as integration events 
 - Learn about [Integration Events](./integration-events) for cross-service communication
 - Understand [Kafka Configuration](./kafka) for message broker setup
 - Explore [Wolverine](./wolverine) messaging framework details
-- See [Event Sourcing](../advanced/event-sourcing) patterns (if applicable)
+- Event Sourcing patterns (coming soon)

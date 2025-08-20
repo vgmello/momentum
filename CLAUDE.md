@@ -386,3 +386,5 @@ When updating library project files in `libs/Momentum/src/`, follow this pattern
 
 -   **Extensions.Abstractions and Extensions.XmlDocs**: Always NuGet packages, never project references when imported
 -   **libs/Momentum folder must work standalone**: Always include ProjectReferences with MSBuild conditions for standalone builds
+
+- ALWAYS test the documentation with 'pnpm docs:build' before you can assert the any documentation changes are working.

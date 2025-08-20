@@ -2,6 +2,7 @@ import { defineConfig, type MarkdownOptions } from "vitepress";
 
 import { MermaidPlugin } from "./plugins/mermaid/mermaid";
 import SnippetPluginExt from "./plugins/snippet";
+import CSharpGenericsPlugin from "./plugins/csharpGenerics";
 import TocSidebar from "./plugins/tocSidebar";
 import AdrSidebar from "./plugins/adr/adrSidebar";
 
@@ -16,6 +17,7 @@ const markdownOptions: MarkdownOptions = {
 
     preConfig: (md) => {
         SnippetPluginExt(md);
+        CSharpGenericsPlugin(md);
     },
 
     config: (md) => {
@@ -26,6 +28,10 @@ const markdownOptions: MarkdownOptions = {
 export default defineConfig({
     title: "Momentum .NET",
     description: "Momentum .NET, It's not a framework, it's a highly opinionated .NET template with pre-configured .NET libraries and tools, for scalable, distributed .NET services.",
+    ignoreDeadLinks: [
+        // Ignore localhost URLs as they're example URLs
+        /^https?:\/\/localhost/
+    ],
     markdown: markdownOptions,
     themeConfig: {
         nav: [

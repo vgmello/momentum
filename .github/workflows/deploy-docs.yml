@@ -39,6 +39,11 @@ jobs:
       url: ${{ steps.docs-deployment.outputs.page_url }}
 
     steps:
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
@@ -50,7 +55,6 @@ jobs:
       - name: Build documentation
         uses: ./.github/actions/docs-build
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
           docs-path: ${{ github.event.inputs.docs-path || 'libs/Momentum/docs' }}
           build-dotnet: ${{ github.event.inputs.build-dotnet || 'true' }}
 

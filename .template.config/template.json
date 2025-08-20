@@ -255,16 +255,20 @@
       "replaces": "app-domain",
       "fileRename": "app-domain"
     },
-    "MomentumVersion": {
-      "type": "bind",
-      "binding": "msbuild:MomentumVersion",
-      "replaces": "$(TemplateMomentumVersion)",
-      "defaultValue": "0.0.1"
+    "appDomainCamelCase": {
+      "type": "derived",
+      "valueSource": "name",
+      "valueTransform": "camelCase",
+      "replaces": "appDomain",
+      "fileRename": "appDomain"
     }
   },
   "forms": {
     "kebab-case": {
       "identifier": "kebabCase"
+    },
+    "camelCase": {
+      "identifier": "firstLowerCaseInvariant"
     },
     "dash-to-underscore": {
       "identifier": "replace",

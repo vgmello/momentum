@@ -43,7 +43,6 @@ runs:
       run: |
         echo "🔍 Checking for consumer-visible changes in ${{ inputs.change-path }}..."
 
-        # Get changed files
         CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD | grep "^${{ inputs.change-path }}" || true)
 
         if [ -z "$CHANGED_FILES" ]; then
@@ -52,7 +51,6 @@ runs:
           exit 0
         fi
 
-        # Filter to consumer-visible changes only
         CONSUMER_CHANGES=$(echo "$CHANGED_FILES" | grep -E '\.(cs|csproj|props|targets)$' | grep -v -E '(Test|\.Tests\.|\.md$|\.gitignore$|\.editorconfig$)' || true)
 
         if [ -z "$CONSUMER_CHANGES" ]; then
@@ -99,19 +97,29 @@ runs:
       if: steps.skip-check.outputs.skip != 'true'
       shell: bash
       run: |
+        # Determine tag prefix based on trigger
+        if [[ "${{ github.ref }}" == refs/tags/template-* ]]; then
+          TAG_PREFIX="template-v"
+          echo "Using template tag format"
+        else
+          TAG_PREFIX="v"
+          echo "Using standard tag format"
+        fi
+
         # Find latest regular release tag
         set +o pipefail
-        PREV_TAG=$(git tag -l "v*.*.*" --sort=-v:refname | grep -v 'pre' | head -1)
+        PREV_TAG=$(git tag -l "${TAG_PREFIX}*.*.*" --sort=-v:refname | grep -v 'pre' | head -1)
         set -o pipefail
 
         if [ -z "$PREV_TAG" ]; then
           echo "No previous regular release found"
-          PREV_TAG="v0.0.0"
+          PREV_TAG="${TAG_PREFIX}0.0.0"
         fi
 
         echo "Previous regular release: $PREV_TAG"
         echo "prev_tag=$PREV_TAG" >> $GITHUB_OUTPUT
-        echo "prev_version=$(echo $PREV_TAG | sed 's/^v//')" >> $GITHUB_OUTPUT
+        echo "tag_prefix=$TAG_PREFIX" >> $GITHUB_OUTPUT
+        echo "prev_version=$(echo $PREV_TAG | sed "s/^${TAG_PREFIX}//")" >> $GITHUB_OUTPUT
 
     - name: Check for pre-releases
       id: check-prerelease
@@ -119,16 +127,14 @@ runs:
       shell: bash
       run: |
         FILE_VERSION="${{ steps.file-version.outputs.version }}"
-
-        # Check for pre-releases of the target version
-        LATEST_PRERELEASE=$(git tag -l "v${FILE_VERSION}-pre.*" --sort=-v:refname | head -1)
+        TAG_PREFIX="${{ steps.previous.outputs.tag_prefix }}"
+        LATEST_PRERELEASE=$(git tag -l "${TAG_PREFIX}${FILE_VERSION}-pre.*" --sort=-v:refname | head -1)
 
         if [ -n "$LATEST_PRERELEASE" ]; then
           echo "Found pre-release: $LATEST_PRERELEASE"
           echo "has_prerelease=true" >> $GITHUB_OUTPUT
           echo "latest_prerelease=$LATEST_PRERELEASE" >> $GITHUB_OUTPUT
 
-          # Extract sequence number
           SEQUENCE=$(echo $LATEST_PRERELEASE | sed -n 's/.*-pre\.\([0-9]\+\)$/\1/p')
           echo "prerelease_sequence=$SEQUENCE" >> $GITHUB_OUTPUT
         else
@@ -182,7 +188,8 @@ runs:
           fi
         fi
 
-        CALCULATED_TAG="v$CALCULATED_VERSION"
+        TAG_PREFIX="${{ steps.previous.outputs.tag_prefix }}"
+        CALCULATED_TAG="${TAG_PREFIX}$CALCULATED_VERSION"
 
         echo "📋 Calculated version: $CALCULATED_VERSION"
         echo "📋 Calculated tag: $CALCULATED_TAG"

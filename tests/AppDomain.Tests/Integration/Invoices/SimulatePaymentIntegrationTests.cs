@@ -15,7 +15,7 @@ public class SimulatePaymentIntegrationTests(IntegrationTestFixture fixture) : I
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE AppDomain.invoices;");
+        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
 
         // Arrange - Create an invoice first
         var createRequest = new CreateInvoiceRequest
@@ -47,7 +47,7 @@ public class SimulatePaymentIntegrationTests(IntegrationTestFixture fixture) : I
         // Note: SimulatePayment doesn't actually modify the invoice status in the database
         // It just triggers a payment event for processing. The invoice should still be in Draft status.
         var dbInvoice = await connection.QuerySingleOrDefaultAsync(
-            "SELECT status FROM AppDomain.invoices WHERE invoice_id = @Id",
+            "SELECT status FROM app_domain.invoices WHERE invoice_id = @Id",
             new { Id = Guid.Parse(createdInvoice.InvoiceId) });
 
         dbInvoice!.ShouldNotBeNull();
@@ -60,7 +60,7 @@ public class SimulatePaymentIntegrationTests(IntegrationTestFixture fixture) : I
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE AppDomain.invoices;");
+        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
 
         // Arrange - Create an invoice first
         var createRequest = new CreateInvoiceRequest
@@ -114,7 +114,7 @@ public class SimulatePaymentIntegrationTests(IntegrationTestFixture fixture) : I
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE AppDomain.invoices;");
+        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
 
         // Arrange - Create an invoice first
         var createRequest = new CreateInvoiceRequest
@@ -147,7 +147,7 @@ public class SimulatePaymentIntegrationTests(IntegrationTestFixture fixture) : I
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE AppDomain.invoices;");
+        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
 
         // Arrange - Create an invoice first
         var createRequest = new CreateInvoiceRequest

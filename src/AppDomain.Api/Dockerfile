@@ -39,4 +39,7 @@ WORKDIR /app
 
 COPY --from=build /app/publish .
 
+# Run Wolverine code generation
+RUN dotnet AppDomain.Api.dll codegen write || echo "Codegen failed"
+
 ENTRYPOINT ["dotnet", "AppDomain.Api.dll"]

@@ -55,9 +55,10 @@ graph TB
 **Purpose**: Internal consistency within bounded contexts
 
 **Characteristics**:
-- Synchronous processing within the same transaction
-- Maintain data consistency
-- Trigger side effects within the same domain
+
+-   Synchronous processing within the same transaction
+-   Maintain data consistency
+-   Trigger side effects within the same domain
 
 **Example**:
 
@@ -75,14 +76,14 @@ public record InvoiceGenerated : IDomainEvent
 **Usage in Command Handler**:
 
 ```csharp
-[DbCommand(sp: "AppDomain.invoices_create")]
+[DbCommand(sp: "app_domain.invoices_create")]
 public partial class CreateInvoiceCommandHandler : IRequestHandler<CreateInvoiceCommand, Result<Invoice>>
 {
     public async Task<Result<Invoice>> Handle(CreateInvoiceCommand request, CancellationToken cancellationToken)
     {
         // Execute stored procedure (generated)
         var invoice = await ExecuteDbCommand(request, cancellationToken);
-        
+
         // Publish domain event for internal consistency
         await _mediator.Publish(new InvoiceGenerated
         {
@@ -90,7 +91,7 @@ public partial class CreateInvoiceCommandHandler : IRequestHandler<CreateInvoice
             InvoiceNumber = invoice.InvoiceNumber,
             Amount = invoice.Amount
         }, cancellationToken);
-        
+
         return Result.Success(invoice);
     }
 }
@@ -101,24 +102,14 @@ public partial class CreateInvoiceCommandHandler : IRequestHandler<CreateInvoice
 **Purpose**: Cross-service communication and business process coordination
 
 **Characteristics**:
-- Asynchronous processing across service boundaries
-- Enable loose coupling between microservices
-- Support eventual consistency patterns
+
+-   Asynchronous processing across service boundaries
+-   Enable loose coupling between microservices
+-   Support eventual consistency patterns
 
 **Event Schema Definition**:
 
 ```csharp
-/// <summary>
-/// Published when a new invoice is created in the system.
-/// Used by accounting and notification services for downstream processing.
-/// </summary>
-/// <param name="InvoiceId">Unique identifier for the created invoice</param>
-/// <param name="InvoiceNumber">Human-readable invoice number</param>
-/// <param name="Amount">Invoice total amount in base currency units</param>
-/// <param name="Currency">ISO 4217 currency code (e.g., "USD", "EUR")</param>
-/// <param name="CashierId">Identifier of the cashier who created the invoice</param>
-/// <param name="CreatedAt">Timestamp when the invoice was created (UTC)</param>
-/// <param name="DueDate">Payment due date for the invoice</param>
 public record InvoiceCreated(
     Ulid InvoiceId,
     string InvoiceNumber,
@@ -178,7 +169,7 @@ public class InvoiceService
     {
         // Business logic
         var payment = await ProcessPayment(invoiceId, amount);
-        
+
         // Publish integration event
         await _publisher.PublishAsync(new InvoicePaid(
             InvoiceId: invoiceId,
@@ -195,7 +186,7 @@ public class InvoiceService
 **Command Handler Publishing**:
 
 ```csharp
-public partial class MarkInvoiceAsPaidCommandHandler 
+public partial class MarkInvoiceAsPaidCommandHandler
 {
     protected override async Task PublishIntegrationEvents(Invoice invoice)
     {
@@ -281,10 +272,10 @@ services.AddWolverine(opts =>
     // Configure retry policies
     opts.OnException<SqlException>()
         .RetryWithCooldown(50.Milliseconds(), 100.Milliseconds(), 250.Milliseconds());
-    
+
     opts.OnException<HttpRequestException>()
         .RetryTimes(3);
-    
+
     // Dead letter queue for unhandleable messages
     opts.OnException<InvalidOperationException>()
         .MoveToErrorQueue();
@@ -344,7 +335,7 @@ public class InvoiceGrain : Grain<InvoiceState>, IInvoiceGrain
         State.LastUpdated = @event.CreatedAt;
 
         await WriteStateAsync();
-        
+
         // Schedule payment reminder
         RegisterTimer(SendPaymentReminder, null, TimeSpan.FromDays(7), TimeSpan.FromDays(1));
     }
@@ -392,7 +383,7 @@ public class PaymentProcessingSaga : Grain<PaymentSagaState>, IPaymentProcessing
 
         // Step 1: Validate payment
         var validationResult = await ValidatePayment(@event);
-        
+
         if (validationResult.IsValid)
         {
             // Step 2: Apply to invoice
@@ -471,7 +462,7 @@ public class EventStore : IEventStore
     {
         const string sql = """
             SELECT event_id, stream_id, event_type, event_data, event_metadata, version, created_at
-            FROM event_store 
+            FROM event_store
             WHERE stream_id = @StreamId AND version > @FromVersion
             ORDER BY version
         """;
@@ -644,16 +635,16 @@ public class InvoicePaidHandlerTests
     {
         // Arrange
         var @event = new InvoicePaid(Ulid.NewUlid(), 1000.00m, DateTimeOffset.UtcNow, "PAY-123");
-        
+
         _notificationServiceMock
             .Setup(x => x.SendPaymentConfirmation(It.IsAny<Ulid>(), It.IsAny<decimal>(), It.IsAny<DateTimeOffset>()))
             .ThrowsAsync(new InvalidOperationException("Service unavailable"));
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _handler.Handle(@event));
-        
+
         Assert.That(exception.Message, Is.EqualTo("Service unavailable"));
-        
+
         // Verify error was logged
         _loggerMock.Verify(
             x => x.Log(
@@ -708,7 +699,7 @@ public class EventIntegrationTests
         // Arrange
         var publisher = _serviceProvider.GetRequiredService<IMessagePublisher>();
         var eventStore = _serviceProvider.GetRequiredService<IEventStore>();
-        
+
         var @event = new InvoiceCreated(
             InvoiceId: Ulid.NewUlid(),
             InvoiceNumber: "INV-001",
@@ -728,7 +719,7 @@ public class EventIntegrationTests
         // Assert
         var events = await eventStore.GetEventsAsync($"invoice-{@event.InvoiceId}");
         var storedEvent = events.FirstOrDefault(e => e.EventType == nameof(InvoiceCreated));
-        
+
         Assert.That(storedEvent, Is.Not.Null);
         Assert.That(storedEvent.StreamId, Is.EqualTo($"invoice-{@event.InvoiceId}"));
     }
@@ -738,10 +729,10 @@ public class EventIntegrationTests
     {
         if (_databaseContainer != null)
             await _databaseContainer.DisposeAsync();
-        
+
         if (_kafkaContainer != null)
             await _kafkaContainer.DisposeAsync();
-        
+
         _serviceProvider?.Dispose();
     }
 }
@@ -755,16 +746,16 @@ public class EventIntegrationTests
 public class EventMetricsMiddleware
 {
     private readonly IMetrics _metrics;
-    
+
     public async Task InvokeAsync(MessageContext context, Func<Task> next)
     {
         var eventType = context.Envelope.MessageType.Name;
         var stopwatch = Stopwatch.StartNew();
-        
+
         try
         {
             await next();
-            
+
             // Success metrics
             _metrics.Counter("events_processed_total")
                 .WithTag("event_type", eventType)
@@ -779,7 +770,7 @@ public class EventMetricsMiddleware
                 .WithTag("status", "error")
                 .WithTag("error_type", ex.GetType().Name)
                 .Increment();
-            
+
             throw;
         }
         finally
@@ -799,21 +790,21 @@ public class EventMetricsMiddleware
 public class EventTracingMiddleware
 {
     private static readonly ActivitySource ActivitySource = new("AppDomain.Events");
-    
+
     public async Task InvokeAsync(MessageContext context, Func<Task> next)
     {
         var eventType = context.Envelope.MessageType.Name;
-        
+
         using var activity = ActivitySource.StartActivity($"Process {eventType}");
         activity?.SetTag("event.type", eventType);
         activity?.SetTag("event.id", context.Envelope.Id?.ToString());
         activity?.SetTag("event.source", context.Envelope.Source);
-        
+
         if (context.Envelope.CorrelationId != null)
         {
             activity?.SetTag("event.correlation_id", context.Envelope.CorrelationId);
         }
-        
+
         try
         {
             await next();
@@ -849,7 +840,7 @@ public class BatchEventProcessor
     public async Task ProcessEventsBatch(IEnumerable<IIntegrationEvent> events)
     {
         var batches = events.Chunk(100); // Process in batches of 100
-        
+
         await Parallel.ForEachAsync(batches, async (batch, cancellationToken) =>
         {
             await ProcessBatch(batch, cancellationToken);
@@ -869,7 +860,7 @@ services.AddWolverine(opts =>
         {
             // Partition by tenant for data locality
             producer.ConfigurePartitioning<InvoiceCreated>(msg => msg.InvoiceId.ToString());
-            
+
             // Ensure ordering by cashier
             producer.ConfigurePartitioning<CashierCreated>(msg => msg.CashierId.ToString());
         });
@@ -896,13 +887,13 @@ public class EventReplayService
     public async Task ReplayEventsAsync(string streamId, DateTimeOffset fromDate, DateTimeOffset toDate)
     {
         var events = await _eventStore.GetEventsByDateRangeAsync(streamId, fromDate, toDate);
-        
+
         foreach (var eventEnvelope in events)
         {
             // Deserialize and republish
             var @event = DeserializeEvent(eventEnvelope);
             await _publisher.PublishAsync(@event);
-            
+
             // Add delay to prevent overwhelming consumers
             await Task.Delay(TimeSpan.FromMilliseconds(10));
         }
@@ -920,26 +911,26 @@ public class EventSourcedInvoiceRepository : IInvoiceRepository
     public async Task<InvoiceAggregate> GetByIdAsync(Ulid invoiceId)
     {
         var events = await _eventStore.GetEventsAsync($"invoice-{invoiceId}");
-        
+
         var aggregate = new InvoiceAggregate();
         foreach (var eventEnvelope in events)
         {
             var @event = DeserializeEvent(eventEnvelope);
             aggregate.ApplyEvent(@event);
         }
-        
+
         return aggregate;
     }
 
     public async Task SaveAsync(InvoiceAggregate aggregate)
     {
         var uncommittedEvents = aggregate.GetUncommittedEvents();
-        
+
         foreach (var @event in uncommittedEvents)
         {
             await _eventStore.AppendEventAsync($"invoice-{aggregate.InvoiceId}", @event, aggregate.Version);
         }
-        
+
         aggregate.MarkEventsAsCommitted();
     }
 }
@@ -947,9 +938,9 @@ public class EventSourcedInvoiceRepository : IInvoiceRepository
 
 ## Related Resources
 
-- [Background Processing](/arch/background-processing) - Orleans and async processing
-- [Testing Strategies](/arch/testing) - Comprehensive testing approaches
-- [Database Design](/arch/database) - Event sourcing and persistence patterns
-- [CQRS Implementation](/arch/cqrs) - Command Query Responsibility Segregation
-- [Wolverine Documentation](https://wolverine.netlify.app/) - Message bus framework
-- [Apache Kafka Documentation](https://kafka.apache.org/documentation/) - Event streaming platform
+-   [Background Processing](/arch/background-processing) - Orleans and async processing
+-   [Testing Strategies](/arch/testing) - Comprehensive testing approaches
+-   [Database Design](/arch/database) - Event sourcing and persistence patterns
+-   [CQRS Implementation](/arch/cqrs) - Command Query Responsibility Segregation
+-   [Wolverine Documentation](https://wolverine.netlify.app/) - Message bus framework
+-   [Apache Kafka Documentation](https://kafka.apache.org/documentation/) - Event streaming platform

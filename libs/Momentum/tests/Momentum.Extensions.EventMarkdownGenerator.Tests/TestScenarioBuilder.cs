@@ -181,7 +181,7 @@ public class TestScenarioBuilder
             "registrationdate" or "completedat" => "System.DateTime",
             "customer" => "AppDomain.Orders.Contracts.Models.Customer",
             "items" => "System.Collections.Generic.List{AppDomain.Orders.Contracts.Models.OrderItem}",
-            "billingaddress" => "AppDomain.Orders.Contracts.Models.Address",
+            "app_domainaddress" => "AppDomain.Orders.Contracts.Models.Address",
             _ => "System.String"
         };
     }

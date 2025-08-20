@@ -8,25 +8,51 @@ date: 2025-01-15
 
 Welcome to **Momentum** - a comprehensive .NET 9 template system that generates complete, production-ready microservices solutions. Whether you're building APIs, event-driven backends, or stateful processing systems, Momentum provides the architecture, patterns, and infrastructure you need to get productive immediately.
 
-## Two Ways to Use Momentum
+## Quick Start (2 Minutes)
 
-### **🚀 Template System (Recommended)**
+Get a complete microservices solution running in under 2 minutes:
 
-The fastest way to get started - generates complete microservices solutions with everything configured and ready to run:
+### 1. Install the Template
 
--   **Instant Setup**: Complete application in one command
--   **Best Practices**: Domain-driven design with CQRS patterns
--   **Full Stack**: APIs, background processing, and documentation
--   **Modern Architecture**: .NET 9, Aspire orchestration, real-world patterns
+```bash
+# Install from NuGet (recommended)
+dotnet new install Momentum.Template
+```
 
-### **📚 Individual Libraries**
+### 2. Generate Your Solution
 
-For existing projects or custom architectures - add Momentum capabilities incrementally:
+```bash
+# Create a complete microservices solution
+dotnet new mmt -n OrderService --allow-scripts yes
+cd OrderService
+```
 
--   **Modular Approach**: Use only what you need
--   **Any .NET 9 App**: Works with existing applications
--   **Incremental Adoption**: Add features as you grow
--   **Custom Integration**: Full control over implementation
+### 3. Start Everything with Aspire
+
+Make sure you have the aspire workload installed:
+
+```bash
+dotnet workload install aspire
+```
+
+```bash
+# Launch the complete application stack
+dotnet run --project src/OrderService.AppHost
+
+# Access the Aspire Dashboard: https://localhost:18110
+# API endpoints: https://localhost:8111
+# Documentation: http://localhost:8119
+```
+
+**That's it!** You now have a running microservices solution with:
+
+-   ✅ REST and gRPC APIs with sample endpoints
+-   ✅ Background event processing with Wolverine
+-   ✅ PostgreSQL database with migrations
+-   ✅ Apache Kafka messaging
+-   ✅ Comprehensive observability
+-   ✅ Live documentation
+-   ✅ Sample business domain (Cashiers/Invoices)
 
 ## Technology Stack
 
@@ -49,7 +75,7 @@ Momentum is built on modern, production-proven technologies:
 
 ### **Core Architecture Principles**
 
--   **🎯 Real-World Mirroring**: Code structure corresponds to business operations
+-   **🎯 Real-World Mirroring**: Code structure corresponds to business operations and processes
 -   **🚫 No Smart Objects**: Entities are data records, not self-modifying objects
 -   **🏢 Front/Back Office**: Synchronous APIs vs Asynchronous processing
 -   **📡 Event-Driven**: Integration events via Kafka with Wolverine message handling
@@ -60,50 +86,8 @@ Momentum is built on modern, production-proven technologies:
 Before getting started, ensure you have:
 
 -   **.NET 9 SDK** - [Download here](https://dotnet.microsoft.com/download/dotnet/9.0)
--   **IDE**: Visual Studio 2022 17.8+, VS Code with C# Dev Kit, or JetBrains Rider
+-   **IDE**: Visual Studio, VS Code with C# Dev Kit, or JetBrains Rider
 -   **Docker Desktop** - Required for databases, Kafka, and local development
-
-## Quick Start with Template (2 Minutes)
-
-Get a complete microservices solution running in under 2 minutes:
-
-### 1. Install the Template
-
-```bash
-# Clone the repository and install the template
-git clone https://github.com/vgmello/momentum.git
-cd momentum
-dotnet new install .
-```
-
-### 2. Generate Your Solution
-
-```bash
-# Create a complete microservices solution
-dotnet new mmt -n OrderService --allow-scripts yes
-cd OrderService
-```
-
-### 3. Start Everything with Aspire
-
-```bash
-# Launch the complete application stack
-dotnet run --project src/OrderService.AppHost
-
-# Access the Aspire Dashboard: https://localhost:18110
-# API endpoints: https://localhost:8101
-# Documentation: http://localhost:8119
-```
-
-**That's it!** You now have a running microservices solution with:
-
--   ✅ REST and gRPC APIs with sample endpoints
--   ✅ Background event processing with Wolverine
--   ✅ PostgreSQL database with migrations
--   ✅ Apache Kafka messaging
--   ✅ Comprehensive observability
--   ✅ Live documentation
--   ✅ Sample business domain (Cashiers/Invoices)
 
 ## Template Configuration Options
 
@@ -127,14 +111,14 @@ dotnet new mmt -n WorkflowEngine --orleans --api false --port 9000
 
 ```bash
 # Generate complete solution with custom settings
-dotnet new mmt -n EcommercePlatform --org "Acme Corp" --port 7000 --kafka true
+dotnet new mmt -n EcommercePlatform --org "Acme Corp" --port 7000
 ```
 
 ### **Minimal Setup**
 
 ```bash
 # Clean slate without sample code
-dotnet new mmt -n CleanService --sample false --project-only
+dotnet new mmt -n CleanService --no-sample
 ```
 
 ### **Available Template Parameters**
@@ -154,8 +138,8 @@ The template offers comprehensive configuration options:
 -   `--port`: Base port number (default: 8100)
 
 **Customization:**
--   `--org`: Organization name for copyright headers
--   `--sample`: Include sample Cashiers/Invoices code (default: true, use `--sample false` to skip)
+-   `--org`: Organization name for copyright headers, github, etc
+-   `--no-sample`: Exclude sample code (default: false, use `--no-sample` to skip)
 -   `--project-only`: Generate only projects without solution files
 -   `--libs`: Include Momentum libraries as project references
 -   `--lib-name`: Custom prefix to replace "Momentum" in library names
@@ -222,7 +206,9 @@ Customize the base port with `--port 9000` to use 9100, 9101, etc.
 
 ## Individual Libraries Approach
 
-For existing projects or custom architectures, use Momentum Libraries individually:
+For existing projects or custom architectures, you can use Momentum Libraries individually. All these capabilities can also be configured through the template system with selective feature inclusion:
+
+📚 **Note**: The template system (`dotnet new mmt`) allows you to configure which libraries and features to include, so you can generate solutions with only the specific Momentum capabilities you need.
 
 Build a simple API service using individual Momentum Libraries when you need to add capabilities to existing projects:
 
@@ -1046,7 +1032,7 @@ Choose your path based on how you're using Momentum:
 
 1. **[Explore the Generated Solution](./template-walkthrough/)** - Understand what was created
 2. **[Add Your Business Domain](./adding-domains/)** - Replace sample code with your logic
-3. **[Deploy to Production](./deployment/)** - Deploy your microservices
+3. **Deploy to Production** - Deploy your microservices (coming soon)
 4. **[Template Options Reference](./template-options/)** - Complete parameter guide
 
 ### **If You're Using Individual Libraries**
@@ -1066,8 +1052,8 @@ Choose your path based on how you're using Momentum:
 
 ### **Community and Support**
 
--   **API Reference**: Browse the complete [API documentation](/reference/Momentum)
--   **Sample Applications**: See [real-world examples](https://github.com/vgmello/momentum/tree/main/examples)
+-   **API Reference**: Browse the complete API documentation
+-   **Sample Applications**: See real-world examples
 -   **GitHub Discussions**: Ask questions and share experiences
 -   **Contributing**: Help improve the libraries for everyone
 
@@ -1133,7 +1119,7 @@ app.MapGet("/orders/{id:guid}", async (Guid id, IMessageBus bus) =>
 });
 ```
 
-**Ready to build amazing applications?** 
+**Ready to build amazing applications?**
 
 ### **Template Users (Recommended)**
 
@@ -1149,9 +1135,9 @@ app.MapGet("/orders/{id:guid}", async (Guid id, IMessageBus bus) =>
 
 ### **Reference & Examples**
 
--   **[API Reference](/reference/Momentum)** - Complete library documentation
--   **[Sample Applications](https://github.com/vgmello/momentum/tree/main/examples)** - Real-world examples
--   **[GitHub Discussions](https://github.com/vgmello/momentum/discussions)** - Community support
+-   **API Reference** - Complete library documentation
+-   **Sample Applications** - Real-world examples
+-   **GitHub Discussions** - Community support
 
 ---
 

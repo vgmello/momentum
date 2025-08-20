@@ -1,6 +1,6 @@
 # Distributed Events Discovery
 
-## Local Domain Discovery {#local-domain-discovery}
+## Local Domain Discovery
 
 This only applies to "local" domain assemblies
 
@@ -40,7 +40,7 @@ var domainAssemblies = AppDomain.CurrentDomain.GetAssemblies()
     .ToArray();
 ```
 
-## Handler-Associated Events Discovery {#handler-associated-events}
+## Handler-Associated Events Discovery
 
 This method identifies distributed events by analyzing handler method parameters and ensures that only events with corresponding handlers are included.
 

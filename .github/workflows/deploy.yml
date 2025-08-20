@@ -54,6 +54,11 @@ jobs:
       url: ${{ steps.docs-deployment.outputs.page_url }}
 
     steps:
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
@@ -71,7 +76,6 @@ jobs:
       - name: Build .NET projects
         uses: ./.github/actions/build
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
           build-target: libs/Momentum/Momentum.slnx
 
       - name: Calculate pre-release version
@@ -164,7 +168,6 @@ jobs:
         if: steps.options.outputs.deploy-docs == 'true'
         uses: ./.github/actions/docs-build
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
           docs-path: libs/Momentum/docs
           build-dotnet: false
 

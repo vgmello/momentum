@@ -1,3 +1,9 @@
+---
+title: DbCommand Pattern
+description: Type-safe, testable approach to database operations with separation of concerns and performance optimization.
+date: 2024-01-15
+---
+
 # DbCommand Pattern in Momentum
 
 The DbCommand pattern in Momentum provides a type-safe, testable approach to database operations. It separates database logic from business logic while maintaining consistency and performance.
@@ -238,10 +244,7 @@ Momentum supports source-generated database commands for enhanced performance an
 ```csharp
 public static partial class GetCashiersQueryHandler
 {
-    /// <summary>
-    /// If the function name starts with a $, the function gets executed as `select * from {dbFunction}`
-    /// </summary>
-    [DbCommand(fn: "$AppDomain.cashiers_get_all")]
+    [DbCommand(fn: "$app_domain.cashiers_get_all")]
     public partial record DbQuery(
         Guid TenantId,
         int Limit,
@@ -278,7 +281,7 @@ public static partial class GetCashiersQueryHandler
 The corresponding PostgreSQL function:
 
 ```sql
--- SQL function: AppDomain.cashiers_get_all
+-- SQL function: app_domain.cashiers_get_all
 CREATE OR REPLACE FUNCTION "AppDomain".cashiers_get_all(
     p_tenant_id UUID,
     p_limit INTEGER,
@@ -680,5 +683,5 @@ public async Task Handle_SourceGeneratedDbQuery_ReturnsResults()
 
 -   Learn about [Entity Mapping](./entity-mapping) for database schema design
 -   Understand [Transactions](./transactions) for complex operations
--   Explore [Query Optimization](./query-optimization) for performance
+-   Explore [Best Practices](../best-practices) for performance optimization
 -   See [Testing](../testing/) for comprehensive database testing strategies

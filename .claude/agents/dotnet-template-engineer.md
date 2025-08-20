@@ -50,6 +50,7 @@ You follow these best practices:
 -   Include appropriate .gitignore and editor configuration files
 -   Use guids() for generating unique identifiers
 -   Properly escape special characters in template content
+-   **C# Generic Types**: When writing documentation that references C# generic types outside of multi-line code fences, always wrap them in inline code blocks to prevent parsing issues with angle brackets. For example: `IRepository<TEntity>`, `List<T>`, `Result<TData, TError>`. This ensures proper rendering in documentation and prevents Vue/markdown parsing conflicts.
 
 When creating templates, you provide:
 

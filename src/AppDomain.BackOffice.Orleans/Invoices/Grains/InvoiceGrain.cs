@@ -8,39 +8,31 @@ namespace AppDomain.BackOffice.Orleans.Invoices.Grains;
 /// <summary>
 ///     Orleans grain implementation for managing invoice state and processing.
 /// </summary>
-public class InvoiceGrain : Grain, IInvoiceGrain
+/// <remarks>
+///     Initializes a new instance of the InvoiceGrain class.
+/// </remarks>
+/// <param name="invoiceState">The persistent state for the invoice</param>
+/// <param name="logger">Logger instance</param>
+public class InvoiceGrain(
+    [PersistentState("invoice", "Default")]
+        IPersistentState<InvoiceGrain.InvoiceState> invoiceState,
+    ILogger<InvoiceGrain> logger) : Grain, IInvoiceGrain
 {
-    private readonly IPersistentState<InvoiceState> _invoiceState;
-    private readonly ILogger<InvoiceGrain> _logger;
-
-    /// <summary>
-    ///     Initializes a new instance of the InvoiceGrain class.
-    /// </summary>
-    /// <param name="invoiceState">The persistent state for the invoice</param>
-    /// <param name="logger">Logger instance</param>
-    public InvoiceGrain(
-        [PersistentState("invoice", "Default")]
-        IPersistentState<InvoiceState> invoiceState,
-        ILogger<InvoiceGrain> logger)
-    {
-        _invoiceState = invoiceState;
-        _logger = logger;
-    }
 
     /// <inheritdoc />
     public async Task<Invoice> CreateInvoiceAsync(Invoice invoice)
     {
-        if (_invoiceState.State.Invoice != null)
+        if (invoiceState.State.Invoice != null)
         {
             throw new InvalidOperationException($"Invoice {this.GetPrimaryKey()} already exists");
         }
 
-        _invoiceState.State.Invoice = invoice;
-        _invoiceState.State.LastUpdated = DateTime.UtcNow;
+        invoiceState.State.Invoice = invoice;
+        invoiceState.State.LastUpdated = DateTime.UtcNow;
 
-        await _invoiceState.WriteStateAsync();
+        await invoiceState.WriteStateAsync();
 
-        _logger.LogInformation("Created invoice {InvoiceId} for tenant {TenantId}",
+        logger.LogInformation("Created invoice {InvoiceId} for tenant {TenantId}",
             invoice.InvoiceId, invoice.TenantId);
 
         // Publish integration event
@@ -55,18 +47,18 @@ public class InvoiceGrain : Grain, IInvoiceGrain
     /// <inheritdoc />
     public Task<Invoice?> GetInvoiceAsync()
     {
-        return Task.FromResult(_invoiceState.State.Invoice);
+        return Task.FromResult(invoiceState.State.Invoice);
     }
 
     /// <inheritdoc />
     public async Task<Invoice> MarkAsPaidAsync(decimal amountPaid, DateTime paymentDate)
     {
-        if (_invoiceState.State.Invoice == null)
+        if (invoiceState.State.Invoice == null)
         {
             throw new InvalidOperationException($"Invoice {this.GetPrimaryKey()} not found");
         }
 
-        var updatedInvoice = _invoiceState.State.Invoice with
+        var updatedInvoice = invoiceState.State.Invoice with
         {
             AmountPaid = amountPaid,
             PaymentDate = paymentDate,
@@ -74,12 +66,12 @@ public class InvoiceGrain : Grain, IInvoiceGrain
             UpdatedDateUtc = DateTime.UtcNow
         };
 
-        _invoiceState.State.Invoice = updatedInvoice;
-        _invoiceState.State.LastUpdated = DateTime.UtcNow;
+        invoiceState.State.Invoice = updatedInvoice;
+        invoiceState.State.LastUpdated = DateTime.UtcNow;
 
-        await _invoiceState.WriteStateAsync();
+        await invoiceState.WriteStateAsync();
 
-        _logger.LogInformation("Marked invoice {InvoiceId} as paid with amount {Amount}",
+        logger.LogInformation("Marked invoice {InvoiceId} as paid with amount {Amount}",
             updatedInvoice.InvoiceId, amountPaid);
 
         // Publish integration event
@@ -94,23 +86,23 @@ public class InvoiceGrain : Grain, IInvoiceGrain
     /// <inheritdoc />
     public async Task<Invoice> UpdateStatusAsync(string newStatus)
     {
-        if (_invoiceState.State.Invoice == null)
+        if (invoiceState.State.Invoice == null)
         {
             throw new InvalidOperationException($"Invoice {this.GetPrimaryKey()} not found");
         }
 
-        var updatedInvoice = _invoiceState.State.Invoice with
+        var updatedInvoice = invoiceState.State.Invoice with
         {
             Status = newStatus,
             UpdatedDateUtc = DateTime.UtcNow
         };
 
-        _invoiceState.State.Invoice = updatedInvoice;
-        _invoiceState.State.LastUpdated = DateTime.UtcNow;
+        invoiceState.State.Invoice = updatedInvoice;
+        invoiceState.State.LastUpdated = DateTime.UtcNow;
 
-        await _invoiceState.WriteStateAsync();
+        await invoiceState.WriteStateAsync();
 
-        _logger.LogInformation("Updated invoice {InvoiceId} status to {Status}",
+        logger.LogInformation("Updated invoice {InvoiceId} status to {Status}",
             updatedInvoice.InvoiceId, newStatus);
 
         return updatedInvoice;
@@ -119,17 +111,17 @@ public class InvoiceGrain : Grain, IInvoiceGrain
     /// <inheritdoc />
     public async Task<bool> ProcessPaymentAsync(decimal amount, string paymentMethod)
     {
-        if (_invoiceState.State.Invoice == null)
+        if (invoiceState.State.Invoice == null)
         {
             throw new InvalidOperationException($"Invoice {this.GetPrimaryKey()} not found");
         }
 
-        var invoice = _invoiceState.State.Invoice;
+        var invoice = invoiceState.State.Invoice;
 
         // Business logic for payment processing
         if (amount <= 0)
         {
-            _logger.LogWarning("Invalid payment amount {Amount} for invoice {InvoiceId}",
+            logger.LogWarning("Invalid payment amount {Amount} for invoice {InvoiceId}",
                 amount, invoice.InvoiceId);
 
             return false;
@@ -137,7 +129,7 @@ public class InvoiceGrain : Grain, IInvoiceGrain
 
         if (invoice.Status == "Paid")
         {
-            _logger.LogWarning("Invoice {InvoiceId} is already paid", invoice.InvoiceId);
+            logger.LogWarning("Invoice {InvoiceId} is already paid", invoice.InvoiceId);
 
             return false;
         }
@@ -145,7 +137,7 @@ public class InvoiceGrain : Grain, IInvoiceGrain
         // Process payment
         await MarkAsPaidAsync(amount, DateTime.UtcNow);
 
-        _logger.LogInformation("Processed payment of {Amount} via {PaymentMethod} for invoice {InvoiceId}",
+        logger.LogInformation("Processed payment of {Amount} via {PaymentMethod} for invoice {InvoiceId}",
             amount, paymentMethod, invoice.InvoiceId);
 
         // Publish payment event
@@ -171,7 +163,7 @@ public class InvoiceGrain : Grain, IInvoiceGrain
     {
         // TODO: Implement integration event publishing via Kafka/Wolverine
         // This would typically use the messaging infrastructure to publish events
-        _logger.LogDebug("Publishing integration event {EventType}: {Event}",
+        logger.LogDebug("Publishing integration event {EventType}: {Event}",
             typeof(T).Name, integrationEvent);
 
         return Task.CompletedTask;

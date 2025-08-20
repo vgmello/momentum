@@ -43,7 +43,7 @@ public static partial class MarkInvoiceAsPaidCommandHandler
     /// <summary>
     ///     Database command for marking an invoice as paid.
     /// </summary>
-    [DbCommand(fn: "$billing.invoices_mark_paid")]
+    [DbCommand(fn: "$app_domain.invoices_mark_paid")]
     public partial record DbCommand(
         Guid TenantId,
         Guid InvoiceId,

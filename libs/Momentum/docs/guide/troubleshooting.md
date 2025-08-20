@@ -310,9 +310,6 @@ public void Validator_InvalidEmail_ReturnsError()
 1. **Verify event definition:**
 
 ```csharp
-/// <summary>
-/// Event documentation is required for discovery
-/// </summary>
 [EventTopic<User>] // Ensure EventTopic attribute is present
 public record UserCreated(
     [PartitionKey] Guid TenantId,

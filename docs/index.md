@@ -16,14 +16,30 @@ hero:
           text: New Dev
           link: /guide/getting-started
 
+<!-- prettier-ignore-start -->
+
 features:
-    - title: Bills
-      details: Comprehensive bill management system for tracking and organizing AppDomain records (coming soon)
+<!--#if (INCLUDE_SAMPLE)-->
+    - title: 💰 Billing & Invoicing
+      details: Complete app_domain system with invoices, payments, and cashier management. Multi-tenant support with comprehensive audit trails and event-driven architecture.
       link: /guide/bills/
-    - title: Cashiers
-      details: Complete cashier management with CRUD operations, event-driven workflows, and payment tracking
+    - title: 👥 Cashier Management
+      details: Full cashier lifecycle management with role-based access control, activity tracking, and integration with invoice processing workflows.
       link: /guide/cashiers/
-    - title: Invoices
-      details: Full invoice lifecycle management from creation to payment with status tracking and automated workflows
+    - title: 📄 Invoice Processing
+      details: End-to-end invoice workflow from creation to payment. Includes validation, state management, and automated event publishing for downstream systems.
       link: /guide/invoices/
+<!--#else-->
+    - title: 🎯 Domain-Driven Design
+      details: Build your business domains with clean separation of concerns. CQRS patterns, event sourcing ready, and vertical slice architecture.
+      link: /guide/adding-domains/
+    - title: 🔄 Event-Driven Architecture
+      details: Asynchronous messaging with Kafka, integration events, and Orleans stateful processing for complex workflows.
+      link: /guide/messaging/
+    - title: 🛡️ Production-Ready Infrastructure
+      details: Built-in observability with OpenTelemetry, health checks, distributed tracing, and comprehensive testing with Testcontainers.
+      link: /guide/service-configuration/
+<!--#endif-->
 ---
+
+<!-- prettier-ignore-end -->

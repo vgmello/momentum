@@ -2,10 +2,6 @@ name: "Build Documentation"
 description: "Build VitePress documentation"
 
 inputs:
-  dotnet-version:
-    description: ".NET SDK version"
-    required: false
-    default: "9.0.x"
   node-version:
     description: "Node.js version"
     required: false
@@ -31,12 +27,6 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Setup .NET
-      if: inputs.build-dotnet == 'true'
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{ inputs.dotnet-version }}
-
     - name: Setup pnpm
       uses: pnpm/action-setup@v4
       with:
@@ -51,23 +41,28 @@ runs:
 
     - name: Build .NET projects
       if: inputs.build-dotnet == 'true'
-      shell: bash
-      working-directory: ${{ inputs.docs-path }}
-      run: |
-        echo "🔨 Building .NET projects..."
-        dotnet build ../src --configuration Release --verbosity minimal
-
-        if [ $? -ne 0 ]; then
-          echo "❌ .NET build failed"
-          exit 1
-        fi
-        echo "✅ .NET build successful"
+      uses: ./.github/actions/build
+      with:
+        build-target: libs/Momentum/Momentum.slnx
 
     - name: Install DocFX
       shell: bash
       run: |
         echo "📦 Installing DocFX..."
-        dotnet tool install -g docfx
+        dotnet tool install -g docfx --verbosity normal
+
+        # Ensure .NET tools are in PATH
+        export PATH="$PATH:$HOME/.dotnet/tools"
+        echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+
+        echo "📋 Verifying DocFX installation..."
+        docfx --version || {
+          echo "❌ DocFX installation failed or not in PATH"
+          echo "PATH: $PATH"
+          echo "HOME: $HOME"
+          ls -la $HOME/.dotnet/tools/ || echo "Tools directory not found"
+          exit 1
+        }
 
     - name: Install npm dependencies
       shell: bash
