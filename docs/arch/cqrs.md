@@ -22,7 +22,7 @@ The CQRS implementation follows these core principles:
 
 Each domain (like Cashiers, Invoices, Bills) follows this consistent structure:
 
-</code></pre>
+```
 src/AppDomain/Cashiers/
 ├── Commands/ # Write operations (what the department does)
 ├── Queries/ # Read operations (what the department knows)
@@ -31,7 +31,7 @@ src/AppDomain/Cashiers/
 │ └── IntegrationEvents/ # Inter-department notifications
 └── Data/
 └── Entities/ # Database representations
-</code></pre>
+```
 
 ## Command Pattern
 
