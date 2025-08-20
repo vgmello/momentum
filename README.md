@@ -111,7 +111,7 @@ dotnet new mmt -n EcommercePlatform --org "Acme Corp" --port 7000
 
 ```bash
 # Clean slate without sample code
-dotnet new mmt -n CleanService --no-sample false --project-only
+dotnet new mmt -n CleanService --no-sample
 ```
 
 ### **Available Template Parameters**
@@ -122,20 +122,20 @@ The template offers comprehensive configuration options:
 
 -   `--api`: REST/gRPC API project (default: true)
 -   `--back-office`: Background processing project (default: true)
--   `--orleans`: Orleans stateful processing project (default: false)
 -   `--aspire`: .NET Aspire orchestration project (default: true)
 -   `--docs`: VitePress documentation project (default: true)
+-   `--orleans`: Orleans stateful processing project (default: false)
 
 **Infrastructure:**
 
 -   `--kafka`: Apache Kafka messaging (default: true)
--   `--db`: Database setup (default, npgsql, liquibase, none)
+-   `--db`: Database setup (default, npgsql, liquibase)
 -   `--port`: Base port number (default: 8100)
 
 **Customization:**
 
--   `--org`: Organization name for copyright headers
--   `--no-sample`: Include sample Cashiers/Invoices code (default: true, use `--no-sample false` to skip)
+-   `--org`: Organization name for copyright headers, github, etc
+-   `--no-sample`: Exclude sample code (default: false, use `--no-sample` to skip)
 -   `--project-only`: Generate only projects without solution files
 -   `--libs`: Include Momentum libraries as project references
 -   `--lib-name`: Custom prefix to replace "Momentum" in library names
@@ -220,178 +220,6 @@ dotnet add package Momentum.ServiceDefaults --version 0.0.1
 dotnet add package Momentum.Extensions --version 0.0.1
 ```
 
-### 2. Configure Service Defaults
-
-Replace the content of `Program.cs`:
-
-```csharp
-using Momentum.Extensions;
-
-var builder = WebApplication.CreateBuilder(args);
-
-// Add Momentum service defaults (observability, health checks, validation)
-builder.AddServiceDefaults();
-
-// Add your application services
-builder.Services.AddScoped<IOrderService, OrderService>();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline
-app.MapDefaultEndpoints(); // Health checks, metrics
-
-// Add your API endpoints
-app.MapPost("/orders", async (CreateOrderCommand command, IOrderService orderService) =>
-{
-    var result = await orderService.CreateOrderAsync(command);
-
-    return result.IsSuccess
-        ? Results.Created($"/orders/{result.Value.Id}", result.Value)
-        : Results.BadRequest(result.Errors);
-});
-
-app.MapGet("/orders/{id:guid}", async (Guid id, IOrderService orderService) =>
-{
-    var result = await orderService.GetOrderAsync(id);
-
-    return result.IsSuccess
-        ? Results.Ok(result.Value)
-        : Results.NotFound();
-});
-
-await app.RunAsync();
-```
-
-### 3. Define Commands and Models
-
-Create `Models/Order.cs`:
-
-```csharp
-namespace OrderService.Models;
-
-public record Order(
-    Guid Id,
-    string CustomerName,
-    string ProductName,
-    decimal Amount,
-    DateTime CreatedAt
-);
-
-public record CreateOrderCommand(
-    string CustomerName,
-    string ProductName,
-    decimal Amount
-);
-```
-
-### 4. Implement Service with Result Types
-
-Create `Services/IOrderService.cs`:
-
-```csharp
-using Momentum.Extensions;
-using OrderService.Models;
-
-namespace OrderService.Services;
-
-public interface IOrderService
-{
-    Task<Result<Order>> CreateOrderAsync(CreateOrderCommand command);
-    Task<Result<Order>> GetOrderAsync(Guid id);
-}
-```
-
-Create `Services/OrderService.cs`:
-
-```csharp
-using Momentum.Extensions;
-using OrderService.Models;
-using FluentValidation.Results;
-
-namespace OrderService.Services;
-
-public class OrderService : IOrderService
-{
-    private static readonly Dictionary<Guid, Order> _orders = new();
-
-    public Task<Result<Order>> CreateOrderAsync(CreateOrderCommand command)
-    {
-        // Validate input (in real apps, use FluentValidation)
-        if (string.IsNullOrWhiteSpace(command.CustomerName))
-        {
-            var errors = new List<ValidationFailure>
-            {
-                new("CustomerName", "Customer name is required")
-            };
-            return Task.FromResult(Result<Order>.Failure(errors));
-        }
-
-        if (command.Amount <= 0)
-        {
-            var errors = new List<ValidationFailure>
-            {
-                new("Amount", "Amount must be greater than zero")
-            };
-            return Task.FromResult(Result<Order>.Failure(errors));
-        }
-
-        // Create the order
-        var order = new Order(
-            Id: Guid.CreateVersion7(),
-            CustomerName: command.CustomerName,
-            ProductName: command.ProductName,
-            Amount: command.Amount,
-            CreatedAt: DateTime.UtcNow
-        );
-
-        _orders[order.Id] = order;
-
-        return Task.FromResult(Result<Order>.Success(order));
-    }
-
-    public Task<Result<Order>> GetOrderAsync(Guid id)
-    {
-        if (_orders.TryGetValue(id, out var order))
-        {
-            return Task.FromResult(Result<Order>.Success(order));
-        }
-
-        var errors = new List<ValidationFailure>
-        {
-            new("Id", "Order not found")
-        };
-        return Task.FromResult(Result<Order>.Failure(errors));
-    }
-}
-```
-
-### 5. Test Your Service
-
-```bash
-# Run the application
-dotnet run
-
-# The service starts with:
-# - API endpoints: https://localhost:7001
-# - Health check: https://localhost:7001/health
-# - Metrics: https://localhost:7001/metrics
-
-# Test creating an order
-curl -X POST https://localhost:7001/orders \
-  -H "Content-Type: application/json" \
-  -d '{
-    "customerName": "John Doe",
-    "productName": "Laptop",
-    "amount": 1299.99
-  }'
-
-# Test retrieving an order (use the ID from the response above)
-curl https://localhost:7001/orders/{order-id}
-
-# Check health status
-curl https://localhost:7001/health
-```
-
 ## Library Integration Results
 
 Congratulations! You've added powerful capabilities to your application:
@@ -401,32 +229,6 @@ Congratulations! You've added powerful capabilities to your application:
 -   ✅ OpenTelemetry observability
 -   ✅ Structured logging with Serilog
 -   ✅ Production-ready service defaults
-
-## Understanding What Happened
-
-In just a few minutes, you added powerful capabilities to your application:
-
-### Service Defaults (`builder.AddServiceDefaults()`)
-
--   **Health Checks**: `/health` (detailed) and `/alive` (simple) endpoints
--   **OpenTelemetry**: Metrics, tracing, and logging correlation
--   **Serilog**: Structured logging with exception details
--   **Resilience**: HTTP client retry and circuit breaker patterns
--   **Service Discovery**: Automatic endpoint resolution in distributed systems
-
-### Result Types (`ResultOfT`)
-
--   **Error Handling**: No more try-catch blocks for business logic
--   **Type Safety**: Compile-time guarantees about success/failure states
--   **Validation**: Built-in support for FluentValidation results
--   **API Friendly**: Easy conversion to HTTP status codes
-
-### Observability Out-of-the-Box
-
--   **Structured Logs**: JSON format with correlation IDs
--   **Metrics**: Application and infrastructure metrics
--   **Tracing**: Request tracking across service boundaries
--   **Health Monitoring**: Automated health check endpoints
 
 ## Individual Libraries Overview
 
@@ -1046,95 +848,6 @@ Choose your path based on how you're using Momentum:
 8. **[Best Practices](./best-practices)** - Production-ready patterns and guidelines
 9. **[Troubleshooting](./troubleshooting)** - Common issues and solutions
 
-### **Community and Support**
-
--   **API Reference**: Browse the complete API documentation
--   **Sample Applications**: See real-world examples
--   **GitHub Discussions**: Ask questions and share experiences
--   **Contributing**: Help improve the libraries for everyone
-
-## Common Patterns Quick Reference
-
-### Result Type Usage
-
-```csharp
-// Success
-return Result<Customer>.Success(customer);
-
-// Single error
-return Result<Customer>.Failure("Customer not found");
-
-// Multiple errors (validation)
-return Result<Customer>.Failure(validationResult.Errors);
-
-// Chaining operations
-var result = await GetCustomerAsync(id);
-if (result.IsFailure) return result;
-
-return await UpdateCustomerAsync(result.Value);
-```
-
-### Service Registration
-
-```csharp
-// Essential services
-builder.AddServiceDefaults();
-
-// API services
-builder.AddApiDefaults();
-
-// Database
-builder.Services.AddScoped<IDbConnection>(_ =>
-    new NpgsqlConnection(connectionString));
-
-// Validation
-builder.Services.AddValidatorsFromAssemblyContaining<Program>();
-
-// Custom services
-builder.Services.AddScoped<IOrderService, OrderService>();
-```
-
-### API Endpoint Patterns
-
-```csharp
-// Command endpoint with validation
-app.MapPost("/orders", async (CreateOrderCommand command, IMessageBus bus) =>
-{
-    var result = await bus.InvokeAsync(command);
-    return result.IsSuccess
-        ? Results.Created($"/orders/{result.Value.Id}", result.Value)
-        : Results.BadRequest(result.Errors);
-});
-
-// Query endpoint
-app.MapGet("/orders/{id:guid}", async (Guid id, IMessageBus bus) =>
-{
-    var query = new GetOrderQuery(id);
-    var result = await bus.InvokeAsync(query);
-    return result.IsSuccess ? Results.Ok(result.Value) : Results.NotFound();
-});
-```
-
-**Ready to build amazing applications?**
-
-### **Template Users (Recommended)**
-
--   **[Template Walkthrough](./template-walkthrough/)** - Understand your generated solution
--   **[Adding Business Domains](./adding-domains/)** - Build your application logic
--   **[Template Options Guide](./template-options/)** - Master all configuration options
-
-### **Library Users**
-
--   **[Service Configuration](./service-configuration/)** - Configure observability and infrastructure
--   **[Database Integration](./database/)** - Add database operations with source generation
--   **[Event Messaging](./messaging/)** - Build event-driven microservices
-
-### **Reference & Examples**
-
--   **API Reference** - Complete library documentation
--   **Sample Applications** - Real-world examples
--   **GitHub Discussions** - Community support
-
 ## Coming Soon
 
 We're continuously expanding Momentum to include even more production-ready technologies and patterns:
@@ -1144,10 +857,68 @@ We're continuously expanding Momentum to include even more production-ready tech
 -   **LGTM stack for improved observability** - Enhanced monitoring with Loki, Grafana, Tempo, and Mimir
 -   **Maybe REDIS** - Caching and session management capabilities
 
+## Support
+
+If you encounter any issues or require assistance, please [open an issue](https://github.com/vgmello/momentum/issues) on the project's GitHub page.
+
+## Contribution
+
+Momentum is designed to be copied and customized, If you've created patterns or improvements that would benefit the broader community, share it, contributions to the template are welcome!
+
+## Code of Conduct
+
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-3.0-4baaaa.svg)](https://www.contributor-covenant.org/version/3/0/code_of_conduct/)
+
+This project has adopted the code of conduct defined by the [Contributor Covenant](https://www.contributor-covenant.org/) to clarify expected behavior in our community. For more information see the [Code of Conduct](CODE_OF_CONDUCT.MD).
+
+## Credits and Acknowledgements
+
+Momentum makes use of several outstanding open-source libraries and frameworks. We extend our gratitude to the developers and contributors of these projects:
+
+### Core Framework Libraries
+
+- **[Wolverine](https://wolverinefx.io/)**: Next-generation message bus and CQRS framework for .NET, providing elegant command/query handling and message processing capabilities.
+- **[Mapperly](https://github.com/riok/mapperly)**: A .NET source generator for generating object mappings at compile-time, offering zero-overhead and type-safe mapping.
+- **[Microsoft Orleans](https://dotnet.github.io/orleans/)**: A cross-platform framework for building robust, scalable distributed applications with virtual actors.
+- **[.NET Aspire](https://github.com/dotnet/aspire)**: An opinionated, cloud-ready stack for building observable, production-ready distributed applications.
+
+### Data & Messaging
+
+- **[Dapper](https://github.com/DapperLib/Dapper)**: A simple object mapper for .NET with high performance and minimal overhead.
+- **[linq2db](https://linq2db.github.io/)**: Fast, lightweight, and type-safe LINQ to SQL implementation for .NET.
+- **[FluentValidation](https://fluentvalidation.net/)**: A popular .NET library for building strongly-typed validation rules.
+- **[CloudNative CloudEvents](https://cloudevents.io/)**: A specification for describing event data in a common way with Kafka integration.
+- **[Npgsql](https://www.npgsql.org/)**: The .NET data provider for PostgreSQL.
+- **[Liquibase](https://www.liquibase.com/)**: Database schema change management and version control.
+
+### Testing & Quality
+
+- **[xUnit v3](https://xunit.net/)**: Modern, extensible testing framework for .NET applications.
+- **[Shouldly](https://docs.shouldly.org/)**: Testing framework that focuses on giving great error messages when assertions fail.
+- **[Testcontainers](https://dotnet.testcontainers.org/)**: A library to support tests with throwaway instances of Docker containers.
+- **[NSubstitute](https://nsubstitute.github.io/)**: A friendly substitute for .NET mocking libraries.
+- **[NetArchTest](https://github.com/BenMorris/NetArchTest)**: A fluent API for .NET that can enforce architectural rules in unit tests.
+
+### Observability & Infrastructure
+
+- **[OpenTelemetry](https://opentelemetry.io/)**: A collection of tools, APIs, and SDKs for instrumenting, generating, collecting, and exporting telemetry data.
+- **[Serilog](https://serilog.net/)**: Diagnostic logging library for .NET applications with rich structured event data.
+- **[Scalar](https://github.com/scalar/scalar)**: Modern API documentation with interactive OpenAPI/Swagger support.
+- **[gRPC](https://grpc.io/)**: A high-performance, open source universal RPC framework.
+- **[Orleans Dashboard](https://github.com/OrleansContrib/OrleansDashboard)**: Web-based monitoring dashboard for Microsoft Orleans applications.
+
+### Code Generation & Utilities
+
+- **[OneOf](https://github.com/mcintyre321/OneOf)**: Discriminated unions for C# with exhaustive matching.
+- **[Spectre.Console](https://spectreconsole.net/)**: A .NET library that makes it easier to create beautiful console applications.
+- **[Fluid](https://github.com/sebastienros/fluid)**: High-performance, secure Liquid templating language for .NET.
+
+Each of these libraries may be licensed differently, so we recommend you review their licenses if you plan to use Momentum in your own projects.
+
+Special thanks to the .NET community and all contributors who help make these tools possible!
+
+> This project only uses third-party libraries with permissive licenses (e.g., MIT, Apache 2.0) that are approved for commercial use.
+
 ---
 
 _Momentum: Real-world microservices. Modern architecture. Production-ready from day one._
-
-### Contributing
-
-Momentum is designed to be copied and customized. However, if you've created patterns or improvements that would benefit the broader community, contributions to the template are welcome!

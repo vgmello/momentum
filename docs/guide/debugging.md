@@ -256,7 +256,7 @@ public async Task<Result<Cashier>> Handle(CreateCashierCommand request)
     },
     "Logging": {
         "LogLevel": {
-            "Npgsql.EntityFrameworkCore.PostgreSQL": "Information"
+            "Npgsql": "Information"
         }
     }
 }
@@ -454,7 +454,7 @@ public class AppDomainInboxHandler
 **Visual Studio**:
 
 -   .NET Aspire Workload
--   Entity Framework Power Tools
+-   PostgreSQL Tools
 -   ResXManager
 
 ### Debugging Tools

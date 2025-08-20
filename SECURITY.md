@@ -15,7 +15,7 @@ We take security vulnerabilities seriously. If you discover a security vulnerabi
 ### How to Report
 
 1. **DO NOT** create a public GitHub issue for security vulnerabilities
-2. Email security reports to: [security contact - update with actual email]
+2. Email security reports to: [github@vgmello.com](mailto:github@vgmello.com)
 3. Include the following information:
    - Description of the vulnerability
    - Steps to reproduce the issue

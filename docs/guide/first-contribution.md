@@ -283,7 +283,7 @@ dotnet test --filter "CashierApiTests"
 dotnet run --project src/AppDomain.AppHost
 
 # Test your changes using:
-# 1. Swagger UI at http://localhost:8101/scalar
+# 1. Scalar API UI at http://localhost:8101/scalar
 # 2. REST client (VS Code extension)
 # 3. Postman or similar tool
 ```
@@ -430,7 +430,7 @@ Adds maximum length validation (100 characters) to the cashier name field in `Cr
 ## Testing
 
 - [x] Unit tests added and passing
-- [x] Manual testing with Swagger UI
+- [x] Manual testing with Scalar API UI
 - [x] All existing tests still pass
 - [x] Validation error message displays correctly
 

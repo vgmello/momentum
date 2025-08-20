@@ -76,18 +76,30 @@ public class CreateCashierCommandHandlerTests
         var (result, integrationEvent) = await CreateCashierCommandHandler.Handle(command, messagingMock, CancellationToken.None);
 
         // Assert - Verify Result<T> success
-        var cashier = result.Match(success => success, failures => null!);
+        var cashier = result.Match(success => success, _ => null!);
         cashier.ShouldNotBeNull();
         cashier.Name.ShouldBe("John Doe");
         cashier.Email.ShouldBe("john.doe@example.com");
+        cashier.CashierId.ShouldNotBe(Guid.Empty);
 
         // Verify integration event publishing
         integrationEvent.ShouldNotBeNull();
         integrationEvent.ShouldBeOfType<CashierCreated>();
+        integrationEvent.Cashier.CashierId.ShouldBe(cashier.CashierId);
+        integrationEvent.Cashier.Name.ShouldBe(cashier.Name);
+        integrationEvent.Cashier.Email.ShouldBe(cashier.Email);
+
+        // Verify messaging was called correctly
+        await messagingMock.Received(1).InvokeCommandAsync(
+            Arg.Is<CreateCashierCommandHandler.DbCommand>(cmd =>
+                cmd.Cashier.TenantId == Guid.Empty &&
+                cmd.Cashier.Name == "John Doe" &&
+                cmd.Cashier.Email == "john.doe@example.com"),
+            Arg.Any<CancellationToken>());
     }
 
-    [Fact] 
-    public async Task Handle_WithDatabaseFailure_ShouldReturnValidationFailures()
+    [Fact]
+    public async Task Handle_WithDatabaseFailure_ShouldThrowException()
     {
         // Arrange
         var messagingMock = Substitute.For<IMessageBus>();
@@ -157,13 +169,14 @@ public async Task Handle_WithDifferentTenants_ShouldIsolateTenantData()
 The `IntegrationTestFixture` provides a complete testing environment with real infrastructure:
 
 ```csharp
-public class IntegrationTestFixture : WebApplicationFactory<Program>, IAsyncLifetime
+public class IntegrationTestFixture : WebApplicationFactory<AppDomain.Api.Program>, IAsyncLifetime
 {
     private readonly INetwork _containerNetwork = new NetworkBuilder().Build();
     private readonly PostgreSqlContainer _postgres;
     private readonly KafkaContainer _kafka;
 
     public GrpcChannel GrpcChannel { get; private set; } = null!;
+    public ITestOutputHelper? TestOutput { get; set; }
 
     public IntegrationTestFixture()
     {
@@ -175,7 +188,7 @@ public class IntegrationTestFixture : WebApplicationFactory<Program>, IAsyncLife
             .Build();
 
         _kafka = new KafkaBuilder()
-            .WithImage("confluentinc/cp-kafka:latest")
+            .WithImage("confluentinc/cp-kafka:7.6.0")
             .WithNetwork(_containerNetwork)
             .Build();
     }
@@ -199,17 +212,30 @@ public class IntegrationTestFixture : WebApplicationFactory<Program>, IAsyncLife
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.UseSetting("ConnectionStrings:AppDomainDb", 
-            _postgres.GetDbConnectionString("AppDomain"));
-        builder.UseSetting("ConnectionStrings:Messaging", 
+        builder.UseSetting("ConnectionStrings:AppDomainDb",
+            _postgres.GetDbConnectionString("app_domain"));
+        builder.UseSetting("ConnectionStrings:ServiceBus",
+            _postgres.GetDbConnectionString("service_bus"));
+        builder.UseSetting("ConnectionStrings:Messaging",
             _kafka.GetBootstrapAddress());
+        builder.UseSetting("Orleans:UseLocalhostClustering", "true");
 
         builder.ConfigureServices((ctx, services) =>
         {
             services.RemoveServices<IHostedService>();
+            services.RemoveServices<ILoggerFactory>();
             services.AddLogging(logging => logging
                 .ClearProviders()
-                .AddSerilog(CreateTestLogger()));
+                .AddSerilog(CreateTestLogger(nameof(AppDomain))));
+
+            services.AddWolverineWithDefaults(ctx.HostingEnvironment, ctx.Configuration,
+                opt => opt.ApplicationAssembly = typeof(AppDomain.Api.Program).Assembly);
+        });
+
+        builder.Configure(app =>
+        {
+            app.UseRouting();
+            app.UseEndpoints(endpoints => endpoints.MapGrpcServices(typeof(AppDomain.Api.Program)));
         });
     }
 }
@@ -235,7 +261,7 @@ public class CreateCashierIntegrationTests(IntegrationTestFixture fixture) : Int
         };
 
         // Act
-        var response = await _client.CreateCashierAsync(request, 
+        var response = await _client.CreateCashierAsync(request,
             cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
@@ -244,9 +270,9 @@ public class CreateCashierIntegrationTests(IntegrationTestFixture fixture) : Int
         Guid.Parse(response.CashierId).ShouldNotBe(Guid.Empty);
 
         // Verify in database
-        var getResponse = await _client.GetCashierAsync(new GetCashierRequest 
-        { 
-            CashierId = response.CashierId 
+        var getResponse = await _client.GetCashierAsync(new GetCashierRequest
+        {
+            CashierId = response.CashierId
         });
         getResponse.ShouldNotBeNull();
     }
@@ -285,7 +311,7 @@ public class EventIntegrationTests(IntegrationTestFixture fixture) : Integration
     {
         // Arrange
         var eventCollector = new IntegrationEventCollector<CashierCreated>();
-        
+
         // Subscribe to Kafka topic
         await eventCollector.StartListening("app_domain.cashiers.created");
 
@@ -361,56 +387,76 @@ public class MultiTenancyRulesTests : ArchitectureTestBase
 }
 ```
 
-## Orleans Grain Testing
+## Validation Testing
 
-### Testing Stateful Grains
+### FluentValidation Testing
+
+Test validation rules using FluentValidation.TestHelper:
 
 ```csharp
-public class InvoiceGrainTests
+public class CashierValidationTests
 {
     [Fact]
-    public async Task ProcessPayment_WithValidInvoice_ShouldUpdateState()
+    public void CreateCashierValidator_WithValidData_ShouldNotHaveValidationErrors()
     {
         // Arrange
-        var silo = new TestClusterBuilder()
-            .AddSiloBuilderConfigurator<TestSiloConfigurations>()
-            .Build();
-        
-        await silo.DeployAsync();
-
-        var grain = silo.GrainFactory.GetGrain<IInvoiceGrain>(Guid.NewGuid());
+        var validator = new CreateCashierValidator();
+        var command = new CreateCashierCommand(Guid.NewGuid(), "John Doe", "john.doe@example.com");
 
         // Act
-        await grain.CreateInvoice(new CreateInvoiceRequest
-        {
-            Amount = 100m,
-            CashierId = Guid.NewGuid()
-        });
-
-        var result = await grain.ProcessPayment(100m);
+        var result = validator.TestValidate(command);
 
         // Assert
-        result.ShouldBeTrue();
-        
-        var state = await grain.GetInvoiceState();
-        state.Status.ShouldBe(InvoiceStatus.Paid);
+        result.ShouldNotHaveAnyValidationErrors();
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void CreateCashierValidator_WithEmptyName_ShouldHaveValidationError(string name)
+    {
+        // Arrange
+        var validator = new CreateCashierValidator();
+        var command = new CreateCashierCommand(Guid.NewGuid(), name, "john.doe@example.com");
+
+        // Act
+        var result = validator.TestValidate(command);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor(x => x.Name)
+            .WithErrorMessage("'Name' must not be empty.");
     }
 
     [Fact]
-    public async Task ProcessPayment_WithInsufficientAmount_ShouldReturnFalse()
+    public void CreateCashierValidator_WithNameTooShort_ShouldHaveValidationError()
     {
-        // Test partial payment scenarios
-    }
-}
+        // Arrange
+        var validator = new CreateCashierValidator();
+        var command = new CreateCashierCommand(Guid.NewGuid(), "A", "john.doe@example.com");
 
-public class TestSiloConfigurations : ISiloConfigurator
-{
-    public void Configure(ISiloBuilder siloBuilder)
+        // Act
+        var result = validator.TestValidate(command);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor(x => x.Name)
+            .WithErrorMessage("The length of 'Name' must be at least 2 characters. You entered 1 characters.");
+    }
+
+    [Fact]
+    public void CreateCashierValidator_WithValidNameBoundaries_ShouldNotHaveValidationErrors()
     {
-        siloBuilder
-            .UseInMemoryReminderService()
-            .AddMemoryGrainStorage("Default")
-            .ConfigureLogging(logging => logging.AddDebug());
+        // Arrange
+        var validator = new CreateCashierValidator();
+        var minLengthCommand = new CreateCashierCommand(Guid.NewGuid(), "Jo", "test@example.com"); // 2 characters
+        var maxLengthCommand = new CreateCashierCommand(Guid.NewGuid(), new string('A', 100), "test@example.com"); // 100 characters
+
+        // Act
+        var minResult = validator.TestValidate(minLengthCommand);
+        var maxResult = validator.TestValidate(maxLengthCommand);
+
+        // Assert
+        minResult.ShouldNotHaveAnyValidationErrors();
+        maxResult.ShouldNotHaveAnyValidationErrors();
     }
 }
 ```
@@ -506,12 +552,12 @@ public async Task BulkOperations_ShouldNotCauseMemoryLeaks()
 
 ### Core Testing Stack
 
-- **xUnit**: Primary testing framework with collection fixtures
+- **xUnit v3**: Primary testing framework with collection fixtures
 - **Shouldly**: Expressive assertions for readable test failures
 - **NSubstitute**: Mocking framework for dependencies
-- **Testcontainers**: Real infrastructure provisioning
-- **FluentAssertions**: Additional assertion helpers
+- **Testcontainers**: Real infrastructure provisioning (PostgreSQL, Kafka)
 - **NetArchTest.Rules**: Architecture constraint validation
+- **FluentValidation.TestHelper**: Validation testing utilities
 
 ### Custom Test Utilities
 
