@@ -22,7 +22,7 @@ CQRS divides your application logic into two distinct responsibilities:
 | **Wolverine Message Bus** | CQRS orchestration and handler discovery | High-performance message processing, automatic registration |
 | **Source Generation** | Compile-time database access code generation | Type safety, performance, reduced boilerplate |
 | **Multi-Tenant Architecture** | Tenant-isolated data access with composite keys | Secure data separation, scalable SaaS architecture |
-| **Result\<T\> Pattern** | Explicit error handling without exceptions | Predictable error flows, better API responses |
+| **`Result<T>` Pattern** | Explicit error handling without exceptions | Predictable error flows, better API responses |
 | **Function-Based Database Access** | PostgreSQL functions with `$` prefix convention | Optimized database operations, maintainable SQL |
 
 ## Architecture Overview

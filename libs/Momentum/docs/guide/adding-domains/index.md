@@ -16,7 +16,7 @@ Adding domains in Momentum follows a structured approach that maintains consiste
 - **Multi-Tenant by Design**: All entities use composite primary keys with `TenantId`
 - **Source Generation**: Database access leverages compile-time code generation
 - **Wolverine Message Bus**: Uses Wolverine instead of MediatR for message handling
-- **Result<T> Pattern**: Commands and queries return strongly-typed results with error handling
+- **`Result<T>` Pattern**: Commands and queries return strongly-typed results with error handling
 - **Function-Based Database Access**: PostgreSQL functions with `$` prefix for source generation
 
 ## Domain Structure
@@ -188,13 +188,13 @@ public static partial class CreateOrderCommandHandler
     /// </summary>
     [DbCommand(fn: "$app_domain.orders_create")]
     public partial record DbCommand(
-        Guid TenantId, 
-        Guid CustomerId, 
+        Guid TenantId,
+        Guid CustomerId,
         string ItemsJson
     ) : ICommand<Result<Guid>>;
 
     public static async Task<Result<Order>> Handle(
-        CreateOrderCommand command, 
+        CreateOrderCommand command,
         IMessageBus messaging,
         CancellationToken cancellationToken)
     {
@@ -207,19 +207,19 @@ public static partial class CreateOrderCommandHandler
 
         // Serialize items to JSON for database function
         var itemsJson = JsonSerializer.Serialize(command.Items);
-        
+
         // Execute database command
         var dbCommand = new DbCommand(command.TenantId, command.CustomerId, itemsJson);
         var result = await messaging.InvokeAsync(dbCommand, cancellationToken);
-        
+
         if (result.IsFailure)
             return Result.Failure<Order>(result.Error);
 
         // Fetch created order
         var getOrderQuery = new GetOrderByIdQuery.DbQuery(command.TenantId, result.Value);
         var order = await messaging.InvokeAsync(getOrderQuery, cancellationToken);
-        
-        return order is not null 
+
+        return order is not null
             ? Result.Success(order)
             : Result.Failure<Order>("Failed to retrieve created order");
     }
@@ -254,7 +254,7 @@ public static partial class GetOrderByIdQueryHandler
     public partial record DbQuery(Guid TenantId, Guid OrderId) : IQuery<Order?>;
 
     public static async Task<Order?> Handle(
-        GetOrderByIdQuery query, 
+        GetOrderByIdQuery query,
         IMessageBus messaging,
         CancellationToken cancellationToken)
     {
@@ -271,7 +271,7 @@ public static partial class GetOrderByIdQueryHandler
 /// <param name="CustomerId">Unique identifier for the customer</param>
 /// <param name="Limit">Maximum number of records to return</param>
 /// <param name="Offset">Number of records to skip for pagination</param>
-public record GetOrdersByCustomerQuery(Guid TenantId, Guid CustomerId, int Limit = 10, int Offset = 0) 
+public record GetOrdersByCustomerQuery(Guid TenantId, Guid CustomerId, int Limit = 10, int Offset = 0)
     : IQuery<IEnumerable<GetOrdersByCustomerQuery.Result>>
 {
     public record Result(Guid OrderId, DateTime OrderDate, decimal TotalAmount, OrderStatus Status);
@@ -287,11 +287,11 @@ public static partial class GetOrdersByCustomerQueryHandler
     ///     The '$' prefix generates: SELECT * FROM app_domain.orders_get_by_customer(...)
     /// </summary>
     [DbCommand(fn: "$app_domain.orders_get_by_customer")]
-    public partial record DbQuery(Guid TenantId, Guid CustomerId, int Limit, int Offset) 
+    public partial record DbQuery(Guid TenantId, Guid CustomerId, int Limit, int Offset)
         : IQuery<IEnumerable<Data.Entities.Order>>;
 
     public static async Task<IEnumerable<GetOrdersByCustomerQuery.Result>> Handle(
-        GetOrdersByCustomerQuery query, 
+        GetOrdersByCustomerQuery query,
         IMessageBus messaging,
         CancellationToken cancellationToken)
     {
@@ -367,10 +367,10 @@ CREATE TABLE app_domain.orders (
     total_amount DECIMAL(12,2) NOT NULL,
     created_date_utc TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc', now()),
     updated_date_utc TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc', now()),
-    
+
     -- Composite primary key ensures tenant isolation
     PRIMARY KEY (tenant_id, order_id),
-    
+
     -- Check constraints for business rules
     CONSTRAINT chk_orders_total_amount_positive CHECK (total_amount >= 0),
     CONSTRAINT chk_orders_status_valid CHECK (status IN ('Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'))
@@ -386,13 +386,13 @@ CREATE TABLE app_domain.order_items (
     unit_price DECIMAL(10,2) NOT NULL,
     created_date_utc TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc', now()),
     updated_date_utc TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc', now()),
-    
+
     -- Composite primary key for tenant isolation
     PRIMARY KEY (tenant_id, order_item_id),
-    
+
     -- Foreign key to orders table with tenant awareness
     FOREIGN KEY (tenant_id, order_id) REFERENCES app_domain.orders(tenant_id, order_id) ON DELETE CASCADE,
-    
+
     -- Business rule constraints
     CONSTRAINT chk_order_items_quantity_positive CHECK (quantity > 0),
     CONSTRAINT chk_order_items_unit_price_positive CHECK (unit_price >= 0)
@@ -431,23 +431,23 @@ DECLARE
 BEGIN
     -- Parse items JSON
     v_items := p_items_json::JSONB;
-    
+
     -- Validate inputs
     IF p_tenant_id IS NULL THEN
         RAISE EXCEPTION 'Tenant ID cannot be null';
     END IF;
-    
+
     IF p_customer_id IS NULL THEN
         RAISE EXCEPTION 'Customer ID cannot be null';
     END IF;
-    
+
     IF jsonb_array_length(v_items) = 0 THEN
         RAISE EXCEPTION 'Order must contain at least one item';
     END IF;
-    
+
     -- Generate new order ID
     v_order_id := gen_random_uuid();
-    
+
     -- Calculate total amount and validate items
     FOR v_item IN SELECT * FROM jsonb_array_elements(v_items)
     LOOP
@@ -455,27 +455,27 @@ BEGIN
         IF (v_item->>'quantity')::INTEGER <= 0 THEN
             RAISE EXCEPTION 'Item quantity must be positive';
         END IF;
-        
+
         IF (v_item->>'unitPrice')::DECIMAL < 0 THEN
             RAISE EXCEPTION 'Item unit price cannot be negative';
         END IF;
-        
-        v_total_amount := v_total_amount + 
+
+        v_total_amount := v_total_amount +
             ((v_item->>'quantity')::INTEGER * (v_item->>'unitPrice')::DECIMAL);
     END LOOP;
-    
+
     -- Create order with tenant isolation
     INSERT INTO app_domain.orders (
         tenant_id, order_id, customer_id, total_amount, status
     ) VALUES (
         p_tenant_id, v_order_id, p_customer_id, v_total_amount, 'Pending'
     );
-    
+
     -- Create order items with tenant isolation
     FOR v_item IN SELECT * FROM jsonb_array_elements(v_items)
     LOOP
         INSERT INTO app_domain.order_items (
-            tenant_id, order_item_id, order_id, product_id, 
+            tenant_id, order_item_id, order_id, product_id,
             product_name, quantity, unit_price
         ) VALUES (
             p_tenant_id,
@@ -487,7 +487,7 @@ BEGIN
             (v_item->>'unitPrice')::DECIMAL
         );
     END LOOP;
-    
+
     RETURN v_order_id;
 EXCEPTION
     WHEN OTHERS THEN
@@ -515,10 +515,10 @@ CREATE OR REPLACE FUNCTION app_domain.orders_get_by_id(
 ) AS $$
 BEGIN
     RETURN QUERY
-    SELECT o.tenant_id, o.order_id, o.customer_id, o.order_date, 
+    SELECT o.tenant_id, o.order_id, o.customer_id, o.order_date,
            o.status, o.total_amount, o.created_date_utc, o.updated_date_utc
     FROM app_domain.orders o
-    WHERE o.tenant_id = p_tenant_id 
+    WHERE o.tenant_id = p_tenant_id
       AND o.order_id = p_order_id;
 END;
 $$ LANGUAGE plpgsql;
@@ -544,10 +544,10 @@ CREATE OR REPLACE FUNCTION app_domain.orders_get_by_customer(
 ) AS $$
 BEGIN
     RETURN QUERY
-    SELECT o.tenant_id, o.order_id, o.customer_id, o.order_date, 
+    SELECT o.tenant_id, o.order_id, o.customer_id, o.order_date,
            o.status, o.total_amount, o.created_date_utc, o.updated_date_utc
     FROM app_domain.orders o
-    WHERE o.tenant_id = p_tenant_id 
+    WHERE o.tenant_id = p_tenant_id
       AND o.customer_id = p_customer_id
     ORDER BY o.order_date DESC
     LIMIT p_limit
@@ -605,7 +605,7 @@ public static class OrdersEndpoints
     {
         // Extract tenant ID from authenticated user context
         var tenantId = context.GetTenantId(); // Extension method for tenant extraction
-        
+
         var command = new CreateOrderCommand(
             tenantId,
             request.CustomerId,
@@ -613,9 +613,9 @@ public static class OrdersEndpoints
                 i.ProductId, i.ProductName, i.Quantity, i.UnitPrice
             )).ToList()
         );
-        
+
         var result = await messageBus.InvokeAsync(command);
-        
+
         return result.Match(
             onSuccess: order => Results.Created($"/orders/{order.OrderId}", order),
             onFailure: error => Results.BadRequest(new { Error = error })
@@ -632,7 +632,7 @@ public static class OrdersEndpoints
     {
         var tenantId = context.GetTenantId();
         var query = new GetOrderByIdQuery(tenantId, id);
-        
+
         var order = await messageBus.InvokeAsync(query);
         return order is not null ? Results.Ok(order) : Results.NotFound();
     }
@@ -649,7 +649,7 @@ public static class OrdersEndpoints
     {
         var tenantId = context.GetTenantId();
         var query = new GetOrdersByCustomerQuery(tenantId, customerId, limit, offset);
-        
+
         var orders = await messageBus.InvokeAsync(query);
         return Results.Ok(new { Orders = orders, Limit = limit, Offset = offset });
     }
@@ -665,9 +665,9 @@ public static class OrdersEndpoints
     {
         var tenantId = context.GetTenantId();
         var command = new UpdateOrderStatusCommand(tenantId, id, request.Status);
-        
+
         var result = await messageBus.InvokeAsync(command);
-        
+
         return result.Match(
             onSuccess: _ => Results.NoContent(),
             onFailure: error => Results.BadRequest(new { Error = error })
@@ -714,12 +714,12 @@ public static class HttpContextExtensions
     public static Guid GetTenantId(this HttpContext context)
     {
         var tenantClaim = context.User.FindFirst("tenant_id")?.Value;
-        
+
         if (string.IsNullOrEmpty(tenantClaim) || !Guid.TryParse(tenantClaim, out var tenantId))
         {
             throw new UnauthorizedAccessException("Invalid or missing tenant context");
         }
-        
+
         return tenantId;
     }
 }
@@ -756,12 +756,12 @@ Encapsulate related values:
 public record Money(decimal Amount, string Currency)
 {
     public static Money Zero(string currency) => new(0, currency);
-    
+
     public Money Add(Money other)
     {
         if (Currency != other.Currency)
             throw new InvalidOperationException("Cannot add different currencies");
-        
+
         return new Money(Amount + other.Amount, Currency);
     }
 }
@@ -778,7 +778,7 @@ public class OrderPricingService
         var subtotal = items.Sum(item => item.Quantity * item.UnitPrice);
         var discount = CalculateDiscount(subtotal, customer);
         var tax = CalculateTax(subtotal - discount);
-        
+
         return subtotal - discount + tax;
     }
 }
@@ -841,7 +841,7 @@ Momentum uses source generators to eliminate boilerplate code and ensure type sa
 ```csharp
 // Your partial class definition
 [DbCommand(fn: "$app_domain.orders_create")]
-public partial record DbCommand(Guid TenantId, Guid CustomerId, string ItemsJson) 
+public partial record DbCommand(Guid TenantId, Guid CustomerId, string ItemsJson)
     : ICommand<Result<Guid>>;
 
 // Generated code (simplified view)
@@ -868,7 +868,7 @@ The `$` prefix in `fn: "$app_domain.orders_create"` tells the generator to:
 1. **Auto-generate SQL**: `SELECT * FROM app_domain.orders_create(...)`
 2. **Map parameters**: Automatically map record properties to function parameters
 3. **Handle results**: Convert database results to strongly-typed objects
-4. **Error handling**: Wrap exceptions in Result<T> pattern
+4. **Error handling**: Wrap exceptions in `Result<T>` pattern
 
 ### Partial Class Requirements
 
@@ -878,7 +878,7 @@ public static partial class CreateOrderCommandHandler
 {
     [DbCommand(fn: "$app_domain.orders_create")]
     public partial record DbCommand(...) : ICommand<Result<Guid>>;
-    
+
     // Your business logic handler
     public static async Task<Result<Order>> Handle(
         CreateOrderCommand command,
@@ -898,14 +898,14 @@ public class CreateOrderCommandHandler { ... }
 public partial class CreateOrderCommandHandler { ... }
 ```
 
-## Result<T> Pattern and Error Handling
+## `Result<T>` Pattern and Error Handling
 
-### Understanding Result<T>
+### Understanding `Result<T>`
 
-Momentum uses the Result<T> pattern for explicit error handling without exceptions:
+Momentum uses the `Result<T>` pattern for explicit error handling without exceptions:
 
 ```csharp
-// Result<T> represents either success with a value or failure with an error
+// `Result<T>` represents either success with a value or failure with an error
 public record Result<T>
 {
     public bool IsSuccess { get; }
@@ -915,7 +915,7 @@ public record Result<T>
 }
 
 // Creating results
-var success = Result.Success(order); // Result<Order>
+var success = Result.Success(order); // `Result<Order>`
 var failure = Result.Failure<Order>("Order not found");
 ```
 
@@ -930,18 +930,18 @@ public static async Task<Result<Order>> Handle(
     // Validation with early returns
     if (!command.Items.Any())
         return Result.Failure<Order>("Order must contain at least one item");
-    
+
     if (command.Items.Any(item => item.Quantity <= 0))
         return Result.Failure<Order>("All items must have positive quantity");
-    
+
     // Database operation
     var dbResult = await messaging.InvokeAsync(new DbCommand(...));
     if (dbResult.IsFailure)
         return Result.Failure<Order>(dbResult.Error);
-    
+
     // Success path
     var order = await GetCreatedOrder(dbResult.Value);
-    return order is not null 
+    return order is not null
         ? Result.Success(order)
         : Result.Failure<Order>("Failed to retrieve created order");
 }
@@ -950,7 +950,7 @@ public static async Task<Result<Order>> Handle(
 ### API Result Handling
 
 ```csharp
-// Extension method for Result<T> in APIs
+// Extension method for `Result<T>` in APIs
 public static IResult ToApiResult<T>(this Result<T> result)
 {
     return result.Match(
@@ -967,7 +967,7 @@ private static async Task<IResult> CreateOrder(
 {
     var command = new CreateOrderCommand(...);
     var result = await messageBus.InvokeAsync(command);
-    
+
     return result.Match(
         onSuccess: order => Results.Created($"/orders/{order.OrderId}", order),
         onFailure: error => Results.BadRequest(new { Error = error })
@@ -978,7 +978,7 @@ private static async Task<IResult> CreateOrder(
 ### Query Result Patterns
 
 ```csharp
-// Queries typically return nullable results instead of Result<T>
+// Queries typically return nullable results instead of `Result<T>`
 public static async Task<Order?> Handle(
     GetOrderByIdQuery query,
     IMessageBus messaging,
@@ -1021,10 +1021,10 @@ private static async Task<IResult> GetOrder(
 - **Source Generation**: Leverage compile-time generation to eliminate runtime reflection
 
 ### Error Handling Strategy
-- **Commands**: Return Result<T> for operations that can fail
+- **Commands**: Return `Result<T>` for operations that can fail
 - **Queries**: Return nullable types for single entities, collections for lists
 - **Database Errors**: Let functions handle validation and constraints
-- **API Layer**: Convert Result<T> to appropriate HTTP responses
+- **API Layer**: Convert `Result<T>` to appropriate HTTP responses
 
 ### Testing Strategy
 - **Unit Tests**: Test business logic in command/query handlers
@@ -1044,7 +1044,7 @@ public class CreateOrderCommandValidator : AbstractValidator<CreateOrderCommand>
         RuleFor(x => x.TenantId).NotEmpty().WithMessage("Tenant ID is required");
         RuleFor(x => x.CustomerId).NotEmpty().WithMessage("Customer ID is required");
         RuleFor(x => x.Items).NotEmpty().WithMessage("Order must contain at least one item");
-        
+
         RuleForEach(x => x.Items).ChildRules(item => {
             item.RuleFor(x => x.ProductId).NotEmpty();
             item.RuleFor(x => x.ProductName).NotEmpty().MaximumLength(255);
@@ -1068,34 +1068,34 @@ public static async Task<Result<Order>> Handle(
     // Execute database operation
     var result = await ExecuteCreateOrder(command, messaging);
     if (result.IsFailure) return result;
-    
+
     var order = result.Value;
-    
+
     // Publish domain event (internal to bounded context)
     var domainEvent = new OrderStatusChanged(
-        order.TenantId, order.OrderId, OrderStatus.Pending, 
+        order.TenantId, order.OrderId, OrderStatus.Pending,
         OrderStatus.Pending, DateTime.UtcNow);
     await messaging.PublishAsync(domainEvent, cancellationToken);
-    
+
     // Publish integration event (cross-bounded context)
     var integrationEvent = new OrderCreated(
         order.TenantId, order.OrderId, order.CustomerId,
         order.TotalAmount, order.OrderDate, order.Status.ToString());
     await messaging.PublishAsync(integrationEvent, cancellationToken);
-    
+
     return Result.Success(order);
 }
 ```
 
 ### Error Handling Strategies
 ```csharp
-// Domain-specific exceptions for Result<T> pattern
+// Domain-specific exceptions for `Result<T>` pattern
 public static class OrderErrors
 {
     public static string OrderNotFound(Guid orderId) => $"Order {orderId} not found";
-    public static string InvalidOrderStatus(OrderStatus current, OrderStatus requested) => 
+    public static string InvalidOrderStatus(OrderStatus current, OrderStatus requested) =>
         $"Cannot change order status from {current} to {requested}";
-    public static string InsufficientInventory(Guid productId, int requested, int available) => 
+    public static string InsufficientInventory(Guid productId, int requested, int available) =>
         $"Insufficient inventory for product {productId}: requested {requested}, available {available}";
 }
 
@@ -1112,14 +1112,14 @@ app.UseExceptionHandler(exceptionHandlerApp =>
     exceptionHandlerApp.Run(async context =>
     {
         var exception = context.Features.Get<IExceptionHandlerPathFeature>()?.Error;
-        
+
         var response = exception switch
         {
             UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Unauthorized access"),
             ArgumentException argEx => (StatusCodes.Status400BadRequest, argEx.Message),
             _ => (StatusCodes.Status500InternalServerError, "An error occurred")
         };
-        
+
         context.Response.StatusCode = response.Item1;
         await context.Response.WriteAsJsonAsync(new { Error = response.Item2 });
     });

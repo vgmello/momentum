@@ -313,10 +313,10 @@ $$;
 - Multi-tenant indexing strategies
 - Function versioning with `runOnChange:true`
 
-## Result<T> Pattern Integration
+## `Result<T>` Pattern Integration
 
 ### Command Results with Database Operations
-Commands use the Result<T> pattern for explicit error handling:
+Commands use the `Result<T>` pattern for explicit error handling:
 
 ```csharp
 public static async Task<Result<Order>> Handle(
