@@ -1,9 +1,11 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
+using AppDomain.Tests.E2E.OpenApi.Generated;
+
 namespace AppDomain.Tests.E2E.Tests;
 
 /// <summary>
-/// End-to-end tests for Cashiers API endpoints
+///     End-to-end tests for Cashiers API endpoints
 /// </summary>
 public class CashiersTests(End2EndTestFixture fixture) : End2EndTest(fixture)
 {
@@ -11,7 +13,7 @@ public class CashiersTests(End2EndTestFixture fixture) : End2EndTest(fixture)
     public async Task GetCashiers_WhenNoCashiers_ReturnsEmptyArray()
     {
         // Act
-        var cashiers = await ApiClient.GetCashiersAsync(null, null);
+        var cashiers = await ApiClient.GetCashiersAsync(null, null, CancellationToken);
 
         // Assert
         cashiers.ShouldNotBeNull();
@@ -29,7 +31,7 @@ public class CashiersTests(End2EndTestFixture fixture) : End2EndTest(fixture)
         };
 
         // Act
-        var cashier = await ApiClient.CreateCashierAsync(createRequest);
+        var cashier = await ApiClient.CreateCashierAsync(createRequest, CancellationToken);
 
         // Assert
         cashier.ShouldNotBeNull();
@@ -49,11 +51,11 @@ public class CashiersTests(End2EndTestFixture fixture) : End2EndTest(fixture)
         };
 
         // Act - Create
-        var createdCashier = await ApiClient.CreateCashierAsync(createRequest);
+        var createdCashier = await ApiClient.CreateCashierAsync(createRequest, CancellationToken);
         createdCashier.ShouldNotBeNull();
 
         // Act - Get by ID
-        var getCashier = await ApiClient.GetCashierAsync(createdCashier.CashierId);
+        var getCashier = await ApiClient.GetCashierAsync(createdCashier.CashierId, CancellationToken);
 
         // Assert
         getCashier.ShouldNotBeNull();
@@ -69,8 +71,7 @@ public class CashiersTests(End2EndTestFixture fixture) : End2EndTest(fixture)
         var nonExistentId = Guid.NewGuid();
 
         // Act & Assert
-        var exception = await Should.ThrowAsync<ApiException>(
-            () => ApiClient.GetCashierAsync(nonExistentId));
+        var exception = await Should.ThrowAsync<ApiException>(() => ApiClient.GetCashierAsync(nonExistentId, CancellationToken));
         exception.StatusCode.ShouldBe(404);
     }
 
@@ -85,8 +86,7 @@ public class CashiersTests(End2EndTestFixture fixture) : End2EndTest(fixture)
         };
 
         // Act & Assert
-        var exception = await Should.ThrowAsync<ApiException>(
-            () => ApiClient.CreateCashierAsync(invalidRequest));
+        var exception = await Should.ThrowAsync<ApiException>(() => ApiClient.CreateCashierAsync(invalidRequest, CancellationToken));
         exception.StatusCode.ShouldBe(400);
     }
 
@@ -100,7 +100,7 @@ public class CashiersTests(End2EndTestFixture fixture) : End2EndTest(fixture)
             Email = "original@example.com"
         };
 
-        var createdCashier = await ApiClient.CreateCashierAsync(createRequest);
+        var createdCashier = await ApiClient.CreateCashierAsync(createRequest, CancellationToken);
         createdCashier.ShouldNotBeNull();
 
         var updateRequest = new UpdateCashierRequest
@@ -111,7 +111,7 @@ public class CashiersTests(End2EndTestFixture fixture) : End2EndTest(fixture)
         };
 
         // Act
-        var updatedCashier = await ApiClient.UpdateCashierAsync(createdCashier.CashierId, updateRequest);
+        var updatedCashier = await ApiClient.UpdateCashierAsync(createdCashier.CashierId, updateRequest, CancellationToken);
 
         // Assert
         updatedCashier.ShouldNotBeNull();
@@ -130,15 +130,14 @@ public class CashiersTests(End2EndTestFixture fixture) : End2EndTest(fixture)
             Email = "delete@example.com"
         };
 
-        var createdCashier = await ApiClient.CreateCashierAsync(createRequest);
+        var createdCashier = await ApiClient.CreateCashierAsync(createRequest, CancellationToken);
         createdCashier.ShouldNotBeNull();
 
         // Act
-        await ApiClient.DeleteCashierAsync(createdCashier.CashierId);
+        await ApiClient.DeleteCashierAsync(createdCashier.CashierId, CancellationToken);
 
         // Assert - Verify cashier was deleted
-        var exception = await Should.ThrowAsync<ApiException>(
-            () => ApiClient.GetCashierAsync(createdCashier.CashierId));
+        var exception = await Should.ThrowAsync<ApiException>(() => ApiClient.GetCashierAsync(createdCashier.CashierId, CancellationToken));
         exception.StatusCode.ShouldBe(404);
     }
 }

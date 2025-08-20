@@ -1,12 +1,13 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
+using AppDomain.Tests.E2E.OpenApi.Generated;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.CommandLine;
 
 namespace AppDomain.Tests.E2E;
 
 /// <summary>
-/// Test fixture (only initialized once)
+///     Test fixture (only initialized once)
 /// </summary>
 public sealed class End2EndTestFixture : IDisposable
 {

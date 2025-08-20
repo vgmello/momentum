@@ -1,9 +1,11 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
+using AppDomain.Tests.E2E.OpenApi.Generated;
+
 namespace AppDomain.Tests.E2E.Tests;
 
 /// <summary>
-/// End-to-end tests for Invoices API endpoints
+///     End-to-end tests for Invoices API endpoints
 /// </summary>
 public class InvoicesTests(End2EndTestFixture fixture) : End2EndTest(fixture)
 {
@@ -11,7 +13,7 @@ public class InvoicesTests(End2EndTestFixture fixture) : End2EndTest(fixture)
     public async Task GetInvoices_WhenNoInvoices_ReturnsEmptyArray()
     {
         // Act
-        var invoices = await ApiClient.GetInvoicesAsync(null, null, null);
+        var invoices = await ApiClient.GetInvoicesAsync(null, null, null, CancellationToken);
 
         // Assert
         invoices.ShouldNotBeNull();
@@ -32,7 +34,7 @@ public class InvoicesTests(End2EndTestFixture fixture) : End2EndTest(fixture)
         };
 
         // Act
-        var invoice = await ApiClient.CreateInvoiceAsync(createRequest);
+        var invoice = await ApiClient.CreateInvoiceAsync(createRequest, CancellationToken);
 
         // Assert
         invoice.ShouldNotBeNull();
@@ -57,11 +59,11 @@ public class InvoicesTests(End2EndTestFixture fixture) : End2EndTest(fixture)
         };
 
         // Act - Create
-        var createdInvoice = await ApiClient.CreateInvoiceAsync(createRequest);
+        var createdInvoice = await ApiClient.CreateInvoiceAsync(createRequest, CancellationToken);
         createdInvoice.ShouldNotBeNull();
 
         // Act - Get by ID
-        var getInvoice = await ApiClient.GetInvoiceAsync(createdInvoice.InvoiceId);
+        var getInvoice = await ApiClient.GetInvoiceAsync(createdInvoice.InvoiceId, CancellationToken);
 
         // Assert
         getInvoice.ShouldNotBeNull();
@@ -78,7 +80,7 @@ public class InvoicesTests(End2EndTestFixture fixture) : End2EndTest(fixture)
         var nonExistentId = Guid.NewGuid();
 
         // Act & Assert
-        var exception = await Should.ThrowAsync<ApiException>(() => ApiClient.GetInvoiceAsync(nonExistentId));
+        var exception = await Should.ThrowAsync<ApiException>(() => ApiClient.GetInvoiceAsync(nonExistentId, CancellationToken));
         exception.StatusCode.ShouldBe(404);
     }
 
@@ -94,7 +96,7 @@ public class InvoicesTests(End2EndTestFixture fixture) : End2EndTest(fixture)
         };
 
         // Act & Assert
-        var exception = await Should.ThrowAsync<ApiException>(() => ApiClient.CreateInvoiceAsync(invalidRequest));
+        var exception = await Should.ThrowAsync<ApiException>(() => ApiClient.CreateInvoiceAsync(invalidRequest, CancellationToken));
         exception.StatusCode.ShouldBe(400);
     }
 
@@ -111,7 +113,7 @@ public class InvoicesTests(End2EndTestFixture fixture) : End2EndTest(fixture)
         };
 
         // Act & Assert
-        var exception = await Should.ThrowAsync<ApiException>(() => ApiClient.CreateInvoiceAsync(invalidRequest));
+        var exception = await Should.ThrowAsync<ApiException>(() => ApiClient.CreateInvoiceAsync(invalidRequest, CancellationToken));
         exception.StatusCode.ShouldBe(400);
     }
 
@@ -127,19 +129,19 @@ public class InvoicesTests(End2EndTestFixture fixture) : End2EndTest(fixture)
             Currency = "USD"
         };
 
-        var createdInvoice = await ApiClient.CreateInvoiceAsync(createRequest);
+        var createdInvoice = await ApiClient.CreateInvoiceAsync(createRequest, CancellationToken);
         createdInvoice.ShouldNotBeNull();
 
         // Act
         var cancelRequest = new CancelInvoiceRequest { Version = createdInvoice.Version };
-        var cancelledInvoice = await ApiClient.CancelInvoiceAsync(createdInvoice.InvoiceId, cancelRequest);
+        var cancelledInvoice = await ApiClient.CancelInvoiceAsync(createdInvoice.InvoiceId, cancelRequest, CancellationToken);
 
         // Assert
         cancelledInvoice.ShouldNotBeNull();
         cancelledInvoice.Status.ShouldBe("Cancelled");
 
         // Verify invoice status changed
-        var updatedInvoice = await ApiClient.GetInvoiceAsync(createdInvoice.InvoiceId);
+        var updatedInvoice = await ApiClient.GetInvoiceAsync(createdInvoice.InvoiceId, CancellationToken);
         updatedInvoice.ShouldNotBeNull();
         updatedInvoice.Status.ShouldBe("Cancelled");
     }
@@ -152,7 +154,7 @@ public class InvoicesTests(End2EndTestFixture fixture) : End2EndTest(fixture)
             Email = $"test{Guid.NewGuid()}@example.com"
         };
 
-        var cashier = await ApiClient.CreateCashierAsync(createRequest);
+        var cashier = await ApiClient.CreateCashierAsync(createRequest, CancellationToken);
         cashier.ShouldNotBeNull();
 
         return cashier;

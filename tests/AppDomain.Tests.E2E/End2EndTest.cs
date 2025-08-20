@@ -1,5 +1,7 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
+using AppDomain.Tests.E2E.OpenApi.Generated;
+
 namespace AppDomain.Tests.E2E;
 
 /// <summary>
@@ -13,6 +15,8 @@ public abstract class End2EndTest(End2EndTestFixture fixture)
     protected HttpClient HttpClient => fixture.HttpClient;
 
     protected AppDomainApiClient ApiClient => fixture.ApiClient;
+
+    protected static CancellationToken CancellationToken => TestContext.Current.CancellationToken;
 }
 
 [CollectionDefinition(nameof(End2EndTest))]
