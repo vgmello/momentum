@@ -19,62 +19,62 @@ public record Invoice : DbEntity
     ///     Gets or sets the tenant identifier.
     /// </summary>
     [PrimaryKey(order: 0)]
-    [Id(0)]
+    [Id(3)]
     public Guid TenantId { get; set; }
 
     /// <summary>
     ///     Gets or sets the invoice identifier.
     /// </summary>
     [PrimaryKey(order: 1)]
-    [Id(1)]
+    [Id(4)]
     public Guid InvoiceId { get; set; }
 
     /// <summary>
     ///     Gets or sets the invoice name or description.
     /// </summary>
-    [Id(2)]
+    [Id(5)]
     public string Name { get; set; } = string.Empty;
 
     /// <summary>
     ///     Gets or sets the invoice status.
     /// </summary>
-    [Id(3)]
+    [Id(6)]
     public string Status { get; set; } = string.Empty;
 
     /// <summary>
     ///     Gets or sets the total amount of the invoice.
     /// </summary>
-    [Id(4)]
+    [Id(7)]
     public decimal Amount { get; set; }
 
     /// <summary>
     ///     Gets or sets the currency code (e.g., USD, EUR).
     /// </summary>
-    [Id(5)]
+    [Id(8)]
     public string? Currency { get; set; }
 
     /// <summary>
     ///     Gets or sets the due date for payment.
     /// </summary>
-    [Id(6)]
+    [Id(9)]
     public DateTime? DueDate { get; set; }
 
     /// <summary>
     ///     Gets or sets the cashier identifier handling this invoice.
     /// </summary>
-    [Id(7)]
+    [Id(10)]
     public Guid? CashierId { get; set; }
 
     /// <summary>
     ///     Gets or sets the amount that has been paid.
     /// </summary>
-    [Id(8)]
+    [Id(11)]
     public decimal? AmountPaid { get; set; }
 
     /// <summary>
     ///     Gets or sets the date when payment was received.
     /// </summary>
-    [Id(9)]
+    [Id(12)]
     public DateTime? PaymentDate { get; set; }
 }
 #else
