@@ -65,33 +65,33 @@ graph TB
     end
 
     <!--#if (INCLUDE_API) -->
-    Client --> API
-    API --> Domain
+    Client -/-> API
+    API -/-> Domain
     <!--#endif -->
     <!--#if (INCLUDE_BACK_OFFICE) -->
-    BackOffice --> Domain
+    BackOffice -/-> Domain
     <!--#endif -->
     <!--#if (INCLUDE_ORLEANS) -->
-    Orleans --> Domain
+    Orleans -/-> Domain
     <!--#endif -->
-    Domain --> Contracts
+    Domain -/-> Contracts
     <!--#if (INCLUDE_API && USE_DB) -->
-    API --> DB
+    API -/-> DB
     <!--#endif -->
     <!--#if (INCLUDE_BACK_OFFICE && USE_DB) -->
-    BackOffice --> DB
+    BackOffice -/-> DB
     <!--#endif -->
     <!--#if (INCLUDE_ORLEANS && USE_DB) -->
-    Orleans --> DB
+    Orleans -/-> DB
     <!--#endif -->
     <!--#if (INCLUDE_BACK_OFFICE && USE_KAFKA) -->
-    BackOffice --> Kafka
+    BackOffice -/-> Kafka
     <!--#endif -->
     <!--#if (INCLUDE_ORLEANS && USE_KAFKA) -->
-    Orleans --> Kafka
+    Orleans -/-> Kafka
     <!--#endif -->
     <!--#if (INCLUDE_API && USE_KAFKA) -->
-    API --> Kafka
+    API -/-> Kafka
     <!--#endif -->
 ```
 

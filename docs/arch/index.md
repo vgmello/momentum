@@ -32,17 +32,17 @@ graph TB
         External[External Services]
     end
 
-    API --> Commands
-    API --> Queries
-    WebUI --> API
-    Commands --> Handlers
-    Queries --> Handlers
-    Handlers --> Entities
-    Handlers --> Database
-    Handlers --> MessageBus
-    Events --> MessageBus
-    Orleans --> Database
-    MessageBus --> Orleans
+    API -/-> Commands
+    API -/-> Queries
+    WebUI -/-> API
+    Commands -/-> Handlers
+    Queries -/-> Handlers
+    Handlers -/-> Entities
+    Handlers -/-> Database
+    Handlers -/-> MessageBus
+    Events -/-> MessageBus
+    Orleans -/-> Database
+    MessageBus -/-> Orleans
 ```
 
 ## Core Principles

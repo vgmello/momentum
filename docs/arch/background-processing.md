@@ -42,21 +42,21 @@ graph TB
         EventStore[Event Store<br/>Audit & Recovery]
     end
 
-    API --> Wolverine
-    External --> Wolverine
-    Scheduled --> Wolverine
-    Wolverine --> Kafka
-    Kafka --> BackOffice
-    BackOffice --> Orleans
-    Orleans --> InvoiceGrain
-    Orleans --> NotificationGrain
-    Orleans --> SagaGrain
-    Orleans --> TimerGrain
-    InvoiceGrain --> Database
-    NotificationGrain --> Database
-    SagaGrain --> Database
-    TimerGrain --> Database
-    Orleans --> EventStore
+    API -/-> Wolverine
+    External -/-> Wolverine
+    Scheduled -/-> Wolverine
+    Wolverine -/-> Kafka
+    Kafka -/-> BackOffice
+    BackOffice -/-> Orleans
+    Orleans -/-> InvoiceGrain
+    Orleans -/-> NotificationGrain
+    Orleans -/-> SagaGrain
+    Orleans -/-> TimerGrain
+    InvoiceGrain -/-> Database
+    NotificationGrain -/-> Database
+    SagaGrain -/-> Database
+    TimerGrain -/-> Database
+    Orleans -/-> EventStore
 ```
 
 ## Orleans Configuration
@@ -233,7 +233,7 @@ public class InvoiceGrain : Grain<InvoiceState>, IInvoiceGrain, IRemindable
 
     public async Task HandlePaymentReceived(PaymentReceived @event)
     {
-        _logger.LogInformation("Processing PaymentReceived for {InvoiceId}: {Amount}", 
+        _logger.LogInformation("Processing PaymentReceived for {InvoiceId}: {Amount}",
             State.InvoiceId, @event.Amount);
 
         var paymentAttempt = new PaymentAttempt
@@ -254,16 +254,16 @@ public class InvoiceGrain : Grain<InvoiceState>, IInvoiceGrain, IRemindable
             {
                 paymentAttempt.Status = PaymentStatus.Failed;
                 paymentAttempt.FailureReason = $"Payment amount {$event.Amount} does not match invoice amount {State.Amount}";
-                
+
                 await WriteStateAsync();
-                
+
                 await _publisher.PublishAsync(new PaymentRejected(
                     State.InvoiceId,
                     @event.PaymentId,
                     paymentAttempt.FailureReason,
                     DateTimeOffset.UtcNow
                 ));
-                
+
                 return;
             }
 
@@ -303,7 +303,7 @@ public class InvoiceGrain : Grain<InvoiceState>, IInvoiceGrain, IRemindable
             {
                 paymentAttempt.Status = PaymentStatus.Failed;
                 paymentAttempt.FailureReason = processResult.ErrorMessage;
-                
+
                 await WriteStateAsync();
 
                 await _publisher.PublishAsync(new PaymentFailed(
@@ -317,10 +317,10 @@ public class InvoiceGrain : Grain<InvoiceState>, IInvoiceGrain, IRemindable
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error processing payment for invoice {InvoiceId}", State.InvoiceId);
-            
+
             paymentAttempt.Status = PaymentStatus.Failed;
             paymentAttempt.FailureReason = "Payment processing error";
-            
+
             await WriteStateAsync();
             throw;
         }
@@ -347,7 +347,7 @@ public class InvoiceGrain : Grain<InvoiceState>, IInvoiceGrain, IRemindable
             State.RemindersSent
         ));
 
-        _logger.LogInformation("Payment reminder {Count} sent for invoice {InvoiceId}", 
+        _logger.LogInformation("Payment reminder {Count} sent for invoice {InvoiceId}",
             State.RemindersSent, State.InvoiceId);
     }
 
@@ -381,7 +381,7 @@ public class InvoiceGrain : Grain<InvoiceState>, IInvoiceGrain, IRemindable
     // Handle reminder callbacks
     public async Task ReceiveReminder(string reminderName, TickStatus status)
     {
-        _logger.LogDebug("Received reminder {ReminderName} for invoice {InvoiceId}", 
+        _logger.LogDebug("Received reminder {ReminderName} for invoice {InvoiceId}",
             reminderName, State.InvoiceId);
 
         switch (reminderName)
@@ -404,7 +404,7 @@ public class InvoiceGrain : Grain<InvoiceState>, IInvoiceGrain, IRemindable
                 break;
 
             default:
-                _logger.LogWarning("Unknown reminder {ReminderName} for invoice {InvoiceId}", 
+                _logger.LogWarning("Unknown reminder {ReminderName} for invoice {InvoiceId}",
                     reminderName, State.InvoiceId);
                 break;
         }
@@ -501,7 +501,7 @@ public class PaymentProcessingSaga : Grain<PaymentSagaState>, IPaymentProcessing
         if (@event.PaymentId != State.PaymentId)
             return; // Not for this saga
 
-        _logger.LogInformation("Payment validation completed for {PaymentId}: {IsValid}", 
+        _logger.LogInformation("Payment validation completed for {PaymentId}: {IsValid}",
             @event.PaymentId, @event.IsValid);
 
         if (@event.IsValid)
@@ -557,7 +557,7 @@ public class PaymentProcessingSaga : Grain<PaymentSagaState>, IPaymentProcessing
         if (@event.PaymentId != State.PaymentId)
             return; // Not for this saga
 
-        _logger.LogWarning("Payment processing failed for {PaymentId}: {Reason}", 
+        _logger.LogWarning("Payment processing failed for {PaymentId}: {Reason}",
             @event.PaymentId, @event.Reason);
 
         await CompleteStep("ProcessPayment", SagaStepStatus.Failed, @event.Reason);
@@ -586,7 +586,7 @@ public class PaymentProcessingSaga : Grain<PaymentSagaState>, IPaymentProcessing
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to compensate step {StepName} in saga {SagaId}", 
+                _logger.LogError(ex, "Failed to compensate step {StepName} in saga {SagaId}",
                     step.StepName, State.SagaId);
                 step.Status = SagaStepStatus.CompensationFailed;
                 step.ErrorMessage = ex.Message;
@@ -784,7 +784,7 @@ public class AppDomainInboxHandler
             var paymentSaga = _grainFactory.GetGrain<IPaymentProcessingSaga>(sagaId);
             await paymentSaga.StartSaga(@event);
 
-            _logger.LogInformation("Started payment processing saga {SagaId} for payment {PaymentId}", 
+            _logger.LogInformation("Started payment processing saga {SagaId} for payment {PaymentId}",
                 sagaId, @event.PaymentId);
         }
         catch (Exception ex)
@@ -896,7 +896,7 @@ public class ScheduledJobGrain : Grain<ScheduledJobState>, IScheduledJobGrain, I
         // Register Orleans reminder for recurring execution
         await RegisterOrUpdateReminder("JobExecution", interval, interval);
 
-        _logger.LogInformation("Scheduled recurring job {JobName} with interval {Interval}", 
+        _logger.LogInformation("Scheduled recurring job {JobName} with interval {Interval}",
             jobName, interval);
     }
 
@@ -946,9 +946,9 @@ public class ScheduledJobGrain : Grain<ScheduledJobState>, IScheduledJobGrain, I
         {
             State.FailureCount++;
             State.LastError = ex.Message;
-            
+
             _logger.LogError(ex, "Failed to execute job {JobName}", State.JobName);
-            
+
             // Publish failure event for monitoring
             await _publisher.PublishAsync(new ScheduledJobFailed(
                 State.JobName,
@@ -961,8 +961,8 @@ public class ScheduledJobGrain : Grain<ScheduledJobState>, IScheduledJobGrain, I
             {
                 State.IsActive = false;
                 await UnregisterReminder("JobExecution");
-                
-                _logger.LogError("Disabled job {JobName} after {FailureCount} consecutive failures", 
+
+                _logger.LogError("Disabled job {JobName} after {FailureCount} consecutive failures",
                     State.JobName, State.FailureCount);
             }
         }
@@ -976,9 +976,9 @@ public class ScheduledJobGrain : Grain<ScheduledJobState>, IScheduledJobGrain, I
     {
         State.IsActive = false;
         await WriteStateAsync();
-        
+
         await UnregisterReminder("JobExecution");
-        
+
         _logger.LogInformation("Cancelled scheduled job {JobName}", State.JobName);
     }
 
@@ -1068,7 +1068,7 @@ public class NotificationGrain : Grain<NotificationState>, INotificationGrain
         // Initialize stream for real-time notifications
         var streamProvider = this.GetStreamProvider("StreamProvider");
         _stream = streamProvider.GetStream<NotificationMessage>("notifications", this.GetPrimaryKey());
-        
+
         await base.OnActivateAsync(cancellationToken);
     }
 
@@ -1136,7 +1136,7 @@ public class NotificationGrain : Grain<NotificationState>, INotificationGrain
             await WriteStateAsync();
         }
 
-        _logger.LogInformation("Client {ClientId} subscribed to notifications for grain {GrainId}", 
+        _logger.LogInformation("Client {ClientId} subscribed to notifications for grain {GrainId}",
             clientId, this.GetPrimaryKey());
     }
 
@@ -1147,7 +1147,7 @@ public class NotificationGrain : Grain<NotificationState>, INotificationGrain
             await WriteStateAsync();
         }
 
-        _logger.LogInformation("Client {ClientId} unsubscribed from notifications for grain {GrainId}", 
+        _logger.LogInformation("Client {ClientId} unsubscribed from notifications for grain {GrainId}",
             clientId, this.GetPrimaryKey());
     }
 }
@@ -1205,7 +1205,7 @@ public class GrainCallFilter : IIncomingGrainCallFilter
         try
         {
             await context.Invoke();
-            
+
             // Record success metrics
             _metrics.Counter("grain_calls_total")
                 .WithTag("grain_type", grainType)
@@ -1234,7 +1234,7 @@ public class GrainCallFilter : IIncomingGrainCallFilter
         finally
         {
             stopwatch.Stop();
-            
+
             // Record duration metrics
             _metrics.Histogram("grain_call_duration_ms")
                 .WithTag("grain_type", grainType)
@@ -1270,12 +1270,12 @@ public class OrleansHealthCheck : IHealthCheck
             // Test grain activation and method call
             var testGrain = _grainFactory.GetGrain<IHealthCheckGrain>(Guid.NewGuid());
             var response = await testGrain.Ping();
-            
+
             if (response == "pong")
             {
                 return HealthCheckResult.Healthy("Orleans cluster is responding");
             }
-            
+
             return HealthCheckResult.Unhealthy("Orleans cluster is not responding correctly");
         }
         catch (Exception ex)
@@ -1317,13 +1317,13 @@ public class InvoiceGrainTests
     public async Task OneTimeSetUp()
     {
         var builder = new TestClusterBuilder();
-        
+
         builder.AddSiloBuilderConfigurator<TestSiloConfiguration>();
         builder.AddClientBuilderConfigurator<TestClientConfiguration>();
-        
+
         _cluster = builder.Build();
         await _cluster.DeployAsync();
-        
+
         _grainFactory = _cluster.Client;
     }
 
@@ -1333,7 +1333,7 @@ public class InvoiceGrainTests
         // Arrange
         var invoiceId = Ulid.NewUlid();
         var grain = _grainFactory.GetGrain<IInvoiceGrain>(invoiceId.ToGuid());
-        
+
         var @event = new InvoiceCreated(
             invoiceId,
             "TEST-001",
@@ -1361,7 +1361,7 @@ public class InvoiceGrainTests
         // Arrange
         var invoiceId = Ulid.NewUlid();
         var grain = _grainFactory.GetGrain<IInvoiceGrain>(invoiceId.ToGuid());
-        
+
         // Create invoice first
         await grain.HandleCreated(new InvoiceCreated(
             invoiceId, "TEST-002", 500.00m, "USD", Ulid.NewUlid(),
@@ -1405,7 +1405,7 @@ public class TestSiloConfiguration : ISiloConfigurator
         siloBuilder.UseInMemoryReminderService();
         siloBuilder.AddMemoryGrainStorageAsDefault();
         siloBuilder.AddMemoryStreams("StreamProvider");
-        
+
         // Mock external services
         siloBuilder.ConfigureServices(services =>
         {
@@ -1452,8 +1452,8 @@ public class RobustGrain : Grain<RobustState>, IRobustGrain
             {
                 var delay = TimeSpan.FromSeconds(Math.Pow(2, attempt)); // Exponential backoff
                 await Task.Delay(delay);
-                
-                _logger.LogWarning("Attempt {Attempt} failed, retrying in {Delay}: {Error}", 
+
+                _logger.LogWarning("Attempt {Attempt} failed, retrying in {Delay}: {Error}",
                     attempt, delay, ex.Message);
             }
         }

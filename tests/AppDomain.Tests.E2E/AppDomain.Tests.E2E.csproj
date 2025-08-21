@@ -27,6 +27,7 @@
         <Compile Remove="OpenApi/Generated/**/*.cs" />
     </ItemGroup>
 
+<!--/-:msbuild-conditional:noEmit -->
     <Target Name="GenerateOpenApiClient" BeforeTargets="CoreCompile">
         <Message Text="Generating OpenApiClient from OpenApi/app-domain-api.json" Importance="high"/>
         <MakeDir Directories="OpenApi/Generated" Condition="!Exists('OpenApi/Generated')"/>
@@ -35,5 +36,6 @@
             <Compile Include="OpenApi/Generated/AppDomainApiClient.cs" />
         </ItemGroup>
     </Target>
+<!--/+:msbuild-conditional:noEmit -->
 
 </Project>

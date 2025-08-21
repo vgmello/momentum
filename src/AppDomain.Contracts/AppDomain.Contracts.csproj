@@ -1,4 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
+<!--/-:msbuild-conditional:noEmit -->
     <PropertyGroup>
         <IsPackable>True</IsPackable>
         <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Debug'">True</GeneratePackageOnBuild>
@@ -6,6 +7,7 @@
         <VersionPrefix>0.0.1</VersionPrefix>
         <VersionSuffix Condition="'$(Configuration)' == 'Debug'">pre</VersionSuffix>
     </PropertyGroup>
+<!--/+:msbuild-conditional:noEmit -->
 
     <PropertyGroup>
         <Authors>ORG_NAME</Authors>
@@ -48,6 +50,7 @@
         <!--#endif -->
     </ItemGroup>
 
+<!--/-:msbuild-conditional:noEmit -->
     <!-- Target to generate nuget during development -->
     <Target Name="SetPackageVersionSuffix" BeforeTargets="GenerateNuspec;Pack" Condition=" '$(Configuration)' == 'Debug' ">
         <ItemGroup>
@@ -62,5 +65,6 @@
         </PropertyGroup>
         <Message Text="Packaging version: $(ProjectName)-$(PackageVersion)" Importance="high"/>
     </Target>
+<!--/+:msbuild-conditional:noEmit -->
 
 </Project>
