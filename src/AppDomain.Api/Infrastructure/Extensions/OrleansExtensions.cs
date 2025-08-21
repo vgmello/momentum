@@ -31,12 +31,7 @@ public static class OrleansExtensions
 
         builder.Services
             .AddOpenTelemetry()
-            .WithMetrics(opt => opt.AddMeter("Microsoft.Orleans"))
-            .WithTracing(tracing =>
-            {
-                tracing.AddSource("Microsoft.Orleans.Runtime");
-                tracing.AddSource("Microsoft.Orleans.Application");
-            });
+            .WithMetrics(opt => opt.AddMeter("Microsoft.Orleans"));
 
         return builder;
     }
