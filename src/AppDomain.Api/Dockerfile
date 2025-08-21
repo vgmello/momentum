@@ -12,9 +12,12 @@ RUN apk add --no-cache \
 USER appuser
 WORKDIR /app
 
-## Patch Kafka Native Lib
-RUN mkdir -p runtimes/linux-arm64/native \
-    && ln -s /usr/lib/librdkafka.so.1 runtimes/linux-arm64/native/alpine-librdkafka.so
+## Patch Kafka Native Lib (ARM64 only)
+RUN TARGETARCH=$(uname -m) && \
+    if [ "$TARGETARCH" = "aarch64" ]; then \
+        mkdir -p runtimes/linux-arm64/native && \
+        ln -s /usr/lib/librdkafka.so.1 runtimes/linux-arm64/native/alpine-librdkafka.so; \
+    fi
 
 # ----
 

@@ -80,6 +80,7 @@ services:
   # #if (INCLUDE_API)
   app-domain-api:
     build:
+      context: .
       dockerfile: ./src/AppDomain.Api/Dockerfile
     profiles: [ "api" ]
     ports:
@@ -123,6 +124,7 @@ services:
   # #if (INCLUDE_BACK_OFFICE)
   app-domain-backoffice:
     build:
+      context: .
       dockerfile: ./src/AppDomain.BackOffice/Dockerfile
     profiles: [ "backoffice" ]
     ports:
@@ -155,6 +157,7 @@ services:
   # #if (INCLUDE_ORLEANS)
   app-domain-orleans:
     build:
+      context: .
       dockerfile: ./src/AppDomain.BackOffice.Orleans/Dockerfile
     profiles: [ "backoffice" ]
     ports:
