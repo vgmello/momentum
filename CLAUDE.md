@@ -238,7 +238,7 @@ dotnet new uninstall Momentum.Template
 **Core Components** (defaults to all enabled):
 
 -   `--aspire`: Include .NET Aspire orchestration project (default: true)
--   `--web-api`: Include REST/gRPC API project (default: true)
+-   `--api`: Include REST/gRPC API project (default: true)
 -   `--back-office`: Include background processing project (default: true)
 -   `--orleans`: Include Orleans stateful processing project (default: false)
 -   `--docs`: Include VitePress documentation project (default: true)
@@ -264,7 +264,7 @@ dotnet new uninstall Momentum.Template
 
 ```bash
 # Minimal API-only setup
-dotnet new mmt -n OrderService --web-api --no-back-office --no-orleans --no-docs --no-sample
+dotnet new mmt -n OrderService --api --no-back-office --no-orleans --no-docs --no-sample
 
 # Orleans-heavy processing service
 dotnet new mmt -n ProcessingEngine --orleans --no-web-api --port 9000
@@ -318,14 +318,6 @@ After template generation, automated post-setup tasks run:
 builder.Services.AddKafkaMessaging(builder.Configuration);
 #endif
 ```
-
-**Parameter Replacements**:
-
--   `AppDomain` → Project name (sourceName)
--   `ORG_NAME` → Organization parameter
--   `SERVICE_BASE_PORT` → Port parameter
--   `app_domain` → Snake case project name
-
 ### Template Testing Guidelines
 
 **CRITICAL**: dotnet new template causes buffer overflow errors in Claude Code. ALWAYS use output redirection.
