@@ -24,7 +24,7 @@
         <!--#if (libs == generators)
         <PackageReference Include="Momentum.Extensions.Abstractions" PrivateAssets="all"
         GeneratePathProperty="true"/>
-        #endif -->
+        #endif-->
     </ItemGroup>
 
     <!--#if (libs == none) -->
