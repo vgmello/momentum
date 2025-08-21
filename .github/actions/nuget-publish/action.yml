@@ -49,6 +49,20 @@ runs:
       run: |
         NUGET_OUTPUT_DIR="./_tmp_nuget_output"
 
+        echo "🔍 Debug information:"
+        echo "   Current directory: $(pwd)"
+        echo "   Target path: ${{ inputs.path }}"
+        echo "   Package version: ${{ inputs.package-version }}"
+        echo "   Configuration: ${{ inputs.config }}"
+        
+        # Validate path exists
+        if [ ! -f "${{ inputs.path }}" ] && [ ! -d "${{ inputs.path }}" ]; then
+          echo "❌ Target path '${{ inputs.path }}' does not exist"
+          echo "   Working directory contents:"
+          ls -la
+          exit 1
+        fi
+
         echo "🧹 Cleaning output directory: $NUGET_OUTPUT_DIR"
         rm -rf "$NUGET_OUTPUT_DIR"
         mkdir -p "$NUGET_OUTPUT_DIR"

@@ -50,7 +50,7 @@ runs:
         # Test deployments
         if [[ "${{ inputs.deploy-type }}" == "test-"* ]]; then
           IS_TEST=true
-          NUGET_SOURCE="https://int.nugettest.org/v3/index.json"
+          NUGET_SOURCE="https://apiint.nugettest.org/v3/index.json"
           if [ -n "${{ inputs.nuget-source-override }}" ]; then
             NUGET_SOURCE="${{ inputs.nuget-source-override }}"
           fi
