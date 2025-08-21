@@ -5,14 +5,20 @@
   "type": "module",
   "scripts": {
     "dev": "pnpm docs:dev",
+    //#if (INCLUDE_BACK_OFFICE)
     "docs:prep": "pnpm docs:events && pnpm docs:dotnet && pnpm docs:adr",
+    ////#else
+    //  "docs:prep": "pnpm docs:dotnet && pnpm docs:adr",
+    //#endif
     "docs:dev": "pnpm docs:prep && vitepress dev",
     "docs:build": "pnpm docs:prep && vitepress build",
     "docs:build:debug": "DEBUG=* pnpm docs:build",
     "docs:preview": "vitepress preview",
     "docs:dotnet": "tsx .vitepress/scripts/docs-dotnet.ts",
     "docs:adr": "tsx .vitepress/scripts/adrlogs-table-gen.ts",
+    //#if (INCLUDE_BACK_OFFICE)
     "docs:events": "tsx .vitepress/scripts/generate-events-docs.ts \"../src/AppDomain.BackOffice/bin/Debug/net9.0/AppDomain.BackOffice.dll,../src/AppDomain/bin/Debug/net9.0/AppDomain.dll\""
+    //#endif
   },
   "dependencies": {
     "glob": "^11.0.3",

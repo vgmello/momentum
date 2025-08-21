@@ -93,7 +93,7 @@ try {
         const env = { ...process.env, 'SkipLocalFeedPush': 'true' };
         const githubUrl = getGitHubUrl();
 
-        let command = `events-docsgen --assemblies "${assembliesArg}" --output "${outputDir}"`;
+        let command = `events-docsgen generate --assemblies "${assembliesArg}" --output "${outputDir}"`;
         if (githubUrl) {
             log(`Using GitHub URL: ${githubUrl}`);
             command += ` --github-url "${githubUrl}"`;
