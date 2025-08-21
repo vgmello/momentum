@@ -81,8 +81,11 @@ You can override default templates by:
 3. Specifying the templates directory using the `--templates` option
 
 ```bash
-dotnet run --project libs/Momentum/src/Momentum.Extensions.EventMarkdownGenerator -- \
-  --assemblies "path/to/assembly.dll" \
+# Install the EventMarkdownGenerator as a global tool
+dotnet tool install --global Momentum.Extensions.EventMarkdownGenerator --prerelease
+
+# Use the tool with custom templates
+events-docsgen --assemblies "path/to/assembly.dll" \
   --templates "./custom-templates/" \
   --output "./docs/events/"
 ```
@@ -159,60 +162,6 @@ The `schema.liquid` template has access to schema model:
 
 Schema property objects have the same structure as event property objects listed above.
 
-## Liquid Template Customization Examples
-
-### Basic Conditional Rendering
-
-```liquid
-{% if event.IsObsolete %}
-> [!CAUTION]
-> This event is deprecated. {{ event.ObsoleteMessage | default: "Use alternative event instead." }}
-{% endif %}
-```
-
-### Property Table with Complex Type Links
-
-```liquid
-| Property | Type | Required | Description |
-|----------|------|----------|-------------|
-{% for property in event.Properties %}
-| {% if property.IsComplexType and property.SchemaLink %}[{{ property.Name }}](/events/schemas/{{ property.SchemaLink }}){% else %}{{ property.Name }}{% endif %} | `{{ property.TypeName }}` | {% if property.IsRequired %}✓{% endif %} | {{ property.Description }} |
-{% endfor %}
-```
-
-### Partition Key Section
-
-```liquid
-{% if event.PartitionKeys.size > 0 %}
-### Partition Keys
-
-{% if event.PartitionKeys.size == 1 %}
-This event uses a partition key for message routing:
-{% else %}
-This event uses multiple partition keys for message routing:
-{% endif %}
-
-{% for partitionKey in event.PartitionKeys %}
-- `{{ partitionKey.Name }}`{% if partitionKey.Description %} - {{ partitionKey.Description }}{% endif %}
-{% endfor %}
-{% endif %}
-```
-
-### Dynamic Schema Inclusion
-
-```liquid
-{% assign complexTypes = event.Properties | where: "IsComplexType", true | where: "IsCollectionType", false %}
-{% if complexTypes.size > 0 %}
-### Reference Schemas
-
-{% for property in complexTypes %}
-#### {{ property.TypeName }}
-
-<!--@include: @/events/schemas/{{ property.SchemaPath }}#schema-->
-{% endfor %}
-{% endif %}
-```
-
 ## Configuration Settings
 
 ### Command Line Options
@@ -261,66 +210,13 @@ The internal `GeneratorOptions` record supports these properties:
 Generate documentation for multiple assemblies in a single run:
 
 ```bash
-dotnet run --project libs/Momentum/src/Momentum.Extensions.EventMarkdownGenerator -- \
-  --assemblies "App.Core.dll,App.Contracts.dll,App.Events.dll" \
+# Install the tool globally first
+dotnet tool install --global Momentum.Extensions.EventMarkdownGenerator --prerelease
+
+# Generate documentation for multiple assemblies
+events-docsgen --assemblies "App.Core.dll,App.Contracts.dll,App.Events.dll" \
   --output "./docs/events/" \
   --verbose
-```
-
-### Custom Template with Enhanced Formatting
-
-Create a custom `event.liquid` template with enhanced sections:
-
-```liquid
----
-editLink: false
----
-
-# {{ event.EventName }}
-
-{% if event.IsObsolete %}
-::: danger Deprecated Event
-{{ event.ObsoleteMessage | default: "This event has been deprecated." }}
-:::
-{% endif %}
-
-## Overview
-
-- **Entity**: `{{ event.Entity | downcase }}`
-- **Type**: {% if event.IsInternal %}Domain Event{% else %}Integration Event{% endif %}
-- **Topic**: `{{ event.TopicName }}`
-- **Size**: {{ event.TotalEstimatedSizeBytes }} bytes{% if event.HasInaccurateEstimates %} ⚠️{% endif %}
-
-{{ event.Description }}
-
-{% if event.Remarks %}
-## Additional Information
-
-{{ event.Remarks }}
-{% endif %}
-
-{% if event.Example %}
-## Usage Example
-
-```json
-{{ event.Example }}
-```
-{% endif %}
-
-## Event Payload
-
-{% include 'property-table.liquid' %}
-
-{% if event.PartitionKeys.size > 0 %}
-## Partition Strategy
-
-{% for partitionKey in event.PartitionKeys %}
-- **{{ partitionKey.Name }}**: {{ partitionKey.Description }}
-{% endfor %}
-{% endif %}
-
----
-**Source**: [{{ event.FullTypeName }}]({{ event.GithubUrl }})
 ```
 
 ### GitHub Actions Integration
@@ -340,23 +236,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
-      
+
       - name: Build Projects
         run: dotnet build
+
+      - name: Install EventMarkdownGenerator
+        run: dotnet tool install --global Momentum.Extensions.EventMarkdownGenerator --prerelease
       
       - name: Generate Event Documentation
         run: |
-          dotnet run --project libs/Momentum/src/Momentum.Extensions.EventMarkdownGenerator -- \
-            --assemblies "src/App.Core/bin/Debug/net9.0/App.Core.dll" \
+          events-docsgen --assemblies "src/App.Core/bin/Debug/net9.0/App.Core.dll" \
             --output "./docs/events/" \
-            --github-url "https://github.com/${{ github.repository }}/blob/main/src" \
+            --github-url "https://github.com/$&#123;&#123; github.repository &#125;&#125;/blob/main/src" \
             --verbose
-      
+
       - name: Commit Documentation
         run: |
           git config --local user.email "action@github.com"
@@ -374,60 +272,20 @@ For development workflows, create a script that rebuilds and regenerates documen
 #!/bin/bash
 # scripts/update-event-docs.sh
 
+echo "Installing/updating EventMarkdownGenerator..."
+dotnet tool install --global Momentum.Extensions.EventMarkdownGenerator --prerelease
+
 echo "Building projects..."
 dotnet build
 
 echo "Generating event documentation..."
-dotnet run --project libs/Momentum/src/Momentum.Extensions.EventMarkdownGenerator -- \
-  --assemblies "$(find src -name '*.dll' -path '*/bin/Debug/net9.0/*' | tr '\n' ',')" \
+events-docsgen --assemblies "$(find src -name '*.dll' -path '*/bin/Debug/net9.0/*' | tr '\n' ',')" \
   --output "./docs/events/" \
   --github-url "https://github.com/your-org/your-repo/blob/main/src" \
   --verbose
 
 echo "Starting documentation server..."
 cd docs && pnpm dev
-```
-
-### Custom Schema Template
-
-Create enhanced schema documentation with additional metadata:
-
-```liquid
----
-editLink: false
----
-
-# {{ schema.name }}
-
-::: info Schema Type
-**Full Name**: `{{ schema.fullTypeName | default: schema.name }}`  
-**Namespace**: `{{ schema.namespace | default: "Unknown" }}`
-:::
-
-## Description
-
-{{ schema.description }}
-
-## Properties
-
-<!-- #region schema -->
-| Property | Type | Required | Nullable | Description |
-|----------|------|----------|----------|-------------|
-{% for property in schema.properties %}
-| {% if property.schemaLink %}[{{ property.name }}]({{ property.schemaLink }}){% else %}{{ property.name }}{% endif %} | `{{ property.typeName }}` | {% if property.isRequired %}✓{% else %}{% endif %} | {% if property.isNullable %}✓{% else %}{% endif %} | {{ property.description }} |
-{% endfor %}
-<!-- #endregion schema -->
-
-{% assign complexProperties = schema.properties | where: "isComplexType", true %}
-{% if complexProperties.size > 0 %}
-## Referenced Types
-
-{% for property in complexProperties %}
-### {{ property.typeName }}
-
-<!--@include: {{ property.schemaPath }}#schema-->
-{% endfor %}
-{% endif %}
 ```
 
 ## Troubleshooting and Best Practices
