@@ -49,7 +49,7 @@ runs:
       id: paths
       shell: pwsh
       run: |
-        & "$GITHUB_WORKSPACE/.github/scripts/Build-Documentation.ps1" `
+        & "${{ github.action_path }}/Build-Documentation.ps1" `
           -NodeVersion "${{ inputs.node-version }}" `
           -PnpmVersion "${{ inputs.pnpm-version }}" `
           -DocsPath "${{ inputs.docs-path }}" `

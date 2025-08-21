@@ -80,17 +80,52 @@ jobs:
         id: latest-version
         shell: pwsh
         run: |
-          & ./.github/scripts/Find-LatestRelease.ps1 `
-            -DeployPrerelease "${{ steps.config.outputs.deploy-prerelease }}" `
-            -TagPrefix "template-v"
+          function Write-GitHubOutput {
+              param([string]$Name, [string]$Value)
+              if ($env:GITHUB_OUTPUT) {
+                  "$Name=$Value" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+              }
+              Write-Host "Output: $Name=$Value"
+          }
+          
+          $deployPrerelease = "${{ steps.config.outputs.deploy-prerelease }}"
+          $tagPrefix = "template-v"
+          
+          Write-Host "Using template tag format with prefix: $tagPrefix"
+          
+          # Find latest template release tag (excluding pre-releases)
+          $allTags = git tag -l "${tagPrefix}*.*.*" --sort=-v:refname
+          $currentTag = $allTags | Where-Object { $_ -notmatch 'pre' } | Select-Object -First 1
+          
+          if (-not $currentTag) {
+              Write-Host "No previous template release found"
+              $currentTag = "${tagPrefix}0.0.1"
+          }
+          
+          Write-Host "Current template release: $currentTag"
+          $currentVersion = $currentTag -replace "^$tagPrefix", ""
+          
+          Write-GitHubOutput -Name "current_version" -Value $currentVersion
 
       - name: Set Momentum lib for template
         id: set-lib-version
         shell: pwsh
         run: |
-          & ./.github/scripts/Set-MomentumLibVersion.ps1 `
-            -Version "${{ steps.latest-version.outputs.current_version }}" `
-            -FilePath "Directory.Packages.props"
+          $version = "${{ steps.latest-version.outputs.current_version }}"
+          $filePath = "Directory.Packages.props"
+          
+          Write-Host "Updating $filePath with version: $version"
+          
+          # Read the file content
+          $content = Get-Content $filePath -Raw
+          
+          # Replace the version placeholder
+          $updatedContent = $content -replace '\$\(TemplateMomentumVersion\)', $version
+          
+          # Write the updated content back
+          $updatedContent | Set-Content $filePath -Encoding utf8
+          
+          Write-Host "✅ Updated $filePath with version: $version"
 
       - name: Calculate pre-release version
         if: steps.config.outputs.deploy-prerelease == 'true'

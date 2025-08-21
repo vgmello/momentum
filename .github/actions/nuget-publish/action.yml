@@ -47,7 +47,7 @@ runs:
       id: publish
       shell: pwsh
       run: |
-        & "$GITHUB_WORKSPACE/.github/scripts/Publish-NuGetPackages.ps1" `
+        & "${{ github.action_path }}/Publish-NuGetPackages.ps1" `
           -Path "${{ inputs.path }}" `
           -Config "${{ inputs.config }}" `
           -PackageVersion "${{ inputs.package-version }}" `
