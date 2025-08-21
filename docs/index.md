@@ -16,7 +16,7 @@ hero:
           text: New Dev
           link: /guide/getting-started
 
-<!-- prettier-ignore-start -->
+# prettier-ignore
 
 features:
 <!--#if (INCLUDE_SAMPLE)-->
@@ -41,5 +41,3 @@ features:
       link: /guide/service-configuration/
 <!--#endif-->
 ---
-
-<!-- prettier-ignore-end -->
