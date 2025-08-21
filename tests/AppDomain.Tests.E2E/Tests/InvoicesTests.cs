@@ -17,6 +17,7 @@ public class InvoicesTests(End2EndTestFixture fixture) : End2EndTest(fixture)
 
         // Assert
         invoices.ShouldNotBeNull();
+
         // For E2E tests, we don't assume empty state - just verify API returns valid data
         foreach (var invoice in invoices)
         {

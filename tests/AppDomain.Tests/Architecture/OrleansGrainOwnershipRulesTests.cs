@@ -14,7 +14,6 @@ namespace AppDomain.Tests.Architecture;
 /// </summary>
 public class OrleansGrainOwnershipRulesTests : ArchitectureTestBase
 {
-
     [Fact]
     public void DomainsWithGrains_ShouldNotCallOtherDomainsGrains()
     {
@@ -37,7 +36,8 @@ public class OrleansGrainOwnershipRulesTests : ArchitectureTestBase
                 if (!result.IsSuccessful)
                 {
                     var otherDomainName = DomainDiscovery.ExtractDomainName(otherActorNamespace);
-                    violations.Add($"{domainName} domain should not call {otherDomainName} grains: {string.Join(", ", result.FailingTypeNames ?? [])}");
+                    violations.Add(
+                        $"{domainName} domain should not call {otherDomainName} grains: {string.Join(", ", result.FailingTypeNames ?? [])}");
                 }
             }
         }
@@ -76,7 +76,8 @@ public class OrleansGrainOwnershipRulesTests : ArchitectureTestBase
 
                 if (!result.IsSuccessful)
                 {
-                    violations.Add($"Grain interface {grainInterface.Name} in {domainName} domain should only be accessed by its owning domain ({string.Join(", ", allowedNamespaces)}): {string.Join(", ", result.FailingTypeNames ?? [])}");
+                    violations.Add(
+                        $"Grain interface {grainInterface.Name} in {domainName} domain should only be accessed by its owning domain ({string.Join(", ", allowedNamespaces)}): {string.Join(", ", result.FailingTypeNames ?? [])}");
                 }
             }
         }
@@ -108,7 +109,8 @@ public class OrleansGrainOwnershipRulesTests : ArchitectureTestBase
 
             if (!result.IsSuccessful)
             {
-                violations.Add($"Only {domainName} domain and its Orleans implementation should call {domainName} grains: {string.Join(", ", result.FailingTypeNames ?? [])}");
+                violations.Add(
+                    $"Only {domainName} domain and its Orleans implementation should call {domainName} grains: {string.Join(", ", result.FailingTypeNames ?? [])}");
             }
         }
 
@@ -160,13 +162,13 @@ public class OrleansGrainOwnershipRulesTests : ArchitectureTestBase
         // Ensure all discovered actor namespaces follow the expected pattern
         foreach (var actorNamespace in domainActorNamespaces)
         {
-            actorNamespace.ShouldMatch(@"^AppDomain\.\w+\.Actors$", 
+            actorNamespace.ShouldMatch(@"^AppDomain\.\w+\.Actors$",
                 $"Actor namespace {actorNamespace} should follow pattern 'AppDomain.DomainName.Actors'");
 
             // Ensure the corresponding domain namespace exists
             var domainName = DomainDiscovery.ExtractDomainName(actorNamespace);
             var domainNamespace = $"AppDomain.{domainName}";
-            
+
             var domainTypes = GetAppDomainTypes()
                 .That().ResideInNamespace(domainNamespace)
                 .GetTypes();

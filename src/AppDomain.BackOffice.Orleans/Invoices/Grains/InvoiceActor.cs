@@ -31,9 +31,9 @@ public class InvoiceActor(
 
         var invoiceId = this.GetPrimaryKey();
         var query = new GetInvoiceQuery(tenantId, invoiceId);
-        
+
         var result = await messageBus.InvokeQueryAsync(query);
-        
+
         return result.Match(
             contractInvoice =>
             {
@@ -49,8 +49,9 @@ public class InvoiceActor(
             },
             errors =>
             {
-                logger.LogWarning("Invoice {InvoiceId} not found for tenant {TenantId}: {Errors}", 
+                logger.LogWarning("Invoice {InvoiceId} not found for tenant {TenantId}: {Errors}",
                     invoiceId, tenantId, string.Join(", ", errors.Select(e => e.ErrorMessage)));
+
                 return (Invoice?)null;
             });
     }
@@ -63,9 +64,9 @@ public class InvoiceActor(
         var invoiceId = this.GetPrimaryKey();
         // Note: MarkInvoiceAsPaidCommand requires version parameter, for now using 0
         var command = new MarkInvoiceAsPaidCommand(tenantId, invoiceId, 0, amountPaid, paymentDate);
-        
+
         var result = await messageBus.InvokeCommandAsync(command);
-        
+
         return result.Match(
             contractInvoice =>
             {
@@ -99,6 +100,7 @@ public class InvoiceActor(
         // For now, we'll fetch the invoice and manually update it
         // In a real implementation, you'd have an UpdateInvoiceStatusCommand
         var currentInvoice = await GetInvoiceAsync(tenantId);
+
         if (currentInvoice == null)
         {
             throw new InvalidOperationException($"Invoice {this.GetPrimaryKey()} not found");
@@ -120,10 +122,11 @@ public class InvoiceActor(
 
         var invoiceId = this.GetPrimaryKey();
         var currentInvoice = await GetInvoiceAsync(tenantId);
-        
+
         if (currentInvoice == null)
         {
             logger.LogWarning("Invoice {InvoiceId} not found for payment processing", invoiceId);
+
             return false;
         }
 
@@ -132,12 +135,14 @@ public class InvoiceActor(
         {
             logger.LogWarning("Invalid payment amount {Amount} for invoice {InvoiceId}",
                 amount, invoiceId);
+
             return false;
         }
 
         if (currentInvoice.Status == "Paid")
         {
             logger.LogWarning("Invoice {InvoiceId} is already paid", invoiceId);
+
             return false;
         }
 

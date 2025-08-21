@@ -8,12 +8,11 @@ namespace AppDomain.Tests.Architecture;
 
 public class DomainIsolationRulesTests : ArchitectureTestBase
 {
-
     [Fact]
     public void Domains_ShouldNotDirectlyReferencEachOthersInternals()
     {
         var domainPrefixes = DomainDiscovery.GetAllDomains().ToList();
-        
+
         // Ensure we discovered some domains
         domainPrefixes.ShouldNotBeEmpty("Should discover at least one domain with Commands, Queries, or Data");
 
@@ -36,7 +35,8 @@ public class DomainIsolationRulesTests : ArchitectureTestBase
 
             if (!result.IsSuccessful)
             {
-                violations.Add($"Domain {domain} should not directly reference other domains' internals: {string.Join(", ", result.FailingTypeNames ?? [])}");
+                violations.Add(
+                    $"Domain {domain} should not directly reference other domains' internals: {string.Join(", ", result.FailingTypeNames ?? [])}");
             }
         }
 
@@ -48,12 +48,12 @@ public class DomainIsolationRulesTests : ArchitectureTestBase
     public void DiscoveredDomains_ShouldHaveExpectedStructure()
     {
         var domains = DomainDiscovery.GetAllDomains().ToList();
-        
+
         Console.WriteLine($"Discovered domains: {string.Join(", ", domains)}");
-        
+
         foreach (var domain in domains)
         {
-            domain.ShouldMatch(@"^AppDomain\.\w+$", 
+            domain.ShouldMatch(@"^AppDomain\.\w+$",
                 $"Domain {domain} should follow pattern 'AppDomain.DomainName'");
         }
     }

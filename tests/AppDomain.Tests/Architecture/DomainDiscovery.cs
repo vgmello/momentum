@@ -23,23 +23,24 @@ public static class DomainDiscovery
     public static IEnumerable<string> GetAllDomains()
     {
         var allTypes = GetAppDomainTypes().GetTypes();
-        
+
         return allTypes
-            .Where(t => t.Namespace != null && 
-                       t.Namespace.StartsWith("AppDomain.") &&
-                       !t.Namespace.StartsWith("AppDomain.BackOffice") &&
-                       !t.Namespace.StartsWith("AppDomain.Api") &&
-                       !t.Namespace.StartsWith("AppDomain.Contracts") &&
-                       !t.Namespace.StartsWith("AppDomain.Tests") &&
-                       !t.Namespace.StartsWith("AppDomain.AppHost") &&
-                       (t.Namespace.Contains(".Commands") || 
-                        t.Namespace.Contains(".Queries") || 
-                        t.Namespace.Contains(".Data") ||
-                        t.Namespace.Contains(".Actors")))
-            .Select(t => 
+            .Where(t => t.Namespace != null &&
+                        t.Namespace.StartsWith("AppDomain.") &&
+                        !t.Namespace.StartsWith("AppDomain.BackOffice") &&
+                        !t.Namespace.StartsWith("AppDomain.Api") &&
+                        !t.Namespace.StartsWith("AppDomain.Contracts") &&
+                        !t.Namespace.StartsWith("AppDomain.Tests") &&
+                        !t.Namespace.StartsWith("AppDomain.AppHost") &&
+                        (t.Namespace.Contains(".Commands") ||
+                         t.Namespace.Contains(".Queries") ||
+                         t.Namespace.Contains(".Data") ||
+                         t.Namespace.Contains(".Actors")))
+            .Select(t =>
             {
                 // Extract domain name (e.g., "AppDomain.Invoices.Commands" -> "AppDomain.Invoices")
                 var parts = t.Namespace!.Split('.');
+
                 return parts.Length >= 2 ? $"{parts[0]}.{parts[1]}" : null;
             })
             .Where(ns => ns != null)
@@ -64,10 +65,10 @@ public static class DomainDiscovery
     {
         return GetAppDomainTypes()
             .GetTypes()
-            .Where(t => t.Namespace?.Contains(".Actors") == true && 
-                       t.Namespace.StartsWith("AppDomain.") &&
-                       !t.Namespace.StartsWith("AppDomain.BackOffice.Orleans") &&
-                       t.GetInterfaces().Any(i => typeof(IGrain).IsAssignableFrom(i)))
+            .Where(t => t.Namespace?.Contains(".Actors") == true &&
+                        t.Namespace.StartsWith("AppDomain.") &&
+                        !t.Namespace.StartsWith("AppDomain.BackOffice.Orleans") &&
+                        t.GetInterfaces().Any(i => typeof(IGrain).IsAssignableFrom(i)))
             .Select(t => t.Namespace!)
             .Distinct()
             .ToList();
@@ -87,10 +88,12 @@ public static class DomainDiscovery
     public static string ExtractDomainName(string namespaceName)
     {
         var parts = namespaceName.Split('.');
+
         if (parts.Length >= 2 && parts[0] == "AppDomain")
         {
             return parts[1];
         }
+
         throw new ArgumentException($"Invalid namespace format: {namespaceName}");
     }
 
