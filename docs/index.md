@@ -19,7 +19,7 @@ hero:
 # prettier-ignore
 
 features:
-<!--#if (INCLUDE_SAMPLE)-->
+<!--#if (INCLUDE_SAMPLE) -->
     - title: 💰 Billing & Invoicing
       details: Complete app_domain system with invoices, payments, and cashier management. Multi-tenant support with comprehensive audit trails and event-driven architecture.
       link: /guide/bills/
@@ -29,7 +29,7 @@ features:
     - title: 📄 Invoice Processing
       details: End-to-end invoice workflow from creation to payment. Includes validation, state management, and automated event publishing for downstream systems.
       link: /guide/invoices/
-<!--#else-->
+<!--#else -->
     - title: 🎯 Domain-Driven Design
       details: Build your business domains with clean separation of concerns. CQRS patterns, event sourcing ready, and vertical slice architecture.
       link: /guide/adding-domains/
@@ -39,5 +39,5 @@ features:
     - title: 🛡️ Production-Ready Infrastructure
       details: Built-in observability with OpenTelemetry, health checks, distributed tracing, and comprehensive testing with Testcontainers.
       link: /guide/service-configuration/
-<!--#endif-->
+<!--#endif -->
 ---

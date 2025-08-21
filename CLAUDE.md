@@ -289,7 +289,7 @@ The template uses conditional compilation symbols throughout the codebase:
 **Conditional Formats**:
 
 -   C# files: `#if INCLUDE_API` / `#endif`
--   Project files: `<!--#if (INCLUDE_API)-->` / `<!--#endif-->`
+-   Project files: `<!--#if (INCLUDE_API) -->` / `<!--#endif -->`
 -   YAML files: `# #if (INCLUDE_API)` / `# #endif`
 
 ### Post-Setup Actions
@@ -306,9 +306,9 @@ After template generation, automated post-setup tasks run:
 **Conditional Project References**:
 
 ```xml
-<!--#if (INCLUDE_API)-->
+<!--#if (INCLUDE_API) -->
 <ProjectReference Include="..\AppDomain.Api\AppDomain.Api.csproj" />
-<!--#endif-->
+<!--#endif -->
 ```
 
 **Conditional Source Code**:

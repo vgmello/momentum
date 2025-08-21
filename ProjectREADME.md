@@ -12,40 +12,40 @@ The AppDomain solution demonstrates modern enterprise architecture patterns incl
 -   **Event-driven architecture** using Apache Kafka
 -   **CQRS pattern** with separate command and query handling
 -   **Microservices architecture** with proper service boundaries
-<!--#if (INCLUDE_ORLEANS)-->
+<!--#if (INCLUDE_ORLEANS) -->
 -   **Orleans-based stateful processing** for complex business workflows
-<!--#endif-->
+<!--#endif -->
 -   **Comprehensive testing strategy** with unit and integration tests
 
-<!--#if (INCLUDE_SAMPLE)-->
+<!--#if (INCLUDE_SAMPLE) -->
 
 ### Key Business Domains
 
 -   **Cashiers**: Management of cashier entities and their payment capabilities
 -   **Invoices**: Invoice lifecycle management with state transitions and payment processing
-<!--#endif-->
+<!--#endif -->
 
 ## Architecture
 
 ```mermaid
 graph TB
     Client[Client Applications]
-    <!--#if (INCLUDE_API)-->
+    <!--#if (INCLUDE_API) -->
     subgraph "Front Office (Synchronous)"
         API[AppDomain.Api<br/>REST & gRPC]
     end
-    <!--#endif-->
+    <!--#endif -->
 
-    <!--#if (INCLUDE_BACK_OFFICE || INCLUDE_ORLEANS)-->
+    <!--#if (INCLUDE_BACK_OFFICE || INCLUDE_ORLEANS) -->
     subgraph "Back Office (Asynchronous)"
-        <!--#if (INCLUDE_BACK_OFFICE)-->
+        <!--#if (INCLUDE_BACK_OFFICE) -->
         BackOffice[AppDomain.BackOffice<br/>Event Processing]
-        <!--#endif-->
-        <!--#if (INCLUDE_ORLEANS)-->
+        <!--#endif -->
+        <!--#if (INCLUDE_ORLEANS) -->
         Orleans[AppDomain.BackOffice.Orleans<br/>Stateful Processing]
-        <!--#endif-->
+        <!--#endif -->
     end
-    <!--#endif-->
+    <!--#endif -->
 
     subgraph "Core Domain"
         Domain[AppDomain<br/>Commands, Queries, Events]
@@ -53,71 +53,71 @@ graph TB
     end
 
     subgraph "Infrastructure"
-        <!--#if (USE_DB)-->
+        <!--#if (USE_DB) -->
         DB[(PostgreSQL<br/>Primary Database)]
-        <!--#endif-->
-        <!--#if (USE_KAFKA)-->
+        <!--#endif -->
+        <!--#if (USE_KAFKA) -->
         Kafka[Apache Kafka<br/>Event Streaming]
-        <!--#endif-->
-        <!--#if (INCLUDE_ASPIRE)-->
+        <!--#endif -->
+        <!--#if (INCLUDE_ASPIRE) -->
         Aspire[.NET Aspire<br/>Orchestration]
-        <!--#endif-->
+        <!--#endif -->
     end
 
-    <!--#if (INCLUDE_API)-->
+    <!--#if (INCLUDE_API) -->
     Client --> API
     API --> Domain
-    <!--#endif-->
-    <!--#if (INCLUDE_BACK_OFFICE)-->
+    <!--#endif -->
+    <!--#if (INCLUDE_BACK_OFFICE) -->
     BackOffice --> Domain
-    <!--#endif-->
-    <!--#if (INCLUDE_ORLEANS)-->
+    <!--#endif -->
+    <!--#if (INCLUDE_ORLEANS) -->
     Orleans --> Domain
-    <!--#endif-->
+    <!--#endif -->
     Domain --> Contracts
-    <!--#if (INCLUDE_API && USE_DB)-->
+    <!--#if (INCLUDE_API && USE_DB) -->
     API --> DB
-    <!--#endif-->
-    <!--#if (INCLUDE_BACK_OFFICE && USE_DB)-->
+    <!--#endif -->
+    <!--#if (INCLUDE_BACK_OFFICE && USE_DB) -->
     BackOffice --> DB
-    <!--#endif-->
-    <!--#if (INCLUDE_ORLEANS && USE_DB)-->
+    <!--#endif -->
+    <!--#if (INCLUDE_ORLEANS && USE_DB) -->
     Orleans --> DB
-    <!--#endif-->
-    <!--#if (INCLUDE_BACK_OFFICE && USE_KAFKA)-->
+    <!--#endif -->
+    <!--#if (INCLUDE_BACK_OFFICE && USE_KAFKA) -->
     BackOffice --> Kafka
-    <!--#endif-->
-    <!--#if (INCLUDE_ORLEANS && USE_KAFKA)-->
+    <!--#endif -->
+    <!--#if (INCLUDE_ORLEANS && USE_KAFKA) -->
     Orleans --> Kafka
-    <!--#endif-->
-    <!--#if (INCLUDE_API && USE_KAFKA)-->
+    <!--#endif -->
+    <!--#if (INCLUDE_API && USE_KAFKA) -->
     API --> Kafka
-    <!--#endif-->
+    <!--#endif -->
 ```
 
 ## Project Structure
 
 <!-- prettier-ignore-start -->
-<!--#if (INCLUDE_API)-->
+<!--#if (INCLUDE_API) -->
 - **AppDomain.Api**: REST and gRPC endpoints for synchronous operations
-<!--#endif-->
-<!--#if (INCLUDE_BACK_OFFICE)-->
+<!--#endif -->
+<!--#if (INCLUDE_BACK_OFFICE) -->
 - **AppDomain.BackOffice**: Background event processing and integration workflows
-<!--#endif-->
-<!--#if (INCLUDE_ORLEANS)-->
+<!--#endif -->
+<!--#if (INCLUDE_ORLEANS) -->
 - **AppDomain.BackOffice.Orleans**: Stateful processing using Microsoft Orleans
-<!--#endif-->
-<!--#if (INCLUDE_ASPIRE)-->
+<!--#endif -->
+<!--#if (INCLUDE_ASPIRE) -->
 - **AppDomain.AppHost**: .NET Aspire orchestration for local development
-<!--#endif-->
+<!--#endif -->
 - **AppDomain**: Core domain logic with commands, queries, and events
 - **AppDomain.Contracts**: Shared contracts and integration events
-<!--#if (db == "liquibase")-->
+<!--#if (db == "liquibase") -->
 - **infra/AppDomain.Database**: Liquibase database migrations
-<!--#endif-->
-<!--#if (INCLUDE_DOCS)-->
+<!--#endif -->
+<!--#if (INCLUDE_DOCS) -->
 - **docs**: VitePress documentation site with auto-generated event docs
-<!--#endif-->
+<!--#endif -->
 <!-- prettier-ignore-end -->
 
 ## Port Allocations
@@ -127,29 +127,29 @@ The solution uses the following port allocations (default base port: 8100):
 <!-- prettier-ignore-start -->
 | Service | HTTP Port | HTTPS Port | Description |
 |---------|-----------|------------|-------------|
-<!--#if (INCLUDE_API)-->
+<!--#if (INCLUDE_API) -->
 | API (HTTP) | 8101 | 8111 | REST API endpoints |
 | API (gRPC) | 8102 | - | gRPC service endpoints |
-<!--#endif-->
-<!--#if (INCLUDE_BACK_OFFICE)-->
+<!--#endif -->
+<!--#if (INCLUDE_BACK_OFFICE) -->
 | BackOffice | 8103 | 8113 | Background processing service |
-<!--#endif-->
-<!--#if (INCLUDE_ORLEANS)-->
+<!--#endif -->
+<!--#if (INCLUDE_ORLEANS) -->
 | Orleans | 8104 | 8114 | Orleans silo endpoints |
-<!--#endif-->
-<!--#if (INCLUDE_ASPIRE)-->
+<!--#endif -->
+<!--#if (INCLUDE_ASPIRE) -->
 | Aspire Dashboard | 18100 | 18110 | .NET Aspire dashboard |
-<!--#endif-->
-<!--#if (INCLUDE_DOCS)-->
+<!--#endif -->
+<!--#if (INCLUDE_DOCS) -->
 | Documentation | 8119 | - | VitePress documentation site |
-<!--#endif-->
-<!--#if (USE_DB)-->
+<!--#endif -->
+<!--#if (USE_DB) -->
 | PostgreSQL | 54320 | - | Database server |
 | pgAdmin | 54321 | - | Database management UI |
-<!--#endif-->
-<!--#if (USE_KAFKA)-->
+<!--#endif -->
+<!--#if (USE_KAFKA) -->
 | Kafka | 59092 | - | Kafka broker |
-<!--#endif-->
+<!--#endif -->
 <!-- prettier-ignore-end -->
 
 ## Prerequisites
@@ -158,29 +158,29 @@ The solution uses the following port allocations (default base port: 8100):
 
 -   **.NET 9 SDK** or later
 -   **Docker Desktop** with Docker Compose
-<!--#if (USE_PGSQL)-->
+<!--#if (USE_PGSQL) -->
 -   **PostgreSQL** (handled by Docker Compose)
-    <!--#endif-->
-    <!--#if (USE_KAFKA)-->
+    <!--#endif -->
+    <!--#if (USE_KAFKA) -->
 -   **Apache Kafka** (handled by Docker Compose)
-<!--#endif-->
+<!--#endif -->
 -   **Git** for version control
 <!-- prettier-ignore-end -->
 
 ### Optional Tools
 
 <!-- prettier-ignore-start -->
-<!--#if (USE_PGSQL)-->
+<!--#if (USE_PGSQL) -->
 
 -   **pgAdmin** (included in Docker setup)
-<!--#endif-->
+<!--#endif -->
 -   **Visual Studio 2022** or **JetBrains Rider**
 -   **Postman** or similar for API testing
 <!-- prettier-ignore-end -->
 
 ## Getting Started
 
-<!--#if (INCLUDE_ASPIRE)-->
+<!--#if (INCLUDE_ASPIRE) -->
 
 ### Option 1: Using .NET Aspire (Recommended)
 
@@ -201,30 +201,30 @@ This will:
 -   Launch the Aspire dashboard at https://localhost:18110
 -   Set up service discovery and health monitoring
 -   Configure distributed tracing with OpenTelemetry
-<!--#endif-->
+<!--#endif -->
 
 ### Option 2: Using Docker Compose
 
 Run specific service profiles:
 
 ```bash
-<!--#if (INCLUDE_API)-->
+<!--#if (INCLUDE_API) -->
 # Run API services
 docker compose --profile api up
-<!--#endif-->
-<!--#if (INCLUDE_BACK_OFFICE)-->
+<!--#endif -->
+<!--#if (INCLUDE_BACK_OFFICE) -->
 # Run BackOffice services
 docker compose --profile backoffice up
-<!--#endif-->
-<!--#if (INCLUDE_ORLEANS)-->
+<!--#endif -->
+<!--#if (INCLUDE_ORLEANS) -->
 # Run Orleans services
 docker compose --profile orleans up
-<!--#endif-->
+<!--#endif -->
 # Run all services
 docker compose up
 ```
 
-<!--#if (db == "liquibase")-->
+<!--#if (db == "liquibase") -->
 
 ### Database Setup
 
@@ -243,7 +243,7 @@ docker compose up AppDomain-db AppDomain-db-migrations
 
 -   **Connection String**: `Host=localhost;Port=54320;Database=app_domain;Username=postgres;Password=password@`
 -   **pgAdmin**: http://localhost:54321 (admin@example.com / admin)
-<!--#endif-->
+<!--#endif -->
 
 ## Development Workflow
 
@@ -277,16 +277,16 @@ dotnet test tests/AppDomain.Tests
 1. **Define the Command/Query** in `src/AppDomain/[Domain]/Commands/` or `Queries/`
 2. **Implement the Handler** using Wolverine's handler pattern
 3. **Create Integration Events** in `src/AppDomain.Contracts/IntegrationEvents/`
- <!--#if (INCLUDE_API)-->
+ <!--#if (INCLUDE_API) -->
 4. **Add API Endpoints** in `src/AppDomain.Api/[Domain]/Controller.cs`
-    <!--#endif-->
-    <!--#if (db == "liquibase")-->
+    <!--#endif -->
+    <!--#if (db == "liquibase") -->
 5. **Create Database Migrations** in `infra/AppDomain.Database/Liquibase/`
- <!--#endif-->
+ <!--#endif -->
 6. **Write Tests** in `tests/AppDomain.Tests/`
  <!-- prettier-ignore-end -->
 
-<!--#if (INCLUDE_API)-->
+<!--#if (INCLUDE_API) -->
 
 ## API Documentation
 
@@ -298,7 +298,7 @@ dotnet test tests/AppDomain.Tests
 
 ### API Endpoints
 
-<!--#if (INCLUDE_SAMPLE)-->
+<!--#if (INCLUDE_SAMPLE) -->
 
 #### Cashiers API
 
@@ -319,7 +319,7 @@ dotnet test tests/AppDomain.Tests
 | POST   | `/api/invoices`          | Create new invoice   |
 | POST   | `/api/invoices/{id}/pay` | Mark invoice as paid |
 
-<!--#endif-->
+<!--#endif -->
 
 ### Authentication
 
@@ -328,9 +328,9 @@ The API supports multiple authentication schemes:
 -   **API Key**: Pass via `X-API-Key` header
 -   **JWT Bearer**: Standard OAuth 2.0 bearer tokens
 -   **Basic Auth**: For development/testing only
-<!--#endif-->
+<!--#endif -->
 
-<!--#if (USE_KAFKA)-->
+<!--#if (USE_KAFKA) -->
 
 ## Event-Driven Architecture
 
@@ -338,7 +338,7 @@ The API supports multiple authentication schemes:
 
 The solution uses Apache Kafka for event streaming:
 
-<!--#if (INCLUDE_SAMPLE)-->
+<!--#if (INCLUDE_SAMPLE) -->
 
 | Event           | Producer   | Consumers           | Description                 |
 | --------------- | ---------- | ------------------- | --------------------------- |
@@ -348,7 +348,7 @@ The solution uses Apache Kafka for event streaming:
 | InvoicePaid     | API        | BackOffice, Orleans | Payment received            |
 | PaymentReceived | BackOffice | Orleans             | Payment processing complete |
 
-<!--#endif-->
+<!--#endif -->
 
 ### Kafka Topics
 
@@ -356,7 +356,7 @@ Topics follow the naming convention: `app_domain.[domain].[event-type]`
 
 Example: `app_domain.cashiers.created`, `app_domain.invoices.paid`
 
-<!--#endif-->
+<!--#endif -->
 
 ## Configuration
 
@@ -366,23 +366,23 @@ Example: `app_domain.cashiers.created`, `app_domain.invoices.paid`
 | ---------------------- | ----------- | ------------------- |
 | ASPNETCORE_ENVIRONMENT | Development | Runtime environment |
 
-<!--#if (USE_DB)-->
+<!--#if (USE_DB) -->
 
 | ConnectionStrings\_\_AppDomainDb | - | PostgreSQL connection string |
 | ConnectionStrings\_\_ServiceBus | - | Service bus database connection |
 
-<!--#endif-->
-<!--#if (USE_KAFKA)-->
+<!--#endif -->
+<!--#if (USE_KAFKA) -->
 
 | Kafka\_\_BootstrapServers | localhost:59092 | Kafka broker addresses |
 
-<!--#endif-->
-<!--#if (INCLUDE_ORLEANS)-->
+<!--#endif -->
+<!--#if (INCLUDE_ORLEANS) -->
 
 | Orleans\_\_ClusterId | dev | Orleans cluster identifier |
 | Orleans\_\_ServiceId | AppDomain | Orleans service identifier |
 
-<!--#endif-->
+<!--#endif -->
 
 ### Application Settings
 
@@ -413,18 +413,18 @@ Never store secrets in configuration files. Use cloud-native secret management f
 ### Docker Build
 
 ```bash
-<!--#if (INCLUDE_API)-->
+<!--#if (INCLUDE_API) -->
 # Build API image
 docker build -f src/AppDomain.Api/Dockerfile -t appdomain-api .
-<!--#endif-->
-<!--#if (INCLUDE_BACK_OFFICE)-->
+<!--#endif -->
+<!--#if (INCLUDE_BACK_OFFICE) -->
 # Build BackOffice image
 docker build -f src/AppDomain.BackOffice/Dockerfile -t appdomain-backoffice .
-<!--#endif-->
-<!--#if (INCLUDE_ORLEANS)-->
+<!--#endif -->
+<!--#if (INCLUDE_ORLEANS) -->
 # Build Orleans image
 docker build -f src/AppDomain.BackOffice.Orleans/Dockerfile -t appdomain-orleans .
-<!--#endif-->
+<!--#endif -->
 ```
 
 ### Kubernetes Deployment
@@ -464,15 +464,15 @@ OpenTelemetry metrics are exposed at `/metrics` (Prometheus format)
 
 ### Distributed Tracing
 
-<!--#if (INCLUDE_ASPIRE)-->
+<!--#if (INCLUDE_ASPIRE) -->
 
 Traces are collected by the Aspire dashboard and can be exported to:
 
-<!--#else-->
+<!--#else -->
 
 Traces can be exported to:
 
-<!--#endif-->
+<!--#endif -->
 
 -   Jaeger
 -   Zipkin
@@ -493,7 +493,7 @@ docker ps | grep postgres
 psql -h localhost -p 54320 -U postgres -d app_domain
 ```
 
-<!--#if (USE_KAFKA)-->
+<!--#if (USE_KAFKA) -->
 
 #### Kafka Connection Issues
 
@@ -505,9 +505,9 @@ docker ps | grep kafka
 docker exec -it <kafka-container> kafka-topics.sh --list --bootstrap-server localhost:9092
 ```
 
-<!--#endif-->
+<!--#endif -->
 
-<!--#if (INCLUDE_API)-->
+<!--#if (INCLUDE_API) -->
 
 #### API Not Responding
 
@@ -519,7 +519,7 @@ docker logs appdomain-api
 netstat -an | grep 8101
 ```
 
-<!--#endif-->
+<!--#endif -->
 
 #### Build Failures
 

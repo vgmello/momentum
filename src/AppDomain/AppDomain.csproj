@@ -31,7 +31,7 @@
     <ItemGroup Condition="false">
         <!--#else
     <ItemGroup>
-        #endif-->
+        #endif -->
         <PackageReference Include="Momentum.Extensions.Abstractions"/>
         <!--#if (libs != ext) -->
         <PackageReference Include="Momentum.Extensions"/>
