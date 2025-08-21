@@ -18,6 +18,10 @@
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing"/>
 <!--#endif-->
         <PackageReference Include="Microsoft.NET.Test.Sdk"/>
+<!--#if (INCLUDE_ORLEANS)-->
+        <PackageReference Include="Microsoft.Orleans.TestingHost"/>
+        <PackageReference Include="Microsoft.Orleans.Client"/>
+<!--#endif-->
         <PackageReference Include="NetArchTest.Rules"/>
         <PackageReference Include="NSubstitute"/>
         <PackageReference Include="Shouldly"/>

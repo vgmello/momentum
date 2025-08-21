@@ -2,6 +2,7 @@
 
 using AppDomain.Invoices.Contracts.IntegrationEvents;
 using AppDomain.Invoices.Contracts.Models;
+using AppDomain.Invoices.Grains;
 
 namespace AppDomain.BackOffice.Orleans.Invoices.Grains;
 
@@ -15,7 +16,7 @@ namespace AppDomain.BackOffice.Orleans.Invoices.Grains;
 /// <param name="logger">Logger instance</param>
 public class InvoiceGrain(
     [PersistentState("invoice", "Default")]
-        IPersistentState<InvoiceGrain.InvoiceState> invoiceState,
+        IPersistentState<InvoiceGrainState> invoiceState,
     ILogger<InvoiceGrain> logger) : Grain, IInvoiceGrain
 {
 
@@ -169,22 +170,4 @@ public class InvoiceGrain(
         return Task.CompletedTask;
     }
 
-    /// <summary>
-    ///     State class for persisting invoice data in Orleans grain storage.
-    /// </summary>
-    [GenerateSerializer]
-    public class InvoiceState
-    {
-        /// <summary>
-        ///     Gets or sets the invoice data.
-        /// </summary>
-        [Id(0)]
-        public Invoice? Invoice { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the last updated timestamp.
-        /// </summary>
-        [Id(1)]
-        public DateTime LastUpdated { get; set; }
-    }
 }

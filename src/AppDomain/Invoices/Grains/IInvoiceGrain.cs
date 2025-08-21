@@ -1,8 +1,10 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
+#if INCLUDE_ORLEANS
 using AppDomain.Invoices.Contracts.Models;
+using Orleans;
 
-namespace AppDomain.BackOffice.Orleans.Invoices.Grains;
+namespace AppDomain.Invoices.Grains;
 
 /// <summary>
 ///     Grain interface for managing invoice state and processing in Orleans.
@@ -45,3 +47,4 @@ public interface IInvoiceGrain : IGrainWithGuidKey
     /// <returns>Processing result</returns>
     Task<bool> ProcessPaymentAsync(decimal amount, string paymentMethod);
 }
+#endif
