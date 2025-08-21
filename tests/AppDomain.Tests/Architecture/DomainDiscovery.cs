@@ -1,9 +1,6 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using NetArchTest.Rules;
-//#if (INCLUDE_ORLEANS)
-using Orleans;
-//#endif
 
 namespace AppDomain.Tests.Architecture;
 
@@ -29,6 +26,7 @@ public static class DomainDiscovery
         return allTypes
             .Where(t => t.Namespace != null &&
                         t.Namespace.StartsWith("AppDomain.") &&
+                        !t.Namespace.StartsWith("AppDomain.Core") &&
                         !t.Namespace.StartsWith("AppDomain.BackOffice") &&
                         !t.Namespace.StartsWith("AppDomain.Api") &&
                         !t.Namespace.StartsWith("AppDomain.Contracts") &&
@@ -60,7 +58,7 @@ public static class DomainDiscovery
             .Distinct();
     }
 
-//#if (INCLUDE_ORLEANS)
+    //#if (INCLUDE_ORLEANS)
     /// <summary>
     ///     Discovers all domains that have Orleans grains by looking for *.Actors namespaces.
     /// </summary>
@@ -84,7 +82,7 @@ public static class DomainDiscovery
     {
         return GetDomainsWithGrains();
     }
-//#endif
+    //#endif
 
     /// <summary>
     ///     Extracts domain name from a namespace (e.g., "AppDomain.Invoices.Actors" -> "Invoices").
@@ -93,7 +91,7 @@ public static class DomainDiscovery
     {
         var parts = namespaceName.Split('.');
 
-        if (parts.Length >= 2 && parts[0] == "AppDomain")
+        if (parts is ["AppDomain", _, ..])
         {
             return parts[1];
         }
