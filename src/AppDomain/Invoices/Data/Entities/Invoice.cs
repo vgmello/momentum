@@ -1,13 +1,13 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using LinqToDB.Mapping;
-#if INCLUDE_ORLEANS
+//#if (INCLUDE_ORLEANS)
 using Orleans;
-#endif
+//#endif
 
 namespace AppDomain.Invoices.Data.Entities;
 
-#if INCLUDE_ORLEANS
+//#if (INCLUDE_ORLEANS)
 /// <summary>
 ///     Invoice entity with Orleans serialization attributes.
 /// </summary>
@@ -77,7 +77,7 @@ public record Invoice : DbEntity
     [Id(12)]
     public DateTime? PaymentDate { get; set; }
 }
-#else
+// #else
 /// <summary>
 ///     Invoice entity for database operations.
 /// </summary>
@@ -135,4 +135,4 @@ public record Invoice : DbEntity
     /// </summary>
     public DateTime? PaymentDate { get; set; }
 }
-#endif
+//#endif
