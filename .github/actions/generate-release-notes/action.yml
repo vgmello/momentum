@@ -28,7 +28,7 @@ runs:
     - name: Generate release notes
       shell: pwsh
       run: |
-        & "$GITHUB_WORKSPACE/.github/scripts/Generate-ReleaseNotes.ps1" `
+        & "${{ github.action_path }}/Generate-ReleaseNotes.ps1" `
           -Version "${{ inputs.version }}" `
           -Tag "${{ inputs.tag }}" `
           -ReleaseType "${{ inputs.release-type }}" `

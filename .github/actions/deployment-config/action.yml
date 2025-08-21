@@ -41,7 +41,7 @@ runs:
       id: config
       shell: pwsh
       run: |
-        & "$GITHUB_WORKSPACE/.github/scripts/Configure-Deployment.ps1" `
+        & "${{ github.action_path }}/Configure-Deployment.ps1" `
           -DeployType "${{ inputs.deploy-type }}" `
           -NugetSourceOverride "${{ inputs.nuget-source-override }}" `
           -NugetApiKey "${{ inputs.nuget-api-key }}" `
