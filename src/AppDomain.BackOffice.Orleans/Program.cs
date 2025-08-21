@@ -1,5 +1,6 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
+using AppDomain.Infrastructure;
 using AppDomain.BackOffice.Orleans;
 using AppDomain.BackOffice.Orleans.Infrastructure.Extensions;
 using Momentum.Extensions.Messaging.Kafka;
@@ -16,6 +17,7 @@ builder.AddKafkaMessagingExtensions();
 //#endif
 builder.AddOrleans();
 
+builder.AddAppDomainServices();
 builder.AddApplicationServices();
 
 var app = builder.Build();
