@@ -386,11 +386,27 @@ Example: `app_domain.cashiers.created`, `app_domain.invoices.paid`
 
 ### Application Settings
 
-Configuration files follow the standard .NET pattern:
+Configuration follows a cloud-native strategy optimized for deployment:
 
--   `appsettings.json` - Base configuration
--   `appsettings.Development.json` - Development overrides
--   `appsettings.Production.json` - Production settings
+#### Configuration File Strategy
+
+-   **`appsettings.json`** - Baseline configuration with local development defaults
+-   **`appsettings.{Environment}.json`** - Environment-specific configuration files for each target environment (Production, QA, Staging)
+-   **`appsettings.Development.json`** - Local development overrides only (excluded from containers via `.dockerignore`)
+-   **Environment Variables** - Deployment-specific overrides and values that vary by deployment instance
+-   **Cloud Secret Management** - Azure Key Vault, AWS Secrets Manager, GCP Secret Manager for sensitive data
+
+#### Configuration Hierarchy
+
+Configuration is applied in this order (later sources override earlier ones):
+
+1. `appsettings.json` (baseline configuration)
+2. `appsettings.{Environment}.json` (environment-specific configuration)
+3. Environment variables (deployment-specific overrides)
+4. Cloud secret providers (production secrets)
+
+[!IMPORTANT]
+Never store secrets in configuration files. Use cloud-native secret management for production deployments.
 
 ## Deployment
 
