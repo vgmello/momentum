@@ -318,6 +318,7 @@ After template generation, automated post-setup tasks run:
 builder.Services.AddKafkaMessaging(builder.Configuration);
 #endif
 ```
+
 ### Template Testing Guidelines
 
 **CRITICAL**: dotnet new template causes buffer overflow errors in Claude Code. ALWAYS use output redirection.
@@ -398,3 +399,7 @@ When updating library project files in `libs/Momentum/src/`, follow this pattern
 
 -   ALWAYS test the documentation with 'pnpm docs:build' before you can assert the any documentation changes are working.
 -   Do not add /// <inheritdoc /> xmldocs comments anywhere
+
+# Troubleshoot
+
+To debug the template generation use the flag `--verbosity diag`

@@ -29,6 +29,10 @@ public class DataAccessRulesTests : ArchitectureTestBase
                 .That().HaveDependencyOn($"{prefix}.Data")
                 .And().DoNotResideInNamespace($"{prefix}.Core.Data") // Allow Core data context to reference domain entities
                 .And().DoNotHaveName("AppDomainDb") // Allow AppDomainDb to reference all domain data
+                .And().DoNotResideInNamespace("Internal")
+#if (INCLUDE_ORLEANS)
+                .And().DoNotResideInNamespace("OrleansCodeGen")
+#endif
                 .Should().ResideInNamespace(prefix)
                 .GetResult();
 

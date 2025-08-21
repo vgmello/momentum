@@ -1,7 +1,5 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
-using System.Linq;
-
 namespace AppDomain.Tests.Architecture;
 
 #pragma warning disable CS8602
