@@ -79,13 +79,9 @@ jobs:
         id: latest-version
         shell: bash
         run: |
-          if [[ "${{ github.ref }}" == refs/tags/template-* ]]; then
-            TAG_PREFIX="template-v"
-            echo "Using template tag format"
-          else
-            TAG_PREFIX="v"
-            echo "Using standard tag format"
-          fi
+          # Always use template- prefix for template releases
+          TAG_PREFIX="template-v"
+          echo "Using template tag format with prefix: ${TAG_PREFIX}"
 
           if [[ "${{ steps.config.outputs.deploy-prerelease }}" == true ]]; then
             TAG_SUFFIX="-pre"
@@ -93,17 +89,17 @@ jobs:
             TAG_SUFFIX=""
           fi
 
-          # Find latest release tag
+          # Find latest template release tag (excluding pre-releases)
           set +o pipefail
-          CURRENT_TAG=$(git tag -l "${TAG_PREFIX}*.*.*${TAG_SUFFIX}" --sort=-v:refname | grep -v 'pre' | head -1)
+          CURRENT_TAG=$(git tag -l "${TAG_PREFIX}*.*.*" --sort=-v:refname | grep -v 'pre' | head -1)
           set -o pipefail
 
           if [ -z "$CURRENT_TAG" ]; then
-            echo "No previous release found"
-            CURRENT_TAG="${TAG_PREFIX}0.0.1${TAG_SUFFIX}"
+            echo "No previous template release found"
+            CURRENT_TAG="${TAG_PREFIX}0.0.1"
           fi
 
-          echo "Current release: $CURRENT_TAG"
+          echo "Current template release: $CURRENT_TAG"
           echo "current_version=$(echo $CURRENT_TAG | sed "s/^${TAG_PREFIX}//")" >> $GITHUB_OUTPUT
 
       - name: Set Momentum lib for template
@@ -127,14 +123,14 @@ jobs:
         uses: ./.github/actions/generate-release-notes
         with:
           version: ${{ steps.prerelease-version.outputs.version }}
-          tag: template-${{ steps.prerelease-version.outputs.tag }}
+          tag: ${{ steps.prerelease-version.outputs.tag }}
           release-type: prerelease
           output-file: prerelease_notes.md
 
       - name: Create GitHub pre-release
         if: steps.config.outputs.deploy-prerelease == 'true' && steps.prerelease-version.outputs.skip != 'true' && steps.config.outputs.is-test != 'true'
         run: |
-          gh release create "template-${{ steps.prerelease-version.outputs.tag }}" \
+          gh release create "${{ steps.prerelease-version.outputs.tag }}" \
             --title "Momentum Template ${{ steps.prerelease-version.outputs.version }}" \
             --notes-file prerelease_notes.md \
             --prerelease \
@@ -176,14 +172,14 @@ jobs:
         uses: ./.github/actions/generate-release-notes
         with:
           version: ${{ steps.release-version.outputs.version }}
-          tag: template-${{ steps.release-version.outputs.tag }}
+          tag: ${{ steps.release-version.outputs.tag }}
           release-type: stable
           output-file: release_notes.md
 
       - name: Create GitHub release
         if: steps.config.outputs.deploy-prerelease == 'false' && steps.config.outputs.is-test != 'true'
         run: |
-          gh release create "template-${{ steps.release-version.outputs.tag }}" \
+          gh release create "${{ steps.release-version.outputs.tag }}" \
             --title "Momentum Template v${{ steps.release-version.outputs.version }}" \
             --notes-file release_notes.md \
             --target main
@@ -217,7 +213,7 @@ jobs:
             elif [ -n "${{ steps.prerelease-version.outputs.version }}" ]; then
               echo "✅ **Pre-release deployed**"
               echo "   - Version: ${{ steps.prerelease-version.outputs.version }}"
-              echo "   - Tag: template-${{ steps.prerelease-version.outputs.tag }}"
+              echo "   - Tag: ${{ steps.prerelease-version.outputs.tag }}"
               echo "   - NuGet: ${{ steps.config.outputs.nuget-source }}"
               if [ "${{ steps.config.outputs.is-test }}" != "true" ]; then
                 echo "   - GitHub Release: Created"
@@ -231,7 +227,7 @@ jobs:
             if [ -n "${{ steps.release-version.outputs.version }}" ]; then
               echo "✅ **Release deployed**"
               echo "   - Version: ${{ steps.release-version.outputs.version }}"
-              echo "   - Tag: template-${{ steps.release-version.outputs.tag }}"
+              echo "   - Tag: ${{ steps.release-version.outputs.tag }}"
               echo "   - NuGet: ${{ steps.config.outputs.nuget-source }}"
               if [ "${{ steps.config.outputs.is-test }}" != "true" ]; then
                 echo "   - GitHub Release: Created"

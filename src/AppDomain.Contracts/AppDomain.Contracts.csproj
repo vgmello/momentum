@@ -24,21 +24,43 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Include="..\AppDomain\**\Contracts\IntegrationEvents\*.cs" Link="%(RecursiveDir)%(Filename)%(Extension)" />
-        <Compile Include="..\AppDomain\**\Contracts\Models\*.cs" Link="%(RecursiveDir)%(Filename)%(Extension)" />
+        <None Include="README.md" Pack="true" PackagePath="\"/>
+        <Compile Include="..\AppDomain\**\Contracts\IntegrationEvents\*.cs" Link="%(RecursiveDir)%(Filename)%(Extension)"/>
+        <Compile Include="..\AppDomain\**\Contracts\Models\*.cs" Link="%(RecursiveDir)%(Filename)%(Extension)"/>
         <!--#if (INCLUDE_API) -->
-        <None Include="..\AppDomain.Api\**\Protos\**\*.proto" Link="%(RecursiveDir)%(Filename)%(Extension)" Pack="true">
-            <PackagePath>Protos</PackagePath>
-        </None>
+        <Protobuf Include="..\AppDomain.Api\**\Protos\**\*.proto" Link="%(RecursiveDir)%(Filename)%(Extension)"
+                  Pack="true"
+                  PackagePath="Protos"
+                  GrpcServices="Client"
+                  ProtoRoot="../AppDomain.Api/"/>
         <!--#endif -->
-        <None Include="README.md" Pack="true" PackagePath="\" />
-        <None Include="AppDomain.Contracts.props" Pack="true" PackagePath="\build" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Momentum.Extensions.Abstractions" />
+        <!--#if (INCLUDE_API) -->
+        <PackageReference Include="Google.Protobuf"/>
+        <PackageReference Include="Grpc.Net.Client"/>
+        <PackageReference Include="Grpc.Tools"/>
+        <!--#endif -->
+        <PackageReference Include="Momentum.Extensions.Abstractions"/>
         <!--#if (false) -->
         <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
         <!--#endif -->
     </ItemGroup>
+
+    <!-- Target to generate nuget during development -->
+    <Target Name="SetPackageVersionSuffix" BeforeTargets="GenerateNuspec;Pack" Condition=" '$(Configuration)' == 'Debug' ">
+        <ItemGroup>
+            <OldPackagesToDelete Include="$(TargetDir)../*.*upkg"/>
+        </ItemGroup>
+        <Message Text="Cleaning up $(ProjectName) nupkg files. Target: $(TargetDir)" Importance="high"/>
+        <Delete Files="@(OldPackagesToDelete)"/>
+
+        <PropertyGroup>
+            <VersionSuffix>$([System.DateTime]::UtcNow.ToString("yyyyMMdd-HHmmss"))</VersionSuffix>
+            <PackageVersion>$(VersionPrefix)-$(VersionSuffix)</PackageVersion>
+        </PropertyGroup>
+        <Message Text="Packaging version: $(ProjectName)-$(PackageVersion)" Importance="high"/>
+    </Target>
+
 </Project>

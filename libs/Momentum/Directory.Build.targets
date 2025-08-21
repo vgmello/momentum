@@ -4,7 +4,7 @@
             <OldPackagesToDelete Include="$(TargetDir)../*.*upkg"/>
             <OldPackagesToDelete Include="$(MSBuildThisFileDirectory).local/nuget/$(PackageId).*.nupkg"/>
         </ItemGroup>
-        <Message Text="Cleaning up nupkg/nuspec files" Importance="high"/>
+        <Message Text="Cleaning up $(ProjectName) nupkg files. Target: $(TargetDir)" Importance="high"/>
         <Delete Files="@(OldPackagesToDelete)"/>
     </Target>
 
@@ -13,11 +13,11 @@
             <VersionSuffix>$([System.DateTime]::UtcNow.ToString("yyyyMMdd-HHmmss"))</VersionSuffix>
             <PackageVersion>$(VersionPrefix)-$(VersionSuffix)</PackageVersion>
         </PropertyGroup>
-        <Message Text="Packaging version: $(PackageVersion)" Importance="high" />
+        <Message Text="Packaging version: $(ProjectName)-$(PackageVersion)" Importance="high"/>
     </Target>
 
     <Target Name="PushToLocalFeed" AfterTargets="Pack" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' and '$(SolutionDir)' != '*Undefined*' ">
-        <MakeDir Directories="$(MSBuildThisFileDirectory).local/nuget"/>
+        <MakeDir Directories="$(MSBuildThisFileDirectory).local/nuget" Condition="!Exists('$(MSBuildThisFileDirectory).local/nuget')"/>
         <Exec Command="dotnet nuget push &quot;$(PackageOutputPath)$(PackageId).$(PackageVersion).nupkg&quot; --source &quot;$(MSBuildThisFileDirectory).local/nuget&quot;"/>
     </Target>
 </Project>

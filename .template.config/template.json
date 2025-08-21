@@ -144,6 +144,13 @@
       "fileRename": "Momentum",
       "replaces": "__LIB_NAME__"
     },
+    "mmt-version": {
+      "type": "parameter",
+      "datatype": "string",
+      "description": "Momentum lib version",
+      "defaultValue": "0.0.1",
+      "replaces": "$(TemplateMomentumVersion)"
+    },
     "ALL": {
       "type": "computed",
       "value": "!(aspire || web-api || back-office || docs) && !project-only"

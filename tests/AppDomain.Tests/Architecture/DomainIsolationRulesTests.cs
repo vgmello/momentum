@@ -1,5 +1,7 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
+using System.Linq;
+
 namespace AppDomain.Tests.Architecture;
 
 #pragma warning disable CS8602
@@ -9,7 +11,12 @@ public class DomainIsolationRulesTests : ArchitectureTestBase
     [Fact]
     public void Domains_ShouldNotDirectlyReferencEachOthersInternals()
     {
-        var domainPrefixes = new[] { "AppDomain.Cashiers", "AppDomain.Invoices" };
+        var domainPrefixes = DomainDiscovery.GetAllDomains().ToList();
+
+        // Ensure we discovered some domains
+        domainPrefixes.ShouldNotBeEmpty("Should discover at least one domain with Commands, Queries, or Data");
+
+        var violations = new List<string>();
 
         foreach (var domain in domainPrefixes)
         {
@@ -26,8 +33,28 @@ public class DomainIsolationRulesTests : ArchitectureTestBase
                 }).ToArray())
                 .GetResult();
 
-            result.IsSuccessful.ShouldBeTrue(
-                $"Domain {domain} should not directly reference other domains' internals: {string.Join(", ", result.FailingTypeNames ?? [])}");
+            if (!result.IsSuccessful)
+            {
+                violations.Add(
+                    $"Domain {domain} should not directly reference other domains' internals: {string.Join(", ", result.FailingTypeNames ?? [])}");
+            }
+        }
+
+        violations.ShouldBeEmpty(
+            $"Domains should maintain isolation from each other's internals:\n{string.Join("\n", violations)}");
+    }
+
+    [Fact]
+    public void DiscoveredDomains_ShouldHaveExpectedStructure()
+    {
+        var domains = DomainDiscovery.GetAllDomains().ToList();
+
+        Console.WriteLine($"Discovered domains: {string.Join(", ", domains)}");
+
+        foreach (var domain in domains)
+        {
+            domain.ShouldMatch(@"^AppDomain\.\w+$",
+                $"Domain {domain} should follow pattern 'AppDomain.DomainName'");
         }
     }
 }

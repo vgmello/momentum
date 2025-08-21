@@ -1007,50 +1007,95 @@ public class BusinessMetrics
 
 ### Configuration Management
 
-#### Use Environment-Specific Settings
+#### Follow the Configuration Hierarchy Strategy
+
+Momentum applications use a specific configuration strategy designed for cloud-native deployments:
+
+**Environment-Specific Configuration Files:**
+- `appsettings.json` contains **baseline configuration** and local development defaults
+- `appsettings.{Environment}.json` files contain **environment-specific configuration** for each target environment (Production, QA, Staging)
+- `appsettings.Development.json` is **only for local development overrides** and excluded from cloud deployments
+- Environment variables are used for **deployment-specific overrides** and values that vary by deployment instance
+- **Cloud secret management** (Azure Key Vault, AWS Secrets Manager, etc.) for sensitive data
 
 ```json
-// appsettings.json
+// appsettings.json - Baseline configuration
 {
-  "Logging": {
-    "LogLevel": {
-      "Default": "Information"
-    }
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "AppDomainDb": "Host=localhost;Port=54320;Database=app_domain;",
+    "ServiceBus": "Host=localhost;Port=54320;Database=service_bus;",
+    "Messaging": "localhost:9092"
   },
-  "Database": {
-    "CommandTimeout": 30,
-    "MaxRetryCount": 3
+  "Aspire": {
+    "Npgsql:DisableHealthChecks": true,
+    "Npgsql:DisableTracing": true
   }
 }
 
-// appsettings.Production.json
+// appsettings.Production.json - Production environment configuration
+{
+  "ConnectionStrings": {
+    "AppDomainDb": "Host=prod-db;Port=5432;Database=app_domain;",
+    "Messaging": "prod-kafka:9092"
+  },
+  "Aspire": {
+    "Npgsql:DisableHealthChecks": false,
+    "Npgsql:DisableTracing": false
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Warning"
+    }
+  }
+}
+
+// appsettings.Development.json - Local development overrides only (excluded in containers)
 {
   "Logging": {
     "LogLevel": {
-      "Default": "Warning",
-      "AppDomain": "Information"
+      "Default": "Debug"
     }
-  },
-  "Database": {
-    "CommandTimeout": 60,
-    "MaxRetryCount": 5
   }
 }
 ```
 
-#### Validate Configuration at Startup
+#### Use Environment Variables for Deployment-Specific Overrides
+
+Use environment variables for values that need to be overridden for specific deployment instances:
+
+```bash
+# Deployment-specific overrides via environment variables
+export Database__CommandTimeout=45  # Override timeout for this specific deployment
+export Logging__LogLevel__Default=Information  # Temporary logging override
+export FEATURE_FLAGS__NewDashboard=true  # Feature flag override
+```
+
+#### Secure Secrets with Cloud Providers
+
+Never store secrets in configuration files. Use cloud-native secret management:
 
 ```csharp
-public class DatabaseOptions
+// Azure Key Vault integration
+builder.Configuration.AddAzureKeyVault(
+    new Uri("https://vault.vault.azure.net/"),
+    new DefaultAzureCredential());
+
+// AWS Secrets Manager integration
+builder.Configuration.AddSecretsManager(options =>
 {
-    public const string SectionName = "Database";
+    options.SecretFilter = entry => entry.Name.StartsWith("/myapp/");
+});
 
-    public string ConnectionString { get; set; } = string.Empty;
-    public int CommandTimeout { get; set; } = 30;
-    public int MaxRetryCount { get; set; } = 3;
-    public bool EnableSensitiveDataLogging { get; set; }
-}
+// Kubernetes secrets (via environment variables)
+// Set in deployment manifests or Helm charts
+```
 
+#### Validate Critical Configuration
+
+Validate essential configuration at startup:
+
+```csharp
 public static class ConfigurationExtensions
 {
     public static DatabaseOptions GetDatabaseOptions(this IConfiguration configuration)
@@ -1060,7 +1105,15 @@ public static class ConfigurationExtensions
 
         if (string.IsNullOrEmpty(options.ConnectionString))
         {
-            throw new InvalidOperationException("Database connection string is required");
+            throw new InvalidOperationException(
+                "Database connection string is required. " +
+                "Set ConnectionStrings__AppDomainDb environment variable.");
+        }
+
+        if (options.CommandTimeout <= 0)
+        {
+            throw new InvalidOperationException(
+                "Database command timeout must be positive.");
         }
 
         return options;

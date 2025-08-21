@@ -2,7 +2,6 @@
 
 using AppDomain.BackOffice.Orleans;
 using AppDomain.BackOffice.Orleans.Infrastructure.Extensions;
-using AppDomain.BackOffice.Orleans.Invoices.Grains;
 using Momentum.Extensions.Messaging.Kafka;
 using Momentum.ServiceDefaults;
 using Momentum.ServiceDefaults.HealthChecks;
@@ -23,20 +22,5 @@ var app = builder.Build();
 
 app.MapOrleansDashboard();
 app.MapDefaultHealthCheckEndpoints();
-
-app.MapPost("/invoices/{id:guid}/pay", async (Guid id, decimal amount, IGrainFactory grains) =>
-{
-    var grain = grains.GetGrain<IInvoiceGrain>(id);
-    await grain.MarkAsPaidAsync(amount, DateTime.UtcNow);
-
-    return Results.Accepted();
-});
-
-app.MapGet("/invoices/{id:guid}", async (Guid id, IGrainFactory grains) =>
-{
-    var grain = grains.GetGrain<IInvoiceGrain>(id);
-
-    return Results.Ok(await grain.GetInvoiceAsync());
-});
 
 await app.RunAsync(args);

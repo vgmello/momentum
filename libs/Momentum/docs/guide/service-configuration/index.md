@@ -76,7 +76,7 @@ Configuration follows the standard .NET configuration hierarchy with Momentum en
 2. **appsettings.{Environment}.json**: Environment-specific overrides
 3. **Environment Variables**: Container and cloud-friendly runtime configuration
 4. **User Secrets**: Development-time secure storage
-5. **Azure Key Vault**: Production secrets management
+5. **Cloud Key Vault/Secret Manager**: Production secrets management
 6. **Aspire Service Discovery**: Automatic service endpoint resolution
 
 ### Service Registration with Domain Assembly Discovery
@@ -123,11 +123,11 @@ public class AppConfiguration
 {
     [Required]
     public string ApplicationName { get; set; } = string.Empty;
-    
+
     [Required]
     [Url]
     public string BaseUrl { get; set; } = string.Empty;
-    
+
     [Range(1, 3600)]
     public int TokenExpirationMinutes { get; set; } = 60;
 }
@@ -524,7 +524,7 @@ var response = await httpClient.GetAsync("https://api/health");
 builder.Services.AddOptions<MyConfiguration>()
     .BindConfiguration("MySection")
     .ValidateDataAnnotations()
-    .Validate(config => !string.IsNullOrEmpty(config.RequiredProperty), 
+    .Validate(config => !string.IsNullOrEmpty(config.RequiredProperty),
         "RequiredProperty cannot be empty")
     .ValidateOnStart();
 ```
@@ -551,7 +551,7 @@ ServiceDefaultsExtensions.EntryAssembly = typeof(Program).Assembly;
 // Add health check timeout and retry policies
 builder.Services.AddHealthChecks()
     .AddNpgSql(connectionString, timeout: TimeSpan.FromSeconds(30))
-    .AddCheck("startup-delay", () => 
+    .AddCheck("startup-delay", () =>
     {
         // Allow time for dependencies to start
         return Task.FromResult(HealthCheckResult.Healthy());
@@ -588,7 +588,7 @@ builder.Services.AddHealthChecks()
 ## Related Topics
 
 - **[Service Defaults](./service-defaults.md)**: Detailed service defaults configuration and automatic discovery
-- **[API Setup](./api-setup.md)**: REST and gRPC API configuration patterns  
+- **[API Setup](./api-setup.md)**: REST and gRPC API configuration patterns
 - **[Observability](./observability.md)**: OpenTelemetry integration and monitoring setup
 - **[Port Allocation](./port-allocation.md)**: Systematic port management across environments
 - **[CQRS](../cqrs/index.md)**: Command and query patterns with Wolverine

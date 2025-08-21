@@ -65,3 +65,8 @@ CLAUDE.md
 **/.template.config
 **/template.json
 
+# Momentum dev nuget file
+**/libs/Momentum/nuget.config
+
+# Internal Generated Code (SourceGen)
+**/Internal/Generated/

@@ -8,6 +8,7 @@ This guide will help you set up the AppDomain Solution development environment a
 -   .NET 9 SDK with Aspire\* (Aspire is not required but recommended)
 -   PostgreSQL client (optional, for database inspection)
 -   API testing tool (Postman, curl, or similar)
+-   Liquibase CLI (or use the Docker service defined in `compose.yml`)
 
 ## Option 1: .NET Aspire (Recommended)
 
@@ -50,6 +51,10 @@ For full control over the setup process:
 Run these commands from the `AppDomain/infra/AppDomain.Database/` directory:
 
 ```bash
+# Run all migrations using the Docker service
+docker compose run --rm app-domain-db-migrations
+
+# Or if you have Liquibase installed locally
 cd AppDomain/infra/AppDomain.Database/
 
 # Step 1: Setup databases (creates actual dbs)

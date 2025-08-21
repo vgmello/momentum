@@ -1,7 +1,6 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Api.Cashiers.Models;
-using AppDomain.Api.Extensions;
 using AppDomain.Cashiers.Commands;
 using AppDomain.Cashiers.Contracts.Models;
 using AppDomain.Cashiers.Queries;

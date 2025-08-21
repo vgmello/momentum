@@ -32,7 +32,7 @@
             <ToolsOutputPath>$(OutputPath)tools\net9.0\</ToolsOutputPath>
         </PropertyGroup>
 
-        <MakeDir Directories="$(ToolsOutputPath)"/>
+        <MakeDir Directories="$(ToolsOutputPath)" Condition="!Exists('$(ToolsOutputPath)')"/>
 
         <ItemGroup>
             <ToolFiles Include="$(OutputPath)*.dll"/>

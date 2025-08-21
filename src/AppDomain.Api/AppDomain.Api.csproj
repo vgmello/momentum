@@ -22,7 +22,6 @@
         <!--#endif -->
         <!--#if (INCLUDE_ORLEANS) -->
         <PackageReference Include="Aspire.Azure.Data.Tables"/>
-        <PackageReference Include="Microsoft.Orleans.Client"/>
         <PackageReference Include="Microsoft.Orleans.Clustering.AzureStorage"/>
         <!--#endif -->
     </ItemGroup>
@@ -57,4 +56,5 @@
             <DependentUpon>Program.cs</DependentUpon>
         </Compile>
     </ItemGroup>
+
 </Project>

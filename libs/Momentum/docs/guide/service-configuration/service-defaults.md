@@ -348,40 +348,186 @@ var app = builder.Build();
 await app.RunAsync();
 ```
 
-## Environment Configuration
+## Configuration Hierarchy
 
-Service defaults adapt to different environments:
+Momentum follows .NET's standard configuration hierarchy with specific recommendations for cloud-native applications.
 
-### Development
+### Configuration File Strategy
+
+#### appsettings.json - Development Baseline Configuration
+The `appsettings.json` file serves as the **baseline configuration** containing common settings and local development defaults:
+
 ```json
 {
-  "Logging": {
-    "LogLevel": {
-      "Default": "Information",
-      "Microsoft.AspNetCore": "Warning"
-    }
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "AppDomainDb": "Host=localhost;Port=54320;Database=app_domain;",
+    "ServiceBus": "Host=localhost;Port=54320;Database=service_bus;",
+    "Messaging": "localhost:9092"
   },
-  "OpenTelemetry": {
-    "Enabled": true,
-    "Endpoint": "http://localhost:4317"
+  "Aspire": {
+    "Npgsql:DisableHealthChecks": true,
+    "Npgsql:DisableTracing": true
+  },
+  "Wolverine": {
+    "CodegenEnabled": false
   }
 }
 ```
 
-### Production
+#### appsettings.Development.json - Local Development Overrides
+The `appsettings.Development.json` file contains **local development-specific overrides** and will be excluded from cloud environments via `.dockerignore`:
+
 ```json
 {
   "Logging": {
     "LogLevel": {
-      "Default": "Warning",
-      "MyApp": "Information"
+      "Default": "Debug",
+      "Microsoft.AspNetCore": "Warning"
     }
   },
-  "OpenTelemetry": {
-    "Enabled": true,
-    "Endpoint": "https://otel.company.com"
+  "Wolverine": {
+    "CodegenEnabled": true
   }
 }
+```
+
+[!WARNING]
+Do not rely on `appsettings.Development.json` for cloud deployments. This file is excluded via `.dockerignore` and will not be available in containerized environments.
+
+### Cloud Environment Configuration
+
+#### Environment-Specific Configuration Files
+Cloud environments (QA, Staging, Production) should use **environment-specific appsettings files** as the primary configuration method:
+
+```json
+// appsettings.Production.json
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Warning",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "ConnectionStrings": {
+    "AppDomainDb": "Host=prod-db;Port=5432;Database=app_domain;",
+    "ServiceBus": "Host=prod-db;Port=5432;Database=service_bus;",
+    "Messaging": "prod-kafka:9092"
+  },
+  "Aspire": {
+    "Npgsql:DisableHealthChecks": false,
+    "Npgsql:DisableTracing": false
+  }
+}
+```
+
+```json
+// appsettings.QA.json
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information"
+    }
+  },
+  "ConnectionStrings": {
+    "AppDomainDb": "Host=qa-db;Port=5432;Database=app_domain;",
+    "Messaging": "qa-kafka:9092"
+  }
+}
+```
+
+#### Environment Variables for Specific Overrides
+Environment variables should be used for **deployment-specific values** and **overrides**, not as the primary configuration method:
+
+```bash
+# Example: Override specific database timeout for this deployment
+export Database__CommandTimeout=45
+
+# Example: Override log level for debugging
+export Logging__LogLevel__Default=Debug
+
+# Example: Override a connection string component
+export ConnectionStrings__AppDomainDb="Host=prod-db;Port=5432;Database=app_domain;Timeout=30;"
+```
+
+#### Cloud-Native Secret Management
+Secrets should use **cloud-native secret management** solutions:
+
+- **Azure**: Azure Key Vault
+- **AWS**: AWS Secrets Manager or Parameter Store
+- **GCP**: Google Secret Manager
+- **Kubernetes**: Kubernetes Secrets
+
+```csharp
+// Example: Azure Key Vault integration
+builder.Configuration.AddAzureKeyVault(
+    new Uri("https://vault.vault.azure.net/"),
+    new DefaultAzureCredential());
+
+// Example: AWS Systems Manager Parameter Store
+builder.Configuration.AddSystemsManager("/myapp", 
+    options => options.Optional = true);
+```
+
+### Configuration Hierarchy Order
+
+.NET applies configuration in this order (later sources override earlier ones):
+
+1. **appsettings.json** (baseline configuration)
+2. **appsettings.{Environment}.json** (environment-specific configuration)
+3. **User secrets** (development only, via `dotnet user-secrets`)
+4. **Environment variables** (deployment-specific overrides)
+5. **Command-line arguments** (container/pod startup)
+6. **Cloud secret providers** (Key Vault, Secrets Manager, etc.)
+
+## Environment Configuration
+
+Service defaults adapt to different environments:
+
+### Development Environment
+```json
+// appsettings.json (baseline) + appsettings.Development.json (local overrides)
+{
+  "ConnectionStrings": {
+    "AppDomainDb": "Host=localhost;Port=54320;Database=app_domain;",
+    "Messaging": "localhost:9092"
+  },
+  "Aspire": {
+    "Npgsql:DisableHealthChecks": true,
+    "Npgsql:DisableTracing": true
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Debug"
+    }
+  }
+}
+```
+
+### Production Environment
+```json
+// appsettings.Production.json (primary configuration)
+{
+  "ConnectionStrings": {
+    "AppDomainDb": "Host=prod-db;Port=5432;Database=app_domain;",
+    "Messaging": "prod-kafka-cluster:9092"
+  },
+  "Aspire": {
+    "Npgsql:DisableHealthChecks": false,
+    "Npgsql:DisableTracing": false
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Warning"
+    }
+  }
+}
+```
+
+```bash
+# Environment variables for deployment-specific overrides only
+DATABASE_TIMEOUT=45  # Override specific timeout for this deployment
+LOGGING_LEVEL=Information  # Temporary logging override
 ```
 
 ## Advanced Configuration
@@ -483,9 +629,10 @@ builder.Services.Configure<ServiceDiscoveryOptions>(options =>
 3. **Use consistent naming**: Follow naming conventions for discoverable components
 
 ### Configuration Management
-1. **Use appsettings.json**: Store configuration in standard .NET configuration files
-2. **Environment-specific settings**: Use appsettings.Development.json, etc.
-3. **Secure secrets**: Use Azure Key Vault, user secrets, or environment variables
+1. **Environment-specific configuration**: Use appsettings.{Environment}.json files for each target environment (Production, QA, Staging)
+2. **Local development**: Use appsettings.Development.json only for local development overrides, excluded from containers
+3. **Deployment overrides**: Use environment variables for deployment-specific values and temporary overrides
+4. **Secret management**: Use cloud-native secret management for sensitive data
 
 ### Service Registration
 1. **Leverage automatic registration**: Let service defaults handle common services

@@ -97,13 +97,20 @@ runs:
       if: steps.skip-check.outputs.skip != 'true'
       shell: bash
       run: |
-        # Determine tag prefix based on trigger
-        if [[ "${{ github.ref }}" == refs/tags/template-* ]]; then
+        # Determine tag prefix based on workflow and version file
+        # Template workflow uses .template.config/version.txt
+        if [[ "${{ inputs.version-file }}" == *".template.config/version.txt"* ]]; then
           TAG_PREFIX="template-v"
-          echo "Using template tag format"
+          echo "Using template tag format (detected from version file: ${{ inputs.version-file }})"
+        elif [[ "${{ github.workflow }}" == "Deploy Momentum Template" ]]; then
+          TAG_PREFIX="template-v"
+          echo "Using template tag format (detected from workflow: ${{ github.workflow }})"
+        elif [[ "${{ github.ref }}" == refs/tags/template-* ]]; then
+          TAG_PREFIX="template-v"
+          echo "Using template tag format (detected from tag: ${{ github.ref }})"
         else
           TAG_PREFIX="v"
-          echo "Using standard tag format"
+          echo "Using standard tag format (workflow: ${{ github.workflow }}, version-file: ${{ inputs.version-file }})"
         fi
 
         # Find latest regular release tag

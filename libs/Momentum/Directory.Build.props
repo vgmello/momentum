@@ -7,7 +7,7 @@
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <CodeAnalysisRuleSet>../../Momentum.ruleset</CodeAnalysisRuleSet>
         <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-        <NoWarn>$(NoWarn);CS1591</NoWarn>
+        <NoWarn>$(NoWarn);CS1591;LOGGEN036</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(IsTestProject)' != 'True' ">
@@ -37,11 +37,13 @@
         <PackageTags>momentum;mmt;</PackageTags>
     </PropertyGroup>
 
+    <!--#if (false) -->
     <ItemGroup Condition=" '$(IsTestProject)' != 'True' ">
         <PackageReference Include="Microsoft.SourceLink.GitHub" />
         <None Include="..\..\assets\icon.png" Pack="true" PackagePath="\" Visible="false" Condition="Exists('..\..\assets\icon.png')" />
         <None Include="README.md" Pack="true" PackagePath="\" Visible="true" Condition="Exists('README.md')" />
     </ItemGroup>
+    <!--#endif -->
 
     <ItemGroup>
         <PackageReference Include="SonarAnalyzer.CSharp" developmentDependency="true">

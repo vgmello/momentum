@@ -44,7 +44,7 @@ public class XmlDocumentationService(ILogger<XmlDocumentationService> logger) : 
                 ConformanceLevel = ConformanceLevel.Document
             });
 
-            await ParseXmlDocumentationAsync(xmlReader);
+            await ParseXmlDocumentationAsync(xmlReader).ConfigureAwait(false);
 
             logger.LogInformation("Loaded XML documentation from {FilePath} with {Count} entries", xmlFilePath, _documentationCache.Count);
 

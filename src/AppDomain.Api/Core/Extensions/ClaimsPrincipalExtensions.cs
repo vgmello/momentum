@@ -2,7 +2,7 @@
 
 using System.Security.Claims;
 
-namespace AppDomain.Api.Extensions;
+namespace AppDomain.Api.Core.Extensions;
 
 /// <summary>
 ///     Provides extension methods for <see cref="ClaimsPrincipal" /> to extract tenant information.

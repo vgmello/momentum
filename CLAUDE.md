@@ -261,7 +261,7 @@ dotnet new uninstall Momentum.Template
 # Minimal API-only setup
 dotnet new mmt -n OrderService --web-api --no-back-office --no-orleans --no-docs --no-sample
 
-# Orleans-heavy processing service  
+# Orleans-heavy processing service
 dotnet new mmt -n ProcessingEngine --orleans --no-web-api --port 9000
 
 # Full stack with custom organization
@@ -388,3 +388,4 @@ When updating library project files in `libs/Momentum/src/`, follow this pattern
 -   **libs/Momentum folder must work standalone**: Always include ProjectReferences with MSBuild conditions for standalone builds
 
 - ALWAYS test the documentation with 'pnpm docs:build' before you can assert the any documentation changes are working.
+- Do not add /// <inheritdoc /> xmldocs comments anywhere

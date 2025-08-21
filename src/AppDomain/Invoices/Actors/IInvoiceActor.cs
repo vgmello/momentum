@@ -1,47 +1,46 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
-using AppDomain.Invoices.Contracts.Models;
+using Orleans;
+using AppDomain.Invoices.Data.Entities;
 
-namespace AppDomain.BackOffice.Orleans.Invoices.Grains;
+namespace AppDomain.Invoices.Actors;
 
 /// <summary>
-///     Grain interface for managing invoice state and processing in Orleans.
+///     Grain interface for managing invoice operations in Orleans.
+///     Invoice data is loaded from the database on demand.
 /// </summary>
-public interface IInvoiceGrain : IGrainWithGuidKey
+public interface IInvoiceActor : IGrainWithGuidKey
 {
     /// <summary>
-    ///     Creates a new invoice with the specified details.
+    ///     Gets the current invoice data from the database.
     /// </summary>
-    /// <param name="invoice">The invoice data to create</param>
-    /// <returns>The created invoice</returns>
-    Task<Invoice> CreateInvoiceAsync(Invoice invoice);
-
-    /// <summary>
-    ///     Gets the current invoice data.
-    /// </summary>
+    /// <param name="tenantId">The tenant identifier</param>
     /// <returns>The current invoice or null if not found</returns>
-    Task<Invoice?> GetInvoiceAsync();
+    Task<Invoice?> GetInvoiceAsync(Guid tenantId);
 
     /// <summary>
     ///     Marks the invoice as paid with the specified amount and date.
     /// </summary>
+    /// <param name="tenantId">The tenant identifier</param>
     /// <param name="amountPaid">Amount that was paid</param>
     /// <param name="paymentDate">Date when payment was received</param>
     /// <returns>The updated invoice</returns>
-    Task<Invoice> MarkAsPaidAsync(decimal amountPaid, DateTime paymentDate);
+    Task<Invoice> MarkAsPaidAsync(Guid tenantId, decimal amountPaid, DateTime paymentDate);
 
     /// <summary>
     ///     Updates the invoice status.
     /// </summary>
+    /// <param name="tenantId">The tenant identifier</param>
     /// <param name="newStatus">New status to set</param>
     /// <returns>The updated invoice</returns>
-    Task<Invoice> UpdateStatusAsync(string newStatus);
+    Task<Invoice> UpdateStatusAsync(Guid tenantId, string newStatus);
 
     /// <summary>
     ///     Processes a payment for this invoice.
     /// </summary>
+    /// <param name="tenantId">The tenant identifier</param>
     /// <param name="amount">Payment amount</param>
     /// <param name="paymentMethod">Method of payment</param>
     /// <returns>Processing result</returns>
-    Task<bool> ProcessPaymentAsync(decimal amount, string paymentMethod);
+    Task<bool> ProcessPaymentAsync(Guid tenantId, decimal amount, string paymentMethod);
 }
