@@ -13,21 +13,21 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-<!--#if (INCLUDE_API)-->
+<!--#if (INCLUDE_API) -->
         <PackageReference Include="Grpc.Tools"/>
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing"/>
-<!--#endif-->
+<!--#endif -->
         <PackageReference Include="Microsoft.NET.Test.Sdk"/>
-<!--#if (INCLUDE_ORLEANS)-->
+<!--#if (INCLUDE_ORLEANS) -->
         <PackageReference Include="Microsoft.Orleans.TestingHost"/>
         <PackageReference Include="Microsoft.Orleans.Client"/>
-<!--#endif-->
+<!--#endif -->
         <PackageReference Include="NetArchTest.Rules"/>
         <PackageReference Include="NSubstitute"/>
         <PackageReference Include="Shouldly"/>
-<!--#if (USE_PGSQL)-->
+<!--#if (USE_PGSQL) -->
         <PackageReference Include="Testcontainers.PostgreSql"/>
-<!--#endif-->
+<!--#endif -->
         <PackageReference Include="Testcontainers.Kafka"/>
         <PackageReference Include="Testcontainers"/>
         <PackageReference Include="xunit.runner.visualstudio"/>
@@ -36,31 +36,31 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\AppDomain\AppDomain.csproj"/>
-<!--#if (INCLUDE_API)-->
+<!--#if (INCLUDE_API) -->
         <ProjectReference Include="..\..\src\AppDomain.Api\AppDomain.Api.csproj"/>
-<!--#endif-->
-<!--#if (INCLUDE_BACK_OFFICE)-->
+<!--#endif -->
+<!--#if (INCLUDE_BACK_OFFICE) -->
         <ProjectReference Include="..\..\src\AppDomain.BackOffice\AppDomain.BackOffice.csproj"/>
-<!--#endif-->
-<!--#if (libs == ext)-->
+<!--#endif -->
+<!--#if (libs == ext) -->
         <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.csproj"/>
-<!--#endif-->
-<!--#if (libs == kafka)-->
+<!--#endif -->
+<!--#if (libs == kafka) -->
         <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.Messaging.Kafka\Momentum.Extensions.Messaging.Kafka.csproj"/>
-<!--#endif-->
-<!--#if (libs == generators)-->
+<!--#endif -->
+<!--#if (libs == generators) -->
         <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.csproj"/>
-<!--#endif-->
+<!--#endif -->
     </ItemGroup>
 
-<!--#if (INCLUDE_API)-->
+<!--#if (INCLUDE_API) -->
     <ItemGroup>
         <Protobuf Include="..\..\src\AppDomain.Api\**\Protos\**\*.proto"
                   ProtoRoot="..\..\src\AppDomain.Api\"
                   GrpcServices="Client"
                   Link="Integration\%(RecursiveDir)%(Filename)%(Extension)"/>
     </ItemGroup>
-<!--#endif-->
+<!--#endif -->
     <ItemGroup>
         <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest"/>
     </ItemGroup>

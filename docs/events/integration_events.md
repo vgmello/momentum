@@ -4,7 +4,7 @@
 
 | Event Name                                 | Description                                                               | Status |
 | ------------------------------------------ | ------------------------------------------------------------------------- | ------ |
-<!--#if (INCLUDE_SAMPLE)-->
+<!--#if (INCLUDE_SAMPLE) -->
 | [InvoiceCreated](./invoice-created.md)     | Published when a new invoice is created in the system                     | Active |
 | [InvoiceCancelled](./invoice-cancelled.md) | Published when an invoice is cancelled                                    | Active |
 | [InvoiceFinalized](./invoice-finalized.md) | Published when an invoice is finalized during business day end processing | Active |

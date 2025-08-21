@@ -62,7 +62,7 @@
     <ItemGroup>
         <!--#if (libs == ext)
         <ProjectReference Include="..\Momentum.Extensions\Momentum.Extensions.csproj"/>
-        #endif-->
+        #endif -->
     </ItemGroup>
     <!--#endif -->
 </Project>
