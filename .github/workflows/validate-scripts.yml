@@ -1,0 +1,99 @@
+name: Validate PowerShell Scripts
+
+on:
+  push:
+    paths:
+      - '**/*.ps1'
+      - '.github/workflows/validate-scripts.yml'
+  pull_request:
+    paths:
+      - '**/*.ps1'
+      - '.github/workflows/validate-scripts.yml'
+
+jobs:
+  validate-powershell:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        
+      - name: Install PowerShell Script Analyzer
+        shell: pwsh
+        run: |
+          Set-PSRepository PSGallery -InstallationPolicy Trusted
+          Install-Module -Name PSScriptAnalyzer -Scope CurrentUser -Force
+          
+      - name: Validate PowerShell scripts
+        shell: pwsh
+        run: |
+          $scripts = Get-ChildItem -Path . -Include *.ps1 -Recurse
+          $errors = @()
+          $warnings = @()
+          
+          foreach ($script in $scripts) {
+              Write-Host "Analyzing: $($script.FullName)"
+              $results = Invoke-ScriptAnalyzer -Path $script.FullName -Severity Error,Warning
+              
+              if ($results) {
+                  foreach ($result in $results) {
+                      if ($result.Severity -eq 'Error') {
+                          $errors += $result
+                          Write-Host "  ❌ Error: $($result.Message) at line $($result.Line)"
+                      } else {
+                          $warnings += $result
+                          Write-Host "  ⚠️ Warning: $($result.Message) at line $($result.Line)"
+                      }
+                  }
+              } else {
+                  Write-Host "  ✅ No issues found"
+              }
+          }
+          
+          Write-Host ""
+          Write-Host "Summary:"
+          Write-Host "  Scripts analyzed: $($scripts.Count)"
+          Write-Host "  Errors found: $($errors.Count)"
+          Write-Host "  Warnings found: $($warnings.Count)"
+          
+          if ($errors.Count -gt 0) {
+              Write-Error "❌ PowerShell validation failed with $($errors.Count) error(s)"
+              exit 1
+          }
+          
+          if ($warnings.Count -gt 0) {
+              Write-Warning "⚠️ PowerShell validation completed with $($warnings.Count) warning(s)"
+          } else {
+              Write-Host "✅ All PowerShell scripts validated successfully"
+          }
+          
+      - name: Check script syntax
+        shell: pwsh
+        run: |
+          $scripts = Get-ChildItem -Path . -Include *.ps1 -Recurse
+          $syntaxErrors = @()
+          
+          foreach ($script in $scripts) {
+              $errors = $null
+              $ast = [System.Management.Automation.Language.Parser]::ParseFile(
+                  $script.FullName,
+                  [ref]$null,
+                  [ref]$errors
+              )
+              
+              if ($errors) {
+                  $syntaxErrors += $errors
+                  Write-Host "❌ Syntax errors in $($script.Name):"
+                  foreach ($error in $errors) {
+                      Write-Host "  Line $($error.Extent.StartLineNumber): $($error.Message)"
+                  }
+              }
+          }
+          
+          if ($syntaxErrors.Count -gt 0) {
+              Write-Error "❌ Syntax validation failed"
+              exit 1
+          }
+          
+          Write-Host "✅ All scripts have valid syntax"
