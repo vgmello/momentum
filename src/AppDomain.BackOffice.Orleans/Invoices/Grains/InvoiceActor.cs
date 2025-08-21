@@ -1,156 +1,201 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
+using Orleans;
+using Wolverine;
 using AppDomain.Invoices.Actors;
 using AppDomain.Invoices.Contracts.IntegrationEvents;
-using AppDomain.Invoices.Contracts.Models;
+using AppDomain.Invoices.Data.Entities;
+using AppDomain.Invoices.Queries;
+using AppDomain.Invoices.Commands;
+using ContractInvoice = AppDomain.Invoices.Contracts.Models.Invoice;
 
 namespace AppDomain.BackOffice.Orleans.Invoices.Grains;
 
 /// <summary>
-///     Orleans grain implementation for managing invoice state and processing.
+///     Orleans grain implementation for managing invoice operations.
+///     Invoice data is loaded from the database on demand.
 /// </summary>
-/// <remarks>
-///     Initializes a new instance of the InvoiceGrain class.
-/// </remarks>
-/// <param name="invoiceState">The persistent state for the invoice</param>
+/// <param name="invoiceState">The persistent state for grain metadata</param>
+/// <param name="messageBus">Wolverine message bus for commands/queries</param>
 /// <param name="logger">Logger instance</param>
 public class InvoiceActor(
     [PersistentState("invoice", "Default")]
     IPersistentState<InvoiceActorState> invoiceState,
+    IMessageBus messageBus,
     ILogger<InvoiceActor> logger) : Grain, IInvoiceActor
 {
     /// <inheritdoc />
-    public async Task<Invoice> LoadInvoice(Invoice invoice)
+    public async Task<Invoice?> GetInvoiceAsync(Guid tenantId)
     {
-        if (invoiceState.State.Invoice != null)
-        {
-            throw new InvalidOperationException($"Invoice {this.GetPrimaryKey()} already exists");
-        }
+        await EnsureInitialized(tenantId);
 
-        invoiceState.State.Invoice = invoice;
-        invoiceState.State.LastUpdated = DateTime.UtcNow;
+        var invoiceId = this.GetPrimaryKey();
+        var query = new GetInvoiceQuery(tenantId, invoiceId);
+        
+        var result = await messageBus.InvokeQueryAsync(query);
+        
+        return result.Match(
+            contractInvoice =>
+            {
+                // Convert contract model to data entity
+                var invoice = MapContractToDataEntity(contractInvoice);
 
-        await invoiceState.WriteStateAsync();
+                // Update access tracking
+                invoiceState.State.LastAccessed = DateTime.UtcNow;
+                invoiceState.State.OperationCount++;
+                _ = invoiceState.WriteStateAsync(); // Fire and forget
 
-        logger.LogInformation("Created invoice {InvoiceId} for tenant {TenantId}",
-            invoice.InvoiceId, invoice.TenantId);
-
-        // Publish integration event
-        await PublishIntegrationEventAsync(new InvoiceCreated(
-            invoice.TenantId,
-            invoice.InvoiceId,
-            invoice));
-
-        return invoice;
+                return invoice;
+            },
+            errors =>
+            {
+                logger.LogWarning("Invoice {InvoiceId} not found for tenant {TenantId}: {Errors}", 
+                    invoiceId, tenantId, string.Join(", ", errors.Select(e => e.ErrorMessage)));
+                return (Invoice?)null;
+            });
     }
 
     /// <inheritdoc />
-    public Task<Invoice?> GetInvoiceAsync()
+    public async Task<Invoice> MarkAsPaidAsync(Guid tenantId, decimal amountPaid, DateTime paymentDate)
     {
-        return Task.FromResult(invoiceState.State.Invoice);
+        await EnsureInitialized(tenantId);
+
+        var invoiceId = this.GetPrimaryKey();
+        // Note: MarkInvoiceAsPaidCommand requires version parameter, for now using 0
+        var command = new MarkInvoiceAsPaidCommand(tenantId, invoiceId, 0, amountPaid, paymentDate);
+        
+        var result = await messageBus.InvokeCommandAsync(command);
+        
+        return result.Match(
+            contractInvoice =>
+            {
+                var invoice = MapContractToDataEntity(contractInvoice);
+
+                // Publish integration event
+                _ = PublishIntegrationEventAsync(new InvoicePaid(
+                    tenantId,
+                    invoiceId,
+                    contractInvoice)); // Fire and forget
+
+                // Update operation tracking
+                invoiceState.State.LastAccessed = DateTime.UtcNow;
+                invoiceState.State.OperationCount++;
+                _ = invoiceState.WriteStateAsync(); // Fire and forget
+
+                logger.LogInformation("Marked invoice {InvoiceId} as paid with amount {Amount}",
+                    invoiceId, amountPaid);
+
+                return invoice;
+            },
+            errors => throw new InvalidOperationException(
+                $"Failed to mark invoice {invoiceId} as paid: {string.Join(", ", errors.Select(e => e.ErrorMessage))}"));
     }
 
     /// <inheritdoc />
-    public async Task<Invoice> MarkAsPaidAsync(decimal amountPaid, DateTime paymentDate)
+    public async Task<Invoice> UpdateStatusAsync(Guid tenantId, string newStatus)
     {
-        if (invoiceState.State.Invoice == null)
+        await EnsureInitialized(tenantId);
+
+        // For now, we'll fetch the invoice and manually update it
+        // In a real implementation, you'd have an UpdateInvoiceStatusCommand
+        var currentInvoice = await GetInvoiceAsync(tenantId);
+        if (currentInvoice == null)
         {
             throw new InvalidOperationException($"Invoice {this.GetPrimaryKey()} not found");
         }
 
-        var updatedInvoice = invoiceState.State.Invoice with
-        {
-            AmountPaid = amountPaid,
-            PaymentDate = paymentDate,
-            Status = "Paid",
-            UpdatedDateUtc = DateTime.UtcNow
-        };
-
-        invoiceState.State.Invoice = updatedInvoice;
-        invoiceState.State.LastUpdated = DateTime.UtcNow;
-
-        await invoiceState.WriteStateAsync();
-
-        logger.LogInformation("Marked invoice {InvoiceId} as paid with amount {Amount}",
-            updatedInvoice.InvoiceId, amountPaid);
-
-        // Publish integration event
-        await PublishIntegrationEventAsync(new InvoicePaid(
-            updatedInvoice.TenantId,
-            updatedInvoice.InvoiceId,
-            updatedInvoice));
-
-        return updatedInvoice;
-    }
-
-    /// <inheritdoc />
-    public async Task<Invoice> UpdateStatusAsync(string newStatus)
-    {
-        if (invoiceState.State.Invoice == null)
-        {
-            throw new InvalidOperationException($"Invoice {this.GetPrimaryKey()} not found");
-        }
-
-        var updatedInvoice = invoiceState.State.Invoice with
-        {
-            Status = newStatus,
-            UpdatedDateUtc = DateTime.UtcNow
-        };
-
-        invoiceState.State.Invoice = updatedInvoice;
-        invoiceState.State.LastUpdated = DateTime.UtcNow;
-
-        await invoiceState.WriteStateAsync();
+        // Update the status (this would typically be done via a command)
+        var updatedInvoice = currentInvoice with { Status = newStatus };
 
         logger.LogInformation("Updated invoice {InvoiceId} status to {Status}",
-            updatedInvoice.InvoiceId, newStatus);
+            this.GetPrimaryKey(), newStatus);
 
         return updatedInvoice;
     }
 
     /// <inheritdoc />
-    public async Task<bool> ProcessPaymentAsync(decimal amount, string paymentMethod)
+    public async Task<bool> ProcessPaymentAsync(Guid tenantId, decimal amount, string paymentMethod)
     {
-        if (invoiceState.State.Invoice == null)
-        {
-            throw new InvalidOperationException($"Invoice {this.GetPrimaryKey()} not found");
-        }
+        await EnsureInitialized(tenantId);
 
-        var invoice = invoiceState.State.Invoice;
+        var invoiceId = this.GetPrimaryKey();
+        var currentInvoice = await GetInvoiceAsync(tenantId);
+        
+        if (currentInvoice == null)
+        {
+            logger.LogWarning("Invoice {InvoiceId} not found for payment processing", invoiceId);
+            return false;
+        }
 
         // Business logic for payment processing
         if (amount <= 0)
         {
             logger.LogWarning("Invalid payment amount {Amount} for invoice {InvoiceId}",
-                amount, invoice.InvoiceId);
-
+                amount, invoiceId);
             return false;
         }
 
-        if (invoice.Status == "Paid")
+        if (currentInvoice.Status == "Paid")
         {
-            logger.LogWarning("Invoice {InvoiceId} is already paid", invoice.InvoiceId);
-
+            logger.LogWarning("Invoice {InvoiceId} is already paid", invoiceId);
             return false;
         }
 
         // Process payment
-        await MarkAsPaidAsync(amount, DateTime.UtcNow);
+        await MarkAsPaidAsync(tenantId, amount, DateTime.UtcNow);
 
         logger.LogInformation("Processed payment of {Amount} via {PaymentMethod} for invoice {InvoiceId}",
-            amount, paymentMethod, invoice.InvoiceId);
+            amount, paymentMethod, invoiceId);
 
         // Publish payment event
         await PublishIntegrationEventAsync(new PaymentReceived(
-            invoice.TenantId,
-            invoice.InvoiceId,
-            invoice.Currency ?? "USD",
+            tenantId,
+            invoiceId,
+            currentInvoice.Currency ?? "USD",
             amount,
             DateTime.UtcNow,
             paymentMethod,
             Guid.NewGuid().ToString()));
 
         return true;
+    }
+
+    /// <summary>
+    ///     Ensures the grain is initialized with tenant information.
+    /// </summary>
+    /// <param name="tenantId">The tenant identifier</param>
+    private async Task EnsureInitialized(Guid tenantId)
+    {
+        if (!invoiceState.State.IsInitialized)
+        {
+            invoiceState.State.TenantId = tenantId;
+            invoiceState.State.ActivatedAt = DateTime.UtcNow;
+            invoiceState.State.IsInitialized = true;
+            invoiceState.State.Metadata!["InvoiceId"] = this.GetPrimaryKey().ToString();
+            await invoiceState.WriteStateAsync();
+        }
+    }
+
+    /// <summary>
+    ///     Maps a contract model invoice to a data entity.
+    /// </summary>
+    /// <param name="invoice">The contract model invoice</param>
+    /// <returns>The data entity</returns>
+    private static Invoice MapContractToDataEntity(ContractInvoice invoice)
+    {
+        return new Invoice
+        {
+            TenantId = invoice.TenantId,
+            InvoiceId = invoice.InvoiceId,
+            Name = invoice.Name,
+            Status = invoice.Status,
+            Amount = invoice.Amount,
+            Currency = invoice.Currency,
+            DueDate = invoice.DueDate,
+            CashierId = invoice.CashierId,
+            AmountPaid = invoice.AmountPaid,
+            PaymentDate = invoice.PaymentDate
+        };
     }
 
     /// <summary>

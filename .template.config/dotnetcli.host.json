@@ -32,6 +32,9 @@
     "kafka": {
       "longName": "kafka",
       "shortName": ""
+    },
+    "mmt-version": {
+      "isHidden": true
     }
   }
 }
