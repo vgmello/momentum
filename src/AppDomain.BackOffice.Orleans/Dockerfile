@@ -38,6 +38,9 @@ COPY . .
 WORKDIR /src/src/AppDomain.BackOffice.Orleans/
 
 ## Create Wolverine generated source files
+## Set Orleans configuration for localhost clustering during build
+ENV ASPNETCORE_ENVIRONMENT=Development
+ENV Orleans__UseLocalhostClustering=true
 RUN dotnet run --no-restore -- codegen write && dotnet run --no-restore -- codegen test
 
 ## Build & Publish
