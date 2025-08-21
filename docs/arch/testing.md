@@ -24,11 +24,11 @@ graph TB
         Contract[Contract Tests<br/>API Compatibility]
     end
 
-    Unit --> Integration
-    Integration --> E2E
-    Unit --> Arch
-    Integration --> Perf
-    Integration --> Contract
+    Unit -/-> Integration
+    Integration -/-> E2E
+    Unit -/-> Arch
+    Integration -/-> Perf
+    Integration -/-> Contract
 ```
 
 ## Unit Testing
@@ -165,7 +165,7 @@ public class CreateCashierCommandHandlerTests
         _connectionMock = new Mock<IDbConnection>();
         _publisherMock = new Mock<IMessagePublisher>();
         _loggerMock = new Mock<ILogger<CreateCashierCommandHandler>>();
-        
+
         _handler = new CreateCashierCommandHandler(
             _connectionMock.Object,
             _publisherMock.Object,
@@ -209,7 +209,7 @@ public class CreateCashierCommandHandlerTests
 
         // Verify integration event was published
         _publisherMock.Verify(x => x.PublishAsync(
-            It.Is<CashierCreated>(e => 
+            It.Is<CashierCreated>(e =>
                 e.CashierId == expectedCashier.CashierId &&
                 e.Name == command.Name &&
                 e.Email == command.Email),
@@ -301,7 +301,7 @@ public class CreateCashierValidatorTests
 
         // Assert
         result.IsValid.ShouldBeFalse();
-        result.Errors.ShouldContain(e => 
+        result.Errors.ShouldContain(e =>
             e.PropertyName == nameof(CreateCashierCommand.Name) &&
             e.ErrorMessage.Contains("required"));
     }
@@ -324,7 +324,7 @@ public class CreateCashierValidatorTests
 
         // Assert
         result.IsValid.ShouldBeFalse();
-        result.Errors.ShouldContain(e => 
+        result.Errors.ShouldContain(e =>
             e.PropertyName == nameof(CreateCashierCommand.Email));
     }
 
@@ -343,7 +343,7 @@ public class CreateCashierValidatorTests
 
         // Assert
         result.IsValid.ShouldBeFalse();
-        result.Errors.ShouldContain(e => 
+        result.Errors.ShouldContain(e =>
             e.PropertyName == nameof(CreateCashierCommand.Name) &&
             e.ErrorMessage.Contains("100 characters"));
     }
@@ -382,7 +382,7 @@ public class CashierDatabaseIntegrationTests
 
         // Run database migrations
         await ApplyDatabaseMigrations();
-        
+
         _connection = new NpgsqlConnection(_connectionString);
         await _connection.OpenAsync();
     }
@@ -421,7 +421,7 @@ public class CashierDatabaseIntegrationTests
         // Assert - Verify retrieval
         getResult.IsSuccess.ShouldBeTrue();
         var retrievedCashier = getResult.Value;
-        
+
         retrievedCashier.CashierId.ShouldBe(createdCashier.CashierId);
         retrievedCashier.Name.ShouldBe(createCommand.Name);
         retrievedCashier.Email.ShouldBe(createCommand.Email);
@@ -447,7 +447,7 @@ public class CashierDatabaseIntegrationTests
 
         // Act - Create first cashier
         var firstResult = await handler.Handle(firstCommand, CancellationToken.None);
-        
+
         // Act - Try to create second cashier with same email
         var secondResult = await handler.Handle(secondCommand, CancellationToken.None);
 
@@ -522,7 +522,7 @@ public class AppDomainApiFactory : WebApplicationFactory<Program>
         {
             // Replace database connection
             services.RemoveAll<IDbConnection>();
-            services.AddScoped<IDbConnection>(_ => 
+            services.AddScoped<IDbConnection>(_ =>
                 new NpgsqlConnection(_dbContainer.GetConnectionString()));
 
             // Replace Kafka configuration
@@ -595,7 +595,7 @@ public class CashiersControllerIntegrationTests : IClassFixture<AppDomainApiFact
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Created);
-        
+
         var createdCashier = await response.Content.ReadFromJsonAsync<CashierResponse>();
         createdCashier.ShouldNotBeNull();
         createdCashier.Name.ShouldBe(request.Name);
@@ -613,7 +613,7 @@ public class CashiersControllerIntegrationTests : IClassFixture<AppDomainApiFact
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
-        
+
         var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
         problemDetails.ShouldNotBeNull();
         problemDetails.Errors.ShouldContainKey("Email");
@@ -632,7 +632,7 @@ public class CashiersControllerIntegrationTests : IClassFixture<AppDomainApiFact
 
         // Assert
         getResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
-        
+
         var retrievedCashier = await getResponse.Content.ReadFromJsonAsync<CashierResponse>();
         retrievedCashier.ShouldNotBeNull();
         retrievedCashier.CashierId.ShouldBe(createdCashier.CashierId);
@@ -691,7 +691,7 @@ public class EventIntegrationTests
         // Arrange
         var publisher = _serviceProvider.GetRequiredService<IMessagePublisher>();
         var eventStore = _serviceProvider.GetRequiredService<IEventStore>();
-        
+
         var @event = new CashierCreated(
             CashierId: Ulid.NewUlid(),
             Name: "Event Test Cashier",
@@ -708,7 +708,7 @@ public class EventIntegrationTests
         // Assert
         var processedEvents = await eventStore.GetEventsAsync($"cashier-{@event.CashierId}");
         var storedEvent = processedEvents.FirstOrDefault(e => e.EventType == nameof(CashierCreated));
-        
+
         storedEvent.ShouldNotBeNull();
         storedEvent.EventType.ShouldBe(nameof(CashierCreated));
     }
@@ -718,7 +718,7 @@ public class EventIntegrationTests
     {
         // Arrange
         var publisher = _serviceProvider.GetRequiredService<IMessagePublisher>();
-        
+
         // Create an event that will initially fail processing
         var @event = new InvoiceCreated(
             InvoiceId: Ulid.NewUlid(),
@@ -748,7 +748,7 @@ public class EventIntegrationTests
         {
             opts.UseKafka(_kafkaContainer.GetBootstrapAddress());
             opts.LocalQueue("test-queue").Sequential();
-            
+
             // Configure retry policies for testing
             opts.OnException<InvalidOperationException>()
                 .RetryTimes(2)
@@ -756,9 +756,9 @@ public class EventIntegrationTests
                 .MoveToErrorQueue();
         });
 
-        services.AddScoped<IDbConnection>(_ => 
+        services.AddScoped<IDbConnection>(_ =>
             new NpgsqlConnection(_dbContainer.GetConnectionString()));
-        
+
         services.AddScoped<IEventStore, EventStore>();
         services.AddLogging();
     }
@@ -774,10 +774,10 @@ public class EventIntegrationTests
     public async Task OneTimeTearDown()
     {
         _serviceProvider?.Dispose();
-        
+
         if (_dbContainer != null)
             await _dbContainer.DisposeAsync();
-        
+
         if (_kafkaContainer != null)
             await _kafkaContainer.DisposeAsync();
     }
@@ -894,13 +894,13 @@ public class ArchitectureTests
 
         // Assert
         eventHandlerTypes.ShouldNotBeEmpty();
-        
+
         foreach (var handlerType in eventHandlerTypes)
         {
             var handleMethods = handlerType.GetMethods()
                 .Where(m => m.Name == "Handle" && m.GetParameters().Length == 1)
                 .ToList();
-                
+
             handleMethods.ShouldNotBeEmpty($"{handlerType.Name} should have at least one Handle method");
         }
     }
@@ -958,7 +958,7 @@ public class DomainArchitectureTests
 
         // Assert
         typesWithDbCommand.ShouldNotBeEmpty();
-        
+
         foreach (var type in typesWithDbCommand)
         {
             type.Name.ShouldEndWith("Command", $"{type.Name} should be a command");
@@ -979,13 +979,13 @@ public class DomainArchitectureTests
         foreach (var eventType in integrationEventTypes)
         {
             var xmlDocFile = Path.ChangeExtension(eventType.Assembly.Location, ".xml");
-            
+
             if (File.Exists(xmlDocFile))
             {
                 var xmlDoc = XDocument.Load(xmlDocFile);
                 var typeDoc = xmlDoc.Descendants("member")
                     .FirstOrDefault(m => m.Attribute("name")?.Value == $"T:{eventType.FullName}");
-                
+
                 typeDoc.ShouldNotBeNull($"{eventType.Name} should have XML documentation for event schema generation");
             }
         }
@@ -1004,8 +1004,8 @@ public class DomainArchitectureTests
         foreach (var type in contractTypes)
         {
             // Contracts should be data-only (records, interfaces, or simple classes)
-            var isValidContractType = type.IsInterface 
-                                    || type.IsRecord() 
+            var isValidContractType = type.IsInterface
+                                    || type.IsRecord()
                                     || (type.IsClass && HasOnlyDataProperties(type));
 
             isValidContractType.ShouldBeTrue($"{type.Name} in Contracts namespace should only contain data");
@@ -1015,9 +1015,9 @@ public class DomainArchitectureTests
     private static bool HasOnlyDataProperties(Type type)
     {
         var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-        
+
         // Only allow property getters/setters and constructors
-        var behaviorMethods = methods.Where(m => 
+        var behaviorMethods = methods.Where(m =>
             !m.IsSpecialName && // Exclude property accessors
             !m.IsConstructor &&
             m.Name != "ToString" &&
@@ -1073,7 +1073,7 @@ public class CashierApiPerformanceTests
             );
 
             var response = await _httpClient.PostAsJsonAsync("/api/cashiers", request);
-            
+
             return response.IsSuccessStatusCode ? Response.Ok() : Response.Fail();
         })
         .WithLoadSimulations(
@@ -1114,7 +1114,7 @@ public class CashierApiPerformanceTests
                     $"Stress Test {context.ScenarioInfo.InstanceId}",
                     $"stress{context.ScenarioInfo.InstanceId}@example.com"
                 );
-                
+
                 var response = await _httpClient.PostAsJsonAsync("/api/cashiers", request);
                 return response.IsSuccessStatusCode ? Response.Ok() : Response.Fail();
             }
@@ -1237,7 +1237,7 @@ public class DatabasePerformanceTests
                 });
 
             await _connection.ExecuteAsync(
-                @"INSERT INTO cashiers (tenant_id, cashier_id, name, email, created_at) 
+                @"INSERT INTO cashiers (tenant_id, cashier_id, name, email, created_at)
                   VALUES (@tenant_id, @cashier_id, @name, @email, @created_at)",
                 cashiers
             );
@@ -1273,7 +1273,7 @@ dotnet test
 
 # Run tests by trait/category
 dotnet test --filter "Category=Unit"
-dotnet test --filter "Category=Integration" 
+dotnet test --filter "Category=Integration"
 dotnet test --filter "Category=Architecture"
 dotnet test --filter "Category=Performance"
 
@@ -1304,18 +1304,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
-          
+
       - name: Restore dependencies
         run: dotnet restore
-        
+
       - name: Run unit tests
         run: dotnet test --filter "Category=Unit" --logger trx --collect:"XPlat Code Coverage"
-        
+
       - name: Upload coverage reports
         uses: codecov/codecov-action@v3
         with:
@@ -1325,22 +1325,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
-          
+
       - name: Start containers
         run: docker compose up -d AppDomain-db kafka
-        
+
       - name: Wait for services
         run: |
           timeout 60 bash -c 'until docker compose ps | grep -q healthy; do sleep 2; done'
-          
+
       - name: Run integration tests
         run: dotnet test --filter "Category=Integration" --logger trx
-        
+
       - name: Stop containers
         run: docker compose down
 
@@ -1348,12 +1348,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
-          
+
       - name: Run architecture tests
         run: dotnet test --filter "Category=Architecture" --logger trx
 ```
@@ -1375,7 +1375,7 @@ public static class TestDataBuilders
 {
     public static CreateCashierCommand.Builder CreateCashierCommand()
         => new CreateCashierCommand.Builder();
-        
+
     public static Cashier.Builder Cashier()
         => new Cashier.Builder();
 }

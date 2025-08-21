@@ -24,13 +24,13 @@ The Bills module is currently under development and will include:
 
 ```mermaid
 flowchart TD
-    A[Bill Creation] --> B[Bill Review]
-    B --> C{Approved?}
+    A[Bill Creation] -/-> B[Bill Review]
+    B -/-> C{Approved?}
     C -->|Yes| D[Generate Invoice]
     C -->|No| E[Revise Bill]
-    E --> B
-    D --> F[Send to Customer]
-    F --> G[Track Payment]
+    E -/-> B
+    D -/-> F[Send to Customer]
+    F -/-> G[Track Payment]
 ```
 
 ### Architecture Preview

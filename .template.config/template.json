@@ -309,9 +309,9 @@
       "include": [
         "docs/**/*",
         "infra/**/*",
-        "libs/Momentum/src/**/*",
         "src/**/*",
-        "tests/**/*"
+        "tests/**/*",
+        "libs/Momentum/src/**/*"
       ],
       "exclude": [
         "**/[Bb]in/**",

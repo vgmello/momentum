@@ -5,25 +5,26 @@ Wolverine is a powerful messaging framework that serves as the backbone of Momen
 ## What is Wolverine?
 
 Wolverine (formerly Jasper) is a .NET messaging framework that provides:
-- **In-process messaging**: CQRS command/query handling
-- **External transports**: Kafka, RabbitMQ, Azure Service Bus integration
-- **Middleware pipeline**: Powerful interceptor pattern
-- **Message persistence**: Reliable message delivery with PostgreSQL
-- **Code generation**: High-performance handlers through source generation
+
+-   **In-process messaging**: CQRS command/query handling
+-   **External transports**: Kafka, RabbitMQ, Azure Service Bus integration
+-   **Middleware pipeline**: Powerful interceptor pattern
+-   **Message persistence**: Reliable message delivery with PostgreSQL
+-   **Code generation**: High-performance handlers through source generation
 
 ## Architecture Overview
 
 ```mermaid
 graph TD
-    A[API Request] --> B[Wolverine Message Bus]
-    B --> C[Validation Middleware]
-    C --> D[Performance Middleware] 
-    D --> E[OpenTelemetry Middleware]
-    E --> F[Handler]
-    F --> G[Database]
-    B --> H[Event Publisher]
-    H --> I[Kafka]
-    H --> J[Local Queues]
+    A[API Request] -/-> B[Wolverine Message Bus]
+    B -/-> C[Validation Middleware]
+    C -/-> D[Performance Middleware]
+    D -/-> E[OpenTelemetry Middleware]
+    E -/-> F[Handler]
+    F -/-> G[Database]
+    B -/-> H[Event Publisher]
+    H -/-> I[Kafka]
+    H -/-> J[Local Queues]
 ```
 
 ## Basic Configuration
@@ -50,13 +51,13 @@ For more control, configure Wolverine manually:
 builder.Services.AddWolverine(opts =>
 {
     opts.ServiceName = "MyService";
-    
+
     // Configure PostgreSQL persistence
     opts.PersistMessagesWithPostgresql(connectionString);
-    
+
     // Add middleware
     opts.Policies.AddMiddleware<CustomMiddleware>();
-    
+
     // Configure discovery
     opts.Discovery.IncludeAssembly(typeof(MyDomainAssembly).Assembly);
 });
@@ -76,7 +77,7 @@ Handlers are automatically discovered from domain assemblies:
 public static class CreateCashierCommandHandler
 {
     public static async Task<(Result<Cashier>, CashierCreated?)> Handle(
-        CreateCashierCommand command, 
+        CreateCashierCommand command,
         IMessageBus messaging,
         CancellationToken cancellationToken)
     {
@@ -103,12 +104,12 @@ public static class MyCommandHandler
 public class MyQueryHandler
 {
     private readonly IDbContext _db;
-    
+
     public MyQueryHandler(IDbContext db)
     {
         _db = db;
     }
-    
+
     public async Task<Result<T>> Handle(MyQuery query, CancellationToken token)
     {
         // Implementation using _db
@@ -122,7 +123,7 @@ public static class CashierHandlers
     {
         // Query handler
     }
-    
+
     public static Task<(Result<Cashier>, CashierCreated?)> Handle(CreateCashierCommand command, IMessageBus bus, CancellationToken token)
     {
         // Command handler
@@ -142,10 +143,10 @@ public interface IMessageBus
     // Execute commands/queries
     Task<TResponse> InvokeAsync<TResponse>(IQuery<TResponse> query, CancellationToken cancellationToken);
     Task<TResponse> InvokeAsync<TResponse>(ICommand<TResponse> command, CancellationToken cancellationToken);
-    
+
     // Execute database commands
     Task<TResponse> InvokeCommandAsync<TResponse>(ICommand<TResponse> command, CancellationToken cancellationToken);
-    
+
     // Publish events
     Task PublishAsync<T>(T message, CancellationToken cancellationToken);
     Task PublishAsync<T>(T message, DeliveryOptions? options, CancellationToken cancellationToken);
@@ -158,37 +159,37 @@ public interface IMessageBus
 public class CashierController : ControllerBase
 {
     private readonly IMessageBus _messageBus;
-    
+
     public CashierController(IMessageBus messageBus)
     {
         _messageBus = messageBus;
     }
-    
+
     [HttpPost]
     public async Task<ActionResult<Cashier>> CreateCashier(CreateCashierCommand command)
     {
         var (result, integrationEvent) = await _messageBus.InvokeAsync(command);
-        
+
         if (result.IsSuccess)
         {
             // Integration event is automatically published if returned from handler
             return CreatedAtAction(nameof(GetCashier), new { id = result.Value.Id }, result.Value);
         }
-        
+
         return BadRequest(result.Errors);
     }
-    
+
     [HttpGet("{id}")]
     public async Task<ActionResult<Cashier>> GetCashier(Guid id)
     {
         var query = new GetCashierQuery(GetTenantId(), id);
         var result = await _messageBus.InvokeAsync(query);
-        
+
         if (result.IsSuccess)
         {
             return Ok(result.Value);
         }
-        
+
         return NotFound();
     }
 }
@@ -218,14 +219,14 @@ public class AuditMiddleware
     public async Task InvokeAsync<T>(MessageContext context, T message, Func<Task> next)
     {
         var auditService = context.Services.GetRequiredService<IAuditService>();
-        
+
         // Before handler execution
         var auditId = await auditService.StartAuditAsync(typeof(T).Name, message);
-        
+
         try
         {
             await next();
-            
+
             // After successful execution
             await auditService.CompleteAuditAsync(auditId, success: true);
         }
@@ -279,12 +280,12 @@ Integration events are routed to external transports:
 ```csharp
 // This is published to Kafka automatically when returned from handler
 public static async Task<(Result<Cashier>, CashierCreated?)> Handle(
-    CreateCashierCommand command, 
+    CreateCashierCommand command,
     IMessageBus messaging,
     CancellationToken cancellationToken)
 {
     // ... business logic
-    
+
     var integrationEvent = new CashierCreated(tenantId, cashier);
     return (result, integrationEvent); // Automatically published
 }
@@ -302,10 +303,10 @@ builder.Services.AddWolverine(opts =>
 {
     // Route all events to Kafka
     opts.PublishAllMessages().ToKafka();
-    
+
     // Route specific messages to specific topics
     opts.PublishMessage<OrderCreated>().ToKafkaTopic("orders");
-    
+
     // Route to local queues
     opts.PublishMessage<InternalNotification>().ToLocalQueue("notifications");
 });
@@ -334,7 +335,7 @@ opts.Policies.UseDurableOutboxOnAllSendingEndpoints();
 // This ensures that if the database transaction succeeds,
 // the integration event will be published, even if the service crashes
 public static async Task<(Result<Cashier>, CashierCreated?)> Handle(
-    CreateCashierCommand command, 
+    CreateCashierCommand command,
     IMessageBus messaging,
     CancellationToken cancellationToken)
 {
@@ -358,10 +359,10 @@ builder.Services.AddWolverine(opts =>
 {
     // Use durable local queues for internal messages
     opts.Policies.UseDurableLocalQueues();
-    
+
     // Apply transactions automatically
     opts.Policies.AutoApplyTransactions();
-    
+
     // Configure retry policies
     opts.Policies.OnException<SqlException>().Retry(3);
     opts.Policies.OnException<HttpRequestException>().RetryWithCooldown(1.Seconds(), 5.Seconds(), 10.Seconds());
@@ -380,10 +381,10 @@ builder.Services.AddWolverine(opts =>
     // Retry transient exceptions
     opts.Policies.OnException<SqlException>().Retry(3);
     opts.Policies.OnException<HttpRequestException>().RetryWithCooldown(1.Seconds(), 5.Seconds());
-    
+
     // Move poison messages to error queue
     opts.Policies.OnException<BusinessRuleException>().MoveToErrorQueue();
-    
+
     // Continue processing for validation errors
     opts.Policies.OnException<ValidationException>().ContinueProcessing();
 });
@@ -408,12 +409,12 @@ Implement custom error handling in middleware:
 public class ErrorHandlingMiddleware
 {
     private readonly ILogger<ErrorHandlingMiddleware> _logger;
-    
+
     public ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger)
     {
         _logger = logger;
     }
-    
+
     public async Task InvokeAsync<T>(MessageContext context, T message, Func<Task> next)
     {
         try
@@ -424,7 +425,7 @@ public class ErrorHandlingMiddleware
         {
             _logger.LogWarning("Business rule violation for {MessageType}: {Message}",
                 typeof(T).Name, ex.Message);
-            
+
             // Don't retry business rule violations
             return;
         }
@@ -450,7 +451,7 @@ public async Task Handle_ValidCommand_ReturnsSuccess()
     // Arrange
     var command = new CreateCashierCommand(Guid.NewGuid(), "John Doe", "john@example.com");
     var mockMessaging = new Mock<IMessageBus>();
-    
+
     mockMessaging
         .Setup(m => m.InvokeCommandAsync(It.IsAny<CreateCashierCommandHandler.DbCommand>(), It.IsAny<CancellationToken>()))
         .ReturnsAsync(new Data.Entities.Cashier { /* ... */ });
@@ -484,12 +485,12 @@ public async Task Should_Process_Command_End_To_End()
 
     // Assert
     result.IsSuccess.Should().BeTrue();
-    
+
     // Verify database state
     var db = testContext.GetService<AppDomainDb>();
     var cashier = await db.Cashiers.FirstOrDefaultAsync(c => c.CashierId == result.Value.Id);
     cashier.Should().NotBeNull();
-    
+
     // Verify event was published (integration test would check Kafka)
     integrationEvent.Should().NotBeNull();
 }
@@ -505,18 +506,18 @@ public class IntegrationTestContext : IDisposable
     private readonly IHost _host;
     private readonly PostgreSqlContainer _database;
     private readonly KafkaContainer _kafka;
-    
+
     public IntegrationTestContext()
     {
         _database = new PostgreSqlBuilder().Build();
         _kafka = new KafkaBuilder().Build();
-        
+
         // Start containers
         Task.WaitAll(
             _database.StartAsync(),
             _kafka.StartAsync()
         );
-        
+
         // Configure test host
         var builder = Host.CreateDefaultBuilder()
             .ConfigureServices(services =>
@@ -527,16 +528,16 @@ public class IntegrationTestContext : IDisposable
                     opts.UseKafka(_kafka.GetBootstrapAddress());
                 });
             });
-            
+
         _host = builder.Build();
         _host.Start();
     }
-    
+
     public T GetService<T>() where T : notnull
     {
         return _host.Services.GetRequiredService<T>();
     }
-    
+
     public void Dispose()
     {
         _host?.Dispose();
@@ -563,7 +564,7 @@ public static class OptimizedHandler
         var result = await db.Entities
             .Where(e => e.Id == query.Id)
             .FirstOrDefaultAsync(token);
-            
+
         return result?.ToModel() ?? Result<T>.NotFound();
     }
 }
@@ -578,12 +579,12 @@ builder.Services.AddWolverine(opts =>
 {
     // Increase parallelism
     opts.Policies.MaximumParallelization(Environment.ProcessorCount * 2);
-    
+
     // Optimize local queues
     opts.LocalQueue("high-priority")
         .MaximumParallelization(10)
         .Sequential(); // For ordered processing
-        
+
     // Configure batch processing
     opts.LocalQueue("batch-processing")
         .ProcessInBatches(50, TimeSpan.FromSeconds(5));
@@ -598,9 +599,9 @@ Optimize memory usage:
 // Use object pools for frequently created objects
 public static class PooledHandler
 {
-    private static readonly ObjectPool<StringBuilder> StringBuilderPool = 
+    private static readonly ObjectPool<StringBuilder> StringBuilderPool =
         new DefaultObjectPoolProvider().CreateStringBuilderPool();
-    
+
     public static async Task<Result<string>> Handle(ProcessDataCommand command, CancellationToken token)
     {
         var sb = StringBuilderPool.Get();
@@ -685,7 +686,7 @@ await app.RunAsync(args);
 
 ## Next Steps
 
-- Learn about [Integration Events](./integration-events) publishing
-- Understand [Kafka Configuration](./kafka) for external messaging
-- Explore [Domain Events](./domain-events) for internal messaging
-- See [Testing](../testing/) for comprehensive testing strategies
+-   Learn about [Integration Events](./integration-events) publishing
+-   Understand [Kafka Configuration](./kafka) for external messaging
+-   Explore [Domain Events](./domain-events) for internal messaging
+-   See [Testing](../testing/) for comprehensive testing strategies
