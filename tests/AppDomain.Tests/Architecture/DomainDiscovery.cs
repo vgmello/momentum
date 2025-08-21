@@ -1,7 +1,9 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using NetArchTest.Rules;
+//#if (INCLUDE_ORLEANS)
 using Orleans;
+//#endif
 
 namespace AppDomain.Tests.Architecture;
 
@@ -58,6 +60,7 @@ public static class DomainDiscovery
             .Distinct();
     }
 
+//#if (INCLUDE_ORLEANS)
     /// <summary>
     ///     Discovers all domains that have Orleans grains by looking for *.Actors namespaces.
     /// </summary>
@@ -81,6 +84,7 @@ public static class DomainDiscovery
     {
         return GetDomainsWithGrains();
     }
+//#endif
 
     /// <summary>
     ///     Extracts domain name from a namespace (e.g., "AppDomain.Invoices.Actors" -> "Invoices").

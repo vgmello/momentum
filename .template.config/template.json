@@ -27,33 +27,37 @@
     "aspire": {
       "type": "parameter",
       "datatype": "bool",
-      "description": "Generate AppHost Aspire project (Default)"
+      "description": "Generate AppHost Aspire project (Default)",
+      "replaces": "__ASPIRE__"
     },
-    "web-api": {
+    "api": {
       "type": "parameter",
       "datatype": "bool",
-      "description": "Generate API project (REST/gRPC endpoints) (Default)"
+      "description": "Generate API project (REST/gRPC endpoints) (Default)",
+      "replaces": "__API__"
     },
     "back-office": {
       "type": "parameter",
       "datatype": "bool",
-      "description": "Generate BackOffice project (background event processing) (Default)"
+      "description": "Generate BackOffice project (background event processing) (Default)",
+      "replaces": "__BACK-OFFICE__"
     },
     "docs": {
       "type": "parameter",
       "datatype": "bool",
-      "description": "Generates documentation project (Default)"
+      "description": "Generates documentation project (Default)",
+      "replaces": "__docs__"
     },
     "orleans": {
       "type": "parameter",
       "datatype": "bool",
-      "description": "Generate Orleans-based BackOffice project (stateful processing)"
+      "description": "Generate Orleans-based BackOffice project (stateful processing)",
+      "replaces": "__orleans__"
     },
     "db-config": {
       "type": "parameter",
       "datatype": "choice",
       "allowMultipleValues": true,
-      "enableQuotelessLiterals": true,
       "description": "Data access setup configuration",
       "defaultValue": "default",
       "choices": [
@@ -71,42 +75,46 @@
         },
         {
           "choice": "default",
-          "description": "NPgsql & Liquibase"
+          "description": "PostgreSQL & Liquibase"
         }
-      ]
+      ],
+      "replaces": "__db-config__"
     },
     "kafka": {
       "type": "parameter",
       "datatype": "bool",
       "description": "Use Apache Kafka",
-      "defaultValue": "true"
+      "defaultValue": "true",
+      "replaces": "__kafka__"
     },
     "port": {
       "type": "parameter",
       "datatype": "int",
       "defaultValue": "8100",
       "description": "Base port number for the application services",
-      "replaces": "SERVICE_BASE_PORT"
+      "replaces": "__SERVICE_BASE_PORT__"
     },
     "org": {
       "type": "parameter",
-      "description": "Organization / Team name"
+      "description": "Organization / Team name",
+      "replaces": "__org__"
     },
     "no-sample": {
       "type": "parameter",
       "datatype": "bool",
-      "description": "Skip generating sample code"
+      "description": "Skip generating sample code",
+      "replaces": "__no-sample__"
     },
     "project-only": {
       "type": "parameter",
       "datatype": "bool",
-      "description": "Only generate the project and its respective files. (no Solution, .gitignore, etc)"
+      "description": "Only generate the project and its respective files. (no Solution, .gitignore, etc)",
+      "replaces": "__project-only__"
     },
     "libs": {
       "type": "parameter",
       "datatype": "choice",
       "allowMultipleValues": true,
-      "enableQuotelessLiterals": true,
       "description": "Momentum libraries to include as direct project references",
       "defaultValue": "none",
       "choices": [
@@ -134,7 +142,8 @@
           "choice": "generators",
           "description": "Include Momentum.Extensions.SourceGenerators as project reference"
         }
-      ]
+      ],
+      "replaces": "__libs__"
     },
     "lib-name": {
       "type": "parameter",
@@ -149,7 +158,19 @@
       "datatype": "string",
       "description": "Momentum lib version",
       "defaultValue": "0.0.1",
-      "replaces": "$(TemplateMomentumVersion)"
+      "replaces": "__TemplateMomentumVersion__"
+    },
+    "debug-symbols": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "Include Debug symbols for the template",
+      "replaces": "__debug-symbols__"
+    },
+    "all1": {
+      "type": "parameter",
+      "isEnabled": "(aspire)",
+      "datatype": "bool",
+      "replaces": "__all1__"
     },
     "ALL": {
       "type": "computed",
@@ -165,7 +186,7 @@
     },
     "INCLUDE_BACK_OFFICE": {
       "type": "computed",
-      "value": "back-office || ALL"
+      "value": "(back-office || ALL)"
     },
     "INCLUDE_DOCS": {
       "type": "computed",
@@ -185,7 +206,7 @@
     },
     "HAS_BACKEND": {
       "type": "computed",
-      "value": "INCLUDE_API || INCLUDE_BACK_OFFICE || INCLUDE_ORLEANS"
+      "value": "(INCLUDE_API || INCLUDE_BACK_OFFICE || INCLUDE_ORLEANS)"
     },
     "AUTO_INCLUDE_DB": {
       "type": "computed",
@@ -240,33 +261,33 @@
         "sourceVariableName": "org",
         "fallbackVariableName": "DefaultOrgName"
       },
-      "replaces": "ORG_NAME"
+      "replaces": "__ORG_NAME__"
     },
     "OrgNameKebab": {
       "type": "derived",
       "valueSource": "OrgName",
       "valueTransform": "kebab-case",
-      "replaces": "org-name"
+      "replaces": "__org-name__"
     },
     "AppDomainSnakeCase": {
       "type": "derived",
       "valueSource": "name",
       "valueTransform": "snake_case",
-      "replaces": "app_domain",
+      "replaces": "__app_domain__",
       "fileRename": "app_domain"
     },
     "AppDomainKebab": {
       "type": "derived",
       "valueSource": "name",
       "valueTransform": "kebab-case",
-      "replaces": "app-domain",
+      "replaces": "__app-domain__",
       "fileRename": "app-domain"
     },
     "appDomainCamelCase": {
       "type": "derived",
       "valueSource": "name",
       "valueTransform": "camelCase",
-      "replaces": "appDomain",
+      "replaces": "__appDomain__",
       "fileRename": "appDomain"
     }
   },
@@ -310,10 +331,19 @@
         "**/.local/**/*",
         "**/.vitepress/cache",
         "**/.vitepress/dist",
+        "**/docs/reference/*",
+        "**/docs/node_modules/**/*",
         "libs/Momentum/src/Momentum.Extensions.Abstractions/**/*",
-        "libs/Momentum/src/Momentum.Extensions.EventMarkdownGenerator/**/*"
+        "libs/Momentum/src/Momentum.Extensions.EventMarkdownGenerator/**/*",
+        "debug.symbols.txt"
       ],
       "modifiers": [
+        {
+          "condition": "(debug-symbols)",
+          "include": [
+            "debug.symbols.txt"
+          ]
+        },
         {
           "condition": "(!project-only)",
           "include": [
@@ -358,7 +388,9 @@
           "condition": "(!INCLUDE_ORLEANS)",
           "exclude": [
             "src/AppDomain.BackOffice.Orleans/**/*",
-            "src/AppDomain.Api/Extensions/OrleansExtensions.cs"
+            "src/AppDomain.Api/Infrastructure/Extensions/OrleansExtensions.cs",
+            "src/AppDomain/**/Actors/**/*",
+            "tests/AppDomain.Tests/Architecture/OrleansGrainOwnershipRulesTests.cs"
           ]
         },
         {
@@ -468,6 +500,11 @@
       }
     }
   ],
+  "primaryOutputs": [
+    {
+      "path": "AppDomain.slnx"
+    }
+  ],
   "postActions": [
     {
       "description": "Run post-setup configuration",
@@ -482,6 +519,17 @@
         "redirectStandardOutput": false,
         "args": "run --project .local/tools/post-setup"
       },
+      "continueOnError": true
+    },
+    {
+      "condition": "(!project-only)",
+      "description": "Restore NuGet packages required by this project.",
+      "manualInstructions": [
+        {
+          "text": "Run 'dotnet restore'"
+        }
+      ],
+      "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
       "continueOnError": true
     }
   ],
