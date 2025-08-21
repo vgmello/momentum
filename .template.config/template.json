@@ -231,6 +231,14 @@
       "value": "kafka && HAS_BACKEND"
     },
     // Generated Symbols
+    "DiagramArrow": {
+      "type": "generated",
+      "generator": "constant",
+      "parameters": {
+        "value": "-->"
+      },
+      "replaces": "-/->"
+    },
     "DefaultOrgName": {
       "type": "generated",
       "generator": "join",

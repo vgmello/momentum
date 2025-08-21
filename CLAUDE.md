@@ -402,4 +402,4 @@ When updating library project files in `libs/Momentum/src/`, follow this pattern
 
 # Troubleshoot
 
-To debug the template generation use the flag `--verbosity diag`
+To debug the template generation use the flag `--verbosity diag` and --debug-symbols (which will generate a debug.symbols.txt file at the root of the destination template)
