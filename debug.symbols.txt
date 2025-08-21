@@ -1,0 +1,16 @@
+aspire=__aspire__
+api=__api__
+back-office=__back-office__
+docs=__docs__
+orleans=__orleans__
+db-config=__db-config__
+kafka=__kafka__
+port=__SERVICE_BASE_PORT__
+org=__org__
+no-sample=__no-sample__
+project-only=__project-only__
+libs=__libs__
+lib-name=__LIB_NAME__
+mmt-version=__TemplateMomentumVersion__
+all=__all1__
+debug-symbols=__debug-symbols__
