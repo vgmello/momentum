@@ -1,17 +1,15 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
-#if INCLUDE_ORLEANS
 using AppDomain.Invoices.Contracts.Models;
-using Orleans;
 
-namespace AppDomain.Invoices.Grains;
+namespace AppDomain.Invoices.Actors;
 
 /// <summary>
 ///     State class for persisting invoice data in Orleans grain storage.
 ///     Contains the invoice data and metadata for Orleans grain persistence.
 /// </summary>
 [GenerateSerializer]
-public sealed class InvoiceGrainState
+public sealed class InvoiceActorState
 {
     /// <summary>
     ///     Gets or sets the invoice domain record.
@@ -25,4 +23,3 @@ public sealed class InvoiceGrainState
     [Id(1)]
     public DateTime LastUpdated { get; set; }
 }
-#endif

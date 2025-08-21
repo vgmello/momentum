@@ -1,23 +1,14 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
-#if INCLUDE_ORLEANS
 using AppDomain.Invoices.Contracts.Models;
-using Orleans;
 
-namespace AppDomain.Invoices.Grains;
+namespace AppDomain.Invoices.Actors;
 
 /// <summary>
 ///     Grain interface for managing invoice state and processing in Orleans.
 /// </summary>
-public interface IInvoiceGrain : IGrainWithGuidKey
+public interface IInvoiceActor : IGrainWithGuidKey
 {
-    /// <summary>
-    ///     Creates a new invoice with the specified details.
-    /// </summary>
-    /// <param name="invoice">The invoice data to create</param>
-    /// <returns>The created invoice</returns>
-    Task<Invoice> CreateInvoiceAsync(Invoice invoice);
-
     /// <summary>
     ///     Gets the current invoice data.
     /// </summary>
@@ -47,4 +38,3 @@ public interface IInvoiceGrain : IGrainWithGuidKey
     /// <returns>Processing result</returns>
     Task<bool> ProcessPaymentAsync(decimal amount, string paymentMethod);
 }
-#endif

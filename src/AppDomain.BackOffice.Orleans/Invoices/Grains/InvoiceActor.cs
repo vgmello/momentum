@@ -1,8 +1,8 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
+using AppDomain.Invoices.Actors;
 using AppDomain.Invoices.Contracts.IntegrationEvents;
 using AppDomain.Invoices.Contracts.Models;
-using AppDomain.Invoices.Grains;
 
 namespace AppDomain.BackOffice.Orleans.Invoices.Grains;
 
@@ -14,14 +14,13 @@ namespace AppDomain.BackOffice.Orleans.Invoices.Grains;
 /// </remarks>
 /// <param name="invoiceState">The persistent state for the invoice</param>
 /// <param name="logger">Logger instance</param>
-public class InvoiceGrain(
+public class InvoiceActor(
     [PersistentState("invoice", "Default")]
-        IPersistentState<InvoiceGrainState> invoiceState,
-    ILogger<InvoiceGrain> logger) : Grain, IInvoiceGrain
+    IPersistentState<InvoiceActorState> invoiceState,
+    ILogger<InvoiceActor> logger) : Grain, IInvoiceActor
 {
-
     /// <inheritdoc />
-    public async Task<Invoice> CreateInvoiceAsync(Invoice invoice)
+    public async Task<Invoice> LoadInvoice(Invoice invoice)
     {
         if (invoiceState.State.Invoice != null)
         {
@@ -169,5 +168,4 @@ public class InvoiceGrain(
 
         return Task.CompletedTask;
     }
-
 }

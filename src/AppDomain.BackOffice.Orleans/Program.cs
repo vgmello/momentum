@@ -2,7 +2,6 @@
 
 using AppDomain.BackOffice.Orleans;
 using AppDomain.BackOffice.Orleans.Infrastructure.Extensions;
-using AppDomain.Invoices.Grains;
 using Momentum.Extensions.Messaging.Kafka;
 using Momentum.ServiceDefaults;
 using Momentum.ServiceDefaults.HealthChecks;
@@ -23,6 +22,5 @@ var app = builder.Build();
 
 app.MapOrleansDashboard();
 app.MapDefaultHealthCheckEndpoints();
-
 
 await app.RunAsync(args);

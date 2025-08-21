@@ -141,7 +141,7 @@ The template offers comprehensive configuration options:
 -   `--lib-name`: Custom prefix to replace "Momentum" in library names
 
 [!NOTE]
-For complete parameter documentation and all available combinations, see the [`template.json`](/libs/Momentum/.template.config/template.json) file and the [Template Options Guide](./template-options/) for detailed use cases and examples.
+For complete parameter documentation and all available combinations, see the [`template.json`](.template.config/template.json) file and the [Template Options Guide](https://momentumlib.net/guide/template-options/) for detailed use cases and examples.
 
 ## Understanding the Generated Solution
 
@@ -828,25 +828,25 @@ Choose your path based on how you're using Momentum:
 
 ### **If You Used the Template**
 
-1. **[Explore the Generated Solution](./template-walkthrough/)** - Understand what was created
-2. **[Add Your Business Domain](./adding-domains/)** - Replace sample code with your logic
+1. **[Explore the Generated Solution](https://momentumlib.net/guide/template-walkthrough/)** - Understand what was created
+2. **[Add Your Business Domain](https://momentumlib.net/guide/adding-domains/)** - Replace sample code with your logic
 3. **Deploy to Production** - Deploy your microservices (coming soon)
-4. **[Template Options Reference](./template-options/)** - Complete parameter guide
+4. **[Template Options Reference](https://momentumlib.net/guide/template-options/)** - Complete parameter guide
 
 ### **If You're Using Individual Libraries**
 
-1. **[Service Configuration Guide](./service-configuration/)** - Deep dive into observability, health checks, and resilience
-2. **[Error Handling Patterns](./error-handling)** - Master the Result pattern and validation
-3. **[Database Operations](./database/)** - Learn DbCommand source generation and best practices
-4. **[Event-Driven Messaging](./messaging/)** - Build robust event-driven architectures with Kafka
-5. **[Testing Strategies](./testing/)** - Comprehensive testing patterns for Momentum applications
+1. **[Service Configuration Guide](https://momentumlib.net/guide/service-configuration/)** - Deep dive into observability, health checks, and resilience
+2. **[Error Handling Patterns](https://momentumlib.net/guide/error-handling)** - Master the Result pattern and validation
+3. **[Database Operations](https://momentumlib.net/guide/database/)** - Learn DbCommand source generation and best practices
+4. **[Event-Driven Messaging](https://momentumlib.net/guide/messaging/)** - Build robust event-driven architectures with Kafka
+5. **[Testing Strategies](https://momentumlib.net/guide/testing/)** - Comprehensive testing patterns for Momentum applications
 
 ### **Advanced Topics for Both Approaches**
 
-6. **[CQRS Implementation](./cqrs/)** - Command/Query separation patterns
-7. **[Architecture Decisions](./arch/)** - Design patterns and architectural guidance
-8. **[Best Practices](./best-practices)** - Production-ready patterns and guidelines
-9. **[Troubleshooting](./troubleshooting)** - Common issues and solutions
+6. **[CQRS Implementation](https://momentumlib.net/guide/cqrs/)** - Command/Query separation patterns
+7. **[Architecture Decisions](https://momentumlib.net/guide/arch/)** - Design patterns and architectural guidance
+8. **[Best Practices](https://momentumlib.net/guide/best-practices)** - Production-ready patterns and guidelines
+9. **[Troubleshooting](https://momentumlib.net/guide/troubleshooting)** - Common issues and solutions
 
 ## Coming Soon
 
@@ -877,41 +877,41 @@ Momentum makes use of several outstanding open-source libraries and frameworks. 
 
 ### Core Framework Libraries
 
-- **[Wolverine](https://wolverinefx.io/)**: Next-generation message bus and CQRS framework for .NET, providing elegant command/query handling and message processing capabilities.
-- **[Mapperly](https://github.com/riok/mapperly)**: A .NET source generator for generating object mappings at compile-time, offering zero-overhead and type-safe mapping.
-- **[Microsoft Orleans](https://dotnet.github.io/orleans/)**: A cross-platform framework for building robust, scalable distributed applications with virtual actors.
-- **[.NET Aspire](https://github.com/dotnet/aspire)**: An opinionated, cloud-ready stack for building observable, production-ready distributed applications.
+-   **[Wolverine](https://wolverinefx.io/)**: Next-generation message bus and CQRS framework for .NET, providing elegant command/query handling and message processing capabilities.
+-   **[Mapperly](https://github.com/riok/mapperly)**: A .NET source generator for generating object mappings at compile-time, offering zero-overhead and type-safe mapping.
+-   **[Microsoft Orleans](https://dotnet.github.io/orleans/)**: A cross-platform framework for building robust, scalable distributed applications with virtual actors.
+-   **[.NET Aspire](https://github.com/dotnet/aspire)**: An opinionated, cloud-ready stack for building observable, production-ready distributed applications.
 
 ### Data & Messaging
 
-- **[Dapper](https://github.com/DapperLib/Dapper)**: A simple object mapper for .NET with high performance and minimal overhead.
-- **[linq2db](https://linq2db.github.io/)**: Fast, lightweight, and type-safe LINQ to SQL implementation for .NET.
-- **[FluentValidation](https://fluentvalidation.net/)**: A popular .NET library for building strongly-typed validation rules.
-- **[CloudNative CloudEvents](https://cloudevents.io/)**: A specification for describing event data in a common way with Kafka integration.
-- **[Npgsql](https://www.npgsql.org/)**: The .NET data provider for PostgreSQL.
-- **[Liquibase](https://www.liquibase.com/)**: Database schema change management and version control.
+-   **[Dapper](https://github.com/DapperLib/Dapper)**: A simple object mapper for .NET with high performance and minimal overhead.
+-   **[linq2db](https://linq2db.github.io/)**: Fast, lightweight, and type-safe LINQ to SQL implementation for .NET.
+-   **[FluentValidation](https://fluentvalidation.net/)**: A popular .NET library for building strongly-typed validation rules.
+-   **[CloudNative CloudEvents](https://cloudevents.io/)**: A specification for describing event data in a common way with Kafka integration.
+-   **[Npgsql](https://www.npgsql.org/)**: The .NET data provider for PostgreSQL.
+-   **[Liquibase](https://www.liquibase.com/)**: Database schema change management and version control.
 
 ### Testing & Quality
 
-- **[xUnit v3](https://xunit.net/)**: Modern, extensible testing framework for .NET applications.
-- **[Shouldly](https://docs.shouldly.org/)**: Testing framework that focuses on giving great error messages when assertions fail.
-- **[Testcontainers](https://dotnet.testcontainers.org/)**: A library to support tests with throwaway instances of Docker containers.
-- **[NSubstitute](https://nsubstitute.github.io/)**: A friendly substitute for .NET mocking libraries.
-- **[NetArchTest](https://github.com/BenMorris/NetArchTest)**: A fluent API for .NET that can enforce architectural rules in unit tests.
+-   **[xUnit v3](https://xunit.net/)**: Modern, extensible testing framework for .NET applications.
+-   **[Shouldly](https://docs.shouldly.org/)**: Testing framework that focuses on giving great error messages when assertions fail.
+-   **[Testcontainers](https://dotnet.testcontainers.org/)**: A library to support tests with throwaway instances of Docker containers.
+-   **[NSubstitute](https://nsubstitute.github.io/)**: A friendly substitute for .NET mocking libraries.
+-   **[NetArchTest](https://github.com/BenMorris/NetArchTest)**: A fluent API for .NET that can enforce architectural rules in unit tests.
 
 ### Observability & Infrastructure
 
-- **[OpenTelemetry](https://opentelemetry.io/)**: A collection of tools, APIs, and SDKs for instrumenting, generating, collecting, and exporting telemetry data.
-- **[Serilog](https://serilog.net/)**: Diagnostic logging library for .NET applications with rich structured event data.
-- **[Scalar](https://github.com/scalar/scalar)**: Modern API documentation with interactive OpenAPI/Swagger support.
-- **[gRPC](https://grpc.io/)**: A high-performance, open source universal RPC framework.
-- **[Orleans Dashboard](https://github.com/OrleansContrib/OrleansDashboard)**: Web-based monitoring dashboard for Microsoft Orleans applications.
+-   **[OpenTelemetry](https://opentelemetry.io/)**: A collection of tools, APIs, and SDKs for instrumenting, generating, collecting, and exporting telemetry data.
+-   **[Serilog](https://serilog.net/)**: Diagnostic logging library for .NET applications with rich structured event data.
+-   **[Scalar](https://github.com/scalar/scalar)**: Modern API documentation with interactive OpenAPI/Swagger support.
+-   **[gRPC](https://grpc.io/)**: A high-performance, open source universal RPC framework.
+-   **[Orleans Dashboard](https://github.com/OrleansContrib/OrleansDashboard)**: Web-based monitoring dashboard for Microsoft Orleans applications.
 
 ### Code Generation & Utilities
 
-- **[OneOf](https://github.com/mcintyre321/OneOf)**: Discriminated unions for C# with exhaustive matching.
-- **[Spectre.Console](https://spectreconsole.net/)**: A .NET library that makes it easier to create beautiful console applications.
-- **[Fluid](https://github.com/sebastienros/fluid)**: High-performance, secure Liquid templating language for .NET.
+-   **[OneOf](https://github.com/mcintyre321/OneOf)**: Discriminated unions for C# with exhaustive matching.
+-   **[Spectre.Console](https://spectreconsole.net/)**: A .NET library that makes it easier to create beautiful console applications.
+-   **[Fluid](https://github.com/sebastienros/fluid)**: High-performance, secure Liquid templating language for .NET.
 
 Each of these libraries may be licensed differently, so we recommend you review their licenses if you plan to use Momentum in your own projects.
 

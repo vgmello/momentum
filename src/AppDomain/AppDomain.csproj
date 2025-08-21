@@ -13,7 +13,8 @@
         <PackageReference Include="Npgsql"/>
         <!--#endif -->
         <!--#if (INCLUDE_ORLEANS) -->
-        <PackageReference Include="Microsoft.Orleans.Core.Abstractions" />
+        <PackageReference Include="Microsoft.Orleans.Client"/>
+        <PackageReference Include="Microsoft.Orleans.Core.Abstractions"/>
         <!--#endif -->
         <PackageReference Include="Riok.Mapperly"/>
         <PackageReference Include="linq2db.AspNet"/>

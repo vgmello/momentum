@@ -50,32 +50,16 @@ Commands represent work orders sent to departments. They follow a simple, consis
 <pre v-pre class="language-csharp"><code>
 public static partial class CreateCashierCommandHandler
 {
-    [DbCommand(sp: "app_domain.cashiers_create", nonQuery: true)]
-    public partial record DbCommand(Guid CashierId, string Name, string? Email) : ICommand&lt;int&gt;;
+    public record DbCommand(Data.Entities.Cashier Cashier) : ICommand&lt;Data.Entities.Cashier&gt;;
 
     public static async Task&lt;(Result&lt;CashierModel&gt;, CashierCreated?)&gt; Handle(CreateCashierCommand command, IMessageBus messaging,
         CancellationToken cancellationToken)
     {
-        if (command.Name.Contains("error"))
-        {
-            throw new DivideByZeroException("Forced test unhandled exception to simulate error scenarios");
-        }
+        var dbCommand = CreateInsertCommand(command);
+        var inserted = await messaging.InvokeCommandAsync(dbCommand, cancellationToken);
 
-        var cashierId = Guid.CreateVersion7();
-
-        var insertCommand = new DbCommand(cashierId, command.Name, command.Email);
-
-        await messaging.InvokeCommandAsync(insertCommand, cancellationToken);
-
-        var result = new CashierModel
-        {
-            TenantId = command.TenantId,
-            CashierId = cashierId,
-            Name = command.Name,
-            Email = command.Email
-        };
-
-        var createdEvent = new CashierCreated(result.TenantId, PartitionKeyTest: 0, result);
+        var result = inserted.ToModel();
+        var createdEvent = new CashierCreated(result.TenantId, result);
 
         return (result, createdEvent);
     }
@@ -85,8 +69,7 @@ public static partial class CreateCashierCommandHandler
 ### Database Command
 
 <pre v-pre class="language-csharp"><code>
-[DbCommand(sp: "app_domain.cashiers_create", nonQuery: true)]
-public partial record DbCommand(Guid CashierId, string Name, string? Email) : ICommand&lt;int&gt;;
+public record DbCommand(Data.Entities.Cashier Cashier) : ICommand&lt;Data.Entities.Cashier&gt;;
 </code></pre>
 
 ## Query Pattern
@@ -232,18 +215,12 @@ public async Task&lt;ActionResult&lt;IEnumerable&lt;GetCashiersQuery.Result&gt;&
 
 ## Database Interaction
 
-Database operations use the `[DbCommand]` attribute for automatic code generation.
+Commands define nested records executed via the message bus, while queries can use the `[DbCommand]` attribute for source-generated handlers.
 
 ### Command Database Operations
 
 <pre v-pre class="language-csharp"><code>
-[DbCommand(sp: "app_domain.cashiers_create", nonQuery: true)]
-public partial record InsertCashierCommand(
-    Guid TenantId,
-    Guid CashierId,
-    string Name,
-    string Email
-) : ICommand&lt;int&gt;;
+public record InsertCashierCommand(Data.Entities.Cashier Cashier) : ICommand&lt;Data.Entities.Cashier&gt;;
 </code></pre>
 
 ### Query Database Operations
@@ -464,7 +441,7 @@ When implementing a new domain, follow this checklist:
 
 -   [ ] Create command record with validation
 -   [ ] Implement static handler method
--   [ ] Add database command with `[DbCommand]` attribute
+-   [ ] Add database command record for persistence
 -   [ ] Return Result&lt;T&gt; and integration event
 -   [ ] Add unit tests for handler logic
 
