@@ -102,6 +102,7 @@ jobs:
             --title "Momentum Libraries ${{ steps.prerelease-version.outputs.tag }} (Pre-release)" \
             --notes-file prerelease_notes.md \
             --prerelease \
+            --draft=false \
             --target main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -147,6 +148,7 @@ jobs:
           gh release create ${{ steps.release-version.outputs.tag }} \
             --title "Momentum Libraries ${{ steps.release-version.outputs.tag }}" \
             --notes-file release_notes.md \
+            --draft=false \
             --target main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
