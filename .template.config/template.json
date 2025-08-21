@@ -579,6 +579,35 @@
           }
         }
       ]
+    },
+    "**.csproj": {
+      "operations": [
+        {
+          "type": "conditional",
+          "configuration": {
+            "actionableIf": [
+              "<!--#if"
+            ],
+            "actionableElse": [
+              "#else",
+              "<!--#else"
+            ],
+            "actionableElseif": [
+              "#elseif",
+              "<!--#elseif",
+              "#elif",
+              "<!--#elif"
+            ],
+            "endif": [
+              "#endif",
+              "<!--#endif"
+            ],
+            "trim": "true",
+            "wholeLine": "true",
+            "evaluator": "C++"
+          }
+        }
+      ]
     }
   }
 }

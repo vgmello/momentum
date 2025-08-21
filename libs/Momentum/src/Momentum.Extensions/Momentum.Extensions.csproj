@@ -24,7 +24,7 @@
         <PackageReference Include="WolverineFx"/>
         <!--#if (libs == ext)
         <PackageReference Include="Momentum.Extensions.Abstractions"/>
-        #endif -->
+        #endif-->
     </ItemGroup>
 
     <!--#if (libs == none) -->

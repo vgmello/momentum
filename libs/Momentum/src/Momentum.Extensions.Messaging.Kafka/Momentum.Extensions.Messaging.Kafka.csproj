@@ -16,7 +16,7 @@
         <PackageReference Include="WolverineFx.Kafka"/>
         <!--#if (libs != defaults)
         <PackageReference Include="Momentum.ServiceDefaults"/>
-        #endif -->
+        #endif-->
     </ItemGroup>
 
     <!--#if (libs == defaults) -->

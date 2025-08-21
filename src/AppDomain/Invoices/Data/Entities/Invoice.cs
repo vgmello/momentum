@@ -3,7 +3,6 @@
 using LinqToDB.Mapping;
 //#if (INCLUDE_ORLEANS)
 using Orleans;
-
 //#endif
 
 namespace AppDomain.Invoices.Data.Entities;
