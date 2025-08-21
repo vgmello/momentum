@@ -43,139 +43,16 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Pack packages
-      id: pack
-      shell: bash
-      run: |
-        NUGET_OUTPUT_DIR="./_tmp_nuget_output"
-
-        echo "🔍 Debug information:"
-        echo "   Current directory: $(pwd)"
-        echo "   Target path: ${{ inputs.path }}"
-        echo "   Package version: ${{ inputs.package-version }}"
-        echo "   Configuration: ${{ inputs.config }}"
-        
-        # Validate path exists
-        if [ ! -f "${{ inputs.path }}" ] && [ ! -d "${{ inputs.path }}" ]; then
-          echo "❌ Target path '${{ inputs.path }}' does not exist"
-          echo "   Working directory contents:"
-          ls -la
-          exit 1
-        fi
-
-        echo "🧹 Cleaning output directory: $NUGET_OUTPUT_DIR"
-        rm -rf "$NUGET_OUTPUT_DIR"
-        mkdir -p "$NUGET_OUTPUT_DIR"
-
-        echo "📦 Packing packages with version ${{ inputs.package-version }}..."
-
-        dotnet pack "${{ inputs.path }}" \
-          --configuration ${{ inputs.config }} \
-          --no-build \
-          -p:PackageVersion=${{ inputs.package-version }} \
-          --output "$NUGET_OUTPUT_DIR" \
-          ${{ inputs.pack-args }}
-
-        if [ $? -ne 0 ]; then
-          echo "❌ Package creation failed"
-          exit 1
-        fi
-
-        echo "✅ Packages created successfully in $NUGET_OUTPUT_DIR"
-        echo "output_dir=$NUGET_OUTPUT_DIR" >> $GITHUB_OUTPUT
-
-    - name: Find packages
-      id: find-packages
-      shell: bash
-      run: |
-        NUGET_OUTPUT_DIR="./_tmp_nuget_output"
-
-        echo "🔍 Finding NuGet packages in '$NUGET_OUTPUT_DIR'..."
-
-        PACKAGES=$(ls -1 "$NUGET_OUTPUT_DIR"/*.nupkg 2>/dev/null | sort)
-
-        if [ -z "$PACKAGES" ]; then
-          echo "❌ No packages found to publish in $NUGET_OUTPUT_DIR"
-          echo "Directory contents:"
-          ls -la "$NUGET_OUTPUT_DIR"
-          exit 1
-        fi
-
-        echo "Found packages:"
-        for pkg in $PACKAGES; do
-          echo "  - $(basename $pkg)"
-        done
-
-        echo "packages<<EOF" >> $GITHUB_OUTPUT
-        echo "$PACKAGES" >> $GITHUB_OUTPUT
-        echo "EOF" >> $GITHUB_OUTPUT
-
-    - name: Publish to NuGet
+    - name: Publish NuGet packages
       id: publish
-      if: inputs.dry-run != 'true'
-      shell: bash
+      shell: pwsh
       run: |
-        SOURCE_NAME=""
-        if [[ "${{ inputs.nuget-source }}" == *"nugettest.org"* ]]; then
-          SOURCE_NAME="NuGet Test"
-        else
-          SOURCE_NAME="NuGet.org"
-        fi
-
-        echo "🚀 Publishing packages to $SOURCE_NAME..."
-        echo "   Source: ${{ inputs.nuget-source }}"
-
-        PACKAGES="${{ steps.find-packages.outputs.packages }}"
-        PUBLISHED_LIST=""
-        SUCCESS_COUNT=0
-        TOTAL_COUNT=0
-
-        for package in $PACKAGES; do
-          TOTAL_COUNT=$((TOTAL_COUNT + 1))
-          PKG_NAME=$(basename "$package")
-          echo ""
-          echo "[$TOTAL_COUNT] Publishing $PKG_NAME..."
-
-          SKIP_FLAG=""
-          if [ "${{ inputs.skip-duplicate }}" == "true" ]; then
-            SKIP_FLAG="--skip-duplicate"
-          fi
-
-          dotnet nuget push "$package" \
-            --api-key ${{ inputs.nuget-api-key }} \
-            --source ${{ inputs.nuget-source }} \
-            --no-symbols \
-            $SKIP_FLAG
-
-          RESULT=$?
-          if [ $RESULT -eq 0 ]; then
-            echo "   ✅ Successfully published $PKG_NAME"
-            PUBLISHED_LIST="$PUBLISHED_LIST$PKG_NAME\n"
-            SUCCESS_COUNT=$((SUCCESS_COUNT + 1))
-          elif [ $RESULT -eq 1 ] && [ "${{ inputs.skip-duplicate }}" == "true" ]; then
-            # Check if error was due to duplicate
-            echo "   ⏭️ Skipped $PKG_NAME (may already exist)"
-            SUCCESS_COUNT=$((SUCCESS_COUNT + 1))
-          else
-            echo "   ❌ Failed to publish $PKG_NAME"
-            exit 1
-          fi
-        done
-
-        echo ""
-        echo "🎉 Published $SUCCESS_COUNT/$TOTAL_COUNT packages to $SOURCE_NAME!"
-        echo "packages<<EOF" >> $GITHUB_OUTPUT
-        echo -e "$PUBLISHED_LIST" >> $GITHUB_OUTPUT
-        echo "EOF" >> $GITHUB_OUTPUT
-
-    - name: Dry run summary
-      if: inputs.dry-run == 'true'
-      shell: bash
-      run: |
-        echo "🔍 DRY RUN - The following packages would be published:"
-        PACKAGES="${{ steps.find-packages.outputs.packages }}"
-        for package in $PACKAGES; do
-          echo "  - $(basename $package)"
-        done
-        echo ""
-        echo "Target: ${{ inputs.nuget-source }}"
+        & "$GITHUB_WORKSPACE/.github/scripts/Publish-NuGetPackages.ps1" `
+          -Path "${{ inputs.path }}" `
+          -Config "${{ inputs.config }}" `
+          -PackageVersion "${{ inputs.package-version }}" `
+          -PackArgs "${{ inputs.pack-args }}" `
+          -NugetApiKey "${{ inputs.nuget-api-key }}" `
+          -NugetSource "${{ inputs.nuget-source }}" `
+          -SkipDuplicate "${{ inputs.skip-duplicate }}" `
+          -DryRun "${{ inputs.dry-run }}"

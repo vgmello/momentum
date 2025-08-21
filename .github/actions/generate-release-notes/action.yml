@@ -26,92 +26,10 @@ runs:
   using: 'composite'
   steps:
     - name: Generate release notes
-      shell: bash
+      shell: pwsh
       run: |
-        VERSION="${{ inputs.version }}"
-        TAG="${{ inputs.tag }}"
-        RELEASE_TYPE="${{ inputs.release-type }}"
-        OUTPUT_FILE="${{ inputs.output-file }}"
-
-        # Auto-detect project type from tag pattern
-        if [[ "$TAG" =~ ^template-v ]]; then
-          PROJECT_TYPE="template"
-          TAG_PATTERN="template-v*"
-          PROJECT_NAME="Momentum Template"
-        else
-          PROJECT_TYPE="libraries"
-          TAG_PATTERN="v*"
-          PROJECT_NAME="Momentum Libraries"
-        fi
-
-        echo "🔍 Auto-detected project type: $PROJECT_TYPE (from tag: $TAG)"
-
-        # Find the last release tag (exclude current tag if it exists)
-        set +o pipefail  # Allow grep to fail if no matches
-        LAST_RELEASE=$(git tag -l "${TAG_PATTERN}" --sort=-v:refname | grep -v "^${TAG}$" | head -1)
-        set -o pipefail
-
-        # Get commit information
-        if [ -n "$LAST_RELEASE" ]; then
-          COMMITS=$(git log --pretty=format:"- %s (%an)" ${LAST_RELEASE}..HEAD --no-merges | grep -v "skip ci" | head -20 || echo "No commits found")
-          COMMIT_COUNT=$(git rev-list --count ${LAST_RELEASE}..HEAD --no-merges)
-          FILES_CHANGED=$(git diff --name-only ${LAST_RELEASE}..HEAD | wc -l)
-        else
-          COMMITS=$(git log --pretty=format:"- %s (%an)" --no-merges | grep -v "skip ci" | head -20 || echo "No commits found")
-          COMMIT_COUNT=$(git rev-list --count HEAD --no-merges)
-          FILES_CHANGED="N/A"
-        fi
-
-        if [ "$RELEASE_TYPE" == "prerelease" ]; then
-          cat > "$OUTPUT_FILE" << EOF
-        # ${PROJECT_NAME} ${VERSION}
-
-        🚧 **Pre-release Version**
-
-        ## What's Changed
-
-        ${COMMITS}
-
-        **Full Changelog**: ${LAST_RELEASE:-beginning}...${TAG}
-
-        ---
-        📊 **Statistics**: ${COMMIT_COUNT} commits | ${FILES_CHANGED} files changed
-        EOF
-        else
-          cat > "$OUTPUT_FILE" << EOF
-        # ${PROJECT_NAME} v${VERSION}
-        EOF
-
-          # Add package list for libraries
-          if [ "$PROJECT_TYPE" == "libraries" ]; then
-            cat >> "$OUTPUT_FILE" << EOF
-
-        ## Packages Published
-
-        - Momentum.Extensions
-        - Momentum.ServiceDefaults
-        - Momentum.Extensions.SourceGenerators
-        - Momentum.Extensions.EventMarkdownGenerator
-        - Momentum.ServiceDefaults.Api
-        - Momentum.Extensions.Abstractions
-        - Momentum.Extensions.Messaging.Kafka
-        - Momentum.Extensions.XmlDocs
-        EOF
-          fi
-
-          cat >> "$OUTPUT_FILE" << EOF
-
-        ## What's Changed
-
-        ${COMMITS}
-
-        **Full Changelog**: ${LAST_RELEASE:-beginning}...${TAG}
-
-        ---
-        📊 **Statistics**: ${COMMIT_COUNT} commits | ${FILES_CHANGED} files changed
-        EOF
-        fi
-
-        echo "📝 Generated ${PROJECT_TYPE} release notes in $OUTPUT_FILE"
-        echo "Contents:"
-        cat "$OUTPUT_FILE"
+        & "$GITHUB_WORKSPACE/.github/scripts/Generate-ReleaseNotes.ps1" `
+          -Version "${{ inputs.version }}" `
+          -Tag "${{ inputs.tag }}" `
+          -ReleaseType "${{ inputs.release-type }}" `
+          -OutputFile "${{ inputs.output-file }}"
