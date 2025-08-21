@@ -17,7 +17,7 @@
     </Target>
 
     <Target Name="PushToLocalFeed" AfterTargets="Pack" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' and '$(SolutionDir)' != '*Undefined*' ">
-        <MakeDir Directories="$(MSBuildThisFileDirectory).local/nuget"/>
+        <MakeDir Directories="$(MSBuildThisFileDirectory).local/nuget" Condition="!Exists('$(MSBuildThisFileDirectory).local/nuget')"/>
         <Exec Command="dotnet nuget push &quot;$(PackageOutputPath)$(PackageId).$(PackageVersion).nupkg&quot; --source &quot;$(MSBuildThisFileDirectory).local/nuget&quot;"/>
     </Target>
 </Project>

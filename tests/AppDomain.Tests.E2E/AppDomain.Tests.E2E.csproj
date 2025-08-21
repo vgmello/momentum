@@ -23,13 +23,17 @@
     <ItemGroup>
         <None Include="appsettings.json" CopyToOutputDirectory="PreserveNewest"/>
         <None Include="appsettings.*.json" CopyToOutputDirectory="PreserveNewest"/>
-        <None Include="OpenApi\app-domain-api.json"/>
+        <None Include="OpenApi/app-domain-api.json"/>
+        <Compile Remove="OpenApi/Generated/**/*.cs" />
     </ItemGroup>
 
-    <Target Name="NSwag" BeforeTargets="CoreCompile">
-        <Message Text="Generating OpenApiClient" Importance="high"/>
+    <Target Name="GenerateOpenApiClient" BeforeTargets="CoreCompile">
+        <Message Text="Generating OpenApiClient from OpenApi/app-domain-api.json" Importance="high"/>
         <MakeDir Directories="OpenApi/Generated" Condition="!Exists('OpenApi/Generated')"/>
         <Exec Command="$(NSwagExe_Net90) openapi2csclient /input:OpenApi/app-domain-api.json /classname:AppDomainApiClient /namespace:AppDomain.Tests.E2E.OpenApi.Generated /output:OpenApi/Generated/AppDomainApiClient.cs /generateResponseClasses:true /generateJsonMethods:true /useHttpClientCreationMethod:true"/>
+        <ItemGroup>
+            <Compile Include="OpenApi/Generated/AppDomainApiClient.cs" />
+        </ItemGroup>
     </Target>
 
 </Project>
