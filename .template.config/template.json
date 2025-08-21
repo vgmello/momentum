@@ -24,6 +24,7 @@
     "1358a541-294a-491c-a8c3-46ac380e4c69"
   ],
   "symbols": {
+    // Component Parameters
     "aspire": {
       "type": "parameter",
       "datatype": "bool",
@@ -40,20 +41,21 @@
       "type": "parameter",
       "datatype": "bool",
       "description": "Generate BackOffice project (background event processing) (Default)",
-      "replaces": "__BACK-OFFICE__"
+      "replaces": "__BACK_OFFICE__"
     },
     "docs": {
       "type": "parameter",
       "datatype": "bool",
       "description": "Generates documentation project (Default)",
-      "replaces": "__docs__"
+      "replaces": "__DOCS__"
     },
     "orleans": {
       "type": "parameter",
       "datatype": "bool",
       "description": "Generate Orleans-based BackOffice project (stateful processing)",
-      "replaces": "__orleans__"
+      "replaces": "__ORLEANS__"
     },
+    // Configuration Parameters
     "db-config": {
       "type": "parameter",
       "datatype": "choice",
@@ -78,14 +80,14 @@
           "description": "PostgreSQL & Liquibase"
         }
       ],
-      "replaces": "__db-config__"
+      "replaces": "__DB_CONFIG__"
     },
     "kafka": {
       "type": "parameter",
       "datatype": "bool",
       "description": "Use Apache Kafka",
       "defaultValue": "true",
-      "replaces": "__kafka__"
+      "replaces": "__KAFKA__"
     },
     "port": {
       "type": "parameter",
@@ -97,20 +99,22 @@
     "org": {
       "type": "parameter",
       "description": "Organization / Team name",
-      "replaces": "__org__"
+      "replaces": "__ORG__"
     },
+    // Content Parameters
     "no-sample": {
       "type": "parameter",
       "datatype": "bool",
       "description": "Skip generating sample code",
-      "replaces": "__no-sample__"
+      "replaces": "__NO_SAMPLE__"
     },
     "project-only": {
       "type": "parameter",
       "datatype": "bool",
       "description": "Only generate the project and its respective files. (no Solution, .gitignore, etc)",
-      "replaces": "__project-only__"
+      "replaces": "__PROJECT_ONLY__"
     },
+    // Library Parameters
     "libs": {
       "type": "parameter",
       "datatype": "choice",
@@ -143,7 +147,7 @@
           "description": "Include Momentum.Extensions.SourceGenerators as project reference"
         }
       ],
-      "replaces": "__libs__"
+      "replaces": "__LIBS__"
     },
     "lib-name": {
       "type": "parameter",
@@ -158,23 +162,17 @@
       "datatype": "string",
       "description": "Momentum lib version",
       "defaultValue": "0.0.1",
-      "replaces": "__TemplateMomentumVersion__"
+      "replaces": "__TEMPLATE_MOMENTUM_VERSION__"
     },
     "debug-symbols": {
       "type": "parameter",
       "datatype": "bool",
       "description": "Include Debug symbols for the template",
-      "replaces": "__debug-symbols__"
-    },
-    "all1": {
-      "type": "parameter",
-      "isEnabled": "(aspire)",
-      "datatype": "bool",
-      "replaces": "__all1__"
+      "replaces": "__DEBUG_SYMBOLS__"
     },
     "ALL": {
       "type": "computed",
-      "value": "!(aspire || web-api || back-office || docs) && !project-only"
+      "value": "!(aspire || api || back-office || docs) && !project-only"
     },
     "INCLUDE_ASPIRE": {
       "type": "computed",
@@ -182,11 +180,11 @@
     },
     "INCLUDE_API": {
       "type": "computed",
-      "value": "web-api || ALL"
+      "value": "api || ALL"
     },
     "INCLUDE_BACK_OFFICE": {
       "type": "computed",
-      "value": "(back-office || ALL)"
+      "value": "back-office || ALL"
     },
     "INCLUDE_DOCS": {
       "type": "computed",
@@ -202,11 +200,11 @@
     },
     "INCLUDE_LIBS": {
       "type": "computed",
-      "value": "libs != none"
+      "value": "libs != 'none'"
     },
     "HAS_BACKEND": {
       "type": "computed",
-      "value": "(INCLUDE_API || INCLUDE_BACK_OFFICE || INCLUDE_ORLEANS)"
+      "value": "INCLUDE_API || INCLUDE_BACK_OFFICE || INCLUDE_ORLEANS"
     },
     "AUTO_INCLUDE_DB": {
       "type": "computed",
@@ -214,11 +212,11 @@
     },
     "USE_PGSQL": {
       "type": "computed",
-      "value": "db-config == npgsql || (AUTO_INCLUDE_DB && db-config == default)"
+      "value": "db-config == 'npgsql' || (AUTO_INCLUDE_DB && db-config == 'default')"
     },
     "USE_LIQUIBASE": {
       "type": "computed",
-      "value": "db-config == liquibase || (AUTO_INCLUDE_DB && db-config == default)"
+      "value": "db-config == 'liquibase' || (AUTO_INCLUDE_DB && db-config == 'default')"
     },
     "INCLUDE_INFRA_DB": {
       "type": "computed",
@@ -232,12 +230,7 @@
       "type": "computed",
       "value": "kafka && HAS_BACKEND"
     },
-    "IncludeLibs": {
-      "type": "derived",
-      "valueSource": "INCLUDE_LIBS",
-      "valueTransform": "kebab-case",
-      "replaces": "__INCLUDE_LIBS__"
-    },
+    // Generated Symbols
     "DefaultOrgName": {
       "type": "generated",
       "generator": "join",
@@ -261,33 +254,33 @@
         "sourceVariableName": "org",
         "fallbackVariableName": "DefaultOrgName"
       },
-      "replaces": "__ORG_NAME__"
+      "replaces": "OrgName"
     },
     "OrgNameKebab": {
       "type": "derived",
       "valueSource": "OrgName",
       "valueTransform": "kebab-case",
-      "replaces": "__org-name__"
+      "replaces": "org-name"
     },
     "AppDomainSnakeCase": {
       "type": "derived",
       "valueSource": "name",
       "valueTransform": "snake_case",
-      "replaces": "__app_domain__",
+      "replaces": "app_domain",
       "fileRename": "app_domain"
     },
     "AppDomainKebab": {
       "type": "derived",
       "valueSource": "name",
       "valueTransform": "kebab-case",
-      "replaces": "__app-domain__",
+      "replaces": "app-domain",
       "fileRename": "app-domain"
     },
-    "appDomainCamelCase": {
+    "AppDomainCamelCase": {
       "type": "derived",
       "valueSource": "name",
       "valueTransform": "camelCase",
-      "replaces": "__appDomain__",
+      "replaces": "appDomain",
       "fileRename": "appDomain"
     }
   },
@@ -339,7 +332,7 @@
       ],
       "modifiers": [
         {
-          "condition": "(debug-symbols)",
+          "condition": "debug-symbols",
           "include": [
             "debug.symbols.txt"
           ]
@@ -448,32 +441,32 @@
           ]
         },
         {
-          "condition": "libs != defaults",
+          "condition": "libs != 'defaults'",
           "exclude": [
             "libs/Momentum/src/Momentum.ServiceDefaults/**/*"
           ]
         },
         {
-          "condition": "libs != api",
+          "condition": "libs != 'api'",
           "exclude": [
             "libs/Momentum/src/Momentum.ServiceDefaults.Api/**/*",
             "libs/Momentum/src/Momentum.Extensions.XmlDocs/**/*"
           ]
         },
         {
-          "condition": "libs != ext",
+          "condition": "libs != 'ext'",
           "exclude": [
             "libs/Momentum/src/Momentum.Extensions/**/*"
           ]
         },
         {
-          "condition": "libs != generators",
+          "condition": "libs != 'generators'",
           "exclude": [
             "libs/Momentum/src/Momentum.Extensions.SourceGenerators/**/*"
           ]
         },
         {
-          "condition": "libs != kafka",
+          "condition": "libs != 'kafka'",
           "exclude": [
             "libs/Momentum/src/Momentum.Extensions.Messaging.Kafka/**/*"
           ]

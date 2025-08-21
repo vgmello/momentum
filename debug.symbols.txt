@@ -1,16 +1,133 @@
-aspire=__aspire__
-api=__api__
-back-office=__back-office__
-docs=__docs__
-orleans=__orleans__
-db-config=__db-config__
-kafka=__kafka__
+# Debug Symbols for Momentum Template
+# This file contains all variable replacements and symbols used in the template
+
+## Component Parameters
+aspire=__ASPIRE__
+api=__API__
+back-office=__BACK_OFFICE__
+docs=__DOCS__
+orleans=__ORLEANS__
+
+## Configuration Parameters
+db-config=__DB_CONFIG__
+kafka=__KAFKA__
 port=__SERVICE_BASE_PORT__
-org=__org__
-no-sample=__no-sample__
-project-only=__project-only__
-libs=__libs__
+org=__ORG__
+
+## Content Parameters
+no-sample=__NO_SAMPLE__
+project-only=__PROJECT_ONLY__
+
+## Library Parameters
+libs=__LIBS__
 lib-name=__LIB_NAME__
-mmt-version=__TemplateMomentumVersion__
-all=__all1__
-debug-symbols=__debug-symbols__
+mmt-version=__TEMPLATE_MOMENTUM_VERSION__
+debug-symbols=__DEBUG_SYMBOLS__
+
+## Generated Symbols
+DefaultOrgName -> Generated join of name + " Team"
+OrgName=OrgName -> Coalesced organization name from org parameter or DefaultOrgName
+OrgNameKebab=org-name -> Organization name in kebab-case
+AppDomainSnakeCase=app_domain -> Project name in snake_case (fileRename: app_domain)
+AppDomainKebab=app-domain -> Project name in kebab-case (fileRename: app-domain)
+AppDomainCamelCase=appDomain -> Project name in camelCase (fileRename: appDomain)
+
+## Computed Symbols (Boolean Logic)
+//#if (ALL)
+ALL=TRUE
+//#else
+ALL=FALSE
+//#endif
+
+//#if (INCLUDE_ASPIRE)
+INCLUDE_ASPIRE=TRUE -> aspire || ALL
+//#else
+INCLUDE_ASPIRE=FALSE -> aspire || ALL
+//#endif
+
+//#if (INCLUDE_API)
+INCLUDE_API=TRUE -> web-api || ALL
+//#else
+INCLUDE_API=FALSE -> web-api || ALL
+//#endif
+
+//#if (INCLUDE_BACK_OFFICE)
+INCLUDE_BACK_OFFICE=TRUE -> back-office || ALL
+//#else
+INCLUDE_BACK_OFFICE=FALSE -> back-office || ALL
+//#endif
+
+//#if (INCLUDE_DOCS)
+INCLUDE_DOCS=TRUE -> docs || ALL
+//#else
+INCLUDE_DOCS=FALSE -> docs || ALL
+//#endif
+
+//#if (INCLUDE_ORLEANS)
+INCLUDE_ORLEANS=TRUE -> orleans
+//#else
+INCLUDE_ORLEANS=FALSE -> orleans
+//#endif
+
+//#if (INCLUDE_SAMPLE)
+INCLUDE_SAMPLE=TRUE -> !no-sample
+//#else
+INCLUDE_SAMPLE=FALSE -> !no-sample
+//#endif
+
+//#if (INCLUDE_LIBS)
+INCLUDE_LIBS=TRUE -> libs != none
+//#else
+INCLUDE_LIBS=FALSE -> libs != none
+//#endif
+
+//#if (HAS_BACKEND)
+HAS_BACKEND=TRUE -> INCLUDE_API || INCLUDE_BACK_OFFICE || INCLUDE_ORLEANS
+//#else
+HAS_BACKEND=FALSE -> INCLUDE_API || INCLUDE_BACK_OFFICE || INCLUDE_ORLEANS
+//#endif
+
+//#if (AUTO_INCLUDE_DB)
+AUTO_INCLUDE_DB=TRUE -> ALL || HAS_BACKEND
+//#else
+AUTO_INCLUDE_DB=FALSE -> ALL || HAS_BACKEND
+//#endif
+
+//#if (USE_PGSQL)
+USE_PGSQL=TRUE -> db-config == npgsql || (AUTO_INCLUDE_DB && db-config == default)
+//#else
+USE_PGSQL=FALSE -> db-config == npgsql || (AUTO_INCLUDE_DB && db-config == default)
+//#endif
+
+//#if (USE_LIQUIBASE)
+USE_LIQUIBASE=TRUE -> db-config == liquibase || (AUTO_INCLUDE_DB && db-config == default)
+//#else
+USE_LIQUIBASE=FALSE -> db-config == liquibase || (AUTO_INCLUDE_DB && db-config == default)
+//#endif
+
+//#if (INCLUDE_INFRA_DB)
+INCLUDE_INFRA_DB=TRUE -> USE_LIQUIBASE
+//#else
+INCLUDE_INFRA_DB=FALSE -> USE_LIQUIBASE
+//#endif
+
+//#if (USE_DB)
+USE_DB=TRUE -> USE_PGSQL
+//#else
+USE_DB=FALSE -> USE_PGSQL
+//#endif
+
+//#if (USE_KAFKA)
+USE_KAFKA=TRUE -> kafka && HAS_BACKEND
+//#else
+USE_KAFKA=FALSE -> kafka && HAS_BACKEND
+//#endif
+
+## Source Name Replacements
+AppDomain -> sourceName (Project name replacement)
+
+## File Rename Patterns
+Momentum -> fileRename for lib-name parameter
+app_domain -> fileRename for AppDomainSnakeCase
+app-domain -> fileRename for AppDomainKebab
+appDomain -> fileRename for AppDomainCamelCase
