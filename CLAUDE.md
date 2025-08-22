@@ -400,6 +400,99 @@ When updating library project files in `libs/Momentum/src/`, follow this pattern
 -   ALWAYS test the documentation with 'pnpm docs:build' before you can assert the any documentation changes are working.
 -   Do not add /// <inheritdoc /> xmldocs comments anywhere
 
+## Template File Exclusion Best Practices
+
+### Core Principle
+Use **selective exclusion** in `template.json` rather than blanket exclusions to preserve generic, reusable infrastructure while removing only component-specific files.
+
+### Template.json Exclusion Patterns
+
+**❌ Wrong Approach - Blanket Exclusion:**
+```json
+{
+  "condition": "(!INCLUDE_API)",
+  "exclude": [
+    "tests/AppDomain.Tests/Integration/**/*"  // Removes everything, including generic helpers
+  ]
+}
+```
+
+**✅ Correct Approach - Selective Exclusion:**
+```json
+{
+  "condition": "(!INCLUDE_API)",
+  "exclude": [
+    "src/AppDomain.Api/**/*",
+    "tests/AppDomain.Tests/Integration/Cashiers/**/*",
+    "tests/AppDomain.Tests/Integration/Invoices/**/*"
+    // Preserves: IntegrationTestFixture.cs and _Internal/ folder
+  ]
+}
+```
+
+### When to Use Conditional Compilation vs Template Exclusion
+
+**Use Template Exclusion (`template.json`) for:**
+- Entire files that are component-specific
+- Folders containing only component-specific content
+- Files that shouldn't exist at all in certain configurations
+
+**Use Conditional Compilation (`#if INCLUDE_API`) for:**
+- Shared files that need to work in multiple configurations
+- Classes that have both generic and component-specific functionality
+- Infrastructure that adapts based on available components
+
+### Integration Testing Infrastructure Pattern
+
+**Always Preserve Generic Infrastructure:**
+- `_Internal/` folders with generic helpers (DatabaseContainerExtensions, ServiceCollectionExtensions, etc.)
+- Base test classes that can adapt to different configurations (IntegrationTestFixture)
+- Database migration containers and connection helpers (LiquibaseMigrationContainer)
+- Logging and service registration utilities (XUnitSink)
+
+**Selectively Exclude Component-Specific Tests:**
+- API endpoint integration tests (`Cashiers/`, `Invoices/`)
+- Component-specific gRPC service tests
+- WebApplicationFactory-dependent tests
+
+### IntegrationTestFixture Design Pattern
+
+**Key Features for Multi-Configuration Support:**
+```csharp
+#if INCLUDE_API
+public class IntegrationTestFixture : WebApplicationFactory<AppDomain.Api.Program>, IAsyncLifetime
+#else
+public class IntegrationTestFixture : IAsyncLifetime
+#endif
+{
+    // Generic properties available in all configurations
+    public string AppDomainDbConnectionString => _postgres.GetDbConnectionString("app_domain");
+    public string KafkaBootstrapAddress => _kafka.GetBootstrapAddress();
+    
+#if INCLUDE_API
+    public GrpcChannel GrpcChannel { get; private set; } = null!;
+#endif
+}
+```
+
+### Benefits of Selective Exclusion
+
+1. **Preserves Reusability**: Generic infrastructure remains available for database/messaging integration tests
+2. **Maintains Clean Source**: Minimal conditional compilation clutter
+3. **Enables Flexibility**: BackOffice-only projects can still write integration tests for their components
+4. **Centralized Control**: All exclusion logic lives in template.json, not scattered across source files
+5. **Better Developer Experience**: Generated projects contain exactly what they need, nothing more or less
+
+### Template Testing Verification Checklist
+
+When implementing selective exclusions:
+- ✅ Build succeeds with 0 errors/warnings
+- ✅ Tests pass without component dependencies
+- ✅ Generic infrastructure files remain present
+- ✅ Component-specific files are properly excluded
+- ✅ Conditional compilation works correctly
+- ✅ Generated projects can extend functionality (e.g., add custom integration tests)
+
 # Troubleshoot
 
 To debug the template generation use the flag `--verbosity diag` and --debug-symbols (which will generate a debug.symbols.txt file at the root of the destination template)

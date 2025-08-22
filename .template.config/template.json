@@ -407,6 +407,13 @@
           ]
         },
         {
+          "condition": "(project-only)",
+          "include": [
+            "Directory.Build.props",
+            "Directory.Packages.props"
+          ]
+        },
+        {
           "condition": "(!INCLUDE_ASPIRE)",
           "exclude": [
             "src/AppDomain.AppHost/**/*"
@@ -416,7 +423,9 @@
           "condition": "(!INCLUDE_API)",
           "exclude": [
             "src/AppDomain.Api/**/*",
-            "tests/AppDomain.Tests/Unit/Infrastructure/OrleansExtensionsTests.cs"
+            "tests/AppDomain.Tests/Unit/Infrastructure/OrleansExtensionsTests.cs",
+            "tests/AppDomain.Tests/Integration/Cashiers/**/*",
+            "tests/AppDomain.Tests/Integration/Invoices/**/*"
           ]
         },
         {
@@ -448,7 +457,7 @@
           ]
         },
         {
-          "condition": "(!HAS_BACKEND || project-only)",
+          "condition": "(!HAS_BACKEND && !project-only)",
           "exclude": [
             "src/AppDomain/**/*",
             "src/AppDomain.Contracts/**/*",

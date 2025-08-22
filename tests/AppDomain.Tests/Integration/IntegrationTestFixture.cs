@@ -5,10 +5,7 @@ using AppDomain.Tests.Integration._Internal.Containers;
 using AppDomain.Tests.Integration._Internal.Extensions;
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Networks;
-using Grpc.Net.Client;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Momentum.ServiceDefaults;
-using Momentum.ServiceDefaults.Api;
 using Momentum.ServiceDefaults.Messaging.Wolverine;
 using Serilog;
 using Serilog.Core;
@@ -16,18 +13,33 @@ using Serilog.Events;
 using System.Diagnostics.CodeAnalysis;
 using Testcontainers.Kafka;
 using Testcontainers.PostgreSql;
+#if INCLUDE_API
+using Grpc.Net.Client;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Momentum.ServiceDefaults.Api;
+#endif
 
 namespace AppDomain.Tests.Integration;
 
 [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
+#if INCLUDE_API
 public class IntegrationTestFixture : WebApplicationFactory<AppDomain.Api.Program>, IAsyncLifetime
+#else
+public class IntegrationTestFixture : IAsyncLifetime
+#endif
 {
     private readonly INetwork _containerNetwork = new NetworkBuilder().Build();
 
     private readonly PostgreSqlContainer _postgres;
     private readonly KafkaContainer _kafka;
 
+#if INCLUDE_API
     public GrpcChannel GrpcChannel { get; private set; } = null!;
+#endif
+
+    public string AppDomainDbConnectionString => _postgres.GetDbConnectionString("app_domain");
+    public string ServiceBusDbConnectionString => _postgres.GetDbConnectionString("service_bus");
+    public string KafkaBootstrapAddress => _kafka.GetBootstrapAddress();
 
     public ITestOutputHelper? TestOutput { get; set; }
 
@@ -55,20 +67,32 @@ public class IntegrationTestFixture : WebApplicationFactory<AppDomain.Api.Progra
         await using var liquibaseMigrationContainer = new LiquibaseMigrationContainer(_postgres.Name, _containerNetwork);
         await liquibaseMigrationContainer.StartAsync();
 
+#if INCLUDE_API
         GrpcChannel = GrpcChannel.ForAddress(Server.BaseAddress, new GrpcChannelOptions
         {
             HttpHandler = Server.CreateHandler()
         });
+#endif
     }
 
-    public new async ValueTask DisposeAsync()
+#if INCLUDE_API
+    public override async ValueTask DisposeAsync()
     {
         await base.DisposeAsync();
         await Task.WhenAll(_postgres.DisposeAsync().AsTask(), _kafka.DisposeAsync().AsTask());
         await _containerNetwork.DisposeAsync();
         await Log.CloseAndFlushAsync();
     }
+#else
+    public async ValueTask DisposeAsync()
+    {
+        await Task.WhenAll(_postgres.DisposeAsync().AsTask(), _kafka.DisposeAsync().AsTask());
+        await _containerNetwork.DisposeAsync();
+        await Log.CloseAndFlushAsync();
+    }
+#endif
 
+#if INCLUDE_API
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseSetting("ConnectionStrings:AppDomainDb", _postgres.GetDbConnectionString("app_domain"));
@@ -106,4 +130,5 @@ public class IntegrationTestFixture : WebApplicationFactory<AppDomain.Api.Progra
             .MinimumLevel.Override(nameof(Microsoft), LogEventLevel.Warning)
             .MinimumLevel.Override(logNamespace, LogEventLevel.Verbose)
             .CreateLogger();
+#endif
 }
