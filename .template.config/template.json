@@ -274,6 +274,26 @@
       "type": "computed",
       "value": "kafka && HAS_BACKEND"
     },
+    "LIBS_INCLUDES_DEFAULTS": {
+      "type": "computed",
+      "value": "libs == 'defaults'"
+    },
+    "LIBS_INCLUDES_API": {
+      "type": "computed",
+      "value": "libs == 'api'"
+    },
+    "LIBS_INCLUDES_EXT": {
+      "type": "computed",
+      "value": "libs == 'ext'"
+    },
+    "LIBS_INCLUDES_KAFKA": {
+      "type": "computed",
+      "value": "libs == 'kafka'"
+    },
+    "LIBS_INCLUDES_GENERATORS": {
+      "type": "computed",
+      "value": "libs == 'generators'"
+    },
     // Generated Symbols
     "DiagramArrow": {
       "type": "generated",
@@ -502,32 +522,32 @@
           ]
         },
         {
-          "condition": "!(libs == 'defaults')",
+          "condition": "(!LIBS_INCLUDES_DEFAULTS)",
           "exclude": [
             "libs/Momentum/src/Momentum.ServiceDefaults/**/*"
           ]
         },
         {
-          "condition": "!(libs == 'api')",
+          "condition": "(!LIBS_INCLUDES_API)",
           "exclude": [
             "libs/Momentum/src/Momentum.ServiceDefaults.Api/**/*",
             "libs/Momentum/src/Momentum.Extensions.XmlDocs/**/*"
           ]
         },
         {
-          "condition": "!(libs == 'ext')",
+          "condition": "(!LIBS_INCLUDES_EXT)",
           "exclude": [
             "libs/Momentum/src/Momentum.Extensions/**/*"
           ]
         },
         {
-          "condition": "!(libs == 'generators')",
+          "condition": "(!LIBS_INCLUDES_GENERATORS)",
           "exclude": [
             "libs/Momentum/src/Momentum.Extensions.SourceGenerators/**/*"
           ]
         },
         {
-          "condition": "!(libs == 'kafka')",
+          "condition": "(!LIBS_INCLUDES_KAFKA)",
           "exclude": [
             "libs/Momentum/src/Momentum.Extensions.Messaging.Kafka/**/*"
           ]

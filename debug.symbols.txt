@@ -75,6 +75,46 @@ INCLUDE_LIBS=TRUE -> !(libs == 'none')
 INCLUDE_LIBS=FALSE -> !(libs == 'none')
 //#endif
 
+## Individual Library Inclusion Conditions  
+# For allowMultipleValues choice parameters, == operator works like contains()
+
+//#if (LIBS_INCLUDES_DEFAULTS)
+LIBS_INCLUDES_DEFAULTS=TRUE -> libs == 'defaults'
+//#else
+LIBS_INCLUDES_DEFAULTS=FALSE -> libs == 'defaults'
+//#endif
+
+//#if (LIBS_INCLUDES_API)
+LIBS_INCLUDES_API=TRUE -> libs == 'api'
+//#else
+LIBS_INCLUDES_API=FALSE -> libs == 'api'
+//#endif
+
+//#if (LIBS_INCLUDES_EXT)
+LIBS_INCLUDES_EXT=TRUE -> libs == 'ext'
+//#else
+LIBS_INCLUDES_EXT=FALSE -> libs == 'ext'
+//#endif
+
+//#if (LIBS_INCLUDES_KAFKA)
+LIBS_INCLUDES_KAFKA=TRUE -> libs == 'kafka'
+//#else
+LIBS_INCLUDES_KAFKA=FALSE -> libs == 'kafka'
+//#endif
+
+//#if (LIBS_INCLUDES_GENERATORS)
+LIBS_INCLUDES_GENERATORS=TRUE -> libs == 'generators'
+//#else
+LIBS_INCLUDES_GENERATORS=FALSE -> libs == 'generators'
+//#endif
+
+## Library Exclusion Conditions (Used in template.json)
+Exclude ServiceDefaults: (!LIBS_INCLUDES_DEFAULTS)
+Exclude ServiceDefaults.Api: (!LIBS_INCLUDES_API)
+Exclude Extensions: (!LIBS_INCLUDES_EXT)
+Exclude Messaging.Kafka: (!LIBS_INCLUDES_KAFKA)
+Exclude SourceGenerators: (!LIBS_INCLUDES_GENERATORS)
+
 //#if (HAS_BACKEND)
 HAS_BACKEND=TRUE -> INCLUDE_API || INCLUDE_BACK_OFFICE || INCLUDE_ORLEANS
 //#else
