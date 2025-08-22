@@ -1,3 +1,4 @@
+<!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
 ---
@@ -14,13 +15,13 @@ editLink: false
 - **Status:** {{ event.Status }}
 - **Version:** {{ event.Version }}
 {% if event.Entity -%}
-    - **Entity:** `{{ event.Entity | downcase }}`
+- **Entity:** `{{ event.Entity | downcase }}`
 {% endif -%}
 - **Type:** {% if event.IsInternal %}Domain Event{% else %}Integration Event{% endif %}
 - **Topic:** `{{ event.TopicName }}`
 - **Estimated Payload Size:** {{ event.TotalEstimatedSizeBytes }} bytes{% if event.HasInaccurateEstimates %} ⚠️ *Contains dynamic properties*{% endif %}
 {% if event.PartitionKeys.size > 0 -%}
-    - **Partition Keys**: {{ event.PartitionKeys | map: "Name" | join: ", " }}
+- **Partition Keys**: {{ event.PartitionKeys | map: "Name" | join: ", " }}
 {% endif -%}
 
 ## Description
@@ -28,13 +29,13 @@ editLink: false
 {{ event.Description }}
 
 {% if event.Remarks -%}
-    {{ event.Remarks }}
+{{ event.Remarks }}
 {% endif -%}
 
 {% if event.Example -%}
-    ### Example
+### Example
 
-    {{ event.Example }}
+{{ event.Example }}
 {% endif -%}
 
 ## Event Payload
@@ -48,14 +49,15 @@ editLink: false
 {% if event.PartitionKeys.size > 0 -%}
 ### Partition Keys
 
-    {% if event.PartitionKeys.size == 1 -%}
+{% if event.PartitionKeys.size == 1 -%}
 This event uses a partition key for message routing:
-    {% else -%}
+{% else -%}
 This event uses multiple partition keys for message routing:
-    {% endif -%}
+{% endif -%}
     {% for partitionKey in event.PartitionKeys -%}
-- `{{ partitionKey.Name }}`{% if partitionKey.Description %} - {{ partitionKey.Description }}{% endif %}
+    - `{{ partitionKey.Name }}`{% if partitionKey.Description %} - {{ partitionKey.Description }}{% endif %}
     {% endfor -%}
+
 {% endif -%}
 
 {% assign complexTypes = event.Properties | where: "IsComplexType", true | where: "IsCollectionType", false -%}
@@ -65,21 +67,21 @@ This event uses multiple partition keys for message routing:
 {% if allComplexTypes.size > 0 %}
 ### Reference Schemas
 
-    {% for property in complexTypes -%}
-        {% assign typeName = property.TypeName -%}
+{% for property in complexTypes -%}
+{% assign typeName = property.TypeName -%}
 #### {{ typeName }}
 
 <!--@include: @/events/schemas/{{ property.SchemaPath }}#schema-->
 
-    {% endfor -%}
+{% endfor -%}
 
-    {% for property in collectionComplexTypes -%}
-        {% assign elementTypeName = property.ElementTypeName | default: property.TypeName -%}
+{% for property in collectionComplexTypes -%}
+{% assign elementTypeName = property.ElementTypeName | default: property.TypeName -%}
 #### {{ elementTypeName }}s
 
 <!--@include: @/events/schemas/{{ property.ElementSchemaPath | default: property.SchemaPath }}#schema-->
 
-    {% endfor -%}
+{% endfor -%}
 {% endif -%}
 
 ## Technical Details

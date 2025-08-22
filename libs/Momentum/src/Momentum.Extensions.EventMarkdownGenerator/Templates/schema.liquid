@@ -1,3 +1,4 @@
+<!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
 ---
@@ -26,15 +27,15 @@ editLink: false
 {% if referencedSchemas.size > 0 -%}
 ### Reference Schemas
 
-    {% for property in referencedSchemas -%}
-        {% if property.isCollectionType -%}
-            {% assign elementType = property.typeName | replace: 'List<', '' | replace: '>', '' -%}
+{% for property in referencedSchemas -%}
+{% if property.isCollectionType -%}
+{% assign elementType = property.typeName | replace: 'List<', '' | replace: '>', '' -%}
 #### {{ elementType }}
-        {% else -%}
+{% else -%}
 #### {{ property.typeName }}
-        {% endif -%}
+{% endif -%}
 
 <!--@include: @/events/schemas/{{ property.schemaPath }}#schema-->
 
-    {% endfor -%}
+{% endfor -%}
 {% endif -%}
