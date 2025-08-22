@@ -24,7 +24,7 @@
         <!--#if (libs == 'api')
         <PackageReference Include="Momentum.Extensions.XmlDocs"/>
         #endif -->
-        <!--#if (libs != 'defaults')
+        <!--#if (!(libs == 'defaults'))
         <PackageReference Include="Momentum.ServiceDefaults"/>
         #endif -->
     </ItemGroup>

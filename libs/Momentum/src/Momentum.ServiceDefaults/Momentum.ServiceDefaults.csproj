@@ -47,7 +47,7 @@
         <PackageReference Include="Serilog.Sinks.OpenTelemetry"/>
         <PackageReference Include="WolverineFx"/>
         <PackageReference Include="WolverineFx.Postgresql"/>
-        <!--#if (libs != 'ext')
+        <!--#if (!(libs == 'ext'))
         <PackageReference Include="Momentum.Extensions"/>
         #endif -->
     </ItemGroup>

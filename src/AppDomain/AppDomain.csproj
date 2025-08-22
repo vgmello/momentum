@@ -33,10 +33,10 @@
     <ItemGroup>
         #endif -->
         <PackageReference Include="Momentum.Extensions.Abstractions"/>
-        <!--#if (libs != 'ext') -->
+        <!--#if (!(libs == 'ext')) -->
         <PackageReference Include="Momentum.Extensions"/>
         <!--#endif -->
-        <!--#if (libs != 'generators') -->
+        <!--#if (!(libs == 'generators')) -->
         <PackageReference Include="Momentum.Extensions.SourceGenerators"/>
         <!--#endif -->
     </ItemGroup>

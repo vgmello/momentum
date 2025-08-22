@@ -209,7 +209,7 @@
       "type": "parameter",
       "datatype": "string",
       "description": "Momentum lib version",
-      "defaultValue": "0.0.1",
+      "defaultValue": "0.0.1-pre.14",
       "replaces": "__TEMPLATE_MOMENTUM_VERSION__"
     },
     "debug-symbols": {
@@ -244,7 +244,7 @@
     },
     "INCLUDE_LIBS": {
       "type": "computed",
-      "value": "libs != 'none'"
+      "value": "!(libs == 'none')"
     },
     "HAS_BACKEND": {
       "type": "computed",
@@ -512,13 +512,13 @@
           ]
         },
         {
-          "condition": "libs != 'generators'",
+          "condition": "!(libs == 'generators')",
           "exclude": [
             "libs/Momentum/src/Momentum.Extensions.SourceGenerators/**/*"
           ]
         },
         {
-          "condition": "libs != 'kafka'",
+          "condition": "!(libs == 'kafka')",
           "exclude": [
             "libs/Momentum/src/Momentum.Extensions.Messaging.Kafka/**/*"
           ]

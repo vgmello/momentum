@@ -5,10 +5,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <!--#if (libs != 'defaults') -->
+        <!--#if (!(libs == 'defaults')) -->
         <PackageReference Include="Momentum.ServiceDefaults"/>
         <!--#endif -->
-        <!--#if (libs != 'kafka') -->
+        <!--#if (!(libs == 'kafka')) -->
         <PackageReference Include="Momentum.Extensions.Messaging.Kafka"/>
         <!--#endif -->
         <!--#if (USE_KAFKA) -->

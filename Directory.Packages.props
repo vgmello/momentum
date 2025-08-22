@@ -96,6 +96,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
+    <PackageVersion Include="Momentum.Extensions.XmlDocs" Version="$(MomentumVersion)" />
     <PackageVersion Include="Momentum.ServiceDefaults" Version="$(MomentumVersion)" />
     <PackageVersion Include="Momentum.ServiceDefaults.Api" Version="$(MomentumVersion)" />
     <PackageVersion Include="NetArchTest.Rules" Version="1.3.2" />

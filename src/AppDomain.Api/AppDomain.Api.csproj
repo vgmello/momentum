@@ -8,13 +8,13 @@
     <ItemGroup>
         <PackageReference Include="Grpc.AspNetCore"/>
         <PackageReference Include="Grpc.Tools"/>
-        <!--#if (libs != 'defaults') -->
+        <!--#if (!(libs == 'defaults')) -->
         <PackageReference Include="Momentum.ServiceDefaults"/>
         <!--#endif -->
-        <!--#if (libs != 'api') -->
+        <!--#if (!(libs == 'api')) -->
         <PackageReference Include="Momentum.ServiceDefaults.Api"/>
         <!--#endif -->
-        <!--#if (libs != 'kafka') -->
+        <!--#if (!(libs == 'kafka')) -->
         <PackageReference Include="Momentum.Extensions.Messaging.Kafka"/>
         <!--#endif -->
         <!--#if (USE_KAFKA) -->

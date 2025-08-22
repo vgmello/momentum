@@ -14,7 +14,7 @@
         <PackageReference Include="Aspire.Confluent.Kafka"/>
         <PackageReference Include="CloudNative.CloudEvents.Kafka"/>
         <PackageReference Include="WolverineFx.Kafka"/>
-        <!--#if (libs != 'defaults')
+        <!--#if (!(libs == 'defaults'))
         <PackageReference Include="Momentum.ServiceDefaults"/>
         #endif -->
     </ItemGroup>
