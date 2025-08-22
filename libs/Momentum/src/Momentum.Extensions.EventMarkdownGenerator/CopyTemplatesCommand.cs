@@ -45,7 +45,7 @@ public sealed class CopyTemplatesCommand : Command<CopyTemplatesCommand.Settings
             AnsiConsole.MarkupLine($"[green]✓[/] Successfully copied default templates to: {outputPath}");
             AnsiConsole.MarkupLine("");
             AnsiConsole.MarkupLine("You can now customize these templates and use them with:");
-            AnsiConsole.MarkupLine($"  events-docsgen generate --templates {settings.Output} [other options]");
+            AnsiConsole.MarkupLine($"  [yellow]events-docsgen generate --templates {settings.Output} [[other options]][/]");
 
             return 0;
         }

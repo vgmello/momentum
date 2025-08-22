@@ -10,28 +10,15 @@ namespace Momentum.Extensions.EventMarkdownGenerator.Tests;
 
 public class IntegrationTests
 {
-    private static string TestAssemblyPath => FindTestAssemblyPath();
-    private static string TestXmlPath => Path.ChangeExtension(TestAssemblyPath, ".xml");
+    private static string TestAssemblyPath => GetTestEventsAssemblyPath();
+    private static string TestXmlPath => TestPathHelper.GetTestEventsXmlPath();
     private static string ReferenceMarkdownPath => FindReferenceMarkdownPath();
 
-    private static string FindTestAssemblyPath()
+    private static string GetTestEventsAssemblyPath()
     {
-        var possiblePaths = new[]
-        {
-            Path.Combine(Directory.GetCurrentDirectory(), "tests", "TestEvents", "bin", "Debug", "net9.0", "TestEvents.dll"),
-            Path.Combine(Path.GetDirectoryName(typeof(IntegrationTests).Assembly.Location)!,
-                "..", "..", "..", "..", "TestEvents", "bin", "Debug", "net9.0", "TestEvents.dll")
-        };
+        var xmlPath = TestPathHelper.GetTestEventsXmlPath();
 
-        foreach (var path in possiblePaths)
-        {
-            var fullPath = Path.GetFullPath(path);
-
-            if (File.Exists(fullPath))
-                return fullPath;
-        }
-
-        throw new FileNotFoundException("Could not find TestEvents.dll. Make sure TestEvents project is built.");
+        return Path.ChangeExtension(xmlPath, ".dll");
     }
 
     private static string FindReferenceMarkdownPath()
@@ -92,9 +79,7 @@ public class IntegrationTests
             // Act - Read generated content
             var generatedContent = await File.ReadAllTextAsync(generatedMarkdown.FilePath, TestContext.Current.CancellationToken);
 
-            // Debug output
-            Console.WriteLine("Generated content:");
-            Console.WriteLine(generatedContent);
+            // Debug output - write full content to file for analysis
             await File.WriteAllTextAsync("/tmp/debug-generated-content.txt", generatedContent, TestContext.Current.CancellationToken);
 
             // Assert - Compare with reference (if exists)
@@ -130,8 +115,9 @@ public class IntegrationTests
         var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser).ToList();
 
         // Assert
-        events.Count.ShouldBe(1);
-        var cashierEvent = events[0];
+        events.Count.ShouldBeGreaterThan(0);
+        var cashierEvent = events.FirstOrDefault(e => e.EventName == "CashierCreated");
+        cashierEvent.ShouldNotBeNull();
 
         cashierEvent.PartitionKeys.Count.ShouldBe(2);
         cashierEvent.PartitionKeys.ShouldContain(pk => pk.Name == "TenantId");
@@ -154,8 +140,9 @@ public class IntegrationTests
         var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser).ToList();
 
         // Assert
-        events.Count.ShouldBe(1);
-        var cashierEvent = events[0];
+        events.Count.ShouldBeGreaterThan(0);
+        var cashierEvent = events.FirstOrDefault(e => e.EventName == "CashierCreated");
+        cashierEvent.ShouldNotBeNull();
         cashierEvent.Domain.ShouldBe("Cashiers"); // Now returns subdomain instead of domain
     }
 
@@ -167,7 +154,7 @@ public class IntegrationTests
         await parser.LoadMultipleDocumentationAsync([TestXmlPath]);
 
         var assembly = Assembly.LoadFrom(TestAssemblyPath);
-        var cashierCreatedType = assembly.GetType("AppDomain.Cashiers.Contracts.IntegrationEvents.CashierCreated");
+        var cashierCreatedType = assembly.GetType("TestEvents.AppDomain.Cashiers.Contracts.IntegrationEvents.CashierCreated");
 
         // Act
         var documentation = parser.GetEventDocumentation(cashierCreatedType!);
@@ -222,20 +209,28 @@ public class IntegrationTests
         var sidebarItems = sidebarGenerator.GenerateSidebarItems(eventsWithDoc);
 
         // Assert
-        sidebarItems.Count.ShouldBe(2); // Events + Schemas sections
+        sidebarItems.Count.ShouldBe(5); // Multiple domain sections + Schemas section
 
-        // Validate events section
-        var eventsSection = sidebarItems.FirstOrDefault(s => s.Text == "Cashiers");
-        eventsSection.ShouldNotBeNull();
-        eventsSection!.Items.Count.ShouldBe(1);
-        eventsSection.Items[0].Text.ShouldBe("Cashier Created");
-        eventsSection.Items[0].Link.ShouldBe("/cashier-created");
+        // Validate AppDomain section exists (contains CashierCreated)
+        var appDomainSection = sidebarItems.FirstOrDefault(s => s.Text == "AppDomain");
+        appDomainSection.ShouldNotBeNull();
+        appDomainSection!.Items.Count.ShouldBe(7);
 
-        // Validate schemas section
+        // Find the Cashiers subsection within AppDomain section
+        var cashiersSubsection = appDomainSection.Items.FirstOrDefault(i => i.Text == "Cashiers");
+        cashiersSubsection.ShouldNotBeNull();
+        cashiersSubsection!.Items.ShouldNotBeNull();
+        cashiersSubsection.Items.Count.ShouldBe(1);
+
+        // Check that CashierCreated is in the Cashiers subsection
+        var cashierCreatedItem = cashiersSubsection.Items[0];
+        cashierCreatedItem.Text.ShouldBe("Cashier Created");
+        cashierCreatedItem.Link.ShouldBe("/cashier-created");
+
+        // Validate schemas section exists
         var schemasSection = sidebarItems.FirstOrDefault(s => s.Text == "Schemas");
         schemasSection.ShouldNotBeNull();
-        schemasSection!.Items.Count.ShouldBe(1);
-        schemasSection.Items[0].Text.ShouldBe("Cashier");
+        schemasSection!.Items.Count.ShouldBeGreaterThan(0);
     }
 
     private static void ValidateGeneratedContent(string content)

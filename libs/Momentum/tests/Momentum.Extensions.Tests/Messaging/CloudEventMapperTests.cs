@@ -1,12 +1,9 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-using CloudNative.CloudEvents;
-using CloudNative.CloudEvents.Kafka;
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
 using Momentum.Extensions.Messaging.Kafka;
 using Momentum.ServiceDefaults.Messaging;
-using Shouldly;
 using System.Text;
 using Wolverine;
 
