@@ -1,5 +1,8 @@
 name: Validate PowerShell Scripts
 
+permissions:
+  contents: read
+
 on:
   push:
     paths:
