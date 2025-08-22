@@ -21,17 +21,17 @@
         <PackageReference Include="Microsoft.AspNetCore.OpenApi"/>
         <PackageReference Include="OpenTelemetry.Extensions.Hosting"/>
         <PackageReference Include="Scalar.AspNetCore"/>
-        <!--#if (libs == 'api')
+        <!--#if (LIBS_INCLUDES_API)
         <PackageReference Include="Momentum.Extensions.XmlDocs"/>
         #endif -->
-        <!--#if (!(libs == 'defaults'))
+        <!--#if (!LIBS_INCLUDES_DEFAULTS)
         <PackageReference Include="Momentum.ServiceDefaults"/>
         #endif -->
     </ItemGroup>
 
-    <!--#if (libs == 'defaults') -->
+    <!--#if (LIBS_INCLUDES_DEFAULTS) -->
     <ItemGroup>
-        <!--#if (libs == 'defaults')
+        <!--#if (LIBS_INCLUDES_DEFAULTS)
         <ProjectReference Include="..\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
         #endif -->
     </ItemGroup>

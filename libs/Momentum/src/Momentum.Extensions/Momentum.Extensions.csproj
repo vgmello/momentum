@@ -22,7 +22,7 @@
         <PackageReference Include="OneOf.SourceGenerator"/>
         <PackageReference Include="Dapper"/>
         <PackageReference Include="WolverineFx"/>
-        <!--#if (libs == 'ext')
+        <!--#if (LIBS_INCLUDES_EXT)
         <PackageReference Include="Momentum.Extensions.Abstractions"/>
         #endif -->
     </ItemGroup>

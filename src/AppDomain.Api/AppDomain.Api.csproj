@@ -8,13 +8,13 @@
     <ItemGroup>
         <PackageReference Include="Grpc.AspNetCore"/>
         <PackageReference Include="Grpc.Tools"/>
-        <!--#if (!(libs == 'defaults')) -->
+        <!--#if (!LIBS_INCLUDES_DEFAULTS) -->
         <PackageReference Include="Momentum.ServiceDefaults"/>
         <!--#endif -->
-        <!--#if (!(libs == 'api')) -->
+        <!--#if (!LIBS_INCLUDES_API) -->
         <PackageReference Include="Momentum.ServiceDefaults.Api"/>
         <!--#endif -->
-        <!--#if (!(libs == 'kafka')) -->
+        <!--#if (!LIBS_INCLUDES_KAFKA) -->
         <PackageReference Include="Momentum.Extensions.Messaging.Kafka"/>
         <!--#endif -->
         <!--#if (USE_KAFKA) -->
@@ -28,18 +28,18 @@
 
     <ItemGroup>
         <ProjectReference Include="..\AppDomain\AppDomain.csproj"/>
-        <!--#if (libs == 'defaults') -->
+        <!--#if (LIBS_INCLUDES_DEFAULTS) -->
         <ProjectReference Include="..\..\libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
         <!--#endif -->
-        <!--#if (libs == 'api') -->
+        <!--#if (LIBS_INCLUDES_API) -->
         <ProjectReference Include="..\..\libs\Momentum\src\Momentum.ServiceDefaults.Api\Momentum.ServiceDefaults.Api.csproj"/>
         <!--#endif -->
-        <!--#if (libs == 'kafka') -->
+        <!--#if (LIBS_INCLUDES_KAFKA) -->
         <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.Messaging.Kafka\Momentum.Extensions.Messaging.Kafka.csproj"/>
         <!--#endif -->
     </ItemGroup>
 
-    <!--#if (libs == 'defaults') -->
+    <!--#if (LIBS_INCLUDES_DEFAULTS) -->
     <Import Project="..\..\libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.props"/>
 
     <!--#endif -->

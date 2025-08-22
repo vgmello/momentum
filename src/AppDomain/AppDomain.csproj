@@ -33,20 +33,20 @@
     <ItemGroup>
         #endif -->
         <PackageReference Include="Momentum.Extensions.Abstractions"/>
-        <!--#if (!(libs == 'ext')) -->
+        <!--#if (!LIBS_INCLUDES_EXT) -->
         <PackageReference Include="Momentum.Extensions"/>
         <!--#endif -->
-        <!--#if (!(libs == 'generators')) -->
+        <!--#if (!LIBS_INCLUDES_GENERATORS) -->
         <PackageReference Include="Momentum.Extensions.SourceGenerators"/>
         <!--#endif -->
     </ItemGroup>
 
-    <!--#if (libs == 'ext' || libs == 'generators') -->
+    <!--#if (LIBS_INCLUDES_EXT || LIBS_INCLUDES_GENERATORS) -->
     <ItemGroup>
-        <!--#if (libs == 'ext') -->
+        <!--#if (LIBS_INCLUDES_EXT) -->
         <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.csproj"/>
         <!--#endif -->
-        <!--#if (libs == 'generators') -->
+        <!--#if (LIBS_INCLUDES_GENERATORS) -->
         <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.csproj">
             <OutputItemType>Analyzer</OutputItemType>
             <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
@@ -56,10 +56,10 @@
         <!--#endif -->
     </ItemGroup>
 
-    <!--#if (libs == 'ext') -->
+    <!--#if (LIBS_INCLUDES_EXT) -->
     <Import Project="..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.props"/>
     <!--#endif -->
-    <!--#if (libs == 'generators') -->
+    <!--#if (LIBS_INCLUDES_GENERATORS) -->
     <!--    <Import Project="..\..\libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.props"/>-->
     <!--#endif -->
     <!--#endif -->

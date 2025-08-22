@@ -45,13 +45,13 @@
 <!--#if (INCLUDE_ORLEANS) -->
         <ProjectReference Include="..\..\src\AppDomain.BackOffice.Orleans\AppDomain.BackOffice.Orleans.csproj"/>
 <!--#endif -->
-<!--#if (libs == 'ext') -->
+<!--#if (LIBS_INCLUDES_EXT) -->
         <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.csproj"/>
 <!--#endif -->
-<!--#if (libs == 'kafka') -->
+<!--#if (LIBS_INCLUDES_KAFKA) -->
         <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.Messaging.Kafka\Momentum.Extensions.Messaging.Kafka.csproj"/>
 <!--#endif -->
-<!--#if (libs == 'generators') -->
+<!--#if (LIBS_INCLUDES_GENERATORS) -->
         <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.csproj"/>
 <!--#endif -->
     </ItemGroup>
