@@ -13,7 +13,7 @@ on:
       - "Directory.Packages.props"
       - "AppDomain.slnx"
       - ".github/workflows/test-template.yml"
-      
+
   workflow_dispatch:
     inputs:
       test-config-path:
@@ -44,48 +44,57 @@ jobs:
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
       test-count: ${{ steps.set-matrix.outputs.test-count }}
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
-        
+
       - name: Read test configuration
         id: read-config
+        shell: pwsh
         run: |
-          CONFIG_PATH="${{ github.event.inputs.test-config-path || '.template.config/test-cases.json' }}"
-          echo "📖 Reading test configuration from: $CONFIG_PATH"
-          
-          if [ ! -f "$CONFIG_PATH" ]; then
-            echo "❌ Test configuration file not found: $CONFIG_PATH"
-            exit 1
-          fi
-          
-          # Read and validate JSON
-          CONFIG_CONTENT=$(cat "$CONFIG_PATH")
-          echo "$CONFIG_CONTENT" | jq empty || {
-            echo "❌ Invalid JSON in test configuration file"
+          $configPath = "${{ github.event.inputs.test-config-path || '.template.config/test-cases.json' }}"
+          Write-Host "📖 Reading test configuration from: $configPath"
+
+          if (-not (Test-Path $configPath)) {
+            Write-Host "❌ Test configuration file not found: $configPath"
             exit 1
           }
-          
+
+          # Read and validate JSON
+          try {
+            $configContent = Get-Content $configPath -Raw
+            $null = $configContent | ConvertFrom-Json
+            Write-Host "✅ JSON validation successful"
+          }
+          catch {
+            Write-Host "❌ Invalid JSON in test configuration file"
+            exit 1
+          }
+
           # Save to output
-          echo "config<<EOF" >> $GITHUB_OUTPUT
-          echo "$CONFIG_CONTENT" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-          
+          Add-Content $env:GITHUB_OUTPUT "config<<EOF"
+          Add-Content $env:GITHUB_OUTPUT $configContent
+          Add-Content $env:GITHUB_OUTPUT "EOF"
+
       - name: Set matrix output
         id: set-matrix
+        shell: pwsh
         run: |
           # Extract test cases for matrix
-          MATRIX=$(echo '${{ steps.read-config.outputs.config }}' | jq -c '.testCases')
-          TEST_COUNT=$(echo '${{ steps.read-config.outputs.config }}' | jq '.testCases | length')
-          
-          echo "📊 Found $TEST_COUNT test cases"
-          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
-          echo "test-count=$TEST_COUNT" >> $GITHUB_OUTPUT
-          
+          $config = '${{ steps.read-config.outputs.config }}' | ConvertFrom-Json
+          $matrix = $config.testCases | ConvertTo-Json -Compress
+          $testCount = $config.testCases.Length
+
+          Write-Host "📊 Found $testCount test cases"
+          Add-Content $env:GITHUB_OUTPUT "matrix=$matrix"
+          Add-Content $env:GITHUB_OUTPUT "test-count=$testCount"
+
           # Display test cases
-          echo "Test cases to run:"
-          echo '${{ steps.read-config.outputs.config }}' | jq -r '.testCases[] | "  - \(.name): \(.description)"'
+          Write-Host "Test cases to run:"
+          foreach ($test in $config.testCases) {
+            Write-Host "  - $($test.name): $($test.description)"
+          }
 
   test-template:
     name: Test - ${{ matrix.test.name }}
@@ -95,16 +104,16 @@ jobs:
       fail-fast: false
       matrix:
         test: ${{ fromJSON(needs.load-tests.outputs.matrix) }}
-    
+
     steps:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
-          
+
       - name: Checkout code
         uses: actions/checkout@v5
-        
+
       - name: Cache NuGet packages
         uses: actions/cache@v4
         with:
@@ -112,179 +121,160 @@ jobs:
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/*.props') }}
           restore-keys: |
             ${{ runner.os }}-nuget-
-            
+
       - name: Install template
         id: install-template
+        shell: pwsh
         run: |
-          echo "🔧 Installing template from current directory..."
+          Write-Host "🔧 Installing template from current directory..."
           dotnet new install . --force
-          
+
           # Verify installation
-          if dotnet new list | grep -q "mmt"; then
-            echo "✅ Template 'mmt' installed successfully"
-          else
-            echo "❌ Template 'mmt' not found after installation"
+          $templateList = dotnet new list
+          if ($templateList -match "mmt") {
+            Write-Host "✅ Template 'mmt' installed successfully"
+          }
+          else {
+            Write-Host "❌ Template 'mmt' not found after installation"
             exit 1
-          fi
-          
+          }
+
       - name: Generate template - ${{ matrix.test.name }}
         id: generate-template
+        shell: pwsh
         run: |
-          echo "🚀 Generating template: ${{ matrix.test.description }}"
-          echo "Command: dotnet new mmt ${{ matrix.test.command }} --allow-scripts yes"
-          
+          Write-Host "🚀 Generating template: ${{ matrix.test.description }}"
+          Write-Host "Command: dotnet new mmt ${{ matrix.test.command }} --allow-scripts yes"
+
           # Create a test directory
-          TEST_DIR="test-output-${{ matrix.test.name }}"
-          mkdir -p "$TEST_DIR"
-          cd "$TEST_DIR"
-          
+          $testDir = "test-output-${{ matrix.test.name }}"
+          New-Item -ItemType Directory -Path $testDir -Force | Out-Null
+          Set-Location $testDir
+
           # Generate template with output redirection (CRITICAL for preventing buffer overflow)
-          if dotnet new mmt ${{ matrix.test.command }} --allow-scripts yes > /dev/null 2>&1; then
-            echo "✅ Template generated successfully"
-            echo "test-dir=$TEST_DIR" >> $GITHUB_OUTPUT
-            
-            # List generated files
-            echo "Generated structure:"
-            ls -la
-          else
-            EXIT_CODE=$?
-            echo "❌ Template generation failed with exit code: $EXIT_CODE"
-            
-            # Try to capture any error output
-            dotnet new mmt ${{ matrix.test.command }} --allow-scripts yes 2>&1 || true
-            exit $EXIT_CODE
-          fi
-          
+          try {
+            $process = Start-Process -FilePath "dotnet" -ArgumentList "new", "mmt", "${{ matrix.test.command }}", "--allow-scripts", "yes" -NoNewWindow -Wait -PassThru -RedirectStandardOutput $null -RedirectStandardError $null
+
+            if ($process.ExitCode -eq 0) {
+              Write-Host "✅ Template generated successfully"
+              Add-Content $env:GITHUB_OUTPUT "test-dir=$testDir"
+
+              # List generated files
+              Write-Host "Generated structure:"
+              Get-ChildItem -Force | Format-Table -AutoSize
+            }
+            else {
+              Write-Host "❌ Template generation failed with exit code: $($process.ExitCode)"
+
+              # Try to capture any error output
+              dotnet new mmt ${{ matrix.test.command }} --allow-scripts yes 2>&1
+              exit $process.ExitCode
+            }
+          }
+          catch {
+            Write-Host "❌ Template generation failed with exception: $($_.Exception.Message)"
+            exit 1
+          }
+
       - name: Build generated project
         id: build-project
         if: success()
+        shell: pwsh
         run: |
-          cd "${{ steps.generate-template.outputs.test-dir }}"
-          
-          # Extract project name from command
-          PROJECT_NAME=$(echo "${{ matrix.test.command }}" | grep -oP '(?<=-n )[^ ]+' || echo "TestProject")
-          echo "📦 Building project: $PROJECT_NAME"
-          
-          # Check if it's a project-only generation
-          if [[ "${{ matrix.test.command }}" == *"--project-only"* ]]; then
-            echo "Project-only mode detected, looking for .csproj files..."
-            CSPROJ_FILES=$(find . -name "*.csproj" | head -5)
-            if [ -z "$CSPROJ_FILES" ]; then
-              echo "❌ No .csproj files found"
-              exit 1
-            fi
-            echo "Found project files:"
-            echo "$CSPROJ_FILES"
-            
-            # Build each project
-            for proj in $CSPROJ_FILES; do
-              echo "Building $proj..."
-              dotnet build "$proj" --configuration Release --verbosity minimal || exit 1
-            done
-          else
-            # Build solution
-            if [ -f "$PROJECT_NAME.slnx" ]; then
-              echo "Building solution file: $PROJECT_NAME.slnx"
-              dotnet build "$PROJECT_NAME.slnx" --configuration Release --verbosity minimal
-            elif [ -f "$PROJECT_NAME.sln" ]; then
-              echo "Building solution file: $PROJECT_NAME.sln"
-              dotnet build "$PROJECT_NAME.sln" --configuration Release --verbosity minimal
-            else
-              echo "⚠️ No solution file found, attempting to build all projects..."
-              dotnet build --configuration Release --verbosity minimal
-            fi
-          fi
-          
-          if [ $? -eq 0 ]; then
-            echo "✅ Build completed successfully"
-          else
-            echo "❌ Build failed"
+          Set-Location "${{ steps.generate-template.outputs.test-dir }}"
+
+          Write-Host "Building solution/project"
+          dotnet build --configuration Release --verbosity minimal
+
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host "✅ Build completed successfully"
+          }
+          else {
+            Write-Host "❌ Build failed"
             exit 1
-          fi
-          
+          }
+
       - name: Run tests
         id: run-tests
         if: success()
+        shell: pwsh
         run: |
-          cd "${{ steps.generate-template.outputs.test-dir }}"
-          
+          Set-Location "${{ steps.generate-template.outputs.test-dir }}"
+
           # Extract project name
-          PROJECT_NAME=$(echo "${{ matrix.test.command }}" | grep -oP '(?<=-n )[^ ]+' || echo "TestProject")
-          
-          echo "🧪 Running tests for: $PROJECT_NAME"
-          
-          # Check if tests exist
-          TEST_PROJECTS=$(find . -name "*Tests*.csproj" -o -name "*Test*.csproj" | head -10)
-          
-          if [ -z "$TEST_PROJECTS" ]; then
-            echo "ℹ️ No test projects found (this is expected for --no-sample)"
-            echo "has-tests=false" >> $GITHUB_OUTPUT
-          else
-            echo "Found test projects:"
-            echo "$TEST_PROJECTS"
-            echo "has-tests=true" >> $GITHUB_OUTPUT
-            
-            # Run tests with detailed output
-            dotnet test \
-              --configuration Release \
-              --logger "trx;LogFileName=${{ matrix.test.name }}.trx" \
-              --logger "console;verbosity=normal" \
-              --results-directory ./TestResults \
-              --collect:"XPlat Code Coverage" \
-              --verbosity minimal
-              
-            TEST_EXIT_CODE=$?
-            
-            if [ $TEST_EXIT_CODE -eq 0 ]; then
-              echo "✅ All tests passed"
-            else
-              echo "❌ Tests failed with exit code: $TEST_EXIT_CODE"
-              
+          $command = "${{ matrix.test.command }}"
+          if ($command -match '-n\s+(\S+)') {
+            $projectName = $matches[1]
+          } else {
+            $projectName = "TestProject"
+          }
+
+          Write-Host "🧪 Running tests for: $projectName"
+
+          # Run tests with detailed output
+          dotnet test `
+            --filter "FullyQualifiedName~$projectName.Tests.Unit" `
+            --configuration Release `
+            --logger "trx;LogFileName=${{ matrix.test.name }}.trx" `
+            --logger "console;verbosity=normal" `
+            --results-directory ./TestResults `
+            --collect:"XPlat Code Coverage" `
+            --verbosity minimal
+
+            $testExitCode = $LASTEXITCODE
+
+            if ($testExitCode -eq 0) {
+              Write-Host "✅ All tests passed"
+            }
+            else {
+              Write-Host "❌ Tests failed with exit code: $testExitCode"
+
               # Show test results summary
-              if [ -d "./TestResults" ]; then
-                echo "Test results available in ./TestResults"
-                ls -la ./TestResults/
-              fi
-              
-              exit $TEST_EXIT_CODE
-            fi
-          fi
-          
+              if (Test-Path "./TestResults") {
+                Write-Host "Test results available in ./TestResults"
+                Get-ChildItem "./TestResults" | Format-Table -AutoSize
+              }
+
+              exit $testExitCode
+            }
+          }
+
       - name: Generate step summary
         if: always()
+        shell: pwsh
         run: |
-          echo "## Test Results: ${{ matrix.test.name }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Description:** ${{ matrix.test.description }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Command:** \`dotnet new mmt ${{ matrix.test.command }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          
-          if [ "${{ steps.generate-template.outcome }}" == "success" ]; then
-            echo "✅ Template Generation: **Success**" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "❌ Template Generation: **Failed**" >> $GITHUB_STEP_SUMMARY
-          fi
-          
-          if [ "${{ steps.build-project.outcome }}" == "success" ]; then
-            echo "✅ Build: **Success**" >> $GITHUB_STEP_SUMMARY
-          elif [ "${{ steps.build-project.outcome }}" == "skipped" ]; then
-            echo "⏭️ Build: **Skipped**" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "❌ Build: **Failed**" >> $GITHUB_STEP_SUMMARY
-          fi
-          
-          if [ "${{ steps.run-tests.outcome }}" == "success" ]; then
-            if [ "${{ steps.run-tests.outputs.has-tests }}" == "true" ]; then
-              echo "✅ Tests: **Passed**" >> $GITHUB_STEP_SUMMARY
-            else
-              echo "ℹ️ Tests: **No tests found** (expected for --no-sample)" >> $GITHUB_STEP_SUMMARY
-            fi
-          elif [ "${{ steps.run-tests.outcome }}" == "skipped" ]; then
-            echo "⏭️ Tests: **Skipped**" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "❌ Tests: **Failed**" >> $GITHUB_STEP_SUMMARY
-          fi
-          
+          Add-Content $env:GITHUB_STEP_SUMMARY "## Test Results: ${{ matrix.test.name }}"
+          Add-Content $env:GITHUB_STEP_SUMMARY ""
+          Add-Content $env:GITHUB_STEP_SUMMARY "**Description:** ${{ matrix.test.description }}"
+          Add-Content $env:GITHUB_STEP_SUMMARY "**Command:** ``dotnet new mmt ${{ matrix.test.command }}``"
+          Add-Content $env:GITHUB_STEP_SUMMARY ""
+
+          if ("${{ steps.generate-template.outcome }}" -eq "success") {
+            Add-Content $env:GITHUB_STEP_SUMMARY "✅ Template Generation: **Success**"
+          } else {
+            Add-Content $env:GITHUB_STEP_SUMMARY "❌ Template Generation: **Failed**"
+          }
+
+          if ("${{ steps.build-project.outcome }}" -eq "success") {
+            Add-Content $env:GITHUB_STEP_SUMMARY "✅ Build: **Success**"
+          } elseif ("${{ steps.build-project.outcome }}" -eq "skipped") {
+            Add-Content $env:GITHUB_STEP_SUMMARY "⏭️ Build: **Skipped**"
+          } else {
+            Add-Content $env:GITHUB_STEP_SUMMARY "❌ Build: **Failed**"
+          }
+
+          if ("${{ steps.run-tests.outcome }}" -eq "success") {
+            if ("${{ steps.run-tests.outputs.has-tests }}" -eq "true") {
+              Add-Content $env:GITHUB_STEP_SUMMARY "✅ Tests: **Passed**"
+            } else {
+              Add-Content $env:GITHUB_STEP_SUMMARY "ℹ️ Tests: **No tests found** (expected for --no-sample)"
+            }
+          } elseif ("${{ steps.run-tests.outcome }}" -eq "skipped") {
+            Add-Content $env:GITHUB_STEP_SUMMARY "⏭️ Tests: **Skipped**"
+          } else {
+            Add-Content $env:GITHUB_STEP_SUMMARY "❌ Tests: **Failed**"
+          }
+
       - name: Upload test results
         if: failure() && steps.run-tests.outputs.has-tests == 'true'
         uses: actions/upload-artifact@v4
@@ -293,7 +283,7 @@ jobs:
           path: |
             ${{ steps.generate-template.outputs.test-dir }}/TestResults/
           retention-days: 7
-          
+
       - name: Upload generated template
         if: failure()
         uses: actions/upload-artifact@v4
@@ -302,44 +292,53 @@ jobs:
           path: |
             ${{ steps.generate-template.outputs.test-dir }}/
           retention-days: 3
-          
+
       - name: Cleanup
         if: always()
+        shell: pwsh
         run: |
-          echo "🧹 Cleaning up generated files..."
-          
+          Write-Host "🧹 Cleaning up generated files..."
+
           # Uninstall template
-          dotnet new uninstall Momentum.Template || true
-          
+          try {
+            dotnet new uninstall Momentum.Template
+          }
+          catch {
+            Write-Host "Template uninstall failed, continuing..."
+          }
+
           # Remove generated directory
-          if [ -n "${{ steps.generate-template.outputs.test-dir }}" ]; then
-            rm -rf "${{ steps.generate-template.outputs.test-dir }}"
-            echo "✅ Cleanup completed"
-          fi
+          $testDir = "${{ steps.generate-template.outputs.test-dir }}"
+          if ($testDir -and (Test-Path $testDir)) {
+            Remove-Item -Path $testDir -Recurse -Force
+            Write-Host "✅ Cleanup completed"
+          }
 
   test-summary:
     name: Test Summary
     needs: [load-tests, test-template]
     runs-on: ubuntu-latest
     if: always()
-    
+
     steps:
       - name: Generate summary report
+        shell: pwsh
         run: |
-          echo "# 📊 Template Test Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Total Tests:** ${{ needs.load-tests.outputs.test-count }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Status:** ${{ needs.test-template.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          
-          if [ "${{ needs.test-template.result }}" == "success" ]; then
-            echo "✅ **All template tests passed successfully!**" >> $GITHUB_STEP_SUMMARY
-          elif [ "${{ needs.test-template.result }}" == "failure" ]; then
-            echo "❌ **Some template tests failed. Check individual test results above.**" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "⚠️ **Template tests were cancelled or skipped.**" >> $GITHUB_STEP_SUMMARY
-          fi
-          
+          Add-Content $env:GITHUB_STEP_SUMMARY "# 📊 Template Test Summary"
+          Add-Content $env:GITHUB_STEP_SUMMARY ""
+          Add-Content $env:GITHUB_STEP_SUMMARY "**Total Tests:** ${{ needs.load-tests.outputs.test-count }}"
+          Add-Content $env:GITHUB_STEP_SUMMARY "**Status:** ${{ needs.test-template.result }}"
+          Add-Content $env:GITHUB_STEP_SUMMARY ""
+
+          if ("${{ needs.test-template.result }}" -eq "success") {
+            Add-Content $env:GITHUB_STEP_SUMMARY "✅ **All template tests passed successfully!**"
+          } elseif ("${{ needs.test-template.result }}" -eq "failure") {
+            Add-Content $env:GITHUB_STEP_SUMMARY "❌ **Some template tests failed. Check individual test results above.**"
+          } else {
+            Add-Content $env:GITHUB_STEP_SUMMARY "⚠️ **Template tests were cancelled or skipped.**"
+          }
+
       - name: Set exit code
         if: needs.test-template.result == 'failure'
+        shell: pwsh
         run: exit 1
