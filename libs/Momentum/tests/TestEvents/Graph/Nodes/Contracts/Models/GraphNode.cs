@@ -25,7 +25,7 @@ public record GraphNode
     /// <summary>
     ///     Collection of child nodes that reference this node as their parent
     /// </summary>
-    public List<GraphNode> Children { get; init; } = new();
+    public List<GraphNode> Children { get; init; } = [];
 
     /// <summary>
     ///     Additional node metadata and properties

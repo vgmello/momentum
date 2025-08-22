@@ -1,3 +1,5 @@
+<!-- prettier-ignore -->
+
 ---
 editLink: false
 ---
@@ -44,15 +46,15 @@ editLink: false
 {% endfor %}
 
 {% if event.PartitionKeys.size > 0 -%}
-    ### Partition Keys
+### Partition Keys
 
     {% if event.PartitionKeys.size == 1 -%}
-        This event uses a partition key for message routing:
+This event uses a partition key for message routing:
     {% else -%}
-        This event uses multiple partition keys for message routing:
+This event uses multiple partition keys for message routing:
     {% endif -%}
     {% for partitionKey in event.PartitionKeys -%}
-        - `{{ partitionKey.Name }}`{% if partitionKey.Description %} - {{ partitionKey.Description }}{% endif %}
+- `{{ partitionKey.Name }}`{% if partitionKey.Description %} - {{ partitionKey.Description }}{% endif %}
     {% endfor -%}
 {% endif -%}
 
@@ -61,21 +63,21 @@ editLink: false
 {% assign allComplexTypes = complexTypes | concat: collectionComplexTypes -%}
 
 {% if allComplexTypes.size > 0 %}
-    ### Reference Schemas
+### Reference Schemas
 
     {% for property in complexTypes -%}
         {% assign typeName = property.TypeName -%}
-        #### {{ typeName }}
+#### {{ typeName }}
 
-        <!--@include: @/events/schemas/{{ property.SchemaPath }}#schema-->
+<!--@include: @/events/schemas/{{ property.SchemaPath }}#schema-->
 
     {% endfor -%}
 
     {% for property in collectionComplexTypes -%}
         {% assign elementTypeName = property.ElementTypeName | default: property.TypeName -%}
-        #### {{ elementTypeName }}s
+#### {{ elementTypeName }}s
 
-        <!--@include: @/events/schemas/{{ property.ElementSchemaPath | default: property.SchemaPath }}#schema-->
+<!--@include: @/events/schemas/{{ property.ElementSchemaPath | default: property.SchemaPath }}#schema-->
 
     {% endfor -%}
 {% endif -%}

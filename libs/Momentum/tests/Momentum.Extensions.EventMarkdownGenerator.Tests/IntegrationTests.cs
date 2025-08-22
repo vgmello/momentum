@@ -209,6 +209,7 @@ public class IntegrationTests
         var sidebarItems = sidebarGenerator.GenerateSidebarItems(eventsWithDoc);
 
         // Assert
+        var cashierCreatedEvent = events.FirstOrDefault(e => e.EventName == "CashierCreated");
         sidebarItems.Count.ShouldBe(5); // Multiple domain sections + Schemas section
 
         // Validate AppDomain section exists (contains CashierCreated)
@@ -225,7 +226,7 @@ public class IntegrationTests
         // Check that CashierCreated is in the Cashiers subsection
         var cashierCreatedItem = cashiersSubsection.Items[0];
         cashierCreatedItem.Text.ShouldBe("Cashier Created");
-        cashierCreatedItem.Link.ShouldBe("/cashier-created");
+        cashierCreatedItem.Link.ShouldBe($"/{cashierCreatedEvent!.FullTypeName}");
 
         // Validate schemas section exists
         var schemasSection = sidebarItems.FirstOrDefault(s => s.Text == "Schemas");

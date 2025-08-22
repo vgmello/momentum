@@ -44,8 +44,7 @@ public class KafkaEventsExtensions(
 
         var autoProvisionEnabled = configuration.GetValue("Kafka:AutoProvision", false);
 
-        logger.LogInformation("Configuring Kafka messaging for service {ServiceName} in environment {Environment}",
-            options.ServiceName, environment.EnvironmentName);
+        logger.LogInformation("Configuring Kafka messaging for service {ServiceName}", options.ServiceName);
         logger.LogInformation("Kafka bootstrap servers: {BootstrapServers}", kafkaConnectionString);
         logger.LogInformation("Consumer group ID: {GroupId}", consumerGroupId);
         logger.LogInformation("Auto-provision enabled: {AutoProvisionEnabled}", autoProvisionEnabled);
@@ -94,7 +93,7 @@ public class KafkaEventsExtensions(
                 continue;
             }
 
-            var topicName = GetTopicName(messageType, topicAttribute, environment.EnvironmentName);
+            var topicName = GetTopicName(environment.EnvironmentName, messageType, topicAttribute);
             publisherTopics.Add(topicName);
 
             var setupKafkaRouteMethodInfo = SetupKafkaPublisherRouteMethodInfo.MakeGenericMethod(messageType);
@@ -130,7 +129,7 @@ public class KafkaEventsExtensions(
                 continue;
             }
 
-            var topicName = GetTopicName(messageType, topicAttribute, environment.EnvironmentName);
+            var topicName = GetTopicName(environment.EnvironmentName, messageType, topicAttribute);
             topicsToSubscribe.Add(topicName);
 
             logger.LogDebug("Discovered handler for {EventType} on topic {TopicName}", messageType.Name, topicName);
@@ -175,11 +174,11 @@ public class KafkaEventsExtensions(
     /// <summary>
     ///     Generates a fully qualified topic name based on environment and domain.
     /// </summary>
+    /// <param name="env">Environment name.</param>
     /// <param name="messageType">The integration event type.</param>
     /// <param name="topicAttribute">The event topic attribute.</param>
-    /// <param name="env">Environment name.</param>
     /// <returns>A topic name in the format: {env}.{domain}.{scope}.{topic}.{version}</returns>
-    private static string GetTopicName(Type messageType, EventTopicAttribute topicAttribute, string env)
+    public static string GetTopicName(string env, Type messageType, EventTopicAttribute topicAttribute)
     {
         var envName = GetEnvNameShort(env);
         var domainName = !string.IsNullOrWhiteSpace(topicAttribute.Domain)
@@ -198,6 +197,11 @@ public class KafkaEventsExtensions(
     private static string GetEnvNameShort(string env)
     {
         var envLower = env.ToLowerInvariant();
+
+        if (envLower.Length < 5)
+        {
+            return envLower;
+        }
 
         return envLower switch
         {

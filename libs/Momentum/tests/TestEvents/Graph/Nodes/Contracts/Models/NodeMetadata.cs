@@ -20,7 +20,7 @@ public record NodeMetadata
     /// <summary>
     ///     List of tags associated with the node
     /// </summary>
-    public List<string> Tags { get; init; } = new();
+    public List<string> Tags { get; init; } = [];
 
     /// <summary>
     ///     Reference back to the node that owns this metadata (circular reference)

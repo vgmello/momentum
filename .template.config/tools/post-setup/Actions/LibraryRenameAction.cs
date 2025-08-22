@@ -16,7 +16,7 @@ public class LibraryRenameAction
     {
         public bool Enabled { get; set; }
         public string LibPrefix { get; set; } = string.Empty;
-        public List<string> ImportedTokens { get; set; } = new();
+        public List<string> ImportedTokens { get; set; } = [];
         public int ProcessedFiles { get; set; }
         public int ChangedFiles { get; set; }
         public string SkipReason { get; set; } = string.Empty;

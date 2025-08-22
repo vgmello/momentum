@@ -12,11 +12,10 @@ namespace Momentum.Extensions.Tests.Messaging;
 public class CloudEventMapperTests
 {
     private readonly CloudEventMapper _mapper;
-    private readonly ServiceBusOptions _serviceBusOptions;
 
     public CloudEventMapperTests()
     {
-        _serviceBusOptions = new ServiceBusOptions
+        var serviceBusOptions = new ServiceBusOptions
         {
             Domain = "TestDomain",
             PublicServiceName = "test-service"
@@ -24,9 +23,9 @@ public class CloudEventMapperTests
         // Use reflection to set the private ServiceUrn property for testing
         typeof(ServiceBusOptions)
             .GetProperty(nameof(ServiceBusOptions.ServiceUrn))!
-            .SetValue(_serviceBusOptions, new Uri("urn:momentum:test-service"));
+            .SetValue(serviceBusOptions, new Uri("urn:momentum:test-service"));
 
-        var options = Options.Create(_serviceBusOptions);
+        var options = Options.Create(serviceBusOptions);
         _mapper = new CloudEventMapper(options);
     }
 
@@ -38,10 +37,11 @@ public class CloudEventMapperTests
         {
             Id = Guid.Parse("123e4567-e89b-12d3-a456-426614174000"),
             MessageType = "TestEvent",
-            Data = Encoding.UTF8.GetBytes("{\"test\":\"data\"}"),
+            Data = "{\"test\":\"data\"}"u8.ToArray(),
             ContentType = "application/json",
             PartitionKey = "test-partition"
         };
+
         // Use reflection to set readonly SentAt property for testing
         typeof(Envelope)
             .GetProperty(nameof(Envelope.SentAt))!
@@ -49,7 +49,7 @@ public class CloudEventMapperTests
 
         var outgoing = new Message<string, byte[]>
         {
-            Headers = new Headers()
+            Headers = []
         };
 
         // Act
@@ -64,8 +64,10 @@ public class CloudEventMapperTests
         GetHeaderValue(outgoing, "ce_id").ShouldBe("123e4567-e89b-12d3-a456-426614174000");
         GetHeaderValue(outgoing, "ce_type").ShouldBe("TestEvent");
         GetHeaderValue(outgoing, "ce_source").ShouldBe("urn:momentum:test-service");
-        GetHeaderValue(outgoing, "ce_datacontenttype").ShouldBe("application/json");
         GetHeaderValue(outgoing, "ce_specversion").ShouldBe("1.0");
+
+        // when binary mode the content type is the actual event type
+        GetHeaderValue(outgoing, "content-type").ShouldBe("application/json");
     }
 
     [Fact]
@@ -76,13 +78,13 @@ public class CloudEventMapperTests
         {
             Id = Guid.NewGuid(),
             MessageType = "TestEvent",
-            Data = Encoding.UTF8.GetBytes("{\"test\":\"data\"}"),
+            Data = "{\"test\":\"data\"}"u8.ToArray(),
             ParentId = "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01"
         };
 
         var outgoing = new Message<string, byte[]>
         {
-            Headers = new Headers()
+            Headers = []
         };
 
         // Act
@@ -101,12 +103,12 @@ public class CloudEventMapperTests
         {
             Id = envelopeId,
             MessageType = "TestEvent",
-            Data = Encoding.UTF8.GetBytes("{\"test\":\"data\"}")
+            Data = "{\"test\":\"data\"}"u8.ToArray()
         };
 
         var outgoing = new Message<string, byte[]>
         {
-            Headers = new Headers()
+            Headers = []
         };
 
         // Act
@@ -142,7 +144,7 @@ public class CloudEventMapperTests
     {
         // Arrange
         var incoming = CreateCloudEventMessage();
-        incoming.Headers.Add("ce_traceparent", Encoding.UTF8.GetBytes("00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01"));
+        incoming.Headers.Add("ce_traceparent", "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01"u8.ToArray());
 
         var envelope = new Envelope();
         // Initialize Headers using reflection since it's readonly
@@ -163,7 +165,7 @@ public class CloudEventMapperTests
         // Arrange
         var incoming = new Message<string, byte[]>
         {
-            Headers = new Headers { { "regular-header", Encoding.UTF8.GetBytes("value") } }
+            Headers = new Headers { { "regular-header", "value"u8.ToArray() } }
         };
 
         var envelope = new Envelope { MessageType = "OriginalType" };
@@ -180,9 +182,11 @@ public class CloudEventMapperTests
     {
         // Arrange
         var incoming = CreateCloudEventMessage();
-        incoming.Headers.Add("ce_id", Encoding.UTF8.GetBytes("invalid-guid"));
+        incoming.Headers.Add("ce_id", "invalid-guid"u8.ToArray());
 
         var envelope = new Envelope();
+        var originalId = envelope.Id;
+
         // Initialize Headers using reflection since it's readonly
         var headersProperty = typeof(Envelope).GetProperty(nameof(Envelope.Headers))!;
         headersProperty.SetValue(envelope, new Dictionary<string, string>());
@@ -191,7 +195,7 @@ public class CloudEventMapperTests
         _mapper.MapIncomingToEnvelope(envelope, incoming);
 
         // Assert
-        envelope.Id.ShouldBe(Guid.Empty);
+        envelope.Id.ShouldBe(originalId);
     }
 
     [Fact]
@@ -208,18 +212,18 @@ public class CloudEventMapperTests
     {
         var headers = new Headers
         {
-            { "ce_specversion", Encoding.UTF8.GetBytes("1.0") },
-            { "ce_id", Encoding.UTF8.GetBytes("123e4567-e89b-12d3-a456-426614174000") },
-            { "ce_type", Encoding.UTF8.GetBytes("TestEvent") },
-            { "ce_source", Encoding.UTF8.GetBytes("urn:momentum:test-service") },
-            { "ce_datacontenttype", Encoding.UTF8.GetBytes("application/json") },
-            { "ce_time", Encoding.UTF8.GetBytes("2024-01-15T10:30:00Z") }
+            { "ce_specversion", "1.0"u8.ToArray() },
+            { "ce_id", "123e4567-e89b-12d3-a456-426614174000"u8.ToArray() },
+            { "ce_type", "TestEvent"u8.ToArray() },
+            { "ce_source", "urn:momentum:test-service"u8.ToArray() },
+            { "ce_datacontenttype", "application/json"u8.ToArray() },
+            { "ce_time", "2024-01-15T10:30:00Z"u8.ToArray() }
         };
 
         return new Message<string, byte[]>
         {
             Headers = headers,
-            Value = Encoding.UTF8.GetBytes("{\"test\":\"data\"}")
+            Value = "{\"test\":\"data\"}"u8.ToArray()
         };
     }
 

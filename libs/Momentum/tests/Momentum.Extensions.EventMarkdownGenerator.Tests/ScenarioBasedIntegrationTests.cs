@@ -432,7 +432,7 @@ public class TestScenario
     public string ExpectedOutputsPath { get; set; } = string.Empty;
     public string AssemblyPath { get; set; } = string.Empty;
     public TestScenarioConfig? Config { get; set; }
-    public List<ExpectedFile> ExpectedFiles { get; set; } = new();
+    public List<ExpectedFile> ExpectedFiles { get; set; } = [];
 }
 
 public class ExpectedFile
@@ -446,7 +446,7 @@ public class ExpectedFile
 public class TestScenarioConfig
 {
     public bool StrictFileMatching { get; set; } = true;
-    public List<string> IgnoreFiles { get; set; } = new();
+    public List<string> IgnoreFiles { get; set; } = [];
     public Dictionary<string, string> CustomAssertions { get; set; } = new();
     public bool GenerateSchemas { get; set; } = true;
     public bool GenerateSidebar { get; set; } = true;
@@ -454,7 +454,7 @@ public class TestScenarioConfig
 
 public class MarkdownGenerationResults
 {
-    public List<IndividualMarkdownOutput> FluidResults { get; set; } = new();
-    public List<IndividualMarkdownOutput> SchemaResults { get; set; } = new();
+    public List<IndividualMarkdownOutput> FluidResults { get; set; } = [];
+    public List<IndividualMarkdownOutput> SchemaResults { get; set; } = [];
     public string SidebarPath { get; set; } = string.Empty;
 }
