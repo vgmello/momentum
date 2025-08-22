@@ -153,7 +153,12 @@ jobs:
 
           # Generate template with output redirection (CRITICAL for preventing buffer overflow)
           try {
-            $process = Start-Process -FilePath "dotnet" -ArgumentList "new", "mmt", "${{ matrix.test.command }}", "--allow-scripts", "yes" -NoNewWindow -Wait -PassThru -RedirectStandardOutput $null -RedirectStandardError $null
+            # Split command into arguments properly handling quotes
+            $command = '${{ matrix.test.command }}'
+            $args = @("new", "mmt") + ($command -split ' (?=(?:[^"]*"[^"]*")*[^"]*$)') + @("--allow-scripts", "yes")
+
+            Write-Host "Arguments: $($args -join ' ')"
+            $process = Start-Process -FilePath "dotnet" -ArgumentList $args -NoNewWindow -Wait -PassThru -RedirectStandardOutput $null -RedirectStandardError $null
 
             if ($process.ExitCode -eq 0) {
               Write-Host "✅ Template generated successfully"
@@ -166,8 +171,8 @@ jobs:
             else {
               Write-Host "❌ Template generation failed with exit code: $($process.ExitCode)"
 
-              # Try to capture any error output
-              dotnet new mmt ${{ matrix.test.command }} --allow-scripts yes 2>&1
+              # Show the exact command that failed
+              Write-Host "Failed command: dotnet $($args -join ' ')"
               exit $process.ExitCode
             }
           }
@@ -210,6 +215,16 @@ jobs:
           }
 
           Write-Host "🧪 Running tests for: $projectName"
+
+          # Check if tests exist first
+          $testProjects = Get-ChildItem -Path . -Recurse -Filter "*.Tests.csproj"
+          if ($testProjects.Count -eq 0) {
+            Write-Host "ℹ️ No test projects found - this is expected for --no-sample configurations"
+            Add-Content $env:GITHUB_OUTPUT "has-tests=false"
+            return
+          }
+
+          Add-Content $env:GITHUB_OUTPUT "has-tests=true"
 
           # Run tests with detailed output
           dotnet test `
@@ -280,8 +295,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-results-${{ matrix.test.name }}
-          path: |
-            ${{ steps.generate-template.outputs.test-dir }}/TestResults/
+          path: ${{ steps.generate-template.outputs.test-dir }}/TestResults
           retention-days: 7
 
       - name: Upload generated template
@@ -289,8 +303,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: generated-template-${{ matrix.test.name }}
-          path: |
-            ${{ steps.generate-template.outputs.test-dir }}/
+          path: ${{ steps.generate-template.outputs.test-dir }}
           retention-days: 3
 
       - name: Cleanup
@@ -302,16 +315,34 @@ jobs:
           # Uninstall template
           try {
             dotnet new uninstall Momentum.Template
+            Write-Host "✅ Template uninstalled"
           }
           catch {
-            Write-Host "Template uninstall failed, continuing..."
+            Write-Host "⚠️ Template uninstall failed, continuing..."
           }
 
-          # Remove generated directory
+          # Remove generated directory (use pattern to clean any test directories)
           $testDir = "${{ steps.generate-template.outputs.test-dir }}"
           if ($testDir -and (Test-Path $testDir)) {
-            Remove-Item -Path $testDir -Recurse -Force
-            Write-Host "✅ Cleanup completed"
+            try {
+              Remove-Item -Path $testDir -Recurse -Force
+              Write-Host "✅ Cleanup completed for: $testDir"
+            }
+            catch {
+              Write-Host "⚠️ Failed to remove test directory: $testDir"
+            }
+          }
+
+          # Clean any remaining test directories as fallback
+          $testDirs = Get-ChildItem -Path . -Directory -Filter "test-output-*" -ErrorAction SilentlyContinue
+          foreach ($dir in $testDirs) {
+            try {
+              Remove-Item -Path $dir.FullName -Recurse -Force
+              Write-Host "✅ Cleaned fallback directory: $($dir.Name)"
+            }
+            catch {
+              Write-Host "⚠️ Failed to remove fallback directory: $($dir.Name)"
+            }
           }
 
   test-summary:
