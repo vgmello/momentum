@@ -52,7 +52,7 @@ public class KafkaEventsExtensionsTests
         var config = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
-                ["ConnectionStrings:Messaging"] = "localhost:9093",
+                ["ConnectionStrings:Messaging"] = "localhost:9093"
             })
             .Build();
 
@@ -77,7 +77,7 @@ public class KafkaEventsExtensionsTests
         var config = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
-                ["ConnectionStrings:Messaging"] = "localhost:909",
+                ["ConnectionStrings:Messaging"] = "localhost:909"
             })
             .Build();
 
