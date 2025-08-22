@@ -10,7 +10,7 @@ using Orleans;
 
 namespace AppDomain.Tests.Unit.Infrastructure;
 
-public class OrleansExtensionsSimpleTests
+public class OrleansExtensionsTests
 {
     [Fact]
     public void AddOrleansClient_ConfigurationValidation_ShouldWork()

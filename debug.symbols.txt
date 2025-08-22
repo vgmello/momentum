@@ -33,34 +33,28 @@ AppDomainKebab=app-domain -> Project name in kebab-case (fileRename: app-domain)
 AppDomainCamelCase=appDomain -> Project name in camelCase (fileRename: appDomain)
 
 ## Computed Symbols (Boolean Logic)
-//#if (ALL)
-ALL=TRUE
-//#else
-ALL=FALSE
-//#endif
-
 //#if (INCLUDE_ASPIRE)
-INCLUDE_ASPIRE=TRUE -> aspire || ALL
+INCLUDE_ASPIRE=TRUE -> aspire || default
 //#else
-INCLUDE_ASPIRE=FALSE -> aspire || ALL
+INCLUDE_ASPIRE=FALSE -> aspire || default
 //#endif
 
 //#if (INCLUDE_API)
-INCLUDE_API=TRUE -> web-api || ALL
+INCLUDE_API=TRUE -> api || default
 //#else
-INCLUDE_API=FALSE -> web-api || ALL
+INCLUDE_API=FALSE -> api || default
 //#endif
 
 //#if (INCLUDE_BACK_OFFICE)
-INCLUDE_BACK_OFFICE=TRUE -> back-office || ALL
+INCLUDE_BACK_OFFICE=TRUE -> back-office || default
 //#else
-INCLUDE_BACK_OFFICE=FALSE -> back-office || ALL
+INCLUDE_BACK_OFFICE=FALSE -> back-office || default
 //#endif
 
 //#if (INCLUDE_DOCS)
-INCLUDE_DOCS=TRUE -> docs || ALL
+INCLUDE_DOCS=TRUE -> docs || default
 //#else
-INCLUDE_DOCS=FALSE -> docs || ALL
+INCLUDE_DOCS=FALSE -> docs || default
 //#endif
 
 //#if (INCLUDE_ORLEANS)

@@ -27,27 +27,75 @@
     // Component Parameters
     "aspire": {
       "type": "parameter",
-      "datatype": "bool",
-      "description": "Generate AppHost Aspire project (Default)",
-      "replaces": "__ASPIRE__"
+      "description": "Generate AppHost Aspire project",
+      "replaces": "__ASPIRE__",
+      "datatype": "choice",
+      "defaultValue": "default",
+      "choices": [
+        {
+          "choice": "default"
+        },
+        {
+          "choice": "true"
+        },
+        {
+          "choice": "false"
+        }
+      ]
     },
     "api": {
       "type": "parameter",
-      "datatype": "bool",
-      "description": "Generate API project (REST/gRPC endpoints) (Default)",
-      "replaces": "__API__"
+      "description": "Generate API project (REST/gRPC endpoints)",
+      "replaces": "__API__",
+      "datatype": "choice",
+      "defaultValue": "default",
+      "choices": [
+        {
+          "choice": "default"
+        },
+        {
+          "choice": "true"
+        },
+        {
+          "choice": "false"
+        }
+      ]
     },
     "back-office": {
       "type": "parameter",
-      "datatype": "bool",
-      "description": "Generate BackOffice project (background event processing) (Default)",
-      "replaces": "__BACK_OFFICE__"
+      "description": "Generate BackOffice project (background event processing)",
+      "replaces": "__BACK_OFFICE__",
+      "datatype": "choice",
+      "defaultValue": "default",
+      "choices": [
+        {
+          "choice": "default"
+        },
+        {
+          "choice": "true"
+        },
+        {
+          "choice": "false"
+        }
+      ]
     },
     "docs": {
       "type": "parameter",
-      "datatype": "bool",
-      "description": "Generates documentation project (Default)",
-      "replaces": "__DOCS__"
+      "description": "Generates documentation project",
+      "replaces": "__DOCS__",
+      "datatype": "choice",
+      "defaultValue": "default",
+      "choices": [
+        {
+          "choice": "default"
+        },
+        {
+          "choice": "true"
+        },
+        {
+          "choice": "false"
+        }
+      ]
     },
     "orleans": {
       "type": "parameter",
@@ -170,25 +218,21 @@
       "description": "Include Debug symbols for the template",
       "replaces": "__DEBUG_SYMBOLS__"
     },
-    "ALL": {
-      "type": "computed",
-      "value": "!(aspire || api || back-office || docs) && !project-only"
-    },
     "INCLUDE_ASPIRE": {
       "type": "computed",
-      "value": "aspire || ALL"
+      "value": "aspire == 'true' || aspire == 'default' && !project-only"
     },
     "INCLUDE_API": {
       "type": "computed",
-      "value": "api || ALL"
+      "value": "api == 'true' || api == 'default' && !project-only"
     },
     "INCLUDE_BACK_OFFICE": {
       "type": "computed",
-      "value": "back-office || ALL"
+      "value": "back-office == 'true' || back-office == 'default' && !project-only"
     },
     "INCLUDE_DOCS": {
       "type": "computed",
-      "value": "docs || ALL"
+      "value": "docs == 'true' || docs == 'default' && !project-only"
     },
     "INCLUDE_ORLEANS": {
       "type": "computed",
@@ -208,7 +252,7 @@
     },
     "AUTO_INCLUDE_DB": {
       "type": "computed",
-      "value": "ALL || HAS_BACKEND"
+      "value": "HAS_BACKEND && !project-only"
     },
     "USE_PGSQL": {
       "type": "computed",
@@ -330,8 +374,9 @@
         "**/*.lock.json",
         "**/_temp/**/*",
         "**/.local/**/*",
-        "**/.vitepress/cache",
-        "**/.vitepress/dist",
+        "**/.vitepress/cache/**/*",
+        "**/.vitepress/dist/**/*",
+        "**/Internal/Generated/**/*",
         "**/docs/reference/*",
         "**/docs/node_modules/**/*",
         "libs/Momentum/src/Momentum.Extensions.Abstractions/**/*",
@@ -370,7 +415,8 @@
         {
           "condition": "(!INCLUDE_API)",
           "exclude": [
-            "src/AppDomain.Api/**/*"
+            "src/AppDomain.Api/**/*",
+            "tests/AppDomain.Tests/Unit/Infrastructure/OrleansExtensionsTests.cs"
           ]
         },
         {
@@ -391,7 +437,8 @@
             "src/AppDomain.BackOffice.Orleans/**/*",
             "src/AppDomain.Api/Infrastructure/Extensions/OrleansExtensions.cs",
             "src/AppDomain/**/Actors/**/*",
-            "tests/AppDomain.Tests/Architecture/OrleansGrainOwnershipRulesTests.cs"
+            "tests/AppDomain.Tests/Architecture/OrleansGrainOwnershipRulesTests.cs",
+            "tests/AppDomain.Tests/Unit/Infrastructure/OrleansExtensionsTests.cs"
           ]
         },
         {
@@ -434,9 +481,6 @@
             "src/AppDomain.BackOffice/Messaging/AppDomainInboxHandler/**/*",
             "src/AppDomain/Cashiers/**/*",
             "src/AppDomain/Invoices/**/*",
-            "src/AppDomain/Core/Data/AppDomainDb.cs",
-            "src/AppDomain/Infrastructure/DependencyInjection.cs",
-            "src/AppDomain/Core/Data/DbEntity.cs",
             "tests/AppDomain.Tests/Unit/Cashier/**/*",
             "tests/AppDomain.Tests/Unit/Invoices/**/*",
             "tests/AppDomain.Tests/Integration/Cashiers/**/*",
@@ -449,20 +493,20 @@
           ]
         },
         {
-          "condition": "libs != 'defaults'",
+          "condition": "!(libs == 'defaults')",
           "exclude": [
             "libs/Momentum/src/Momentum.ServiceDefaults/**/*"
           ]
         },
         {
-          "condition": "libs != 'api'",
+          "condition": "!(libs == 'api')",
           "exclude": [
             "libs/Momentum/src/Momentum.ServiceDefaults.Api/**/*",
             "libs/Momentum/src/Momentum.Extensions.XmlDocs/**/*"
           ]
         },
         {
-          "condition": "libs != 'ext'",
+          "condition": "!(libs == 'ext')",
           "exclude": [
             "libs/Momentum/src/Momentum.Extensions/**/*"
           ]

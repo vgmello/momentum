@@ -42,6 +42,9 @@
 <!--#if (INCLUDE_BACK_OFFICE) -->
         <ProjectReference Include="..\..\src\AppDomain.BackOffice\AppDomain.BackOffice.csproj"/>
 <!--#endif -->
+<!--#if (INCLUDE_ORLEANS) -->
+        <ProjectReference Include="..\..\src\AppDomain.BackOffice.Orleans\AppDomain.BackOffice.Orleans.csproj"/>
+<!--#endif -->
 <!--#if (libs == 'ext') -->
         <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.csproj"/>
 <!--#endif -->
