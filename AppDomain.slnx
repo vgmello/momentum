@@ -10,19 +10,19 @@
         <Project Path="libs\Momentum\src\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj" />
         <Project Path="libs\Momentum\src\Momentum.Extensions.XmlDocs\Momentum.Extensions.XmlDocs.csproj" />
         <!--#endif -->
-        <!--#if (libs == kafka) -->
+        <!--#if (libs == 'kafka') -->
         <Project Path="libs\Momentum\src\Momentum.Extensions.Messaging.Kafka\Momentum.Extensions.Messaging.Kafka.csproj" />
         <!--#endif -->
-        <!--#if (libs == generators) -->
+        <!--#if (libs == 'generators') -->
         <Project Path="libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.csproj" />
         <!--#endif -->
-        <!--#if (libs == ext) -->
+        <!--#if (libs == 'ext') -->
         <Project Path="libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.csproj" />
         <!--#endif -->
-        <!--#if (libs == api) -->
+        <!--#if (libs == 'api') -->
         <Project Path="libs\Momentum\src\Momentum.ServiceDefaults.Api\Momentum.ServiceDefaults.Api.csproj" />
         <!--#endif -->
-        <!--#if (libs == defaults) -->
+        <!--#if (libs == 'defaults') -->
         <Project Path="libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj" />
         <!--#endif -->
     </Folder>

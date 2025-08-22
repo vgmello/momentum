@@ -76,9 +76,9 @@ INCLUDE_SAMPLE=FALSE -> !no-sample
 //#endif
 
 //#if (INCLUDE_LIBS)
-INCLUDE_LIBS=TRUE -> libs != none
+INCLUDE_LIBS=TRUE -> libs != 'none'
 //#else
-INCLUDE_LIBS=FALSE -> libs != none
+INCLUDE_LIBS=FALSE -> libs != 'none'
 //#endif
 
 //#if (HAS_BACKEND)

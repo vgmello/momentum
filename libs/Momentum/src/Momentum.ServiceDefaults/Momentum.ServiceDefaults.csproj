@@ -12,7 +12,7 @@
         </PackageProjectUrl>
     </PropertyGroup>
 
-    <!--#if (libs == none) -->
+    <!--#if (libs == 'none') -->
     <ItemGroup>
         <None Include="Momentum.ServiceDefaults.props" Pack="true" PackagePath="build/"/>
     </ItemGroup>
@@ -47,20 +47,20 @@
         <PackageReference Include="Serilog.Sinks.OpenTelemetry"/>
         <PackageReference Include="WolverineFx"/>
         <PackageReference Include="WolverineFx.Postgresql"/>
-        <!--#if (libs != ext)
+        <!--#if (libs != 'ext')
         <PackageReference Include="Momentum.Extensions"/>
         #endif -->
     </ItemGroup>
 
-    <!--#if (libs == none) -->
+    <!--#if (libs == 'none') -->
     <ItemGroup>
         <ProjectReference Include="..\Momentum.Extensions\Momentum.Extensions.csproj"/>
     </ItemGroup>
     <!--#endif -->
 
-    <!--#if (libs == ext) -->
+    <!--#if (libs == 'ext') -->
     <ItemGroup>
-        <!--#if (libs == ext)
+        <!--#if (libs == 'ext')
         <ProjectReference Include="..\Momentum.Extensions\Momentum.Extensions.csproj"/>
         #endif -->
     </ItemGroup>

@@ -21,13 +21,13 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all"/>
         <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all"/>
-        <!--#if (libs == generators)
+        <!--#if (libs == 'generators')
         <PackageReference Include="Momentum.Extensions.Abstractions" PrivateAssets="all"
         GeneratePathProperty="true"/>
         #endif -->
     </ItemGroup>
 
-    <!--#if (libs == none) -->
+    <!--#if (libs == 'none') -->
     <ItemGroup>
         <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="\analyzers\dotnet\cs" Visible="false"/>
         <None
@@ -47,12 +47,12 @@
 
     <Target Name="GetDependencyTargetPaths">
         <ItemGroup>
-            <!--#if (libs == none) -->
+            <!--#if (libs == 'none') -->
             <TargetPathWithTargetPlatformMoniker
                 Include="$(ProjectDir)..\Momentum.Extensions.Abstractions\$(OutputPath)\Momentum.Extensions.Abstractions.dll"
                 IncludeRuntimeDependency="false"/>
             <!--#endif -->
-            <!--#if (libs == generators)
+            <!--#if (libs == 'generators')
             <TargetPathWithTargetPlatformMoniker
                 Include="$(PKGMomentum_Extensions_Abstractions)analyzers\dotnet\cs\Momentum.Extensions.Abstractions.dll"
                 IncludeRuntimeDependency="false"/>

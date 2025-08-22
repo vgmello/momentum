@@ -14,20 +14,20 @@
         <PackageReference Include="Aspire.Confluent.Kafka"/>
         <PackageReference Include="CloudNative.CloudEvents.Kafka"/>
         <PackageReference Include="WolverineFx.Kafka"/>
-        <!--#if (libs != defaults)
+        <!--#if (libs != 'defaults')
         <PackageReference Include="Momentum.ServiceDefaults"/>
         #endif -->
     </ItemGroup>
 
-    <!--#if (libs == defaults) -->
+    <!--#if (libs == 'defaults') -->
     <ItemGroup>
-        <!--#if (libs == defaults)
+        <!--#if (libs == 'defaults')
         <ProjectReference Include="..\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
         #endif -->
     </ItemGroup>
     <!--#endif -->
 
-    <!--#if (libs == none) -->
+    <!--#if (libs == 'none') -->
     <ItemGroup>
         <ProjectReference Include="..\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
         <ProjectReference Include="..\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>

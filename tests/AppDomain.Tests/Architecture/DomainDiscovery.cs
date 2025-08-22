@@ -14,7 +14,11 @@ public static class DomainDiscovery
     ///     Gets all types from the AppDomain assemblies for architecture testing.
     /// </summary>
     private static Types GetAppDomainTypes() => Types
+#if INCLUDE_API
         .InAssemblies([typeof(IAppDomainAssembly).Assembly, typeof(Api.DependencyInjection).Assembly]);
+#else
+        .InAssemblies([typeof(IAppDomainAssembly).Assembly]);
+#endif
 
     /// <summary>
     ///     Discovers all domain namespaces by looking for Commands, Queries, or Data folders.

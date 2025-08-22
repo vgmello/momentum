@@ -42,13 +42,13 @@
 <!--#if (INCLUDE_BACK_OFFICE) -->
         <ProjectReference Include="..\..\src\AppDomain.BackOffice\AppDomain.BackOffice.csproj"/>
 <!--#endif -->
-<!--#if (libs == ext) -->
+<!--#if (libs == 'ext') -->
         <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.csproj"/>
 <!--#endif -->
-<!--#if (libs == kafka) -->
+<!--#if (libs == 'kafka') -->
         <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.Messaging.Kafka\Momentum.Extensions.Messaging.Kafka.csproj"/>
 <!--#endif -->
-<!--#if (libs == generators) -->
+<!--#if (libs == 'generators') -->
         <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.csproj"/>
 <!--#endif -->
     </ItemGroup>

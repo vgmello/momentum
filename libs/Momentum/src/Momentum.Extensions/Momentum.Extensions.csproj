@@ -9,7 +9,7 @@
         <PackageProjectUrl>https://github.com/vgmello/momentum/blob/main/libs/Momentum/src/Momentum.Extensions/README.md</PackageProjectUrl>
     </PropertyGroup>
 
-    <!--#if (libs == none) -->
+    <!--#if (libs == 'none') -->
     <ItemGroup>
         <None Include="Momentum.Extensions.props" Pack="true" PackagePath="\build"/>
     </ItemGroup>
@@ -22,12 +22,12 @@
         <PackageReference Include="OneOf.SourceGenerator"/>
         <PackageReference Include="Dapper"/>
         <PackageReference Include="WolverineFx"/>
-        <!--#if (libs == ext)
+        <!--#if (libs == 'ext')
         <PackageReference Include="Momentum.Extensions.Abstractions"/>
         #endif -->
     </ItemGroup>
 
-    <!--#if (libs == none) -->
+    <!--#if (libs == 'none') -->
     <ItemGroup>
         <ProjectReference Include="..\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
     </ItemGroup>

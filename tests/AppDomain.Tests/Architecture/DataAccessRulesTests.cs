@@ -12,7 +12,12 @@ public class DataAccessRulesTests : ArchitectureTestBase
     [Fact]
     public void DataClasses_ShouldOnlyBeUsedByDomainClasses_ExceptCoreDataContext()
     {
-        var assemblies = new[] { typeof(IAppDomainAssembly).Assembly, typeof(Api.DependencyInjection).Assembly };
+        var assemblies = new[] { 
+            typeof(IAppDomainAssembly).Assembly
+#if INCLUDE_API
+            , typeof(Api.DependencyInjection).Assembly
+#endif
+        };
 
         var dataNamespaces = assemblies
             .SelectMany(a => a.GetTypes())
