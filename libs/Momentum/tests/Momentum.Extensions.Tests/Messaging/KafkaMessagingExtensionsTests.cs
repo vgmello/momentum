@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Momentum.Extensions.Messaging.Kafka;
-using Shouldly;
 using Wolverine;
 
 namespace Momentum.Extensions.Tests.Messaging;

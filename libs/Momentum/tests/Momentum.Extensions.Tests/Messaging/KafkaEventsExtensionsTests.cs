@@ -8,7 +8,6 @@ using Momentum.Extensions.Abstractions.Messaging;
 using Momentum.Extensions.Messaging.Kafka;
 using Momentum.ServiceDefaults.Messaging;
 using NSubstitute;
-using Shouldly;
 using System.Reflection;
 using Wolverine;
 

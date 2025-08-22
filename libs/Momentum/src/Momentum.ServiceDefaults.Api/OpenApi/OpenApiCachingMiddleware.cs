@@ -54,13 +54,16 @@ public class OpenApiCachingMiddleware(
     private async Task HandleOpenApiRequestAsync(HttpContext context)
     {
         var cacheKey = GetCacheKey(context.Request);
+
         if (!IsValidCacheKey(cacheKey))
         {
             logger.LogWarning("Invalid cache key detected in OpenAPI request: {CacheKey}", cacheKey);
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
             await context.Response.WriteAsync("Invalid OpenAPI request path.");
+
             return;
         }
+
         var filePath = GetCacheFilePath(cacheKey);
 
         if (!_cacheInitialized.ContainsKey(cacheKey))
@@ -211,12 +214,14 @@ public class OpenApiCachingMiddleware(
         {
             return false;
         }
+
         // Optionally, restrict to a safe pattern (alphanumeric, '-', '_')
         foreach (var c in cacheKey)
         {
             if (!(char.IsLetterOrDigit(c) || c == '-' || c == '_'))
                 return false;
         }
+
         return true;
     }
 
