@@ -1,3 +1,5 @@
+<!-- // @formatter:off -->
+
 ---
 editLink: false
 ---
@@ -22,17 +24,17 @@ editLink: false
 
 {% assign referencedSchemas = schema.properties | where: "schemaLink" -%}
 {% if referencedSchemas.size > 0 -%}
-    ### Reference Schemas
+### Reference Schemas
 
-    {% for property in referencedSchemas -%}
-        {% if property.isCollectionType -%}
-            {% assign elementType = property.typeName | replace: 'List<', '' | replace: '>', '' -%}
-            #### {{ elementType }}
-        {% else -%}
-            #### {{ property.typeName }}
-        {% endif -%}
+{% for property in referencedSchemas -%}
+{% if property.isCollectionType -%}
+{% assign elementType = property.typeName | replace: 'List<', '' | replace: '>', '' -%}
+#### {{ elementType }}
+{% else -%}
+#### {{ property.typeName }}
+{% endif -%}
 
-        <!--@include: @/events/schemas/{{ property.schemaPath }}#schema-->
+<!--@include: @/events/schemas/{{ property.schemaPath }}#schema-->
 
-    {% endfor -%}
+{% endfor -%}
 {% endif -%}
