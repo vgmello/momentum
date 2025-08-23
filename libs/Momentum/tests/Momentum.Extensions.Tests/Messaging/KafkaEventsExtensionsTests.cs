@@ -1,5 +1,6 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
+using Confluent.Kafka;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -66,6 +67,64 @@ public class KafkaEventsExtensionsTests
         // Assert
         transport.ConsumerConfig.BootstrapServers.ShouldBe("localhost:9093");
         transport.ProducerConfig.BootstrapServers.ShouldBe("localhost:9093");
+    }
+
+    [Fact]
+    public void Configure_WithProducerConfigSettings_AppliesProducerConfiguration()
+    {
+        // Arrange
+        var config = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["ConnectionStrings:Messaging"] = "localhost:9092",
+                ["Kafka:ProducerConfig:EnableIdempotence"] = "true",
+                ["Kafka:ProducerConfig:MaxInFlight"] = "1",
+                ["Kafka:ProducerConfig:Acks"] = "All",
+                ["Kafka:ProducerConfig:MessageSendMaxRetries"] = "15"
+            })
+            .Build();
+
+        var extension = new KafkaEventsExtensions(_logger, config, _serviceBusOptions, _environment);
+        var options = new WolverineOptions { ServiceName = "test-service" };
+        var transport = options.Transports.GetOrCreate<KafkaTransport>();
+
+        // Act
+        extension.Configure(options);
+
+        // Assert
+        transport.ProducerConfig.EnableIdempotence.ShouldBe(true);
+        transport.ProducerConfig.MaxInFlight.ShouldBe(1);
+        transport.ProducerConfig.Acks.ShouldBe(Acks.All);
+        transport.ProducerConfig.MessageSendMaxRetries.ShouldBe(15);
+    }
+
+    [Fact]
+    public void Configure_WithConsumerConfigSettings_AppliesConsumerConfiguration()
+    {
+        // Arrange
+        var config = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["ConnectionStrings:Messaging"] = "localhost:9092",
+                ["Kafka:ConsumerConfig:SessionTimeoutMs"] = "15000",
+                ["Kafka:ConsumerConfig:HeartbeatIntervalMs"] = "5000",
+                ["Kafka:ConsumerConfig:MaxPollIntervalMs"] = "600000",
+                ["Kafka:ConsumerConfig:FetchMinBytes"] = "2048"
+            })
+            .Build();
+
+        var extension = new KafkaEventsExtensions(_logger, config, _serviceBusOptions, _environment);
+        var options = new WolverineOptions { ServiceName = "test-service" };
+        var transport = options.Transports.GetOrCreate<KafkaTransport>();
+
+        // Act
+        extension.Configure(options);
+
+        // Assert
+        transport.ConsumerConfig.SessionTimeoutMs.ShouldBe(15000);
+        transport.ConsumerConfig.HeartbeatIntervalMs.ShouldBe(5000);
+        transport.ConsumerConfig.MaxPollIntervalMs.ShouldBe(600000);
+        transport.ConsumerConfig.FetchMinBytes.ShouldBe(2048);
     }
 
     [Fact]
