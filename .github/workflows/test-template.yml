@@ -14,6 +14,20 @@ on:
       - "AppDomain.slnx"
       - ".github/workflows/test-template.yml"
 
+  push:
+    branches: [ main ]
+    paths:
+      - ".template.config/**"
+      - "src/**"
+      - "infra/**"
+      - "tests/**"
+      - "libs/Momentum/src/**"
+      - "libs/Momentum/Momentum.Template.csproj"
+      - "Directory.Build.props"
+      - "Directory.Packages.props"
+      - "AppDomain.slnx"
+      - ".github/workflows/test-template.yml"
+
   workflow_dispatch:
     inputs:
       test-config-path:
