@@ -2,7 +2,7 @@
   "testCases": [
     {
       "name": "minimal-api",
-      "command": "-n MinimalApi --web-api --no-back-office --no-orleans --no-docs --no-sample",
+      "command": "-n MinimalApi --api --no-back-office --no-orleans --no-docs --no-sample",
       "description": "Test minimal API-only configuration"
     },
     {

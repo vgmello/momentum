@@ -252,7 +252,6 @@ jobs:
 
               exit $testExitCode
             }
-          }
 
       - name: Generate step summary
         if: always()
@@ -291,7 +290,7 @@ jobs:
           }
 
       - name: Upload test results
-        if: failure() && steps.run-tests.outputs.has-tests == 'true'
+        if: failure() && steps.run-tests.outputs.has-tests == 'true' && steps.generate-template.outputs.test-dir
         uses: actions/upload-artifact@v4
         with:
           name: test-results-${{ matrix.test.name }}
@@ -299,7 +298,7 @@ jobs:
           retention-days: 7
 
       - name: Upload generated template
-        if: failure()
+        if: failure() && steps.generate-template.outputs.test-dir
         uses: actions/upload-artifact@v4
         with:
           name: generated-template-${{ matrix.test.name }}
@@ -334,16 +333,23 @@ jobs:
           }
 
           # Clean any remaining test directories as fallback
-          $testDirs = Get-ChildItem -Path . -Directory -Filter "test-output-*" -ErrorAction SilentlyContinue
-          foreach ($dir in $testDirs) {
-            try {
-              Remove-Item -Path $dir.FullName -Recurse -Force
-              Write-Host "✅ Cleaned fallback directory: $($dir.Name)"
-            }
-            catch {
-              Write-Host "⚠️ Failed to remove fallback directory: $($dir.Name)"
+          try {
+            $testDirs = Get-ChildItem -Path . -Directory -Filter "test-output-*" -ErrorAction SilentlyContinue
+            foreach ($dir in $testDirs) {
+              try {
+                Remove-Item -Path $dir.FullName -Recurse -Force
+                Write-Host "✅ Cleaned fallback directory: $($dir.Name)"
+              }
+              catch {
+                Write-Host "⚠️ Failed to remove fallback directory: $($dir.Name)"
+              }
             }
           }
+          catch {
+            Write-Host "⚠️ Error during fallback cleanup, continuing..."
+          }
+          
+          Write-Host "✅ Cleanup process completed"
 
   test-summary:
     name: Test Summary
