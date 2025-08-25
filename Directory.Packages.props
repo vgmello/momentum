@@ -19,6 +19,7 @@
     <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="9.4.1" />
     <PackageVersion Include="Aspire.Npgsql" Version="9.4.1" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.14.0" />
+    <PackageVersion Include="Bogus" Version="35.6.2" />
     <PackageVersion Include="CloudNative.CloudEvents.Kafka" Version="2.8.0" />
     <PackageVersion Include="CloudNative.CloudEvents.SystemTextJson" Version="2.8.0" />
     <PackageVersion Include="Confluent.Kafka.Extensions.OpenTelemetry" Version="0.4.0" />

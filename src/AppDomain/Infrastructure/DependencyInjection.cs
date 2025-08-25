@@ -1,14 +1,13 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
-//#if (USE_DB)
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 
+//#if (USE_DB)
 using Dapper;
 using LinqToDB.AspNet;
 using LinqToDB.AspNet.Logging;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using Momentum.Extensions.Data.LinqToDb;
-
 //#endif
 
 namespace AppDomain.Infrastructure;

@@ -430,7 +430,10 @@
           "condition": "(project-only)",
           "include": [
             "Directory.Build.props",
-            "Directory.Packages.props"
+            "Directory.Packages.props",
+            "*.ruleset",
+            "*.slnx",
+            "*.slnx.DotSettings"
           ]
         },
         {
@@ -489,6 +492,14 @@
           "exclude": [
             "src/AppDomain.AppHost/Extensions/LiquibaseExtensions.cs",
             "tests/AppDomain.Tests/Integration/_Internal/Containers/LiquibaseMigrationContainer.cs"
+          ]
+        },
+        {
+          "condition": "(!USE_DB)",
+          "exclude": [
+            "tests/AppDomain.Tests/Integration/_Internal/Extensions/DatabaseContainerExtensions.cs",
+            "tests/AppDomain.Tests/Integration/Cashiers/**/*",
+            "tests/AppDomain.Tests/Integration/Invoices/**/*"
           ]
         },
         {

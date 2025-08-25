@@ -2,6 +2,7 @@
 
 using AppDomain.Invoices.Grpc;
 using AppDomain.Tests.Integration._Internal;
+using AppDomain.Tests.Integration._Internal.TestDataGenerators;
 using System.Data.Common;
 
 namespace AppDomain.Tests.Integration.Invoices;
@@ -9,6 +10,7 @@ namespace AppDomain.Tests.Integration.Invoices;
 public class SimulatePaymentIntegrationTests(IntegrationTestFixture fixture) : IntegrationTest(fixture)
 {
     private readonly InvoicesService.InvoicesServiceClient _client = new(fixture.GrpcChannel);
+    private readonly InvoiceFaker _invoiceFaker = new();
 
     [Fact]
     public async Task SimulatePayment_ShouldTriggerPaymentSimulationSuccessfully()
@@ -18,24 +20,20 @@ public class SimulatePaymentIntegrationTests(IntegrationTestFixture fixture) : I
         await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
 
         // Arrange - Create an invoice first
-        var createRequest = new CreateInvoiceRequest
-        {
-            Name = "Invoice for Payment Simulation",
-            Amount = 200.00,
-            Currency = "USD"
-        };
+        var createRequest = _invoiceFaker
+            .WithAmount(200.00)
+            .WithCurrency("USD")
+            .Generate();
 
         var createdInvoice = await _client.CreateInvoiceAsync(createRequest, cancellationToken: TestContext.Current.CancellationToken);
 
-        var simulateRequest = new SimulatePaymentRequest
-        {
-            InvoiceId = createdInvoice.InvoiceId,
-            Version = createdInvoice.Version,
-            Amount = 200.00,
-            Currency = "USD",
-            PaymentMethod = "Credit Card",
-            PaymentReference = "TEST-REF-123"
-        };
+        var simulateFaker = new SimulatePaymentFaker(createdInvoice.InvoiceId)
+            .WithAmount(200.00)
+            .WithPaymentMethod("credit_card");
+        var simulateRequest = simulateFaker.Generate();
+        simulateRequest.Version = createdInvoice.Version;
+        simulateRequest.Currency = "USD";
+        simulateRequest.PaymentReference = "TEST-REF-123";
 
         // Act
         var response = await _client.SimulatePaymentAsync(simulateRequest, cancellationToken: TestContext.Current.CancellationToken);
@@ -63,24 +61,20 @@ public class SimulatePaymentIntegrationTests(IntegrationTestFixture fixture) : I
         await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
 
         // Arrange - Create an invoice first
-        var createRequest = new CreateInvoiceRequest
-        {
-            Name = "Invoice for Minimal Payment Simulation",
-            Amount = 100.00,
-            Currency = "EUR"
-        };
+        var createRequest = _invoiceFaker
+            .WithAmount(100.00)
+            .WithCurrency("EUR")
+            .Generate();
 
         var createdInvoice = await _client.CreateInvoiceAsync(createRequest, cancellationToken: TestContext.Current.CancellationToken);
 
-        var simulateRequest = new SimulatePaymentRequest
-        {
-            InvoiceId = createdInvoice.InvoiceId,
-            Version = createdInvoice.Version,
-            Amount = 100.00,
-            Currency = "EUR", // Use invoice currency as default
-            PaymentMethod = "Default",
-            PaymentReference = "DEFAULT-REF"
-        };
+        var simulateFaker = new SimulatePaymentFaker(createdInvoice.InvoiceId)
+            .WithAmount(100.00);
+        var simulateRequest = simulateFaker.Generate();
+        simulateRequest.Version = createdInvoice.Version;
+        simulateRequest.Currency = "EUR"; // Use invoice currency as default
+        simulateRequest.PaymentMethod = "Default";
+        simulateRequest.PaymentReference = "DEFAULT-REF";
 
         // Act
         var response = await _client.SimulatePaymentAsync(simulateRequest, cancellationToken: TestContext.Current.CancellationToken);
@@ -94,13 +88,11 @@ public class SimulatePaymentIntegrationTests(IntegrationTestFixture fixture) : I
     public async Task SimulatePayment_WithNonExistentInvoice_ShouldThrowInvalidArgumentException()
     {
         // Arrange
-        var simulateRequest = new SimulatePaymentRequest
-        {
-            InvoiceId = Guid.NewGuid().ToString(),
-            Version = 1,
-            Amount = 100.00,
-            Currency = "USD"
-        };
+        var simulateFaker = new SimulatePaymentFaker(Guid.NewGuid().ToString())
+            .WithAmount(100.00);
+        var simulateRequest = simulateFaker.Generate();
+        simulateRequest.Version = 1;
+        simulateRequest.Currency = "USD";
 
         // Act & Assert
         var exception = await Should.ThrowAsync<RpcException>(async () =>
@@ -117,12 +109,10 @@ public class SimulatePaymentIntegrationTests(IntegrationTestFixture fixture) : I
         await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
 
         // Arrange - Create an invoice first
-        var createRequest = new CreateInvoiceRequest
-        {
-            Name = "Invoice for Invalid Payment Simulation",
-            Amount = 100.00,
-            Currency = "USD"
-        };
+        var createRequest = _invoiceFaker
+            .WithAmount(100.00)
+            .WithCurrency("USD")
+            .Generate();
 
         var createdInvoice = await _client.CreateInvoiceAsync(createRequest, cancellationToken: TestContext.Current.CancellationToken);
 

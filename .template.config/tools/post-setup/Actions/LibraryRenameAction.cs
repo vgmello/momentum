@@ -193,16 +193,21 @@ public class LibraryRenameAction
     {
         try
         {
-            var encoding = Encoding.UTF8;
-
             var bytes = File.ReadAllBytes(filePath);
+            bool hasBom = bytes is [0xEF, 0xBB, 0xBF, ..];
 
-            if (bytes is [0xEF, 0xBB, 0xBF, ..])
+            // Read content properly handling BOM
+            string originalContent;
+            if (hasBom)
             {
-                encoding = new UTF8Encoding(true); // UTF-8 with BOM
+                // Skip BOM bytes when reading content
+                originalContent = Encoding.UTF8.GetString(bytes, 3, bytes.Length - 3);
+            }
+            else
+            {
+                originalContent = Encoding.UTF8.GetString(bytes);
             }
 
-            var originalContent = encoding.GetString(bytes);
             var modifiedContent = regex.Replace(originalContent, match =>
             {
                 var token = match.Groups["token"].Value;
@@ -221,7 +226,17 @@ public class LibraryRenameAction
             if (modifiedContent != originalContent)
             {
                 var tempFile = filePath + ".tmp";
-                File.WriteAllText(tempFile, modifiedContent, encoding);
+                
+                // Write with same BOM handling as original file
+                if (hasBom)
+                {
+                    File.WriteAllText(tempFile, modifiedContent, new UTF8Encoding(true));
+                }
+                else
+                {
+                    File.WriteAllText(tempFile, modifiedContent, new UTF8Encoding(false));
+                }
+                
                 File.Move(tempFile, filePath, overwrite: true);
 
                 Console.WriteLine($"  → Updated library references in: {Path.GetRelativePath(projectDir, filePath)}");
