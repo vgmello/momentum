@@ -2,10 +2,10 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <AspireAppHostSdkVersion>9.4</AspireAppHostSdkVersion>
+    <MomentumVersion>__TEMPLATE_MOMENTUM_VERSION__</MomentumVersion>
     <!--#if (false) -->
-    <TemplateMomentumVersion>0.0.1</TemplateMomentumVersion>
+    <MomentumVersion>0.0.1</MomentumVersion>
     <!--#endif -->
-    <MomentumVersion>$(TemplateMomentumVersion)</MomentumVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Aspire.Azure.Data.Tables" Version="9.4.1" />
@@ -19,6 +19,7 @@
     <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="9.4.1" />
     <PackageVersion Include="Aspire.Npgsql" Version="9.4.1" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.14.0" />
+    <PackageVersion Include="Bogus" Version="35.6.2" />
     <PackageVersion Include="CloudNative.CloudEvents.Kafka" Version="2.8.0" />
     <PackageVersion Include="CloudNative.CloudEvents.SystemTextJson" Version="2.8.0" />
     <PackageVersion Include="Confluent.Kafka.Extensions.OpenTelemetry" Version="0.4.0" />
@@ -96,6 +97,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
+    <PackageVersion Include="Momentum.Extensions.XmlDocs" Version="$(MomentumVersion)" />
     <PackageVersion Include="Momentum.ServiceDefaults" Version="$(MomentumVersion)" />
     <PackageVersion Include="Momentum.ServiceDefaults.Api" Version="$(MomentumVersion)" />
     <PackageVersion Include="NetArchTest.Rules" Version="1.3.2" />

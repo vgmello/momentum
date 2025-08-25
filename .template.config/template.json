@@ -24,36 +24,90 @@
     "1358a541-294a-491c-a8c3-46ac380e4c69"
   ],
   "symbols": {
+    // Component Parameters
     "aspire": {
       "type": "parameter",
-      "datatype": "bool",
-      "description": "Generate AppHost Aspire project (Default)"
+      "description": "Generate AppHost Aspire project",
+      "replaces": "__ASPIRE__",
+      "datatype": "choice",
+      "defaultValue": "default",
+      "choices": [
+        {
+          "choice": "default"
+        },
+        {
+          "choice": "true"
+        },
+        {
+          "choice": "false"
+        }
+      ]
     },
-    "web-api": {
+    "api": {
       "type": "parameter",
-      "datatype": "bool",
-      "description": "Generate API project (REST/gRPC endpoints) (Default)"
+      "description": "Generate API project (REST/gRPC endpoints)",
+      "replaces": "__API__",
+      "datatype": "choice",
+      "defaultValue": "default",
+      "choices": [
+        {
+          "choice": "default"
+        },
+        {
+          "choice": "true"
+        },
+        {
+          "choice": "false"
+        }
+      ]
     },
     "back-office": {
       "type": "parameter",
-      "datatype": "bool",
-      "description": "Generate BackOffice project (background event processing) (Default)"
+      "description": "Generate BackOffice project (background event processing)",
+      "replaces": "__BACK_OFFICE__",
+      "datatype": "choice",
+      "defaultValue": "default",
+      "choices": [
+        {
+          "choice": "default"
+        },
+        {
+          "choice": "true"
+        },
+        {
+          "choice": "false"
+        }
+      ]
     },
     "docs": {
       "type": "parameter",
-      "datatype": "bool",
-      "description": "Generates documentation project (Default)"
+      "description": "Generates documentation project",
+      "replaces": "__DOCS__",
+      "datatype": "choice",
+      "defaultValue": "default",
+      "choices": [
+        {
+          "choice": "default"
+        },
+        {
+          "choice": "true"
+        },
+        {
+          "choice": "false"
+        }
+      ]
     },
     "orleans": {
       "type": "parameter",
       "datatype": "bool",
-      "description": "Generate Orleans-based BackOffice project (stateful processing)"
+      "description": "Generate Orleans-based BackOffice project (stateful processing)",
+      "replaces": "__ORLEANS__"
     },
+    // Configuration Parameters
     "db-config": {
       "type": "parameter",
       "datatype": "choice",
       "allowMultipleValues": true,
-      "enableQuotelessLiterals": true,
       "description": "Data access setup configuration",
       "defaultValue": "default",
       "choices": [
@@ -71,42 +125,48 @@
         },
         {
           "choice": "default",
-          "description": "NPgsql & Liquibase"
+          "description": "PostgreSQL & Liquibase"
         }
-      ]
+      ],
+      "replaces": "__DB_CONFIG__"
     },
     "kafka": {
       "type": "parameter",
       "datatype": "bool",
       "description": "Use Apache Kafka",
-      "defaultValue": "true"
+      "defaultValue": "true",
+      "replaces": "__KAFKA__"
     },
     "port": {
       "type": "parameter",
       "datatype": "int",
       "defaultValue": "8100",
       "description": "Base port number for the application services",
-      "replaces": "SERVICE_BASE_PORT"
+      "replaces": "__SERVICE_BASE_PORT__"
     },
     "org": {
       "type": "parameter",
-      "description": "Organization / Team name"
+      "description": "Organization / Team name",
+      "replaces": "__ORG__"
     },
+    // Content Parameters
     "no-sample": {
       "type": "parameter",
       "datatype": "bool",
-      "description": "Skip generating sample code"
+      "description": "Skip generating sample code",
+      "replaces": "__NO_SAMPLE__"
     },
     "project-only": {
       "type": "parameter",
       "datatype": "bool",
-      "description": "Only generate the project and its respective files. (no Solution, .gitignore, etc)"
+      "description": "Only generate the project and its respective files. (no Solution, .gitignore, etc)",
+      "replaces": "__PROJECT_ONLY__"
     },
+    // Library Parameters
     "libs": {
       "type": "parameter",
       "datatype": "choice",
       "allowMultipleValues": true,
-      "enableQuotelessLiterals": true,
       "description": "Momentum libraries to include as direct project references",
       "defaultValue": "none",
       "choices": [
@@ -134,7 +194,8 @@
           "choice": "generators",
           "description": "Include Momentum.Extensions.SourceGenerators as project reference"
         }
-      ]
+      ],
+      "replaces": "__LIBS__"
     },
     "lib-name": {
       "type": "parameter",
@@ -148,28 +209,30 @@
       "type": "parameter",
       "datatype": "string",
       "description": "Momentum lib version",
-      "defaultValue": "0.0.1",
-      "replaces": "$(TemplateMomentumVersion)"
+      "defaultValue": "0.0.1-pre.14",
+      "replaces": "__TEMPLATE_MOMENTUM_VERSION__"
     },
-    "ALL": {
-      "type": "computed",
-      "value": "!(aspire || web-api || back-office || docs) && !project-only"
+    "debug-symbols": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "Include Debug symbols for the template",
+      "replaces": "__DEBUG_SYMBOLS__"
     },
     "INCLUDE_ASPIRE": {
       "type": "computed",
-      "value": "aspire || ALL"
+      "value": "aspire == 'true' || aspire == 'default' && !project-only"
     },
     "INCLUDE_API": {
       "type": "computed",
-      "value": "web-api || ALL"
+      "value": "api == 'true' || api == 'default' && !project-only"
     },
     "INCLUDE_BACK_OFFICE": {
       "type": "computed",
-      "value": "back-office || ALL"
+      "value": "back-office == 'true' || back-office == 'default' && !project-only"
     },
     "INCLUDE_DOCS": {
       "type": "computed",
-      "value": "docs || ALL"
+      "value": "docs == 'true' || docs == 'default' && !project-only"
     },
     "INCLUDE_ORLEANS": {
       "type": "computed",
@@ -181,7 +244,7 @@
     },
     "INCLUDE_LIBS": {
       "type": "computed",
-      "value": "libs != none"
+      "value": "!(libs == 'none')"
     },
     "HAS_BACKEND": {
       "type": "computed",
@@ -189,15 +252,15 @@
     },
     "AUTO_INCLUDE_DB": {
       "type": "computed",
-      "value": "ALL || HAS_BACKEND"
+      "value": "HAS_BACKEND && !project-only"
     },
     "USE_PGSQL": {
       "type": "computed",
-      "value": "db-config == npgsql || (AUTO_INCLUDE_DB && db-config == default)"
+      "value": "db-config == 'npgsql' || (AUTO_INCLUDE_DB && db-config == 'default')"
     },
     "USE_LIQUIBASE": {
       "type": "computed",
-      "value": "db-config == liquibase || (AUTO_INCLUDE_DB && db-config == default)"
+      "value": "db-config == 'liquibase' || (AUTO_INCLUDE_DB && db-config == 'default')"
     },
     "INCLUDE_INFRA_DB": {
       "type": "computed",
@@ -211,11 +274,34 @@
       "type": "computed",
       "value": "kafka && HAS_BACKEND"
     },
-    "IncludeLibs": {
-      "type": "derived",
-      "valueSource": "INCLUDE_LIBS",
-      "valueTransform": "kebab-case",
-      "replaces": "__INCLUDE_LIBS__"
+    "LIBS_INCLUDES_DEFAULTS": {
+      "type": "computed",
+      "value": "libs == 'defaults'"
+    },
+    "LIBS_INCLUDES_API": {
+      "type": "computed",
+      "value": "libs == 'api'"
+    },
+    "LIBS_INCLUDES_EXT": {
+      "type": "computed",
+      "value": "libs == 'ext'"
+    },
+    "LIBS_INCLUDES_KAFKA": {
+      "type": "computed",
+      "value": "libs == 'kafka'"
+    },
+    "LIBS_INCLUDES_GENERATORS": {
+      "type": "computed",
+      "value": "libs == 'generators'"
+    },
+    // Generated Symbols
+    "DiagramArrow": {
+      "type": "generated",
+      "generator": "constant",
+      "parameters": {
+        "value": "-->"
+      },
+      "replaces": "-/->"
     },
     "DefaultOrgName": {
       "type": "generated",
@@ -240,7 +326,7 @@
         "sourceVariableName": "org",
         "fallbackVariableName": "DefaultOrgName"
       },
-      "replaces": "ORG_NAME"
+      "replaces": "OrgName"
     },
     "OrgNameKebab": {
       "type": "derived",
@@ -262,7 +348,7 @@
       "replaces": "app-domain",
       "fileRename": "app-domain"
     },
-    "appDomainCamelCase": {
+    "AppDomainCamelCase": {
       "type": "derived",
       "valueSource": "name",
       "valueTransform": "camelCase",
@@ -295,9 +381,9 @@
       "include": [
         "docs/**/*",
         "infra/**/*",
-        "libs/Momentum/src/**/*",
         "src/**/*",
-        "tests/**/*"
+        "tests/**/*",
+        "libs/Momentum/src/**/*"
       ],
       "exclude": [
         "**/[Bb]in/**",
@@ -308,12 +394,22 @@
         "**/*.lock.json",
         "**/_temp/**/*",
         "**/.local/**/*",
-        "**/.vitepress/cache",
-        "**/.vitepress/dist",
+        "**/.vitepress/cache/**/*",
+        "**/.vitepress/dist/**/*",
+        "**/Internal/Generated/**/*",
+        "**/docs/reference/*",
+        "**/docs/node_modules/**/*",
         "libs/Momentum/src/Momentum.Extensions.Abstractions/**/*",
-        "libs/Momentum/src/Momentum.Extensions.EventMarkdownGenerator/**/*"
+        "libs/Momentum/src/Momentum.Extensions.EventMarkdownGenerator/**/*",
+        "debug.symbols.txt"
       ],
       "modifiers": [
+        {
+          "condition": "debug-symbols",
+          "include": [
+            "debug.symbols.txt"
+          ]
+        },
         {
           "condition": "(!project-only)",
           "include": [
@@ -331,6 +427,16 @@
           ]
         },
         {
+          "condition": "(project-only)",
+          "include": [
+            "Directory.Build.props",
+            "Directory.Packages.props",
+            "*.ruleset",
+            "*.slnx",
+            "*.slnx.DotSettings"
+          ]
+        },
+        {
           "condition": "(!INCLUDE_ASPIRE)",
           "exclude": [
             "src/AppDomain.AppHost/**/*"
@@ -339,7 +445,10 @@
         {
           "condition": "(!INCLUDE_API)",
           "exclude": [
-            "src/AppDomain.Api/**/*"
+            "src/AppDomain.Api/**/*",
+            "tests/AppDomain.Tests/Unit/Infrastructure/OrleansExtensionsTests.cs",
+            "tests/AppDomain.Tests/Integration/Cashiers/**/*",
+            "tests/AppDomain.Tests/Integration/Invoices/**/*"
           ]
         },
         {
@@ -358,7 +467,10 @@
           "condition": "(!INCLUDE_ORLEANS)",
           "exclude": [
             "src/AppDomain.BackOffice.Orleans/**/*",
-            "src/AppDomain.Api/Extensions/OrleansExtensions.cs"
+            "src/AppDomain.Api/Infrastructure/Extensions/OrleansExtensions.cs",
+            "src/AppDomain/**/Actors/**/*",
+            "tests/AppDomain.Tests/Architecture/OrleansGrainOwnershipRulesTests.cs",
+            "tests/AppDomain.Tests/Unit/Infrastructure/OrleansExtensionsTests.cs"
           ]
         },
         {
@@ -368,7 +480,7 @@
           ]
         },
         {
-          "condition": "(!HAS_BACKEND || project-only)",
+          "condition": "(!HAS_BACKEND && !project-only)",
           "exclude": [
             "src/AppDomain/**/*",
             "src/AppDomain.Contracts/**/*",
@@ -380,6 +492,14 @@
           "exclude": [
             "src/AppDomain.AppHost/Extensions/LiquibaseExtensions.cs",
             "tests/AppDomain.Tests/Integration/_Internal/Containers/LiquibaseMigrationContainer.cs"
+          ]
+        },
+        {
+          "condition": "(!USE_DB)",
+          "exclude": [
+            "tests/AppDomain.Tests/Integration/_Internal/Extensions/DatabaseContainerExtensions.cs",
+            "tests/AppDomain.Tests/Integration/Cashiers/**/*",
+            "tests/AppDomain.Tests/Integration/Invoices/**/*"
           ]
         },
         {
@@ -401,9 +521,6 @@
             "src/AppDomain.BackOffice/Messaging/AppDomainInboxHandler/**/*",
             "src/AppDomain/Cashiers/**/*",
             "src/AppDomain/Invoices/**/*",
-            "src/AppDomain/Core/Data/AppDomainDb.cs",
-            "src/AppDomain/Infrastructure/DependencyInjection.cs",
-            "src/AppDomain/Core/Data/DbEntity.cs",
             "tests/AppDomain.Tests/Unit/Cashier/**/*",
             "tests/AppDomain.Tests/Unit/Invoices/**/*",
             "tests/AppDomain.Tests/Integration/Cashiers/**/*",
@@ -416,32 +533,32 @@
           ]
         },
         {
-          "condition": "libs != defaults",
+          "condition": "(!LIBS_INCLUDES_DEFAULTS)",
           "exclude": [
             "libs/Momentum/src/Momentum.ServiceDefaults/**/*"
           ]
         },
         {
-          "condition": "libs != api",
+          "condition": "(!LIBS_INCLUDES_API)",
           "exclude": [
             "libs/Momentum/src/Momentum.ServiceDefaults.Api/**/*",
             "libs/Momentum/src/Momentum.Extensions.XmlDocs/**/*"
           ]
         },
         {
-          "condition": "libs != ext",
+          "condition": "(!LIBS_INCLUDES_EXT)",
           "exclude": [
             "libs/Momentum/src/Momentum.Extensions/**/*"
           ]
         },
         {
-          "condition": "libs != generators",
+          "condition": "(!LIBS_INCLUDES_GENERATORS)",
           "exclude": [
             "libs/Momentum/src/Momentum.Extensions.SourceGenerators/**/*"
           ]
         },
         {
-          "condition": "libs != kafka",
+          "condition": "(!LIBS_INCLUDES_KAFKA)",
           "exclude": [
             "libs/Momentum/src/Momentum.Extensions.Messaging.Kafka/**/*"
           ]
@@ -468,6 +585,11 @@
       }
     }
   ],
+  "primaryOutputs": [
+    {
+      "path": "AppDomain.slnx"
+    }
+  ],
   "postActions": [
     {
       "description": "Run post-setup configuration",
@@ -482,6 +604,17 @@
         "redirectStandardOutput": false,
         "args": "run --project .local/tools/post-setup"
       },
+      "continueOnError": true
+    },
+    {
+      "condition": "(!project-only)",
+      "description": "Restore NuGet packages required by this project.",
+      "manualInstructions": [
+        {
+          "text": "Run 'dotnet restore'"
+        }
+      ],
+      "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
       "continueOnError": true
     }
   ],

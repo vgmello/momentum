@@ -34,6 +34,7 @@ permissions:
 jobs:
   deploy-docs:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     environment:
       name: github-pages
       url: ${{ steps.docs-deployment.outputs.page_url }}
@@ -68,14 +69,11 @@ jobs:
         uses: actions/deploy-pages@v4
 
       - name: Deployment Summary
+        shell: pwsh
         run: |
-          echo "# 📚 Documentation Deployment Summary"
-          echo ""
-          if [ -n "${{ steps.docs-deployment.outputs.page_url }}" ]; then
-            echo "✅ **Documentation deployed successfully**"
-            echo "   - URL: ${{ steps.docs-deployment.outputs.page_url }}"
-            echo "   - Source: ${{ github.event.inputs.docs-path || 'libs/Momentum/docs' }}"
-            echo "   - Built .NET: ${{ github.event.inputs.build-dotnet || 'true' }}"
-          else
-            echo "❌ **Documentation deployment failed**"
-          fi
+          & ./.github/scripts/Write-DeploymentSummary.ps1 `
+            -IsTest "false" `
+            -DeployPrerelease "false" `
+            -DeployDocs "true" `
+            -DocsUrl "${{ steps.docs-deployment.outputs.page_url }}" `
+            -DocsPath "${{ github.event.inputs.docs-path || 'libs/Momentum/docs' }}"

@@ -2,7 +2,6 @@
 
 using Momentum.Extensions.Abstractions.Messaging;
 using Momentum.Extensions.Messaging.Kafka;
-using Shouldly;
 
 namespace Momentum.Extensions.Tests.Messaging;
 

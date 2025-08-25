@@ -1,7 +1,5 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
-using Orleans;
-using Wolverine;
 using AppDomain.Invoices.Actors;
 using AppDomain.Invoices.Contracts.IntegrationEvents;
 using AppDomain.Invoices.Data.Entities;

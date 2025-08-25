@@ -33,6 +33,7 @@ dotnet build src/AppDomain.Api
 ```
 
 ### Template Development
+
 ```bash
 # Install template locally for testing
 dotnet new install .
@@ -235,31 +236,35 @@ dotnet new uninstall Momentum.Template
 ### Template Parameters
 
 **Core Components** (defaults to all enabled):
-- `--aspire`: Include .NET Aspire orchestration project (default: true)
-- `--web-api`: Include REST/gRPC API project (default: true)
-- `--back-office`: Include background processing project (default: true)
-- `--orleans`: Include Orleans stateful processing project (default: false)
-- `--docs`: Include VitePress documentation project (default: true)
+
+-   `--aspire`: Include .NET Aspire orchestration project (default: true)
+-   `--api`: Include REST/gRPC API project (default: true)
+-   `--back-office`: Include background processing project (default: true)
+-   `--orleans`: Include Orleans stateful processing project (default: false)
+-   `--docs`: Include VitePress documentation project (default: true)
 
 **Configuration Options**:
-- `--db-config`: Database setup (`default`, `npgsql`, `liquibase`, `none`)
-- `--kafka`: Include Apache Kafka messaging (default: true)
-- `--port`: Base port number for services (default: 8100)
-- `--org`: Organization/team name for copyright headers
+
+-   `--db-config`: Database setup (`default`, `npgsql`, `liquibase`, `none`)
+-   `--kafka`: Include Apache Kafka messaging (default: true)
+-   `--port`: Base port number for services (default: 8100)
+-   `--org`: Organization/team name for copyright headers
 
 **Content Options**:
-- `--no-sample`: Skip generating sample Cashiers/Invoices code
-- `--project-only`: Generate only projects without solution files
+
+-   `--no-sample`: Skip generating sample Cashiers/Invoices code
+-   `--project-only`: Generate only projects without solution files
 
 **Library Options**:
-- `--libs`: How to include Momentum libraries (`none`, `defaults`, `api`, `ext`, `kafka`, `generators`)
-- `--lib-name`: Custom prefix to replace "Momentum" in library names
+
+-   `--libs`: How to include Momentum libraries (`none`, `defaults`, `api`, `ext`, `kafka`, `generators`)
+-   `--lib-name`: Custom prefix to replace "Momentum" in library names
 
 ### Template Generation Examples
 
 ```bash
 # Minimal API-only setup
-dotnet new mmt -n OrderService --web-api --no-back-office --no-orleans --no-docs --no-sample
+dotnet new mmt -n OrderService --api --no-back-office --no-orleans --no-docs --no-sample
 
 # Orleans-heavy processing service
 dotnet new mmt -n ProcessingEngine --orleans --no-web-api --port 9000
@@ -276,14 +281,16 @@ dotnet new mmt -n DevApp --libs defaults,api,ext --lib-name AcmePlatform
 The template uses conditional compilation symbols throughout the codebase:
 
 **Primary Symbols**:
-- `INCLUDE_API`, `INCLUDE_BACK_OFFICE`, `INCLUDE_ORLEANS`
-- `INCLUDE_ASPIRE`, `INCLUDE_DOCS`, `INCLUDE_SAMPLE`
-- `USE_PGSQL`, `USE_LIQUIBASE`, `USE_KAFKA`
+
+-   `INCLUDE_API`, `INCLUDE_BACK_OFFICE`, `INCLUDE_ORLEANS`
+-   `INCLUDE_ASPIRE`, `INCLUDE_DOCS`, `INCLUDE_SAMPLE`
+-   `USE_PGSQL`, `USE_LIQUIBASE`, `USE_KAFKA`
 
 **Conditional Formats**:
-- C# files: `#if INCLUDE_API` / `#endif`
-- Project files: `<!--#if (INCLUDE_API)-->` / `<!--#endif-->`
-- YAML files: `# #if (INCLUDE_API)` / `# #endif`
+
+-   C# files: `#if INCLUDE_API` / `#endif`
+-   Project files: `<!--#if (INCLUDE_API) -->` / `<!--#endif -->`
+-   YAML files: `# #if (INCLUDE_API)` / `# #endif`
 
 ### Post-Setup Actions
 
@@ -297,24 +304,20 @@ After template generation, automated post-setup tasks run:
 ### Template File Structure Patterns
 
 **Conditional Project References**:
+
 ```xml
-<!--#if (INCLUDE_API)-->
+<!--#if (INCLUDE_API) -->
 <ProjectReference Include="..\AppDomain.Api\AppDomain.Api.csproj" />
-<!--#endif-->
+<!--#endif -->
 ```
 
 **Conditional Source Code**:
+
 ```csharp
 #if USE_KAFKA
 builder.Services.AddKafkaMessaging(builder.Configuration);
 #endif
 ```
-
-**Parameter Replacements**:
-- `AppDomain` → Project name (sourceName)
-- `ORG_NAME` → Organization parameter
-- `SERVICE_BASE_PORT` → Port parameter
-- `app_domain` → Snake case project name
 
 ### Template Testing Guidelines
 
@@ -373,6 +376,13 @@ docker compose up AppDomain-db-migrations > /dev/null 2>&1
 
 **NEVER** run `dotnet new mmt` without output redirection - it will crash Claude Code with RangeError: Invalid string length.
 
+**IMPORTANT**: Always clean up generated templates after testing to prevent disk space issues:
+
+```bash
+# Always clean up after template testing
+rm -rf TestProject
+```
+
 ## Library Conditional Dependencies Pattern
 
 When updating library project files in `libs/Momentum/src/`, follow this pattern to ensure they work both standalone and in template context:
@@ -387,5 +397,102 @@ When updating library project files in `libs/Momentum/src/`, follow this pattern
 -   **Extensions.Abstractions and Extensions.XmlDocs**: Always NuGet packages, never project references when imported
 -   **libs/Momentum folder must work standalone**: Always include ProjectReferences with MSBuild conditions for standalone builds
 
-- ALWAYS test the documentation with 'pnpm docs:build' before you can assert the any documentation changes are working.
-- Do not add /// <inheritdoc /> xmldocs comments anywhere
+-   ALWAYS test the documentation with 'pnpm docs:build' before you can assert the any documentation changes are working.
+-   Do not add /// <inheritdoc /> xmldocs comments anywhere
+
+## Template File Exclusion Best Practices
+
+### Core Principle
+Use **selective exclusion** in `template.json` rather than blanket exclusions to preserve generic, reusable infrastructure while removing only component-specific files.
+
+### Template.json Exclusion Patterns
+
+**❌ Wrong Approach - Blanket Exclusion:**
+```json
+{
+  "condition": "(!INCLUDE_API)",
+  "exclude": [
+    "tests/AppDomain.Tests/Integration/**/*"  // Removes everything, including generic helpers
+  ]
+}
+```
+
+**✅ Correct Approach - Selective Exclusion:**
+```json
+{
+  "condition": "(!INCLUDE_API)",
+  "exclude": [
+    "src/AppDomain.Api/**/*",
+    "tests/AppDomain.Tests/Integration/Cashiers/**/*",
+    "tests/AppDomain.Tests/Integration/Invoices/**/*"
+    // Preserves: IntegrationTestFixture.cs and _Internal/ folder
+  ]
+}
+```
+
+### When to Use Conditional Compilation vs Template Exclusion
+
+**Use Template Exclusion (`template.json`) for:**
+- Entire files that are component-specific
+- Folders containing only component-specific content
+- Files that shouldn't exist at all in certain configurations
+
+**Use Conditional Compilation (`#if INCLUDE_API`) for:**
+- Shared files that need to work in multiple configurations
+- Classes that have both generic and component-specific functionality
+- Infrastructure that adapts based on available components
+
+### Integration Testing Infrastructure Pattern
+
+**Always Preserve Generic Infrastructure:**
+- `_Internal/` folders with generic helpers (DatabaseContainerExtensions, ServiceCollectionExtensions, etc.)
+- Base test classes that can adapt to different configurations (IntegrationTestFixture)
+- Database migration containers and connection helpers (LiquibaseMigrationContainer)
+- Logging and service registration utilities (XUnitSink)
+
+**Selectively Exclude Component-Specific Tests:**
+- API endpoint integration tests (`Cashiers/`, `Invoices/`)
+- Component-specific gRPC service tests
+- WebApplicationFactory-dependent tests
+
+### IntegrationTestFixture Design Pattern
+
+**Key Features for Multi-Configuration Support:**
+```csharp
+#if INCLUDE_API
+public class IntegrationTestFixture : WebApplicationFactory<AppDomain.Api.Program>, IAsyncLifetime
+#else
+public class IntegrationTestFixture : IAsyncLifetime
+#endif
+{
+    // Generic properties available in all configurations
+    public string AppDomainDbConnectionString => _postgres.GetDbConnectionString("app_domain");
+    public string KafkaBootstrapAddress => _kafka.GetBootstrapAddress();
+    
+#if INCLUDE_API
+    public GrpcChannel GrpcChannel { get; private set; } = null!;
+#endif
+}
+```
+
+### Benefits of Selective Exclusion
+
+1. **Preserves Reusability**: Generic infrastructure remains available for database/messaging integration tests
+2. **Maintains Clean Source**: Minimal conditional compilation clutter
+3. **Enables Flexibility**: BackOffice-only projects can still write integration tests for their components
+4. **Centralized Control**: All exclusion logic lives in template.json, not scattered across source files
+5. **Better Developer Experience**: Generated projects contain exactly what they need, nothing more or less
+
+### Template Testing Verification Checklist
+
+When implementing selective exclusions:
+- ✅ Build succeeds with 0 errors/warnings
+- ✅ Tests pass without component dependencies
+- ✅ Generic infrastructure files remain present
+- ✅ Component-specific files are properly excluded
+- ✅ Conditional compilation works correctly
+- ✅ Generated projects can extend functionality (e.g., add custom integration tests)
+
+# Troubleshoot
+
+To debug the template generation use the flag `--verbosity diag` and --debug-symbols (which will generate a debug.symbols.txt file at the root of the destination template)

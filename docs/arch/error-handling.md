@@ -22,7 +22,12 @@ The system uses a `Result<T>` type that represents either success or failure exp
 
 ### Result Type Implementation
 
-<<< @/../libs/Momentum/src/Momentum.Extensions/Result.cs
+````csharp
+[GenerateOneOf] // SourceGenerated
+public partial class Result<T> : OneOfBase<T, List<ValidationFailure>>
+{
+}
+```
 
 ### Why Result Over Exceptions
 

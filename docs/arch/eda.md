@@ -42,17 +42,17 @@ graph TB
         end
     end
 
-    DOMAIN --> DOMAIN_EVENTS
-    DOMAIN_EVENTS --> HANDLERS
-    COMMANDS --> HANDLERS
-    QUERIES --> HANDLERS
-    HANDLERS --> INTEGRATION
-    HANDLERS --> OUTBOX
-    OUTBOX --> WOLVERINE
-    WOLVERINE --> KAFKA
-    KAFKA --> SERVICE_A
-    KAFKA --> SERVICE_B
-    KAFKA --> SERVICE_C
+    DOMAIN -/-> DOMAIN_EVENTS
+    DOMAIN_EVENTS -/-> HANDLERS
+    COMMANDS -/-> HANDLERS
+    QUERIES -/-> HANDLERS
+    HANDLERS -/-> INTEGRATION
+    HANDLERS -/-> OUTBOX
+    OUTBOX -/-> WOLVERINE
+    WOLVERINE -/-> KAFKA
+    KAFKA -/-> SERVICE_A
+    KAFKA -/-> SERVICE_B
+    KAFKA -/-> SERVICE_C
 
     style DOMAIN fill:#e3f2fd
     style DOMAIN_EVENTS fill:#fff3e0
@@ -351,18 +351,18 @@ The Platform implements a comprehensive middleware pipeline for event processing
 ```mermaid
 graph TD
     subgraph "Event Processing Pipeline"
-        MSG[Incoming Message] --> AUTH[Authentication]
-        AUTH --> VAL[FluentValidation]
-        VAL --> LOG[Logging Middleware]
-        LOG --> TRACE[OpenTelemetry Tracing]
-        TRACE --> RETRY[Retry Policy]
-        RETRY --> CB[Circuit Breaker]
-        CB --> HANDLER[Message Handler]
-        HANDLER --> CLOUD[CloudEvents Transform]
-        CLOUD --> PUB[Event Publishing]
-        PUB --> OUTBOX[Outbox Pattern]
-        OUTBOX --> KAFKA[Kafka Publishing]
-        KAFKA --> RESP[Response]
+        MSG[Incoming Message] -/-> AUTH[Authentication]
+        AUTH -/-> VAL[FluentValidation]
+        VAL -/-> LOG[Logging Middleware]
+        LOG -/-> TRACE[OpenTelemetry Tracing]
+        TRACE -/-> RETRY[Retry Policy]
+        RETRY -/-> CB[Circuit Breaker]
+        CB -/-> HANDLER[Message Handler]
+        HANDLER -/-> CLOUD[CloudEvents Transform]
+        CLOUD -/-> PUB[Event Publishing]
+        PUB -/-> OUTBOX[Outbox Pattern]
+        OUTBOX -/-> KAFKA[Kafka Publishing]
+        KAFKA -/-> RESP[Response]
 
         RETRY -.->|On Failure| DLQ[Dead Letter Queue]
         CB -.->|Circuit Open| FALLBACK[Fallback Response]
@@ -426,12 +426,12 @@ graph LR
         OUTBOX_CLEANUP[Outbox Cleanup]
     end
 
-    HANDLER --> DB_UPDATE
-    DB_UPDATE --> OUTBOX_INSERT
-    OUTBOX_INSERT --> COMMIT
-    COMMIT --> OUTBOX_PROCESSOR
-    OUTBOX_PROCESSOR --> KAFKA_PUBLISH
-    KAFKA_PUBLISH --> OUTBOX_CLEANUP
+    HANDLER -/-> DB_UPDATE
+    DB_UPDATE -/-> OUTBOX_INSERT
+    OUTBOX_INSERT -/-> COMMIT
+    COMMIT -/-> OUTBOX_PROCESSOR
+    OUTBOX_PROCESSOR -/-> KAFKA_PUBLISH
+    KAFKA_PUBLISH -/-> OUTBOX_CLEANUP
 
     style HANDLER fill:#e3f2fd
     style DB_UPDATE fill:#e8f5e8

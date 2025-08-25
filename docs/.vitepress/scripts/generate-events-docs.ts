@@ -77,10 +77,23 @@ try {
     const assembliesArg = existingAssemblies.join(',');
 
     try {
+        // Check if events-docsgen tool is available
+        try {
+            execSync('events-docsgen --version', { stdio: 'pipe' });
+        } catch (checkError) {
+            log('❌ The events-docsgen tool is not installed.');
+            log('');
+            log('Please install it using:');
+            log('  dotnet tool install -g Momentum.Extensions.EventMarkdownGenerator --prerelease');
+            log('');
+            log('After installation, make sure the dotnet tools directory is in your PATH.');
+            process.exit(1);
+        }
+
         const env = { ...process.env, 'SkipLocalFeedPush': 'true' };
         const githubUrl = getGitHubUrl();
 
-        let command = `events-docsgen --assemblies "${assembliesArg}" --output "${outputDir}"`;
+        let command = `events-docsgen generate --assemblies "${assembliesArg}" --output "${outputDir}"`;
         if (githubUrl) {
             log(`Using GitHub URL: ${githubUrl}`);
             command += ` --github-url "${githubUrl}"`;

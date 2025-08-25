@@ -31,12 +31,7 @@ public static class OrleansExtensions
 
         builder.Services
             .AddOpenTelemetry()
-            .WithMetrics(opt => opt.AddMeter("Microsoft.Orleans"))
-            .WithTracing(tracing =>
-            {
-                tracing.AddSource("Microsoft.Orleans.Runtime");
-                tracing.AddSource("Microsoft.Orleans.Application");
-            });
+            .WithMetrics(opt => opt.AddMeter("Microsoft.Orleans"));
 
         return builder;
     }
@@ -60,8 +55,10 @@ public static class OrleansExtensions
         var factory = LazyClusterClientFactory(primaryClusterClientRegistration);
         var newPrimaryClusterClient = new ServiceDescriptor(clusterClientType, factory, primaryKeyedClusterClient.Lifetime);
 
+        builder.Services.Add(primaryKeyedClusterClient);
         builder.Services.Add(newPrimaryClusterClient);
-        builder.Services.AddHostedService<LazyClusterClientManager>();
+        builder.Services.AddSingleton<LazyClusterClientManager>();
+        builder.Services.AddHostedService(sp => sp.GetRequiredService<LazyClusterClientManager>());
     }
 
     private static Func<IServiceProvider, object> LazyClusterClientFactory(ServiceDescriptor primaryClusterClientRegistration)

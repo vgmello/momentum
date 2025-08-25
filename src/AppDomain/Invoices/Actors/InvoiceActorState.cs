@@ -1,7 +1,5 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
-using Orleans;
-
 namespace AppDomain.Invoices.Actors;
 
 /// <summary>

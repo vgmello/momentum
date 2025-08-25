@@ -16,13 +16,13 @@ Momentum's handler architecture provides clear separation of concerns and promot
 
 ```mermaid
 graph TD
-    A["API Request"] --> B["Command/Query"]
-    B --> C["FluentValidation"]
-    C --> D["Main Handler"]
-    D --> E["DbCommand Handler"]
-    E --> F["Database"]
-    D --> G["Integration Events"]
-    G --> H["Message Bus (Kafka)"]
+    A["API Request"] -/-> B["Command/Query"]
+    B -/-> C["FluentValidation"]
+    C -/-> D["Main Handler"]
+    D -/-> E["DbCommand Handler"]
+    E -/-> F["Database"]
+    D -/-> G["Integration Events"]
+    G -/-> H["Message Bus (Kafka)"]
 
     style A fill:#e1f5fe
     style D fill:#f3e5f5

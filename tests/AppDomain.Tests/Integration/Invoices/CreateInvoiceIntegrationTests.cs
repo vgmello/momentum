@@ -2,6 +2,7 @@
 
 using AppDomain.Invoices.Grpc;
 using AppDomain.Tests.Integration._Internal;
+using AppDomain.Tests.Integration._Internal.TestDataGenerators;
 using System.Data.Common;
 
 namespace AppDomain.Tests.Integration.Invoices;
@@ -9,6 +10,7 @@ namespace AppDomain.Tests.Integration.Invoices;
 public class CreateInvoiceIntegrationTests(IntegrationTestFixture fixture) : IntegrationTest(fixture)
 {
     private readonly InvoicesService.InvoicesServiceClient _client = new(fixture.GrpcChannel);
+    private readonly InvoiceFaker _invoiceFaker = new();
 
     [Fact]
     public async Task CreateInvoice_ShouldCreateInvoiceSuccessfully()
@@ -18,20 +20,17 @@ public class CreateInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
         await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
 
         // Arrange
-        var createRequest = new CreateInvoiceRequest
-        {
-            Name = "Test Invoice",
-            Amount = 100.50,
-            Currency = "USD",
-            DueDate = Timestamp.FromDateTime(DateTime.UtcNow.AddDays(30))
-        };
+        var createRequest = _invoiceFaker
+            .WithAmount(100.50)
+            .WithCurrency("USD")
+            .Generate();
 
         // Act
         var createdInvoice = await _client.CreateInvoiceAsync(createRequest, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         createdInvoice.ShouldNotBeNull();
-        createdInvoice.Name.ShouldBe("Test Invoice");
+        createdInvoice.Name.ShouldBe(createRequest.Name);
         createdInvoice.Amount.ShouldBe(100.50);
         createdInvoice.Currency.ShouldBe("USD");
         createdInvoice.Status.ShouldBe("Draft");
@@ -48,7 +47,7 @@ public class CreateInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
         var amount = (decimal)dbInvoice.amount;
         var currency = (string)dbInvoice.currency;
         var status = (string)dbInvoice.status;
-        name.ShouldBe("Test Invoice");
+        name.ShouldBe(createRequest.Name);
         amount.ShouldBe(100.50m);
         currency.ShouldBe("USD");
         status.ShouldBe("Draft");
@@ -75,13 +74,11 @@ public class CreateInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
             });
 
         // Arrange
-        var createRequest = new CreateInvoiceRequest
-        {
-            Name = "Invoice with Cashier",
-            Amount = 250.75,
-            Currency = "EUR",
-            CashierId = cashierId.ToString()
-        };
+        var createRequest = _invoiceFaker
+            .WithCashier(cashierId.ToString())
+            .WithAmount(250.75)
+            .WithCurrency("EUR")
+            .Generate();
 
         // Act
         var createdInvoice = await _client.CreateInvoiceAsync(createRequest, cancellationToken: TestContext.Current.CancellationToken);
@@ -103,12 +100,9 @@ public class CreateInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
     public async Task CreateInvoice_WithInvalidData_ShouldThrowInvalidArgumentException()
     {
         // Arrange
-        var createRequest = new CreateInvoiceRequest
-        {
-            Name = "", // Invalid empty name
-            Amount = -10, // Invalid negative amount
-            Currency = "USD"
-        };
+        var createRequest = _invoiceFaker.Generate();
+        createRequest.Name = ""; // Invalid empty name
+        createRequest.Amount = -10; // Invalid negative amount
 
         // Act & Assert
         var exception = await Should.ThrowAsync<RpcException>(async () =>
@@ -127,17 +121,17 @@ public class CreateInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
         await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
 
         // Arrange
-        var createRequest = new CreateInvoiceRequest
-        {
-            Name = "Minimal Invoice",
-            Amount = 50.00
-        };
+        var createRequest = _invoiceFaker
+            .WithAmount(50.00)
+            .WithoutDueDate()
+            .Generate();
+        createRequest.Currency = string.Empty; // Clear currency to test defaults
 
         // Act
         var createdInvoice = await _client.CreateInvoiceAsync(createRequest, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
-        createdInvoice.Name.ShouldBe("Minimal Invoice");
+        createdInvoice.Name.ShouldBe(createRequest.Name);
         createdInvoice.Amount.ShouldBe(50.00);
         createdInvoice.Currency.ShouldBeNullOrEmpty();
         createdInvoice.Status.ShouldBe("Draft");

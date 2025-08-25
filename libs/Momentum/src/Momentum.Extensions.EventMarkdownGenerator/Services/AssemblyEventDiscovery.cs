@@ -66,15 +66,18 @@ public static class AssemblyEventDiscovery
         var obsoleteAttribute = eventType.GetCustomAttribute<ObsoleteAttribute>();
         var (properties, partitionKeys) = GetEventPropertiesAndPartitionKeys(eventType, xmlParser);
 
-        var topicName = topicAttribute.ShouldPluralizeTopicName ? topicAttribute.Topic.Pluralize() : topicAttribute.Topic;
+        var topicName = GetTopicName(topicAttribute, eventType);
+        if (topicAttribute.ShouldPluralizeTopicName)
+            topicName = topicName.Pluralize();
 
         var eventDomain = !string.IsNullOrWhiteSpace(topicAttribute.Domain)
             ? topicAttribute.Domain
             : GetDomainFromNamespace(eventType.Namespace) ?? defaultDomain;
 
         // Build full topic name: {env}.{domain}.{visibility}.{topic}.{version}
-        var visibility = topicAttribute.Internal ? "internal" : "external";
+        var visibility = topicAttribute.Internal ? "internal" : "public";
         var version = topicAttribute.Version;
+
         var fullTopicName = $"{{env}}.{defaultDomain.ToLowerInvariant()}.{visibility}.{topicName}.{version}";
 
         return new EventMetadata
@@ -243,5 +246,18 @@ public static class AssemblyEventDiscovery
         var assemblyParts = assemblyName.Split('.');
 
         return assemblyParts[0];
+    }
+
+    /// <summary>
+    ///     Gets the topic name from either generic or string-based EventTopicAttribute
+    /// </summary>
+    private static string GetTopicName(EventTopicAttribute topicAttribute, Type eventType)
+    {
+        if (!string.IsNullOrEmpty(topicAttribute.Topic))
+        {
+            return topicAttribute.Topic;
+        }
+
+        return eventType.Name.ToKebabCase();
     }
 }

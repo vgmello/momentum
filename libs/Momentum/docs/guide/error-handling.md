@@ -31,21 +31,21 @@ Momentum classifies errors into distinct categories:
 
 ```mermaid
 graph TD
-    A["Error Types"] --> B["Validation Failures"]
-    A --> C["Business Rule Violations"]
-    A --> D["Infrastructure Exceptions"]
+    A["Error Types"] -/-> B["Validation Failures"]
+    A -/-> C["Business Rule Violations"]
+    A -/-> D["Infrastructure Exceptions"]
 
-    B --> B1["Input validation"]
-    B --> B2["Missing data"]
-    B --> B3["Format errors"]
+    B -/-> B1["Input validation"]
+    B -/-> B2["Missing data"]
+    B -/-> B3["Format errors"]
 
-    C --> C1["Business logic violations"]
-    C --> C2["State inconsistencies"]
-    C --> C3["Authorization failures"]
+    C -/-> C1["Business logic violations"]
+    C -/-> C2["State inconsistencies"]
+    C -/-> C3["Authorization failures"]
 
-    D --> D1["Database connectivity"]
-    D --> D2["External service failures"]
-    D --> D3["System exceptions"]
+    D -/-> D1["Database connectivity"]
+    D -/-> D2["External service failures"]
+    D -/-> D3["System exceptions"]
 
     style B fill:#e8f5e8
     style C fill:#fff3e0

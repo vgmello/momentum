@@ -24,13 +24,13 @@ Invoices follow a defined status progression:
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Draft: Create Invoice
-    Draft --> Finalized: Finalize
-    Draft --> Cancelled: Cancel
-    Finalized --> Paid: Process Payment
-    Finalized --> Cancelled: Cancel
-    Paid --> [*]
-    Cancelled --> [*]
+    [*] -/-> Draft: Create Invoice
+    Draft -/-> Finalized: Finalize
+    Draft -/-> Cancelled: Cancel
+    Finalized -/-> Paid: Process Payment
+    Finalized -/-> Cancelled: Cancel
+    Paid -/-> [*]
+    Cancelled -/-> [*]
 ```
 
 ### Status Definitions
@@ -215,13 +215,13 @@ Integration tests verify the complete flow including event publishing and databa
 
 ```mermaid
 flowchart LR
-    A[Invoice Due] --> B{Payment Received?}
+    A[Invoice Due] -/-> B{Payment Received?}
     B -->|No| C[Send Reminder]
     B -->|Yes| D[Process Payment]
-    C --> E[Grace Period]
-    E --> B
-    D --> F[Mark as Paid]
-    F --> G[Publish Events]
+    C -/-> E[Grace Period]
+    E -/-> B
+    D -/-> F[Mark as Paid]
+    F -/-> G[Publish Events]
 ```
 
 ### Refund Processing

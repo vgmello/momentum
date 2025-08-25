@@ -45,48 +45,13 @@ runs:
       with:
         build-target: libs/Momentum/Momentum.slnx
 
-    - name: Install DocFX
-      shell: bash
-      run: |
-        echo "📦 Installing DocFX..."
-        dotnet tool install -g docfx --verbosity normal
-
-        # Ensure .NET tools are in PATH
-        export PATH="$PATH:$HOME/.dotnet/tools"
-        echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
-
-        echo "📋 Verifying DocFX installation..."
-        docfx --version || {
-          echo "❌ DocFX installation failed or not in PATH"
-          echo "PATH: $PATH"
-          echo "HOME: $HOME"
-          ls -la $HOME/.dotnet/tools/ || echo "Tools directory not found"
-          exit 1
-        }
-
-    - name: Install npm dependencies
-      shell: bash
-      working-directory: ${{ inputs.docs-path }}
-      run: |
-        echo "📦 Installing npm dependencies..."
-        pnpm install --no-frozen-lockfile
-
     - name: Build documentation
-      shell: bash
-      working-directory: ${{ inputs.docs-path }}
-      run: |
-        echo "📚 Building documentation with VitePress..."
-        pnpm docs:build
-
-        if [ $? -ne 0 ]; then
-          echo "❌ Documentation build failed"
-          exit 1
-        fi
-        echo "✅ Documentation built successfully"
-
-    - name: Set output paths
       id: paths
-      shell: bash
+      shell: pwsh
       run: |
-        echo "dist=${{ inputs.docs-path }}/.vitepress/dist" >> $GITHUB_OUTPUT
+        & "${{ github.action_path }}/Build-Documentation.ps1" `
+          -NodeVersion "${{ inputs.node-version }}" `
+          -PnpmVersion "${{ inputs.pnpm-version }}" `
+          -DocsPath "${{ inputs.docs-path }}" `
+          -BuildDotnet "${{ inputs.build-dotnet }}"
 

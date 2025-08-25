@@ -4,7 +4,7 @@
 
 | Event Name                                 | Description                                                                 | Status |
 | ------------------------------------------ | --------------------------------------------------------------------------- | ------ |
-<!--#if (INCLUDE_SAMPLE)-->
+<!--#if (INCLUDE_SAMPLE) -->
 | [InvoiceGenerated](./invoice-generated.md) | Internal event triggered when an invoice is generated for domain processing | Active |
 <!--#endif -->
 

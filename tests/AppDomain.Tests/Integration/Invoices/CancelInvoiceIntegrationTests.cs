@@ -2,6 +2,7 @@
 
 using AppDomain.Invoices.Grpc;
 using AppDomain.Tests.Integration._Internal;
+using AppDomain.Tests.Integration._Internal.TestDataGenerators;
 using System.Data.Common;
 
 namespace AppDomain.Tests.Integration.Invoices;
@@ -9,6 +10,7 @@ namespace AppDomain.Tests.Integration.Invoices;
 public class CancelInvoiceIntegrationTests(IntegrationTestFixture fixture) : IntegrationTest(fixture)
 {
     private readonly InvoicesService.InvoicesServiceClient _client = new(fixture.GrpcChannel);
+    private readonly InvoiceFaker _invoiceFaker = new();
 
     [Fact]
     public async Task CancelInvoice_ShouldCancelInvoiceSuccessfully()
@@ -18,20 +20,16 @@ public class CancelInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
         await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
 
         // Arrange - Create an invoice first
-        var createRequest = new CreateInvoiceRequest
-        {
-            Name = "Invoice to Cancel",
-            Amount = 100.00,
-            Currency = "USD"
-        };
+        var createRequest = _invoiceFaker
+            .WithAmount(100.00)
+            .WithCurrency("USD")
+            .Generate();
 
         var createdInvoice = await _client.CreateInvoiceAsync(createRequest, cancellationToken: TestContext.Current.CancellationToken);
 
-        var cancelRequest = new CancelInvoiceRequest
-        {
-            InvoiceId = createdInvoice.InvoiceId,
-            Version = createdInvoice.Version
-        };
+        var cancelFaker = new CancelInvoiceFaker(createdInvoice.InvoiceId);
+        var cancelRequest = cancelFaker.Generate();
+        cancelRequest.Version = createdInvoice.Version;
 
         // Act
         var cancelledInvoice = await _client.CancelInvoiceAsync(cancelRequest, cancellationToken: TestContext.Current.CancellationToken);
@@ -40,7 +38,7 @@ public class CancelInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
         cancelledInvoice.ShouldNotBeNull();
         cancelledInvoice.InvoiceId.ShouldBe(createdInvoice.InvoiceId);
         cancelledInvoice.Status.ShouldBe("Cancelled");
-        cancelledInvoice.Name.ShouldBe("Invoice to Cancel");
+        cancelledInvoice.Name.ShouldBe(createRequest.Name);
         cancelledInvoice.Amount.ShouldBe(100.00);
 
         // Verify in database
@@ -57,11 +55,9 @@ public class CancelInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
     public async Task CancelInvoice_WithNonExistentInvoice_ShouldThrowFailedPreconditionException()
     {
         // Arrange
-        var cancelRequest = new CancelInvoiceRequest
-        {
-            InvoiceId = Guid.NewGuid().ToString(),
-            Version = 1
-        };
+        var cancelFaker = new CancelInvoiceFaker(Guid.NewGuid().ToString());
+        var cancelRequest = cancelFaker.Generate();
+        cancelRequest.Version = 1;
 
         // Act & Assert
         var exception = await Should.ThrowAsync<RpcException>(async () =>
@@ -75,11 +71,9 @@ public class CancelInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
     public async Task CancelInvoice_WithInvalidGuid_ShouldThrowInvalidArgumentException()
     {
         // Arrange
-        var cancelRequest = new CancelInvoiceRequest
-        {
-            InvoiceId = "invalid-guid",
-            Version = 1
-        };
+        var cancelFaker = new CancelInvoiceFaker("invalid-guid");
+        var cancelRequest = cancelFaker.Generate();
+        cancelRequest.Version = 1;
 
         // Act & Assert
         var exception = await Should.ThrowAsync<RpcException>(async () =>
@@ -96,30 +90,24 @@ public class CancelInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
         await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
 
         // Arrange - Create and cancel an invoice
-        var createRequest = new CreateInvoiceRequest
-        {
-            Name = "Invoice to Cancel Twice",
-            Amount = 100.00,
-            Currency = "USD"
-        };
+        var createRequest = _invoiceFaker
+            .WithAmount(100.00)
+            .WithCurrency("USD")
+            .Generate();
 
         var createdInvoice = await _client.CreateInvoiceAsync(createRequest, cancellationToken: TestContext.Current.CancellationToken);
 
         // Cancel it first time
-        var cancelRequest = new CancelInvoiceRequest
-        {
-            InvoiceId = createdInvoice.InvoiceId,
-            Version = createdInvoice.Version
-        };
+        var cancelFaker = new CancelInvoiceFaker(createdInvoice.InvoiceId);
+        var cancelRequest = cancelFaker.Generate();
+        cancelRequest.Version = createdInvoice.Version;
 
         await _client.CancelInvoiceAsync(cancelRequest, cancellationToken: TestContext.Current.CancellationToken);
 
         // Act & Assert - Try to cancel again with old version
-        var secondCancelRequest = new CancelInvoiceRequest
-        {
-            InvoiceId = createdInvoice.InvoiceId,
-            Version = createdInvoice.Version // Using old version should fail
-        };
+        var secondCancelFaker = new CancelInvoiceFaker(createdInvoice.InvoiceId);
+        var secondCancelRequest = secondCancelFaker.Generate();
+        secondCancelRequest.Version = createdInvoice.Version; // Using old version should fail
         var exception = await Should.ThrowAsync<RpcException>(async () =>
             await _client.CancelInvoiceAsync(secondCancelRequest, cancellationToken: TestContext.Current.CancellationToken));
 

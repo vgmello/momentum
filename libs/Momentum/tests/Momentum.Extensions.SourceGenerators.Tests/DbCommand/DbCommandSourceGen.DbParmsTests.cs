@@ -114,6 +114,7 @@ public class DbCommandSourceGenDbParmsTests : DbCommandSourceGenTestsBase
             name: "SP with Column attribute custom naming",
             source:
             """
+            using Momentum.Extensions.Abstractions.Dapper.MetadataAttributes;
             [DbCommand(sp: "update_user", paramsCase: DbParamsCase.SnakeCase)]
             public partial record UpdateUserCommand(
                 int UserId,

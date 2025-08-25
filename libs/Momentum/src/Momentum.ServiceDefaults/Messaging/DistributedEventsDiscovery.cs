@@ -44,6 +44,7 @@ public static class DistributedEventsDiscovery
                 return mainNamespaceIndex >= 0 ? assemblyName[..mainNamespaceIndex] : assemblyName;
             })
             .ToHashSet();
+        //-:replacements:noEmit
 
         var domainAssemblies = AppDomain.CurrentDomain.GetAssemblies()
             .Where(assembly =>
@@ -53,6 +54,7 @@ public static class DistributedEventsDiscovery
                 return name is not null && domainPrefixes.Any(prefix => name.StartsWith(prefix));
             })
             .ToArray();
+        //+:replacements:noEmit
 
         return domainAssemblies.SelectMany(a => a.GetTypes()).Where(IsIntegrationEventType);
     }

@@ -39,13 +39,13 @@ graph TB
         EventStore[Event Store<br/>Audit & Replay]
     end
 
-    API --> Commands
-    Commands --> EventBus
-    EventBus --> Kafka
-    Kafka --> BackOffice
-    BackOffice --> Orleans
-    Orleans --> Database
-    EventBus --> EventStore
+    API -/-> Commands
+    Commands -/-> EventBus
+    EventBus -/-> Kafka
+    Kafka -/-> BackOffice
+    BackOffice -/-> Orleans
+    Orleans -/-> Database
+    EventBus -/-> EventStore
 ```
 
 ## Event Types

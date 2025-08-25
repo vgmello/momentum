@@ -1,6 +1,5 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-using Momentum.Extensions.Abstractions.Dapper.MetadataAttributes;
 using Momentum.Extensions.Abstractions.Extensions;
 using Momentum.Extensions.Abstractions.Messaging;
 using Momentum.Extensions.SourceGenerators.Extensions;
@@ -107,7 +106,7 @@ internal class DbCommandTypeInfoSourceGen : DbCommandTypeInfo
     ///         <item><strong>Hierarchy Analysis:</strong> Tracks parent types for nested class generation</item>
     ///         <item><strong>Validation:</strong> Runs analyzers and collects diagnostics</item>
     ///     </list>
-    /// 
+    ///
     ///     <para>The analysis is performed immediately during construction to support incremental generation caching.</para>
     /// </remarks>
     public DbCommandTypeInfoSourceGen(INamedTypeSymbol typeSymbol, DbCommandSourceGenSettings settings) :
@@ -155,7 +154,7 @@ internal class DbCommandTypeInfoSourceGen : DbCommandTypeInfo
     ///         The source generator uses this property to determine whether to proceed with code generation.
     ///         Types with errors are skipped, but warnings and info diagnostics don't prevent generation.
     ///     </para>
-    /// 
+    ///
     ///     <para>
     ///         <strong>Error vs Warning Strategy:</strong>
     ///     </para>
@@ -261,13 +260,13 @@ internal class DbCommandTypeInfoSourceGen : DbCommandTypeInfo
             .Where(p => p is { DeclaredAccessibility: Accessibility.Public, IsStatic: false, GetMethod: not null })
             .Select(p => new PropertyInfo(p.Name, GetParameterName(p, paramsCase, settings)));
 
-        return primaryProperties.Values.Concat(normalProps).ToImmutableArray();
+        return [..primaryProperties.Values.Concat(normalProps)];
     }
 
     private static string GetParameterName(ISymbol prop, DbParamsCase paramsCase, DbCommandSourceGenSettings settings)
     {
         var columnNameAttribute = prop.GetAttributes()
-            .FirstOrDefault(a => a.AttributeClass?.Name.Contains(nameof(ColumnAttribute)) == true);
+            .FirstOrDefault(a => a.AttributeClass?.Name.StartsWith("Column") == true);
 
         var customColumnName = columnNameAttribute?.GetConstructorArgument<string>(index: 0);
 

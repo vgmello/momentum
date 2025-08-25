@@ -18,11 +18,13 @@
         </PackageReference>
     </ItemGroup>
 
+<!--/-:msbuild-conditional:noEmit -->
     <ItemGroup>
         <Content Include="$(SolutionDir).dockerignore" Condition="Exists('Dockerfile')">
             <Link>.dockerignore</Link>
         </Content>
     </ItemGroup>
+<!--/+:msbuild-conditional:noEmit -->
 
     <!--#if (false) -->
     <PropertyGroup>

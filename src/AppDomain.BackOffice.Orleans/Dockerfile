@@ -15,8 +15,8 @@ WORKDIR /app
 ## Patch Kafka Native Lib (ARM64 only)
 RUN TARGETARCH=$(uname -m) && \
     if [ "$TARGETARCH" = "aarch64" ]; then \
-        mkdir -p runtimes/linux-arm64/native && \
-        ln -s /usr/lib/librdkafka.so.1 runtimes/linux-arm64/native/alpine-librdkafka.so; \
+    mkdir -p runtimes/linux-arm64/native && \
+    ln -s /usr/lib/librdkafka.so.1 runtimes/linux-arm64/native/alpine-librdkafka.so; \
     fi
 
 # ----
@@ -43,7 +43,7 @@ ENV ASPNETCORE_ENVIRONMENT=Development
 ENV Orleans__UseLocalhostClustering=true
 RUN dotnet run --no-restore -- codegen write && dotnet run --no-restore -- codegen test
 
-## Build & Publish
+## Build / Publish
 RUN dotnet publish \
     -c "$BUILD_CONFIGURATION" \
     -o /app/publish \

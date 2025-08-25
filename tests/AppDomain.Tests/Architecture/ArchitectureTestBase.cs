@@ -15,5 +15,9 @@ public abstract class ArchitectureTestBase
     ///     Gets all types from the AppDomain assemblies for architecture testing.
     /// </summary>
     protected static Types GetAppDomainTypes() => Types
+#if INCLUDE_API
         .InAssemblies([typeof(IAppDomainAssembly).Assembly, typeof(Api.DependencyInjection).Assembly]);
+#else
+        .InAssemblies([typeof(IAppDomainAssembly).Assembly]);
+#endif
 }

@@ -13,7 +13,7 @@ public class TestScenarioBuilder
     private readonly string _scenarioName;
     private readonly string _basePath;
     private readonly StringBuilder _xmlBuilder;
-    private readonly List<ExpectedFile> _expectedFiles = new();
+    private readonly List<ExpectedFile> _expectedFiles = [];
     private TestScenarioConfig _config = new();
 
     public TestScenarioBuilder(string scenarioName, string basePath = "IntegrationTestScenarios")
@@ -129,7 +129,7 @@ public class TestScenarioBuilder
             StrictFileMatching = strictFileMatching,
             GenerateSchemas = generateSchemas,
             GenerateSidebar = generateSidebar,
-            IgnoreFiles = ignoreFiles ?? new List<string>(),
+            IgnoreFiles = ignoreFiles ?? [],
             CustomAssertions = customAssertions ?? new Dictionary<string, string>()
         };
 

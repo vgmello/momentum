@@ -126,7 +126,9 @@ public static class TypeUtils
         // Handle generic types
         if (type.IsGenericType)
         {
-            var genericTypeName = type.Name[..type.Name.IndexOf('`')];
+            // Check if the type name contains a backtick (generic type indicator)
+            var backtickIndex = type.Name.IndexOf('`');
+            var genericTypeName = backtickIndex >= 0 ? type.Name[..backtickIndex] : type.Name;
             var genericArgs = type.GetGenericArguments().Select(GetFriendlyTypeName);
 
             return $"{genericTypeName}<{string.Join(", ", genericArgs)}>";

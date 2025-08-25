@@ -49,6 +49,25 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
     {
         try
         {
+            // Validate required arguments
+            if (string.IsNullOrWhiteSpace(settings.Assemblies))
+            {
+                AnsiConsole.MarkupLine("[red]Error:[/] The --assemblies argument is required. Please specify one or more assembly paths.");
+                AnsiConsole.MarkupLine(
+                    "Usage: events-docsgen generate --assemblies [yellow]<path1>[/][gray],[/][yellow]<path2>[/]... --output [yellow]<output-path>[/]");
+
+                return 1;
+            }
+
+            if (string.IsNullOrWhiteSpace(settings.Output))
+            {
+                AnsiConsole.MarkupLine("[red]Error:[/] The --output argument is required. Please specify an output directory path.");
+                AnsiConsole.MarkupLine(
+                    "Usage: events-docsgen generate --assemblies [yellow]<path1>[/][gray],[/][yellow]<path2>[/]... --output [yellow]<output-path>[/]");
+
+                return 1;
+            }
+
             var assemblyPaths = settings.Assemblies.Split(',', StringSplitOptions.RemoveEmptyEntries)
                 .Select(p => p.Trim())
                 .ToList();

@@ -14,7 +14,7 @@ public class XmlDocumentationParserTests
     {
         // Arrange
         var parser = new XmlDocumentationParser();
-        var xmlPath = "../TestEvents/bin/Debug/net9.0/TestEvents.xml";
+        var xmlPath = TestPathHelper.GetTestEventsXmlPath();
 
         // Act
         var result = await parser.LoadMultipleDocumentationAsync([xmlPath]);
@@ -23,8 +23,9 @@ public class XmlDocumentationParserTests
         result.ShouldBeTrue();
 
         // Load the actual CashierCreated type
-        var assembly = Assembly.LoadFrom("../TestEvents/bin/Debug/net9.0/TestEvents.dll");
-        var cashierCreatedType = assembly.GetType("AppDomain.Cashiers.Contracts.IntegrationEvents.CashierCreated");
+        var testEventsAssemblyPath = Path.ChangeExtension(xmlPath, ".dll");
+        var assembly = Assembly.LoadFrom(testEventsAssemblyPath);
+        var cashierCreatedType = assembly.GetType("TestEvents.AppDomain.Cashiers.Contracts.IntegrationEvents.CashierCreated");
         cashierCreatedType.ShouldNotBeNull();
 
         // Get documentation for the event

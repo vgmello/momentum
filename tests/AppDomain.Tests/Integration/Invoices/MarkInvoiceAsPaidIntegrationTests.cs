@@ -2,6 +2,7 @@
 
 using AppDomain.Invoices.Grpc;
 using AppDomain.Tests.Integration._Internal;
+using AppDomain.Tests.Integration._Internal.TestDataGenerators;
 using System.Data.Common;
 
 namespace AppDomain.Tests.Integration.Invoices;
@@ -9,6 +10,7 @@ namespace AppDomain.Tests.Integration.Invoices;
 public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) : IntegrationTest(fixture)
 {
     private readonly InvoicesService.InvoicesServiceClient _client = new(fixture.GrpcChannel);
+    private readonly InvoiceFaker _invoiceFaker = new();
 
     [Fact]
     public async Task MarkInvoiceAsPaid_ShouldMarkInvoiceAsPaidSuccessfully()
@@ -18,23 +20,19 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
         await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
 
         // Arrange - Create an invoice first
-        var createRequest = new CreateInvoiceRequest
-        {
-            Name = "Invoice to Pay",
-            Amount = 150.75,
-            Currency = "USD"
-        };
+        var createRequest = _invoiceFaker
+            .WithAmount(150.75)
+            .WithCurrency("USD")
+            .Generate();
 
         var createdInvoice = await _client.CreateInvoiceAsync(createRequest, cancellationToken: TestContext.Current.CancellationToken);
 
         var paymentDate = DateTime.UtcNow;
-        var markPaidRequest = new MarkInvoiceAsPaidRequest
-        {
-            InvoiceId = createdInvoice.InvoiceId,
-            Version = createdInvoice.Version,
-            AmountPaid = 150.75,
-            PaymentDate = Timestamp.FromDateTime(paymentDate)
-        };
+        var markPaidFaker = new MarkInvoiceAsPaidFaker(createdInvoice.InvoiceId);
+        var markPaidRequest = markPaidFaker.Generate();
+        markPaidRequest.Version = createdInvoice.Version;
+        markPaidRequest.AmountPaid = 150.75;
+        markPaidRequest.PaymentDate = Timestamp.FromDateTime(paymentDate);
 
         // Act
         var paidInvoice = await _client.MarkInvoiceAsPaidAsync(markPaidRequest, cancellationToken: TestContext.Current.CancellationToken);
@@ -43,7 +41,7 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
         paidInvoice.ShouldNotBeNull();
         paidInvoice.InvoiceId.ShouldBe(createdInvoice.InvoiceId);
         paidInvoice.Status.ShouldBe("Paid");
-        paidInvoice.Name.ShouldBe("Invoice to Pay");
+        paidInvoice.Name.ShouldBe(createRequest.Name);
         paidInvoice.Amount.ShouldBe(150.75);
 
         // Verify in database
@@ -68,22 +66,18 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
         await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
 
         // Arrange - Create an invoice first
-        var createRequest = new CreateInvoiceRequest
-        {
-            Name = "Invoice to Pay Without Date",
-            Amount = 100.00,
-            Currency = "USD"
-        };
+        var createRequest = _invoiceFaker
+            .WithAmount(100.00)
+            .WithCurrency("USD")
+            .Generate();
 
         var createdInvoice = await _client.CreateInvoiceAsync(createRequest, cancellationToken: TestContext.Current.CancellationToken);
 
-        var markPaidRequest = new MarkInvoiceAsPaidRequest
-        {
-            InvoiceId = createdInvoice.InvoiceId,
-            Version = createdInvoice.Version,
-            AmountPaid = 100.00
-            // PaymentDate is null - should use current time
-        };
+        var markPaidFaker = new MarkInvoiceAsPaidFaker(createdInvoice.InvoiceId);
+        var markPaidRequest = markPaidFaker.Generate();
+        markPaidRequest.Version = createdInvoice.Version;
+        markPaidRequest.AmountPaid = 100.00;
+        markPaidRequest.PaymentDate = null; // Should use current time
 
         var beforePayment = DateTime.UtcNow;
 
@@ -109,12 +103,10 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
     public async Task MarkInvoiceAsPaid_WithNonExistentInvoice_ShouldThrowFailedPreconditionException()
     {
         // Arrange
-        var markPaidRequest = new MarkInvoiceAsPaidRequest
-        {
-            InvoiceId = Guid.NewGuid().ToString(),
-            Version = 1,
-            AmountPaid = 100.00
-        };
+        var markPaidFaker = new MarkInvoiceAsPaidFaker(Guid.NewGuid().ToString());
+        var markPaidRequest = markPaidFaker.Generate();
+        markPaidRequest.Version = 1;
+        markPaidRequest.AmountPaid = 100.00;
 
         // Act & Assert
         var exception = await Should.ThrowAsync<RpcException>(async () =>
@@ -132,21 +124,17 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
         await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
 
         // Arrange - Create an invoice first
-        var createRequest = new CreateInvoiceRequest
-        {
-            Name = "Invoice with Invalid Payment",
-            Amount = 100.00,
-            Currency = "USD"
-        };
+        var createRequest = _invoiceFaker
+            .WithAmount(100.00)
+            .WithCurrency("USD")
+            .Generate();
 
         var createdInvoice = await _client.CreateInvoiceAsync(createRequest, cancellationToken: TestContext.Current.CancellationToken);
 
-        var markPaidRequest = new MarkInvoiceAsPaidRequest
-        {
-            InvoiceId = createdInvoice.InvoiceId,
-            Version = createdInvoice.Version,
-            AmountPaid = -50.00 // Invalid negative amount
-        };
+        var markPaidFaker = new MarkInvoiceAsPaidFaker(createdInvoice.InvoiceId);
+        var markPaidRequest = markPaidFaker.Generate();
+        markPaidRequest.Version = createdInvoice.Version;
+        markPaidRequest.AmountPaid = -50.00; // Invalid negative amount
 
         // Act & Assert
         var exception = await Should.ThrowAsync<RpcException>(async () =>

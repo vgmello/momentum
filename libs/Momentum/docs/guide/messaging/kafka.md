@@ -29,12 +29,12 @@ Momentum provides **seamless Kafka integration** with minimal configuration requ
 
 ```mermaid
 graph TB
-    A["Command Handler"] --> B["Integration Event"]
-    B --> C["Momentum Framework"]
-    C --> D["Kafka Producer"]
-    D --> E["Kafka Topic"]
-    E --> F["Kafka Consumer"]
-    F --> G["Event Handler"]
+    A["Command Handler"] -/-> B["Integration Event"]
+    B -/-> C["Momentum Framework"]
+    C -/-> D["Kafka Producer"]
+    D -/-> E["Kafka Topic"]
+    E -/-> F["Kafka Consumer"]
+    F -/-> G["Event Handler"]
 
     H["Service A"] -.-> A
     G -.-> I["Service B"]

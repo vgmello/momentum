@@ -38,9 +38,32 @@ updates:
       - dependency-name: "Microsoft.EntityFrameworkCore.*"
         update-types: ["version-update:semver-major"]
 
-  # NPM packages for VitePress documentation
+  # NPM packages for VitePress documentation (main docs)
   - package-ecosystem: "npm"
     directory: "/docs"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "08:00"
+    open-pull-requests-limit: 5
+    groups:
+      vitepress:
+        patterns:
+          - "vitepress*"
+          - "@vueuse/*"
+      development:
+        patterns:
+          - "typescript"
+          - "tsx"
+          - "@types/*"
+    ignore:
+      # Ignore major version updates for VitePress to avoid breaking changes
+      - dependency-name: "vitepress"
+        update-types: ["version-update:semver-major"]
+
+  # NPM packages for Momentum library documentation
+  - package-ecosystem: "npm"
+    directory: "/libs/Momentum/docs"
     schedule:
       interval: "weekly"
       day: "monday"

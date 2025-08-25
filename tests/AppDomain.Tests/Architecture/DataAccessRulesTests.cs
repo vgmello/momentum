@@ -12,7 +12,12 @@ public class DataAccessRulesTests : ArchitectureTestBase
     [Fact]
     public void DataClasses_ShouldOnlyBeUsedByDomainClasses_ExceptCoreDataContext()
     {
-        var assemblies = new[] { typeof(IAppDomainAssembly).Assembly, typeof(Api.DependencyInjection).Assembly };
+        var assemblies = new[] { 
+            typeof(IAppDomainAssembly).Assembly
+#if INCLUDE_API
+            , typeof(Api.DependencyInjection).Assembly
+#endif
+        };
 
         var dataNamespaces = assemblies
             .SelectMany(a => a.GetTypes())
@@ -29,6 +34,10 @@ public class DataAccessRulesTests : ArchitectureTestBase
                 .That().HaveDependencyOn($"{prefix}.Data")
                 .And().DoNotResideInNamespace($"{prefix}.Core.Data") // Allow Core data context to reference domain entities
                 .And().DoNotHaveName("AppDomainDb") // Allow AppDomainDb to reference all domain data
+                .And().DoNotResideInNamespace("Internal")
+#if (INCLUDE_ORLEANS)
+                .And().DoNotResideInNamespace("OrleansCodeGen")
+#endif
                 .Should().ResideInNamespace(prefix)
                 .GetResult();
 

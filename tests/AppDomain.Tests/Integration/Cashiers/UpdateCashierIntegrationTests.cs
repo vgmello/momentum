@@ -2,6 +2,7 @@
 
 using AppDomain.Cashiers.Grpc;
 using AppDomain.Tests.Integration._Internal;
+using AppDomain.Tests.Integration._Internal.TestDataGenerators;
 using System.Data.Common;
 
 namespace AppDomain.Tests.Integration.Cashiers;
@@ -9,6 +10,7 @@ namespace AppDomain.Tests.Integration.Cashiers;
 public class UpdateCashierIntegrationTests(IntegrationTestFixture fixture) : IntegrationTest(fixture)
 {
     private readonly CashiersService.CashiersServiceClient _client = new(fixture.GrpcChannel);
+    private readonly CashierFaker _cashierFaker = new();
 
     [Fact]
     public async Task UpdateCashier_ShouldUpdateCashierSuccessfully()
@@ -18,11 +20,7 @@ public class UpdateCashierIntegrationTests(IntegrationTestFixture fixture) : Int
         await connection.ExecuteAsync("TRUNCATE TABLE app_domain.cashiers;");
 
         // Arrange - Create a cashier first
-        var createRequest = new CreateCashierRequest
-        {
-            Name = "Original Name",
-            Email = "original@test.com"
-        };
+        var createRequest = _cashierFaker.Generate();
 
         var createdCashier = await _client.CreateCashierAsync(createRequest, cancellationToken: TestContext.Current.CancellationToken);
 
@@ -31,21 +29,17 @@ public class UpdateCashierIntegrationTests(IntegrationTestFixture fixture) : Int
             "SELECT xmin FROM app_domain.cashiers WHERE cashier_id = @Id",
             new { Id = Guid.Parse(createdCashier.CashierId) });
 
-        var updateRequest = new UpdateCashierRequest
-        {
-            CashierId = createdCashier.CashierId,
-            Name = "Updated Name",
-            Email = "updated@test.com",
-            Version = currentVersion
-        };
+        var updateFaker = new UpdateCashierFaker(createdCashier.CashierId);
+        var updateRequest = updateFaker.Generate();
+        updateRequest.Version = currentVersion;
 
         // Act
         var updatedCashier = await _client.UpdateCashierAsync(updateRequest, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         updatedCashier.CashierId.ShouldBe(createdCashier.CashierId);
-        updatedCashier.Name.ShouldBe("Updated Name");
-        updatedCashier.Email.ShouldBe("updated@test.com");
+        updatedCashier.Name.ShouldBe(updateRequest.Name);
+        updatedCashier.Email.ShouldBe(updateRequest.Email);
         updatedCashier.TenantId.ShouldBe("12345678-0000-0000-0000-000000000000");
     }
 
@@ -57,21 +51,13 @@ public class UpdateCashierIntegrationTests(IntegrationTestFixture fixture) : Int
         await connection.ExecuteAsync("TRUNCATE TABLE app_domain.cashiers;");
 
         // Arrange - Create a cashier first
-        var createRequest = new CreateCashierRequest
-        {
-            Name = "Original Name",
-            Email = "original@test.com"
-        };
+        var createRequest = _cashierFaker.Generate();
 
         var createdCashier = await _client.CreateCashierAsync(createRequest, cancellationToken: TestContext.Current.CancellationToken);
 
-        var updateRequest = new UpdateCashierRequest
-        {
-            CashierId = createdCashier.CashierId,
-            Name = "Updated Name",
-            Email = "updated@test.com",
-            Version = 999 // Invalid version
-        };
+        var updateFaker = new UpdateCashierFaker(createdCashier.CashierId);
+        var updateRequest = updateFaker.Generate();
+        updateRequest.Version = 999; // Invalid version
 
         // Act & Assert
         var exception = await Should.ThrowAsync<RpcException>(async () =>
@@ -85,13 +71,9 @@ public class UpdateCashierIntegrationTests(IntegrationTestFixture fixture) : Int
     public async Task UpdateCashier_WithNonExistentCashierId_ShouldThrowInvalidArgumentException()
     {
         // Arrange
-        var updateRequest = new UpdateCashierRequest
-        {
-            CashierId = Guid.NewGuid().ToString(),
-            Name = "Updated Name",
-            Email = "updated@test.com",
-            Version = 1
-        };
+        var updateFaker = new UpdateCashierFaker();
+        var updateRequest = updateFaker.Generate();
+        updateRequest.Version = 1;
 
         // Act & Assert
         var exception = await Should.ThrowAsync<RpcException>(async () =>

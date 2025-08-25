@@ -53,6 +53,7 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     environment:
       name: production
 
@@ -77,37 +78,54 @@ jobs:
 
       - name: Find latest release
         id: latest-version
-        shell: bash
+        shell: pwsh
         run: |
-          # Always use template- prefix for template releases
-          TAG_PREFIX="template-v"
-          echo "Using template tag format with prefix: ${TAG_PREFIX}"
+          function Write-GitHubOutput {
+              param([string]$Name, [string]$Value)
+              if ($env:GITHUB_OUTPUT) {
+                  "$Name=$Value" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+              }
+              Write-Host "Output: $Name=$Value"
+          }
 
-          if [[ "${{ steps.config.outputs.deploy-prerelease }}" == true ]]; then
-            TAG_SUFFIX="-pre"
-          else
-            TAG_SUFFIX=""
-          fi
+          $deployPrerelease = "${{ steps.config.outputs.deploy-prerelease }}"
+          $tagPrefix = "template-v"
+
+          Write-Host "Using template tag format with prefix: $tagPrefix"
 
           # Find latest template release tag (excluding pre-releases)
-          set +o pipefail
-          CURRENT_TAG=$(git tag -l "${TAG_PREFIX}*.*.*" --sort=-v:refname | grep -v 'pre' | head -1)
-          set -o pipefail
+          $allTags = git tag -l "${tagPrefix}*.*.*" --sort=-v:refname
+          $currentTag = $allTags | Where-Object { $_ -notmatch 'pre' } | Select-Object -First 1
 
-          if [ -z "$CURRENT_TAG" ]; then
-            echo "No previous template release found"
-            CURRENT_TAG="${TAG_PREFIX}0.0.1"
-          fi
+          if (-not $currentTag) {
+              Write-Host "No previous template release found"
+              $currentTag = "${tagPrefix}0.0.1"
+          }
 
-          echo "Current template release: $CURRENT_TAG"
-          echo "current_version=$(echo $CURRENT_TAG | sed "s/^${TAG_PREFIX}//")" >> $GITHUB_OUTPUT
+          Write-Host "Current template release: $currentTag"
+          $currentVersion = $currentTag -replace "^$tagPrefix", ""
+
+          Write-GitHubOutput -Name "current_version" -Value $currentVersion
 
       - name: Set Momentum lib for template
         id: set-lib-version
-        shell: bash
+        shell: pwsh
         run: |
-          sed -i 's/$(TemplateMomentumVersion)/'"${{ steps.latest-version.outputs.current_version }}"'/g' Directory.Packages.props
-          echo "Updated Directory.Packages.props with version: ${{ steps.latest-version.outputs.current_version }}"
+          $version = "${{ steps.latest-version.outputs.current_version }}"
+          $filePath = "Directory.Packages.props"
+
+          Write-Host "Updating $filePath with version: $version"
+
+          # Read the file content
+          $content = Get-Content $filePath -Raw
+
+          # Replace the version placeholder
+          $updatedContent = $content -replace '__TEMPLATE_MOMENTUM_VERSION__', $version
+
+          # Write the updated content back
+          $updatedContent | Set-Content $filePath -Encoding utf8
+
+          Write-Host "✅ Updated $filePath with version: $version"
 
       - name: Calculate pre-release version
         if: steps.config.outputs.deploy-prerelease == 'true'
@@ -129,12 +147,14 @@ jobs:
 
       - name: Create GitHub pre-release
         if: steps.config.outputs.deploy-prerelease == 'true' && steps.prerelease-version.outputs.skip != 'true' && steps.config.outputs.is-test != 'true'
+        shell: pwsh
         run: |
-          gh release create "${{ steps.prerelease-version.outputs.tag }}" \
-            --title "Momentum Template ${{ steps.prerelease-version.outputs.version }}" \
-            --notes-file prerelease_notes.md \
-            --prerelease \
-            --target main
+          & ./.github/scripts/Create-GitHubRelease.ps1 `
+            -Tag "${{ steps.prerelease-version.outputs.tag }}" `
+            -Title "Momentum Template ${{ steps.prerelease-version.outputs.version }}" `
+            -NotesFile "prerelease_notes.md" `
+            -Prerelease `
+            -Target "main"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -150,13 +170,14 @@ jobs:
 
       - name: Verify main branch for release
         if: steps.config.outputs.deploy-prerelease == 'false'
+        shell: pwsh
         run: |
-          CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-          if [ "$CURRENT_BRANCH" != "main" ]; then
-            echo "❌ Release must be created from main branch. Current: $CURRENT_BRANCH"
+          $currentBranch = git rev-parse --abbrev-ref HEAD
+          if ($currentBranch -ne "main") {
+            Write-Error "❌ Release must be created from main branch. Current: $currentBranch"
             exit 1
-          fi
-          echo "✅ Confirmed on main branch"
+          }
+          Write-Host "✅ Confirmed on main branch"
 
       - name: Calculate release version
         if: steps.config.outputs.deploy-prerelease == 'false'
@@ -178,11 +199,13 @@ jobs:
 
       - name: Create GitHub release
         if: steps.config.outputs.deploy-prerelease == 'false' && steps.config.outputs.is-test != 'true'
+        shell: pwsh
         run: |
-          gh release create "${{ steps.release-version.outputs.tag }}" \
-            --title "Momentum Template v${{ steps.release-version.outputs.version }}" \
-            --notes-file release_notes.md \
-            --target main
+          & ./.github/scripts/Create-GitHubRelease.ps1 `
+            -Tag "${{ steps.release-version.outputs.tag }}" `
+            -Title "Momentum Template v${{ steps.release-version.outputs.version }}" `
+            -NotesFile "release_notes.md" `
+            -Target "main"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -197,42 +220,15 @@ jobs:
           nuget-source: ${{ steps.config.outputs.nuget-source }}
 
       - name: Deployment Summary
+        shell: pwsh
         run: |
-          echo "# 📊 Deployment Summary"
-          echo ""
-
-          if [ "${{ steps.config.outputs.is-test }}" == "true" ]; then
-            echo "🧪 **Test Deployment Mode**"
-            echo "   - NuGet Source: ${{ steps.config.outputs.nuget-source }}"
-            echo ""
-          fi
-
-          if [ "${{ steps.config.outputs.deploy-prerelease }}" == "true" ]; then
-            if [ "${{ steps.prerelease-version.outputs.skip }}" == "true" ]; then
-              echo "⏭️ Pre-release skipped (no consumer-visible changes)"
-            elif [ -n "${{ steps.prerelease-version.outputs.version }}" ]; then
-              echo "✅ **Pre-release deployed**"
-              echo "   - Version: ${{ steps.prerelease-version.outputs.version }}"
-              echo "   - Tag: ${{ steps.prerelease-version.outputs.tag }}"
-              echo "   - NuGet: ${{ steps.config.outputs.nuget-source }}"
-              if [ "${{ steps.config.outputs.is-test }}" != "true" ]; then
-                echo "   - GitHub Release: Created"
-              fi
-            else
-              echo "❌ **Pre-release failed**"
-            fi
-          fi
-
-          if [ "${{ steps.config.outputs.deploy-prerelease }}" == "false" ]; then
-            if [ -n "${{ steps.release-version.outputs.version }}" ]; then
-              echo "✅ **Release deployed**"
-              echo "   - Version: ${{ steps.release-version.outputs.version }}"
-              echo "   - Tag: ${{ steps.release-version.outputs.tag }}"
-              echo "   - NuGet: ${{ steps.config.outputs.nuget-source }}"
-              if [ "${{ steps.config.outputs.is-test }}" != "true" ]; then
-                echo "   - GitHub Release: Created"
-              fi
-            else
-              echo "❌ **Release failed**"
-            fi
-          fi
+          & ./.github/scripts/Write-DeploymentSummary.ps1 `
+            -IsTest "${{ steps.config.outputs.is-test }}" `
+            -DeployPrerelease "${{ steps.config.outputs.deploy-prerelease }}" `
+            -PrereleaseSkip "${{ steps.prerelease-version.outputs.skip }}" `
+            -PrereleaseVersion "${{ steps.prerelease-version.outputs.version }}" `
+            -PrereleaseTag "${{ steps.prerelease-version.outputs.tag }}" `
+            -ReleaseVersion "${{ steps.release-version.outputs.version }}" `
+            -ReleaseTag "${{ steps.release-version.outputs.tag }}" `
+            -NugetSource "${{ steps.config.outputs.nuget-source }}" `
+            -DeployDocs "false"
