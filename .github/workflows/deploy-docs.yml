@@ -59,7 +59,7 @@ jobs:
           build-dotnet: ${{ github.event.inputs.build-dotnet || 'true' }}
 
       - name: Upload to GitHub Pages
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: ${{ github.event.inputs.docs-path || 'libs/Momentum/docs' }}/.vitepress/dist
 
