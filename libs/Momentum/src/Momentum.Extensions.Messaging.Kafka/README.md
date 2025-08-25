@@ -71,13 +71,43 @@ app.Run();
 
 ### 2. Configuration
 
-Add the Kafka connection string to your configuration:
+The package now leverages .NET Aspire's Kafka configuration. Add the Kafka connection to your configuration:
 
 ```json
-// appsettings.json
+// appsettings.json - Complete Aspire integration
 {
     "ConnectionStrings": {
-        "Messaging": "localhost:9092"
+        "messaging": "localhost:9092"
+    },
+    "Aspire": {
+        "Confluent": {
+            "Kafka": {
+                "messaging": {
+                    "BootstrapServers": "localhost:9092",
+                    "Producer": {
+                        "Config": {
+                            "Acks": "All",
+                            "EnableIdempotence": true,
+                            "CompressionType": "Snappy",
+                            "BatchSize": 16384
+                        }
+                    },
+                    "Consumer": {
+                        "Config": {
+                            "AutoOffsetReset": "Latest",
+                            "EnableAutoCommit": true,
+                            "AutoCommitIntervalMs": 1000
+                        }
+                    },
+                    "Security": {
+                        "Protocol": "Plaintext"
+                    }
+                }
+            }
+        }
+    },
+    "Wolverine": {
+        "AutoProvision": true
     }
 }
 ```
@@ -141,6 +171,75 @@ public class CustomerCreatedHandler
 ```
 
 ## Advanced Configuration
+
+### Aspire Integration
+
+This package fully integrates with .NET Aspire's Kafka configuration system:
+
+#### Multiple Kafka Connections
+
+```csharp
+// Support for multiple Kafka clusters
+builder.AddKafkaMessagingExtensions("primary");
+builder.AddKafkaMessagingExtensions("secondary", 
+    configureProducerSettings: settings => {
+        // Producer-specific configuration
+    },
+    configureConsumerSettings: settings => {
+        // Consumer-specific configuration  
+    });
+
+// Or use advanced Aspire-Wolverine bridge integration
+builder.AddKafkaMessagingWithAspire("primary", kafka => 
+{
+    kafka.AutoProvision();
+    // Additional Wolverine-specific configuration
+});
+```
+
+#### Advanced Aspire-Wolverine Bridge
+
+For maximum integration leveraging all Aspire capabilities:
+
+```csharp
+// Program.cs - Full Aspire-Wolverine bridge
+var builder = WebApplication.CreateBuilder(args);
+
+builder.AddServiceDefaults();
+
+// Use the advanced Aspire-Wolverine bridge
+builder.AddKafkaMessagingWithAspire("messaging", kafka =>
+{
+    kafka.AutoProvision();
+    
+    // Wolverine-specific configuration with Aspire integration
+    kafka.ConfigureProducers(config => {
+        config.Acks = Acks.All;
+        config.EnableIdempotence = true;
+    });
+    
+    kafka.ConfigureConsumers(config => {
+        config.GroupId = "my-service-group";
+        config.AutoOffsetReset = AutoOffsetReset.Latest;
+    });
+});
+
+var app = builder.Build();
+app.Run();
+```
+
+**Bridge Benefits:**
+- **Automatic Configuration Binding**: Aspire configuration automatically applied to Wolverine
+- **Enhanced Health Checks**: Wolverine-specific Kafka endpoint monitoring  
+- **Security Integration**: Automatic SASL/SSL configuration from Aspire settings
+- **Service Discovery**: Dynamic endpoint resolution through Aspire
+
+#### Configuration Hierarchy
+
+The package supports multiple configuration sources in order of precedence:
+1. **Aspire Configuration**: `Aspire:Confluent:Kafka:Producer/Consumer:Config`
+2. **Connection Strings**: `ConnectionStrings:messaging`
+3. **Wolverine Settings**: `Wolverine:AutoProvision`
 
 ### Topic Naming Convention
 
@@ -297,11 +396,12 @@ Built-in observability includes:
 **Connection Failures**
 
 ```
-InvalidOperationException: Kafka connection string 'Messaging' not found in configuration
+InvalidOperationException: Kafka connection string 'messaging' not found in configuration
 ```
 
--   Ensure the `Messaging` connection string is configured
+-   Ensure the `messaging` connection string is configured (note lowercase)
 -   Verify Kafka broker accessibility
+-   Check Aspire configuration is properly structured
 
 **Topic Creation Issues**
 
@@ -309,8 +409,8 @@ InvalidOperationException: Kafka connection string 'Messaging' not found in conf
 Topic does not exist and auto-creation is disabled
 ```
 
--   Enable auto-provisioning in Kafka configuration
--   Manually create topics if auto-creation is disabled
+-   Enable auto-provisioning: `"Wolverine:AutoProvision": true`
+-   Manually create topics if auto-creation is disabled in production
 
 **Serialization Errors**
 
@@ -330,7 +430,8 @@ Enable debug logging for detailed troubleshooting:
     "Logging": {
         "LogLevel": {
             "Momentum.Extensions.Messaging.Kafka": "Debug",
-            "Wolverine.Kafka": "Debug"
+            "Wolverine.Kafka": "Debug",
+            "Aspire.Confluent.Kafka": "Debug"
         }
     }
 }

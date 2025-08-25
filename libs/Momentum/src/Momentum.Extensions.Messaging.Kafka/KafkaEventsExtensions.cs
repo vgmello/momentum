@@ -23,9 +23,10 @@ public class KafkaEventsExtensions(
     ILogger<KafkaEventsExtensions> logger,
     IConfiguration configuration,
     IOptions<ServiceBusOptions> serviceBusOptions,
-    IHostEnvironment environment) : IWolverineExtension
+    IHostEnvironment environment,
+    string connectionName = KafkaMessagingExtensions.DefaultConnectionName,
+    Action<KafkaTransportExpression>? configureKafka = null) : IWolverineExtension
 {
-    internal const string ConnectionStringName = "Messaging";
 
     private static readonly MethodInfo SetupKafkaPublisherRouteMethodInfo =
         typeof(KafkaEventsExtensions).GetMethod(nameof(SetupKafkaPublisherRoute), BindingFlags.NonPublic | BindingFlags.Static)!;
@@ -38,13 +39,18 @@ public class KafkaEventsExtensions(
     /// </remarks>
     public void Configure(WolverineOptions options)
     {
-        var kafkaConnectionString = configuration.GetConnectionString(ConnectionStringName)!;
+        // Get Kafka connection string from Aspire configuration
+        var kafkaConnectionString = configuration.GetConnectionString(connectionName)
+            ?? throw new InvalidOperationException($"Kafka connection string '{connectionName}' not found in configuration.");
+
         var cloudEventMapper = new CloudEventMapper(serviceBusOptions);
         var consumerGroupId = $"{options.ServiceName}-{GetEnvNameShort(environment.EnvironmentName)}";
 
-        var autoProvisionEnabled = configuration.GetValue("Kafka:AutoProvision", false);
+        // Check for auto-provision setting in Wolverine configuration
+        var autoProvisionEnabled = configuration.GetValue("Wolverine:AutoProvision", false);
 
-        logger.LogInformation("Configuring Kafka messaging for service {ServiceName}", options.ServiceName);
+        logger.LogInformation("Configuring Kafka messaging for service {ServiceName} with connection {ConnectionName}", 
+            options.ServiceName, connectionName);
         logger.LogInformation("Kafka bootstrap servers: {BootstrapServers}", kafkaConnectionString);
         logger.LogInformation("Consumer group ID: {GroupId}", consumerGroupId);
         logger.LogInformation("Auto-provision enabled: {AutoProvisionEnabled}", autoProvisionEnabled);
@@ -53,12 +59,44 @@ public class KafkaEventsExtensions(
             .UseKafka(kafkaConnectionString)
             .ConfigureSenders(cfg => cfg.UseInterop(cloudEventMapper))
             .ConfigureListeners(cfg => cfg.UseInterop(cloudEventMapper))
+            .ConfigureProducers(producer =>
+            {
+                // Apply Aspire producer configuration if available
+                var aspireProducerConfig = configuration.GetSection($"Aspire:Confluent:Kafka:Producer:Config");
+                if (aspireProducerConfig.Exists())
+                {
+                    var acks = aspireProducerConfig.GetValue<string>("Acks");
+                    if (!string.IsNullOrEmpty(acks))
+                    {
+                        producer.Acks = Enum.Parse<Confluent.Kafka.Acks>(acks, ignoreCase: true);
+                    }
+                    
+                    var enableIdempotence = aspireProducerConfig.GetValue<bool?>("EnableIdempotence");
+                    if (enableIdempotence.HasValue)
+                    {
+                        producer.EnableIdempotence = enableIdempotence.Value;
+                    }
+                }
+            })
             .ConfigureConsumers(consumer =>
             {
                 consumer.GroupId = consumerGroupId;
-                consumer.AutoOffsetReset = Confluent.Kafka.AutoOffsetReset.Latest;
-                consumer.EnableAutoCommit = true;
-                consumer.EnableAutoOffsetStore = false;
+                
+                // Apply Aspire consumer configuration if available
+                var aspireConsumerConfig = configuration.GetSection($"Aspire:Confluent:Kafka:Consumer:Config");
+                if (aspireConsumerConfig.Exists())
+                {
+                    consumer.AutoOffsetReset = aspireConsumerConfig.GetValue("AutoOffsetReset", Confluent.Kafka.AutoOffsetReset.Latest);
+                    consumer.EnableAutoCommit = aspireConsumerConfig.GetValue("EnableAutoCommit", true);
+                    consumer.EnableAutoOffsetStore = aspireConsumerConfig.GetValue("EnableAutoOffsetStore", false);
+                }
+                else
+                {
+                    // Default configuration
+                    consumer.AutoOffsetReset = Confluent.Kafka.AutoOffsetReset.Latest;
+                    consumer.EnableAutoCommit = true;
+                    consumer.EnableAutoOffsetStore = false;
+                }
             });
 
         if (autoProvisionEnabled)
@@ -70,6 +108,9 @@ public class KafkaEventsExtensions(
         {
             logger.LogDebug("Kafka auto-provisioning disabled - topics must be created manually");
         }
+
+        // Apply additional Kafka configuration if provided
+        configureKafka?.Invoke(kafkaConfig);
 
         SetupPublisher(options);
         SetupSubscribers(options);
