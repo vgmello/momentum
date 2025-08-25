@@ -28,7 +28,6 @@
         <PackageReference Include="Momentum.ServiceDefaults"/>
         #endif -->
     </ItemGroup>
-
     <!--#if (LIBS_INCLUDES_DEFAULTS) -->
     <ItemGroup>
         <!--#if (LIBS_INCLUDES_DEFAULTS)
@@ -36,8 +35,7 @@
         #endif -->
     </ItemGroup>
     <!--#endif -->
-
-    <!--#if (libs == 'none') -->
+    <!--#if (!LIBS_INCLUDES_API) -->
     <ItemGroup>
         <ProjectReference Include="..\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
         <ProjectReference Include="..\Momentum.Extensions.XmlDocs\Momentum.Extensions.XmlDocs.csproj"/>

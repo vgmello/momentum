@@ -27,7 +27,25 @@
         #endif -->
     </ItemGroup>
 
-    <!--#if (libs == 'none') -->
+    <PropertyGroup>
+        <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
+    </PropertyGroup>
+
+    <Target Name="GetDependencyTargetPaths">
+        <ItemGroup>
+            <!--#if (!LIBS_INCLUDES_GENERATORS) -->
+            <TargetPathWithTargetPlatformMoniker
+                Include="$(ProjectDir)..\Momentum.Extensions.Abstractions\$(OutputPath)\Momentum.Extensions.Abstractions.dll"
+                IncludeRuntimeDependency="false"/>
+            <!--#endif -->
+            <!--#if (LIBS_INCLUDES_GENERATORS)
+            <TargetPathWithTargetPlatformMoniker
+                Include="$(PKGMomentum_Extensions_Abstractions)analyzers\dotnet\cs\Momentum.Extensions.Abstractions.dll"
+                IncludeRuntimeDependency="false"/>
+            #endif -->
+        </ItemGroup>
+    </Target>
+    <!--#if (!LIBS_INCLUDES_GENERATORS) -->
     <ItemGroup>
         <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="\analyzers\dotnet\cs" Visible="false"/>
         <None
@@ -40,23 +58,4 @@
         <ProjectReference Include="..\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj" PrivateAssets="all"/>
     </ItemGroup>
     <!--#endif -->
-
-    <PropertyGroup>
-        <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
-    </PropertyGroup>
-
-    <Target Name="GetDependencyTargetPaths">
-        <ItemGroup>
-            <!--#if (libs == 'none') -->
-            <TargetPathWithTargetPlatformMoniker
-                Include="$(ProjectDir)..\Momentum.Extensions.Abstractions\$(OutputPath)\Momentum.Extensions.Abstractions.dll"
-                IncludeRuntimeDependency="false"/>
-            <!--#endif -->
-            <!--#if (LIBS_INCLUDES_GENERATORS)
-            <TargetPathWithTargetPlatformMoniker
-                Include="$(PKGMomentum_Extensions_Abstractions)analyzers\dotnet\cs\Momentum.Extensions.Abstractions.dll"
-                IncludeRuntimeDependency="false"/>
-            #endif -->
-        </ItemGroup>
-    </Target>
 </Project>
