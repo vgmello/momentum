@@ -50,9 +50,41 @@ public static class SimulatePaymentCommandHandler
     ///     Handles the SimulatePaymentCommand and generates a payment received event for testing.
     /// </summary>
     /// <param name="command">The simulate payment command</param>
+    /// <param name="messaging">The message bus for database operations (to check if invoice exists)</param>
+    /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>A tuple containing the success result and payment received event</returns>
-    public static Task<(Result<bool>, PaymentReceived)> Handle(SimulatePaymentCommand command)
+    public static async Task<(Result<bool>, PaymentReceived?)> Handle(
+        SimulatePaymentCommand command, IMessageBus messaging, CancellationToken cancellationToken)
     {
+        var getInvoiceQuery = new Queries.GetInvoiceQuery(command.TenantId, command.InvoiceId);
+
+        try
+        {
+            var invoiceResult = await messaging.InvokeQueryAsync(getInvoiceQuery, cancellationToken);
+
+            var invoiceFound = invoiceResult.Match(
+                invoice => invoice != null,
+                _ => false
+            );
+
+            if (!invoiceFound)
+            {
+                var failures = new List<ValidationFailure>
+                {
+                    new("InvoiceId", "Invoice not found.")
+                };
+                return (failures, null);
+            }
+        }
+        catch
+        {
+            var failures = new List<ValidationFailure>
+            {
+                new("InvoiceId", "Invoice not found.")
+            };
+            return (failures, null);
+        }
+
         var paymentReceivedEvent = new PaymentReceived(
             TenantId: command.TenantId,
             InvoiceId: command.InvoiceId,
@@ -63,6 +95,6 @@ public static class SimulatePaymentCommandHandler
             PaymentReference: command.PaymentReference
         );
 
-        return Task.FromResult<(Result<bool>, PaymentReceived)>((true, paymentReceivedEvent));
+        return (true, paymentReceivedEvent);
     }
 }

@@ -203,9 +203,28 @@ jobs:
         shell: pwsh
         run: |
           Set-Location "${{ steps.generate-template.outputs.test-dir }}"
+          $solutionFiles = Get-ChildItem -Filter "*.slnx" -ErrorAction SilentlyContinue
 
-          Write-Host "Building solution/project"
-          dotnet build --configuration Release --verbosity minimal
+          if ($solutionFiles.Count -gt 0) {
+            Write-Host "Building solution: $($solutionFiles[0].Name)"
+            dotnet build $solutionFiles[0].Name --configuration Release --verbosity minimal
+          }
+          else {
+            # No solution file, find and build all project files
+            $projectFiles = Get-ChildItem -Recurse -Filter "*.csproj" -ErrorAction SilentlyContinue
+
+            if ($projectFiles.Count -eq 0) {
+              Write-Host "❌ No solution or project files found"
+              exit 1
+            }
+
+            Write-Host "Building $($projectFiles.Count) project(s):"
+            foreach ($project in $projectFiles) {
+              Write-Host "  - $($project.Name)"
+            }
+
+            dotnet build --configuration Release --verbosity minimal
+          }
 
           if ($LASTEXITCODE -eq 0) {
             Write-Host "✅ Build completed successfully"
@@ -364,7 +383,7 @@ jobs:
           catch {
             Write-Host "⚠️ Error during fallback cleanup, continuing..."
           }
-          
+
           Write-Host "✅ Cleanup process completed"
 
   test-summary:

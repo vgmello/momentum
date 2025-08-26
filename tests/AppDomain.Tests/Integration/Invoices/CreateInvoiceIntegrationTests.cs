@@ -126,6 +126,7 @@ public class CreateInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
             .WithoutDueDate()
             .Generate();
         createRequest.Currency = string.Empty; // Clear currency to test defaults
+        createRequest.CashierId = string.Empty; // Clear CashierId to test without cashier
 
         // Act
         var createdInvoice = await _client.CreateInvoiceAsync(createRequest, cancellationToken: TestContext.Current.CancellationToken);
