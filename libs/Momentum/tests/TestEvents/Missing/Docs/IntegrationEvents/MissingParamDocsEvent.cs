@@ -2,13 +2,13 @@
 
 using Momentum.Extensions.Abstractions.Messaging;
 
-namespace TestEvents.Missing.Docs;
+namespace TestEvents.Missing.Docs.IntegrationEvents;
 
 /// <summary>
-///
+///     Event with missing parameter documentation
 /// </summary>
-[EventTopic<EmptySummaryEvent>]
-public sealed record EmptySummaryEvent(
+[EventTopic<MissingParamDocsEvent>]
+public sealed record MissingParamDocsEvent(
     [PartitionKey(Order = 0)] Guid TenantId,
     string Data
 );

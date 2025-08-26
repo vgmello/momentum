@@ -2,7 +2,7 @@
 
 using Momentum.Extensions.Abstractions.Messaging;
 
-namespace TestEvents.Missing.Docs;
+namespace TestEvents.Missing.Docs.IntegrationEvents;
 
 /// <summary>
 ///     Event with malformed XML in documentation

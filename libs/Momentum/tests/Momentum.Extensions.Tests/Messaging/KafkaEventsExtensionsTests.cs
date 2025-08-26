@@ -11,168 +11,165 @@ using Momentum.Extensions.Messaging.Kafka;
 using Momentum.ServiceDefaults.Messaging;
 using NSubstitute;
 using Wolverine;
-using Wolverine.Kafka.Internals;
 
 namespace Momentum.Extensions.Tests.Messaging;
 
-public class KafkaEventsExtensionsTests
+public class KafkaSetupExtensionsTests
 {
-    private readonly ILogger<KafkaEventsExtensions> _logger = NullLogger<KafkaEventsExtensions>.Instance;
     private readonly IHostEnvironment _environment = Substitute.For<IHostEnvironment>();
+    private readonly ILogger<KafkaWolverineExtensions> _logger = new NullLogger<KafkaWolverineExtensions>();
     private readonly IOptions<ServiceBusOptions> _serviceBusOptions = Options.Create(new ServiceBusOptions());
+    private readonly ITopicNameGenerator _topicNameGenerator = Substitute.For<ITopicNameGenerator>();
 
     [Fact]
-    public void Configure_WithAutoProvisionConfigTrue_EnablesAutoProvision()
+    public void KafkaWolverineExtensions_WithConnectionString_DoesNotThrow()
     {
         // Arrange
         var config = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
-                ["ConnectionStrings:Messaging"] = "localhost:9092",
-                ["Kafka:AutoProvision"] = "true"
+                ["ConnectionStrings:Messaging"] = "localhost:9092"
             })
             .Build();
 
-        var extension = new KafkaEventsExtensions(_logger, config, _serviceBusOptions, _environment);
+        _environment.EnvironmentName.Returns("Development");
+        var extension = new KafkaWolverineExtensions(_logger, config, _serviceBusOptions, _environment, _topicNameGenerator, "Messaging");
         var options = new WolverineOptions { ServiceName = "test-service" };
-        var transport = options.Transports.GetOrCreate<KafkaTransport>();
 
-        transport.AutoProvision = false;
-
-        // Act
-        extension.Configure(options);
-
-        // Assert
-        transport.AutoProvision.ShouldBeTrue();
+        // Act & Assert
+        Should.NotThrow(() => extension.Configure(options));
     }
 
     [Fact]
-    public void Configure_WithConnectionString_UsesConnectionString()
+    public void KafkaWolverineExtensions_WithoutConnectionString_Throws()
+    {
+        // Arrange
+        var config = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?> { })
+            .Build();
+
+        _environment.EnvironmentName.Returns("Development");
+        var extension = new KafkaWolverineExtensions(_logger, config, _serviceBusOptions, _environment, _topicNameGenerator, "Messaging");
+        var options = new WolverineOptions { ServiceName = "test-service" };
+
+        // Act & Assert
+        Should.Throw<InvalidOperationException>(() => extension.Configure(options))
+            .Message.ShouldContain("Kafka connection string 'Messaging' not set");
+    }
+
+    [Fact]
+    public void KafkaAspireExtensions_AppliesProducerConfig()
     {
         // Arrange
         var config = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
-                ["ConnectionStrings:Messaging"] = "localhost:9093"
+                ["Aspire:Confluent:Kafka:Messaging:Producer:EnableIdempotence"] = "true",
+                ["Aspire:Confluent:Kafka:Messaging:Producer:MaxInFlight"] = "1",
+                ["Aspire:Confluent:Kafka:Messaging:Producer:Acks"] = "All",
+                ["Aspire:Confluent:Kafka:Messaging:Producer:MessageSendMaxRetries"] = "15"
             })
             .Build();
 
-        var extension = new KafkaEventsExtensions(_logger, config, _serviceBusOptions, _environment);
-        var options = new WolverineOptions { ServiceName = "test-service" };
-        var transport = options.Transports.GetOrCreate<KafkaTransport>();
+        var producerConfig = new ProducerConfig { BootstrapServers = "localhost:9092" };
 
         // Act
-        extension.Configure(options);
+        KafkaAspireExtensions.ApplyAspireProducerConfig(config, "Messaging", producerConfig);
 
         // Assert
-        transport.ConsumerConfig.BootstrapServers.ShouldBe("localhost:9093");
-        transport.ProducerConfig.BootstrapServers.ShouldBe("localhost:9093");
+        producerConfig.EnableIdempotence.ShouldBe(true);
+        producerConfig.MaxInFlight.ShouldBe(1);
+        producerConfig.Acks.ShouldBe(Acks.All);
+        producerConfig.MessageSendMaxRetries.ShouldBe(15);
     }
 
     [Fact]
-    public void Configure_WithProducerConfigSettings_AppliesProducerConfiguration()
+    public void KafkaAspireExtensions_AppliesConsumerConfig()
     {
         // Arrange
         var config = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
-                ["ConnectionStrings:Messaging"] = "localhost:9092",
-                ["Kafka:ProducerConfig:EnableIdempotence"] = "true",
-                ["Kafka:ProducerConfig:MaxInFlight"] = "1",
-                ["Kafka:ProducerConfig:Acks"] = "All",
-                ["Kafka:ProducerConfig:MessageSendMaxRetries"] = "15"
+                ["Aspire:Confluent:Kafka:Messaging:Consumer:SessionTimeoutMs"] = "15000",
+                ["Aspire:Confluent:Kafka:Messaging:Consumer:HeartbeatIntervalMs"] = "5000",
+                ["Aspire:Confluent:Kafka:Messaging:Consumer:MaxPollIntervalMs"] = "600000",
+                ["Aspire:Confluent:Kafka:Messaging:Consumer:FetchMinBytes"] = "2048",
+                ["Aspire:Confluent:Kafka:Messaging:Consumer:AutoOffsetReset"] = "Earliest"
             })
             .Build();
 
-        var extension = new KafkaEventsExtensions(_logger, config, _serviceBusOptions, _environment);
-        var options = new WolverineOptions { ServiceName = "test-service" };
-        var transport = options.Transports.GetOrCreate<KafkaTransport>();
+        var consumerConfig = new ConsumerConfig { BootstrapServers = "localhost:9092" };
 
         // Act
-        extension.Configure(options);
+        KafkaAspireExtensions.ApplyAspireConsumerConfig(config, "Messaging", consumerConfig);
 
         // Assert
-        transport.ProducerConfig.EnableIdempotence.ShouldBe(true);
-        transport.ProducerConfig.MaxInFlight.ShouldBe(1);
-        transport.ProducerConfig.Acks.ShouldBe(Acks.All);
-        transport.ProducerConfig.MessageSendMaxRetries.ShouldBe(15);
+        consumerConfig.SessionTimeoutMs.ShouldBe(15000);
+        consumerConfig.HeartbeatIntervalMs.ShouldBe(5000);
+        consumerConfig.MaxPollIntervalMs.ShouldBe(600000);
+        consumerConfig.FetchMinBytes.ShouldBe(2048);
+        consumerConfig.AutoOffsetReset.ShouldBe(AutoOffsetReset.Earliest);
     }
 
     [Fact]
-    public void Configure_WithConsumerConfigSettings_AppliesConsumerConfiguration()
+    public void KafkaAspireExtensions_AppliesSecurityConfig()
     {
         // Arrange
         var config = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
-                ["ConnectionStrings:Messaging"] = "localhost:9092",
-                ["Kafka:ConsumerConfig:SessionTimeoutMs"] = "15000",
-                ["Kafka:ConsumerConfig:HeartbeatIntervalMs"] = "5000",
-                ["Kafka:ConsumerConfig:MaxPollIntervalMs"] = "600000",
-                ["Kafka:ConsumerConfig:FetchMinBytes"] = "2048"
+                ["Aspire:Confluent:Kafka:Messaging:Security:Protocol"] = "SaslSsl",
+                ["Aspire:Confluent:Kafka:Messaging:Security:SaslMechanism"] = "Plain",
+                ["Aspire:Confluent:Kafka:Messaging:Security:SaslUsername"] = "user123",
+                ["Aspire:Confluent:Kafka:Messaging:Security:SaslPassword"] = "pass456",
+                ["Aspire:Confluent:Kafka:Messaging:Security:SslCaLocation"] = "/path/to/ca.crt",
+                ["Aspire:Confluent:Kafka:Messaging:Security:SslCertificateLocation"] = "/path/to/cert.crt",
+                ["Aspire:Confluent:Kafka:Messaging:Security:SslKeyLocation"] = "/path/to/key.key"
             })
             .Build();
 
-        var extension = new KafkaEventsExtensions(_logger, config, _serviceBusOptions, _environment);
-        var options = new WolverineOptions { ServiceName = "test-service" };
-        var transport = options.Transports.GetOrCreate<KafkaTransport>();
+        var clientConfig = new ClientConfig { BootstrapServers = "localhost:9092" };
 
         // Act
-        extension.Configure(options);
+        KafkaAspireExtensions.ApplyAspireClientConfig(config, "Messaging", clientConfig);
 
         // Assert
-        transport.ConsumerConfig.SessionTimeoutMs.ShouldBe(15000);
-        transport.ConsumerConfig.HeartbeatIntervalMs.ShouldBe(5000);
-        transport.ConsumerConfig.MaxPollIntervalMs.ShouldBe(600000);
-        transport.ConsumerConfig.FetchMinBytes.ShouldBe(2048);
+        clientConfig.SecurityProtocol.ShouldBe(SecurityProtocol.SaslSsl);
+        clientConfig.SaslMechanism.ShouldBe(SaslMechanism.Plain);
+        clientConfig.SaslUsername.ShouldBe("user123");
+        clientConfig.SaslPassword.ShouldBe("pass456");
+        clientConfig.SslCaLocation.ShouldBe("/path/to/ca.crt");
+        clientConfig.SslCertificateLocation.ShouldBe("/path/to/cert.crt");
+        clientConfig.SslKeyLocation.ShouldBe("/path/to/key.key");
     }
 
-    [Fact]
-    public void Configure_WithEnvironmentName_CreatesCorrectConsumerGroupId()
-    {
-        // Arrange
-        _environment.EnvironmentName.Returns("Production");
-
-        var config = new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string?>
-            {
-                ["ConnectionStrings:Messaging"] = "localhost:909"
-            })
-            .Build();
-
-        var extension = new KafkaEventsExtensions(_logger, config, _serviceBusOptions, _environment);
-        var options = new WolverineOptions { ServiceName = "test-service" };
-        var transport = options.Transports.GetOrCreate<KafkaTransport>();
-
-        // Act
-        extension.Configure(options);
-
-        // Assert
-        transport.ConsumerConfig.GroupId.ShouldBe("test-service-prod");
-    }
 
     [Theory]
     [InlineData("Development", "dev")]
     [InlineData("Production", "prod")]
     [InlineData("Test", "test")]
     [InlineData("Staging", "stag")]
-    public void GetTopicName_WithDifferentEnvironments_MapsCorrectly(string environment, string expectedPrefix)
+    public void TopicNameGenerator_WithDifferentEnvironments_MapsCorrectly(string environment, string expectedPrefix)
     {
         // Arrange
+        _environment.EnvironmentName.Returns(environment);
+        var generator = new TopicNameGenerator(_environment);
         var messageType = typeof(TestEvent);
         var topicAttribute = new EventTopicAttribute("test-topic", domain: "test-domain");
 
         // Act
-        var result = KafkaEventsExtensions.GetTopicName(environment, messageType, topicAttribute);
+        var result = generator.GetTopicName(messageType, topicAttribute);
 
         // Assert
         result.ShouldBe($"{expectedPrefix}.test-domain.public.test-topic.v1");
     }
 
     [Fact]
-    public void GetTopicName_WithInternalScope_CreatesInternalTopic()
+    public void TopicNameGenerator_WithInternalScope_CreatesInternalTopic()
     {
         // Arrange
+        _environment.EnvironmentName.Returns("Development");
+        var generator = new TopicNameGenerator(_environment);
         var messageType = typeof(TestEvent);
         var topicAttribute = new EventTopicAttribute("test-topic", domain: "test-domain")
         {
@@ -180,39 +177,58 @@ public class KafkaEventsExtensionsTests
         };
 
         // Act
-        var result = KafkaEventsExtensions.GetTopicName("Development", messageType, topicAttribute);
+        var result = generator.GetTopicName(messageType, topicAttribute);
 
         // Assert
         result.ShouldBe("dev.test-domain.internal.test-topic.v1");
     }
 
     [Fact]
-    public void GetTopicName_WithPluralization_PluralizesTopicName()
+    public void TopicNameGenerator_WithPluralization_PluralizesTopicName()
     {
         // Arrange
+        _environment.EnvironmentName.Returns("Development");
+        var generator = new TopicNameGenerator(_environment);
         var messageType = typeof(TestEvent);
-        // Create a test attribute that overrides ShouldPluralizeTopicName
         var topicAttribute = new TestPluralizeEventTopicAttribute("customer", domain: "sales");
 
         // Act
-        var result = KafkaEventsExtensions.GetTopicName("Development", messageType, topicAttribute);
+        var result = generator.GetTopicName(messageType, topicAttribute);
 
         // Assert
         result.ShouldBe("dev.sales.public.customers.v1");
     }
 
     [Fact]
-    public void GetTopicName_WithVersion_IncludesVersion()
+    public void TopicNameGenerator_WithVersion_IncludesVersion()
     {
         // Arrange
+        _environment.EnvironmentName.Returns("Development");
+        var generator = new TopicNameGenerator(_environment);
         var messageType = typeof(TestEvent);
         var topicAttribute = new EventTopicAttribute("test-topic", domain: "test-domain", version: "v2");
 
         // Act
-        var result = KafkaEventsExtensions.GetTopicName("Development", messageType, topicAttribute);
+        var result = generator.GetTopicName(messageType, topicAttribute);
 
         // Assert
         result.ShouldBe("dev.test-domain.public.test-topic.v2");
+    }
+
+    [Fact]
+    public void TopicNameGenerator_WithEmptyVersion_DoesNotIncludeVersion()
+    {
+        // Arrange
+        _environment.EnvironmentName.Returns("Development");
+        var generator = new TopicNameGenerator(_environment);
+        var messageType = typeof(TestEvent);
+        var topicAttribute = new EventTopicAttribute("test-topic", domain: "test-domain", version: "");
+
+        // Act
+        var result = generator.GetTopicName(messageType, topicAttribute);
+
+        // Assert
+        result.ShouldBe("dev.test-domain.public.test-topic");
     }
 
     private record TestEvent;
