@@ -25,14 +25,20 @@ public static class OrleansExtensions
 
         if (!useLocalCluster)
         {
-            var connectionStringName = config.GetValue<string>("Clustering:ServiceKey") ?? SectionName;
-            var orleansConnectionString = builder.Configuration.GetConnectionString(connectionStringName);
+            var clusterServiceName = GetServiceName(config, "Clustering:ServiceKey", SectionName);
+            var grainStateServiceName = GetServiceName(config, "GrainStorage:Default:ServiceKey", SectionName);
+
+            var orleansConnectionString = builder.Configuration.GetConnectionString(clusterServiceName);
 
             if (string.IsNullOrEmpty(orleansConnectionString))
                 throw new InvalidOperationException($"Orleans connection string '{orleansConnectionString}' is not set.");
 
-            builder.AddKeyedAzureTableServiceClient(connectionStringName);
-            builder.AddKeyedAzureBlobServiceClient($"{connectionStringName}GrainState");
+            builder.AddKeyedAzureTableServiceClient(clusterServiceName);
+            builder.AddKeyedAzureBlobServiceClient(grainStateServiceName);
+        }
+        else
+        {
+            SetupLocalCluster(config);
         }
 
         builder.UseOrleans(siloBuilder =>
@@ -41,12 +47,6 @@ public static class OrleansExtensions
             {
                 siloBuilder.UseLocalhostClustering();
             }
-
-            siloBuilder.Configure<ClusterOptions>(opt =>
-            {
-                opt.ClusterId = "app-domain--cluster";
-                opt.ServiceId = "AppDomain-BackOffice-Orleans";
-            });
 
             siloBuilder.Configure<GrainCollectionOptions>(builder.Configuration.GetSection("Orleans:GrainCollection"));
 
@@ -62,6 +62,25 @@ public static class OrleansExtensions
             .WithMetrics(opt => opt.AddMeter("Microsoft.Orleans"));
 
         return builder;
+    }
+
+    private static string GetServiceName(IConfigurationSection config, string keyPath, string defaultValue)
+    {
+        var serviceName = config.GetValue<string>(keyPath);
+
+        if (serviceName is null)
+        {
+            serviceName = defaultValue;
+            config[keyPath] = serviceName;
+        }
+
+        return serviceName;
+    }
+
+    private static void SetupLocalCluster(IConfigurationSection config)
+    {
+        config["Clustering:ProviderType"] = "Development";
+        config["GrainStorage:Default:ProviderType"] = "Memory";
     }
 
     /// <summary>

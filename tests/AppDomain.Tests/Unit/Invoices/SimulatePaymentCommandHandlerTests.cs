@@ -25,9 +25,11 @@ public class SimulatePaymentCommandHandlerTests
         var tenantId = Guid.NewGuid();
         var command = new SimulatePaymentCommand(tenantId, invoiceId, 1, amount, currency, paymentMethod, paymentReference);
 
-        messagingMock.InvokeQueryAsync<Result<AppDomain.Invoices.Contracts.Models.Invoice>>(Arg.Any<IQuery<Result<AppDomain.Invoices.Contracts.Models.Invoice>>>(), Arg.Any<CancellationToken>())
-            .Returns(new AppDomain.Invoices.Contracts.Models.Invoice(tenantId, invoiceId, "Test", "Draft", 100, "USD", DateTime.UtcNow, null, null, null, DateTime.UtcNow, DateTime.UtcNow, 1));
-        
+        messagingMock.InvokeQueryAsync<Result<AppDomain.Invoices.Contracts.Models.Invoice>>(
+                Arg.Any<IQuery<Result<AppDomain.Invoices.Contracts.Models.Invoice>>>(), Arg.Any<CancellationToken>())
+            .Returns(new AppDomain.Invoices.Contracts.Models.Invoice(tenantId, invoiceId, "Test", "Draft", 100, "USD", DateTime.UtcNow,
+                null, null, null, DateTime.UtcNow, DateTime.UtcNow, 1));
+
         var handlerResult = await SimulatePaymentCommandHandler.Handle(command, messagingMock, CancellationToken.None);
         var result = handlerResult.Item1;
         var integrationEvent = handlerResult.Item2;
@@ -47,7 +49,8 @@ public class SimulatePaymentCommandHandlerTests
         integrationEvent.PaymentDate.ShouldBeInRange(DateTime.UtcNow.AddSeconds(-5), DateTime.UtcNow.AddSeconds(5));
 
         await messagingMock.Received(1)
-            .InvokeQueryAsync<Result<AppDomain.Invoices.Contracts.Models.Invoice>>(Arg.Any<IQuery<Result<AppDomain.Invoices.Contracts.Models.Invoice>>>(), Arg.Any<CancellationToken>());
+            .InvokeQueryAsync<Result<AppDomain.Invoices.Contracts.Models.Invoice>>(
+                Arg.Any<IQuery<Result<AppDomain.Invoices.Contracts.Models.Invoice>>>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -61,9 +64,12 @@ public class SimulatePaymentCommandHandlerTests
         var command = new SimulatePaymentCommand(tenantId, invoiceId, 1, amount);
 
         var mockMessageBus = Substitute.For<IMessageBus>();
-        mockMessageBus.InvokeQueryAsync<Result<AppDomain.Invoices.Contracts.Models.Invoice>>(Arg.Any<IQuery<Result<AppDomain.Invoices.Contracts.Models.Invoice>>>(), Arg.Any<CancellationToken>())
-            .Returns(new AppDomain.Invoices.Contracts.Models.Invoice(tenantId, invoiceId, "Test", "Draft", 100, "USD", DateTime.UtcNow, null, null, null, DateTime.UtcNow, DateTime.UtcNow, 1));
-        
+        mockMessageBus
+            .InvokeQueryAsync<Result<AppDomain.Invoices.Contracts.Models.Invoice>>(
+                Arg.Any<IQuery<Result<AppDomain.Invoices.Contracts.Models.Invoice>>>(), Arg.Any<CancellationToken>())
+            .Returns(new AppDomain.Invoices.Contracts.Models.Invoice(tenantId, invoiceId, "Test", "Draft", 100, "USD", DateTime.UtcNow,
+                null, null, null, DateTime.UtcNow, DateTime.UtcNow, 1));
+
         var handlerResult = await SimulatePaymentCommandHandler.Handle(command, mockMessageBus, CancellationToken.None);
         var integrationEvent = handlerResult.Item2;
 

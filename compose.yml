@@ -106,8 +106,7 @@ services:
       - ConnectionStrings__Messaging=kafka:9092
       # #endif
       # #if (INCLUDE_ORLEANS)
-      - Orleans__UseLocalhostClustering=false
-      - ConnectionStrings__OrleansClustering=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;TableEndpoint=http://azurite:10002/devstoreaccount1;
+      - ConnectionStrings__Orleans=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;TableEndpoint=http://azurite:10002/devstoreaccount1;BlobEndpoint=http://azurite:10000/devstoreaccount1
       # #endif
       - Kestrel__Endpoints__Http__Protocols=Http1
       - Kestrel__Endpoints__Http__Url=http://+:8080
@@ -180,9 +179,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ServiceName=AppDomain
-      - Orleans__UseLocalhostClustering=false
-      - ConnectionStrings__OrleansClustering=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;TableEndpoint=http://azurite:10002/devstoreaccount1;
-      - ConnectionStrings__OrleansGrainState=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;
+      - ConnectionStrings__Orleans=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;TableEndpoint=http://azurite:10002/devstoreaccount1;BlobEndpoint=http://azurite:10000/devstoreaccount1
       # #if (USE_DB)
       - ConnectionStrings__AppDomainDb=Host=app-domain-db;Port=5432;Database=app_domain;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-password@}
       - ConnectionStrings__ServiceBus=Host=app-domain-db;Port=5432;Database=service_bus;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-password@}
@@ -206,7 +203,7 @@ services:
     profiles: [ "storage", "backoffice" ]
     ports:
       - "10000:10000"  # Blob service
-      - "10001:10001"  # Queue service  
+      - "10001:10001"  # Queue service
       - "10002:10002"  # Table service
     # Using default Azurite account (devstoreaccount1) - no environment needed
     volumes:

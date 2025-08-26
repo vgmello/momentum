@@ -14,13 +14,24 @@ public static class OrleansExtensions
 
         if (!useLocalCluster)
         {
-            var connectionStringName = config.GetValue<string>("Clustering:ServiceKey") ?? SectionName;
-            var orleansConnectionString = builder.Configuration.GetConnectionString(connectionStringName);
+            var serviceName = config.GetValue<string>("Clustering:ServiceKey");
+
+            if (serviceName is null)
+            {
+                serviceName = SectionName;
+                config["Clustering:ServiceKey"] = serviceName;
+            }
+
+            var orleansConnectionString = builder.Configuration.GetConnectionString(serviceName);
 
             if (string.IsNullOrEmpty(orleansConnectionString))
                 throw new InvalidOperationException($"Orleans connection string '{orleansConnectionString}' is not set.");
 
-            builder.AddKeyedAzureTableServiceClient(connectionStringName);
+            builder.AddKeyedAzureTableServiceClient(serviceName);
+        }
+        else
+        {
+            config["Clustering:ProviderType"] = "Development";
         }
 
         builder.UseOrleansClient(clientBuilder =>

@@ -102,7 +102,7 @@ public class OrleansExtensionsTests
         // Should have LazyClusterClientManager
         hostedServices.Any(s => s.GetType().Name == "LazyClusterClientManager").ShouldBeTrue();
 
-        // Should have LazyClusterClientManager registered as IHostedService 
+        // Should have LazyClusterClientManager registered as IHostedService
         // When using factory pattern, we need to check the resolved service instead of service descriptors
         var lazyManager = serviceProvider.GetServices<IHostedService>()
             .FirstOrDefault(s => s.GetType().Name == "LazyClusterClientManager");
@@ -207,7 +207,7 @@ public class OrleansExtensionsTests
         builder2.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
             ["Orleans:UseLocalhostClustering"] = "false",
-            ["ConnectionStrings:OrleansClustering"] = "test-connection"
+            ["ConnectionStrings:Orleans"] = "test-connection"
         });
 
         Should.NotThrow(() => builder2.AddOrleansClient());

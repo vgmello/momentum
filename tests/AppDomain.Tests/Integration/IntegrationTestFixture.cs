@@ -42,7 +42,7 @@ namespace AppDomain.Tests.Integration;
 public class IntegrationTestFixture : IAsyncLifetime
 {
     private readonly INetwork _containerNetwork = new NetworkBuilder().Build();
-    
+
 #if INCLUDE_API
     private WebApplication? _app;
 #endif
@@ -115,8 +115,6 @@ public class IntegrationTestFixture : IAsyncLifetime
     private async Task CreateTestWebApplicationAsync()
     {
         var builder = WebApplication.CreateEmptyBuilder(new WebApplicationOptions());
-        
-        // Configure connection strings for test containers
         var configData = new Dictionary<string, string?>();
 
 #if USE_DB
@@ -132,34 +130,27 @@ public class IntegrationTestFixture : IAsyncLifetime
         configData["Aspire:Confluent:Kafka:Messaging:Consumer:Config:AutoOffsetReset"] = "Latest";
         configData["Aspire:Confluent:Kafka:Messaging:Consumer:Config:EnableAutoCommit"] = "true";
         configData["Aspire:Confluent:Kafka:Messaging:Security:Protocol"] = "Plaintext";
+
 #endif
-
-        // Configure Orleans for local clustering
         configData["Orleans:UseLocalhostClustering"] = "true";
-
-        // Enable Wolverine code generation for dynamic handler compilation
         configData["ServiceBus:Wolverine:CodegenEnabled"] = "true";
 
         builder.Configuration.AddInMemoryCollection(configData);
-        
-        // Configure Kestrel for gRPC testing
+
         builder.WebHost.UseKestrel(options =>
         {
-            options.Listen(System.Net.IPAddress.Loopback, 0, listenOptions =>
+            options.Listen(IPAddress.Loopback, 0, listenOptions =>
             {
                 listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http2;
             });
         });
 
-        // Replace default logging with test logger with more detailed logging for debugging
         builder.Services.AddLogging(logging => logging
             .ClearProviders()
             .AddSerilog(CreateTestLogger(nameof(AppDomain)).ForContext("Integration", "Test")));
 
-        // Set the entry assembly to AppDomain assembly for Wolverine handler discovery
         ServiceDefaultsExtensions.EntryAssembly = typeof(IAppDomainAssembly).Assembly;
 
-        // Use AddServiceDefaults pattern like Program.cs
         builder.AddServiceDefaults();
         builder.AddApiServiceDefaults();
 #if USE_KAFKA
@@ -167,26 +158,23 @@ public class IntegrationTestFixture : IAsyncLifetime
 #endif
 
         builder.AddAppDomainServices();
-        ((IHostApplicationBuilder)builder).AddApplicationServices();
+        builder.AddApplicationServices();
 
         _app = builder.Build();
-        
-        // Configure middleware like Program.cs
+
         _app.ConfigureApiUsingDefaults(requireAuth: false);
         _app.MapDefaultHealthCheckEndpoints();
 
-        // Manually map gRPC services from API assembly since entry assembly is test assembly
         _app.MapGrpcServices(typeof(AppDomain.Api.Program));
 
         await _app.StartAsync();
 
-        // Setup gRPC channel for testing
         var httpClient = new HttpClient(new HttpClientHandler())
         {
             DefaultRequestVersion = HttpVersion.Version20,
             DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher
         };
-        
+
         GrpcChannel = GrpcChannel.ForAddress(_app.Urls.First(), new GrpcChannelOptions
         {
             HttpClient = httpClient
@@ -202,8 +190,8 @@ public class IntegrationTestFixture : IAsyncLifetime
             await _app.StopAsync();
             await _app.DisposeAsync();
         }
-        
-        GrpcChannel?.Dispose();
+
+        GrpcChannel.Dispose();
 #endif
 
         var disposeTasks = new List<Task>();
@@ -222,11 +210,10 @@ public class IntegrationTestFixture : IAsyncLifetime
     private Logger CreateTestLogger(string logNamespace) =>
         new LoggerConfiguration()
             .WriteTo.Sink(new XUnitSink(() => TestOutput))
-            .MinimumLevel.Debug()
+            .MinimumLevel.Information()
             .MinimumLevel.Override(nameof(Microsoft), LogEventLevel.Warning)
-            .MinimumLevel.Override("Wolverine", LogEventLevel.Debug)
             .MinimumLevel.Override("LinqToDB", LogEventLevel.Debug)
             .MinimumLevel.Override("AppDomain", LogEventLevel.Debug)
-            .MinimumLevel.Override(logNamespace, LogEventLevel.Verbose)
+            .MinimumLevel.Override(logNamespace, LogEventLevel.Debug)
             .CreateLogger();
 }

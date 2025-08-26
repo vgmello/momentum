@@ -17,10 +17,9 @@ namespace AppDomain.BackOffice.Orleans.Invoices.Grains;
 /// <param name="messageBus">Wolverine message bus for commands/queries</param>
 /// <param name="logger">Logger instance</param>
 public class InvoiceActor(
-    [PersistentState("invoice", "Default")]
-    IPersistentState<InvoiceActorState> invoiceState,
-    IMessageBus messageBus,
-    ILogger<InvoiceActor> logger) : Grain, IInvoiceActor
+    ILogger<InvoiceActor> logger,
+    [PersistentState("invoice")] IPersistentState<InvoiceActorState> invoiceState,
+    IMessageBus messageBus) : Grain, IInvoiceActor
 {
     /// <inheritdoc />
     public async Task<Invoice?> GetInvoiceAsync(Guid tenantId)
@@ -32,7 +31,7 @@ public class InvoiceActor(
 
         var result = await messageBus.InvokeQueryAsync(query);
 
-        return result.Match(
+        return result.Match<Invoice?>(
             contractInvoice =>
             {
                 // Convert contract model to data entity
@@ -50,7 +49,7 @@ public class InvoiceActor(
                 logger.LogWarning("Invoice {InvoiceId} not found for tenant {TenantId}: {Errors}",
                     invoiceId, tenantId, string.Join(", ", errors.Select(e => e.ErrorMessage)));
 
-                return (Invoice?)null;
+                return null;
             });
     }
 
@@ -209,10 +208,7 @@ public class InvoiceActor(
     /// <returns>A task representing the asynchronous operation</returns>
     private Task PublishIntegrationEventAsync<T>(T integrationEvent) where T : class
     {
-        // TODO: Implement integration event publishing via Kafka/Wolverine
-        // This would typically use the messaging infrastructure to publish events
-        logger.LogDebug("Publishing integration event {EventType}: {Event}",
-            typeof(T).Name, integrationEvent);
+        logger.LogDebug("Publishing integration event {EventType}: {Event}", typeof(T).Name, integrationEvent);
 
         return Task.CompletedTask;
     }

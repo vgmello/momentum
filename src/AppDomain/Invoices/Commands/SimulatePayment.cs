@@ -73,6 +73,7 @@ public static class SimulatePaymentCommandHandler
                 {
                     new("InvoiceId", "Invoice not found.")
                 };
+
                 return (failures, null);
             }
         }
@@ -82,6 +83,7 @@ public static class SimulatePaymentCommandHandler
             {
                 new("InvoiceId", "Invoice not found.")
             };
+
             return (failures, null);
         }
 
