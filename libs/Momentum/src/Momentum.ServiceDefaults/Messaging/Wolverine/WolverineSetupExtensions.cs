@@ -1,14 +1,15 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
+using JasperFx;
 using JasperFx.CodeGeneration;
 using JasperFx.Resources;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Momentum.ServiceDefaults.Messaging.Middlewares;
 using System.Reflection;
 using Wolverine;
-using Wolverine.Postgresql;
 using Wolverine.Runtime;
 
 namespace Momentum.ServiceDefaults.Messaging.Wolverine;
@@ -18,16 +19,10 @@ namespace Momentum.ServiceDefaults.Messaging.Wolverine;
 /// </summary>
 public static class WolverineSetupExtensions
 {
-    /// <summary>
-    ///     Gets or sets a value indicating whether to skip service registration.
-    /// </summary>
-    /// <remarks>
-    ///     Used primarily for testing scenarios where manual service registration is preferred.
-    /// </remarks>
-    public static bool SkipServiceRegistration { get; set; }
+    public const string SectionName = "Wolverine";
 
     /// <summary>
-    ///     Adds Wolverine messaging framework with production-ready configuration for reliable message processing.
+    ///     Adds ServiceBus with Wolverine messaging framework with production-ready configuration for reliable message processing.
     /// </summary>
     /// <param name="builder">The host application builder to configure.</param>
     /// <param name="configure">Optional action to configure Wolverine options for specific business requirements.</param>
@@ -38,14 +33,14 @@ public static class WolverineSetupExtensions
     /// <example>
     ///     <!--@include: @code/examples/wolverine-setup-examples.md -->
     /// </example>
-    public static IHostApplicationBuilder AddWolverine(this IHostApplicationBuilder builder, Action<WolverineOptions>? configure = null)
+    public static IHostApplicationBuilder AddServiceBus(this IHostApplicationBuilder builder, Action<WolverineOptions>? configure = null)
     {
-        if (!SkipServiceRegistration)
-        {
-            builder.AddKeyedNpgsqlDataSource("ServiceBus");
+        var serviceBusConfig = builder.Configuration.GetSection(ServiceBusOptions.SectionName);
 
-            AddWolverineWithDefaults(builder.Services, builder.Environment, builder.Configuration, configure);
-        }
+        AddWolverineWithDefaults(builder.Services, builder.Environment, serviceBusConfig, configure);
+
+        builder.AddKeyedNpgsqlDataSource(ServiceBusOptions.SectionName);
+        builder.Services.ConfigureOptions<WolverineNpgsqlExtensions>();
 
         return builder;
     }
@@ -101,7 +96,7 @@ public static class WolverineSetupExtensions
     ///     </list>
     /// </remarks>
     /// <example>
-    ///     See <see cref="AddWolverine" /> for examples.
+    ///     See <see cref="AddServiceBus" /> for examples.
     /// </example>
     public static void AddWolverineWithDefaults(
         this IServiceCollection services, IHostEnvironment env, IConfiguration configuration, Action<WolverineOptions>? configure)
@@ -117,20 +112,14 @@ public static class WolverineSetupExtensions
             .BindConfiguration(ServiceBusOptions.SectionName)
             .ValidateOnStart();
 
-        var connectionString = configuration.GetConnectionString(ServiceBusOptions.SectionName);
+        var wolverineConfig = configuration.GetSection(SectionName);
+        services.Configure<WolverineOptions>(wolverineConfig);
 
         services.AddWolverine(ExtensionDiscovery.ManualOnly, opts =>
         {
             opts.ApplicationAssembly = ServiceDefaultsExtensions.EntryAssembly;
-            opts.ServiceName = ServiceBusOptions.GetServiceName(env.ApplicationName);
 
             opts.UseSystemTextJsonForSerialization();
-
-            if (!string.IsNullOrWhiteSpace(connectionString))
-            {
-                opts.ConfigurePostgresql(connectionString);
-                opts.ConfigureReliableMessaging();
-            }
 
             opts.Policies.Add<ExceptionHandlingPolicy>();
             opts.Policies.Add<FluentValidationPolicy>();
@@ -142,13 +131,29 @@ public static class WolverineSetupExtensions
 
             opts.ConfigureAppHandlers(opts.ApplicationAssembly);
 
-            var codegenEnabled = configuration.GetSection("Wolverine:CodegenEnabled").Get<bool>();
+            var codegenEnabled = wolverineConfig.GetValue<bool>("CodegenEnabled");
             opts.CodeGeneration.TypeLoadMode = codegenEnabled ? TypeLoadMode.Auto : TypeLoadMode.Static;
+
+            var autoProvision = configuration.GetValue<bool>("AutoProvision");
+            var configAutoProvisionStorage = configuration.GetValue<string?>("AutoBuildMessageStorageOnStartup");
+
+            if (!autoProvision && configAutoProvisionStorage is null)
+            {
+                opts.AutoBuildMessageStorageOnStartup = AutoCreate.None;
+            }
 
             opts.Services.AddResourceSetupOnStartup();
 
             configure?.Invoke(opts);
         });
+
+        services.AddSingleton<IConfigureOptions<WolverineOptions>>(prov =>
+            new ConfigureNamedOptions<WolverineOptions>(string.Empty, wolverineOptions =>
+            {
+                var options = prov.GetRequiredService<IOptions<ServiceBusOptions>>();
+
+                wolverineOptions.ServiceName = options.Value.PublicServiceName;
+            }));
     }
 
     /// <summary>
@@ -168,37 +173,6 @@ public static class WolverineSetupExtensions
         {
             options.Discovery.IncludeAssembly(handlerAssembly);
         }
-
-        return options;
-    }
-
-    /// <summary>
-    ///     Configures PostgreSQL for message persistence and transport.
-    /// </summary>
-    /// <param name="options">The Wolverine options to configure.</param>
-    /// <param name="connectionString">The PostgreSQL connection string.</param>
-    /// <returns>The configured Wolverine options for method chaining.</returns>
-    /// <remarks>
-    ///     This method:
-    ///     <list type="bullet">
-    ///         <item>Sets up PostgreSQL for both persistence and transport</item>
-    ///         <item>Creates a schema based on the service name</item>
-    ///         <item>Enables auto-provisioning of database objects</item>
-    ///         <item>Uses "queues" as the transport schema</item>
-    ///     </list>
-    ///     The persistence schema name is derived from the service name by replacing
-    ///     dots and hyphens with underscores and converting to lowercase.
-    /// </remarks>
-    public static WolverineOptions ConfigurePostgresql(this WolverineOptions options, string connectionString)
-    {
-        var persistenceSchema = options.ServiceName
-            .Replace(".", "_")
-            .Replace("-", "_")
-            .ToLowerInvariant();
-
-        options
-            .PersistMessagesWithPostgresql(connectionString, schemaName: persistenceSchema)
-            .EnableMessageTransport(transport => transport.TransportSchemaName("queues"));
 
         return options;
     }

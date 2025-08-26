@@ -25,7 +25,7 @@ public class ServiceBusOptions
     /// <value>
     ///     Returns "ServiceBus" which corresponds to the ServiceBus section in configuration files.
     /// </value>
-    public static string SectionName => "ServiceBus";
+    public const string SectionName = "ServiceBus";
 
     /// <summary>
     ///     Gets or sets the domain name for the service, used for message routing and URN generation.
@@ -76,39 +76,23 @@ public class ServiceBusOptions
     public Uri ServiceUrn { get; private set; } = null!;
 
     /// <summary>
-    ///     Gets or sets the CloudEvents configuration for standardized cross-service messaging.
+    ///     Enables reliable message delivery. (Default: true)
     /// </summary>
-    /// <value>
-    ///     A <see cref="CloudEventsSettings" /> instance containing CloudEvents specification
-    ///     settings for event formatting and routing.
-    /// </value>
     /// <remarks>
-    ///     See <see cref="ServiceBusOptions" /> for detailed configuration information.
+    ///     Enables:
+    ///     <list type="bullet">
+    ///         <item>Automatic transaction middleware</item>
+    ///         <item>Durable local queues for reliable processing</item>
+    ///         <item>Durable outbox pattern on all sending endpoints</item>
+    ///     </list>
+    ///     These settings ensure message delivery reliability and prevent message loss
+    ///     in case of failures.
     /// </remarks>
-    /// <example>
-    ///     See class-level examples in <see cref="ServiceBusOptions" />.
-    /// </example>
-    public CloudEventsSettings CloudEvents { get; set; } = new();
-
-    /// <summary>
-    ///     Converts an application name to a service name following DNS naming conventions.
-    /// </summary>
-    /// <param name="appName">The application name to convert.</param>
-    /// <returns>
-    ///     A service name in lowercase with dots replaced by hyphens, suitable for
-    ///     DNS naming, Kubernetes services, and message routing.
-    /// </returns>
-    /// <remarks>
-    ///     See <see cref="ServiceBusOptions" /> for detailed configuration information.
-    /// </remarks>
-    /// <example>
-    ///     See class-level examples in <see cref="ServiceBusOptions" />.
-    /// </example>
-    public static string GetServiceName(string appName) => appName.ToLowerInvariant().Replace('.', '-');
+    public bool ReliableMessaging { get; set; } = true;
 
     private static string GetDomainName()
     {
-        // TODO: consider a dedicated assembly attribute or csproj property to override explicitly if needed
+        // TODO: maybe a dedicated assembly attribute or csproj property to override explicitly if needed
         var simpleName = ServiceDefaultsExtensions.EntryAssembly.GetName().Name!;
         var mainNamespaceIndex = simpleName.IndexOf('.');
 
@@ -150,5 +134,7 @@ public class ServiceBusOptions
                                   "Transactional Inbox/Outbox and Message Persistence features disabled");
             }
         }
+
+        private static string GetServiceName(string appName) => appName.ToLowerInvariant().Replace('.', '-');
     }
 }

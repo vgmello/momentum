@@ -16,7 +16,10 @@
         <PackageReference Include="xunit.v3"/>
         <PackageReference Include="xunit.runner.visualstudio"/>
         <PackageReference Include="Shouldly"/>
-        <PackageReference Include="NSwag.MSBuild"/>
+        <PackageReference Include="NSwag.MSBuild">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="System.Net.Http.Json"/>
     </ItemGroup>
 
