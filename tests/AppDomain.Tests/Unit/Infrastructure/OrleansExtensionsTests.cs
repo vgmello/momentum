@@ -1,12 +1,6 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
 using AppDomain.Api.Infrastructure.Extensions;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using NSubstitute;
-using Orleans;
 
 namespace AppDomain.Tests.Unit.Infrastructure;
 
@@ -252,5 +246,4 @@ public class OrleansExtensionsTests
             s.ServiceType == typeof(IClusterClient) && !s.IsKeyedService);
         primaryClientRegistration.Lifetime.ShouldBe(ServiceLifetime.Singleton);
     }
-
 }

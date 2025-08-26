@@ -9,25 +9,30 @@ namespace AppDomain.BackOffice.Orleans.Infrastructure.Extensions;
 /// </summary>
 public static class OrleansExtensions
 {
+    public const string SectionName = "Orleans";
+
     /// <summary>
     ///     Adds and configures Orleans silo with clustering, grain state persistence, and monitoring.
     /// </summary>
     /// <param name="builder">The host application builder.</param>
+    /// <param name="sectionName">Section Name</param>
     /// <returns>The host application builder for method chaining.</returns>
-    public static IHostApplicationBuilder AddOrleans(this IHostApplicationBuilder builder)
+    public static IHostApplicationBuilder AddOrleans(this IHostApplicationBuilder builder, string sectionName = SectionName)
     {
-        var useLocalCluster = builder.Configuration.GetValue<bool>("Orleans:UseLocalhostClustering");
+        var config = builder.Configuration.GetSection(sectionName);
+
+        var useLocalCluster = config.GetValue<bool>("UseLocalhostClustering");
 
         if (!useLocalCluster)
         {
-            var connectionStringName = builder.Configuration.GetValue<string>("Orleans:Clustering:ServiceKey") ?? "Orleans";
+            var connectionStringName = config.GetValue<string>("Clustering:ServiceKey") ?? SectionName;
             var orleansConnectionString = builder.Configuration.GetConnectionString(connectionStringName);
 
             if (string.IsNullOrEmpty(orleansConnectionString))
-                throw new InvalidOperationException($"Orleans '{orleansConnectionString}' connection string is not configured.");
+                throw new InvalidOperationException($"Orleans connection string '{orleansConnectionString}' is not set.");
 
             builder.AddKeyedAzureTableServiceClient(connectionStringName);
-            builder.AddKeyedAzureBlobServiceClient("OrleansGrainState");
+            builder.AddKeyedAzureBlobServiceClient($"{connectionStringName}GrainState");
         }
 
         builder.UseOrleans(siloBuilder =>

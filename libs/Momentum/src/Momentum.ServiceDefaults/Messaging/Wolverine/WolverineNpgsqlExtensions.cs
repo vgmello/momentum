@@ -36,7 +36,7 @@ public class WolverineNpgsqlExtensions(IConfiguration configuration, IOptions<Se
         var connectionString = configuration.GetConnectionString(ServiceBusOptions.SectionName);
 
         if (string.IsNullOrWhiteSpace(connectionString))
-            throw new InvalidOperationException("The connection string for the ServiceBus is not set.");
+            throw new InvalidOperationException($"The DB string '{ServiceBusOptions.SectionName}' is not set.");
 
         var persistenceSchema = options.ServiceName
             .Replace(".", "_")

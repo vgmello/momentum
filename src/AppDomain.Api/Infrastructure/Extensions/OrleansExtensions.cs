@@ -4,18 +4,22 @@ namespace AppDomain.Api.Infrastructure.Extensions;
 
 public static class OrleansExtensions
 {
-    public static IHostApplicationBuilder AddOrleansClient(this IHostApplicationBuilder builder)
+    public const string SectionName = "Orleans";
+
+    public static IHostApplicationBuilder AddOrleansClient(this IHostApplicationBuilder builder, string sectionName = SectionName)
     {
-        var useLocalCluster = builder.Configuration.GetValue<bool>("Orleans:UseLocalhostClustering");
-        var connectionStringName = builder.Configuration.GetValue<string>("Orleans:Clustering:ServiceKey") ?? "OrleansClustering";
+        var config = builder.Configuration.GetSection(sectionName);
 
-        var orleansConnectionString = builder.Configuration.GetConnectionString(connectionStringName);
-
-        if (!useLocalCluster && string.IsNullOrEmpty(orleansConnectionString))
-            throw new InvalidOperationException("Orleans 'OrleansClustering' ConnectionString is missing");
+        var useLocalCluster = config.GetValue<bool>("UseLocalhostClustering");
 
         if (!useLocalCluster)
         {
+            var connectionStringName = config.GetValue<string>("Clustering:ServiceKey") ?? SectionName;
+            var orleansConnectionString = builder.Configuration.GetConnectionString(connectionStringName);
+
+            if (string.IsNullOrEmpty(orleansConnectionString))
+                throw new InvalidOperationException($"Orleans connection string '{orleansConnectionString}' is not set.");
+
             builder.AddKeyedAzureTableServiceClient(connectionStringName);
         }
 

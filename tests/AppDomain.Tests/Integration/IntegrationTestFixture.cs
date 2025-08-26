@@ -142,7 +142,6 @@ public class IntegrationTestFixture : IAsyncLifetime
 #endif
         builder.UseSetting("Orleans:UseLocalhostClustering", "true");
 
-        WolverineSetupExtensions.SkipServiceRegistration = true;
         ServiceDefaultsExtensions.EntryAssembly = typeof(AppDomain.Api.Program).Assembly;
 
         builder.ConfigureServices((ctx, services) =>
@@ -154,8 +153,7 @@ public class IntegrationTestFixture : IAsyncLifetime
                 .ClearProviders()
                 .AddSerilog(CreateTestLogger(nameof(AppDomain))));
 
-            services.AddWolverineWithDefaults(ctx.HostingEnvironment, ctx.Configuration,
-                opt => opt.ApplicationAssembly = typeof(AppDomain.Api.Program).Assembly);
+            services.AddWolverineWithDefaults(ctx.Configuration, opt => opt.ApplicationAssembly = typeof(AppDomain.Api.Program).Assembly);
         });
 
         builder.Configure(app =>

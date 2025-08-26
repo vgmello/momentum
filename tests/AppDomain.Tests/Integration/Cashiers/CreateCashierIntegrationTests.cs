@@ -35,6 +35,7 @@ public class CreateCashierIntegrationTests(IntegrationTestFixture fixture) : Int
 
         // Act
         var responses = new List<Cashier>();
+
         foreach (var request in requests)
         {
             var response = await _client.CreateCashierAsync(request, cancellationToken: TestContext.Current.CancellationToken);

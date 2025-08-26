@@ -12,7 +12,8 @@ public class DataAccessRulesTests : ArchitectureTestBase
     [Fact]
     public void DataClasses_ShouldOnlyBeUsedByDomainClasses_ExceptCoreDataContext()
     {
-        var assemblies = new[] { 
+        var assemblies = new[]
+        {
             typeof(IAppDomainAssembly).Assembly
 #if INCLUDE_API
             , typeof(Api.DependencyInjection).Assembly

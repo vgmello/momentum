@@ -2,7 +2,6 @@
 
 using AppDomain.Invoices.Grpc;
 using Bogus;
-using Google.Protobuf.WellKnownTypes;
 
 namespace AppDomain.Tests.Integration._Internal.TestDataGenerators;
 
@@ -20,30 +19,35 @@ public sealed class InvoiceFaker : Faker<CreateInvoiceRequest>
     public InvoiceFaker WithCashier(string cashierId)
     {
         RuleFor(i => i.CashierId, cashierId);
+
         return this;
     }
 
     public InvoiceFaker WithAmount(double amount)
     {
         RuleFor(i => i.Amount, amount);
+
         return this;
     }
 
     public InvoiceFaker WithCurrency(string currency)
     {
         RuleFor(i => i.Currency, currency);
+
         return this;
     }
 
     public InvoiceFaker WithoutDueDate()
     {
         RuleFor(i => i.DueDate, (Timestamp?)null);
+
         return this;
     }
 
     public InvoiceFaker WithDueDate(DateTime dueDate)
     {
         RuleFor(i => i.DueDate, Timestamp.FromDateTime(dueDate.ToUniversalTime()));
+
         return this;
     }
 }
@@ -61,12 +65,14 @@ public sealed class SimulatePaymentFaker : Faker<SimulatePaymentRequest>
     public SimulatePaymentFaker WithAmount(double amount)
     {
         RuleFor(p => p.Amount, amount);
+
         return this;
     }
 
     public SimulatePaymentFaker WithPaymentMethod(string method)
     {
         RuleFor(p => p.PaymentMethod, method);
+
         return this;
     }
 }

@@ -209,20 +209,13 @@ public class OpenApiCachingMiddleware(
         // Disallow path traversal and path separators
         if (string.IsNullOrWhiteSpace(cacheKey) ||
             cacheKey.Contains("..") ||
-            cacheKey.Contains("/") ||
-            cacheKey.Contains("\\"))
+            cacheKey.Contains('/') ||
+            cacheKey.Contains('\\'))
         {
             return false;
         }
 
-        // Optionally, restrict to a safe pattern (alphanumeric, '-', '_')
-        foreach (var c in cacheKey)
-        {
-            if (!(char.IsLetterOrDigit(c) || c == '-' || c == '_'))
-                return false;
-        }
-
-        return true;
+        return cacheKey.All(c => char.IsLetterOrDigit(c) || c == '-' || c == '_');
     }
 
     private static string GetCacheDirectory()

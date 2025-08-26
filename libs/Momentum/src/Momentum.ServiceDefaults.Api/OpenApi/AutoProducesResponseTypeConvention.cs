@@ -19,7 +19,7 @@ public class AutoProducesResponseTypeConvention : IActionModelConvention
     ///     This is a special status code that is used to indicate that the operation has an auto-generated response type.
     ///     Which should be overridden by the OpenAPI XML operation transformer.
     /// </summary>
-    internal static readonly int StatusCode = -299;
+    internal const int StatusCode = -299;
 
     /// <summary>
     ///     Applies the convention to an action model.

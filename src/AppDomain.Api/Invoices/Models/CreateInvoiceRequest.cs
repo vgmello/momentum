@@ -13,7 +13,7 @@ namespace AppDomain.Api.Invoices.Models;
 public record CreateInvoiceRequest(
     string Name,
     [property: JsonRequired] decimal Amount,
-    string? Currency = "",
+    string Currency = "",
     DateTime? DueDate = null,
     Guid? CashierId = null
 );

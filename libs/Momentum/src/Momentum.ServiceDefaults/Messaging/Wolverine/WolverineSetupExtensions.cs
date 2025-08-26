@@ -5,7 +5,6 @@ using JasperFx.CodeGeneration;
 using JasperFx.Resources;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Momentum.ServiceDefaults.Messaging.Middlewares;
 using System.Reflection;
@@ -22,34 +21,9 @@ public static class WolverineSetupExtensions
     public const string SectionName = "Wolverine";
 
     /// <summary>
-    ///     Adds ServiceBus with Wolverine messaging framework with production-ready configuration for reliable message processing.
-    /// </summary>
-    /// <param name="builder">The host application builder to configure.</param>
-    /// <param name="configure">Optional action to configure Wolverine options for specific business requirements.</param>
-    /// <returns>The configured host application builder for method chaining.</returns>
-    /// <remarks>
-    ///     <!--@include: @code/messaging/wolverine-setup-detailed.md -->
-    /// </remarks>
-    /// <example>
-    ///     <!--@include: @code/examples/wolverine-setup-examples.md -->
-    /// </example>
-    public static IHostApplicationBuilder AddServiceBus(this IHostApplicationBuilder builder, Action<WolverineOptions>? configure = null)
-    {
-        var serviceBusConfig = builder.Configuration.GetSection(ServiceBusOptions.SectionName);
-
-        AddWolverineWithDefaults(builder.Services, builder.Environment, serviceBusConfig, configure);
-
-        builder.AddKeyedNpgsqlDataSource(ServiceBusOptions.SectionName);
-        builder.Services.ConfigureOptions<WolverineNpgsqlExtensions>();
-
-        return builder;
-    }
-
-    /// <summary>
     ///     Adds Wolverine services with comprehensive defaults for enterprise messaging scenarios.
     /// </summary>
     /// <param name="services">The service collection to configure.</param>
-    /// <param name="env">The hosting environment for environment-specific configuration.</param>
     /// <param name="configuration">The application configuration containing connection strings and messaging settings.</param>
     /// <param name="configure">Optional action to customize Wolverine options for specific business requirements.</param>
     /// <remarks>
@@ -95,22 +69,13 @@ public static class WolverineSetupExtensions
     ///         <item>Environment-aware configuration and feature flags</item>
     ///     </list>
     /// </remarks>
-    /// <example>
-    ///     See <see cref="AddServiceBus" /> for examples.
-    /// </example>
-    public static void AddWolverineWithDefaults(
-        this IServiceCollection services, IHostEnvironment env, IConfiguration configuration, Action<WolverineOptions>? configure)
+    public static void AddWolverineWithDefaults(this IServiceCollection services,
+        IConfiguration configuration, Action<WolverineOptions>? configure)
     {
         var wolverineRegistered = services.Any(s => s.ServiceType == typeof(IWolverineRuntime));
 
         if (wolverineRegistered)
             return;
-
-        services
-            .ConfigureOptions<ServiceBusOptions.Configurator>()
-            .AddOptions<ServiceBusOptions>()
-            .BindConfiguration(ServiceBusOptions.SectionName)
-            .ValidateOnStart();
 
         var wolverineConfig = configuration.GetSection(SectionName);
         services.Configure<WolverineOptions>(wolverineConfig);

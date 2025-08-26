@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Momentum.ServiceDefaults.Logging;
-using Momentum.ServiceDefaults.Messaging.Wolverine;
+using Momentum.ServiceDefaults.Messaging;
 using Momentum.ServiceDefaults.OpenTelemetry;
 using Serilog;
 using System.Reflection;
@@ -86,7 +86,7 @@ public static class ServiceDefaultsExtensions
     ///     </list>
     ///     Validators are registered as scoped services and integrated with Wolverine's
     ///     message handling pipeline for automatic validation of commands and queries.
-    ///
+    /// 
     ///     This approach supports the Domain-Driven Design pattern where validation
     ///     rules are defined close to the domain entities and business logic.
     /// </remarks>
@@ -116,7 +116,7 @@ public static class ServiceDefaultsExtensions
     ///         <item>Proper log flushing on application shutdown</item>
     ///         <item>Support for containerized environments and orchestrators</item>
     ///     </list>
-    ///
+    /// 
     ///     <para>
     ///         <strong>Supported Wolverine Commands:</strong>
     ///     </para>

@@ -277,7 +277,7 @@ public static async Task<Result<ComplexOperation>> Handle(
 public record CreateInvoiceCommand(
     string Name,
     decimal Amount,
-    string? Currency = "",
+    string Currency = "",
     DateTime? DueDate = null,
     Guid? CashierId = null
 ) : ICommand<Result<InvoiceModel>>;
