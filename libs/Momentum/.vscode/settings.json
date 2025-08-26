@@ -1,0 +1,4 @@
+{
+  "dotnet.defaultSolution": "Momentum.slnx",
+  "dotnet.automaticallyCreateSolutionInWorkspace": false
+}

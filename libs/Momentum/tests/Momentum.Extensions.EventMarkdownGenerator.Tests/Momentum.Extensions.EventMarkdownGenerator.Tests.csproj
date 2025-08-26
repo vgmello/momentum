@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <IsTestProject>true</IsTestProject>
+        <NoWarn>$(NoWarn);S3885</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk"/>
+        <PackageReference Include="xunit.v3"/>
+        <PackageReference Include="xunit.runner.visualstudio">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Shouldly"/>
+        <PackageReference Include="NSubstitute"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="../../src/Momentum.Extensions.EventMarkdownGenerator/Momentum.Extensions.EventMarkdownGenerator.csproj"/>
+        <ProjectReference Include="../../src/Momentum.Extensions.Abstractions/Momentum.Extensions.Abstractions.csproj"/>
+        <ProjectReference Include="../TestEvents/TestEvents.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="IntegrationTestScenarios/**/*" CopyToOutputDirectory="PreserveNewest"/>
+    </ItemGroup>
+</Project>

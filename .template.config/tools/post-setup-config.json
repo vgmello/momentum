@@ -1,0 +1,38 @@
+{
+  "projectName": "AppDomain",
+  "basePort": __SERVICE_BASE_PORT__,
+  "momentumLibImport": {
+    //#if (INCLUDE_LIBS)
+    "enabled": true,
+    //#endif
+    "libName": "__LIB_NAME__",
+    "scanRoots": [
+      ".",
+      "src",
+      "infra",
+      "libs",
+      "tests"
+    ],
+    "fileExtensions": [
+      ".cs",
+      ".csproj",
+      ".props",
+      ".targets",
+      ".sln",
+      ".slnx",
+      ".json",
+      ".yml",
+      ".yaml",
+      ".md"
+    ],
+    "excludeDirs": [
+      ".git",
+      "bin",
+      "obj",
+      "node_modules",
+      ".template.config",
+      ".local/tools"
+    ],
+    "maxBytes": 2097152
+  }
+}

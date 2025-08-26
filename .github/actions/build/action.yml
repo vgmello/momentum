@@ -1,0 +1,44 @@
+name: "Build .NET Projects"
+description: "Build .NET projects with caching"
+
+inputs:
+  configuration:
+    description: "Build configuration (Debug/Release)"
+    required: false
+    default: "Release"
+  build-target:
+    description: "Solution or Project to build"
+    required: false
+    default: "*.slnx"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/*.props') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
+    - name: Restore dependencies
+      shell: bash
+      run: |
+        echo "📦 Restoring dependencies..."
+        dotnet restore ${{ inputs.build-target }} --verbosity minimal
+
+    - name: Build project
+      shell: bash
+      run: |
+        echo "🔨 Building ${{ inputs.build-target }}..."
+        dotnet build ${{ inputs.build-target }} \
+          --configuration ${{ inputs.configuration }} \
+          --no-restore \
+          --verbosity minimal
+
+        if [ $? -ne 0 ]; then
+          echo "❌ Build failed"
+          exit 1
+        fi
+        echo "✅ Build successful"

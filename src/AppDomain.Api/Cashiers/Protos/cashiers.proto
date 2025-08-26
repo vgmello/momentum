@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+import "Cashiers/Protos/Models/cashier.proto";
+import "google/protobuf/empty.proto";
+
+option csharp_namespace = "AppDomain.Cashiers.Grpc";
+
+package app_domain.cashiers;
+
+service CashiersService {
+  rpc GetCashier (GetCashierRequest) returns (app_domain.cashiers.Cashier);
+  rpc GetCashiers (GetCashiersRequest) returns (GetCashiersResponse);
+  rpc CreateCashier (CreateCashierRequest) returns (app_domain.cashiers.Cashier);
+  rpc UpdateCashier (UpdateCashierRequest) returns (app_domain.cashiers.Cashier);
+  rpc DeleteCashier (DeleteCashierRequest) returns (google.protobuf.Empty);
+}
+
+message GetCashierRequest {
+  string id = 1;
+}
+
+message GetCashiersRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+}
+
+message GetCashiersResponse {
+  repeated app_domain.cashiers.Cashier cashiers = 1;
+}
+
+message CreateCashierRequest {
+  string name = 1;
+  string email = 2;
+}
+
+message UpdateCashierRequest {
+  string cashierId = 1;
+  string name = 2;
+  string email = 3;
+  int32 version = 4;
+}
+
+message DeleteCashierRequest {
+  string cashierId = 1;
+}

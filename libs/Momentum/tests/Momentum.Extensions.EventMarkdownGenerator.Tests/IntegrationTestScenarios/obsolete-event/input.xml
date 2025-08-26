@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TestEvents</name>
+    </assembly>
+    <members>
+        <member name="T:AppDomain.Legacy.Contracts.IntegrationEvents.PaymentProcessed">
+            <summary>Published when a payment is processed through the legacy payment system</summary>
+            <remarks>
+            ## When It's Triggered
+            
+            This event was published when:
+            - Payment was processed through the old payment gateway
+            - Transaction was completed successfully
+            
+            ## Migration Notes
+            
+            This event has been replaced by the new PaymentCompleted event which provides:
+            - Enhanced payment method tracking
+            - Better error handling and retry logic
+            - Improved audit trail capabilities
+            </remarks>
+        </member>
+        <member name="M:AppDomain.Legacy.Contracts.IntegrationEvents.PaymentProcessed.#ctor(System.Guid,System.Decimal,System.String)">
+            <param name="tenantId">Identifier of the tenant</param>
+            <param name="amount">Payment amount that was processed</param>
+            <param name="transactionId">Legacy transaction identifier</param>
+        </member>
+    </members>
+</doc>

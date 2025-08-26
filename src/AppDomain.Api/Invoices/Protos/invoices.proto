@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+import "Invoices/Protos/Models/invoice.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option csharp_namespace = "AppDomain.Invoices.Grpc";
+
+package app_domain.invoices;
+
+service InvoicesService {
+  rpc GetInvoice (GetInvoiceRequest) returns (app_domain.invoices.Invoice);
+  rpc GetInvoices (GetInvoicesRequest) returns (GetInvoicesResponse);
+  rpc CreateInvoice (CreateInvoiceRequest) returns (app_domain.invoices.Invoice);
+  rpc CancelInvoice (CancelInvoiceRequest) returns (app_domain.invoices.Invoice);
+  rpc MarkInvoiceAsPaid (MarkInvoiceAsPaidRequest) returns (app_domain.invoices.Invoice);
+  rpc SimulatePayment (SimulatePaymentRequest) returns (SimulatePaymentResponse);
+}
+
+message GetInvoiceRequest {
+  string id = 1;
+}
+
+message GetInvoicesRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+  google.protobuf.StringValue status = 3;
+}
+
+message GetInvoicesResponse {
+  repeated app_domain.invoices.Invoice invoices = 1;
+}
+
+message CreateInvoiceRequest {
+  string name = 1;
+  double amount = 2;
+  string currency = 3;
+  optional google.protobuf.Timestamp due_date = 4;
+  string cashierId = 5;
+}
+
+message CancelInvoiceRequest {
+  string invoiceId = 1;
+  int32 version = 2;
+}
+
+message MarkInvoiceAsPaidRequest {
+  string invoiceId = 1;
+  int32 version = 2;
+  double amount_paid = 3;
+  google.protobuf.Timestamp payment_date = 4;
+}
+
+message SimulatePaymentRequest {
+  string invoiceId = 1;
+  int32 version = 2;
+  double amount = 3;
+  string currency = 4;
+  string payment_method = 5;
+  string payment_reference = 6;
+}
+
+message SimulatePaymentResponse {
+  string message = 1;
+}

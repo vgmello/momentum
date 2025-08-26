@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TestEvents</name>
+    </assembly>
+    <members>
+        <member name="T:AppDomain.Orders.Contracts.IntegrationEvents.OrderCompleted">
+            <summary>Published when an order is successfully completed and payment is processed</summary>
+            <remarks>
+            ## When It's Triggered
+            
+            This event is published when:
+            - Payment processing completes successfully
+            - All order items are confirmed as available
+            - Order status is updated to completed
+            
+            ## Business Impact
+            
+            This event triggers:
+            - Inventory reduction for ordered items
+            - Customer notification emails
+            - Analytics and reporting updates
+            - Loyalty points calculation
+            </remarks>
+        </member>
+        <member name="M:AppDomain.Orders.Contracts.IntegrationEvents.OrderCompleted.#ctor(System.Guid,System.Guid,System.String,AppDomain.Orders.Contracts.Models.Customer,System.Collections.Generic.List{AppDomain.Orders.Contracts.Models.OrderItem},System.Decimal,System.DateTime)">
+            <param name="tenantId">Identifier of the tenant that owns the order</param>
+            <param name="orderId">Unique identifier for the completed order</param>
+            <param name="orderNumber">Human-readable order number for customer reference</param>
+            <param name="customer">Complete customer information including AppDomain and shipping details</param>
+            <param name="items">List of all items included in the completed order</param>
+            <param name="totalAmount">Final total amount charged to the customer</param>
+            <param name="completedAt">Date and time when the order was completed</param>
+        </member>
+        <member name="T:AppDomain.Orders.Contracts.Models.Customer">
+            <summary>Represents customer information for order processing</summary>
+        </member>
+        <member name="P:AppDomain.Orders.Contracts.Models.Customer.CustomerId">
+            <summary>Unique identifier for the customer</summary>
+        </member>
+        <member name="P:AppDomain.Orders.Contracts.Models.Customer.Name">
+            <summary>Full name of the customer</summary>
+        </member>
+        <member name="P:AppDomain.Orders.Contracts.Models.Customer.Email">
+            <summary>Email address for order notifications</summary>
+        </member>
+        <member name="P:AppDomain.Orders.Contracts.Models.Customer.AppDomainAddress">
+            <summary>Complete AppDomain address information</summary>
+        </member>
+        <member name="T:AppDomain.Orders.Contracts.Models.OrderItem">
+            <summary>Represents an individual item within an order</summary>
+        </member>
+        <member name="P:AppDomain.Orders.Contracts.Models.OrderItem.ProductId">
+            <summary>Unique identifier for the ordered product</summary>
+        </member>
+        <member name="P:AppDomain.Orders.Contracts.Models.OrderItem.ProductName">
+            <summary>Display name of the ordered product</summary>
+        </member>
+        <member name="P:AppDomain.Orders.Contracts.Models.OrderItem.Quantity">
+            <summary>Number of units ordered for this product</summary>
+        </member>
+        <member name="P:AppDomain.Orders.Contracts.Models.OrderItem.UnitPrice">
+            <summary>Price per unit of the product at time of order</summary>
+        </member>
+        <member name="P:AppDomain.Orders.Contracts.Models.OrderItem.TotalPrice">
+            <summary>Total price for this line item (quantity * unit price)</summary>
+        </member>
+        <member name="T:AppDomain.Orders.Contracts.Models.Address">
+            <summary>Represents a physical address for AppDomain or shipping</summary>
+        </member>
+        <member name="P:AppDomain.Orders.Contracts.Models.Address.Street">
+            <summary>Street address including number and name</summary>
+        </member>
+        <member name="P:AppDomain.Orders.Contracts.Models.Address.City">
+            <summary>City name</summary>
+        </member>
+        <member name="P:AppDomain.Orders.Contracts.Models.Address.State">
+            <summary>State or province</summary>
+        </member>
+        <member name="P:AppDomain.Orders.Contracts.Models.Address.PostalCode">
+            <summary>Postal or ZIP code</summary>
+        </member>
+        <member name="P:AppDomain.Orders.Contracts.Models.Address.Country">
+            <summary>Country name or code</summary>
+        </member>
+    </members>
+</doc>

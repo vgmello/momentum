@@ -1,0 +1,13 @@
+<Project>
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <AssemblyName>PostSetup</AssemblyName>
+        <ImportDirectoryBuildProps>false</ImportDirectoryBuildProps>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk"/>
+    <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk"/>
+</Project>

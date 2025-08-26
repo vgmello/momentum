@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <EnableDefaultItems>false</EnableDefaultItems>
+        <NoWarn>$(NoWarn);NU5128</NoWarn>
+        <NoDefaultExcludes>true</NoDefaultExcludes>
+        <GenerateDocumentationFile>false</GenerateDocumentationFile>
+        <IncludeContentInPack>true</IncludeContentInPack>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <IncludeSymbols>false</IncludeSymbols>
+        <ContentTargetFolders>content</ContentTargetFolders>
+        <CodeAnalysisRuleSet/>
+        <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <IsPackable>false</IsPackable>
+        <IsPackable Condition="'$(PackTemplate)' == 'true'">true</IsPackable>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <PackageType>Template</PackageType>
+        <PackageId>Momentum.Template</PackageId>
+        <Title>Momentum .NET Template</Title>
+        <Description>Momentum .NET, a comprehensive template - Create production-ready microservices with Orleans, gRPC, Kafka, and PostgreSQL using Domain-Driven Design patterns</Description>
+        <PackageProjectUrl>https://github.com/vgmello/momentum</PackageProjectUrl>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Content Include="..\..\.template.config\**" PackagePath="/content/.template.config"
+                 Link=".template.config\%(RecursiveDir)%(Filename)%(Extension)" Exclude="**\bin\**;**\obj\**;"/>
+        <Content Include="..\..\.vscode\**" PackagePath="/content/.vscode"
+                 Link=".vscode\%(RecursiveDir)%(Filename)%(Extension)" Exclude="**\bin\**;**\obj\**;"/>
+        <Content Include="..\..\docs\**" PackagePath="/content/docs"
+                 Link="docs\%(RecursiveDir)%(Filename)%(Extension)" Exclude="**\bin\**;**\obj\**;"/>
+        <Content Include="..\..\infra\**" PackagePath="/content/infra"
+                 Link="infra\%(RecursiveDir)%(Filename)%(Extension)" Exclude="**\bin\**;**\obj\**;"/>
+        <Content Include="..\..\src\**" PackagePath="/content/src"
+                 Link="src\%(RecursiveDir)%(Filename)%(Extension)" Exclude="**\bin\**;**\obj\**;"/>
+        <Content Include="..\..\tests\**" PackagePath="/content/tests"
+                 Link="tests\%(RecursiveDir)%(Filename)%(Extension)" Exclude="**\bin\**;**\obj\**;"/>
+        <Content Include="..\..\libs\Momentum\src\**" PackagePath="/content/libs/Momentum/src/"
+                 Link="libs\Momentum\src\%(RecursiveDir)%(Filename)%(Extension)"
+                 Exclude="**\bin\**;**\obj\**;**\libs\Momentum\src\Momentum.Extensions.Abstractions\**;**\libs\Momentum\src\Momentum.Extensions.XmlDocs\**;**\libs\Momentum\src\Momentum.Extensions.EventMarkdownGenerator\**"/>
+        <Content Include="..\..\*" PackagePath="/content/"
+                 Link="%(Filename)%(Extension)"  Exclude="**\CLAUDE.md"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="..\..\README.md" Pack="true" PackagePath="\"/>
+        <None Include=".\assets\icon.png" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+</Project>

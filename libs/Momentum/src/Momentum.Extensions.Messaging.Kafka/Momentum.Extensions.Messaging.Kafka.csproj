@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <IsPackable>true</IsPackable>
+        <PackageId>Momentum.Extensions.Messaging.Kafka</PackageId>
+        <PackageDescription>Kafka messaging integration for Momentum platform providing event-driven
+            communication through Apache Kafka with CloudEvents and WolverineFx support.
+        </PackageDescription>
+        <PackageProjectUrl>
+            https://github.com/vgmello/momentum/blob/main/libs/Momentum/src/Momentum.Extensions.Messaging.Kafka/README.md
+        </PackageProjectUrl>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Aspire.Confluent.Kafka"/>
+        <PackageReference Include="CloudNative.CloudEvents.Kafka"/>
+        <PackageReference Include="WolverineFx.Kafka"/>
+        <!--#if (!LIBS_INCLUDES_DEFAULTS)
+        <PackageReference Include="Momentum.ServiceDefaults"/>
+        #endif -->
+    </ItemGroup>
+    <!--#if (LIBS_INCLUDES_DEFAULTS) -->
+    <ItemGroup>
+        <!--#if (LIBS_INCLUDES_DEFAULTS)
+        <ProjectReference Include="..\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
+        #endif -->
+    </ItemGroup>
+    <!--#endif -->
+    <!--#if (!LIBS_INCLUDES_KAFKA) -->
+    <ItemGroup>
+        <ProjectReference Include="..\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
+        <ProjectReference Include="..\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
+    </ItemGroup>
+    <!--#endif -->
+</Project>

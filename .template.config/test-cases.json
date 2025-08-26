@@ -1,0 +1,44 @@
+{
+  "testCases": [
+    {
+      "name": "minimal-api",
+      "command": "-n MinimalApi --api true --back-office false --docs false --no-sample",
+      "description": "Test minimal API-only configuration"
+    },
+    {
+      "name": "full-stack-default",
+      "command": "-n FullStack",
+      "description": "Test full stack with all default components"
+    },
+    {
+      "name": "orleans-stateful",
+      "command": "-n OrleansApp --orleans --port 9000",
+      "description": "Test Orleans stateful processing with custom port"
+    },
+    {
+      "name": "no-database",
+      "command": "-n NoDbApp --db none --no-sample",
+      "description": "Test without database configuration"
+    },
+    {
+      "name": "kafka-only",
+      "command": "-n KafkaApp --kafka --aspire false --port 8200",
+      "description": "Test Kafka messaging without Aspire"
+    },
+    {
+      "name": "project-only-minimal",
+      "command": "-n ProjectOnly --project-only --no-sample",
+      "description": "Test project-only generation without solution"
+    },
+    {
+      "name": "custom-org",
+      "command": "-n CustomOrg --org \"Test Corp\" --no-sample",
+      "description": "Test with custom organization name"
+    },
+    {
+      "name": "no-kafka-no-db",
+      "command": "-n SimpleService --kafka false --db none --no-sample",
+      "description": "Test simple service without Kafka or database"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "strictFileMatching": true,
+  "ignoreFiles": [],
+  "customAssertions": {
+    "payment-status-changed.md": "Should properly handle nullable types (? suffix) and enum types, showing required vs optional fields"
+  },
+  "generateSchemas": false,
+  "generateSidebar": false
+}

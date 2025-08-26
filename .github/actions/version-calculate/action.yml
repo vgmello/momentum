@@ -1,0 +1,47 @@
+name: "Calculate Version"
+description: "Calculate version for releases and pre-releases"
+
+inputs:
+  version-file:
+    description: "Path to version file"
+    required: false
+    default: "libs/Momentum/version.txt"
+  release-type:
+    description: "Type of release (stable/prerelease)"
+    required: false
+    default: "stable"
+  check-changes:
+    description: "Check for consumer-visible changes"
+    required: false
+    default: "false"
+  change-path:
+    description: "Path to check for changes"
+    required: false
+    default: "libs/Momentum/src"
+
+outputs:
+  version:
+    description: "Calculated version"
+    value: ${{ steps.calculate.outputs.version }}
+  tag:
+    description: "Version tag"
+    value: ${{ steps.calculate.outputs.tag }}
+  skip:
+    description: "Whether to skip release"
+    value: ${{ steps.calculate.outputs.skip }}
+  has-prerelease:
+    description: "Whether pre-releases exist for this version"
+    value: ${{ steps.calculate.outputs.has_prerelease }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Calculate version
+      id: calculate
+      shell: pwsh
+      run: |
+        & "${{ github.action_path }}/Calculate-Version.ps1" `
+          -VersionFile "${{ inputs.version-file }}" `
+          -ReleaseType "${{ inputs.release-type }}" `
+          -CheckChanges "${{ inputs.check-changes }}" `
+          -ChangePath "${{ inputs.change-path }}"

@@ -1,0 +1,35 @@
+name: 'Generate Release Notes'
+description: 'Generate release notes for Momentum projects (auto-detects type from tag)'
+
+inputs:
+  version:
+    description: 'Package version'
+    required: true
+  tag:
+    description: 'Release tag'
+    required: true
+  release-type:
+    description: 'Type of release (prerelease/stable)'
+    required: false
+    default: 'stable'
+  output-file:
+    description: 'Output file name'
+    required: false
+    default: 'release_notes.md'
+
+outputs:
+  notes-file:
+    description: 'Path to generated release notes file'
+    value: ${{ inputs.output-file }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Generate release notes
+      shell: pwsh
+      run: |
+        & "${{ github.action_path }}/Generate-ReleaseNotes.ps1" `
+          -Version "${{ inputs.version }}" `
+          -Tag "${{ inputs.tag }}" `
+          -ReleaseType "${{ inputs.release-type }}" `
+          -OutputFile "${{ inputs.output-file }}"

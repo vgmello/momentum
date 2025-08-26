@@ -1,0 +1,9 @@
+{
+  "strictFileMatching": true,
+  "ignoreFiles": [],
+  "customAssertions": {
+    "product-stock-updated.md": "Should contain multiple partition keys section with proper ordering"
+  },
+  "generateSchemas": false,
+  "generateSidebar": false
+}

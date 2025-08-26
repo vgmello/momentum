@@ -1,0 +1,677 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Momentum .NET",
+  "classifications": [
+    "Microservices",
+    "CQRS",
+    "EventDriven",
+    "Momentum.NET"
+  ],
+  "name": "Momentum .NET Template",
+  "description": "A comprehensive template for creating domain-driven microservices following standard architecture patterns",
+  "identity": "Momentum.Template",
+  "shortName": "mmt",
+  "tags": {
+    "language": "C#",
+    "type": "solution"
+  },
+  "sourceName": "AppDomain",
+  "preferNameDirectory": true,
+  "guids": [
+    "4d1e9d4f-ee8a-4d91-8c2b-11e09987ac0b",
+    "5e2f0e5f-ff9b-5e02-9d3c-22f10098bd1c",
+    "310fa8e1-342a-4675-a3f0-f8912a5da0dd",
+    "1358a541-294a-491c-a8c3-46ac380e4c69"
+  ],
+  "symbols": {
+    // Component Parameters
+    "aspire": {
+      "type": "parameter",
+      "description": "Generate AppHost Aspire project",
+      "replaces": "__ASPIRE__",
+      "datatype": "choice",
+      "defaultValue": "default",
+      "choices": [
+        {
+          "choice": "default"
+        },
+        {
+          "choice": "true"
+        },
+        {
+          "choice": "false"
+        }
+      ]
+    },
+    "api": {
+      "type": "parameter",
+      "description": "Generate API project (REST/gRPC endpoints)",
+      "replaces": "__API__",
+      "datatype": "choice",
+      "defaultValue": "default",
+      "choices": [
+        {
+          "choice": "default"
+        },
+        {
+          "choice": "true"
+        },
+        {
+          "choice": "false"
+        }
+      ]
+    },
+    "back-office": {
+      "type": "parameter",
+      "description": "Generate BackOffice project (background event processing)",
+      "replaces": "__BACK_OFFICE__",
+      "datatype": "choice",
+      "defaultValue": "default",
+      "choices": [
+        {
+          "choice": "default"
+        },
+        {
+          "choice": "true"
+        },
+        {
+          "choice": "false"
+        }
+      ]
+    },
+    "docs": {
+      "type": "parameter",
+      "description": "Generates documentation project",
+      "replaces": "__DOCS__",
+      "datatype": "choice",
+      "defaultValue": "default",
+      "choices": [
+        {
+          "choice": "default"
+        },
+        {
+          "choice": "true"
+        },
+        {
+          "choice": "false"
+        }
+      ]
+    },
+    "orleans": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "Generate Orleans-based BackOffice project (stateful processing)",
+      "replaces": "__ORLEANS__"
+    },
+    // Configuration Parameters
+    "db-config": {
+      "type": "parameter",
+      "datatype": "choice",
+      "allowMultipleValues": true,
+      "description": "Data access setup configuration",
+      "defaultValue": "default",
+      "choices": [
+        {
+          "choice": "npgsql",
+          "description": "Use PostgreSQL database"
+        },
+        {
+          "choice": "liquibase",
+          "description": "Use Liquibase database migrations"
+        },
+        {
+          "choice": "none",
+          "description": "No database setup"
+        },
+        {
+          "choice": "default",
+          "description": "PostgreSQL & Liquibase"
+        }
+      ],
+      "replaces": "__DB_CONFIG__"
+    },
+    "kafka": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "Use Apache Kafka",
+      "defaultValue": "true",
+      "replaces": "__KAFKA__"
+    },
+    "port": {
+      "type": "parameter",
+      "datatype": "int",
+      "defaultValue": "8100",
+      "description": "Base port number for the application services",
+      "replaces": "__SERVICE_BASE_PORT__"
+    },
+    "org": {
+      "type": "parameter",
+      "description": "Organization / Team name",
+      "replaces": "__ORG__"
+    },
+    // Content Parameters
+    "no-sample": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "Skip generating sample code",
+      "replaces": "__NO_SAMPLE__"
+    },
+    "project-only": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "Only generate the project and its respective files. (no Solution, .gitignore, etc)",
+      "replaces": "__PROJECT_ONLY__"
+    },
+    // Library Parameters
+    "libs": {
+      "type": "parameter",
+      "datatype": "choice",
+      "allowMultipleValues": true,
+      "description": "Momentum libraries to include as direct project references",
+      "defaultValue": "none",
+      "choices": [
+        {
+          "choice": "none",
+          "description": "Use NuGet packages for all libraries"
+        },
+        {
+          "choice": "defaults",
+          "description": "Include Momentum.ServiceDefaults as project reference"
+        },
+        {
+          "choice": "api",
+          "description": "Include Momentum.ServiceDefaults.Api as project reference"
+        },
+        {
+          "choice": "ext",
+          "description": "Include Momentum.Extensions as project reference"
+        },
+        {
+          "choice": "kafka",
+          "description": "Include Momentum.Extensions.Messaging.Kafka as project reference"
+        },
+        {
+          "choice": "generators",
+          "description": "Include Momentum.Extensions.SourceGenerators as project reference"
+        }
+      ],
+      "replaces": "__LIBS__"
+    },
+    "lib-name": {
+      "type": "parameter",
+      "datatype": "string",
+      "description": "Name prefix to replace 'Momentum' in library names",
+      "defaultValue": "Momentum",
+      "fileRename": "Momentum",
+      "replaces": "__LIB_NAME__"
+    },
+    "mmt-version": {
+      "type": "parameter",
+      "datatype": "string",
+      "description": "Momentum lib version",
+      "defaultValue": "0.0.1-pre.14",
+      "replaces": "__TEMPLATE_MOMENTUM_VERSION__"
+    },
+    "debug-symbols": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "Include Debug symbols for the template",
+      "replaces": "__DEBUG_SYMBOLS__"
+    },
+    "INCLUDE_ASPIRE": {
+      "type": "computed",
+      "value": "aspire == 'true' || aspire == 'default' && !project-only"
+    },
+    "INCLUDE_API": {
+      "type": "computed",
+      "value": "api == 'true' || api == 'default' && !project-only"
+    },
+    "INCLUDE_BACK_OFFICE": {
+      "type": "computed",
+      "value": "back-office == 'true' || back-office == 'default' && !project-only"
+    },
+    "INCLUDE_DOCS": {
+      "type": "computed",
+      "value": "docs == 'true' || docs == 'default' && !project-only"
+    },
+    "INCLUDE_ORLEANS": {
+      "type": "computed",
+      "value": "orleans"
+    },
+    "INCLUDE_SAMPLE": {
+      "type": "computed",
+      "value": "!no-sample"
+    },
+    "INCLUDE_LIBS": {
+      "type": "computed",
+      "value": "!(libs == 'none')"
+    },
+    "HAS_BACKEND": {
+      "type": "computed",
+      "value": "INCLUDE_API || INCLUDE_BACK_OFFICE || INCLUDE_ORLEANS"
+    },
+    "AUTO_INCLUDE_DB": {
+      "type": "computed",
+      "value": "HAS_BACKEND && !project-only"
+    },
+    "USE_PGSQL": {
+      "type": "computed",
+      "value": "db-config == 'npgsql' || (AUTO_INCLUDE_DB && db-config == 'default')"
+    },
+    "USE_LIQUIBASE": {
+      "type": "computed",
+      "value": "db-config == 'liquibase' || (AUTO_INCLUDE_DB && db-config == 'default')"
+    },
+    "INCLUDE_INFRA_DB": {
+      "type": "computed",
+      "value": "USE_LIQUIBASE"
+    },
+    "USE_DB": {
+      "type": "computed",
+      "value": "USE_PGSQL"
+    },
+    "USE_KAFKA": {
+      "type": "computed",
+      "value": "kafka && HAS_BACKEND"
+    },
+    "LIBS_INCLUDES_DEFAULTS": {
+      "type": "computed",
+      "value": "libs == 'defaults'"
+    },
+    "LIBS_INCLUDES_API": {
+      "type": "computed",
+      "value": "libs == 'api'"
+    },
+    "LIBS_INCLUDES_EXT": {
+      "type": "computed",
+      "value": "libs == 'ext'"
+    },
+    "LIBS_INCLUDES_KAFKA": {
+      "type": "computed",
+      "value": "libs == 'kafka'"
+    },
+    "LIBS_INCLUDES_GENERATORS": {
+      "type": "computed",
+      "value": "libs == 'generators'"
+    },
+    // Generated Symbols
+    "DiagramArrow": {
+      "type": "generated",
+      "generator": "constant",
+      "parameters": {
+        "value": "-->"
+      },
+      "replaces": "-/->"
+    },
+    "DefaultOrgName": {
+      "type": "generated",
+      "generator": "join",
+      "parameters": {
+        "symbols": [
+          {
+            "type": "ref",
+            "value": "name"
+          },
+          {
+            "type": "const",
+            "value": " Team"
+          }
+        ]
+      }
+    },
+    "OrgName": {
+      "type": "generated",
+      "generator": "coalesce",
+      "parameters": {
+        "sourceVariableName": "org",
+        "fallbackVariableName": "DefaultOrgName"
+      },
+      "replaces": "OrgName"
+    },
+    "OrgNameKebab": {
+      "type": "derived",
+      "valueSource": "OrgName",
+      "valueTransform": "kebab-case",
+      "replaces": "org-name"
+    },
+    "AppDomainSnakeCase": {
+      "type": "derived",
+      "valueSource": "name",
+      "valueTransform": "snake_case",
+      "replaces": "app_domain",
+      "fileRename": "app_domain"
+    },
+    "AppDomainKebab": {
+      "type": "derived",
+      "valueSource": "name",
+      "valueTransform": "kebab-case",
+      "replaces": "app-domain",
+      "fileRename": "app-domain"
+    },
+    "AppDomainCamelCase": {
+      "type": "derived",
+      "valueSource": "name",
+      "valueTransform": "camelCase",
+      "replaces": "appDomain",
+      "fileRename": "appDomain"
+    }
+  },
+  "forms": {
+    "kebab-case": {
+      "identifier": "kebabCase"
+    },
+    "camelCase": {
+      "identifier": "firstLowerCaseInvariant"
+    },
+    "dash-to-underscore": {
+      "identifier": "replace",
+      "pattern": "-",
+      "replacement": "_"
+    },
+    "snake_case": {
+      "identifier": "chain",
+      "steps": [
+        "kebab-case",
+        "dash-to-underscore"
+      ]
+    }
+  },
+  "sources": [
+    {
+      "include": [
+        "docs/**/*",
+        "infra/**/*",
+        "src/**/*",
+        "tests/**/*",
+        "libs/Momentum/src/**/*"
+      ],
+      "exclude": [
+        "**/[Bb]in/**",
+        "**/[Oo]bj/**",
+        ".template.config/**/*",
+        "**/*.filelist",
+        "**/*.user",
+        "**/*.lock.json",
+        "**/_temp/**/*",
+        "**/.local/**/*",
+        "**/.vitepress/cache/**/*",
+        "**/.vitepress/dist/**/*",
+        "**/Internal/Generated/**/*",
+        "**/docs/reference/*",
+        "**/docs/node_modules/**/*",
+        "libs/Momentum/src/Momentum.Extensions.Abstractions/**/*",
+        "libs/Momentum/src/Momentum.Extensions.EventMarkdownGenerator/**/*",
+        "debug.symbols.txt"
+      ],
+      "modifiers": [
+        {
+          "condition": "debug-symbols",
+          "include": [
+            "debug.symbols.txt"
+          ]
+        },
+        {
+          "condition": "(!project-only)",
+          "include": [
+            ".dockerignore",
+            ".editorconfig",
+            ".gitattributes",
+            ".gitignore",
+            ".mcp.json",
+            "compose.yml",
+            "*.ruleset",
+            "*.slnx",
+            "*.slnx.DotSettings",
+            "*.props",
+            ".vscode/**/*"
+          ]
+        },
+        {
+          "condition": "(project-only)",
+          "include": [
+            "Directory.Build.props",
+            "Directory.Packages.props",
+            "*.ruleset",
+            "*.slnx",
+            "*.slnx.DotSettings"
+          ]
+        },
+        {
+          "condition": "(!INCLUDE_ASPIRE)",
+          "exclude": [
+            "src/AppDomain.AppHost/**/*"
+          ]
+        },
+        {
+          "condition": "(!INCLUDE_API)",
+          "exclude": [
+            "src/AppDomain.Api/**/*",
+            "tests/AppDomain.Tests/Unit/Infrastructure/OrleansExtensionsTests.cs",
+            "tests/AppDomain.Tests/Integration/Cashiers/**/*",
+            "tests/AppDomain.Tests/Integration/Invoices/**/*"
+          ]
+        },
+        {
+          "condition": "(!INCLUDE_BACK_OFFICE)",
+          "exclude": [
+            "src/AppDomain.BackOffice/**/*"
+          ]
+        },
+        {
+          "condition": "(!INCLUDE_DOCS)",
+          "exclude": [
+            "docs/**/*"
+          ]
+        },
+        {
+          "condition": "(!INCLUDE_ORLEANS)",
+          "exclude": [
+            "src/AppDomain.BackOffice.Orleans/**/*",
+            "src/AppDomain.Api/Infrastructure/Extensions/OrleansExtensions.cs",
+            "src/AppDomain/**/Actors/**/*",
+            "tests/AppDomain.Tests/Architecture/OrleansGrainOwnershipRulesTests.cs",
+            "tests/AppDomain.Tests/Unit/Infrastructure/OrleansExtensionsTests.cs"
+          ]
+        },
+        {
+          "condition": "(!INCLUDE_INFRA_DB)",
+          "exclude": [
+            "infra/AppDomain.Database/**/*"
+          ]
+        },
+        {
+          "condition": "(!HAS_BACKEND && !project-only)",
+          "exclude": [
+            "src/AppDomain/**/*",
+            "src/AppDomain.Contracts/**/*",
+            "tests/AppDomain.Tests/**/*"
+          ]
+        },
+        {
+          "condition": "(!USE_LIQUIBASE)",
+          "exclude": [
+            "src/AppDomain.AppHost/Extensions/LiquibaseExtensions.cs",
+            "tests/AppDomain.Tests/Integration/_Internal/Containers/LiquibaseMigrationContainer.cs"
+          ]
+        },
+        {
+          "condition": "(!USE_DB)",
+          "exclude": [
+            "tests/AppDomain.Tests/Integration/_Internal/Extensions/DatabaseContainerExtensions.cs",
+            "tests/AppDomain.Tests/Integration/Cashiers/**/*",
+            "tests/AppDomain.Tests/Integration/Invoices/**/*"
+          ]
+        },
+        {
+          "condition": "(USE_LIQUIBASE)",
+          "include": [
+            "src/AppDomain.AppHost/Extensions/LiquibaseExtensions.cs"
+          ]
+        },
+        {
+          "condition": "(!INCLUDE_SAMPLE)",
+          "exclude": [
+            "infra/AppDomain.Database/Liquibase/app_domain/cashiers/**/*",
+            "infra/AppDomain.Database/Liquibase/app_domain/invoices/**/*",
+            "src/AppDomain.Api/Cashiers/**/*",
+            "src/AppDomain.Api/Invoices/**/*",
+            "src/AppDomain.BackOffice.Orleans/Invoices/**/*",
+            "src/AppDomain.BackOffice/Invoices/**/*",
+            "src/AppDomain.BackOffice/Messaging/AccountingInboxHandler/**/*",
+            "src/AppDomain.BackOffice/Messaging/AppDomainInboxHandler/**/*",
+            "src/AppDomain/Cashiers/**/*",
+            "src/AppDomain/Invoices/**/*",
+            "tests/AppDomain.Tests/Unit/Cashier/**/*",
+            "tests/AppDomain.Tests/Unit/Invoices/**/*",
+            "tests/AppDomain.Tests/Integration/Cashiers/**/*",
+            "tests/AppDomain.Tests/Integration/Invoices/**/*",
+            "tests/AppDomain.Tests/Integration/_Internal/TestDataGenerators/**/*",
+            "tests/AppDomain.Tests/Architecture/DomainIsolationRulesTests.cs",
+            "tests/AppDomain.Tests/Architecture/MultiTenancyRulesTests.cs",
+            "docs/guide/cashiers/**/*",
+            "docs/guide/invoices/**/*",
+            "docs/guide/bills/**/*"
+          ]
+        },
+        {
+          "condition": "(!LIBS_INCLUDES_DEFAULTS)",
+          "exclude": [
+            "libs/Momentum/src/Momentum.ServiceDefaults/**/*"
+          ]
+        },
+        {
+          "condition": "(!LIBS_INCLUDES_API)",
+          "exclude": [
+            "libs/Momentum/src/Momentum.ServiceDefaults.Api/**/*",
+            "libs/Momentum/src/Momentum.Extensions.XmlDocs/**/*"
+          ]
+        },
+        {
+          "condition": "(!LIBS_INCLUDES_EXT)",
+          "exclude": [
+            "libs/Momentum/src/Momentum.Extensions/**/*"
+          ]
+        },
+        {
+          "condition": "(!LIBS_INCLUDES_GENERATORS)",
+          "exclude": [
+            "libs/Momentum/src/Momentum.Extensions.SourceGenerators/**/*"
+          ]
+        },
+        {
+          "condition": "(!LIBS_INCLUDES_KAFKA)",
+          "exclude": [
+            "libs/Momentum/src/Momentum.Extensions.Messaging.Kafka/**/*"
+          ]
+        }
+      ]
+    },
+    {
+      "source": "./.template.config/tools",
+      "target": "./.local/tools",
+      "include": [
+        "post-setup-config.json",
+        "post-setup/**/*"
+      ]
+    },
+    {
+      "source": "./",
+      "target": "./",
+      "condition": "(!project-only)",
+      "include": [
+        "ProjectREADME.md"
+      ],
+      "rename": {
+        "ProjectREADME.md": "README.md"
+      }
+    }
+  ],
+  "primaryOutputs": [
+    {
+      "path": "AppDomain.slnx"
+    }
+  ],
+  "postActions": [
+    {
+      "description": "Run post-setup configuration",
+      "manualInstructions": [
+        {
+          "text": "Run post-setup manually if this fails: dotnet run --project .local/tools/post-setup"
+        }
+      ],
+      "actionId": "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
+      "args": {
+        "executable": "dotnet",
+        "redirectStandardOutput": false,
+        "args": "run --project .local/tools/post-setup"
+      },
+      "continueOnError": true
+    },
+    {
+      "condition": "(!project-only)",
+      "description": "Restore NuGet packages required by this project.",
+      "manualInstructions": [
+        {
+          "text": "Run 'dotnet restore'"
+        }
+      ],
+      "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+      "continueOnError": true
+    }
+  ],
+  "SpecialCustomOperations": {
+    "**.slnx": {
+      "operations": [
+        {
+          "type": "conditional",
+          "configuration": {
+            "actionableIf": [
+              "<!--#if"
+            ],
+            "actionableElse": [
+              "#else",
+              "<!--#else"
+            ],
+            "actionableElseif": [
+              "#elseif",
+              "<!--#elseif",
+              "#elif",
+              "<!--#elif"
+            ],
+            "endif": [
+              "#endif",
+              "<!--#endif"
+            ],
+            "trim": "true",
+            "wholeLine": "true",
+            "evaluator": "C++"
+          }
+        }
+      ]
+    },
+    "**.yml": {
+      "operations": [
+        {
+          "type": "conditional",
+          "configuration": {
+            "actionableIf": [
+              "# #if"
+            ],
+            "actionableElse": [
+              "# #else"
+            ],
+            "actionableElseif": [
+              "# #elseif"
+            ],
+            "endif": [
+              "# #endif"
+            ],
+            "trim": "true",
+            "wholeLine": "true",
+            "evaluator": "C++"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,77 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <IsTestProject>true</IsTestProject>
+        <IsPackable>false</IsPackable>
+        <EnableDefaultContentItems>false</EnableDefaultContentItems>
+        <NoWarn>$(NoWarn);CS0436;</NoWarn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Bogus"/>
+        <PackageReference Include="coverlet.collector">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+<!--#if (INCLUDE_API) -->
+        <PackageReference Include="Grpc.Tools"/>
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing"/>
+<!--#endif -->
+        <PackageReference Include="Microsoft.NET.Test.Sdk"/>
+<!--#if (INCLUDE_ORLEANS) -->
+        <PackageReference Include="Microsoft.Orleans.TestingHost"/>
+        <PackageReference Include="Microsoft.Orleans.Client"/>
+<!--#endif -->
+        <PackageReference Include="NetArchTest.Rules"/>
+        <PackageReference Include="NSubstitute"/>
+        <PackageReference Include="Shouldly"/>
+<!--#if (USE_PGSQL) -->
+        <PackageReference Include="Testcontainers.PostgreSql"/>
+<!--#endif -->
+        <PackageReference Include="Testcontainers.Kafka"/>
+        <PackageReference Include="Testcontainers"/>
+        <PackageReference Include="xunit.runner.visualstudio"/>
+        <PackageReference Include="xunit.v3"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\AppDomain\AppDomain.csproj"/>
+<!--#if (INCLUDE_API) -->
+        <ProjectReference Include="..\..\src\AppDomain.Api\AppDomain.Api.csproj"/>
+<!--#endif -->
+<!--#if (INCLUDE_BACK_OFFICE) -->
+        <ProjectReference Include="..\..\src\AppDomain.BackOffice\AppDomain.BackOffice.csproj"/>
+<!--#endif -->
+<!--#if (INCLUDE_ORLEANS) -->
+        <ProjectReference Include="..\..\src\AppDomain.BackOffice.Orleans\AppDomain.BackOffice.Orleans.csproj"/>
+<!--#endif -->
+<!--#if (LIBS_INCLUDES_EXT) -->
+        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.csproj"/>
+<!--#endif -->
+<!--#if (LIBS_INCLUDES_KAFKA) -->
+        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.Messaging.Kafka\Momentum.Extensions.Messaging.Kafka.csproj"/>
+<!--#endif -->
+<!--#if (LIBS_INCLUDES_GENERATORS) -->
+        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.csproj"/>
+<!--#endif -->
+    </ItemGroup>
+
+<!--#if (INCLUDE_API) -->
+    <ItemGroup>
+        <Protobuf Include="..\..\src\AppDomain.Api\**\Protos\**\*.proto"
+                  ProtoRoot="..\..\src\AppDomain.Api\"
+                  GrpcServices="Client"
+                  Link="Integration\%(RecursiveDir)%(Filename)%(Extension)"/>
+    </ItemGroup>
+<!--#endif -->
+    <ItemGroup>
+        <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit"/>
+        <Using Include="Shouldly"/>
+    </ItemGroup>
+
+</Project>

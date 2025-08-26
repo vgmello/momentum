@@ -1,0 +1,79 @@
+name: Deploy Documentation
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "libs/Momentum/docs/**"
+  workflow_dispatch:
+    inputs:
+      docs-path:
+        description: "Documentation path"
+        required: false
+        default: "libs/Momentum/docs"
+        type: string
+      build-dotnet:
+        description: "Build .NET projects first"
+        required: false
+        default: true
+        type: boolean
+
+env:
+  DOTNET_VERSION: "9.0.x"
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy-docs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: github-pages
+      url: ${{ steps.docs-deployment.outputs.page_url }}
+
+    steps:
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Build documentation
+        uses: ./.github/actions/docs-build
+        with:
+          docs-path: ${{ github.event.inputs.docs-path || 'libs/Momentum/docs' }}
+          build-dotnet: ${{ github.event.inputs.build-dotnet || 'true' }}
+
+      - name: Upload to GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ github.event.inputs.docs-path || 'libs/Momentum/docs' }}/.vitepress/dist
+
+      - name: Deploy to GitHub Pages
+        id: docs-deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Deployment Summary
+        shell: pwsh
+        run: |
+          & ./.github/scripts/Write-DeploymentSummary.ps1 `
+            -IsTest "false" `
+            -DeployPrerelease "false" `
+            -DeployDocs "true" `
+            -DocsUrl "${{ steps.docs-deployment.outputs.page_url }}" `
+            -DocsPath "${{ github.event.inputs.docs-path || 'libs/Momentum/docs' }}"

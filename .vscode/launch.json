@@ -1,0 +1,12 @@
+{
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Run vitepress",
+      "runtimeExecutable": "vitepress",
+      "cwd": "${workspaceFolder}/docs",
+      "args": ["dev"]
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <!--#if (USE_PGSQL) -->
+        <DbCommandDefaultParamCase>SnakeCase</DbCommandDefaultParamCase>
+        <DbCommandParamPrefix>p_</DbCommandParamPrefix>
+        <!--#endif -->
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!--#if (USE_PGSQL) -->
+        <PackageReference Include="Aspire.Npgsql"/>
+        <PackageReference Include="Npgsql"/>
+        <!--#endif -->
+        <!--#if (INCLUDE_ORLEANS) -->
+        <PackageReference Include="Microsoft.Orleans.Client"/>
+        <PackageReference Include="Microsoft.Orleans.Core.Abstractions"/>
+        <!--#endif -->
+        <PackageReference Include="Riok.Mapperly"/>
+        <PackageReference Include="linq2db.AspNet"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="Momentum.Extensions.Abstractions.Messaging.DefaultDomainAttribute">
+            <Domain>AppDomain</Domain>
+        </AssemblyAttribute>
+    </ItemGroup>
+
+    <!--#if (false) -->
+    <ItemGroup Condition="false">
+        <!--#else
+    <ItemGroup>
+        #endif -->
+        <PackageReference Include="Momentum.Extensions.Abstractions"/>
+        <!--#if (!LIBS_INCLUDES_EXT) -->
+        <PackageReference Include="Momentum.Extensions"/>
+        <!--#endif -->
+        <!--#if (!LIBS_INCLUDES_GENERATORS) -->
+        <PackageReference Include="Momentum.Extensions.SourceGenerators"/>
+        <!--#endif -->
+    </ItemGroup>
+
+    <!--#if (LIBS_INCLUDES_EXT || LIBS_INCLUDES_GENERATORS) -->
+    <ItemGroup>
+        <!--#if (LIBS_INCLUDES_EXT) -->
+        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.csproj"/>
+        <!--#endif -->
+        <!--#if (LIBS_INCLUDES_GENERATORS) -->
+        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.csproj">
+            <OutputItemType>Analyzer</OutputItemType>
+            <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </ProjectReference>
+        <!--#endif -->
+    </ItemGroup>
+
+    <!--#if (LIBS_INCLUDES_EXT) -->
+    <Import Project="..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.props"/>
+    <!--#endif -->
+    <!--#if (LIBS_INCLUDES_GENERATORS) -->
+    <!--    <Import Project="..\..\libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.props"/>-->
+    <!--#endif -->
+    <!--#endif -->
+    <!--#if (false) -->
+    <ItemGroup>
+        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
+    </ItemGroup>
+    <!--#endif -->
+</Project>

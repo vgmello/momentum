@@ -1,0 +1,7 @@
+{
+  "strictFileMatching": true,
+  "ignoreFiles": [],
+  "customAssertions": {},
+  "generateSchemas": false,
+  "generateSidebar": true
+}

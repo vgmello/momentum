@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <IsPackable>true</IsPackable>
+        <PackageId>Momentum.Extensions</PackageId>
+        <PackageDescription>Core extensions library for Momentum .NET providing common utilities,
+            result types, messaging abstractions, and data access helpers. Includes integrations
+            with Dapper, FluentValidation, OneOf, and WolverineFx.
+        </PackageDescription>
+        <PackageProjectUrl>https://github.com/vgmello/momentum/blob/main/libs/Momentum/src/Momentum.Extensions/README.md</PackageProjectUrl>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="FluentValidation"/>
+        <PackageReference Include="linq2db"/>
+        <PackageReference Include="OneOf"/>
+        <PackageReference Include="OneOf.SourceGenerator"/>
+        <PackageReference Include="Dapper"/>
+        <PackageReference Include="WolverineFx"/>
+        <!--#if (LIBS_INCLUDES_EXT)
+        <PackageReference Include="Momentum.Extensions.Abstractions"/>
+        #endif -->
+    </ItemGroup>
+    <!--#if (!LIBS_INCLUDES_EXT) -->
+    <ItemGroup>
+        <None Include="Momentum.Extensions.props" Pack="true" PackagePath="\build"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
+    </ItemGroup>
+    <!--#endif -->
+</Project>

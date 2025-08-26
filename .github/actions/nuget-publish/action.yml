@@ -1,0 +1,58 @@
+name: "Publish NuGet Packages"
+description: "Pack and publish NuGet packages"
+
+inputs:
+  path:
+    description: "Path to the project or solution to pack"
+    required: true
+  config:
+    description: "MS Build configuration"
+    required: false
+    default: "Release"
+  package-version:
+    description: "Version to use for the packages"
+    required: true
+  pack-args:
+    description: "Additional arguments for dotnet pack"
+    required: false
+    default: ""
+  nuget-api-key:
+    description: "NuGet API key for publishing"
+    required: true
+  nuget-source:
+    description: "NuGet source URL"
+    required: false
+    default: "https://api.nuget.org/v3/index.json"
+  skip-duplicate:
+    description: "Skip duplicate packages"
+    required: false
+    default: "true"
+  dry-run:
+    description: "Perform a dry run without actually publishing"
+    required: false
+    default: "false"
+
+outputs:
+  published-packages:
+    description: "List of published packages"
+    value: ${{ steps.publish.outputs.packages }}
+  output-dir:
+    description: "Packages output dir"
+    value: ${{ steps.pack.outputs.output_dir }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Publish NuGet packages
+      id: publish
+      shell: pwsh
+      run: |
+        & "${{ github.action_path }}/Publish-NuGetPackages.ps1" `
+          -Path "${{ inputs.path }}" `
+          -Config "${{ inputs.config }}" `
+          -PackageVersion "${{ inputs.package-version }}" `
+          -PackArgs "${{ inputs.pack-args }}" `
+          -NugetApiKey "${{ inputs.nuget-api-key }}" `
+          -NugetSource "${{ inputs.nuget-source }}" `
+          -SkipDuplicate "${{ inputs.skip-duplicate }}" `
+          -DryRun "${{ inputs.dry-run }}"

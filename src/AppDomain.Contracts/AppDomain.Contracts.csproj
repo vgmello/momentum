@@ -1,0 +1,70 @@
+<Project Sdk="Microsoft.NET.Sdk">
+<!--/-:msbuild-conditional:noEmit -->
+    <PropertyGroup>
+        <IsPackable>True</IsPackable>
+        <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Debug'">True</GeneratePackageOnBuild>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <VersionPrefix>0.0.1</VersionPrefix>
+        <VersionSuffix Condition="'$(Configuration)' == 'Debug'">pre</VersionSuffix>
+    </PropertyGroup>
+<!--/+:msbuild-conditional:noEmit -->
+
+    <PropertyGroup>
+        <Authors>ORG_NAME</Authors>
+        <Company>ORG_NAME</Company>
+        <Copyright>Copyright (c) ORG_NAME. All rights reserved.</Copyright>
+        <PackageTags>app_domain;app_domain.contracts</PackageTags>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <RepositoryUrl>https://github.com/ORG_NAME/AppDomain</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="Momentum.Extensions.Abstractions.Messaging.DefaultDomainAttribute">
+            <Domain>AppDomain</Domain>
+        </AssemblyAttribute>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="\"/>
+        <Compile Include="..\AppDomain\**\Contracts\IntegrationEvents\*.cs" Link="%(RecursiveDir)%(Filename)%(Extension)"/>
+        <Compile Include="..\AppDomain\**\Contracts\Models\*.cs" Link="%(RecursiveDir)%(Filename)%(Extension)"/>
+        <!--#if (INCLUDE_API) -->
+        <Protobuf Include="..\AppDomain.Api\**\Protos\**\*.proto" Link="%(RecursiveDir)%(Filename)%(Extension)"
+                  Pack="true"
+                  PackagePath="Protos"
+                  GrpcServices="Client"
+                  ProtoRoot="../AppDomain.Api/"/>
+        <!--#endif -->
+    </ItemGroup>
+
+    <ItemGroup>
+        <!--#if (INCLUDE_API) -->
+        <PackageReference Include="Google.Protobuf"/>
+        <PackageReference Include="Grpc.Net.Client"/>
+        <PackageReference Include="Grpc.Tools"/>
+        <!--#endif -->
+        <PackageReference Include="Momentum.Extensions.Abstractions"/>
+        <!--#if (false) -->
+        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
+        <!--#endif -->
+    </ItemGroup>
+
+<!--/-:msbuild-conditional:noEmit -->
+    <!-- Target to generate nuget during development -->
+    <Target Name="SetPackageVersionSuffix" BeforeTargets="GenerateNuspec;Pack" Condition=" '$(Configuration)' == 'Debug' ">
+        <ItemGroup>
+            <OldPackagesToDelete Include="$(TargetDir)../*.*upkg"/>
+        </ItemGroup>
+        <Message Text="Cleaning up $(ProjectName) nupkg files. Target: $(TargetDir)" Importance="high"/>
+        <Delete Files="@(OldPackagesToDelete)"/>
+
+        <PropertyGroup>
+            <VersionSuffix>$([System.DateTime]::UtcNow.ToString("yyyyMMdd-HHmmss"))</VersionSuffix>
+            <PackageVersion>$(VersionPrefix)-$(VersionSuffix)</PackageVersion>
+        </PropertyGroup>
+        <Message Text="Packaging version: $(ProjectName)-$(PackageVersion)" Importance="high"/>
+    </Target>
+<!--/+:msbuild-conditional:noEmit -->
+
+</Project>

@@ -1,0 +1,37 @@
+[
+  {
+    "text": "Orders",
+    "link": null,
+    "collapsed": false,
+    "items": [
+      {
+        "text": "Order Completed",
+        "link": "/order-completed"
+      }
+    ]
+  },
+  {
+    "text": "Schemas",
+    "collapsed": false,
+    "items": [
+      {
+        "text": "Orders",
+        "collapsed": false,
+        "items": [
+          {
+            "text": "Address",
+            "link": "/schemas/AppDomain.Orders.Contracts.Models.Address"
+          },
+          {
+            "text": "Customer",
+            "link": "/schemas/AppDomain.Orders.Contracts.Models.Customer"
+          },
+          {
+            "text": "OrderItem",
+            "link": "/schemas/AppDomain.Orders.Contracts.Models.OrderItem"
+          }
+        ]
+      }
+    ]
+  }
+]

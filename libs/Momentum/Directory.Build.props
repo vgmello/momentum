@@ -1,0 +1,58 @@
+<Project>
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+        <CodeAnalysisRuleSet>../../Momentum.ruleset</CodeAnalysisRuleSet>
+        <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+        <NoWarn>$(NoWarn);CS1591;LOGGEN036</NoWarn>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(IsTestProject)' != 'True' ">
+        <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Debug' ">true</GeneratePackageOnBuild>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <MomentumVersion>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)version.txt').Trim())</MomentumVersion>
+        <VersionPrefix>$(MomentumVersion)</VersionPrefix>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Authors>Momentum Contributors</Authors>
+        <Company>Momentum .NET</Company>
+        <Copyright>Copyright © $([System.DateTime]::Now.Year) Momentum</Copyright>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/vgmello/momentum</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageIcon>icon.png</PackageIcon>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageReleaseNotes>https://github.com/vgmello/momentum/releases/tag/v$(PackageVersion)</PackageReleaseNotes>
+        <PackageTags>momentum;mmt;</PackageTags>
+    </PropertyGroup>
+
+    <!--#if (false) -->
+    <ItemGroup Condition=" '$(IsTestProject)' != 'True' ">
+        <PackageReference Include="Microsoft.SourceLink.GitHub" />
+        <None Include="..\..\assets\icon.png" Pack="true" PackagePath="\" Visible="false" Condition="Exists('..\..\assets\icon.png')" />
+        <None Include="README.md" Pack="true" PackagePath="\" Visible="true" Condition="Exists('README.md')" />
+    </ItemGroup>
+    <!--#endif -->
+
+    <ItemGroup>
+        <PackageReference Include="SonarAnalyzer.CSharp" developmentDependency="true">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <Target Name="ValidateMomentumVersion" BeforeTargets="Build">
+        <Message Text="Building Momentum Libraries version: $(MomentumVersion)" Importance="high" />
+    </Target>
+</Project>

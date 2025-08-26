@@ -1,0 +1,91 @@
+<!-- // @formatter:off -->
+<!-- prettier-ignore -->
+
+---
+editLink: false
+---
+
+# {{ event.EventName }}
+
+{% if event.IsObsolete -%}
+    > [!CAUTION]
+    > This event is deprecated. {{ event.ObsoleteMessage | default: "Use alternative event instead." }}
+
+{% endif -%}
+- **Status:** {{ event.Status }}
+- **Version:** {{ event.Version }}
+{% if event.Entity -%}
+- **Entity:** `{{ event.Entity | downcase }}`
+{% endif -%}
+- **Type:** {% if event.IsInternal %}Domain Event{% else %}Integration Event{% endif %}
+- **Topic:** `{{ event.TopicName }}`
+- **Estimated Payload Size:** {{ event.TotalEstimatedSizeBytes }} bytes{% if event.HasInaccurateEstimates %} ⚠️ *Contains dynamic properties*{% endif %}
+{% if event.PartitionKeys.size > 0 -%}
+- **Partition Keys**: {{ event.PartitionKeys | map: "Name" | join: ", " }}
+{% endif -%}
+
+## Description
+
+{{ event.Description }}
+
+{% if event.Remarks -%}
+{{ event.Remarks }}
+{% endif -%}
+
+{% if event.Example -%}
+### Example
+
+{{ event.Example }}
+{% endif -%}
+
+## Event Payload
+
+| Property | Type | Required | Size | Description |
+| ----------------------------------------------------------------- | --------- | -------- | -------- | --------------------------------------------------------------------- |
+{% for property in event.Properties -%}
+    | {% if property.IsComplexType and property.SchemaLink -%}[{{ property.Name }}](/events/schemas/{{ property.SchemaLink }}){% else -%}{{ property.Name }}{% endif %}| `{{ property.TypeName }}` | {% if property.IsRequired -%}✓{% else %} {% endif %}| {{ property.EstimatedSizeDisplay }} | {{ property.Description }} |
+{% endfor %}
+
+{% if event.PartitionKeys.size > 0 -%}
+### Partition Keys
+
+{% if event.PartitionKeys.size == 1 -%}
+This event uses a partition key for message routing:
+{% else -%}
+This event uses multiple partition keys for message routing:
+{% endif -%}
+    {% for partitionKey in event.PartitionKeys -%}
+    - `{{ partitionKey.Name }}`{% if partitionKey.Description %} - {{ partitionKey.Description }}{% endif %}
+    {% endfor -%}
+
+{% endif -%}
+
+{% assign complexTypes = event.Properties | where: "IsComplexType", true | where: "IsCollectionType", false -%}
+{% assign collectionComplexTypes = event.Properties | where: "IsComplexType", true | where: "IsCollectionType", true -%}
+{% assign allComplexTypes = complexTypes | concat: collectionComplexTypes -%}
+
+{% if allComplexTypes.size > 0 %}
+### Reference Schemas
+
+{% for property in complexTypes -%}
+{% assign typeName = property.TypeName -%}
+#### {{ typeName }}
+
+<!--@include: @/events/schemas/{{ property.SchemaPath }}#schema-->
+
+{% endfor -%}
+
+{% for property in collectionComplexTypes -%}
+{% assign elementTypeName = property.ElementTypeName | default: property.TypeName -%}
+#### {{ elementTypeName }}s
+
+<!--@include: @/events/schemas/{{ property.ElementSchemaPath | default: property.SchemaPath }}#schema-->
+
+{% endfor -%}
+{% endif -%}
+
+## Technical Details
+
+- **Full Type:** [{{ event.FullTypeName }}]({{ event.GithubUrl }})
+- **Namespace:** `{{ event.Namespace }}`
+- **Topic Attribute:** `{{ event.TopicAttributeDisplayName }}`

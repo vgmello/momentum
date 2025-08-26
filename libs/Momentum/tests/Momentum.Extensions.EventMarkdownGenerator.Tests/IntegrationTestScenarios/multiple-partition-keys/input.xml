@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TestEvents</name>
+    </assembly>
+    <members>
+        <member name="T:AppDomain.Inventory.Contracts.IntegrationEvents.ProductStockUpdated">
+            <summary>Published when product stock levels are updated in the inventory system</summary>
+            <remarks>
+            ## When It's Triggered
+            
+            This event is published when:
+            - Product stock is adjusted manually
+            - Automated stock replenishment occurs
+            - Stock is reserved for orders
+            - Stock reservations are released
+            
+            ## Partition Strategy
+            
+            This event uses multiple partition keys to optimize message routing:
+            - Primary partitioning by tenant for isolation
+            - Secondary partitioning by warehouse for regional processing
+            - Tertiary partitioning by product category for specialized handlers
+            </remarks>
+        </member>
+        <member name="M:AppDomain.Inventory.Contracts.IntegrationEvents.ProductStockUpdated.#ctor(System.Guid,System.Guid,System.String,System.Guid,System.Int32,System.Int32,System.DateTime)">
+            <param name="tenantId">Identifier of the tenant that owns the inventory</param>
+            <param name="warehouseId">Identifier of the warehouse where stock is managed</param>
+            <param name="productCategory">Category of the product for specialized processing</param>
+            <param name="productId">Unique identifier of the product</param>
+            <param name="previousQuantity">Stock quantity before the update</param>
+            <param name="newQuantity">Stock quantity after the update</param>
+            <param name="updatedAt">Date and time when the stock was updated</param>
+        </member>
+    </members>
+</doc>
