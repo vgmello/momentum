@@ -102,11 +102,11 @@ public class OrleansExtensionsTests
         // Should have LazyClusterClientManager
         hostedServices.Any(s => s.GetType().Name == "LazyClusterClientManager").ShouldBeTrue();
 
-        // Should not have cluster client services that also implement IHostedService
-        // Note: We can't test this with ServiceProvider resolution as it would trigger Orleans setup
-        // Instead verify by inspecting the service collection before building
-        var finalServiceDescriptors = builder.Services.Where(s => s.ServiceType == typeof(IHostedService)).ToList();
-        finalServiceDescriptors.Any(s => s.ImplementationType?.Name == "LazyClusterClientManager").ShouldBeTrue();
+        // Should have LazyClusterClientManager registered as IHostedService 
+        // When using factory pattern, we need to check the resolved service instead of service descriptors
+        var lazyManager = serviceProvider.GetServices<IHostedService>()
+            .FirstOrDefault(s => s.GetType().Name == "LazyClusterClientManager");
+        lazyManager.ShouldNotBeNull();
     }
 
     [Fact]

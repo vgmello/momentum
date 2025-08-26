@@ -21,8 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <AssemblyAttribute
-            Include="Momentum.Extensions.Abstractions.Messaging.DefaultDomainAttribute">
+        <AssemblyAttribute Include="Momentum.Extensions.Abstractions.Messaging.DefaultDomainAttribute">
             <Domain>AppDomain</Domain>
         </AssemblyAttribute>
     </ItemGroup>

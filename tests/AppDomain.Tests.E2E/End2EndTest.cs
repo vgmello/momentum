@@ -8,6 +8,7 @@ namespace AppDomain.Tests.E2E;
 ///     Base class for E2E tests that provides API client and configuration
 /// </summary>
 [Collection(nameof(End2EndTest))]
+[Trait("Type", "E2E")]
 public abstract class End2EndTest(End2EndTestFixture fixture)
 {
     protected TestSettings TestSettings => fixture.TestSettings;

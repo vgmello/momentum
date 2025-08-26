@@ -3,6 +3,7 @@
 namespace AppDomain.Tests.Integration._Internal;
 
 [Collection(nameof(IntegrationTest))]
+[Trait("Type", "Integration")]
 public class IntegrationTest
 {
     protected IntegrationTestFixture Fixture { get; }

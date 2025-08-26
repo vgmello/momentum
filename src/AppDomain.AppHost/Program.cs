@@ -27,7 +27,7 @@ builder.AddLiquibaseMigrations(pgsql, dbPassword);
 
 #endif
 #if (USE_KAFKA)
-var kafka = builder.AddKafka("messaging", port: 59092);
+var kafka = builder.AddKafka("Messaging", port: 59092);
 
 kafka.WithKafkaUI(resource => resource
     .WithHostPort(port: 59093)
@@ -37,7 +37,7 @@ kafka.WithKafkaUI(resource => resource
 #endif
 #if (INCLUDE_ORLEANS)
 var storage = builder.AddAzureStorage("app-domain-azure-storage").RunAsEmulator();
-var clustering = storage.AddTables("OrleansClustering");
+var clustering = storage.AddTables("Orleans");
 var grainStorage = storage.AddBlobs("OrleansGrainState");
 
 var orleans = builder

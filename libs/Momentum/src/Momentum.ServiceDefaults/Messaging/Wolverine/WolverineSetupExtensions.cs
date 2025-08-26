@@ -100,7 +100,7 @@ public static class WolverineSetupExtensions
             opts.CodeGeneration.TypeLoadMode = codegenEnabled ? TypeLoadMode.Auto : TypeLoadMode.Static;
 
             var autoProvision = configuration.GetValue<bool>("AutoProvision");
-            var configAutoProvisionStorage = configuration.GetValue<string?>("AutoBuildMessageStorageOnStartup");
+            var configAutoProvisionStorage = configuration.GetValue<string>("AutoBuildMessageStorageOnStartup");
 
             if (!autoProvision && configAutoProvisionStorage is null)
             {

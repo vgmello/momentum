@@ -77,12 +77,12 @@ The package now leverages .NET Aspire's Kafka configuration. Add the Kafka conne
 // appsettings.json - Complete Aspire integration
 {
     "ConnectionStrings": {
-        "messaging": "localhost:9092"
+        "Messaging": "localhost:9092"
     },
     "Aspire": {
         "Confluent": {
             "Kafka": {
-                "messaging": {
+                "Messaging": {
                     "BootstrapServers": "localhost:9092",
                     "Producer": {
                         "Config": {
@@ -208,7 +208,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 // Use the advanced Aspire-Wolverine bridge
-builder.AddKafkaMessagingWithAspire("messaging", kafka =>
+builder.AddKafkaMessagingWithAspire("Messaging", kafka =>
 {
     kafka.AutoProvision();
     
