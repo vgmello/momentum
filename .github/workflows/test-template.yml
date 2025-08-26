@@ -172,7 +172,9 @@ jobs:
             $args = @("new", "mmt") + ($command -split ' (?=(?:[^"]*"[^"]*")*[^"]*$)') + @("--allow-scripts", "yes")
 
             Write-Host "Arguments: $($args -join ' ')"
-            $process = Start-Process -FilePath "dotnet" -ArgumentList $args -NoNewWindow -Wait -PassThru -RedirectStandardOutput $null -RedirectStandardError $null
+            $outputFile = "template-output.txt"
+            $errorFile = "template-error.txt"
+            $process = Start-Process -FilePath "dotnet" -ArgumentList $args -NoNewWindow -Wait -PassThru -RedirectStandardOutput $outputFile -RedirectStandardError $errorFile
 
             if ($process.ExitCode -eq 0) {
               Write-Host "✅ Template generated successfully"

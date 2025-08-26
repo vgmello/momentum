@@ -2,7 +2,7 @@
   "testCases": [
     {
       "name": "minimal-api",
-      "command": "-n MinimalApi --api --no-back-office --no-orleans --no-docs --no-sample",
+      "command": "-n MinimalApi --api true --back-office false --docs false --no-sample",
       "description": "Test minimal API-only configuration"
     },
     {
@@ -22,7 +22,7 @@
     },
     {
       "name": "kafka-only",
-      "command": "-n KafkaApp --kafka --no-aspire --port 8200",
+      "command": "-n KafkaApp --kafka --aspire false --port 8200",
       "description": "Test Kafka messaging without Aspire"
     },
     {
@@ -37,7 +37,7 @@
     },
     {
       "name": "no-kafka-no-db",
-      "command": "-n SimpleService --no-kafka --db none --no-sample",
+      "command": "-n SimpleService --kafka false --db none --no-sample",
       "description": "Test simple service without Kafka or database"
     }
   ]

@@ -525,6 +525,7 @@
             "tests/AppDomain.Tests/Unit/Invoices/**/*",
             "tests/AppDomain.Tests/Integration/Cashiers/**/*",
             "tests/AppDomain.Tests/Integration/Invoices/**/*",
+            "tests/AppDomain.Tests/Integration/_Internal/TestDataGenerators/**/*",
             "tests/AppDomain.Tests/Architecture/DomainIsolationRulesTests.cs",
             "tests/AppDomain.Tests/Architecture/MultiTenancyRulesTests.cs",
             "docs/guide/cashiers/**/*",
