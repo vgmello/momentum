@@ -62,7 +62,7 @@ New-Item -ItemType Directory -Path $nugetOutputDir | Out-Null
 Write-Host "📦 Packing packages with version $PackageVersion..."
 
 # Build arguments array to avoid Invoke-Expression parsing issues
-$packArgs = @(
+$packArguments = @(
     "pack",
     $Path,
     "--configuration", $Config,
@@ -75,20 +75,20 @@ $packArgs = @(
 if (-not [string]::IsNullOrWhiteSpace($PackArgs)) {
     # Split PackArgs properly and add to array
     $additionalArgs = $PackArgs -split '\s+(?=(?:[^"]*"[^"]*")*[^"]*$)' | Where-Object { $_ -ne '' }
-    $packArgs += $additionalArgs
+    $packArguments += $additionalArgs
 }
 
-# Debug: Show the packArgs array for troubleshooting
-Write-Host "Debug packArgs array:"
-for ($i = 0; $i -lt $packArgs.Length; $i++) {
-    Write-Host "  [$i]: '$($packArgs[$i])'"
+# Debug: Show the arguments array for troubleshooting
+Write-Host "Debug packArguments array:"
+for ($i = 0; $i -lt $packArguments.Length; $i++) {
+    Write-Host "  [$i]: '$($packArguments[$i])'"
 }
 
-$commandDisplay = "dotnet " + ($packArgs -join " ")
+$commandDisplay = "dotnet " + ($packArguments -join " ")
 Write-Host "Executing: $commandDisplay"
 
 Write-Host "About to execute dotnet with splatted args..."
-& dotnet @packArgs
+& dotnet @packArguments
 
 if ($LASTEXITCODE -ne 0) {
     Write-Error "❌ Package creation failed"
