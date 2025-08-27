@@ -167,16 +167,15 @@ jobs:
 
           # Generate template with output redirection (CRITICAL for preventing buffer overflow)
           try {
-            # Split command into arguments properly handling quotes
-            $command = '${{ matrix.test.command }}'
-            $args = @("new", "mmt") + ($command -split ' (?=(?:[^"]*"[^"]*")*[^"]*$)') + @("--allow-scripts", "yes")
+            # Build and execute the command directly
+            $fullCommand = "dotnet new mmt ${{ matrix.test.command }} --allow-scripts yes > template-output.txt 2> template-error.txt"
+            Write-Host "Executing: $fullCommand"
+            
+            # Execute the command directly
+            Invoke-Expression $fullCommand
+            $exitCode = $LASTEXITCODE
 
-            Write-Host "Arguments: $($args -join ' ')"
-            $outputFile = "template-output.txt"
-            $errorFile = "template-error.txt"
-            $process = Start-Process -FilePath "dotnet" -ArgumentList $args -NoNewWindow -Wait -PassThru -RedirectStandardOutput $outputFile -RedirectStandardError $errorFile
-
-            if ($process.ExitCode -eq 0) {
+            if ($exitCode -eq 0) {
               Write-Host "✅ Template generated successfully"
               Add-Content $env:GITHUB_OUTPUT "test-dir=$testDir"
 
@@ -185,11 +184,14 @@ jobs:
               Get-ChildItem -Force | Format-Table -AutoSize
             }
             else {
-              Write-Host "❌ Template generation failed with exit code: $($process.ExitCode)"
+              Write-Host "❌ Template generation failed with exit code: $exitCode"
 
-              # Show the exact command that failed
-              Write-Host "Failed command: dotnet $($args -join ' ')"
-              exit $process.ExitCode
+              # Show error output if available
+              if (Test-Path "template-error.txt") {
+                Write-Host "Error output:"
+                Get-Content "template-error.txt"
+              }
+              exit $exitCode
             }
           }
           catch {

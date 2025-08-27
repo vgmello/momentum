@@ -32,7 +32,7 @@
     },
     {
       "name": "custom-org",
-      "command": "-n CustomOrg --org \"Test Corp\" --no-sample",
+      "command": "-n CustomOrg --org 'Test Corp' --no-sample",
       "description": "Test with custom organization name"
     },
     {
