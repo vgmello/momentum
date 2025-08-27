@@ -392,8 +392,8 @@ The `appsettings.Development.json` file contains **local development-specific ov
 }
 ```
 
-[!WARNING]
-Do not rely on `appsettings.Development.json` for cloud deployments. This file is excluded via `.dockerignore` and will not be available in containerized environments.
+> [!WARNING]
+> Do not rely on `appsettings.Development.json` for cloud deployments. This file is excluded via `.dockerignore` and will not be available in containerized environments.
 
 ### Cloud Environment Configuration
 

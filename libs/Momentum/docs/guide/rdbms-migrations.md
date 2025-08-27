@@ -8,8 +8,8 @@ date: 2024-01-15
 
 Momentum uses Liquibase for database schema evolution, providing enterprise-grade migration management with support for multiple environments, rollbacks, and team collaboration. This guide covers migration patterns, deployment strategies, and best practices for maintaining database schemas in production applications.
 
-[!NOTE]
-**Template Examples Notice**: This documentation shows patterns using example domains like `cashiers` and `invoices` from the Momentum template. These are **not requirements** for your application. Replace these examples with your actual business domains (e.g., `orders`, `customers`, `products`, etc.). The `AppDomain` prefix is also a placeholder that gets replaced with your project name when using the template.
+> [!NOTE]
+> **Template Examples Notice**: This documentation shows patterns using example domains like `cashiers` and `invoices` from the Momentum template. These are **not requirements** for your application. Replace these examples with your actual business domains (e.g., `orders`, `customers`, `products`, etc.). The `AppDomain` prefix is also a placeholder that gets replaced with your project name when using the template.
 
 ## Overview
 
@@ -700,8 +700,8 @@ Validation Failed:
           app_domain/customers/tables/customers.sql::dev_user::create customers table
 ```
 
-[!NOTE]
-This example shows the error format using `customers` instead of the template's `cashiers` entity.
+> [!NOTE]
+> This example shows the error format using `customers` instead of the template's `cashiers` entity.
 
 **Solutions:**
 
