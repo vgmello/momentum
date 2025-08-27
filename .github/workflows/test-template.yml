@@ -267,6 +267,14 @@ jobs:
 
           Write-Host "🧪 Running tests for: $projectName"
 
+          # Navigate to the generated project directory
+          if (Test-Path $projectName) {
+            Set-Location $projectName
+            Write-Host "Switched to project directory: $projectName"
+          } else {
+            Write-Host "⚠️ Project directory '$projectName' not found, staying in current directory"
+          }
+
           # Check if tests exist first
           $testProjects = Get-ChildItem -Path . -Recurse -Filter "*.Tests.csproj"
           if ($testProjects.Count -eq 0) {
