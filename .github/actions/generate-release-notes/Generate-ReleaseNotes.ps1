@@ -20,6 +20,16 @@ if ($Tag -match '^template-v') {
     $projectName = "Momentum Template"
 }
 
+# Get repository information for GitHub links
+$repoUrl = git config --get remote.origin.url
+if ($repoUrl -match 'github\.com[:/](.+?)(?:\.git)?$') {
+    $repoPath = $Matches[1]
+    $githubBaseUrl = "https://github.com/$repoPath"
+}
+else {
+    $githubBaseUrl = $null
+}
+
 Write-Host "🔍 Auto-detected project type: $projectType (from tag: $Tag)"
 
 # Find the last release tag (exclude current tag if it exists)
@@ -56,7 +66,19 @@ if ($ReleaseType -eq "prerelease") {
     $content += ""
     $content += $commits
     $content += ""
-    $content += "**Full Changelog**: $(if ($lastRelease) { $lastRelease } else { 'beginning' })...$Tag"
+    
+    # Generate Full Changelog link for prerelease
+    if ($githubBaseUrl) {
+        $changelogUrl = if ($lastRelease) { 
+            "$githubBaseUrl/compare/$lastRelease...$Tag" 
+        } else { 
+            "$githubBaseUrl/commits/$Tag" 
+        }
+        $content += "**Full Changelog**: [$changelogUrl]($changelogUrl)"
+    }
+    else {
+        $content += "**Full Changelog**: $(if ($lastRelease) { $lastRelease } else { 'beginning' })...$Tag"
+    }
     $content += ""
     $content += "---"
     $content += "📊 **Statistics**: $commitCount commits | $filesChanged files changed"
@@ -84,7 +106,19 @@ else {
     $content += ""
     $content += $commits
     $content += ""
-    $content += "**Full Changelog**: $(if ($lastRelease) { $lastRelease } else { 'beginning' })...$Tag"
+    
+    # Generate Full Changelog link for stable release
+    if ($githubBaseUrl) {
+        $changelogUrl = if ($lastRelease) { 
+            "$githubBaseUrl/compare/$lastRelease...$Tag" 
+        } else { 
+            "$githubBaseUrl/commits/$Tag" 
+        }
+        $content += "**Full Changelog**: [$changelogUrl]($changelogUrl)"
+    }
+    else {
+        $content += "**Full Changelog**: $(if ($lastRelease) { $lastRelease } else { 'beginning' })...$Tag"
+    }
     $content += ""
     $content += "---"
     $content += "📊 **Statistics**: $commitCount commits | $filesChanged files changed"
