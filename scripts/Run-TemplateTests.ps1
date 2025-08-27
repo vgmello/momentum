@@ -411,11 +411,19 @@ function Invoke-TestCategory {
         'component-isolation' {
             Write-ColoredMessage -Level 'INFO' -Message "Running Category 1: Component Isolation Tests"
 
-            $components = @('api', 'back-office', 'orleans', 'aspire', 'docs')
+            $components = @(
+                @{ Name = 'api'; TestName = 'TestApiOnly' },
+                @{ Name = 'back-office'; TestName = 'TestBackOfficeOnly' },
+                @{ Name = 'orleans'; TestName = 'TestOrleansOnly' },
+                @{ Name = 'aspire'; TestName = 'TestAspireOnly' },
+                @{ Name = 'docs'; TestName = 'TestDocsOnly' }
+            )
             foreach ($component in $components) {
-                $otherComponents = $components | Where-Object { $_ -ne $component } | ForEach-Object { "--$_ false" }
-                $params = "--$component true " + ($otherComponents -join ' ')
-                Test-Template -Name "Test$((Get-Culture).TextInfo.ToTitleCase($component))Only" -Parameters $params -TestCategory 'Component Isolation'
+                $otherComponents = $components |
+                    Where-Object { $_.Name -ne $component.Name } |
+                    ForEach-Object { "--$($_.Name) false" }
+                $params = "--$($component.Name) true " + ($otherComponents -join ' ')
+                Test-Template -Name $component.TestName -Parameters $params -TestCategory 'Component Isolation'
             }
 
         }
@@ -423,9 +431,13 @@ function Invoke-TestCategory {
         'database-config' {
             Write-ColoredMessage -Level 'INFO' -Message "Running Category 2: Database Configuration Tests"
 
-            $databases = @('none', 'npgsql', 'liquibase')
+            $databases = @(
+                @{ Name = 'none'; TestName = 'TestDbNone' },
+                @{ Name = 'npgsql'; TestName = 'TestDbNpgsql' },
+                @{ Name = 'liquibase'; TestName = 'TestDbLiquibase' }
+            )
             foreach ($db in $databases) {
-                Test-Template -Name "TestDb$((Get-Culture).TextInfo.ToTitleCase($db))" -Parameters "--db $db" -TestCategory 'Database Config'
+                Test-Template -Name $db.TestName -Parameters "--db $($db.Name)" -TestCategory 'Database Config'
             }
 
             # Test database + infrastructure combinations
@@ -453,9 +465,15 @@ function Invoke-TestCategory {
         'library-config' {
             Write-ColoredMessage -Level 'INFO' -Message "Running Category 5: Library Configuration Tests"
 
-            $libraries = @('defaults', 'api', 'ext', 'kafka', 'generators')
+            $libraries = @(
+                @{ Name = 'defaults'; TestName = 'TestLibDefaults' },
+                @{ Name = 'api'; TestName = 'TestLibApi' },
+                @{ Name = 'ext'; TestName = 'TestLibExt' },
+                @{ Name = 'kafka'; TestName = 'TestLibKafka' },
+                @{ Name = 'generators'; TestName = 'TestLibGenerators' }
+            )
             foreach ($lib in $libraries) {
-                Test-Template -Name "TestLib$((Get-Culture).TextInfo.ToTitleCase($lib))" -Parameters "--libs $lib" -TestCategory 'Library Config'
+                Test-Template -Name $lib.TestName -Parameters "--libs $($lib.Name)" -TestCategory 'Library Config'
             }
 
             # Test library combinations
