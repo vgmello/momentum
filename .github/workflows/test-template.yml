@@ -277,22 +277,30 @@ jobs:
 
           Add-Content $env:GITHUB_OUTPUT "has-tests=true"
 
-          # Run tests with detailed output
-          try {
-            dotnet test `
-              --filter "FullyQualifiedName~.Unit." `
-              --configuration Release `
-              --logger "trx;LogFileName=${{ matrix.test.name }}.trx" `
-              --logger "console;verbosity=normal" `
-              --results-directory ./TestResults `
-              --collect:"XPlat Code Coverage" `
-              --verbosity minimal
-
-            $testExitCode = $LASTEXITCODE
-          }
-          catch {
-            Write-Host "❌ Test execution failed: $($_.Exception.Message)"
+          # Find solution file
+          $solutionFile = Get-ChildItem -Filter "*.slnx" | Select-Object -First 1
+          if (-not $solutionFile) {
+            Write-Host "❌ No solution file found"
             $testExitCode = 1
+          } else {
+            # Run tests with detailed output
+            Write-Host "Running tests on solution: $($solutionFile.Name)"
+            try {
+              dotnet test $solutionFile.Name `
+                --filter "FullyQualifiedName~.Unit." `
+                --configuration Release `
+                --logger "trx;LogFileName=${{ matrix.test.name }}.trx" `
+                --logger "console;verbosity=normal" `
+                --results-directory ./TestResults `
+                --collect:"XPlat Code Coverage" `
+                --verbosity minimal
+
+              $testExitCode = $LASTEXITCODE
+            }
+            catch {
+              Write-Host "❌ Test execution failed: $($_.Exception.Message)"
+              $testExitCode = 1
+            }
           }
 
             if ($testExitCode -eq 0) {
