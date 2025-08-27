@@ -140,8 +140,8 @@ The template offers comprehensive configuration options:
 -   `--libs`: Include Momentum libraries as project references
 -   `--lib-name`: Custom prefix to replace "Momentum" in library names
 
-[!NOTE]
-For complete parameter documentation and all available combinations, see the [`template.json`](.template.config/template.json) file and the [Template Options Guide](https://momentumlib.net/guide/template-options/) for detailed use cases and examples.
+> [!NOTE]
+> For complete parameter documentation and all available combinations, see the [`template.json`](.template.config/template.json) file and the [Template Options Guide](https://momentumlib.net/guide/template-options/) for detailed use cases and examples.
 
 ## Understanding the Generated Solution
 

@@ -121,8 +121,8 @@ public record InvoiceCreated(
 ) : IIntegrationEvent;
 ```
 
-[!TIP]
-XML documentation comments on integration events are used to auto-generate event schema documentation.
+> [!TIP]
+> XML documentation comments on integration events are used to auto-generate event schema documentation.
 
 ## Event Publishing
 

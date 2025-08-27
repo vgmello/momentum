@@ -32,8 +32,8 @@ Control which projects are generated in your solution:
 | `--aspire`      | bool | true    | Generate .NET Aspire orchestration project for local development   |
 | `--docs`        | bool | true    | Generate VitePress documentation project                           |
 
-[!TIP]
-When no specific components are specified (all defaults), the template generates a complete solution with all components included.
+> [!TIP]
+> When no specific components are specified (all defaults), the template generates a complete solution with all components included.
 
 ### Infrastructure Configuration Parameters
 
@@ -80,8 +80,8 @@ Control how Momentum libraries are included in your solution:
 -   **`kafka`**: Include Kafka messaging extensions
 -   **`generators`**: Include source generators for DbCommand and other features
 
-[!NOTE]
-Multiple library options can be specified: `--libs defaults,api,ext`
+> [!NOTE]
+> Multiple library options can be specified: `--libs defaults,api,ext`
 
 ## Conditional Compilation System
 

@@ -405,8 +405,8 @@ Configuration is applied in this order (later sources override earlier ones):
 3. Environment variables (deployment-specific overrides)
 4. Cloud secret providers (production secrets)
 
-[!IMPORTANT]
-Never store secrets in configuration files. Use cloud-native secret management for production deployments.
+> [!IMPORTANT]
+> Never store secrets in configuration files. Use cloud-native secret management for production deployments.
 
 ## Deployment
 
