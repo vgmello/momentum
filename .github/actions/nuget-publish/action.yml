@@ -46,15 +46,29 @@ runs:
     - name: Publish NuGet packages
       id: publish
       shell: pwsh
+      env:
+        NUGET_API_KEY: ${{ inputs.nuget-api-key }}
       run: |
+        # Mask the API key in logs
+        if ($env:NUGET_API_KEY -ne "") {
+          Write-Host "::add-mask::$($env:NUGET_API_KEY)"
+        }
+        
         $args = @(
           "-Path", "${{ inputs.path }}",
           "-Config", "${{ inputs.config }}",
           "-PackageVersion", "${{ inputs.package-version }}",
-          "-PackArgs", "${{ inputs.pack-args }}",
-          "-NugetApiKey", "${{ inputs.nuget-api-key }}",
+          "-NugetApiKey", $env:NUGET_API_KEY,
           "-NugetSource", "${{ inputs.nuget-source }}"
         )
+        
+        # Parse pack-args as an array if provided
+        $packArgsInput = "${{ inputs.pack-args }}"
+        if (-not [string]::IsNullOrWhiteSpace($packArgsInput)) {
+          # Split on spaces but preserve quoted strings
+          $packArgsArray = $packArgsInput -split '\s+(?=(?:[^"]*"[^"]*")*[^"]*$)' | Where-Object { $_ -ne '' }
+          $args += "-PackArgs", $packArgsArray
+        }
         
         if ("${{ inputs.skip-duplicate }}" -eq "true") {
           $args += "-SkipDuplicate"

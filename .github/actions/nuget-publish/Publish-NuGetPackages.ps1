@@ -3,23 +3,23 @@ param(
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
     [string]$Path,
-    
+
     [string]$Config = "Release",
-    
+
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
     [string]$PackageVersion,
-    
-    [string]$PackArgs = "",
-    
+
+    [string[]]$PackArgs = @(),
+
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
     [string]$NugetApiKey,
-    
+
     [string]$NugetSource = "https://api.nuget.org/v3/index.json",
-    
+
     [switch]$SkipDuplicate,
-    
+
     [switch]$DryRun
 )
 
@@ -78,12 +78,11 @@ $packArguments = @(
 )
 
 # Add additional pack arguments if provided
-if (-not [string]::IsNullOrWhiteSpace($PackArgs)) {
-    # Split PackArgs properly and add to array
-    $additionalArgs = $PackArgs -split '\s+(?=(?:[^"]*"[^"]*")*[^"]*$)' | Where-Object { $_ -ne '' }
-    $packArguments += $additionalArgs
+if ($PackArgs.Count -gt 0) {
+    $packArguments += $PackArgs
 }
 
+# Display command without sensitive information
 $commandDisplay = "dotnet " + ($packArguments -join " ")
 Write-Host "Executing: $commandDisplay"
 & dotnet @packArguments
@@ -118,34 +117,38 @@ Write-GitHubMultilineOutput -Name "packages" -Values ($packages | ForEach-Object
 # Publish to NuGet
 if (-not $DryRun) {
     $sourceName = if ($NugetSource -like "*nugettest.org*") { "NuGet Test" } else { "NuGet.org" }
-    
+
     Write-Host "🚀 Publishing packages to $sourceName..."
     Write-Host "   Source: $NugetSource"
-    
+
     $publishedList = @()
     $successCount = 0
     $totalCount = $packages.Count
-    
+    $currentPackage = 0
+
     foreach ($package in $packages) {
-        $totalCount++
+        $currentPackage++
         $pkgName = $package.Name
         Write-Host ""
-        Write-Host "[$totalCount] Publishing $pkgName..."
-        
+        Write-Host "[$currentPackage/$totalCount] Publishing $pkgName..."
+
         $pushArgs = @(
             "nuget", "push", $package.FullName,
-            "--api-key", $NugetApiKey,
             "--source", $NugetSource,
             "--no-symbols"
         )
-        
+
         if ($SkipDuplicate) {
             $pushArgs += "--skip-duplicate"
         }
-        
+
+        # Add API key last to make it easier to filter from logs
+        $pushArgs += "--api-key", $NugetApiKey
+
+        # Execute without displaying the full command (which contains the API key)
         $result = & dotnet @pushArgs 2>&1
         $exitCode = $LASTEXITCODE
-        
+
         if ($exitCode -eq 0) {
             Write-Host "   ✅ Successfully published $pkgName"
             $publishedList += $pkgName
@@ -161,7 +164,7 @@ if (-not $DryRun) {
             exit 1
         }
     }
-    
+
     Write-Host ""
     Write-Host "🎉 Published $successCount/$totalCount packages to $sourceName!"
     Write-GitHubMultilineOutput -Name "packages" -Values $publishedList
