@@ -400,6 +400,7 @@
         "**/docs/reference/*",
         "**/docs/node_modules/**/*",
         "libs/Momentum/src/Momentum.Extensions.Abstractions/**/*",
+        "libs/Momentum/src/Momentum.Extensions.XmlDocs/**/*",
         "libs/Momentum/src/Momentum.Extensions.EventMarkdownGenerator/**/*",
         "debug.symbols.txt"
       ],
@@ -448,7 +449,8 @@
             "src/AppDomain.Api/**/*",
             "tests/AppDomain.Tests/Unit/Infrastructure/OrleansExtensionsTests.cs",
             "tests/AppDomain.Tests/Integration/Cashiers/**/*",
-            "tests/AppDomain.Tests/Integration/Invoices/**/*"
+            "tests/AppDomain.Tests/Integration/Invoices/**/*",
+            "tests/AppDomain.Tests/Integration/_Internal/TestDataGenerators/**/*",
           ]
         },
         {
