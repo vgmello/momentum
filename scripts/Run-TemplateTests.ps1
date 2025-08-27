@@ -144,7 +144,7 @@ function Get-ErrorSummary {
         Where-Object { $_.Trim() -and $_ -match $Filter } |
         Select-Object -First $MaxLines
 
-    if ($errorLines.Count -gt 0) {
+    if (@($errorLines).Count -gt 0) {
         return ' - ' + ($errorLines -join '; ')
     }
 
@@ -264,7 +264,7 @@ function Test-Template {
         Set-Location -Path $Name
 
         $projects = @(Get-ChildItem -Path . -Filter "*.csproj" -Recurse -ErrorAction SilentlyContinue)
-        $projectCount = $projects.Count
+        $projectCount = @($projects).Count
 
         $tempBuildOut = [System.IO.Path]::GetTempFileName()
         $tempBuildErr = [System.IO.Path]::GetTempFileName()
@@ -611,14 +611,14 @@ function Invoke-Cleanup {
         $remainingDirs = @(Get-ChildItem -Path $script:ExecutionTestDir -Directory -ErrorAction SilentlyContinue)
     }
 
-    if ($KeepResultsWithErrors -and $script:FailedTests -gt 0 -and $remainingDirs.Count -gt 0) {
+    if ($KeepResultsWithErrors -and $script:FailedTests -gt 0 -and @($remainingDirs).Count -gt 0) {
         Write-ColoredMessage -Level 'WARN' -Message "Failed test results preserved: $script:ExecutionTestDir"
-        Write-ColoredMessage -Level 'INFO' -Message "$($remainingDirs.Count) test directories preserved"
+        Write-ColoredMessage -Level 'INFO' -Message "$(@($remainingDirs).Count) test directories preserved"
         return
     }
 
     # Clean up the execution directory if empty or not preserving
-    if ((Test-Path -Path $script:ExecutionTestDir) -and ($remainingDirs.Count -eq 0)) {
+    if ((Test-Path -Path $script:ExecutionTestDir) -and (@($remainingDirs).Count -eq 0)) {
         try {
             [System.IO.Directory]::Delete($script:ExecutionTestDir, $true)
             Write-ColoredMessage -Level 'INFO' -Message "Cleaned up empty execution directory: $script:ExecutionTimestamp"

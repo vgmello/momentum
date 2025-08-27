@@ -495,7 +495,12 @@
         {
           "condition": "(!USE_LIQUIBASE)",
           "exclude": [
-            "src/AppDomain.AppHost/Extensions/LiquibaseExtensions.cs",
+            "src/AppDomain.AppHost/Extensions/LiquibaseExtensions.cs"
+          ]
+        },
+        {
+          "condition": "(!USE_DB)",
+          "exclude": [
             "tests/AppDomain.Tests/Integration/_Internal/Containers/LiquibaseMigrationContainer.cs"
           ]
         },
