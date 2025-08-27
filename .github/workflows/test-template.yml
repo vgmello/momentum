@@ -304,6 +304,20 @@ jobs:
                 --verbosity minimal
 
               $testExitCode = $LASTEXITCODE
+              
+              # Check if the failure was due to no tests matching filter (expected for --no-sample)
+              if ($testExitCode -ne 0) {
+                if (Test-Path "./TestResults") {
+                  $trxFiles = Get-ChildItem "./TestResults" -Filter "*.trx"
+                  if ($trxFiles.Count -gt 0) {
+                    $trxContent = Get-Content $trxFiles[0].FullName -Raw
+                    if ($trxContent -match "No test matches the given testcase filter") {
+                      Write-Host "ℹ️ No unit tests found matching filter - this is expected for --no-sample configurations"
+                      $testExitCode = 0
+                    }
+                  }
+                }
+              }
             }
             catch {
               Write-Host "❌ Test execution failed: $($_.Exception.Message)"
