@@ -45,11 +45,17 @@
         <File Path="ProjectREADME.md" />
         <!--#endif -->
     </Folder>
-    <!--#if (HAS_BACKEND) -->
+    <!--#if (HAS_BACKEND || INCLUDE_API) -->
     <Folder Name="/Tests/">
+        <!--#if (INCLUDE_API) -->
         <Project Path="tests\AppDomain.Tests.E2E\AppDomain.Tests.E2E.csproj" />
+        <!--#endif -->
+        <!--#if (HAS_BACKEND) -->
         <Project Path="tests\AppDomain.Tests\AppDomain.Tests.csproj" />
+        <!--#endif -->
     </Folder>
+    <!--#endif -->
+    <!--#if (HAS_BACKEND) -->
     <Project Path="src\AppDomain\AppDomain.csproj" />
     <Project Path="src\AppDomain.Contracts\AppDomain.Contracts.csproj" />
     <!--#endif -->

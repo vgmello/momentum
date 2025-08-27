@@ -393,6 +393,8 @@
         "**/*.user",
         "**/*.lock.json",
         "**/_temp/**/*",
+        "**/scripts/**/*",
+        "**/_template_tests/**/*",
         "**/.local/**/*",
         "**/.vitepress/cache/**/*",
         "**/.vitepress/dist/**/*",
@@ -447,10 +449,11 @@
           "condition": "(!INCLUDE_API)",
           "exclude": [
             "src/AppDomain.Api/**/*",
+            "tests/AppDomain.Tests.E2E/**/*",
             "tests/AppDomain.Tests/Unit/Infrastructure/OrleansExtensionsTests.cs",
             "tests/AppDomain.Tests/Integration/Cashiers/**/*",
             "tests/AppDomain.Tests/Integration/Invoices/**/*",
-            "tests/AppDomain.Tests/Integration/_Internal/TestDataGenerators/**/*",
+            "tests/AppDomain.Tests/Integration/_Internal/TestDataGenerators/**/*"
           ]
         },
         {

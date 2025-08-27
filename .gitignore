@@ -441,5 +441,6 @@ temp/
 requirements/
 
 _temp
+_template_tests/
 .pnpm-store/
 docs/obj**
