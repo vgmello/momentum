@@ -27,13 +27,13 @@ using Testcontainers.Kafka;
 using Grpc.Net.Client;
 using System.Net;
 using AppDomain.Api;
-#if INCLUDE_ORLEANS
-using AppDomain.Api.Infrastructure.Extensions;
-#endif
 using AppDomain.Infrastructure;
 using Momentum.Extensions.Messaging.Kafka;
 using Momentum.ServiceDefaults.Api;
 using Momentum.ServiceDefaults.HealthChecks;
+#endif
+#if INCLUDE_API && INCLUDE_ORLEANS
+using AppDomain.Api.Infrastructure.Extensions;
 #endif
 
 [assembly: DomainAssembly(typeof(IAppDomainAssembly))]
