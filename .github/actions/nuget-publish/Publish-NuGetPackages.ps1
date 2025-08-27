@@ -78,16 +78,8 @@ if (-not [string]::IsNullOrWhiteSpace($PackArgs)) {
     $packArguments += $additionalArgs
 }
 
-# Debug: Show the arguments array for troubleshooting
-Write-Host "Debug packArguments array:"
-for ($i = 0; $i -lt $packArguments.Length; $i++) {
-    Write-Host "  [$i]: '$($packArguments[$i])'"
-}
-
 $commandDisplay = "dotnet " + ($packArguments -join " ")
 Write-Host "Executing: $commandDisplay"
-
-Write-Host "About to execute dotnet with splatted args..."
 & dotnet @packArguments
 
 if ($LASTEXITCODE -ne 0) {
