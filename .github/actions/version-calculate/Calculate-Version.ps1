@@ -2,13 +2,12 @@
 param(
     [ValidateNotNullOrEmpty()]
     [string]$VersionFile = "libs/Momentum/version.txt",
-    
+
     [ValidateSet("stable", "prerelease")]
     [string]$ReleaseType = "stable",
-    
-    [ValidateSet("true", "false")]
+
     [string]$CheckChanges = "false",
-    
+
     [ValidateNotNullOrEmpty()]
     [string]$ChangePath = "libs/Momentum/src"
 )
@@ -31,24 +30,27 @@ function Compare-Version {
     return $v1.CompareTo($v2)
 }
 
-# Check for consumer-visible changes
+if ([string]::IsNullOrWhiteSpace($CheckChanges)) {
+    $CheckChanges = "false"
+}
+
 $skip = $false
 if ($CheckChanges -eq "true") {
     Write-Host "🔍 Checking for consumer-visible changes in $ChangePath..."
-    
+
     try {
         $changedFiles = git diff --name-only HEAD~1 HEAD | Where-Object { $_ -like "$ChangePath*" }
-        
+
         if (-not $changedFiles) {
             Write-Host "No changes in $ChangePath, skipping release"
             $skip = $true
         }
         else {
-            $consumerChanges = $changedFiles | Where-Object { 
-                $_ -match '\.(cs|csproj|props|targets)$' -and 
+            $consumerChanges = $changedFiles | Where-Object {
+                $_ -match '\.(cs|csproj|props|targets)$' -and
                 $_ -notmatch '(Test|\.Tests\.|\.md$|\.gitignore$|\.editorconfig$)'
             }
-            
+
             if (-not $consumerChanges) {
                 Write-Host "No consumer-visible changes, skipping release"
                 $skip = $true
@@ -129,7 +131,7 @@ if ($latestPrerelease) {
     $hasPrerelease = $true
     Write-GitHubOutput -Name "has_prerelease" -Value "true"
     Write-GitHubOutput -Name "latest_prerelease" -Value $latestPrerelease
-    
+
     if ($latestPrerelease -match '-pre\.(\d+)$') {
         $prereleaseSequence = [int]$Matches[1]
     }

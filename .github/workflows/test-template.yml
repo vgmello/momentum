@@ -210,7 +210,7 @@ jobs:
             dotnet build $solutionFiles[0].Name --configuration Release --verbosity minimal
           }
           else {
-            # No solution file, find and build all project files
+            # No solution file, find and build individual project files
             $projectFiles = Get-ChildItem -Recurse -Filter "*.csproj" -ErrorAction SilentlyContinue
 
             if ($projectFiles.Count -eq 0) {
@@ -223,7 +223,21 @@ jobs:
               Write-Host "  - $($project.Name)"
             }
 
-            dotnet build --configuration Release --verbosity minimal
+            # Build each project individually to avoid MSB1003 error
+            $buildFailed = $false
+            foreach ($project in $projectFiles) {
+              Write-Host "Building: $($project.Name)"
+              dotnet build $project.FullName --configuration Release --verbosity minimal
+              if ($LASTEXITCODE -ne 0) {
+                Write-Host "❌ Build failed for: $($project.Name)"
+                $buildFailed = $true
+                break
+              }
+            }
+            
+            if ($buildFailed) {
+              exit 1
+            }
           }
 
           if ($LASTEXITCODE -eq 0) {

@@ -61,17 +61,27 @@ New-Item -ItemType Directory -Path $nugetOutputDir | Out-Null
 
 Write-Host "📦 Packing packages with version $PackageVersion..."
 
-$packCommand = @"
-dotnet pack "$Path" `
-  --configuration $Config `
-  --no-build `
-  -p:PackageVersion=$PackageVersion `
-  --output "$nugetOutputDir" `
-  $PackArgs
-"@
+# Build arguments array to avoid Invoke-Expression parsing issues
+$packArgs = @(
+    "pack",
+    $Path,
+    "--configuration", $Config,
+    "--no-build",
+    "-p:PackageVersion=$PackageVersion",
+    "--output", $nugetOutputDir
+)
 
-Write-Host "Executing: $packCommand"
-$result = Invoke-Expression $packCommand
+# Add additional pack arguments if provided
+if (-not [string]::IsNullOrWhiteSpace($PackArgs)) {
+    # Split PackArgs properly and add to array
+    $additionalArgs = $PackArgs -split '\s+(?=(?:[^"]*"[^"]*")*[^"]*$)' | Where-Object { $_ -ne '' }
+    $packArgs += $additionalArgs
+}
+
+$commandDisplay = "dotnet " + ($packArgs -join " ")
+Write-Host "Executing: $commandDisplay"
+
+& dotnet @packArgs
 
 if ($LASTEXITCODE -ne 0) {
     Write-Error "❌ Package creation failed"
