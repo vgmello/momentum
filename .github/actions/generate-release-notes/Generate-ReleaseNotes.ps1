@@ -30,6 +30,23 @@ else {
     $githubBaseUrl = $null
 }
 
+# Function to generate Full Changelog link
+function Get-ChangelogLink {
+    param($LastRelease, $Tag, $GithubBaseUrl)
+    
+    if ($GithubBaseUrl) {
+        $changelogUrl = if ($LastRelease) { 
+            "$GithubBaseUrl/compare/$LastRelease...$Tag" 
+        } else { 
+            "$GithubBaseUrl/commits/$Tag" 
+        }
+        return "**Full Changelog**: [$changelogUrl]($changelogUrl)"
+    }
+    else {
+        return "**Full Changelog**: $(if ($LastRelease) { $LastRelease } else { 'beginning' })...$Tag"
+    }
+}
+
 Write-Host "🔍 Auto-detected project type: $projectType (from tag: $Tag)"
 
 # Find the last release tag (exclude current tag if it exists)
@@ -66,19 +83,7 @@ if ($ReleaseType -eq "prerelease") {
     $content += ""
     $content += $commits
     $content += ""
-    
-    # Generate Full Changelog link for prerelease
-    if ($githubBaseUrl) {
-        $changelogUrl = if ($lastRelease) { 
-            "$githubBaseUrl/compare/$lastRelease...$Tag" 
-        } else { 
-            "$githubBaseUrl/commits/$Tag" 
-        }
-        $content += "**Full Changelog**: [$changelogUrl]($changelogUrl)"
-    }
-    else {
-        $content += "**Full Changelog**: $(if ($lastRelease) { $lastRelease } else { 'beginning' })...$Tag"
-    }
+    $content += (Get-ChangelogLink -LastRelease $lastRelease -Tag $Tag -GithubBaseUrl $githubBaseUrl)
     $content += ""
     $content += "---"
     $content += "📊 **Statistics**: $commitCount commits | $filesChanged files changed"
@@ -106,19 +111,7 @@ else {
     $content += ""
     $content += $commits
     $content += ""
-    
-    # Generate Full Changelog link for stable release
-    if ($githubBaseUrl) {
-        $changelogUrl = if ($lastRelease) { 
-            "$githubBaseUrl/compare/$lastRelease...$Tag" 
-        } else { 
-            "$githubBaseUrl/commits/$Tag" 
-        }
-        $content += "**Full Changelog**: [$changelogUrl]($changelogUrl)"
-    }
-    else {
-        $content += "**Full Changelog**: $(if ($lastRelease) { $lastRelease } else { 'beginning' })...$Tag"
-    }
+    $content += (Get-ChangelogLink -LastRelease $lastRelease -Tag $Tag -GithubBaseUrl $githubBaseUrl)
     $content += ""
     $content += "---"
     $content += "📊 **Statistics**: $commitCount commits | $filesChanged files changed"
