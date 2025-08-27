@@ -6,7 +6,7 @@ param(
     [ValidateSet("stable", "prerelease")]
     [string]$ReleaseType = "stable",
 
-    [string]$CheckChanges = "false",
+    [switch]$CheckChanges,
 
     [ValidateNotNullOrEmpty()]
     [string]$ChangePath = "libs/Momentum/src"
@@ -24,18 +24,25 @@ function Write-GitHubOutput {
 }
 
 function Compare-Version {
-    param([string]$Version1, [string]$Version2)
-    $v1 = [Version]::Parse($Version1)
-    $v2 = [Version]::Parse($Version2)
-    return $v1.CompareTo($v2)
-}
-
-if ([string]::IsNullOrWhiteSpace($CheckChanges)) {
-    $CheckChanges = "false"
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$Version1, 
+        [Parameter(Mandatory=$true)]
+        [string]$Version2
+    )
+    try {
+        $v1 = [Version]::Parse($Version1)
+        $v2 = [Version]::Parse($Version2)
+        return $v1.CompareTo($v2)
+    }
+    catch {
+        Write-Error "Failed to compare versions '$Version1' and '$Version2': $_"
+        throw
+    }
 }
 
 $skip = $false
-if ($CheckChanges -eq "true") {
+if ($CheckChanges) {
     Write-Host "🔍 Checking for consumer-visible changes in $ChangePath..."
 
     try {

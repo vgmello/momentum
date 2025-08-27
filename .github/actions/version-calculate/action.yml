@@ -40,8 +40,14 @@ runs:
       id: calculate
       shell: pwsh
       run: |
-        & "${{ github.action_path }}/Calculate-Version.ps1" `
-          -VersionFile "${{ inputs.version-file }}" `
-          -ReleaseType "${{ inputs.release-type }}" `
-          -CheckChanges "${{ inputs.check-changes }}" `
-          -ChangePath "${{ inputs.change-path }}"
+        $args = @(
+          "-VersionFile", "${{ inputs.version-file }}",
+          "-ReleaseType", "${{ inputs.release-type }}",
+          "-ChangePath", "${{ inputs.change-path }}"
+        )
+        
+        if ("${{ inputs.check-changes }}" -eq "true") {
+          $args += "-CheckChanges"
+        }
+        
+        & "${{ github.action_path }}/Calculate-Version.ps1" @args

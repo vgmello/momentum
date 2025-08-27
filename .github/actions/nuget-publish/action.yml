@@ -47,12 +47,21 @@ runs:
       id: publish
       shell: pwsh
       run: |
-        & "${{ github.action_path }}/Publish-NuGetPackages.ps1" `
-          -Path "${{ inputs.path }}" `
-          -Config "${{ inputs.config }}" `
-          -PackageVersion "${{ inputs.package-version }}" `
-          -PackArgs "${{ inputs.pack-args }}" `
-          -NugetApiKey "${{ inputs.nuget-api-key }}" `
-          -NugetSource "${{ inputs.nuget-source }}" `
-          -SkipDuplicate "${{ inputs.skip-duplicate }}" `
-          -DryRun "${{ inputs.dry-run }}"
+        $args = @(
+          "-Path", "${{ inputs.path }}",
+          "-Config", "${{ inputs.config }}",
+          "-PackageVersion", "${{ inputs.package-version }}",
+          "-PackArgs", "${{ inputs.pack-args }}",
+          "-NugetApiKey", "${{ inputs.nuget-api-key }}",
+          "-NugetSource", "${{ inputs.nuget-source }}"
+        )
+        
+        if ("${{ inputs.skip-duplicate }}" -eq "true") {
+          $args += "-SkipDuplicate"
+        }
+        
+        if ("${{ inputs.dry-run }}" -eq "true") {
+          $args += "-DryRun"
+        }
+        
+        & "${{ github.action_path }}/Publish-NuGetPackages.ps1" @args

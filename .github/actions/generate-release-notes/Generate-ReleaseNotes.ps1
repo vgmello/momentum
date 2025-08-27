@@ -1,13 +1,20 @@
+[CmdletBinding()]
 param(
     [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
     [string]$Version,
     
     [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
     [string]$Tag,
     
+    [ValidateSet("stable", "prerelease")]
     [string]$ReleaseType = "stable",
+    
     [string]$OutputFile = "release_notes.md"
 )
+
+$ErrorActionPreference = "Stop"
 
 # Auto-detect project type from tag pattern
 $projectType = "libraries"

@@ -1,23 +1,29 @@
+[CmdletBinding()]
 param(
     [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
     [string]$Path,
     
     [string]$Config = "Release",
     
     [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
     [string]$PackageVersion,
     
     [string]$PackArgs = "",
     
     [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
     [string]$NugetApiKey,
     
     [string]$NugetSource = "https://api.nuget.org/v3/index.json",
     
-    [string]$SkipDuplicate = "true",
+    [switch]$SkipDuplicate,
     
-    [string]$DryRun = "false"
+    [switch]$DryRun
 )
+
+$ErrorActionPreference = "Stop"
 
 function Write-GitHubOutput {
     param([string]$Name, [string]$Value)
@@ -110,7 +116,7 @@ foreach ($pkg in $packages) {
 Write-GitHubMultilineOutput -Name "packages" -Values ($packages | ForEach-Object { $_.FullName })
 
 # Publish to NuGet
-if ($DryRun -ne "true") {
+if (-not $DryRun) {
     $sourceName = if ($NugetSource -like "*nugettest.org*") { "NuGet Test" } else { "NuGet.org" }
     
     Write-Host "🚀 Publishing packages to $sourceName..."
@@ -133,7 +139,7 @@ if ($DryRun -ne "true") {
             "--no-symbols"
         )
         
-        if ($SkipDuplicate -eq "true") {
+        if ($SkipDuplicate) {
             $pushArgs += "--skip-duplicate"
         }
         
@@ -145,7 +151,7 @@ if ($DryRun -ne "true") {
             $publishedList += $pkgName
             $successCount++
         }
-        elseif ($exitCode -eq 1 -and $SkipDuplicate -eq "true" -and $result -match "already exists") {
+        elseif ($exitCode -eq 1 -and $SkipDuplicate -and $result -match "already exists") {
             Write-Host "   ⏭️ Skipped $pkgName (may already exist)"
             $successCount++
         }

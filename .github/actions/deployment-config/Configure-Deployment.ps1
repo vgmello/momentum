@@ -1,11 +1,16 @@
+[CmdletBinding()]
 param(
     [string]$DeployType = "",
     [string]$NugetSourceOverride = "",
     [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
     [string]$NugetApiKey,
     [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
     [string]$NugetTestApiKey
 )
+
+$ErrorActionPreference = "Stop"
 
 function Write-GitHubOutput {
     param([string]$Name, [string]$Value)
@@ -25,7 +30,7 @@ $nugetSource = "https://api.nuget.org/v3/index.json"
 if ($DeployType -like "test-*") {
     $isTest = $true
     $nugetSource = "https://apiint.nugettest.org/v3/index.json"
-    if ($NugetSourceOverride) {
+    if (-not [string]::IsNullOrWhiteSpace($NugetSourceOverride)) {
         $nugetSource = $NugetSourceOverride
     }
 }
@@ -41,8 +46,8 @@ if (($githubEventName -eq "push" -and $githubRef -eq "refs/heads/main") -or
 
 # Set docs flag for library releases
 $githubRefName = $env:GITHUB_REF_NAME
-if ($githubRef -match '^refs/tags/v' -or 
-    $githubRef -match '^refs/tags/template-v' -or 
+if ($githubRef -match '^refs/tags/v' -or
+    $githubRef -match '^refs/tags/template-v' -or
     $githubRefName -eq "release" -or
     $DeployType -eq "docs-only") {
     $deployDocs = $true

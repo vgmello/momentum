@@ -52,6 +52,5 @@ runs:
         & "${{ github.action_path }}/Build-Documentation.ps1" `
           -NodeVersion "${{ inputs.node-version }}" `
           -PnpmVersion "${{ inputs.pnpm-version }}" `
-          -DocsPath "${{ inputs.docs-path }}" `
-          -BuildDotnet "${{ inputs.build-dotnet }}"
+          -DocsPath "${{ inputs.docs-path }}"
 

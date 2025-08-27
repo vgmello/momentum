@@ -71,9 +71,10 @@ jobs:
       - name: Deployment Summary
         shell: pwsh
         run: |
-          & ./.github/scripts/Write-DeploymentSummary.ps1 `
-            -IsTest "false" `
-            -DeployPrerelease "false" `
-            -DeployDocs "true" `
-            -DocsUrl "${{ steps.docs-deployment.outputs.page_url }}" `
-            -DocsPath "${{ github.event.inputs.docs-path || 'libs/Momentum/docs' }}"
+          $args = @(
+            "-DocsUrl", "${{ steps.docs-deployment.outputs.page_url }}",
+            "-DocsPath", "${{ github.event.inputs.docs-path || 'libs/Momentum/docs' }}",
+            "-DeployDocs"
+          )
+          
+          & ./.github/scripts/Write-DeploymentSummary.ps1 @args

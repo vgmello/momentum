@@ -191,14 +191,29 @@ jobs:
       - name: Deployment Summary
         shell: pwsh
         run: |
-          & ./.github/scripts/Write-DeploymentSummary.ps1 `
-            -IsTest "${{ steps.options.outputs.is-test }}" `
-            -DeployPrerelease "${{ steps.options.outputs.deploy-prerelease }}" `
-            -PrereleaseSkip "${{ steps.prerelease-version.outputs.skip }}" `
-            -PrereleaseVersion "${{ steps.prerelease-version.outputs.version }}" `
-            -PrereleaseTag "${{ steps.prerelease-version.outputs.tag }}" `
-            -ReleaseVersion "${{ steps.release-version.outputs.version }}" `
-            -ReleaseTag "${{ steps.release-version.outputs.tag }}" `
-            -NugetSource "${{ steps.options.outputs.nuget-source }}" `
-            -DeployDocs "${{ steps.options.outputs.deploy-docs }}" `
-            -DocsUrl "${{ steps.docs-deployment.outputs.page_url }}"
+          $args = @(
+            "-PrereleaseVersion", "${{ steps.prerelease-version.outputs.version }}",
+            "-PrereleaseTag", "${{ steps.prerelease-version.outputs.tag }}",
+            "-ReleaseVersion", "${{ steps.release-version.outputs.version }}",
+            "-ReleaseTag", "${{ steps.release-version.outputs.tag }}",
+            "-NugetSource", "${{ steps.options.outputs.nuget-source }}",
+            "-DocsUrl", "${{ steps.docs-deployment.outputs.page_url }}"
+          )
+          
+          if ("${{ steps.options.outputs.is-test }}" -eq "true") {
+            $args += "-IsTest"
+          }
+          
+          if ("${{ steps.options.outputs.deploy-prerelease }}" -eq "true") {
+            $args += "-DeployPrerelease"
+          }
+          
+          if ("${{ steps.prerelease-version.outputs.skip }}" -eq "true") {
+            $args += "-PrereleaseSkip"
+          }
+          
+          if ("${{ steps.options.outputs.deploy-docs }}" -eq "true") {
+            $args += "-DeployDocs"
+          }
+          
+          & ./.github/scripts/Write-DeploymentSummary.ps1 @args
