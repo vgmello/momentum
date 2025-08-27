@@ -276,16 +276,22 @@ jobs:
           Add-Content $env:GITHUB_OUTPUT "has-tests=true"
 
           # Run tests with detailed output
-          dotnet test `
-            --filter "FullyQualifiedName~$projectName.Tests.Unit" `
-            --configuration Release `
-            --logger "trx;LogFileName=${{ matrix.test.name }}.trx" `
-            --logger "console;verbosity=normal" `
-            --results-directory ./TestResults `
-            --collect:"XPlat Code Coverage" `
-            --verbosity minimal
+          try {
+            dotnet test `
+              --filter "FullyQualifiedName~.Unit." `
+              --configuration Release `
+              --logger "trx;LogFileName=${{ matrix.test.name }}.trx" `
+              --logger "console;verbosity=normal" `
+              --results-directory ./TestResults `
+              --collect:"XPlat Code Coverage" `
+              --verbosity minimal
 
             $testExitCode = $LASTEXITCODE
+          }
+          catch {
+            Write-Host "❌ Test execution failed: $($_.Exception.Message)"
+            $testExitCode = 1
+          }
 
             if ($testExitCode -eq 0) {
               Write-Host "✅ All tests passed"
