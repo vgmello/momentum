@@ -309,7 +309,7 @@ jobs:
           Add-Content $env:GITHUB_STEP_SUMMARY "## Test Results: ${{ matrix.test.name }}"
           Add-Content $env:GITHUB_STEP_SUMMARY ""
           Add-Content $env:GITHUB_STEP_SUMMARY "**Description:** ${{ matrix.test.description }}"
-          Add-Content $env:GITHUB_STEP_SUMMARY "**Command:** ``dotnet new mmt ${{ matrix.test.command }}``"
+          Add-Content $env:GITHUB_STEP_SUMMARY "**Command:** ``````dotnet new mmt ${{ matrix.test.command }}``````"
           Add-Content $env:GITHUB_STEP_SUMMARY ""
 
           if ("${{ steps.generate-template.outcome }}" -eq "success") {
