@@ -24,7 +24,7 @@ editorconfig_spaces_around_assignment_operators = true
 trim_trailing_whitespace = false
 
 # JSON and YAML files
-[*.{json,yml,yaml}]
+[*.{json,yml,yaml,props}]
 indent_size = 2
 tab_width = 2
 
