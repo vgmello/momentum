@@ -54,28 +54,28 @@ runs:
           Write-Host "::add-mask::$($env:NUGET_API_KEY)"
         }
         
-        $args = @(
-          "-Path", "${{ inputs.path }}",
-          "-Config", "${{ inputs.config }}",
-          "-PackageVersion", "${{ inputs.package-version }}",
-          "-NugetApiKey", $env:NUGET_API_KEY,
-          "-NugetSource", "${{ inputs.nuget-source }}"
-        )
+        $params = @{
+          Path = "${{ inputs.path }}"
+          Config = "${{ inputs.config }}"
+          PackageVersion = "${{ inputs.package-version }}"
+          NugetApiKey = $env:NUGET_API_KEY
+          NugetSource = "${{ inputs.nuget-source }}"
+        }
         
         # Parse pack-args as an array if provided
         $packArgsInput = "${{ inputs.pack-args }}"
         if (-not [string]::IsNullOrWhiteSpace($packArgsInput)) {
           # Split on spaces but preserve quoted strings
           $packArgsArray = $packArgsInput -split '\s+(?=(?:[^"]*"[^"]*")*[^"]*$)' | Where-Object { $_ -ne '' }
-          $args += "-PackArgs", $packArgsArray
+          $params['PackArgs'] = $packArgsArray
         }
         
         if ("${{ inputs.skip-duplicate }}" -eq "true") {
-          $args += "-SkipDuplicate"
+          $params['SkipDuplicate'] = $true
         }
         
         if ("${{ inputs.dry-run }}" -eq "true") {
-          $args += "-DryRun"
+          $params['DryRun'] = $true
         }
         
-        & "${{ github.action_path }}/Publish-NuGetPackages.ps1" @args
+        & "${{ github.action_path }}/Publish-NuGetPackages.ps1" @params
