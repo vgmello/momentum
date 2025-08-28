@@ -58,10 +58,13 @@
     <!--#if (LIBS_INCLUDES_EXT) -->
     <Import Project="..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.props"/>
     <!--#endif -->
+
     <!--#if (LIBS_INCLUDES_GENERATORS) -->
-    <!--    <Import Project="..\..\libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.props"/>-->
+    <Import Project="..\..\libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.props"/>
     <!--#endif -->
+
     <!--#endif -->
+
     <!--#if (false) -->
     <ItemGroup>
         <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
