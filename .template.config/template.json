@@ -509,7 +509,8 @@
           "exclude": [
             "tests/AppDomain.Tests/Integration/_Internal/Extensions/DatabaseContainerExtensions.cs",
             "tests/AppDomain.Tests/Integration/Cashiers/**/*",
-            "tests/AppDomain.Tests/Integration/Invoices/**/*"
+            "tests/AppDomain.Tests/Integration/Invoices/**/*",
+            "tests/AppDomain.Tests.E2E/**/*"
           ]
         },
         {

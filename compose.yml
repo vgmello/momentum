@@ -235,9 +235,12 @@ services:
       retries: 3
       start_period: 10s
   # #endif
+# #if (INCLUDE_ORLEANS || INCLUDE_DOCS)
 volumes:
-  # #if (INCLUDE_ORLEANS)
+# #endif
+# #if (INCLUDE_ORLEANS)
   azurite-data:
-  # #endif
-  # #if (INCLUDE_DOCS)
-  pnpm_node_modules: # #endif
+# #endif
+# #if (INCLUDE_DOCS)
+  pnpm_node_modules:
+# #endif
