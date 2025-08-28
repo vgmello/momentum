@@ -47,7 +47,7 @@
     </Folder>
     <!--#if (HAS_BACKEND || INCLUDE_API) -->
     <Folder Name="/Tests/">
-        <!--#if (INCLUDE_API) -->
+        <!--#if (INCLUDE_API && USE_DB) -->
         <Project Path="tests\AppDomain.Tests.E2E\AppDomain.Tests.E2E.csproj" />
         <!--#endif -->
         <!--#if (HAS_BACKEND) -->

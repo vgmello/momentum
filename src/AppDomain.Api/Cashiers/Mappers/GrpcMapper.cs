@@ -1,5 +1,6 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
+using AppDomain.Api.Core.Extensions;
 using AppDomain.Cashiers.Commands;
 using AppDomain.Cashiers.Contracts.Models;
 using AppDomain.Cashiers.Grpc;
@@ -59,7 +60,7 @@ public static partial class GrpcMapper
     /// <param name="tenantId">The tenant identifier for multi-tenancy support.</param>
     /// <returns>A <see cref="DeleteCashierCommand" /> for domain processing.</returns>
     public static DeleteCashierCommand ToCommand(this DeleteCashierRequest request, Guid tenantId)
-        => new(tenantId, Guid.Parse(request.CashierId));
+        => new(tenantId, request.CashierId.ToGuidSafe("Invalid cashier ID format"));
 
     /// <summary>
     ///     Transforms a gRPC request to retrieve cashiers into a domain query.
@@ -75,7 +76,8 @@ public static partial class GrpcMapper
     /// <param name="request">The get cashier request from the gRPC client.</param>
     /// <param name="tenantId">The tenant identifier for multi-tenancy support.</param>
     /// <returns>A <see cref="GetCashierQuery" /> for domain processing.</returns>
-    public static GetCashierQuery ToQuery(this GetCashierRequest request, Guid tenantId) => new(tenantId, Guid.Parse(request.Id));
+    public static GetCashierQuery ToQuery(this GetCashierRequest request, Guid tenantId)
+        => new(tenantId, request.Id.ToGuidSafe("Invalid cashier ID format"));
 
     /// <summary>
     ///     Converts a GUID to its string representation for gRPC serialization.

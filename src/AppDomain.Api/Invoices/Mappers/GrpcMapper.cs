@@ -1,5 +1,6 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
+using AppDomain.Api.Core.Extensions;
 using AppDomain.Invoices.Commands;
 using AppDomain.Invoices.Grpc;
 using AppDomain.Invoices.Grpc.Models;
@@ -33,7 +34,8 @@ public static partial class GrpcMapper
     /// <param name="request">The gRPC request containing the invoice ID</param>
     /// <param name="tenantId">The tenant identifier to scope the query</param>
     /// <returns>A query object for retrieving a specific invoice</returns>
-    public static GetInvoiceQuery ToQuery(this GetInvoiceRequest request, Guid tenantId) => new(tenantId, Guid.Parse(request.Id));
+    public static GetInvoiceQuery ToQuery(this GetInvoiceRequest request, Guid tenantId)
+        => new(tenantId, request.Id.ToGuidSafe("Invalid invoice ID format"));
 
     /// <summary>
     ///     Converts a gRPC request for multiple invoices into a domain query.
@@ -89,11 +91,11 @@ public static partial class GrpcMapper
     public static SimulatePaymentCommand ToCommand(this SimulatePaymentRequest request, Guid tenantId)
         => new(
             tenantId,
-            Guid.Parse(request.InvoiceId),
+            Guid.TryParse(request.InvoiceId, out var invoiceId) ? invoiceId : Guid.Empty,
             request.Version,
             (decimal)request.Amount,
             request.Currency,
-            request.PaymentMethod ?? "Credit Card",
+            request.PaymentMethod ?? string.Empty,
             request.PaymentReference ?? $"SIM-{Guid.NewGuid():N}"[..8]
         );
 
