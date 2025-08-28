@@ -45,7 +45,7 @@
             <!--#endif -->
             <!--#if (LIBS_INCLUDES_GENERATORS)
             <TargetPathWithTargetPlatformMoniker
-                Include="$(PKGMomentum_Extensions_Abstractions)analyzers\dotnet\cs\Momentum.Extensions.Abstractions.dll"
+                Include="$(PKGMomentum_Extensions_Abstractions)\lib\netstandard2.1\Momentum.Extensions.Abstractions.dll"
                 IncludeRuntimeDependency="false"/>
             #endif -->
         </ItemGroup>
