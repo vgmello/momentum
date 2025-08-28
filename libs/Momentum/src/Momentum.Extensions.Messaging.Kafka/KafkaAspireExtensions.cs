@@ -37,42 +37,58 @@ public static class KafkaAspireExtensions
 
     private static void ApplySecuritySettings(IConfiguration configuration, string serviceName, ClientConfig clientConfig)
     {
-        var securitySection = configuration.GetSection($"Aspire:Confluent:Kafka:{serviceName}:Security");
+        var securitySection = GetSecuritySection(configuration, serviceName);
 
         if (!securitySection.Exists())
+            return;
+
+        ApplySecurityProtocol(securitySection, clientConfig);
+        ApplySaslSettings(securitySection, clientConfig);
+        ApplySslSettings(securitySection, clientConfig);
+    }
+
+    private static IConfigurationSection GetSecuritySection(IConfiguration configuration, string serviceName)
+    {
+        var securitySection = configuration.GetSection($"Aspire:Confluent:Kafka:{serviceName}:Security");
+        return securitySection.Exists() 
+            ? securitySection 
+            : configuration.GetSection("Aspire:Confluent:Kafka:Security");
+    }
+
+    private static void ApplySecurityProtocol(IConfigurationSection securitySection, ClientConfig clientConfig)
+    {
+        if (securitySection["Protocol"] is { } protocol &&
+            Enum.TryParse<SecurityProtocol>(protocol, ignoreCase: true, out var securityProtocol))
         {
-            securitySection = configuration.GetSection("Aspire:Confluent:Kafka:Security");
+            clientConfig.SecurityProtocol = securityProtocol;
+        }
+    }
+
+    private static void ApplySaslSettings(IConfigurationSection securitySection, ClientConfig clientConfig)
+    {
+        if (securitySection["SaslMechanism"] is { } saslMechanism &&
+            Enum.TryParse<SaslMechanism>(saslMechanism, ignoreCase: true, out var mechanism))
+        {
+            clientConfig.SaslMechanism = mechanism;
         }
 
-        if (securitySection.Exists())
-        {
-            if (securitySection["Protocol"] is { } protocol &&
-                Enum.TryParse<SecurityProtocol>(protocol, ignoreCase: true, out var securityProtocol))
-            {
-                clientConfig.SecurityProtocol = securityProtocol;
-            }
+        if (securitySection["SaslUsername"] is { } username)
+            clientConfig.SaslUsername = username;
 
-            if (securitySection["SaslMechanism"] is { } saslMechanism &&
-                Enum.TryParse<SaslMechanism>(saslMechanism, ignoreCase: true, out var mechanism))
-            {
-                clientConfig.SaslMechanism = mechanism;
-            }
+        if (securitySection["SaslPassword"] is { } password)
+            clientConfig.SaslPassword = password;
+    }
 
-            if (securitySection["SaslUsername"] is { } username)
-                clientConfig.SaslUsername = username;
+    private static void ApplySslSettings(IConfigurationSection securitySection, ClientConfig clientConfig)
+    {
+        if (securitySection["SslCaLocation"] is { } caLocation)
+            clientConfig.SslCaLocation = caLocation;
 
-            if (securitySection["SaslPassword"] is { } password)
-                clientConfig.SaslPassword = password;
+        if (securitySection["SslCertificateLocation"] is { } certLocation)
+            clientConfig.SslCertificateLocation = certLocation;
 
-            if (securitySection["SslCaLocation"] is { } caLocation)
-                clientConfig.SslCaLocation = caLocation;
-
-            if (securitySection["SslCertificateLocation"] is { } certLocation)
-                clientConfig.SslCertificateLocation = certLocation;
-
-            if (securitySection["SslKeyLocation"] is { } keyLocation)
-                clientConfig.SslKeyLocation = keyLocation;
-        }
+        if (securitySection["SslKeyLocation"] is { } keyLocation)
+            clientConfig.SslKeyLocation = keyLocation;
     }
 
     private static void ApplyConfig(IConfiguration configuration, string serviceName, string? configType, ClientConfig clientConfig)

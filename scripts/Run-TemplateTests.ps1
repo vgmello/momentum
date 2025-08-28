@@ -151,6 +151,36 @@ function Get-ErrorSummary {
     return ''
 }
 
+function Test-MaxFailuresReached {
+    <#
+    .SYNOPSIS
+        Check if maximum failures reached and exit early if needed
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [string]$TestName,
+
+        [Parameter()]
+        [string[]]$TempFiles = @()
+    )
+
+    if ($MaxFailures -gt 0 -and $script:FailedTests -ge $MaxFailures) {
+        Write-ColoredMessage -Level 'ERROR' -Message "Reached maximum failures ($MaxFailures). Exiting early."
+        
+        # Clean up any temp files passed in
+        if ($TempFiles.Count -gt 0) {
+            Remove-Item $TempFiles -Force -ErrorAction SilentlyContinue
+        }
+        
+        Pop-Location
+        Invoke-IndividualTestCleanup -TestName $TestName -TestResult 'FAILED'
+        Show-Results
+        exit 1
+    }
+}
+
 function Write-ColoredMessage {
     <#
     .SYNOPSIS
@@ -293,7 +323,14 @@ function Test-Template {
                     $testOutput = Get-Content $tempTestErr -Raw -ErrorAction SilentlyContinue
                     $testErrorSummary = Get-ErrorSummary -ErrorOutput $testOutput -MaxLines 2 -Filter '(Failed|Error|Exception|Assert)'
 
-                    Write-ColoredMessage -Level 'WARN' -Message "[$TestCategory] $Name`: Tests failed (build succeeded)$testErrorSummary"
+                    Write-ColoredMessage -Level 'ERROR' -Message "[$TestCategory] $Name`: Tests failed$testErrorSummary"
+                    $script:FailedTests++
+                    $script:TestResults[$Name] = 'FAILED'
+
+                    Remove-Item $tempTestOut, $tempTestErr -Force -ErrorAction SilentlyContinue
+
+                    Test-MaxFailuresReached -TestName $Name
+                    return
                 }
 
                 Remove-Item $tempTestOut, $tempTestErr -Force -ErrorAction SilentlyContinue
@@ -310,16 +347,7 @@ function Test-Template {
             $script:FailedTests++
             $script:TestResults[$Name] = 'FAILED'
 
-            # Check for early exit on max failures
-            if ($MaxFailures -gt 0 -and $script:FailedTests -ge $MaxFailures) {
-                Write-ColoredMessage -Level 'ERROR' -Message "Reached maximum failures ($MaxFailures). Exiting early."
-
-                Remove-Item $tempBuildOut, $tempBuildErr -Force -ErrorAction SilentlyContinue
-                Pop-Location
-                Invoke-IndividualTestCleanup -TestName $Name -TestResult 'FAILED'
-                Show-Results
-                exit 1
-            }
+            Test-MaxFailuresReached -TestName $Name -TempFiles @($tempBuildOut, $tempBuildErr)
         }
 
         # Clean up build temp files
@@ -331,14 +359,7 @@ function Test-Template {
         $script:FailedTests++
         $script:TestResults[$Name] = 'FAILED'
 
-        # Check for early exit on max failures
-        if ($MaxFailures -gt 0 -and $script:FailedTests -ge $MaxFailures) {
-            Write-ColoredMessage -Level 'ERROR' -Message "Reached maximum failures ($MaxFailures). Exiting early."
-            Pop-Location
-            Invoke-IndividualTestCleanup -TestName $Name -TestResult 'FAILED'
-            Show-Results
-            exit 1
-        }
+        Test-MaxFailuresReached -TestName $Name
     }
     finally {
         Pop-Location
@@ -477,8 +498,8 @@ function Invoke-TestCategory {
             }
 
             # Test library combinations
-            Test-Template -Name 'TestLibMulti' -Parameters '--libs defaults,api,kafka' -TestCategory 'Library Config'
-            Test-Template -Name 'TestLibCustomName' -Parameters '--libs defaults,ext --lib-name CustomPlatform' -TestCategory 'Library Config'
+            Test-Template -Name 'TestLibMulti' -Parameters '--libs defaults --libs api --libs kafka' -TestCategory 'Library Config'
+            Test-Template -Name 'TestLibCustomName' -Parameters '--libs defaults --libs ext --lib-name CustomPlatform' -TestCategory 'Library Config'
         }
 
         'real-world-patterns' {
@@ -487,7 +508,7 @@ function Invoke-TestCategory {
             Test-Template -Name 'TestMicroservice' -Parameters '--api true --back-office false --kafka true --db npgsql' -TestCategory 'Real-World Patterns'
             Test-Template -Name 'TestEventProcessor' -Parameters '--api false --back-office true --kafka true --orleans true' -TestCategory 'Real-World Patterns'
             Test-Template -Name 'TestAPIGateway' -Parameters '--api true --no-sample --kafka false --db none' -TestCategory 'Real-World Patterns'
-            Test-Template -Name 'TestFullStack' -Parameters '--orleans true --api true --back-office true --aspire true --libs defaults,api,kafka' -TestCategory 'Real-World Patterns'
+            Test-Template -Name 'TestFullStack' -Parameters '--orleans true --api true --back-office true --aspire true --libs defaults --libs api --libs kafka' -TestCategory 'Real-World Patterns'
         }
 
         'orleans-combinations' {
