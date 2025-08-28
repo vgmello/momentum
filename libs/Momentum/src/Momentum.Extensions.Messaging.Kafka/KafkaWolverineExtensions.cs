@@ -43,9 +43,9 @@ public class KafkaWolverineExtensions(
                                     ?? throw new InvalidOperationException($"Kafka connection string '{serviceName}' not set.");
 
         var cloudEventMapper = new CloudEventMapper(serviceBusOptions);
-        var consumerGroupId = $"{options.ServiceName}-{environment.GetEnvNameShort()}";
-
         var autoProvisionEnabled = configuration.GetValue($"{ServiceBusOptions.SectionName}:Wolverine:AutoProvision", false);
+
+        var consumerGroupId = GetConsumerGroupId(configuration, serviceName, options.ServiceName, environment.GetEnvNameShort());
 
         LogInfoMessage(options, consumerGroupId, autoProvisionEnabled);
 
@@ -57,6 +57,8 @@ public class KafkaWolverineExtensions(
         kafkaConfig.ConfigureClient(clientConfig => ApplyAspireClientConfig(configuration, serviceName, clientConfig));
         kafkaConfig.ConfigureConsumers(consumerConfig => ApplyAspireConsumerConfig(configuration, serviceName, consumerConfig));
         kafkaConfig.ConfigureProducers(producerConfig => ApplyAspireProducerConfig(configuration, serviceName, producerConfig));
+
+        kafkaConfig.ConfigureClient(clientConfig => clientConfig.ClientId ??= options.ServiceName.ToLowerInvariant());
 
         if (autoProvisionEnabled)
         {
@@ -168,6 +170,7 @@ public class KafkaWolverineExtensions(
     {
         logger.LogInformation("Configuring Kafka messaging for service {ServiceName} with connection {ConnectionName}",
             options.ServiceName, serviceName);
+
         logger.LogInformation("Consumer group ID: {GroupId}", consumerGroupId);
         logger.LogInformation("Auto-provision enabled: {AutoProvisionEnabled}", autoProvisionEnabled);
     }

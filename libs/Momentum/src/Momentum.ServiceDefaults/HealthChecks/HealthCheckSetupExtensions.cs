@@ -40,7 +40,14 @@ public static partial class HealthCheckSetupExtensions
         var logger = GetHealthCheckLogger(app.Services);
 
         // liveness probe
-        app.MapGet("/status", () => healthCheckStore.LastHealthStatus.ToString())
+        app.MapGet("/status", () =>
+            {
+                var statusCode = healthCheckStore.LastHealthStatus is not HealthStatus.Unhealthy
+                    ? StatusCodes.Status200OK
+                    : StatusCodes.Status503ServiceUnavailable;
+
+                return Results.Text(healthCheckStore.LastHealthStatus.ToString(), statusCode: statusCode);
+            })
             .ExcludeFromDescription();
 
         // container-only health check probe

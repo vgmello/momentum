@@ -52,6 +52,7 @@ var appDomainApi = builder
     .WithEnvironment("ServiceName", "AppDomain")
 #if (INCLUDE_ORLEANS)
     .WithEnvironment("Aspire__Azure__Data__Tables__DisableHealthChecks", "true")
+    .WithEnvironment("Orleans__UseLocalhostClustering", "false")
 #endif
     .WithKestrelLaunchProfileEndpoints()
 #if (USE_DB)

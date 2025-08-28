@@ -15,7 +15,8 @@ public static class KafkaAspireExtensions
     /// </summary>
     public static void ApplyAspireProducerConfig(IConfiguration configuration, string serviceName, ProducerConfig producerConfig)
     {
-        ApplyConfig(configuration, serviceName, "Producer", producerConfig);
+        ApplyConfig(configuration, "Producer:Config", producerConfig);
+        ApplyConfig(configuration, $"Producer:{serviceName}:Config", producerConfig);
     }
 
     /// <summary>
@@ -23,7 +24,8 @@ public static class KafkaAspireExtensions
     /// </summary>
     public static void ApplyAspireConsumerConfig(IConfiguration configuration, string serviceName, ConsumerConfig consumerConfig)
     {
-        ApplyConfig(configuration, serviceName, "Consumer", consumerConfig);
+        ApplyConfig(configuration, "Consumer:Config", consumerConfig);
+        ApplyConfig(configuration, $"Consumer:{serviceName}:Config", consumerConfig);
     }
 
     /// <summary>
@@ -31,94 +33,31 @@ public static class KafkaAspireExtensions
     /// </summary>
     public static void ApplyAspireClientConfig(IConfiguration configuration, string serviceName, ClientConfig clientConfig)
     {
-        ApplyConfig(configuration, serviceName, string.Empty, clientConfig);
-        ApplySecuritySettings(configuration, serviceName, clientConfig);
+        ApplyConfig(configuration, "Security", clientConfig);
+        ApplyConfig(configuration, $"Security:{serviceName}:Config", clientConfig);
     }
 
-    private static void ApplySecuritySettings(IConfiguration configuration, string serviceName, ClientConfig clientConfig)
+    public static string GetConsumerGroupId(IConfiguration configuration, string serviceName, string logicalServiceName, string environment)
     {
-        var securitySection = GetSecuritySection(configuration, serviceName);
+        var consumerGroupConfig = $"Aspire:Confluent:Kafka:Consumer:{serviceName}:Config:GroupId";
+        var consumerGroupId = configuration.GetValue<string>(consumerGroupConfig);
 
-        if (!securitySection.Exists())
-            return;
-
-        ApplySecurityProtocol(securitySection, clientConfig);
-        ApplySaslSettings(securitySection, clientConfig);
-        ApplySslSettings(securitySection, clientConfig);
-    }
-
-    private static IConfigurationSection GetSecuritySection(IConfiguration configuration, string serviceName)
-    {
-        var securitySection = configuration.GetSection($"Aspire:Confluent:Kafka:{serviceName}:Security");
-        return securitySection.Exists() 
-            ? securitySection 
-            : configuration.GetSection("Aspire:Confluent:Kafka:Security");
-    }
-
-    private static void ApplySecurityProtocol(IConfigurationSection securitySection, ClientConfig clientConfig)
-    {
-        if (securitySection["Protocol"] is { } protocol &&
-            Enum.TryParse<SecurityProtocol>(protocol, ignoreCase: true, out var securityProtocol))
+        if (consumerGroupId is null)
         {
-            clientConfig.SecurityProtocol = securityProtocol;
-        }
-    }
-
-    private static void ApplySaslSettings(IConfigurationSection securitySection, ClientConfig clientConfig)
-    {
-        if (securitySection["SaslMechanism"] is { } saslMechanism &&
-            Enum.TryParse<SaslMechanism>(saslMechanism, ignoreCase: true, out var mechanism))
-        {
-            clientConfig.SaslMechanism = mechanism;
+            consumerGroupId = $"{logicalServiceName}-{environment}";
+            configuration[consumerGroupConfig] = consumerGroupId;
         }
 
-        if (securitySection["SaslUsername"] is { } username)
-            clientConfig.SaslUsername = username;
-
-        if (securitySection["SaslPassword"] is { } password)
-            clientConfig.SaslPassword = password;
+        return consumerGroupId;
     }
 
-    private static void ApplySslSettings(IConfigurationSection securitySection, ClientConfig clientConfig)
+    private static void ApplyConfig(IConfiguration configuration, string configName, ClientConfig clientConfig)
     {
-        if (securitySection["SslCaLocation"] is { } caLocation)
-            clientConfig.SslCaLocation = caLocation;
-
-        if (securitySection["SslCertificateLocation"] is { } certLocation)
-            clientConfig.SslCertificateLocation = certLocation;
-
-        if (securitySection["SslKeyLocation"] is { } keyLocation)
-            clientConfig.SslKeyLocation = keyLocation;
-    }
-
-    private static void ApplyConfig(IConfiguration configuration, string serviceName, string? configType, ClientConfig clientConfig)
-    {
-        var configTypeSuffix = string.IsNullOrWhiteSpace(configType) ? string.Empty : $":{configType}";
-
-        var configSection = configuration.GetSection($"Aspire:Confluent:Kafka:{serviceName}{configTypeSuffix}");
-
-        if (configSection.Exists())
-        {
-            BindKafkaConfiguration(configSection, clientConfig);
-        }
-
-        var generalConfigSection = configuration.GetSection($"Aspire:Confluent:Kafka{configTypeSuffix}");
+        var generalConfigSection = configuration.GetSection($"Aspire:Confluent:Kafka:{configName}");
 
         if (generalConfigSection.Exists())
         {
-            BindKafkaConfiguration(generalConfigSection, clientConfig);
+            generalConfigSection.Bind(clientConfig);
         }
-
-        var commonSection = configuration.GetSection($"Aspire:Confluent:Kafka:{serviceName}");
-
-        if (commonSection.Exists())
-        {
-            BindKafkaConfiguration(commonSection, clientConfig);
-        }
-    }
-
-    private static void BindKafkaConfiguration(IConfigurationSection section, ClientConfig config)
-    {
-        section.Bind(config);
     }
 }
