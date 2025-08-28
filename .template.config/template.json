@@ -209,8 +209,8 @@
       "type": "parameter",
       "datatype": "string",
       "description": "Momentum lib version",
-      "defaultValue": "0.0.1-pre.14",
-      "replaces": "__TEMPLATE_MOMENTUM_VERSION__"
+      "defaultValue": "__CI_MOMENTUM_VERSION__",
+      "replaces": "$(TemplateMomentumVersion)"
     },
     "debug-symbols": {
       "type": "parameter",
@@ -401,6 +401,8 @@
         "**/Internal/Generated/**/*",
         "**/docs/reference/*",
         "**/docs/node_modules/**/*",
+        "libs/Momentum/Directory.Build.props",
+        "libs/Momentum/Directory.Build.targets",
         "libs/Momentum/src/Momentum.Extensions.Abstractions/**/*",
         "libs/Momentum/src/Momentum.Extensions.XmlDocs/**/*",
         "libs/Momentum/src/Momentum.Extensions.EventMarkdownGenerator/**/*",

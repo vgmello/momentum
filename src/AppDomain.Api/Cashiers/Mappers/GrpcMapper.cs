@@ -1,6 +1,5 @@
 // Copyright (c) ORG_NAME. All rights reserved.
 
-using AppDomain.Api.Core.Extensions;
 using AppDomain.Cashiers.Commands;
 using AppDomain.Cashiers.Contracts.Models;
 using AppDomain.Cashiers.Grpc;

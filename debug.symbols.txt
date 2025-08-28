@@ -21,7 +21,7 @@ project-only=__PROJECT_ONLY__
 ## Library Parameters
 libs=__LIBS__
 lib-name=__LIB_NAME__
-mmt-version=__TEMPLATE_MOMENTUM_VERSION__
+momentum_version=$(TemplateMomentumVersion)
 debug-symbols=__DEBUG_SYMBOLS__
 
 ## Generated Symbols

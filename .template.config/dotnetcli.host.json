@@ -33,8 +33,13 @@
       "longName": "kafka",
       "shortName": ""
     },
+    "libs": {
+      "longName": "libs",
+      "shortName": ""
+    },
     "mmt-version": {
-      "isHidden": true
+      "longName": "mmt-version",
+      "shortName": ""
     }
   }
 }
