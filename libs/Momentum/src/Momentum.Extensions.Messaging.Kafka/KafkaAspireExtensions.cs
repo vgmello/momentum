@@ -36,7 +36,7 @@ public static class KafkaAspireExtensions
     public static void ApplyAspireClientConfig(IConfiguration configuration, string serviceName, ClientConfig clientConfig)
     {
         ApplyConfig(configuration, "Security", clientConfig);
-        ApplyConfig(configuration, $"Security:{serviceName}:Config", clientConfig);
+        ApplyConfig(configuration, $"Security:{serviceName}", clientConfig);
     }
 
     public static void SetConfigConsumerGroupId(IConfiguration configuration, string serviceName, string groupPrefix, string environment)

@@ -33,7 +33,7 @@ public class KafkaSetupExtensionsTests
             .Build();
 
         _environment.EnvironmentName.Returns("Development");
-        var extension = new KafkaWolverineExtensions(_logger, config, _serviceBusOptions, _environment, _topicNameGenerator, "Messaging");
+        var extension = new KafkaWolverineExtensions(_logger, config, _serviceBusOptions, _topicNameGenerator, "Messaging");
         var options = new WolverineOptions { ServiceName = "test-service" };
 
         // Act & Assert
@@ -45,11 +45,11 @@ public class KafkaSetupExtensionsTests
     {
         // Arrange
         var config = new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string?> { })
+            .AddInMemoryCollection([])
             .Build();
 
         _environment.EnvironmentName.Returns("Development");
-        var extension = new KafkaWolverineExtensions(_logger, config, _serviceBusOptions, _environment, _topicNameGenerator, "Messaging");
+        var extension = new KafkaWolverineExtensions(_logger, config, _serviceBusOptions, _topicNameGenerator, "Messaging");
         var options = new WolverineOptions { ServiceName = "test-service" };
 
         // Act & Assert
@@ -64,10 +64,10 @@ public class KafkaSetupExtensionsTests
         var config = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
-                ["Aspire:Confluent:Kafka:Messaging:Producer:EnableIdempotence"] = "true",
-                ["Aspire:Confluent:Kafka:Messaging:Producer:MaxInFlight"] = "1",
-                ["Aspire:Confluent:Kafka:Messaging:Producer:Acks"] = "All",
-                ["Aspire:Confluent:Kafka:Messaging:Producer:MessageSendMaxRetries"] = "15"
+                ["Aspire:Confluent:Kafka:Producer:Messaging:Config:EnableIdempotence"] = "true",
+                ["Aspire:Confluent:Kafka:Producer:Messaging:Config:MaxInFlight"] = "1",
+                ["Aspire:Confluent:Kafka:Producer:Messaging:Config:Acks"] = "All",
+                ["Aspire:Confluent:Kafka:Producer:Messaging:Config:MessageSendMaxRetries"] = "15"
             })
             .Build();
 
@@ -90,11 +90,11 @@ public class KafkaSetupExtensionsTests
         var config = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
-                ["Aspire:Confluent:Kafka:Messaging:Consumer:SessionTimeoutMs"] = "15000",
-                ["Aspire:Confluent:Kafka:Messaging:Consumer:HeartbeatIntervalMs"] = "5000",
-                ["Aspire:Confluent:Kafka:Messaging:Consumer:MaxPollIntervalMs"] = "600000",
-                ["Aspire:Confluent:Kafka:Messaging:Consumer:FetchMinBytes"] = "2048",
-                ["Aspire:Confluent:Kafka:Messaging:Consumer:AutoOffsetReset"] = "Earliest"
+                ["Aspire:Confluent:Kafka:Consumer:Messaging:Config:SessionTimeoutMs"] = "15000",
+                ["Aspire:Confluent:Kafka:Consumer:Messaging:Config:HeartbeatIntervalMs"] = "5000",
+                ["Aspire:Confluent:Kafka:Consumer:Messaging:Config:MaxPollIntervalMs"] = "600000",
+                ["Aspire:Confluent:Kafka:Consumer:Messaging:Config:FetchMinBytes"] = "2048",
+                ["Aspire:Confluent:Kafka:Consumer:Messaging:Config:AutoOffsetReset"] = "Earliest"
             })
             .Build();
 
@@ -118,13 +118,13 @@ public class KafkaSetupExtensionsTests
         var config = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
-                ["Aspire:Confluent:Kafka:Messaging:Security:Protocol"] = "SaslSsl",
-                ["Aspire:Confluent:Kafka:Messaging:Security:SaslMechanism"] = "Plain",
-                ["Aspire:Confluent:Kafka:Messaging:Security:SaslUsername"] = "user123",
-                ["Aspire:Confluent:Kafka:Messaging:Security:SaslPassword"] = "pass456",
-                ["Aspire:Confluent:Kafka:Messaging:Security:SslCaLocation"] = "/path/to/ca.crt",
-                ["Aspire:Confluent:Kafka:Messaging:Security:SslCertificateLocation"] = "/path/to/cert.crt",
-                ["Aspire:Confluent:Kafka:Messaging:Security:SslKeyLocation"] = "/path/to/key.key"
+                ["Aspire:Confluent:Kafka:Security:SecurityProtocol"] = "SaslSsl",
+                ["Aspire:Confluent:Kafka:Security:SaslMechanism"] = "Plain",
+                ["Aspire:Confluent:Kafka:Security:SaslUsername"] = "user123",
+                ["Aspire:Confluent:Kafka:Security:SaslPassword"] = "pass456",
+                ["Aspire:Confluent:Kafka:Security:SslCaLocation"] = "/path/to/ca.crt",
+                ["Aspire:Confluent:Kafka:Security:SslCertificateLocation"] = "/path/to/cert.crt",
+                ["Aspire:Confluent:Kafka:Security:SslKeyLocation"] = "/path/to/key.key"
             })
             .Build();
 
