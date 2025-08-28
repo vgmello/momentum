@@ -1,6 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <IsAspireSharedProject>true</IsAspireSharedProject>
+    </PropertyGroup>
+    
+    <!--#if (!LIBS_INCLUDES_API) -->
+    <PropertyGroup>
         <IsPackable>true</IsPackable>
         <PackageId>Momentum.ServiceDefaults.Api</PackageId>
         <PackageDescription>API-specific service defaults for Momentum platform extending the base
@@ -9,6 +13,7 @@
         </PackageDescription>
         <PackageProjectUrl>https://github.com/vgmello/momentum/blob/main/libs/Momentum/src/Momentum.ServiceDefaults.Api/README.md</PackageProjectUrl>
     </PropertyGroup>
+    <!--#endif -->
 
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App"/>

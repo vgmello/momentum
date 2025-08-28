@@ -1,4 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+    <!--#if (!LIBS_INCLUDES_KAFKA) -->
     <PropertyGroup>
         <IsPackable>true</IsPackable>
         <PackageId>Momentum.Extensions.Messaging.Kafka</PackageId>
@@ -9,6 +10,7 @@
             https://github.com/vgmello/momentum/blob/main/libs/Momentum/src/Momentum.Extensions.Messaging.Kafka/README.md
         </PackageProjectUrl>
     </PropertyGroup>
+    <!--#endif -->
 
     <ItemGroup>
         <PackageReference Include="Aspire.Confluent.Kafka"/>
