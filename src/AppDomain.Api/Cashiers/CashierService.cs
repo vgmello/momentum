@@ -74,7 +74,8 @@ public class CashierService(IMessageBus bus) : CashiersService.CashiersServiceBa
     /// <exception cref="RpcException">Thrown when the request is invalid or the cashier is not found</exception>
     public override async Task<CashierModel> UpdateCashier(UpdateCashierRequest request, ServerCallContext context)
     {
-        var command = request.ToCommand(context.GetTenantId(), Guid.Parse(request.CashierId));
+        var cashierId = request.CashierId.ToGuidSafe("Invalid cashier ID format");
+        var command = request.ToCommand(context.GetTenantId(), cashierId);
         var result = await bus.InvokeCommandAsync(command, context.CancellationToken);
 
         return result.Match(

@@ -24,8 +24,14 @@ $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
 # Check if gh CLI is available
-$ghVersion = gh --version 2>&1
-if ($LASTEXITCODE -ne 0) {
+try {
+    $ghVersion = gh --version 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        throw "GitHub CLI returned non-zero exit code"
+    }
+    Write-Verbose "GitHub CLI version: $ghVersion"
+}
+catch {
     Write-Error "❌ GitHub CLI (gh) is not installed or not in PATH"
     exit 1
 }
@@ -52,13 +58,13 @@ if (-not $Draft) {
     $releaseArgs += "--draft=false"
 }
 
-Write-Host "Creating GitHub release..."
-Write-Host "  Tag: $Tag"
-Write-Host "  Title: $Title"
-Write-Host "  Notes: $NotesFile"
-Write-Host "  Target: $Target"
-Write-Host "  Prerelease: $($Prerelease.IsPresent)"
-Write-Host "  Draft: $($Draft.IsPresent)"
+Write-Host "🚀 Creating GitHub release..."
+Write-Host "   Tag: $Tag"
+Write-Host "   Title: $Title"
+Write-Host "   Notes: $NotesFile"
+Write-Host "   Target: $Target"
+Write-Host "   Prerelease: $($Prerelease.IsPresent)"
+Write-Host "   Draft: $($Draft.IsPresent)"
 
 # Execute gh command
 & gh @releaseArgs

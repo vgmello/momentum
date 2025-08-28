@@ -9,6 +9,10 @@
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <LangVersion>Latest</LangVersion>
         <NoWarn>$(NoWarn);RS1041;RS2007;RS1036;NU5128</NoWarn>
+    </PropertyGroup>
+    
+    <!--#if (!LIBS_INCLUDES_GENERATORS) -->
+    <PropertyGroup>
         <IsPackable>true</IsPackable>
         <PackageId>Momentum.Extensions.SourceGenerators</PackageId>
         <PackageDescription>Source generators for the Momentum platform providing compile-time code
@@ -17,6 +21,7 @@
         </PackageDescription>
         <PackageProjectUrl>https://github.com/vgmello/momentum/blob/main/libs/Momentum/src/Momentum.Extensions.SourceGenerators/README.md</PackageProjectUrl>
     </PropertyGroup>
+    <!--#endif -->
 
     <ItemGroup>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all"/>

@@ -197,6 +197,7 @@ public class OrleansExtensionsTests
         {
             ["Orleans:UseLocalhostClustering"] = "false",
             ["Orleans:Clustering:ServiceKey"] = "CustomOrleansKey",
+            ["Orleans:Clustering:ProviderType"] = "Development",
             ["ConnectionStrings:CustomOrleansKey"] = "test-connection"
         });
 
@@ -207,6 +208,7 @@ public class OrleansExtensionsTests
         builder2.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
             ["Orleans:UseLocalhostClustering"] = "false",
+            ["Orleans:Clustering:ProviderType"] = "Development",
             ["ConnectionStrings:Orleans"] = "test-connection"
         });
 

@@ -21,7 +21,7 @@ project-only=__PROJECT_ONLY__
 ## Library Parameters
 libs=__LIBS__
 lib-name=__LIB_NAME__
-mmt-version=__TEMPLATE_MOMENTUM_VERSION__
+momentum_version=$(TemplateMomentumVersion)
 debug-symbols=__DEBUG_SYMBOLS__
 
 ## Generated Symbols
@@ -75,8 +75,8 @@ INCLUDE_LIBS=TRUE -> !(libs == 'none')
 INCLUDE_LIBS=FALSE -> !(libs == 'none')
 //#endif
 
-## Individual Library Inclusion Conditions  
-# For allowMultipleValues choice parameters, == operator works like contains()
+## Individual Library Inclusion Conditions
+# Microsoft docs: For allowMultipleValues choice parameters, == operator works like contains()
 
 //#if (LIBS_INCLUDES_DEFAULTS)
 LIBS_INCLUDES_DEFAULTS=TRUE -> libs == 'defaults'

@@ -1,6 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <IsAspireSharedProject>true</IsAspireSharedProject>
+    </PropertyGroup>
+    
+    <!--#if (!LIBS_INCLUDES_DEFAULTS) -->
+    <PropertyGroup>
         <IsPackable>true</IsPackable>
         <PackageId>Momentum.ServiceDefaults</PackageId>
         <PackageDescription>Service defaults for Momentum platform providing common configurations
@@ -11,6 +15,7 @@
             https://github.com/vgmello/momentum/blob/main/libs/Momentum/src/Momentum.ServiceDefaults/README.md
         </PackageProjectUrl>
     </PropertyGroup>
+    <!--#endif -->
 
     <!--#if (libs == 'none') -->
     <ItemGroup>

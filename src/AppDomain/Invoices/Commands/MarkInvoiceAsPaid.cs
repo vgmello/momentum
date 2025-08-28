@@ -30,7 +30,7 @@ public class MarkInvoiceAsPaidValidator : AbstractValidator<MarkInvoiceAsPaidCom
     {
         RuleFor(c => c.TenantId).NotEmpty();
         RuleFor(c => c.InvoiceId).NotEmpty();
-        RuleFor(c => c.AmountPaid).GreaterThan(0);
+        RuleFor(c => c.AmountPaid).GreaterThan(0).WithMessage("'Amount Paid' must be greater than '0'.");
         RuleFor(c => c.PaymentDate).NotEmpty().When(c => c.PaymentDate.HasValue);
     }
 }

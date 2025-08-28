@@ -73,31 +73,48 @@ public class XmlDocumentationOperationTransformer(
 
         foreach (var parameter in operation.Parameters)
         {
-            if (xmlDocs.Parameters.TryGetValue(parameter.Name, out var paramDoc))
-            {
-                parameter.Description = paramDoc.Description;
-            }
-
-            if (parametersByName.TryGetValue(parameter.Name, out var paramInfo))
-            {
-                if (paramDoc?.Example is not null)
-                {
-                    parameter.Example = paramInfo.ParameterType.ConvertToOpenApiType(paramDoc.Example);
-                }
-
-                if (paramInfo.HasDefaultValue)
-                {
-                    var defaultValue = paramInfo.DefaultValue?.ToString();
-
-                    if (!string.IsNullOrEmpty(defaultValue))
-                    {
-                        parameter.Description = string.IsNullOrEmpty(parameter.Description)
-                            ? $"Default value: {defaultValue}"
-                            : $"{parameter.Description} (Default: {defaultValue})";
-                    }
-                }
-            }
+            EnrichParameterWithDocumentation(parameter, xmlDocs);
+            EnrichParameterWithReflectionInfo(parameter, parametersByName, xmlDocs);
         }
+    }
+
+    private static void EnrichParameterWithDocumentation(OpenApiParameter parameter, XmlDocumentationInfo xmlDocs)
+    {
+        if (xmlDocs.Parameters.TryGetValue(parameter.Name, out var paramDoc))
+        {
+            parameter.Description = paramDoc.Description;
+        }
+    }
+
+    private static void EnrichParameterWithReflectionInfo(OpenApiParameter parameter, Dictionary<string, ParameterInfo> parametersByName, XmlDocumentationInfo xmlDocs)
+    {
+        if (!parametersByName.TryGetValue(parameter.Name, out var paramInfo))
+            return;
+
+        SetParameterExample(parameter, xmlDocs, paramInfo);
+        SetParameterDefaultValue(parameter, paramInfo);
+    }
+
+    private static void SetParameterExample(OpenApiParameter parameter, XmlDocumentationInfo xmlDocs, ParameterInfo paramInfo)
+    {
+        if (xmlDocs.Parameters.TryGetValue(parameter.Name, out var paramDoc) && paramDoc.Example is not null)
+        {
+            parameter.Example = paramInfo.ParameterType.ConvertToOpenApiType(paramDoc.Example);
+        }
+    }
+
+    private static void SetParameterDefaultValue(OpenApiParameter parameter, ParameterInfo paramInfo)
+    {
+        if (!paramInfo.HasDefaultValue)
+            return;
+
+        var defaultValue = paramInfo.DefaultValue?.ToString();
+        if (string.IsNullOrEmpty(defaultValue))
+            return;
+
+        parameter.Description = string.IsNullOrEmpty(parameter.Description)
+            ? $"Default value: {defaultValue}"
+            : $"{parameter.Description} (Default: {defaultValue})";
     }
 
     private static void EnrichResponses(OpenApiOperation operation, XmlDocumentationInfo xmlDocs)

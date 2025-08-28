@@ -34,8 +34,8 @@ dotnet run --project src/AppDomain.AppHost
 -   **Distributed Tracing**: Follow requests across service boundaries
 -   **Resource Management**: Monitor database connections and external dependencies
 
-[!TIP]
-Access the dashboard at `http://localhost:15888` when running the AppHost locally.
+> [!TIP]
+> Access the dashboard at `http://localhost:15888` when running the AppHost locally.
 
 ### Service-Level Debugging
 

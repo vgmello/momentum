@@ -2,7 +2,6 @@
 
 using JasperFx.Core.Reflection;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Momentum.Extensions.Abstractions.Messaging;
@@ -23,7 +22,6 @@ public class KafkaWolverineExtensions(
     ILogger<KafkaWolverineExtensions> logger,
     IConfiguration configuration,
     IOptions<ServiceBusOptions> serviceBusOptions,
-    IHostEnvironment environment,
     ITopicNameGenerator topicNameGenerator,
     string serviceName
 ) : IWolverineExtension
@@ -43,11 +41,7 @@ public class KafkaWolverineExtensions(
                                     ?? throw new InvalidOperationException($"Kafka connection string '{serviceName}' not set.");
 
         var cloudEventMapper = new CloudEventMapper(serviceBusOptions);
-        var consumerGroupId = $"{options.ServiceName}-{environment.GetEnvNameShort()}";
-
         var autoProvisionEnabled = configuration.GetValue($"{ServiceBusOptions.SectionName}:Wolverine:AutoProvision", false);
-
-        LogInfoMessage(options, consumerGroupId, autoProvisionEnabled);
 
         var kafkaConfig = options
             .UseKafka(kafkaConnectionString)
@@ -162,13 +156,5 @@ public class KafkaWolverineExtensions(
                     e.PartitionKey = partitionKeyGetter(typedMessage);
                 }
             });
-    }
-
-    private void LogInfoMessage(WolverineOptions options, string consumerGroupId, bool autoProvisionEnabled)
-    {
-        logger.LogInformation("Configuring Kafka messaging for service {ServiceName} with connection {ConnectionName}",
-            options.ServiceName, serviceName);
-        logger.LogInformation("Consumer group ID: {GroupId}", consumerGroupId);
-        logger.LogInformation("Auto-provision enabled: {AutoProvisionEnabled}", autoProvisionEnabled);
     }
 }

@@ -15,7 +15,7 @@ var pgsql = builder
         .WithEndpointProxySupport(false)
         .WithImage("dpage/pgadmin4", "latest")
         .WithLifetime(ContainerLifetime.Persistent)
-        .WithUrlForEndpoint("http", url => url.DisplayText = "PgAdmin (DB Management)"))
+        .WithEndpointUrl("http","PgAdmin (DB Management)"))
     .WithLifetime(ContainerLifetime.Persistent);
 
 var database = pgsql.AddDatabase(name: "AppDomainDb", databaseName: "app_domain");
@@ -32,7 +32,7 @@ var kafka = builder.AddKafka("Messaging", port: 59092);
 kafka.WithKafkaUI(resource => resource
     .WithHostPort(port: 59093)
     .WaitFor(kafka)
-    .WithUrlForEndpoint("http", url => url.DisplayText = "Kafka UI"));
+    .WithEndpointUrl("http", "Kafka UI"));
 
 #endif
 #if (INCLUDE_ORLEANS)
@@ -52,6 +52,7 @@ var appDomainApi = builder
     .WithEnvironment("ServiceName", "AppDomain")
 #if (INCLUDE_ORLEANS)
     .WithEnvironment("Aspire__Azure__Data__Tables__DisableHealthChecks", "true")
+    .WithEnvironment("Orleans__UseLocalhostClustering", "false")
 #endif
     .WithKestrelLaunchProfileEndpoints()
 #if (USE_DB)
@@ -67,6 +68,7 @@ var appDomainApi = builder
 #if (USE_DB)
     .WaitFor(database)
 #endif
+    .WithEndpointUrl("http|https", "AppDomain API", "/scalar")
     .WithHttpHealthCheck("/health/internal");
 
 #endif
@@ -105,11 +107,7 @@ builder
     .WaitFor(pgsql)
 #endif
     .WithReplicas(3)
-    .WithUrlForEndpoint("https", url =>
-    {
-        url.DisplayText = "Dashboard";
-        url.Url = "/dashboard";
-    })
+    .WithEndpointUrl("http|https", "Dashboard", "/dashboard")
     .WithHttpHealthCheck("/health/internal");
 
 #endif
@@ -120,7 +118,7 @@ builder
     .WithBindMount("../../", "/app")
     .WithVolume("/app/docs/node_modules")
     .WithHttpEndpoint(port: 8119, targetPort: 5173, name: "http")
-    .WithUrlForEndpoint("http", url => url.DisplayText = "App Documentation")
+    .WithEndpointUrl("http", "App Documentation")
 #if (INCLUDE_API)
     .WaitFor(appDomainApi)
 #endif

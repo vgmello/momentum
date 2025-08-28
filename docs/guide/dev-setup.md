@@ -586,5 +586,5 @@ Once your development environment is set up:
 - Team chat channels for immediate support
 - Code review process for learning and collaboration
 
-[!TIP]
-Keep your development environment updated regularly by running `git pull`, `dotnet restore`, and `pnpm install` to stay current with the latest changes.
+> [!TIP]
+> Keep your development environment updated regularly by running `git pull`, `dotnet restore`, and `pnpm install` to stay current with the latest changes.

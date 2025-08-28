@@ -1,9 +1,11 @@
+[CmdletBinding()]
 param(
     [string]$NodeVersion = "22",
     [string]$PnpmVersion = "9",
-    [string]$DocsPath = "libs/Momentum/docs",
-    [string]$BuildDotnet = "true"
+    [string]$DocsPath = "libs/Momentum/docs"
 )
+
+$ErrorActionPreference = "Stop"
 
 function Write-GitHubOutput {
     param([string]$Name, [string]$Value)
@@ -11,17 +13,6 @@ function Write-GitHubOutput {
         "$Name=$Value" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
     }
     Write-Host "Output: $Name=$Value"
-}
-
-# Build .NET projects if requested
-if ($BuildDotnet -eq "true") {
-    Write-Host "📦 Building .NET projects..."
-    dotnet build libs/Momentum/Momentum.slnx --configuration Release
-    
-    if ($LASTEXITCODE -ne 0) {
-        Write-Error "❌ .NET build failed"
-        exit 1
-    }
 }
 
 # Install DocFX
@@ -37,24 +28,28 @@ if ($env:GITHUB_PATH) {
 }
 
 Write-Host "📋 Verifying DocFX installation..."
-$docfxVersion = docfx --version 2>&1
-
-if ($LASTEXITCODE -ne 0) {
+try {
+    $docfxVersion = docfx --version 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        throw "DocFX returned non-zero exit code"
+    }
+    Write-Host "✅ DocFX version: $docfxVersion"
+}
+catch {
     Write-Error "❌ DocFX installation failed or not in PATH"
-    Write-Host "PATH: $env:PATH"
-    Write-Host "HOME: $env:HOME"
+    Write-Host "Diagnostic information:"
+    Write-Host "   PATH: $env:PATH"
+    Write-Host "   HOME: $env:HOME"
     
     if (Test-Path $dotnetToolsPath) {
-        Write-Host "Tools directory contents:"
+        Write-Host "   Tools directory contents:"
         Get-ChildItem $dotnetToolsPath | Format-Table Name
     }
     else {
-        Write-Host "Tools directory not found"
+        Write-Host "   Tools directory not found: $dotnetToolsPath"
     }
     exit 1
 }
-
-Write-Host "DocFX version: $docfxVersion"
 
 # Change to docs directory
 Push-Location $DocsPath

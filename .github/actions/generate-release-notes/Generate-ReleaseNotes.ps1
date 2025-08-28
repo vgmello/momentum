@@ -1,13 +1,20 @@
+[CmdletBinding()]
 param(
     [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
     [string]$Version,
     
     [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
     [string]$Tag,
     
+    [ValidateSet("stable", "prerelease")]
     [string]$ReleaseType = "stable",
+    
     [string]$OutputFile = "release_notes.md"
 )
+
+$ErrorActionPreference = "Stop"
 
 # Auto-detect project type from tag pattern
 $projectType = "libraries"
@@ -18,6 +25,33 @@ if ($Tag -match '^template-v') {
     $projectType = "template"
     $tagPattern = "template-v*"
     $projectName = "Momentum Template"
+}
+
+# Get repository information for GitHub links
+$repoUrl = git config --get remote.origin.url
+if ($repoUrl -match 'github\.com[:/](.+?)(?:\.git)?$') {
+    $repoPath = $Matches[1]
+    $githubBaseUrl = "https://github.com/$repoPath"
+}
+else {
+    $githubBaseUrl = $null
+}
+
+# Function to generate Full Changelog link
+function Get-ChangelogLink {
+    param($LastRelease, $Tag, $GithubBaseUrl)
+    
+    if ($GithubBaseUrl) {
+        $changelogUrl = if ($LastRelease) { 
+            "$GithubBaseUrl/compare/$LastRelease...$Tag" 
+        } else { 
+            "$GithubBaseUrl/commits/$Tag" 
+        }
+        return "**Full Changelog**: [$changelogUrl]($changelogUrl)"
+    }
+    else {
+        return "**Full Changelog**: $(if ($LastRelease) { $LastRelease } else { 'beginning' })...$Tag"
+    }
 }
 
 Write-Host "🔍 Auto-detected project type: $projectType (from tag: $Tag)"
@@ -56,7 +90,7 @@ if ($ReleaseType -eq "prerelease") {
     $content += ""
     $content += $commits
     $content += ""
-    $content += "**Full Changelog**: $(if ($lastRelease) { $lastRelease } else { 'beginning' })...$Tag"
+    $content += (Get-ChangelogLink -LastRelease $lastRelease -Tag $Tag -GithubBaseUrl $githubBaseUrl)
     $content += ""
     $content += "---"
     $content += "📊 **Statistics**: $commitCount commits | $filesChanged files changed"
@@ -84,7 +118,7 @@ else {
     $content += ""
     $content += $commits
     $content += ""
-    $content += "**Full Changelog**: $(if ($lastRelease) { $lastRelease } else { 'beginning' })...$Tag"
+    $content += (Get-ChangelogLink -LastRelease $lastRelease -Tag $Tag -GithubBaseUrl $githubBaseUrl)
     $content += ""
     $content += "---"
     $content += "📊 **Statistics**: $commitCount commits | $filesChanged files changed"
