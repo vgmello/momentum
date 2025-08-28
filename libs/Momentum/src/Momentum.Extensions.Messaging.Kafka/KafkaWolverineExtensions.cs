@@ -2,7 +2,6 @@
 
 using JasperFx.Core.Reflection;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Momentum.Extensions.Abstractions.Messaging;
@@ -23,7 +22,6 @@ public class KafkaWolverineExtensions(
     ILogger<KafkaWolverineExtensions> logger,
     IConfiguration configuration,
     IOptions<ServiceBusOptions> serviceBusOptions,
-    IHostEnvironment environment,
     ITopicNameGenerator topicNameGenerator,
     string serviceName
 ) : IWolverineExtension
@@ -45,10 +43,6 @@ public class KafkaWolverineExtensions(
         var cloudEventMapper = new CloudEventMapper(serviceBusOptions);
         var autoProvisionEnabled = configuration.GetValue($"{ServiceBusOptions.SectionName}:Wolverine:AutoProvision", false);
 
-        var consumerGroupId = GetConsumerGroupId(configuration, serviceName, options.ServiceName, environment.GetEnvNameShort());
-
-        LogInfoMessage(options, consumerGroupId, autoProvisionEnabled);
-
         var kafkaConfig = options
             .UseKafka(kafkaConnectionString)
             .ConfigureSenders(cfg => cfg.UseInterop(cloudEventMapper))
@@ -57,8 +51,6 @@ public class KafkaWolverineExtensions(
         kafkaConfig.ConfigureClient(clientConfig => ApplyAspireClientConfig(configuration, serviceName, clientConfig));
         kafkaConfig.ConfigureConsumers(consumerConfig => ApplyAspireConsumerConfig(configuration, serviceName, consumerConfig));
         kafkaConfig.ConfigureProducers(producerConfig => ApplyAspireProducerConfig(configuration, serviceName, producerConfig));
-
-        kafkaConfig.ConfigureClient(clientConfig => clientConfig.ClientId ??= options.ServiceName.ToLowerInvariant());
 
         if (autoProvisionEnabled)
         {
@@ -164,14 +156,5 @@ public class KafkaWolverineExtensions(
                     e.PartitionKey = partitionKeyGetter(typedMessage);
                 }
             });
-    }
-
-    private void LogInfoMessage(WolverineOptions options, string consumerGroupId, bool autoProvisionEnabled)
-    {
-        logger.LogInformation("Configuring Kafka messaging for service {ServiceName} with connection {ConnectionName}",
-            options.ServiceName, serviceName);
-
-        logger.LogInformation("Consumer group ID: {GroupId}", consumerGroupId);
-        logger.LogInformation("Auto-provision enabled: {AutoProvisionEnabled}", autoProvisionEnabled);
     }
 }

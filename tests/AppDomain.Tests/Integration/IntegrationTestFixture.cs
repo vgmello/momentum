@@ -4,10 +4,6 @@ using AppDomain.Tests.Integration._Internal;
 using AppDomain.Tests.Integration._Internal.Extensions;
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Networks;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
@@ -15,9 +11,7 @@ using System.Diagnostics.CodeAnalysis;
 using Momentum.ServiceDefaults;
 using AppDomain;
 //#if (USE_DB)
-using AppDomain.Core.Data;
 using AppDomain.Tests.Integration._Internal.Containers;
-using Momentum.Extensions.Data.LinqToDb;
 using Testcontainers.PostgreSql;
 //#endif
 //#if (USE_KAFKA)
@@ -31,9 +25,10 @@ using AppDomain.Infrastructure;
 using Momentum.Extensions.Messaging.Kafka;
 using Momentum.ServiceDefaults.Api;
 using Momentum.ServiceDefaults.HealthChecks;
+
 //#endif
 //#if (INCLUDE_API && INCLUDE_ORLEANS)
-using AppDomain.Api.Infrastructure.Extensions;
+
 //#endif
 
 [assembly: DomainAssembly(typeof(IAppDomainAssembly))]
@@ -51,6 +46,7 @@ public class IntegrationTestFixture : IAsyncLifetime
 
 //#if (USE_DB)
     private readonly PostgreSqlContainer _postgres;
+
 //#endif
 //#if (USE_KAFKA)
     private readonly KafkaContainer _kafka;
@@ -63,7 +59,9 @@ public class IntegrationTestFixture : IAsyncLifetime
 
 //#if (USE_DB)
     public string AppDomainDbConnectionString => _postgres.GetDbConnectionString("app_domain");
+
     public string ServiceBusDbConnectionString => _postgres.GetDbConnectionString("service_bus");
+
 //#endif
 //#if (USE_KAFKA)
     public string KafkaBootstrapAddress => _kafka.GetBootstrapAddress();
@@ -117,12 +115,13 @@ public class IntegrationTestFixture : IAsyncLifetime
     private async Task CreateTestWebApplicationAsync()
     {
         var builder = WebApplication.CreateEmptyBuilder(new WebApplicationOptions());
-        var configData = new Dictionary<string, string?>();
-
-//#if (USE_DB)
-        configData["ConnectionStrings:AppDomainDb"] = _postgres.GetDbConnectionString("app_domain");
-        configData["ConnectionStrings:ServiceBus"] = _postgres.GetDbConnectionString("service_bus");
-//#endif
+        var configData = new Dictionary<string, string?>
+        {
+            //#if (USE_DB)
+            ["ConnectionStrings:AppDomainDb"] = _postgres.GetDbConnectionString("app_domain"),
+            ["ConnectionStrings:ServiceBus"] = _postgres.GetDbConnectionString("service_bus")
+            //#endif
+        };
 
 //#if (USE_KAFKA)
         var kafkaAddress = _kafka.GetBootstrapAddress();
@@ -196,15 +195,19 @@ public class IntegrationTestFixture : IAsyncLifetime
         GrpcChannel.Dispose();
 //#endif
 
-        var disposeTasks = new List<Task>();
-//#if (USE_DB)
-        disposeTasks.Add(_postgres.DisposeAsync().AsTask());
-//#endif
-//#if (USE_KAFKA)
-        disposeTasks.Add(_kafka.DisposeAsync().AsTask());
-//#endif
+        var disposeTasks = new List<Task>
+        {
+            //#if (USE_DB)
+            _postgres.DisposeAsync().AsTask(),
+            //#endif
+            //#if (USE_KAFKA)
+            _kafka.DisposeAsync().AsTask()
+            //#endif
+        };
+
         if (disposeTasks.Count > 0)
             await Task.WhenAll(disposeTasks);
+
         await _containerNetwork.DisposeAsync();
         await Log.CloseAndFlushAsync();
     }

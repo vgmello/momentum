@@ -7,8 +7,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Momentum.Extensions.Abstractions.Extensions;
 using Momentum.ServiceDefaults.Messaging;
 using Wolverine;
+using static Momentum.Extensions.Messaging.Kafka.KafkaAspireExtensions;
 
 namespace Momentum.Extensions.Messaging.Kafka;
 
@@ -30,6 +32,16 @@ public static class KafkaSetupExtensions
         Action<KafkaProducerSettings>? configureProducerSettings = null,
         Action<KafkaConsumerSettings>? configureConsumerSettings = null)
     {
+        var clientId = builder.Environment.ApplicationName.ToKebabCase();
+
+        SetConfigConsumerGroupId(
+            builder.Configuration,
+            serviceName,
+            clientId,
+            builder.Environment.GetEnvNameShort());
+
+        SetConfigClientId(builder.Configuration, serviceName, clientId);
+
         builder.AddKafkaProducer<string, byte[]>(serviceName, configureProducerSettings);
         builder.AddKafkaConsumer<string, byte[]>(serviceName, configureConsumerSettings);
 
@@ -40,7 +52,6 @@ public static class KafkaSetupExtensions
                 provider.GetRequiredService<ILogger<KafkaWolverineExtensions>>(),
                 provider.GetRequiredService<IConfiguration>(),
                 provider.GetRequiredService<IOptions<ServiceBusOptions>>(),
-                provider.GetRequiredService<IHostEnvironment>(),
                 provider.GetRequiredService<ITopicNameGenerator>(),
                 serviceName)
         );

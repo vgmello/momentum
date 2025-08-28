@@ -10,6 +10,8 @@ namespace Momentum.Extensions.Messaging.Kafka;
 /// </summary>
 public static class KafkaAspireExtensions
 {
+    public const string SectionName = "Aspire:Confluent:Kafka";
+
     /// <summary>
     ///     Applies Aspire producer configuration to Wolverine's producer config.
     /// </summary>
@@ -37,27 +39,50 @@ public static class KafkaAspireExtensions
         ApplyConfig(configuration, $"Security:{serviceName}:Config", clientConfig);
     }
 
-    public static string GetConsumerGroupId(IConfiguration configuration, string serviceName, string logicalServiceName, string environment)
+    public static void SetConfigConsumerGroupId(IConfiguration configuration, string serviceName, string groupPrefix, string environment)
     {
-        var consumerGroupConfig = $"Aspire:Confluent:Kafka:Consumer:{serviceName}:Config:GroupId";
-        var consumerGroupId = configuration.GetValue<string>(consumerGroupConfig);
+        var consumerGroupIdConfig = $"{SectionName}:Consumer:{serviceName}:Config:GroupId";
+        var consumerGroupId = configuration.GetValue<string>(consumerGroupIdConfig);
 
         if (consumerGroupId is null)
         {
-            consumerGroupId = $"{logicalServiceName}-{environment}";
-            configuration[consumerGroupConfig] = consumerGroupId;
+            configuration[consumerGroupIdConfig] = $"{groupPrefix}-{environment}";
+        }
+    }
+
+    public static void SetConfigClientId(IConfiguration configuration, string serviceName, string clientId)
+    {
+        const string clientIdConfig = $"{SectionName}:ClientId";
+        var configClientId = configuration.GetValue<string>(clientIdConfig);
+
+        if (configClientId is null)
+        {
+            configClientId = clientId;
+            configuration[clientIdConfig] = configClientId;
         }
 
-        return consumerGroupId;
+        var consumerClientIdConfig = $"{SectionName}:Consumer:{serviceName}:Config:ClientId";
+        var consumerClientId = configuration.GetValue<string>(consumerClientIdConfig);
+
+        if (consumerClientId is null)
+        {
+            configuration[consumerClientIdConfig] = configClientId;
+        }
+
+        var producerClientIdConfig = $"{SectionName}:Producer:{serviceName}:Config:ClientId";
+        var producerClientId = configuration.GetValue<string>(producerClientIdConfig);
+
+        if (producerClientId is null)
+        {
+            configuration[producerClientIdConfig] = configClientId;
+        }
     }
 
     private static void ApplyConfig(IConfiguration configuration, string configName, ClientConfig clientConfig)
     {
-        var generalConfigSection = configuration.GetSection($"Aspire:Confluent:Kafka:{configName}");
+        var configSection = configuration.GetSection($"{SectionName}:{configName}");
 
-        if (generalConfigSection.Exists())
-        {
-            generalConfigSection.Bind(clientConfig);
-        }
+        if (configSection.Exists())
+            configSection.Bind(clientConfig);
     }
 }
