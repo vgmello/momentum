@@ -444,3 +444,6 @@ _temp
 _template_tests/
 .pnpm-store/
 docs/obj**
+
+# Local development version files
+libs/Momentum/current-local-version.txt
