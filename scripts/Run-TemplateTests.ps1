@@ -257,6 +257,16 @@ function Test-Template {
     try {
         # Build template arguments
         $templateArgs = @('new', 'mmt', '-n', $Name, '--allow-scripts', 'yes')
+        
+        # Add local version if available (for local development)
+        $localVersionFile = Join-Path -Path $PSScriptRoot -ChildPath '../libs/Momentum/current-local-version.txt'
+        if (Test-Path $localVersionFile) {
+            $localVersion = Get-Content $localVersionFile -Raw | ForEach-Object { $_.Trim() }
+            if ($localVersion) {
+                $templateArgs += @('--mmt-version', $localVersion)
+            }
+        }
+        
         if ($Parameters.Trim()) {
             $templateArgs += ($Parameters -split '\s+' | Where-Object { $_ })
         }

@@ -1,4 +1,16 @@
 <Project>
+    <Target Name="GenerateLocalVersion" BeforeTargets="Build" Condition="!Exists('$(MSBuildThisFileDirectory)current-local-version.txt')">
+        <PropertyGroup>
+            <LocalVersionSuffix>$([System.DateTime]::UtcNow.ToString("yyyyMMdd-HHmmss"))</LocalVersionSuffix>
+            <BaseVersion>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)version.txt').Trim())</BaseVersion>
+            <LocalVersion>$(BaseVersion)-local.$(LocalVersionSuffix)</LocalVersion>
+            <LocalFeedAbsolutePath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory).local/nuget'))</LocalFeedAbsolutePath>
+        </PropertyGroup>
+        <Message Text="Generating local version: $(LocalVersion)" Importance="high"/>
+        <WriteLinesToFile File="$(MSBuildThisFileDirectory)current-local-version.txt" Lines="$(LocalVersion)" Overwrite="true"/>
+        <WriteLinesToFile File="$(MSBuildThisFileDirectory)local-feed-path.txt" Lines="$(LocalFeedAbsolutePath)" Overwrite="true"/>
+    </Target>
+
     <Target Name="CleanOldPackages" BeforeTargets="Build" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' ">
         <ItemGroup>
             <OldPackagesToDelete Include="$(TargetDir)../*.*upkg"/>
@@ -8,12 +20,11 @@
         <Delete Files="@(OldPackagesToDelete)"/>
     </Target>
 
-    <Target Name="SetPackageVersionSuffix" BeforeTargets="GenerateNuspec;Pack" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' ">
+    <Target Name="UseConsistentLocalVersion" BeforeTargets="GenerateNuspec;Pack" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' and Exists('$(MSBuildThisFileDirectory)current-local-version.txt') ">
         <PropertyGroup>
-            <VersionSuffix>$([System.DateTime]::UtcNow.ToString("yyyyMMdd-HHmmss"))</VersionSuffix>
-            <PackageVersion>$(VersionPrefix)-$(VersionSuffix)</PackageVersion>
+            <PackageVersion>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)current-local-version.txt').Trim())</PackageVersion>
         </PropertyGroup>
-        <Message Text="Packaging version: $(ProjectName)-$(PackageVersion)" Importance="high"/>
+        <Message Text="Using consistent local version: $(ProjectName)-$(PackageVersion)" Importance="high"/>
     </Target>
 
     <Target Name="PushToLocalFeed" AfterTargets="Pack" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug'">
