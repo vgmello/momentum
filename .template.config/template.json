@@ -607,11 +607,27 @@
       "target": "./",
       "include": [
         "libs/Momentum/current-local-version.txt",
-        "libs/Momentum/local-feed-path.txt",
+        "libs/Momentum/local-feed-path.txt"
+      ]
+    },
+    {
+      "source": "./",
+      "target": "./",
+      "include": [
         "Directory.Build.Local.props"
       ],
       "rename": {
         "Directory.Build.Local.props": "libs/Momentum/Directory.Build.Local.props"
+      }
+    },
+    {
+      "source": "./",
+      "target": "./",
+      "include": [
+        "Directory.Build.Local.props"
+      ],
+      "rename": {
+        "Directory.Build.Local.props": "src/Directory.Build.Local.props"
       }
     }
   ],
