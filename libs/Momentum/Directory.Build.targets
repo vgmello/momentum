@@ -1,5 +1,5 @@
 <Project>
-    <Target Name="GenerateLocalVersion" BeforeTargets="Build" Condition="!Exists('$(MSBuildThisFileDirectory)current-local-version.txt')">
+    <Target Name="GenerateLocalVersion" BeforeTargets="Build" Condition="'$(MSBuildProjectName)' == 'Momentum.Extensions.Abstractions' and !Exists('$(MSBuildThisFileDirectory)current-local-version.txt')">
         <PropertyGroup>
             <LocalVersionSuffix>$([System.DateTime]::UtcNow.ToString("yyyyMMdd-HHmmss"))</LocalVersionSuffix>
             <BaseVersion>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)version.txt').Trim())</BaseVersion>

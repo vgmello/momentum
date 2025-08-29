@@ -40,7 +40,7 @@
                  Link="libs\Momentum\src\%(RecursiveDir)%(Filename)%(Extension)"
                  Exclude="**\bin\**;**\obj\**;**\libs\Momentum\src\Momentum.Extensions.Abstractions\**;**\libs\Momentum\src\Momentum.Extensions.XmlDocs\**;**\libs\Momentum\src\Momentum.Extensions.EventMarkdownGenerator\**"/>
         <Content Include="..\..\*" PackagePath="/content/"
-                 Link="%(Filename)%(Extension)"  Exclude="**\CLAUDE.md;debug.symbols.txt;Directory.Build.props"/>
+                 Link="%(Filename)%(Extension)"  Exclude="**\CLAUDE.md;debug.symbols.txt"/>
     </ItemGroup>
 
     <ItemGroup>
