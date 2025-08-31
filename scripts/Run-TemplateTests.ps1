@@ -6,13 +6,13 @@
 
 .DESCRIPTION
     Comprehensive test suite for the Momentum .NET template (mmt) covering all critical scenarios:
-    
+
     • Component isolation testing
-    • Infrastructure variation testing  
+    • Infrastructure variation testing
     • Configuration edge case testing
     • Real-world pattern testing
     • Automated validation
-    
+
     Features:
     • 8 test categories with ~25 parametrized tests
     • Immediate cleanup after each test to conserve disk space
@@ -168,12 +168,12 @@ function Test-MaxFailuresReached {
 
     if ($MaxFailures -gt 0 -and $script:FailedTests -ge $MaxFailures) {
         Write-ColoredMessage -Level 'ERROR' -Message "Reached maximum failures ($MaxFailures). Exiting early."
-        
+
         # Clean up any temp files passed in
         if ($TempFiles.Count -gt 0) {
             Remove-Item $TempFiles -Force -ErrorAction SilentlyContinue
         }
-        
+
         Pop-Location
         Invoke-IndividualTestCleanup -TestName $TestName -TestResult 'FAILED'
         Show-Results
@@ -257,16 +257,7 @@ function Test-Template {
     try {
         # Build template arguments
         $templateArgs = @('new', 'mmt', '-n', $Name, '--allow-scripts', 'yes')
-        
-        # Add local version if available (for local development)
-        $localVersionFile = Join-Path -Path $PSScriptRoot -ChildPath '../libs/Momentum/current-local-version.txt'
-        if (Test-Path $localVersionFile) {
-            $localVersion = Get-Content $localVersionFile -Raw | ForEach-Object { $_.Trim() }
-            if ($localVersion) {
-                $templateArgs += @('--mmt-version', $localVersion)
-            }
-        }
-        
+
         if ($Parameters.Trim()) {
             $templateArgs += ($Parameters -split '\s+' | Where-Object { $_ })
         }
@@ -320,7 +311,7 @@ function Test-Template {
 
                 # Exclude E2E tests by filtering out tests with Type=E2E trait
                 $testArgs = @('test', '--verbosity', 'normal', '--filter', 'Type!=E2E')
-                
+
                 $testProcess = Start-Process -FilePath 'dotnet' -ArgumentList $testArgs `
                     -NoNewWindow -Wait -PassThru `
                     -RedirectStandardOutput $testOut -RedirectStandardError $testErr
@@ -531,7 +522,7 @@ function Invoke-TestCategory {
             Test-Template -Name 'TestDebugSymbols' -Parameters '--debug-symbols' -TestCategory 'Edge Cases'
             $allFalseParams = '--api false --back-office false --orleans false --docs false --aspire false --kafka false'
             Test-Template -Name 'TestAllFalse' -Parameters $allFalseParams -TestCategory 'Edge Cases'
-            
+
             $allTrueParams = '--api true --back-office true --orleans true --docs true --aspire true --kafka true'
             Test-Template -Name 'TestAllTrue' -Parameters $allTrueParams -TestCategory 'Edge Cases'
         }
@@ -555,7 +546,7 @@ function Show-Categories {
     Write-Host ''
     Write-Host 'Use -MaxFailures N to exit after N failures (default: 0 = run all)' -ForegroundColor Yellow
     Write-Host ''
-    
+
     $categories = @(
         @{ Number = '1'; Name = 'component-isolation'; Description = 'Test each component in isolation' }
         @{ Number = '2'; Name = 'database-config'; Description = 'Validate all database setup options' }
@@ -566,7 +557,7 @@ function Show-Categories {
         @{ Number = '7'; Name = 'orleans-combinations'; Description = 'Test stateful processing configurations' }
         @{ Number = '8'; Name = 'edge-cases'; Description = 'Test boundary conditions and special modes' }
     )
-    
+
     foreach ($category in $categories) {
         $paddedName = $category.Name.PadRight(20)
         Write-Host "$($category.Number). $paddedName - $($category.Description)" -ForegroundColor White
@@ -698,7 +689,7 @@ function Invoke-Main {
         else {
             $allCategories = @(
                 'component-isolation',
-                'database-config', 
+                'database-config',
                 'port-config',
                 'org-names',
                 'library-config',

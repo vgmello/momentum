@@ -40,6 +40,11 @@
     "mmt-version": {
       "longName": "mmt-version",
       "shortName": ""
+    },
+    "debug-symbols": {
+      "longName": "debug-symbols",
+      "shortName": "",
+      "isHidden": true
     }
   }
 }

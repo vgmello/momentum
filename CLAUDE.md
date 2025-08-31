@@ -17,7 +17,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 # Install template for testing
-dotnet new install .
+# IMPORTANT: Only install the template from the main repo folder do not copy the template folder to another location
+dotnet new install ./ --force
 
 # Generate test solution
 dotnet new mmt -n TestService --allow-scripts yes
@@ -140,7 +141,7 @@ Generated services follow CQRS with Wolverine:
 YourService/
 ├── Customers/                    # Business domain
 │   ├── Commands/                 # Actions (CreateCustomer, etc.)
-│   ├── Queries/                  # Data retrieval (GetCustomer, etc.)  
+│   ├── Queries/                  # Data retrieval (GetCustomer, etc.)
 │   ├── Data/                     # Database operations
 │   └── Contracts/                # Integration events
 └── Orders/                       # Another domain
@@ -222,7 +223,7 @@ Comprehensive template testing across scenarios:
 # Test specific scenarios
 ./scripts/Run-TemplateTests.ps1 -Category real-world-patterns
 
-# Available categories: component-isolation, database-config, port-config, 
+# Available categories: component-isolation, database-config, port-config,
 # org-names, library-config, real-world-patterns, orleans-combinations, edge-cases
 ```
 
@@ -237,7 +238,7 @@ public async Task<Result<Customer>> Handle(CreateCustomerCommand command)
     var validationResult = await validator.ValidateAsync(command);
     if (!validationResult.IsValid)
         return Result<Customer>.Failure(validationResult.Errors);
-    
+
     // Business logic...
     return Result<Customer>.Success(customer);
 }

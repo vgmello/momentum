@@ -1,7 +1,4 @@
 <Project>
-  <!-- Import local development configuration if it exists -->
-  <Import Project="libs/Momentum/Directory.Build.Local.props" Condition="Exists('libs/Momentum/Directory.Build.Local.props')" />
-
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
@@ -32,5 +29,9 @@
   <PropertyGroup>
     <DefineConstants>USE_PGSQL;USE_LIQUIBASE;USE_KAFKA;INCLUDE_ORLEANS;INCLUDE_API;USE_DB;USE_KAFKA;INCLUDE_DOCS;INCLUDE_BACK_OFFICE</DefineConstants>
   </PropertyGroup>
+  <!--#endif -->
+
+  <!--#if (local) -->
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" Condition="'' != $([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
   <!--#endif -->
 </Project>

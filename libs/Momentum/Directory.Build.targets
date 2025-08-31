@@ -1,5 +1,5 @@
 <Project>
-    <Target Name="GenerateLocalVersion" BeforeTargets="Build" Condition="'$(MSBuildProjectName)' == 'Momentum.Extensions.Abstractions' and !Exists('$(MSBuildThisFileDirectory)current-local-version.txt')">
+    <Target Name="GenerateLocalVersion" BeforeTargets="Build" Condition="'$(MSBuildProjectName)' == 'Momentum.Extensions.Abstractions' and '$(Configuration)' == 'Debug'">
         <PropertyGroup>
             <LocalVersionSuffix>$([System.DateTime]::UtcNow.ToString("yyyyMMdd-HHmmss"))</LocalVersionSuffix>
             <BaseVersion>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)version.txt').Trim())</BaseVersion>
@@ -7,8 +7,8 @@
             <LocalFeedAbsolutePath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory).local/nuget'))</LocalFeedAbsolutePath>
         </PropertyGroup>
         <Message Text="Generating local version: $(LocalVersion)" Importance="high"/>
-        <WriteLinesToFile File="$(MSBuildThisFileDirectory)current-local-version.txt" Lines="$(LocalVersion)" Overwrite="true"/>
-        <WriteLinesToFile File="$(MSBuildThisFileDirectory)local-feed-path.txt" Lines="$(LocalFeedAbsolutePath)" Overwrite="true"/>
+        <WriteLinesToFile File="$(MSBuildThisFileDirectory)../../current-local-version.txt" Lines="$(LocalVersion)" Overwrite="true"/>
+        <WriteLinesToFile File="$(MSBuildThisFileDirectory)../../local-feed-path.txt" Lines="$(LocalFeedAbsolutePath)" Overwrite="true"/>
     </Target>
 
     <Target Name="CleanOldPackages" BeforeTargets="Build" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' ">
@@ -24,7 +24,7 @@
         <PropertyGroup>
             <PackageVersion>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)current-local-version.txt').Trim())</PackageVersion>
         </PropertyGroup>
-        <Message Text="Using consistent local version: $(ProjectName)-$(PackageVersion)" Importance="high"/>
+        <Message Text="Using local version: $(ProjectName)-$(PackageVersion)" Importance="high"/>
     </Target>
 
     <Target Name="PushToLocalFeed" AfterTargets="Pack" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug'">
