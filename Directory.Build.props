@@ -1,4 +1,6 @@
 <Project>
+  <!-- Import local development configuration if it exists -->
+  <Import Project="libs/Momentum/Directory.Build.Local.props" Condition="Exists('libs/Momentum/Directory.Build.Local.props')" />
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>

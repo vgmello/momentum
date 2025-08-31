@@ -434,11 +434,13 @@
         {
           "condition": "(project-only)",
           "include": [
-            "Directory.Build.props",
             "Directory.Packages.props",
             "*.ruleset",
             "*.slnx",
             "*.slnx.DotSettings"
+          ],
+          "exclude": [
+            "Directory.Build.Local.props"
           ]
         },
         {
@@ -598,6 +600,34 @@
       ],
       "rename": {
         "ProjectREADME.md": "README.md"
+      }
+    },
+    {
+      "source": "./",
+      "target": "./",
+      "include": [
+        "libs/Momentum/current-local-version.txt",
+        "libs/Momentum/local-feed-path.txt"
+      ]
+    },
+    {
+      "source": "./",
+      "target": "./",
+      "include": [
+        "Directory.Build.Local.props"
+      ],
+      "rename": {
+        "Directory.Build.Local.props": "libs/Momentum/Directory.Build.Local.props"
+      }
+    },
+    {
+      "source": "./",
+      "target": "./",
+      "include": [
+        "Directory.Build.Local.props"
+      ],
+      "rename": {
+        "Directory.Build.Local.props": "src/Directory.Build.Local.props"
       }
     }
   ],

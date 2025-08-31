@@ -3,11 +3,6 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <AspireAppHostSdkVersion>9.4</AspireAppHostSdkVersion>
     <MomentumVersion>$(TemplateMomentumVersion)</MomentumVersion>
-    <!--#if (mmt-version == "__CI_MOMENTUM_VERSION__") -->
-    <MomentumVersion>0.0.1-pre.14</MomentumVersion>
-    <!--#elseif (false) -->
-    <MomentumVersion>0.0.1-local</MomentumVersion>
-    <!--#endif -->
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Aspire.Azure.Data.Tables" Version="9.4.1" />
