@@ -42,7 +42,6 @@ function Write-GitHubMultilineOutput {
     }
 }
 
-# Pack packages
 $nugetOutputDir = "./_tmp_nuget_output"
 
 Write-Host "🔍 Debug information:"
@@ -51,7 +50,6 @@ Write-Host "   Target path: $Path"
 Write-Host "   Package version: $PackageVersion"
 Write-Host "   Configuration: $Config"
 
-# Validate path exists
 if (-not (Test-Path $Path)) {
     Write-Error "❌ Target path '$Path' does not exist"
     Write-Host "   Working directory contents:"
@@ -67,7 +65,6 @@ New-Item -ItemType Directory -Path $nugetOutputDir | Out-Null
 
 Write-Host "📦 Packing packages with version $PackageVersion..."
 
-# Build arguments array to avoid Invoke-Expression parsing issues
 $packArguments = @(
     "pack",
     $Path,
@@ -77,12 +74,10 @@ $packArguments = @(
     "--output", $nugetOutputDir
 )
 
-# Add additional pack arguments if provided
 if ($PackArgs.Count -gt 0) {
     $packArguments += $PackArgs
 }
 
-# Display command without sensitive information
 $commandDisplay = "dotnet " + ($packArguments -join " ")
 Write-Host "Executing: $commandDisplay"
 & dotnet @packArguments
@@ -95,7 +90,6 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "✅ Packages created successfully in $nugetOutputDir"
 Write-GitHubOutput -Name "output_dir" -Value $nugetOutputDir
 
-# Find packages
 Write-Host "🔍 Finding NuGet packages in '$nugetOutputDir'..."
 
 $packages = Get-ChildItem -Path $nugetOutputDir -Filter "*.nupkg" | Sort-Object Name
@@ -116,9 +110,7 @@ Write-GitHubMultilineOutput -Name "packages" -Values ($packages | ForEach-Object
 
 # Publish to NuGet
 if (-not $DryRun) {
-    $sourceName = if ($NugetSource -like "*nugettest.org*") { "NuGet Test" } else { "NuGet.org" }
-
-    Write-Host "🚀 Publishing packages to $sourceName..."
+    Write-Host "🚀 Publishing packages..."
     Write-Host "   Source: $NugetSource"
 
     $publishedList = @()
@@ -166,7 +158,7 @@ if (-not $DryRun) {
     }
 
     Write-Host ""
-    Write-Host "🎉 Published $successCount/$totalCount packages to $sourceName!"
+    Write-Host "🎉 Published $successCount/$totalCount packages !"
     Write-GitHubMultilineOutput -Name "packages" -Values $publishedList
 }
 else {

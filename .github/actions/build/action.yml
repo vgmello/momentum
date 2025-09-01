@@ -2,14 +2,13 @@ name: "Build .NET Projects"
 description: "Build .NET projects with caching"
 
 inputs:
+  build-target:
+    description: "Solution or Project to build"
+    required: true
   configuration:
     description: "Build configuration (Debug/Release)"
     required: false
     default: "Release"
-  build-target:
-    description: "Solution or Project to build"
-    required: false
-    default: "*.slnx"
 
 runs:
   using: "composite"
