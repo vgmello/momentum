@@ -256,7 +256,7 @@ function Test-Template {
 
     try {
         # Build template arguments
-        $templateArgs = @('new', 'mmt', '-n', $Name, '--allow-scripts', 'yes')
+        $templateArgs = @('new', 'mmt', '-n', $Name, '--allow-scripts', 'yes', '--local')
 
         if ($Parameters.Trim()) {
             $templateArgs += ($Parameters -split '\s+' | Where-Object { $_ })

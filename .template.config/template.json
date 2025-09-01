@@ -205,6 +205,13 @@
       "fileRename": "Momentum",
       "replaces": "__LIB_NAME__"
     },
+    "local": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "Use local NuGet packages from libs/Momentum/.local/nuget/ for testing",
+      "defaultValue": "false",
+      "replaces": "__LOCAL__"
+    },
     "mmt-version": {
       "type": "parameter",
       "datatype": "string",
@@ -273,6 +280,10 @@
     "USE_KAFKA": {
       "type": "computed",
       "value": "kafka && HAS_BACKEND"
+    },
+    "USE_LOCAL": {
+      "type": "computed",
+      "value": "local"
     },
     "LIBS_INCLUDES_DEFAULTS": {
       "type": "computed",
@@ -383,9 +394,7 @@
         "infra/**/*",
         "src/**/*",
         "tests/**/*",
-        "libs/Momentum/src/**/*",
-        "current-local-version.txt",
-        "local-feed-path.txt"
+        "libs/Momentum/src/**/*"
       ],
       "exclude": [
         "**/[Bb]in/**",
@@ -437,12 +446,10 @@
           "condition": "(project-only)",
           "include": [
             "Directory.Packages.props",
+            "Directory.Build.props",
             "*.ruleset",
             "*.slnx",
             "*.slnx.DotSettings"
-          ],
-          "exclude": [
-            "Directory.Build.Local.props"
           ]
         },
         {
@@ -607,22 +614,12 @@
     {
       "source": "./",
       "target": "./",
+      "condition": "(USE_LOCAL)",
       "include": [
-        "Directory.Build.Local.props"
-      ],
-      "rename": {
-        "Directory.Build.Local.props": "libs/Momentum/Directory.Build.props"
-      }
-    },
-    {
-      "source": "./",
-      "target": "./",
-      "include": [
-        "Directory.Build.Local.props"
-      ],
-      "rename": {
-        "Directory.Build.Local.props": "src/Directory.Build.props"
-      }
+        "Directory.Build.Local.props",
+        "local-mmt-version.txt",
+        "local-feed-path.txt"
+      ]
     }
   ],
   "primaryOutputs": [

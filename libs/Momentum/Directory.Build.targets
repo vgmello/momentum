@@ -7,7 +7,7 @@
             <LocalFeedAbsolutePath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory).local/nuget'))</LocalFeedAbsolutePath>
         </PropertyGroup>
         <Message Text="Generating local version: $(LocalVersion)" Importance="high"/>
-        <WriteLinesToFile File="$(MSBuildThisFileDirectory)../../current-local-version.txt" Lines="$(LocalVersion)" Overwrite="true"/>
+        <WriteLinesToFile File="$(MSBuildThisFileDirectory)../../local-mmt-version.txt" Lines="$(LocalVersion)" Overwrite="true"/>
         <WriteLinesToFile File="$(MSBuildThisFileDirectory)../../local-feed-path.txt" Lines="$(LocalFeedAbsolutePath)" Overwrite="true"/>
     </Target>
 
@@ -20,9 +20,9 @@
         <Delete Files="@(OldPackagesToDelete)"/>
     </Target>
 
-    <Target Name="UseConsistentLocalVersion" BeforeTargets="GenerateNuspec;Pack" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' and Exists('$(MSBuildThisFileDirectory)current-local-version.txt') ">
+    <Target Name="UseConsistentLocalVersion" BeforeTargets="GenerateNuspec;Pack" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' and Exists('$(MSBuildThisFileDirectory)../../local-mmt-version.txt') ">
         <PropertyGroup>
-            <PackageVersion>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)current-local-version.txt').Trim())</PackageVersion>
+            <PackageVersion>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)../../local-mmt-version.txt').Trim())</PackageVersion>
         </PropertyGroup>
         <Message Text="Using local version: $(ProjectName)-$(PackageVersion)" Importance="high"/>
     </Target>

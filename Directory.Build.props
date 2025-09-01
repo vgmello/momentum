@@ -30,8 +30,7 @@
     <DefineConstants>USE_PGSQL;USE_LIQUIBASE;USE_KAFKA;INCLUDE_ORLEANS;INCLUDE_API;USE_DB;USE_KAFKA;INCLUDE_DOCS;INCLUDE_BACK_OFFICE</DefineConstants>
   </PropertyGroup>
   <!--#endif -->
-
   <!--#if (local) -->
-  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" Condition="'' != $([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+  <Import Project="$(MSBuildThisFileDirectory)Directory.Build.Local.props" Condition="Exists('$(MSBuildThisFileDirectory)Directory.Build.Local.props')" />
   <!--#endif -->
 </Project>

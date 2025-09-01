@@ -20,10 +20,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # IMPORTANT: Only install the template from the main repo folder do not copy the template folder to another location
 dotnet new install ./ --force
 
-# Generate test solution
+# Generate test solution (standard)
 dotnet new mmt -n TestService --allow-scripts yes
 
-# Run comprehensive template tests
+# Generate test solution with local NuGet packages for development
+dotnet new mmt -n TestService --allow-scripts yes --local
+
+# Run comprehensive template tests (automatically uses --local flag)
 ./scripts/Run-TemplateTests.ps1
 
 # Run specific test category
@@ -31,6 +34,19 @@ dotnet new mmt -n TestService --allow-scripts yes
 
 # Test with early exit after failures
 ./scripts/Run-TemplateTests.ps1 -MaxFailures 3
+```
+
+### Local NuGet Package Development
+
+```bash
+# Build and pack Momentum libraries to local NuGet feed
+cd libs/Momentum
+dotnet build Momentum.slnx
+
+# Test template with fresh local packages
+cd ../../
+dotnet new install ./ --force
+dotnet new mmt -n TestLocal --allow-scripts yes --local --project-only
 ```
 
 ### Building and Testing
@@ -132,6 +148,7 @@ YourService/
 - Infrastructure: `--db [none|npgsql|liquibase]`, `--kafka`
 - Customization: `--org "Company"`, `--port 8100`, `--no-sample`
 - Libraries: `--libs [defaults|api|ext|kafka|generators]`
+- Development: `--local` (use local NuGet packages for testing)
 
 ### Domain-Driven Design Patterns
 
@@ -179,6 +196,37 @@ YourService/
 - **Momentum.ServiceDefaults.Api**: OpenAPI, gRPC, route conventions
 - **Momentum.Extensions.SourceGenerators**: DbCommand code generation
 - **Momentum.Extensions.Messaging.Kafka**: CloudEvents and Kafka integration
+
+### Local Development with `--local` Flag
+
+The `--local` flag enables template testing with locally built Momentum libraries:
+
+**What it does**:
+- Includes `Directory.Build.Local.props` with local NuGet feed configuration
+- Copies `local-mmt-version.txt` and `local-feed-path.txt` to generated project
+- Configures MSBuild to use local packages from `libs/Momentum/.local/nuget/`
+- Automatically used by `Run-TemplateTests.ps1` for template testing
+
+**Generated Local Configuration**:
+```xml
+<!-- Directory.Build.Local.props -->
+<MomentumLocalFeedPath>libs/Momentum/.local/nuget</MomentumLocalFeedPath>
+<RestoreAdditionalProjectSources>$(MomentumLocalFeedPath)</RestoreAdditionalProjectSources>
+<LocalMomentumVersion>0.0.1-local.20250901-234411</LocalMomentumVersion>
+
+<!-- Directory.Packages.props with --local -->
+<MomentumVersion>__CI_MOMENTUM_VERSION__</MomentumVersion>
+<MomentumVersion>$(LocalMomentumVersion)</MomentumVersion> <!-- Overrides above -->
+```
+
+**Usage**:
+```bash
+# Generate template with local packages
+dotnet new mmt -n TestLocal --local --project-only
+
+# ... pack libraries with NEW_VERSION ...
+dotnet new mmt -n TestUpdated --local
+```
 
 ## Testing Strategy
 
@@ -314,3 +362,4 @@ Template generates environment-specific configurations:
 - **Development**: Uses Aspire dashboard, verbose logging
 - **Production**: Optimized for container deployment
 - **Docker Compose**: Full-stack local development environment
+- ALWAYS TEST ANY CHANGES YOU MADE

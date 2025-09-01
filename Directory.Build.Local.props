@@ -5,18 +5,15 @@
     Generated templates will use Directory.Build.Local.props (renamed to Directory.Build.props).
   -->
 
-  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" Condition="'' != $([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
-
   <PropertyGroup>
-    <!-- Read local feed path from file if it exists (for both momentum repo and generated templates) -->
-    <MomentumLocalFeedPath Condition="Exists('$(MSBuildThisFileDirectory)../local-feed-path.txt')">$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)../local-feed-path.txt').Trim())</MomentumLocalFeedPath>
+    <!-- Read local feed path from file if it exists -->
+    <MomentumLocalFeedPath Condition="Exists('$(MSBuildThisFileDirectory)local-feed-path.txt')">$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)local-feed-path.txt').Trim())</MomentumLocalFeedPath>
 
     <!-- Enable local NuGet feed if path exists -->
     <RestoreAdditionalProjectSources Condition="'$(MomentumLocalFeedPath)' != '' and Exists('$(MomentumLocalFeedPath)')">$(MomentumLocalFeedPath)</RestoreAdditionalProjectSources>
 
     <!-- Set template version from local version file with fallback -->
-    <TemplateMomentumVersion Condition="Exists('$(MSBuildThisFileDirectory)../current-local-version.txt')">$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)../current-local-version.txt').Trim())</TemplateMomentumVersion>
-    <TemplateMomentumVersion Condition="'$(TemplateMomentumVersion)' == ''">0.0.1</TemplateMomentumVersion>
+    <LocalMomentumVersion Condition="Exists('$(MSBuildThisFileDirectory)local-mmt-version.txt')">$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)local-mmt-version.txt').Trim())</LocalMomentumVersion>
   </PropertyGroup>
 
 </Project>

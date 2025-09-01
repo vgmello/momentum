@@ -1,1 +1,0 @@
-/home/vgmello/shared/repos/momentum/libs/Momentum/.local/nuget

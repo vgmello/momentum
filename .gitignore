@@ -446,5 +446,5 @@ _template_tests/
 docs/obj**
 
 # Local development version files
-libs/Momentum/current-local-version.txt
-libs/Momentum/local-feed-path.txt
+local-mmt-version.txt
+local-feed-path.txt
