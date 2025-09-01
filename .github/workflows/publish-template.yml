@@ -42,6 +42,7 @@ env:
   DOTNET_NOLOGO: true
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
+  NUGET_SOURCE: "https://api.nuget.org/v3/index.json"
 
 concurrency:
   group: deploy-template-${{ github.ref }}
@@ -101,46 +102,6 @@ jobs:
 
           Write-Host "✅ Updated $filePath with version: $version"
 
-      - name: Calculate release version
-        if: steps.config.outputs.deploy-prerelease == 'true'
-        id: release-version
-        uses: ./.github/actions/version-calculate
-        with:
-          version-file: .template.config/version.txt
-          release-type: prerelease
-
-      - name: Generate pre-release notes
-        if: steps.config.outputs.deploy-prerelease == 'true' && steps.prerelease-version.outputs.skip != 'true'
-        uses: ./.github/actions/generate-release-notes
-        with:
-          version: ${{ steps.prerelease-version.outputs.version }}
-          tag: ${{ steps.prerelease-version.outputs.tag }}
-          release-type: prerelease
-          output-file: prerelease_notes.md
-
-      - name: Create GitHub pre-release
-        if: steps.config.outputs.deploy-prerelease == 'true' && steps.prerelease-version.outputs.skip != 'true' && steps.config.outputs.is-test != 'true'
-        shell: pwsh
-        run: |
-          & ./.github/scripts/Create-GitHubRelease.ps1 `
-            -Tag "${{ steps.prerelease-version.outputs.tag }}" `
-            -Title "Momentum Template ${{ steps.prerelease-version.outputs.version }}" `
-            -NotesFile "prerelease_notes.md" `
-            -Prerelease `
-            -Target "main"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Publish pre-release packages
-        if: steps.config.outputs.deploy-prerelease == 'true' && steps.prerelease-version.outputs.skip != 'true'
-        uses: ./.github/actions/nuget-publish
-        with:
-          path: libs/Momentum/Momentum.Template.csproj
-          package-version: ${{ steps.prerelease-version.outputs.version }}
-          pack-args: -p:PackTemplate=true --restore
-          nuget-api-key: ${{ steps.config.outputs.nuget-api-key }}
-          nuget-source: ${{ steps.config.outputs.nuget-source }}
-
       - name: Verify main branch for release
         if: steps.config.outputs.deploy-prerelease == 'false'
         shell: pwsh
@@ -153,66 +114,53 @@ jobs:
           Write-Host "✅ Confirmed on main branch"
 
       - name: Calculate release version
-        if: steps.config.outputs.deploy-prerelease == 'false'
         id: release-version
         uses: ./.github/actions/version-calculate
         with:
           version-file: .template.config/version.txt
-          release-type: stable
+          release-type: ${{ steps.config.outputs.release-type }}
           check-changes: false
 
       - name: Generate release notes
-        if: steps.config.outputs.deploy-prerelease == 'false'
         uses: ./.github/actions/generate-release-notes
         with:
           version: ${{ steps.release-version.outputs.version }}
           tag: ${{ steps.release-version.outputs.tag }}
-          release-type: stable
-          output-file: release_notes.md
+          release-type: ${{ steps.config.outputs.release-type }}
+          output-file: ${{ steps.config.outputs.release-type }}_notes.md
 
       - name: Create GitHub release
-        if: steps.config.outputs.deploy-prerelease == 'false' && steps.config.outputs.is-test != 'true'
         shell: pwsh
         run: |
           & ./.github/scripts/Create-GitHubRelease.ps1 `
             -Tag "${{ steps.release-version.outputs.tag }}" `
-            -Title "Momentum Template v${{ steps.release-version.outputs.version }}" `
-            -NotesFile "release_notes.md" `
+            -Title "Momentum Template ${{ steps.release-version.outputs.tag }}" `
+            -NotesFile "${{ steps.config.outputs.release-type }}_notes.md" `
+            ${{ steps.config.outputs.deploy-prerelease == 'true' && '-Prerelease' || '' }} `
             -Target "main"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Publish release packages
-        if: steps.config.outputs.deploy-prerelease == 'false'
+      - name: Publish packages
         uses: ./.github/actions/nuget-publish
         with:
           path: libs/Momentum/Momentum.Template.csproj
           package-version: ${{ steps.release-version.outputs.version }}
           pack-args: -p:PackTemplate=true --restore
-          nuget-api-key: ${{ steps.config.outputs.nuget-api-key }}
-          nuget-source: ${{ steps.config.outputs.nuget-source }}
+          nuget-api-key: ${{ secrets.NUGET_API_KEY }}
+          nuget-source: ${{ env.NUGET_SOURCE }}
 
       - name: Deployment Summary
         shell: pwsh
         run: |
           $args = @(
-            "-PrereleaseVersion", "${{ steps.prerelease-version.outputs.version }}",
-            "-PrereleaseTag", "${{ steps.prerelease-version.outputs.tag }}",
             "-ReleaseVersion", "${{ steps.release-version.outputs.version }}",
             "-ReleaseTag", "${{ steps.release-version.outputs.tag }}",
-            "-NugetSource", "${{ steps.config.outputs.nuget-source }}"
+            "-NugetSource", "${{ env.NUGET_SOURCE }}"
           )
-
-          if ("${{ steps.config.outputs.is-test }}" -eq "true") {
-            $args += "-IsTest"
-          }
 
           if ("${{ steps.config.outputs.deploy-prerelease }}" -eq "true") {
             $args += "-DeployPrerelease"
-          }
-
-          if ("${{ steps.prerelease-version.outputs.skip }}" -eq "true") {
-            $args += "-PrereleaseSkip"
           }
 
           & ./.github/scripts/Write-DeploymentSummary.ps1 @args

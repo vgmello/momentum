@@ -31,6 +31,7 @@ env:
   DOTNET_NOLOGO: true
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
+  NUGET_SOURCE: ${{ github.event.inputs.nuget-source || 'https://api.nuget.org/v3/index.json' }}
 
 concurrency:
   group: publish-${{ github.ref }}
@@ -113,8 +114,8 @@ jobs:
         with:
           path: libs/Momentum/Momentum.slnx
           package-version: ${{ steps.release-version.outputs.version }}
-          nuget-api-key: ${{ steps.config.outputs.nuget-api-key }}
-          nuget-source: ${{ steps.config.outputs.nuget-source }}
+          nuget-api-key: ${{ secrets.NUGET_API_KEY }}
+          nuget-source: ${{ env.NUGET_SOURCE }}
 
       - name: Setup Pages
         if: steps.config.outputs.deploy-docs == 'true'
@@ -144,7 +145,7 @@ jobs:
           $args = @(
             "-ReleaseVersion", "${{ steps.release-version.outputs.version }}",
             "-ReleaseTag", "${{ steps.release-version.outputs.tag }}",
-            "-NugetSource", "${{ steps.config.outputs.nuget-source }}"
+            "-NugetSource", "${{ env.NUGET_SOURCE }}"
           )
 
           if ("${{ steps.config.outputs.deploy-prerelease }}" -eq "true") {

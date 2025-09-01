@@ -12,14 +12,12 @@ Write-Host "# 📊 Deployment Summary"
 Write-Host ""
 
 if ($DeployPrerelease) {
-    if (-not [string]::IsNullOrWhiteSpace($PrereleaseVersion)) {
+    if (-not [string]::IsNullOrWhiteSpace($ReleaseVersion)) {
         Write-Host "✅ **Pre-release deployed**"
-        Write-Host "   - Version: $PrereleaseVersion"
-        Write-Host "   - Tag: $PrereleaseTag"
+        Write-Host "   - Version: $ReleaseVersion"
+        Write-Host "   - Tag: $ReleaseTag"
         Write-Host "   - NuGet: $NugetSource"
-        if (-not $IsTest) {
-            Write-Host "   - GitHub Release: Created"
-        }
+        Write-Host "   - GitHub Release: Created"
     }
     else {
         Write-Host "❌ **Pre-release failed**"
@@ -32,9 +30,7 @@ if (-not $DeployPrerelease) {
         Write-Host "   - Version: $ReleaseVersion"
         Write-Host "   - Tag: $ReleaseTag"
         Write-Host "   - NuGet: $NugetSource"
-        if (-not $IsTest) {
-            Write-Host "   - GitHub Release: Created"
-        }
+        Write-Host "   - GitHub Release: Created"
     }
     else {
         Write-Host "❌ **Release failed**"
