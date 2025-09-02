@@ -1,39 +1,17 @@
 [CmdletBinding()]
 param(
-    [string]$DeployType = "",
-    [string]$NugetSourceOverride = "",
-    [Parameter(Mandatory=$true)]
-    [ValidateNotNullOrEmpty()]
-    [string]$NugetApiKey,
-    [Parameter(Mandatory=$true)]
-    [ValidateNotNullOrEmpty()]
-    [string]$NugetTestApiKey
+    [string]$DeployType = ""
 )
+
+# Import Common
+. ..\common\Common.ps1
 
 $ErrorActionPreference = "Stop"
 
-function Write-GitHubOutput {
-    param([string]$Name, [string]$Value)
-    if ($env:GITHUB_OUTPUT) {
-        "$Name=$Value" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-    }
-    Write-Host "Output: $Name=$Value"
-}
-
-# Initialize variables (defaults)
+# Set defaults
+$releaseType = "stable"
 $deployPrerelease = $false
 $deployDocs = $false
-$isTest = $false
-$nugetSource = "https://api.nuget.org/v3/index.json"
-
-# Test deployments
-if ($DeployType -like "test-*") {
-    $isTest = $true
-    $nugetSource = "https://apiint.nugettest.org/v3/index.json"
-    if (-not [string]::IsNullOrWhiteSpace($NugetSourceOverride)) {
-        $nugetSource = $NugetSourceOverride
-    }
-}
 
 # Set prerelease flag (only when explicitly needed)
 $githubEventName = $env:GITHUB_EVENT_NAME
@@ -41,7 +19,9 @@ $githubRef = $env:GITHUB_REF
 
 if (($githubEventName -eq "push" -and $githubRef -eq "refs/heads/main") -or
     ($githubEventName -eq "workflow_dispatch" -and $DeployType -like "*prerelease")) {
+    # We want all commits to main that are not a explicit 'release' tag to be a pre-release
     $deployPrerelease = $true
+    $releaseType = "prerelease"
 }
 
 # Set docs flag for library releases
@@ -53,18 +33,11 @@ if ($githubRef -match '^refs/tags/v' -or
     $deployDocs = $true
 }
 
-# API key selection
-$apiKey = if ($isTest) { $NugetTestApiKey } else { $NugetApiKey }
-
 # Output configuration
 Write-GitHubOutput -Name "deploy-prerelease" -Value $deployPrerelease.ToString().ToLower()
 Write-GitHubOutput -Name "deploy-docs" -Value $deployDocs.ToString().ToLower()
-Write-GitHubOutput -Name "is-test" -Value $isTest.ToString().ToLower()
-Write-GitHubOutput -Name "nuget-source" -Value $nugetSource
-Write-GitHubOutput -Name "nuget-api-key" -Value $apiKey
+Write-GitHubOutput -Name "release-type" -Value $releaseType
 
-# Debug logging
 Write-Host "### Deployment Configuration"
-Write-Host "- Prerelease: $deployPrerelease | Docs: $deployDocs | Test: $isTest"
-Write-Host "- Source: $nugetSource"
+Write-Host "- Prerelease: $deployPrerelease | Docs: $deployDocs | Release Type: $releaseType"
 Write-Host "- Trigger: $githubEventName | Ref: $githubRef | Type: $DeployType"

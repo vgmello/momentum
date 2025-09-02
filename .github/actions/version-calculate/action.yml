@@ -10,14 +10,6 @@ inputs:
     description: "Type of release (stable/prerelease)"
     required: false
     default: "stable"
-  check-changes:
-    description: "Check for consumer-visible changes"
-    required: false
-    default: "false"
-  change-path:
-    description: "Path to check for changes"
-    required: false
-    default: "libs/Momentum/src"
 
 outputs:
   version:
@@ -26,12 +18,15 @@ outputs:
   tag:
     description: "Version tag"
     value: ${{ steps.calculate.outputs.tag }}
-  skip:
-    description: "Whether to skip release"
-    value: ${{ steps.calculate.outputs.skip }}
   has-prerelease:
     description: "Whether pre-releases exist for this version"
     value: ${{ steps.calculate.outputs.has_prerelease }}
+  previous-version:
+    description: "Previous version"
+    value: ${{ steps.calculate.outputs.previous_version }}
+  previous-stable-version:
+    description: "Previous version"
+    value: ${{ steps.calculate.outputs.previous_stable_version }}
 
 runs:
   using: "composite"
@@ -40,14 +35,6 @@ runs:
       id: calculate
       shell: pwsh
       run: |
-        $params = @{
-          VersionFile = "${{ inputs.version-file }}"
-          ReleaseType = "${{ inputs.release-type }}"
-          ChangePath = "${{ inputs.change-path }}"
-        }
-        
-        if ("${{ inputs.check-changes }}" -eq "true") {
-          $params['CheckChanges'] = $true
-        }
-        
-        & "${{ github.action_path }}/Calculate-Version.ps1" @params
+        & "${{ github.action_path }}/Calculate-Version.ps1" `
+        -VersionFile = "${{ inputs.version-file }}" `
+        -ReleaseType = "${{ inputs.release-type }}"

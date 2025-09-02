@@ -8,6 +8,8 @@
     <Folder Name="/Libs/">
         <!--#if (false) -->
         <!-- These are only for source development, never included in generated templates -->
+        <File Path="libs\Momentum\Directory.Build.props" />
+        <File Path="libs\Momentum\Directory.Build.targets" />
         <Project Path="libs\Momentum\src\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj" />
         <Project Path="libs\Momentum\src\Momentum.Extensions.XmlDocs\Momentum.Extensions.XmlDocs.csproj" />
         <!--#endif -->

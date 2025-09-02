@@ -4,29 +4,19 @@ param(
     [string]$VersionFile = "libs/Momentum/version.txt",
 
     [ValidateSet("stable", "prerelease")]
-    [string]$ReleaseType = "stable",
-
-    [switch]$CheckChanges,
-
-    [ValidateNotNullOrEmpty()]
-    [string]$ChangePath = "libs/Momentum/src"
+    [string]$ReleaseType = "stable"
 )
+
+# Import Common
+. ..\common\Common.ps1
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-function Write-GitHubOutput {
-    param([string]$Name, [string]$Value)
-    if ($env:GITHUB_OUTPUT) {
-        "$Name=$Value" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-    }
-    Write-Host "Output: $Name=$Value"
-}
-
 function Compare-Version {
     param(
         [Parameter(Mandatory=$true)]
-        [string]$Version1, 
+        [string]$Version1,
         [Parameter(Mandatory=$true)]
         [string]$Version2
     )
@@ -39,44 +29,6 @@ function Compare-Version {
         Write-Error "Failed to compare versions '$Version1' and '$Version2': $_"
         throw
     }
-}
-
-$skip = $false
-if ($CheckChanges) {
-    Write-Host "🔍 Checking for consumer-visible changes in $ChangePath..."
-
-    try {
-        $changedFiles = git diff --name-only HEAD~1 HEAD | Where-Object { $_ -like "$ChangePath*" }
-
-        if (-not $changedFiles) {
-            Write-Host "No changes in $ChangePath, skipping release"
-            $skip = $true
-        }
-        else {
-            $consumerChanges = $changedFiles | Where-Object {
-                $_ -match '\.(cs|csproj|props|targets)$' -and
-                $_ -notmatch '(Test|\.Tests\.|\.md$|\.gitignore$|\.editorconfig$)'
-            }
-
-            if (-not $consumerChanges) {
-                Write-Host "No consumer-visible changes, skipping release"
-                $skip = $true
-            }
-            else {
-                Write-Host "✅ Consumer-visible changes detected"
-            }
-        }
-    }
-    catch {
-        Write-Error "❌ Failed to check for changes: $_"
-        exit 1
-    }
-}
-
-Write-GitHubOutput -Name "skip" -Value $skip.ToString().ToLower()
-
-if ($skip) {
-    exit 0
 }
 
 # Read version file
@@ -100,36 +52,28 @@ if ($VersionFile -like "*.template.config/version.txt*") {
     $tagPrefix = "template-v"
     Write-Host "Using template tag format (detected from version file: $VersionFile)"
 }
-elseif ($env:GITHUB_WORKFLOW -eq "Deploy Momentum Template") {
-    $tagPrefix = "template-v"
-    Write-Host "Using template tag format (detected from workflow: $env:GITHUB_WORKFLOW)"
-}
-elseif ($env:GITHUB_REF -like "refs/tags/template-*") {
-    $tagPrefix = "template-v"
-    Write-Host "Using template tag format (detected from tag: $env:GITHUB_REF)"
-}
 else {
     Write-Host "Using standard tag format"
 }
 
-# Find previous releases
-$allTags = git tag -l "${tagPrefix}*.*.*" --sort=-v:refname
+# Find previous stable releases
+$allTags = git tag -l "${tagPrefix}*.*.*" --sort=-creatordate
 $prevTag = $allTags | Where-Object { $_ -notmatch 'pre' } | Select-Object -First 1
 
 if (-not $prevTag) {
-    Write-Host "No previous regular release found"
+    Write-Host "No previous stable release found"
     $prevTag = "${tagPrefix}0.0.0"
 }
 
-Write-Host "Previous regular release: $prevTag"
+Write-Host "Previous stable release: $prevTag"
 $prevVersion = $prevTag -replace "^$tagPrefix", ""
 
 Write-GitHubOutput -Name "prev_tag" -Value $prevTag
 Write-GitHubOutput -Name "tag_prefix" -Value $tagPrefix
-Write-GitHubOutput -Name "prev_version" -Value $prevVersion
+Write-GitHubOutput -Name "previous_stable_version" -Value $prevVersion
 
 # Check for pre-releases
-$latestPrerelease = git tag -l "${tagPrefix}${fileVersion}-pre.*" --sort=-v:refname | Select-Object -First 1
+$latestPrerelease = git tag -l "${tagPrefix}${fileVersion}-pre.*" --sort=-creatordate | Select-Object -First 1
 $hasPrerelease = $false
 $prereleaseSequence = 0
 
@@ -171,6 +115,7 @@ else {
         $calculatedVersion = $fileVersion
         Write-Host "ℹ️  Transitioning from pre-release to stable: $calculatedVersion"
     }
+    # Check if the version was bumped manually in the version file
     elseif ((Compare-Version -Version1 $fileVersion -Version2 $prevVersion) -gt 0) {
         $calculatedVersion = $fileVersion
         Write-Host "ℹ️  Using file version: $calculatedVersion (> $prevVersion)"

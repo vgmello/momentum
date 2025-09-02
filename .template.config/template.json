@@ -205,6 +205,13 @@
       "fileRename": "Momentum",
       "replaces": "__LIB_NAME__"
     },
+    "local": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "Use local NuGet packages from libs/Momentum/.local/nuget/ for testing",
+      "defaultValue": "false",
+      "replaces": "__LOCAL__"
+    },
     "mmt-version": {
       "type": "parameter",
       "datatype": "string",
@@ -273,6 +280,10 @@
     "USE_KAFKA": {
       "type": "computed",
       "value": "kafka && HAS_BACKEND"
+    },
+    "USE_LOCAL": {
+      "type": "computed",
+      "value": "local"
     },
     "LIBS_INCLUDES_DEFAULTS": {
       "type": "computed",
@@ -434,8 +445,8 @@
         {
           "condition": "(project-only)",
           "include": [
-            "Directory.Build.props",
             "Directory.Packages.props",
+            "Directory.Build.props",
             "*.ruleset",
             "*.slnx",
             "*.slnx.DotSettings"
@@ -599,6 +610,16 @@
       "rename": {
         "ProjectREADME.md": "README.md"
       }
+    },
+    {
+      "source": "./",
+      "target": "./",
+      "condition": "(USE_LOCAL)",
+      "include": [
+        "Directory.Build.Local.props",
+        "local-mmt-version.txt",
+        "local-feed-path.txt"
+      ]
     }
   ],
   "primaryOutputs": [

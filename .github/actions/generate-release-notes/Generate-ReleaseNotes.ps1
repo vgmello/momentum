@@ -3,14 +3,14 @@ param(
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
     [string]$Version,
-    
+
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
     [string]$Tag,
-    
+
     [ValidateSet("stable", "prerelease")]
     [string]$ReleaseType = "stable",
-    
+
     [string]$OutputFile = "release_notes.md"
 )
 
@@ -40,12 +40,12 @@ else {
 # Function to generate Full Changelog link
 function Get-ChangelogLink {
     param($LastRelease, $Tag, $GithubBaseUrl)
-    
+
     if ($GithubBaseUrl) {
-        $changelogUrl = if ($LastRelease) { 
-            "$GithubBaseUrl/compare/$LastRelease...$Tag" 
-        } else { 
-            "$GithubBaseUrl/commits/$Tag" 
+        $changelogUrl = if ($LastRelease) {
+            "$GithubBaseUrl/compare/$LastRelease...$Tag"
+        } else {
+            "$GithubBaseUrl/commits/$Tag"
         }
         return "**Full Changelog**: [$changelogUrl]($changelogUrl)"
     }
@@ -62,18 +62,18 @@ $lastRelease = $allTags | Where-Object { $_ -ne $Tag } | Select-Object -First 1
 
 # Get commit information
 if ($lastRelease) {
-    $commits = git log --pretty=format:"- %s (%an)" "${lastRelease}..HEAD" --no-merges | 
-               Where-Object { $_ -notmatch "skip ci" } | 
+    $commits = git log --pretty=format:"- %s (%an)" "${lastRelease}..HEAD" --no-merges |
+               Where-Object { $_ -notmatch "skip ci" } |
                Select-Object -First 20
-    
+
     $commitCount = git rev-list --count "${lastRelease}..HEAD" --no-merges
     $filesChanged = (git diff --name-only "${lastRelease}..HEAD").Count
 }
 else {
-    $commits = git log --pretty=format:"- %s (%an)" --no-merges | 
-               Where-Object { $_ -notmatch "skip ci" } | 
+    $commits = git log --pretty=format:"- %s (%an)" --no-merges |
+               Where-Object { $_ -notmatch "skip ci" } |
                Select-Object -First 20
-    
+
     $commitCount = git rev-list --count HEAD --no-merges
     $filesChanged = "N/A"
 }
@@ -97,7 +97,7 @@ if ($ReleaseType -eq "prerelease") {
 }
 else {
     $content += "# ${projectName} v${Version}"
-    
+
     # Add package list for libraries
     if ($projectType -eq "libraries") {
         $content += ""
@@ -112,7 +112,7 @@ else {
         $content += "- Momentum.Extensions.Messaging.Kafka"
         $content += "- Momentum.Extensions.XmlDocs"
     }
-    
+
     $content += ""
     $content += "## What's Changed"
     $content += ""

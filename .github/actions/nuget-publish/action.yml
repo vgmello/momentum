@@ -53,7 +53,7 @@ runs:
         if ($env:NUGET_API_KEY -ne "") {
           Write-Host "::add-mask::$($env:NUGET_API_KEY)"
         }
-        
+
         $params = @{
           Path = "${{ inputs.path }}"
           Config = "${{ inputs.config }}"
@@ -61,7 +61,7 @@ runs:
           NugetApiKey = $env:NUGET_API_KEY
           NugetSource = "${{ inputs.nuget-source }}"
         }
-        
+
         # Parse pack-args as an array if provided
         $packArgsInput = "${{ inputs.pack-args }}"
         if (-not [string]::IsNullOrWhiteSpace($packArgsInput)) {
@@ -69,13 +69,13 @@ runs:
           $packArgsArray = $packArgsInput -split '\s+(?=(?:[^"]*"[^"]*")*[^"]*$)' | Where-Object { $_ -ne '' }
           $params['PackArgs'] = $packArgsArray
         }
-        
+
         if ("${{ inputs.skip-duplicate }}" -eq "true") {
           $params['SkipDuplicate'] = $true
         }
-        
+
         if ("${{ inputs.dry-run }}" -eq "true") {
           $params['DryRun'] = $true
         }
-        
+
         & "${{ github.action_path }}/Publish-NuGetPackages.ps1" @params

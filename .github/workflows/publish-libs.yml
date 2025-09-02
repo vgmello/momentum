@@ -1,0 +1,160 @@
+name: Publish Momentum Libraries
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "libs/Momentum/src/**"
+      - "libs/Momentum/docs/**"
+    tags:
+      - "release"
+      - "v*.*.*"
+
+  workflow_dispatch:
+    inputs:
+      deploy-type:
+        description: "Type of deployment"
+        required: true
+        default: "prerelease"
+        type: choice
+        options:
+          - prerelease
+          - release
+      nuget-source:
+        description: "NuGet source"
+        required: false
+        default: "https://api.nuget.org/v3/index.json"
+
+env:
+  DOTNET_VERSION: "9.0.x"
+  DOTNET_NOLOGO: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  NUGET_SOURCE: ${{ github.event.inputs.nuget-source || 'https://api.nuget.org/v3/index.json' }}
+
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: production
+      url: ${{ steps.docs-deployment.outputs.page_url }}
+
+    steps:
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # Fetching all history for version calculation and release notes (prev vs now)
+
+      - name: Configure deployment
+        id: config
+        uses: ./.github/actions/deployment-config
+        with:
+          deploy-type: ${{ github.event.inputs.deploy-type }}
+
+      - name: Build .NET projects
+        uses: ./.github/actions/build
+        with:
+          build-target: libs/Momentum/Momentum.slnx
+
+      - name: Verify main branch for release
+        if: steps.config.outputs.deploy-prerelease == 'false'
+        shell: pwsh
+        run: |
+          $currentBranch = git rev-parse --abbrev-ref HEAD
+          if ($currentBranch -ne "main") {
+            Write-Error "❌ Release must be created from main branch. Current: $currentBranch"
+            exit 1
+          }
+          Write-Host "✅ Confirmed on main branch"
+
+      - name: Calculate release version
+        id: release-version
+        uses: ./.github/actions/version-calculate
+        with:
+          release-type: ${{ steps.config.outputs.release-type }}
+
+      - name: Generate release notes
+        uses: ./.github/actions/generate-release-notes
+        with:
+          version: ${{ steps.release-version.outputs.version }}
+          tag: ${{ steps.release-version.outputs.tag }}
+          release-type: ${{ steps.config.outputs.release-type }}
+          output-file: ${{ steps.config.outputs.release-type }}_notes.md
+
+      - name: Create GitHub release
+        shell: pwsh
+        run: |
+          & ./.github/scripts/Create-GitHubRelease.ps1 `
+            -Tag "${{ steps.release-version.outputs.tag }}" `
+            -Title "Momentum Libraries ${{ steps.release-version.outputs.tag }}" `
+            -NotesFile "${{ steps.config.outputs.release-type }}_notes.md" `
+            ${{ steps.config.outputs.deploy-prerelease == 'true' && '-Prerelease' || '' }} `
+            -Target "main"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish packages
+        uses: ./.github/actions/nuget-publish
+        with:
+          path: libs/Momentum/Momentum.slnx
+          package-version: ${{ steps.release-version.outputs.version }}
+          nuget-api-key: ${{ secrets.NUGET_API_KEY }}
+          nuget-source: ${{ env.NUGET_SOURCE }}
+
+      - name: Setup Pages
+        if: steps.config.outputs.deploy-docs == 'true'
+        uses: actions/configure-pages@v5
+
+      - name: Build documentation
+        if: steps.config.outputs.deploy-docs == 'true'
+        uses: ./.github/actions/docs-build
+        with:
+          docs-path: libs/Momentum/docs
+          build-dotnet: false
+
+      - name: Upload to GitHub Pages
+        if: steps.config.outputs.deploy-docs == 'true'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: libs/Momentum/docs/.vitepress/dist
+
+      - name: Deploy to GitHub Pages
+        if: steps.config.outputs.deploy-docs == 'true'
+        id: docs-deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Deployment Summary
+        shell: pwsh
+        run: |
+          $args = @(
+            "-ReleaseVersion", "${{ steps.release-version.outputs.version }}",
+            "-ReleaseTag", "${{ steps.release-version.outputs.tag }}",
+            "-NugetSource", "${{ env.NUGET_SOURCE }}"
+          )
+
+          if ("${{ steps.config.outputs.deploy-prerelease }}" -eq "true") {
+            $args += "-DeployPrerelease"
+          }
+
+          if ("${{ steps.config.outputs.deploy-docs }}" -eq "true") {
+            $args += "-DocsUrl", "${{ steps.docs-deployment.outputs.page_url }}"
+            $args += "-DeployDocs"
+          }
+
+          & ./.github/scripts/Write-DeploymentSummary.ps1 @args

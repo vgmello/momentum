@@ -1,7 +1,5 @@
 [CmdletBinding()]
 param(
-    [string]$NodeVersion = "22",
-    [string]$PnpmVersion = "9",
     [string]$DocsPath = "libs/Momentum/docs"
 )
 
@@ -15,7 +13,6 @@ function Write-GitHubOutput {
     Write-Host "Output: $Name=$Value"
 }
 
-# Install DocFX
 Write-Host "📦 Installing DocFX..."
 dotnet tool install -g docfx --verbosity normal
 
@@ -40,7 +37,7 @@ catch {
     Write-Host "Diagnostic information:"
     Write-Host "   PATH: $env:PATH"
     Write-Host "   HOME: $env:HOME"
-    
+
     if (Test-Path $dotnetToolsPath) {
         Write-Host "   Tools directory contents:"
         Get-ChildItem $dotnetToolsPath | Format-Table Name
@@ -55,26 +52,24 @@ catch {
 Push-Location $DocsPath
 
 try {
-    # Install npm dependencies
     Write-Host "📦 Installing npm dependencies..."
     pnpm install --no-frozen-lockfile
-    
+
     if ($LASTEXITCODE -ne 0) {
         Write-Error "❌ npm dependency installation failed"
         exit 1
     }
-    
-    # Build documentation
+
     Write-Host "📚 Building documentation with VitePress..."
     pnpm docs:build
-    
+
     if ($LASTEXITCODE -ne 0) {
         Write-Error "❌ Documentation build failed"
         exit 1
     }
-    
+
     Write-Host "✅ Documentation built successfully"
-    
+
     # Set output paths
     $distPath = Join-Path (Get-Location) ".vitepress/dist"
     Write-GitHubOutput -Name "dist" -Value $distPath

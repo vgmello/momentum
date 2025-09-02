@@ -444,3 +444,7 @@ _temp
 _template_tests/
 .pnpm-store/
 docs/obj**
+
+# Local development version files
+local-mmt-version.txt
+local-feed-path.txt

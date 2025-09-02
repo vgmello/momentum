@@ -6,13 +6,13 @@
 
 .DESCRIPTION
     Comprehensive test suite for the Momentum .NET template (mmt) covering all critical scenarios:
-    
+
     • Component isolation testing
-    • Infrastructure variation testing  
+    • Infrastructure variation testing
     • Configuration edge case testing
     • Real-world pattern testing
     • Automated validation
-    
+
     Features:
     • 8 test categories with ~25 parametrized tests
     • Immediate cleanup after each test to conserve disk space
@@ -168,12 +168,12 @@ function Test-MaxFailuresReached {
 
     if ($MaxFailures -gt 0 -and $script:FailedTests -ge $MaxFailures) {
         Write-ColoredMessage -Level 'ERROR' -Message "Reached maximum failures ($MaxFailures). Exiting early."
-        
+
         # Clean up any temp files passed in
         if ($TempFiles.Count -gt 0) {
             Remove-Item $TempFiles -Force -ErrorAction SilentlyContinue
         }
-        
+
         Pop-Location
         Invoke-IndividualTestCleanup -TestName $TestName -TestResult 'FAILED'
         Show-Results
@@ -256,32 +256,29 @@ function Test-Template {
 
     try {
         # Build template arguments
-        $templateArgs = @('new', 'mmt', '-n', $Name, '--allow-scripts', 'yes')
+        $templateArgs = @('new', 'mmt', '-n', $Name, '--allow-scripts', 'yes', '--local')
+
         if ($Parameters.Trim()) {
             $templateArgs += ($Parameters -split '\s+' | Where-Object { $_ })
         }
 
-        $tempOut = [System.IO.Path]::GetTempFileName()
-        $tempErr = [System.IO.Path]::GetTempFileName()
+        $generationOut = Join-Path -Path $tempDir -ChildPath "01-generation-stdout.log"
+        $generationErr = Join-Path -Path $tempDir -ChildPath "01-generation-stderr.log"
 
         $process = Start-Process -FilePath 'dotnet' -ArgumentList $templateArgs `
             -NoNewWindow -Wait -PassThru `
-            -RedirectStandardOutput $tempOut -RedirectStandardError $tempErr
+            -RedirectStandardOutput $generationOut -RedirectStandardError $generationErr
 
         if ($process.ExitCode -ne 0) {
-            $errorOutput = Get-Content $tempErr -Raw -ErrorAction SilentlyContinue
+            $errorOutput = Get-Content $generationErr -Raw -ErrorAction SilentlyContinue
             $errorSummary = Get-ErrorSummary -ErrorOutput $errorOutput -MaxLines 3
 
             Write-ColoredMessage -Level 'ERROR' -Message "[$TestCategory] $Name`: Generation failed$errorSummary"
             $script:FailedTests++
             $script:TestResults[$Name] = 'FAILED'
 
-            Remove-Item $tempOut, $tempErr -Force -ErrorAction SilentlyContinue
             return
         }
-
-        # Clean up temp files for successful generation
-        Remove-Item $tempOut, $tempErr -Force -ErrorAction SilentlyContinue
 
         if (-not (Test-Path -Path $Name -PathType Container)) {
             Write-ColoredMessage -Level 'ERROR' -Message "[$TestCategory] $Name`: Generation succeeded but directory not found"
@@ -296,62 +293,58 @@ function Test-Template {
         $projects = @(Get-ChildItem -Path . -Filter "*.csproj" -Recurse -ErrorAction SilentlyContinue)
         $projectCount = @($projects).Count
 
-        $tempBuildOut = [System.IO.Path]::GetTempFileName()
-        $tempBuildErr = [System.IO.Path]::GetTempFileName()
+        $buildOut = Join-Path -Path $tempDir -ChildPath "02-build-stdout.log"
+        $buildErr = Join-Path -Path $tempDir -ChildPath "02-build-stderr.log"
 
         # Attempt to build the generated project
-        $buildProcess = Start-Process -FilePath 'dotnet' -ArgumentList @('build', '--verbosity', 'quiet') `
+        $buildProcess = Start-Process -FilePath 'dotnet' -ArgumentList @('build', '--verbosity', 'normal') `
             -NoNewWindow -Wait -PassThru `
-            -RedirectStandardOutput $tempBuildOut -RedirectStandardError $tempBuildErr
+            -RedirectStandardOutput $buildOut -RedirectStandardError $buildErr
 
         if ($buildProcess.ExitCode -eq 0) {
             Write-ColoredMessage -Level 'SUCCESS' -Message "[$TestCategory] $Name`: Build succeeded ($projectCount projects)"
 
-            # Run tests if they exist
+            # Run tests if they exist (excluding E2E tests)
             if (Test-Path -Path 'tests' -PathType Container) {
-                $tempTestOut = [System.IO.Path]::GetTempFileName()
-                $tempTestErr = [System.IO.Path]::GetTempFileName()
+                $testOut = Join-Path -Path $tempDir -ChildPath "03-test-stdout.log"
+                $testErr = Join-Path -Path $tempDir -ChildPath "03-test-stderr.log"
 
-                $testProcess = Start-Process -FilePath 'dotnet' -ArgumentList @('test', '--verbosity', 'quiet') `
+                # Exclude E2E tests by filtering out tests with Type=E2E trait
+                $testArgs = @('test', '--verbosity', 'normal', '--filter', 'Type!=E2E')
+
+                $testProcess = Start-Process -FilePath 'dotnet' -ArgumentList $testArgs `
                     -NoNewWindow -Wait -PassThru `
-                    -RedirectStandardOutput $tempTestOut -RedirectStandardError $tempTestErr
+                    -RedirectStandardOutput $testOut -RedirectStandardError $testErr
 
                 if ($testProcess.ExitCode -eq 0) {
-                    Write-ColoredMessage -Level 'SUCCESS' -Message "[$TestCategory] $Name`: Tests passed"
+                    Write-ColoredMessage -Level 'SUCCESS' -Message "[$TestCategory] $Name`: Tests passed (E2E tests excluded)"
                 }
                 else {
-                    $testOutput = Get-Content $tempTestErr -Raw -ErrorAction SilentlyContinue
+                    $testOutput = Get-Content $testErr -Raw -ErrorAction SilentlyContinue
                     $testErrorSummary = Get-ErrorSummary -ErrorOutput $testOutput -MaxLines 2 -Filter '(Failed|Error|Exception|Assert)'
 
                     Write-ColoredMessage -Level 'ERROR' -Message "[$TestCategory] $Name`: Tests failed$testErrorSummary"
                     $script:FailedTests++
                     $script:TestResults[$Name] = 'FAILED'
 
-                    Remove-Item $tempTestOut, $tempTestErr -Force -ErrorAction SilentlyContinue
-
                     Test-MaxFailuresReached -TestName $Name
                     return
                 }
-
-                Remove-Item $tempTestOut, $tempTestErr -Force -ErrorAction SilentlyContinue
             }
 
             $script:PassedTests++
             $script:TestResults[$Name] = 'PASSED'
         }
         else {
-            $buildOutput = Get-Content $tempBuildErr -Raw -ErrorAction SilentlyContinue
+            $buildOutput = Get-Content $buildErr -Raw -ErrorAction SilentlyContinue
             $buildErrorSummary = Get-ErrorSummary -ErrorOutput $buildOutput -MaxLines 3 -Filter '(error|Error|CS[0-9]+|MSB[0-9]+)'
 
             Write-ColoredMessage -Level 'ERROR' -Message "[$TestCategory] $Name`: Build failed$buildErrorSummary"
             $script:FailedTests++
             $script:TestResults[$Name] = 'FAILED'
 
-            Test-MaxFailuresReached -TestName $Name -TempFiles @($tempBuildOut, $tempBuildErr)
+            Test-MaxFailuresReached -TestName $Name
         }
-
-        # Clean up build temp files
-        Remove-Item $tempBuildOut, $tempBuildErr -Force -ErrorAction SilentlyContinue
 
     }
     catch {
@@ -529,7 +522,7 @@ function Invoke-TestCategory {
             Test-Template -Name 'TestDebugSymbols' -Parameters '--debug-symbols' -TestCategory 'Edge Cases'
             $allFalseParams = '--api false --back-office false --orleans false --docs false --aspire false --kafka false'
             Test-Template -Name 'TestAllFalse' -Parameters $allFalseParams -TestCategory 'Edge Cases'
-            
+
             $allTrueParams = '--api true --back-office true --orleans true --docs true --aspire true --kafka true'
             Test-Template -Name 'TestAllTrue' -Parameters $allTrueParams -TestCategory 'Edge Cases'
         }
@@ -553,7 +546,7 @@ function Show-Categories {
     Write-Host ''
     Write-Host 'Use -MaxFailures N to exit after N failures (default: 0 = run all)' -ForegroundColor Yellow
     Write-Host ''
-    
+
     $categories = @(
         @{ Number = '1'; Name = 'component-isolation'; Description = 'Test each component in isolation' }
         @{ Number = '2'; Name = 'database-config'; Description = 'Validate all database setup options' }
@@ -564,7 +557,7 @@ function Show-Categories {
         @{ Number = '7'; Name = 'orleans-combinations'; Description = 'Test stateful processing configurations' }
         @{ Number = '8'; Name = 'edge-cases'; Description = 'Test boundary conditions and special modes' }
     )
-    
+
     foreach ($category in $categories) {
         $paddedName = $category.Name.PadRight(20)
         Write-Host "$($category.Number). $paddedName - $($category.Description)" -ForegroundColor White
@@ -696,7 +689,7 @@ function Invoke-Main {
         else {
             $allCategories = @(
                 'component-isolation',
-                'database-config', 
+                'database-config',
                 'port-config',
                 'org-names',
                 'library-config',

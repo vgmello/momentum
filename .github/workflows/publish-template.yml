@@ -1,0 +1,166 @@
+name: Publish Momentum Template
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".template.config/**"
+      - "src/**"
+      - "docs/**"
+      - "infra/**"
+      - "tests/**"
+      - "libs/Momentum/src/**"
+      - "libs/Momentum/Momentum.Template.csproj"
+      - "compose.yml"
+      - "README.md"
+      - "ProjectREADME.md"
+      - "Directory.Build.props"
+      - "Directory.Packages.props"
+      - "AppDomain.slnx"
+      - "AppDomain.ruleset"
+      - ".gitignore"
+      - ".vscode/**"
+    tags:
+      - "template-v*.*.*"
+
+  workflow_dispatch:
+    inputs:
+      deploy-type:
+        description: "Deployment type"
+        required: true
+        default: "prerelease"
+        type: choice
+        options:
+          - prerelease
+          - release
+          - test-prerelease
+          - test-release
+
+env:
+  DOTNET_VERSION: "9.0.x"
+  DOTNET_NOLOGO: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  NUGET_SOURCE: "https://api.nuget.org/v3/index.json"
+
+concurrency:
+  group: deploy-template-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: production
+
+    steps:
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Configure deployment
+        id: config
+        uses: ./.github/actions/deployment-config
+        with:
+          deploy-type: ${{ github.event.inputs.deploy-type }}
+
+      - name: Find latest momentum version
+        id: latest-mmt-version
+        uses: ./.github/actions/version-calculate
+        with:
+          release-type: prerelease
+
+      - name: Set Momentum lib for template
+        id: set-lib-version
+        shell: pwsh
+        run: |
+          $version = "${{ steps.latest-mmt-version.outputs.current_version }}"
+          $filePath = ".template.config/template.json"
+
+          Write-Host "Updating $filePath with version: $version"
+
+          # Read the file content
+          $content = Get-Content $filePath -Raw
+
+          # Replace the version placeholder
+          $updatedContent = $content -replace '__CI_MOMENTUM_VERSION__', $version
+
+          # Write the updated content back
+          $updatedContent | Set-Content $filePath -Encoding utf8
+
+          Write-Host "✅ Updated $filePath with version: $version"
+
+      - name: Verify main branch for release
+        if: steps.config.outputs.deploy-prerelease == 'false'
+        shell: pwsh
+        run: |
+          $currentBranch = git rev-parse --abbrev-ref HEAD
+          if ($currentBranch -ne "main") {
+            Write-Error "❌ Release must be created from main branch. Current: $currentBranch"
+            exit 1
+          }
+          Write-Host "✅ Confirmed on main branch"
+
+      - name: Calculate release version
+        id: release-version
+        uses: ./.github/actions/version-calculate
+        with:
+          version-file: .template.config/version.txt
+          release-type: ${{ steps.config.outputs.release-type }}
+          check-changes: false
+
+      - name: Generate release notes
+        uses: ./.github/actions/generate-release-notes
+        with:
+          version: ${{ steps.release-version.outputs.version }}
+          tag: ${{ steps.release-version.outputs.tag }}
+          release-type: ${{ steps.config.outputs.release-type }}
+          output-file: ${{ steps.config.outputs.release-type }}_notes.md
+
+      - name: Create GitHub release
+        shell: pwsh
+        run: |
+          & ./.github/scripts/Create-GitHubRelease.ps1 `
+            -Tag "${{ steps.release-version.outputs.tag }}" `
+            -Title "Momentum Template ${{ steps.release-version.outputs.tag }}" `
+            -NotesFile "${{ steps.config.outputs.release-type }}_notes.md" `
+            ${{ steps.config.outputs.deploy-prerelease == 'true' && '-Prerelease' || '' }} `
+            -Target "main"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish packages
+        uses: ./.github/actions/nuget-publish
+        with:
+          path: libs/Momentum/Momentum.Template.csproj
+          package-version: ${{ steps.release-version.outputs.version }}
+          pack-args: -p:PackTemplate=true --restore
+          nuget-api-key: ${{ secrets.NUGET_API_KEY }}
+          nuget-source: ${{ env.NUGET_SOURCE }}
+
+      - name: Deployment Summary
+        shell: pwsh
+        run: |
+          $args = @(
+            "-ReleaseVersion", "${{ steps.release-version.outputs.version }}",
+            "-ReleaseTag", "${{ steps.release-version.outputs.tag }}",
+            "-NugetSource", "${{ env.NUGET_SOURCE }}"
+          )
+
+          if ("${{ steps.config.outputs.deploy-prerelease }}" -eq "true") {
+            $args += "-DeployPrerelease"
+          }
+
+          & ./.github/scripts/Write-DeploymentSummary.ps1 @args

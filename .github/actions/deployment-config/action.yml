@@ -1,48 +1,28 @@
-name: 'Configure Deployment'
-description: 'Configure deployment settings for both templates and libraries'
+name: "Configure Deployment"
+description: "Configure deployment settings for both templates and libraries"
 
 inputs:
   deploy-type:
-    description: 'Type of deployment from workflow_dispatch'
+    description: "Type of deployment from workflow_dispatch"
     required: false
-    default: ''
-  nuget-source-override:
-    description: 'Custom NuGet source (for testing)'
-    required: false
-    default: ''
-  nuget-api-key:
-    description: 'NuGet API key for production'
-    required: true
-  nuget-test-api-key:
-    description: 'NuGet API key for testing'
-    required: true
+    default: ""
 
 outputs:
   deploy-prerelease:
-    description: 'Whether to deploy a prerelease (false = release)'
+    description: "Whether to deploy a prerelease (false = release)"
     value: ${{ steps.config.outputs.deploy-prerelease }}
   deploy-docs:
-    description: 'Whether to deploy documentation'
+    description: "Whether to deploy documentation"
     value: ${{ steps.config.outputs.deploy-docs }}
-  is-test:
-    description: 'Whether this is a test deployment'
-    value: ${{ steps.config.outputs.is-test }}
-  nuget-source:
-    description: 'NuGet source URL to use'
-    value: ${{ steps.config.outputs.nuget-source }}
-  nuget-api-key:
-    description: 'NuGet API key to use'
-    value: ${{ steps.config.outputs.nuget-api-key }}
+  release-type:
+    description: "Type of release (stable/prerelease)"
+    value: ${{ steps.config.outputs.release-type }}
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - name: Configure deployment
       id: config
       shell: pwsh
       run: |
-        & "${{ github.action_path }}/Configure-Deployment.ps1" `
-          -DeployType "${{ inputs.deploy-type }}" `
-          -NugetSourceOverride "${{ inputs.nuget-source-override }}" `
-          -NugetApiKey "${{ inputs.nuget-api-key }}" `
-          -NugetTestApiKey "${{ inputs.nuget-test-api-key }}"
+        & "${{ github.action_path }}/Configure-Deployment.ps1" -DeployType "${{ inputs.deploy-type }}"

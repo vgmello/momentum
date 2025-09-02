@@ -1,19 +1,35 @@
 <Project>
-    <Target Name="CleanOldPackages" BeforeTargets="Build" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' ">
-        <ItemGroup>
-            <OldPackagesToDelete Include="$(TargetDir)../*.*upkg"/>
-            <OldPackagesToDelete Include="$(MSBuildThisFileDirectory).local/nuget/$(PackageId).*.nupkg"/>
-        </ItemGroup>
-        <Message Text="Cleaning up $(ProjectName) nupkg files. Target: $(TargetDir)" Importance="high"/>
-        <Delete Files="@(OldPackagesToDelete)"/>
+    <PropertyGroup>
+        <BaseVersion>1000.0.0-pre</BaseVersion>
+    </PropertyGroup>
+
+    <Target Name="GenerateLocalVersion" BeforeTargets="Build" Condition="'$(MSBuildProjectName)' == 'Momentum.Extensions.Abstractions' and '$(Configuration)' == 'Debug'">
+        <PropertyGroup>
+            <LocalVersionSuffix>$([System.DateTime]::UtcNow.ToString("yyMMddHHmmss"))</LocalVersionSuffix>
+            <LocalVersion>$(BaseVersion)$(LocalVersionSuffix)</LocalVersion>
+            <LocalFeedAbsolutePath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory).local/nuget'))</LocalFeedAbsolutePath>
+        </PropertyGroup>
+
+        <Message Text="Generating local version: $(LocalVersion)" Importance="high"/>
+        <WriteLinesToFile File="$(MSBuildThisFileDirectory)../../local-mmt-version.txt" Lines="$(LocalVersion)" Overwrite="true"/>
+        <WriteLinesToFile File="$(MSBuildThisFileDirectory)../../local-feed-path.txt" Lines="$(LocalFeedAbsolutePath)" Overwrite="true"/>
     </Target>
 
-    <Target Name="SetPackageVersionSuffix" BeforeTargets="GenerateNuspec;Pack" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' ">
+    <Target Name="UseConsistentLocalVersion" BeforeTargets="Build;GenerateNuspec;Pack" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' and Exists('$(MSBuildThisFileDirectory)../../local-mmt-version.txt') ">
         <PropertyGroup>
-            <VersionSuffix>$([System.DateTime]::UtcNow.ToString("yyyyMMdd-HHmmss"))</VersionSuffix>
-            <PackageVersion>$(VersionPrefix)-$(VersionSuffix)</PackageVersion>
+            <PackageVersion>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)../../local-mmt-version.txt').Trim())</PackageVersion>
+            <Version>$(PackageVersion)</Version>
         </PropertyGroup>
-        <Message Text="Packaging version: $(ProjectName)-$(PackageVersion)" Importance="high"/>
+        <Message Text="Using local version: $(PackageId).$(PackageVersion)" Importance="high"/>
+    </Target>
+
+    <Target Name="CleanOldPackages" BeforeTargets="Build;Clean" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' ">
+        <ItemGroup>
+            <OldPackagesToDelete Include="$(TargetDir)../*.*upkg"/>
+            <OldPackagesToDelete Include="$(MSBuildThisFileDirectory).local/nuget/$(PackageId).$(BaseVersion)*.nupkg"/>
+        </ItemGroup>
+        <Message Text="Cleaning up $(ProjectName) nupkg files ($(PackageId).$(BaseVersion)*.nupkg). Target: $(TargetDir)" Importance="high"/>
+        <Delete Files="@(OldPackagesToDelete)"/>
     </Target>
 
     <Target Name="PushToLocalFeed" AfterTargets="Pack" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug'">

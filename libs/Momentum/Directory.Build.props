@@ -20,12 +20,6 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <MomentumVersion>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)version.txt').Trim())</MomentumVersion>
-        <VersionPrefix>$(MomentumVersion)</VersionPrefix>
-        <VersionSuffix Condition="'$(Configuration)' == 'Debug'">local</VersionSuffix>
-    </PropertyGroup>
-
-    <PropertyGroup>
         <Authors>Momentum Contributors</Authors>
         <Company>Momentum .NET</Company>
         <Copyright>Copyright © $([System.DateTime]::Now.Year) Momentum</Copyright>

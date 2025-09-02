@@ -1,0 +1,19 @@
+<Project>
+  <!--
+    Local Development Configuration
+    This file enables local NuGet package resolution during template development.
+    Generated templates will use Directory.Build.Local.props (renamed to Directory.Build.props).
+  -->
+
+  <PropertyGroup>
+    <!-- Read local feed path from file if it exists -->
+    <MomentumLocalFeedPath Condition="Exists('$(MSBuildThisFileDirectory)local-feed-path.txt')">$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)local-feed-path.txt').Trim())</MomentumLocalFeedPath>
+
+    <!-- Enable local NuGet feed if path exists -->
+    <RestoreAdditionalProjectSources Condition="'$(MomentumLocalFeedPath)' != '' and Exists('$(MomentumLocalFeedPath)')">$(MomentumLocalFeedPath)</RestoreAdditionalProjectSources>
+
+    <!-- Set template version from local version file with fallback -->
+    <LocalMomentumVersion Condition="Exists('$(MSBuildThisFileDirectory)local-mmt-version.txt')">$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)local-mmt-version.txt').Trim())</LocalMomentumVersion>
+  </PropertyGroup>
+
+</Project>
