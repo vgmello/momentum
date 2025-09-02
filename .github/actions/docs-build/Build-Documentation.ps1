@@ -3,15 +3,11 @@ param(
     [string]$DocsPath = "libs/Momentum/docs"
 )
 
-$ErrorActionPreference = "Stop"
+# Import Common
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+. (Join-Path $scriptDir "../common/Common.ps1")
 
-function Write-GitHubOutput {
-    param([string]$Name, [string]$Value)
-    if ($env:GITHUB_OUTPUT) {
-        "$Name=$Value" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-    }
-    Write-Host "Output: $Name=$Value"
-}
+$ErrorActionPreference = "Stop"
 
 Write-Host "📦 Installing DocFX..."
 dotnet tool install -g docfx --verbosity normal

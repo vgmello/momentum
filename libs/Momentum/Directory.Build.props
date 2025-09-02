@@ -17,6 +17,11 @@
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+        <!-- Set Version property from local version file if it exists -->
+        <LocalMomentumVersion Condition="Exists('$(MSBuildThisFileDirectory)../../local-mmt-version.txt')">$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)../../local-mmt-version.txt').Trim())</LocalMomentumVersion>
+        <Version Condition="'$(LocalMomentumVersion)' != '' and '$(Configuration)' == 'Debug'">$(LocalMomentumVersion)</Version>
+        <PackageVersion Condition="'$(LocalMomentumVersion)' != '' and '$(Configuration)' == 'Debug'">$(LocalMomentumVersion)</PackageVersion>
     </PropertyGroup>
 
     <PropertyGroup>

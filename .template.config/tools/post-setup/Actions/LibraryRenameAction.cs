@@ -96,7 +96,7 @@ public class LibraryRenameAction
             {
                 processedFiles++;
 
-                if (ProcessFileContent(filePath, regex, libPrefix, projectDir))
+                if (ProcessFileContent(filePath, regex, libPrefix, projectDir, importedTokens))
                 {
                     changedFiles++;
                 }
@@ -154,8 +154,9 @@ public class LibraryRenameAction
     {
         var escapedTokens = tokens.Select(Regex.Escape);
         var alternation = string.Join("|", escapedTokens);
-        // This ensures we don't match Momentum.Extensions.Abstractions when we want to rename Momentum.Extensions
-        var pattern = $@"\bMomentum\.(?<token>{alternation})(?!\.Abstractions)";
+        // Only match Momentum libraries that are actually imported (in tokens list)
+        // Use negative lookahead to ensure we don't match substrings (e.g., Extensions in Extensions.Abstractions)
+        var pattern = $@"\bMomentum\.(?<token>{alternation})(?!\.|\w)";
 
         return new Regex(pattern, RegexOptions.Compiled);
     }
@@ -189,7 +190,7 @@ public class LibraryRenameAction
                                       filePath.Contains($"{Path.DirectorySeparatorChar}{dir}"));
     }
 
-    private static bool ProcessFileContent(string filePath, Regex regex, string libPrefix, string projectDir)
+    private static bool ProcessFileContent(string filePath, Regex regex, string libPrefix, string projectDir, List<string> importedTokens)
     {
         try
         {
@@ -212,21 +213,28 @@ public class LibraryRenameAction
             {
                 var token = match.Groups["token"].Value;
 
+                // Check if this match is inside a PackageReference Include attribute
+                var matchIndex = match.Index;
+                var beforeMatch = originalContent.Substring(0, matchIndex);
+                var lineStart = beforeMatch.LastIndexOf('\n') + 1;
+                var currentLine = originalContent.Substring(lineStart,
+                    originalContent.IndexOfAny(['\n', '\r'], matchIndex) - lineStart);
+
+                // Don't rename if it's in a PackageReference Include attribute
+                if (currentLine.TrimStart().StartsWith("<PackageReference") &&
+                    currentLine.Contains("Include="))
+                {
+                    return match.Value; // Keep original
+                }
+
                 return $"{libPrefix}.{token}";
             });
 
-            // Also handle path renaming in solution files (libs\Momentum\ -> libs\libPrefix\)
-            if (Path.GetExtension(filePath).Equals(".slnx", StringComparison.OrdinalIgnoreCase) ||
-                Path.GetExtension(filePath).Equals(".sln", StringComparison.OrdinalIgnoreCase))
-            {
-                modifiedContent = modifiedContent.Replace($"libs\\Momentum\\", $"libs\\{libPrefix}\\");
-                modifiedContent = modifiedContent.Replace($"libs/Momentum/", $"libs/{libPrefix}/");
-            }
 
             if (modifiedContent != originalContent)
             {
                 var tempFile = filePath + ".tmp";
-                
+
                 // Write with same BOM handling as original file
                 if (hasBom)
                 {
@@ -236,7 +244,7 @@ public class LibraryRenameAction
                 {
                     File.WriteAllText(tempFile, modifiedContent, new UTF8Encoding(false));
                 }
-                
+
                 File.Move(tempFile, filePath, overwrite: true);
 
                 Console.WriteLine($"  → Updated library references in: {Path.GetRelativePath(projectDir, filePath)}");

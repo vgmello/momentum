@@ -404,7 +404,6 @@
         "**/*.user",
         "**/*.lock.json",
         "**/_temp/**/*",
-        "**/scripts/**/*",
         "**/_template_tests/**/*",
         "**/.local/**/*",
         "**/.vitepress/cache/**/*",

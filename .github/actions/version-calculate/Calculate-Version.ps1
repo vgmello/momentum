@@ -8,7 +8,8 @@ param(
 )
 
 # Import Common
-. ..\common\Common.ps1
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+. (Join-Path $scriptDir "../common/Common.ps1")
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
