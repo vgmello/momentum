@@ -26,6 +26,8 @@ const markdownOptions: MarkdownOptions = {
     },
 };
 
+const API_BASE_URL = process.env.API_BASE_URL || "https://app-domain.api.org_name.com"
+
 export default defineConfig({
     title: "AppDomain Solution",
     description: "Comprehensive AppDomain management system with Cashiers, Invoices, and Bills",
@@ -33,7 +35,7 @@ export default defineConfig({
     themeConfig: {
         nav: [
             { text: "Home", link: "/" },
-            { text: "API", link: "http://localhost:8101/scalar" },
+            { text: "API", link: `${API_BASE_URL}/scalar` },
             { text: "Events", link: "/events/" },
             { text: "Guide", link: "/guide/" },
             { text: "Architecture", link: "/arch/" },
@@ -41,7 +43,7 @@ export default defineConfig({
         ],
 
         editLink: {
-            pattern: 'https://github.com/user/project/edit/main/docs/:path'
+            pattern: 'https://github.com/OrgName/AppDomain/edit/main/docs/:path'
         },
 
         search: {
@@ -126,9 +128,15 @@ export default defineConfig({
         socialLinks: [{ icon: "github", link: "https://github.com/" }],
 
         footer: {
-            copyright: "Copyright © 2025 AppDomain Team",
+            copyright: "Copyright © 2025 OrgName",
         },
     },
     lastUpdated: true,
     cleanUrls: true,
+    ignoreDeadLinks: [/^https?:\/\/.*/],
+    vite: {
+        define: {
+            __API_BASE_URL__: JSON.stringify(API_BASE_URL),
+        },
+    }
 });

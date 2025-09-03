@@ -80,7 +80,7 @@ Before getting started, ensure you have:
 
 -   **.NET 9 SDK** - [Download here](https://dotnet.microsoft.com/download/dotnet/9.0)
 -   **IDE**: Visual Studio, VS Code with C# Dev Kit, or JetBrains Rider
--   **Docker Desktop** - Required for databases, Kafka, and local development
+-   **Local Container Solution (Docker, Rancher, Podman, etc)** - Required for databases, Kafka, and local development
 
 ## Template Configuration Options
 

@@ -157,7 +157,7 @@ The solution uses the following port allocations (default base port: 8100):
 <!-- prettier-ignore-start -->
 
 -   **.NET 9 SDK** or later
--   **Docker Desktop** with Docker Compose
+-   **Container Solution (Docker, Rancher, Podman, etc)** - Required for databases, Kafka, etc
 <!--#if (USE_PGSQL) -->
 -   **PostgreSQL** (handled by Docker Compose)
     <!--#endif -->
@@ -320,14 +320,6 @@ dotnet test tests/AppDomain.Tests
 | POST   | `/api/invoices/{id}/pay` | Mark invoice as paid |
 
 <!--#endif -->
-
-### Authentication
-
-The API supports multiple authentication schemes:
-
--   **API Key**: Pass via `X-API-Key` header
--   **JWT Bearer**: Standard OAuth 2.0 bearer tokens
--   **Basic Auth**: For development/testing only
 <!--#endif -->
 
 <!--#if (USE_KAFKA) -->
@@ -365,23 +357,16 @@ Example: `app_domain.cashiers.created`, `app_domain.invoices.paid`
 | Variable               | Default     | Description         |
 | ---------------------- | ----------- | ------------------- |
 | ASPNETCORE_ENVIRONMENT | Development | Runtime environment |
-
 <!--#if (USE_DB) -->
-
 | ConnectionStrings\_\_AppDomainDb | - | PostgreSQL connection string |
 | ConnectionStrings\_\_ServiceBus | - | Service bus database connection |
-
 <!--#endif -->
 <!--#if (USE_KAFKA) -->
-
-| Kafka\_\_BootstrapServers | localhost:59092 | Kafka broker addresses |
-
+| ConnectionStrings\_\_Messaging | localhost:59092 | Kafka broker addresses |
 <!--#endif -->
 <!--#if (INCLUDE_ORLEANS) -->
-
 | Orleans\_\_ClusterId | dev | Orleans cluster identifier |
 | Orleans\_\_ServiceId | AppDomain | Orleans service identifier |
-
 <!--#endif -->
 
 ### Application Settings
@@ -427,19 +412,6 @@ docker build -f src/AppDomain.BackOffice.Orleans/Dockerfile -t appdomain-orleans
 <!--#endif -->
 ```
 
-### Kubernetes Deployment
-
-Example deployment manifests are available in `/k8s`:
-
-```bash
-# Deploy to Kubernetes
-kubectl apply -f k8s/namespace.yaml
-kubectl apply -f k8s/configmap.yaml
-kubectl apply -f k8s/secrets.yaml
-kubectl apply -f k8s/deployments/
-kubectl apply -f k8s/services/
-```
-
 ### Production Considerations
 
 1. **Database**: Use managed PostgreSQL (Azure Database, AWS RDS, etc.)
@@ -454,9 +426,9 @@ kubectl apply -f k8s/services/
 
 All services expose health endpoints:
 
--   `/health/live` - Liveness probe
--   `/health/ready` - Readiness probe
--   `/health/internal` - Detailed health status
+-   `/status` - Liveness probe
+-   `/health/internal` - Readiness probe (only accessible from localhost, no auth)
+-   `/health` - Public health endpoint, auth required
 
 ### Metrics
 
@@ -476,8 +448,7 @@ Traces can be exported to:
 
 -   Jaeger
 -   Zipkin
--   Azure Application Insights
--   AWS X-Ray
+-   LGTM stack
 
 ## Troubleshooting
 

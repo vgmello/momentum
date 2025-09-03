@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <AspireAppHostSdkVersion>9.4</AspireAppHostSdkVersion>
+    <AspireAppHostSdkVersion>9.4.0</AspireAppHostSdkVersion>
     <MomentumVersion>$(TemplateMomentumVersion)</MomentumVersion>
     <!--#if (USE_LOCAL) -->
     <MomentumVersion>$(LocalMomentumVersion)</MomentumVersion>
