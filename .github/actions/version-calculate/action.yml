@@ -36,5 +36,5 @@ runs:
       shell: pwsh
       run: |
         & "${{ github.action_path }}/Calculate-Version.ps1" `
-        -VersionFile = "${{ inputs.version-file }}" `
-        -ReleaseType = "${{ inputs.release-type }}"
+        -VersionFile "${{ inputs.version-file }}" `
+        -ReleaseType "${{ inputs.release-type }}"
