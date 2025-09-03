@@ -4,14 +4,26 @@ The AppDomain service uses PostgreSQL with a well-defined schema managed through
 
 ## Database Project Structure
 
-The database is organized using Liquibase migrations with a clear separation of concerns:
+The database is organized using Liquibase migrations with a single file per object pattern, grouped by domain and object type:
 
 ```
 infra/AppDomain.Database/Liquibase/
-├── AppDomain/
-│   ├── tables/           # Domain tables
-│   └── procedures/       # Domain stored procedures
-└── service_bus/          # Messaging infrastructure
+├── app_domain/
+│   ├── cashiers/
+│   │   ├── tables/       # Cashier-related tables
+│   │   │   ├── cashiers.sql
+│   │   │   └── cashier_currencies.sql
+│   │   └── procedures/   # Cashier-related procedures
+│   │       └── cashiers_get_all.sql
+│   ├── invoices/
+│   │   ├── tables/       # Invoice-related tables
+│   │   │   └── invoices.sql
+│   │   └── procedures/   # Invoice-related procedures
+│   │       ├── invoices_cancel.sql
+│   │       └── invoices_mark_paid.sql
+│   └── app_domain.sql    # Main domain schema setup
+└── service_bus/
+    └── service_bus.sql   # Messaging infrastructure
 ```
 
 ### Naming Conventions
@@ -34,28 +46,28 @@ infra/AppDomain.Database/Liquibase/
 
 ## Database Tables
 
-| Schema      | Table              | Purpose                                         | Definition                                                                                            |
-| ----------- | ------------------ | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| AppDomain   | cashiers           | Primary table for cashier management            | [cashiers.sql](infra/AppDomain.Database/Liquibase/app_domain/tables/cashiers.sql)                     |
-| AppDomain   | cashier_currencies | Multi-currency support for cashiers             | [cashier_currencies.sql](infra/AppDomain.Database/Liquibase/app_domain/tables/cashier_currencies.sql) |
-| AppDomain   | invoices           | Invoice information and status tracking         | [invoices.sql](infra/AppDomain.Database/Liquibase/app_domain/tables/invoices.sql)                     |
-| service_bus | outbox             | Outbox pattern for reliable message publishing  | [service_bus.sql](infra/AppDomain.Database/Liquibase/service_bus/service_bus.sql)                     |
-| service_bus | inbox              | Inbox pattern for idempotent message processing | [service_bus.sql](infra/AppDomain.Database/Liquibase/service_bus/service_bus.sql)                     |
+| Schema      | Table              | Purpose                                         |
+| ----------- | ------------------ | ----------------------------------------------- |
+| AppDomain   | cashiers           | Primary table for cashier management            |
+| AppDomain   | cashier_currencies | Multi-currency support for cashiers             |
+| AppDomain   | invoices           | Invoice information and status tracking         |
+| service_bus | outbox             | Outbox pattern for reliable message publishing  |
+| service_bus | inbox              | Inbox pattern for idempotent message processing |
 
 ## Stored Procedures
 
-| Function            | Purpose                            | Definition                                                                                                  |
-| ------------------- | ---------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| cashiers_get        | Get single cashier by ID           | [cashiers_get.sql](infra/AppDomain.Database/Liquibase/app_domain/procedures/cashier_get.sql)                |
-| cashiers_get_all    | Get paginated list of cashiers     | [cashiers_get_all.sql](infra/AppDomain.Database/Liquibase/app_domain/procedures/cashiers_get.sql)           |
-| cashiers_create     | Create new cashier with validation | [cashiers.sql](infra/AppDomain.Database/Liquibase/app_domain/procedures/cashiers_create.sql)                |
-| cashiers_update     | Update existing cashier            | [cashiers_update.sql](infra/AppDomain.Database/Liquibase/app_domain/procedures/cashiers_update.sql)         |
-| cashiers_delete     | Soft delete cashier                | [cashiers_delete.sql](infra/AppDomain.Database/Liquibase/app_domain/procedures/cashiers_delete.sql)         |
-| invoices_get        | Get paginated list of invoices     | [invoices_get.sql](infra/AppDomain.Database/Liquibase/app_domain/procedures/invoices_get.sql)               |
-| invoices_get_single | Get single invoice by ID           | [invoices_get_single.sql](infra/AppDomain.Database/Liquibase/app_domain/procedures/invoices_get_single.sql) |
-| invoices_create     | Create new invoice                 | [invoices_create.sql](infra/AppDomain.Database/Liquibase/app_domain/procedures/invoices_create.sql)         |
-| invoices_mark_paid  | Mark invoice as paid               | [invoices_mark_paid.sql](infra/AppDomain.Database/Liquibase/app_domain/procedures/invoices_mark_paid.sql)   |
-| invoices_cancel     | Cancel invoice                     | [invoices.sql](infra/AppDomain.Database/Liquibase/app_domain/procedures/invoices_cancel.sql)                |
+| Function            | Purpose                            |
+| ------------------- | ---------------------------------- |
+| cashiers_get        | Get single cashier by ID           |
+| cashiers_get_all    | Get paginated list of cashiers     |
+| cashiers_create     | Create new cashier with validation |
+| cashiers_update     | Update existing cashier            |
+| cashiers_delete     | Soft delete cashier                |
+| invoices_get        | Get paginated list of invoices     |
+| invoices_get_single | Get single invoice by ID           |
+| invoices_create     | Create new invoice                 |
+| invoices_mark_paid  | Mark invoice as paid               |
+| invoices_cancel     | Cancel invoice                     |
 
 ## Data Access Patterns
 
@@ -77,38 +89,42 @@ This generates:
 
 ## Migration Management
 
-### Liquibase Changelog Structure
+### Single File Per Object Pattern
 
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog">
+Each database object (table, procedure, function, etc.) is defined in its own SQL file using Liquibase's formatted SQL syntax. This approach provides better organization, version control, and maintainability.
 
-    <!-- Include domain-specific changelogs -->
-    <include file="AppDomain/changelog.xml" relativeToChangelogFile="true"/>
-    <include file="service_bus/changelog.xml" relativeToChangelogFile="true"/>
+### File Structure and Naming
 
-</databaseChangeLog>
+- **Tables**: Located in `{domain}/{subdomain}/tables/{object_name}.sql`
+- **Procedures**: Located in `{domain}/{subdomain}/procedures/{procedure_name}.sql`
+- **Schema Setup**: Domain-level files like `app_domain.sql` for schema initialization
+
+### Example Migration File
+
+```sql
+--liquibase formatted sql
+--changeset dev_user:"create cashiers table"
+CREATE TABLE IF NOT EXISTS app_domain.cashiers (
+    tenant_id UUID,
+    cashier_id UUID,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100),
+    created_date_utc TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc', now()),
+    updated_date_utc TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc', now()),
+    PRIMARY KEY (tenant_id, cashier_id)
+);
+
+--changeset dev_user:"add email to cashiers table"
+ALTER TABLE app_domain.cashiers
+ADD COLUMN IF NOT EXISTS email VARCHAR(100);
 ```
 
-### Domain Changelog Example
+### Migration Benefits
 
-```xml
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog">
-
-    <changeSet id="001-create-cashiers-table" author="AppDomain-team">
-        <sqlFile path="tables/cashiers.sql" relativeToChangelogFile="true"/>
-    </changeSet>
-
-    <changeSet id="002-create-cashier-currencies-table" author="AppDomain-team">
-        <sqlFile path="tables/cashier_currencies.sql" relativeToChangelogFile="true"/>
-    </changeSet>
-
-    <changeSet id="003-create-cashier-procedure" author="AppDomain-team">
-        <sqlFile path="procedures/create_cashier.sql" relativeToChangelogFile="true"/>
-    </changeSet>
-
-</databaseChangeLog>
-```
+- **Single Responsibility**: Each file manages one database object
+- **Clear History**: Changes to specific objects are easily tracked
+- **Domain Organization**: Related objects are grouped by business domain
+- **Version Control Friendly**: Smaller files reduce merge conflicts
 
 ### Running Migrations
 
