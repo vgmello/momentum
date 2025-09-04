@@ -6,6 +6,9 @@ on:
       - main
     paths:
       - "libs/Momentum/docs/**"
+    tags:
+      - "release"
+
   workflow_dispatch:
     inputs:
       docs-path:

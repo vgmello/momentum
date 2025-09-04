@@ -1,8 +1,6 @@
 # AppDomain.Contracts
 
-Contracts (models, integration events<!--#if (INCLUDE_API)
-, and optional gRPC protobufs
-#endif -->) that define the public surface of the AppDomain. This package is designed to be shared by other services and clients so they can:
+Contracts (models, integration events, and optional gRPC protobufs) that define the public surface of the AppDomain. This package is designed to be shared by other services and clients so they can:
 
 -   Consume and publish integration events consistently;
 -   Reuse domain models for request/response DTOs;

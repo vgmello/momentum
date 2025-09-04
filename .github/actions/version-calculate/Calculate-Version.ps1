@@ -1,10 +1,11 @@
 [CmdletBinding()]
 param(
     [ValidateNotNullOrEmpty()]
-    [string]$VersionFile = "libs/Momentum/version.txt",
+    [string]$VersionFile,
 
-    [ValidateSet("stable", "prerelease")]
-    [string]$ReleaseType = "stable"
+    [string]$Prerelease = 'false',
+
+    [string]$TagPrefix = 'v'
 )
 
 # Import Common
@@ -14,127 +15,345 @@ $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-function Compare-Version {
+function Get-FileVersion {
+    <#
+    .SYNOPSIS
+    Gets the version from the version file
+    .DESCRIPTION
+    Reads the version file and parses it as a semantic version
+    .PARAMETER VersionFile
+    Path to the version file
+    .OUTPUTS
+    System.Management.Automation.SemanticVersion
+    #>
     param(
-        [Parameter(Mandatory=$true)]
-        [string]$Version1,
-        [Parameter(Mandatory=$true)]
-        [string]$Version2
+        [Parameter(Mandatory = $true)]
+        [string]$VersionFile
     )
+    
+    if (-not (Test-Path $VersionFile)) {
+        Write-Error "❌ Error: $VersionFile not found"
+        exit 1
+    }
+
+    $fileVersionContent = (Get-Content $VersionFile).Trim()
+    
     try {
-        $v1 = [Version]::Parse($Version1)
-        $v2 = [Version]::Parse($Version2)
-        return $v1.CompareTo($v2)
+        # Parse as semantic version
+        $fileVersion = [System.Management.Automation.SemanticVersion]::Parse($fileVersionContent)
+        Write-Host "📋 File version: $fileVersion"
+        return $fileVersion
     }
     catch {
-        Write-Error "Failed to compare versions '$Version1' and '$Version2': $_"
-        throw
+        Write-Error "❌ Error: Invalid semantic version format in file: $fileVersionContent"
+        exit 1
     }
 }
 
-# Read version file
-if (-not (Test-Path $VersionFile)) {
-    Write-Error "❌ Error: $VersionFile not found"
-    exit 1
-}
-
-$fileVersion = (Get-Content $VersionFile).Trim()
-
-if ($fileVersion -notmatch '^\d+\.\d+\.\d+$') {
-    Write-Error "❌ Error: Invalid version format: $fileVersion"
-    exit 1
-}
-
-Write-Host "📋 File version: $fileVersion"
-
-# Determine tag prefix
-$tagPrefix = "v"
-if ($VersionFile -like "*.template.config/version.txt*") {
-    $tagPrefix = "template-v"
-    Write-Host "Using template tag format (detected from version file: $VersionFile)"
-}
-else {
-    Write-Host "Using standard tag format"
-}
-
-# Find previous stable releases
-$allTags = git tag -l "${tagPrefix}*.*.*" --sort=-creatordate
-$prevTag = $allTags | Where-Object { $_ -notmatch 'pre' } | Select-Object -First 1
-
-if (-not $prevTag) {
-    Write-Host "No previous stable release found"
-    $prevTag = "${tagPrefix}0.0.0"
-}
-
-Write-Host "Previous stable release: $prevTag"
-$prevVersion = $prevTag -replace "^$tagPrefix", ""
-
-Write-GitHubOutput -Name "prev_tag" -Value $prevTag
-Write-GitHubOutput -Name "tag_prefix" -Value $tagPrefix
-Write-GitHubOutput -Name "previous_stable_version" -Value $prevVersion
-
-# Check for pre-releases
-$latestPrerelease = git tag -l "${tagPrefix}${fileVersion}-pre.*" --sort=-creatordate | Select-Object -First 1
-$hasPrerelease = $false
-$prereleaseSequence = 0
-
-if ($latestPrerelease) {
-    Write-Host "Found pre-release: $latestPrerelease"
-    $hasPrerelease = $true
-    Write-GitHubOutput -Name "has_prerelease" -Value "true"
-    Write-GitHubOutput -Name "latest_prerelease" -Value $latestPrerelease
-
-    if ($latestPrerelease -match '-pre\.(\d+)$') {
-        $prereleaseSequence = [int]$Matches[1]
+function Get-LatestReleaseForMajor {
+    <#
+    .SYNOPSIS
+    Gets the latest release tag for a specific major version
+    .DESCRIPTION
+    Searches git tags for the latest release matching the major version
+    .PARAMETER MajorVersion
+    The major version to search for
+    .PARAMETER TagPrefix
+    The tag prefix to use when searching
+    .OUTPUTS
+    System.Management.Automation.SemanticVersion or $null if no tags found
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [int]$MajorVersion,
+        
+        [Parameter(Mandatory = $true)]
+        [string]$TagPrefix
+    )
+    
+    # Get all tags matching the major version pattern
+    $tagPattern = "${TagPrefix}${MajorVersion}.*"
+    $allTags = @(git tag -l $tagPattern --sort=-version:refname)
+    
+    if ($allTags.Count -eq 0) {
+        Write-Host "ℹ️  No previous releases found for major version $MajorVersion"
+        return $null
     }
-    Write-GitHubOutput -Name "prerelease_sequence" -Value $prereleaseSequence.ToString()
-}
-else {
-    Write-GitHubOutput -Name "has_prerelease" -Value "false"
-    Write-GitHubOutput -Name "prerelease_sequence" -Value "0"
+    
+    # Find the latest stable or pre-release version
+    foreach ($tag in $allTags) {
+        $versionString = $tag -replace "^${TagPrefix}", ""
+        try {
+            $version = [System.Management.Automation.SemanticVersion]::Parse($versionString)
+            Write-Host "📋 Latest release found: $version"
+            return $version
+        }
+        catch {
+            Write-Warning "⚠️  Skipping invalid version tag: $tag"
+            continue
+        }
+    }
+    
+    return $null
 }
 
-# Calculate version
-$calculatedVersion = ""
+function Get-LatestPrereleaseForVersion {
+    <#
+    .SYNOPSIS
+    Gets the latest pre-release for a specific version
+    .DESCRIPTION
+    Searches git tags for the latest pre-release matching the base version
+    .PARAMETER BaseVersion
+    The base version to search for (e.g., "1.0.0")
+    .PARAMETER PreReleaseLabel
+    The pre-release label to search for (e.g., "alpha", "beta", "preview")
+    .PARAMETER TagPrefix
+    The tag prefix to use when searching
+    .OUTPUTS
+    System.Management.Automation.SemanticVersion or $null if no pre-releases found
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$BaseVersion,
+        
+        [string]$PreReleaseLabel,
+        
+        [Parameter(Mandatory = $true)]
+        [string]$TagPrefix
+    )
+    
+    # Build tag pattern based on whether we have a pre-release label
+    if ($PreReleaseLabel) {
+        $tagPattern = "${TagPrefix}${BaseVersion}-${PreReleaseLabel}*"
+    }
+    else {
+        $tagPattern = "${TagPrefix}${BaseVersion}-*"
+    }
+    
+    $prereleaseTags = @(git tag -l $tagPattern --sort=-version:refname)
+    
+    if ($prereleaseTags.Count -eq 0) {
+        return $null
+    }
+    
+    # Return the first valid pre-release version found
+    foreach ($tag in $prereleaseTags) {
+        $versionString = $tag -replace "^${TagPrefix}", ""
+        try {
+            $version = [System.Management.Automation.SemanticVersion]::Parse($versionString)
+            return $version
+        }
+        catch {
+            Write-Warning "⚠️  Skipping invalid version tag: $tag"
+            continue
+        }
+    }
+    
+    return $null
+}
+
+function Get-NextPrereleaseNumber {
+    <#
+    .SYNOPSIS
+    Extracts and increments the pre-release number
+    .DESCRIPTION
+    Parses a pre-release string like "alpha.1" and returns the next number
+    .PARAMETER PrereleaseString
+    The pre-release string to parse
+    .OUTPUTS
+    The next pre-release number
+    #>
+    param(
+        [string]$PrereleaseString
+    )
+    
+    if ([string]::IsNullOrEmpty($PrereleaseString)) {
+        return 1
+    }
+    
+    # Match patterns like "alpha.1", "beta.2", "preview.3", or just "1"
+    if ($PrereleaseString -match '\.(\d+)$') {
+        return [int]$Matches[1] + 1
+    }
+    elseif ($PrereleaseString -match '^(\d+)$') {
+        return [int]$Matches[1] + 1
+    }
+    
+    return 1
+}
+
+# Main script logic
+Write-Host "🔍 Calculating version..."
+Write-Host "   Version file: $VersionFile"
+Write-Host "   Prerelease: $Prerelease"
+Write-Host "   Tag prefix: $TagPrefix"
+
+# Parse the Prerelease parameter as boolean
+$IsPrerelease = $Prerelease -eq 'true' -or $Prerelease -eq '1' -or $Prerelease -eq 'yes'
+
+# Get the version from file
+$fileVersion = Get-FileVersion -VersionFile $VersionFile
+
+# Get core version components
+$baseVersionString = "$($fileVersion.Major).$($fileVersion.Minor).$($fileVersion.Patch)"
+$filePreReleaseLabel = $fileVersion.PreReleaseLabel
+
+# Get the latest release for this major version
+$latestRelease = Get-LatestReleaseForMajor -MajorVersion $fileVersion.Major -TagPrefix $TagPrefix
+
+# Initialize output variables
+$calculatedVersion = $null
 $calculatedTag = ""
+$previousVersion = ""
+$previousTag = ""
 
-if ($ReleaseType -eq "prerelease") {
-    # Calculate pre-release version
-    if ($hasPrerelease) {
-        $nextSequence = $prereleaseSequence + 1
-        $calculatedVersion = "${fileVersion}-pre.${nextSequence}"
-        Write-Host "ℹ️  Incrementing pre-release: sequence $prereleaseSequence → $nextSequence"
+# Store previous version info
+if ($latestRelease) {
+    $previousVersion = $latestRelease.ToString()
+    $previousTag = "${TagPrefix}${previousVersion}"
+    Write-GitHubOutput -Name "previous-version" -Value $previousVersion
+    Write-GitHubOutput -Name "previous-tag" -Value $previousTag
+    
+    # Find the latest stable version (without pre-release)
+    $stableTags = @(git tag -l "${TagPrefix}$($fileVersion.Major).*.*" --sort=-version:refname | Where-Object { $_ -notmatch '-' })
+    if ($stableTags.Count -gt 0) {
+        $stableVersionString = $stableTags[0] -replace "^${TagPrefix}", ""
+        Write-GitHubOutput -Name "previous-stable-version" -Value $stableVersionString
     }
     else {
-        $calculatedVersion = "${fileVersion}-pre.1"
-        Write-Host "ℹ️  First pre-release for version $fileVersion"
+        Write-GitHubOutput -Name "previous-stable-version" -Value ""
     }
 }
 else {
-    # Calculate stable release version
-    if ($hasPrerelease) {
-        $calculatedVersion = $fileVersion
-        Write-Host "ℹ️  Transitioning from pre-release to stable: $calculatedVersion"
+    Write-GitHubOutput -Name "previous-version" -Value ""
+    Write-GitHubOutput -Name "previous-tag" -Value ""
+    Write-GitHubOutput -Name "previous-stable-version" -Value ""
+}
+
+# Version calculation logic
+if ($IsPrerelease) {
+    Write-Host "🔧 Calculating pre-release version..."
+    
+    # Determine the pre-release label from file version or use default
+    $prereleaseLabel = if ($filePreReleaseLabel) { 
+        # Extract just the label part (e.g., "alpha" from "alpha.1")
+        $labelParts = $filePreReleaseLabel -split '\.'
+        $labelParts[0]
+    } else { 
+        "preview" 
     }
-    # Check if the version was bumped manually in the version file
-    elseif ((Compare-Version -Version1 $fileVersion -Version2 $prevVersion) -gt 0) {
-        $calculatedVersion = $fileVersion
-        Write-Host "ℹ️  Using file version: $calculatedVersion (> $prevVersion)"
+    
+    # Check if there's already a stable release with the file version
+    $stableTag = "${TagPrefix}${baseVersionString}"
+    $stableExists = $null -ne (git tag -l $stableTag 2>$null)
+    
+    if ($stableExists) {
+        Write-Host "ℹ️  Stable version $baseVersionString already exists"
+        
+        # Need to find next available version for pre-release
+        $major = $fileVersion.Major
+        $minor = $fileVersion.Minor
+        $patch = $fileVersion.Patch
+        
+        do {
+            $patch++
+            $nextBaseVersion = "$major.$minor.$patch"
+            $nextStableTag = "${TagPrefix}${nextBaseVersion}"
+            $nextStableExists = $null -ne (git tag -l $nextStableTag 2>$null)
+        } while ($nextStableExists)
+        
+        $calculatedVersion = [System.Management.Automation.SemanticVersion]::new(
+            $major, $minor, $patch, "$prereleaseLabel.1"
+        )
+        Write-Host "ℹ️  Creating first pre-release for next available version: $calculatedVersion"
     }
     else {
-        $versionParts = $prevVersion.Split('.')
-        $major = [int]$versionParts[0]
-        $minor = [int]$versionParts[1]
-        $patch = [int]$versionParts[2]
-        $calculatedVersion = "$major.$minor.$($patch + 1)"
-        Write-Host "ℹ️  Incrementing patch: $prevVersion → $calculatedVersion"
+        # Check for existing pre-releases for this version
+        $latestPrerelease = Get-LatestPrereleaseForVersion `
+            -BaseVersion $baseVersionString `
+            -PreReleaseLabel $prereleaseLabel `
+            -TagPrefix $TagPrefix
+        
+        if ($latestPrerelease) {
+            # Increment the pre-release number
+            $nextNumber = Get-NextPrereleaseNumber -PrereleaseString $latestPrerelease.PreReleaseLabel
+            $calculatedVersion = [System.Management.Automation.SemanticVersion]::new(
+                $fileVersion.Major, 
+                $fileVersion.Minor, 
+                $fileVersion.Patch, 
+                "$prereleaseLabel.$nextNumber"
+            )
+            Write-Host "ℹ️  Incrementing pre-release: $latestPrerelease → $calculatedVersion"
+        }
+        else {
+            # First pre-release for this version
+            $calculatedVersion = [System.Management.Automation.SemanticVersion]::new(
+                $fileVersion.Major, 
+                $fileVersion.Minor, 
+                $fileVersion.Patch, 
+                "$prereleaseLabel.1"
+            )
+            Write-Host "ℹ️  First pre-release for version $baseVersionString"
+        }
+    }
+}
+else {
+    Write-Host "🔧 Calculating stable release version..."
+    
+    # Check if file version is greater than latest release
+    if (-not $latestRelease -or $fileVersion.CompareTo($latestRelease) -gt 0) {
+        # User wants to create a new version (file version is greater)
+        $calculatedVersion = [System.Management.Automation.SemanticVersion]::new(
+            $fileVersion.Major, 
+            $fileVersion.Minor, 
+            $fileVersion.Patch
+        )
+        
+        if ($latestRelease) {
+            Write-Host "ℹ️  File version ($fileVersion) > latest release ($latestRelease)"
+        }
+        else {
+            Write-Host "ℹ️  First release for major version $($fileVersion.Major)"
+        }
+        Write-Host "ℹ️  Creating stable release: $calculatedVersion"
+    }
+    elseif ($fileVersion.CompareTo($latestRelease) -eq 0 -and $latestRelease.PreReleaseLabel) {
+        # File version equals latest, but latest is a pre-release - promote to stable
+        $calculatedVersion = [System.Management.Automation.SemanticVersion]::new(
+            $fileVersion.Major, 
+            $fileVersion.Minor, 
+            $fileVersion.Patch
+        )
+        Write-Host "ℹ️  Promoting pre-release to stable: $latestRelease → $calculatedVersion"
+    }
+    else {
+        # File version is less than or equal to latest stable - increment patch
+        if ($latestRelease.PreReleaseLabel) {
+            # Latest is a pre-release, get the base version
+            $major = $latestRelease.Major
+            $minor = $latestRelease.Minor
+            $patch = $latestRelease.Patch
+        }
+        else {
+            # Latest is stable, increment patch
+            $major = $latestRelease.Major
+            $minor = $latestRelease.Minor
+            $patch = $latestRelease.Patch + 1
+        }
+        
+        $calculatedVersion = [System.Management.Automation.SemanticVersion]::new($major, $minor, $patch)
+        Write-Host "ℹ️  Incrementing version: $latestRelease → $calculatedVersion"
     }
 }
 
-$calculatedTag = "${tagPrefix}${calculatedVersion}"
+# Generate the tag
+$calculatedTag = "${TagPrefix}${calculatedVersion}"
 
-Write-Host "📋 Calculated version: $calculatedVersion"
-Write-Host "📋 Calculated tag: $calculatedTag"
+# Output results
+Write-Host "✅ Version calculation complete:"
+Write-Host "   Calculated version: $calculatedVersion"
+Write-Host "   Calculated tag: $calculatedTag"
 
-Write-GitHubOutput -Name "version" -Value $calculatedVersion
-Write-GitHubOutput -Name "tag" -Value $calculatedTag
+# Write GitHub outputs (using the naming convention from action.yml)
+Write-GitHubOutput -Name "next-version" -Value $calculatedVersion.ToString()
+Write-GitHubOutput -Name "next-tag" -Value $calculatedTag

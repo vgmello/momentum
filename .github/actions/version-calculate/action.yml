@@ -5,28 +5,32 @@ inputs:
   version-file:
     description: "Path to version file"
     required: false
-    default: "libs/Momentum/version.txt"
-  release-type:
+    default: "version.txt"
+  prerelease:
     description: "Type of release (stable/prerelease)"
     required: false
-    default: "stable"
+    default: "true"
+  tag-prefix:
+    description: "Tag prefix"
+    required: false
+    default: "v"
 
 outputs:
-  version:
+  next-version:
     description: "Calculated version"
-    value: ${{ steps.calculate.outputs.version }}
-  tag:
+    value: ${{ steps.calculate.outputs.next-version }}
+  next-tag:
     description: "Version tag"
-    value: ${{ steps.calculate.outputs.tag }}
-  has-prerelease:
-    description: "Whether pre-releases exist for this version"
-    value: ${{ steps.calculate.outputs.has_prerelease }}
+    value: ${{ steps.calculate.outputs.next-tag }}
   previous-version:
     description: "Previous version"
-    value: ${{ steps.calculate.outputs.previous_version }}
+    value: ${{ steps.calculate.outputs.previous-version }}
+  previous-tag:
+    description: "Previous Tag"
+    value: ${{ steps.calculate.outputs.previous-tag }}
   previous-stable-version:
-    description: "Previous version"
-    value: ${{ steps.calculate.outputs.previous_stable_version }}
+    description: "Previous stable version"
+    value: ${{ steps.calculate.outputs.previous-stable-version }}
 
 runs:
   using: "composite"
@@ -37,4 +41,5 @@ runs:
       run: |
         & "${{ github.action_path }}/Calculate-Version.ps1" `
         -VersionFile "${{ inputs.version-file }}" `
-        -ReleaseType "${{ inputs.release-type }}"
+        -Prerelease "${{ inputs.prerelease }}" `
+        -TagPrefix "${{ inputs.tag-prefix }}"

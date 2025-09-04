@@ -258,7 +258,7 @@ Ready to begin? Follow our comprehensive getting started guide:
 
 ### API Documentation
 
--   [REST API Reference]({{ __API_BASE_URL__ }}/scalar)
+-   [REST API Reference](${API_BASE_URL}/scalar)
 -   [Integration Events](/events/)
 
 ### Advanced Topics
@@ -274,4 +274,4 @@ The design makes the codebase intuitive for developers, product teams, and even 
 -   **Explore the Domains**: Deep dive into [Cashiers](/guide/cashiers/), [Invoices](/guide/invoices/), or [Bills](/guide/bills/)
 -   **Understand the Architecture**: Learn about our [architectural patterns](/arch/)
 -   **Start Contributing**: Follow our [development guide](/guide/dev-setup)
--   **Review the APIs**: Check out the [API documentation]({{ __API_BASE_URL__ }}/scalar)
+-   **Review the APIs**: Check out the [API documentation](${API_BASE_URL}/scalar)
