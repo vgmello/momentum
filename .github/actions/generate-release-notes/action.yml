@@ -8,28 +8,24 @@ inputs:
   tag:
     description: 'Release tag'
     required: true
-  release-type:
-    description: 'Type of release (prerelease/stable)'
+  previous-tag:
+    description: 'Previous release tag for generating commit diff'
     required: false
-    default: 'stable'
-  output-file:
-    description: 'Output file name'
-    required: false
-    default: 'release_notes.md'
+    default: ''
 
 outputs:
   notes-file:
     description: 'Path to generated release notes file'
-    value: ${{ inputs.output-file }}
+    value: ${{ steps.generate.outputs.notes-file }}
 
 runs:
   using: 'composite'
   steps:
     - name: Generate release notes
+      id: generate
       shell: pwsh
       run: |
         & "${{ github.action_path }}/Generate-ReleaseNotes.ps1" `
           -Version "${{ inputs.version }}" `
           -Tag "${{ inputs.tag }}" `
-          -ReleaseType "${{ inputs.release-type }}" `
-          -OutputFile "${{ inputs.output-file }}"
+          -PreviousTag "${{ inputs.previous-tag }}"

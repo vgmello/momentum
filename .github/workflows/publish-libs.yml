@@ -84,7 +84,7 @@ jobs:
         with:
           version: ${{ steps.release-version.outputs.next-version }}
           tag: ${{ steps.release-version.outputs.next-tag }}
-          previous-tag: ${{ steps.release-version.outputs.current-tag }}
+          previous-tag: ${{ steps.release-version.outputs.previous-tag }}
 
       - name: Create GitHub release
         shell: pwsh
@@ -92,7 +92,7 @@ jobs:
           & ./.github/scripts/Create-GitHubRelease.ps1 `
             -Tag "${{ steps.release-version.outputs.next-tag }}" `
             -Title "Momentum Libraries ${{ steps.release-version.outputs.next-tag }}" `
-            -NotesFile "${{ steps.release-notes.outputs.release-notes-file }}" `
+            -NotesFile "${{ steps.release-notes.outputs.notes-file }}" `
             ${{ steps.config.outputs.prerelease == 'true' && '-Prerelease' || '' }} `
             -Target "main"
         env:

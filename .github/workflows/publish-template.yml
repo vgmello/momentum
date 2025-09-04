@@ -75,7 +75,7 @@ jobs:
         with:
           deploy-type: ${{ github.event.inputs.deploy-type }}
 
-      - name: Find latest momentum version
+      - name: Calculate next momentum lib version
         id: latest-mmt-version
         uses: ./.github/actions/version-calculate
         with:
@@ -87,7 +87,7 @@ jobs:
         id: set-lib-version
         shell: pwsh
         run: |
-          $version = "${{ steps.latest-mmt-version.outputs.current_version }}"
+          $version = "${{ steps.latest-mmt-version.outputs.next-version }}"
           $filePath = ".template.config/template.json"
 
           Write-Host "Updating $filePath with version: $version"
@@ -117,7 +117,7 @@ jobs:
         with:
           version: ${{ steps.release-version.outputs.next-version }}
           tag: ${{ steps.release-version.outputs.next-tag }}
-          previous-tag: ${{ steps.release-version.outputs.current-tag }}
+          previous-tag: ${{ steps.release-version.outputs.previous-tag }}
 
       - name: Create GitHub release
         shell: pwsh
@@ -125,7 +125,7 @@ jobs:
           & ./.github/scripts/Create-GitHubRelease.ps1 `
             -Tag "${{ steps.release-version.outputs.next-tag }}" `
             -Title "Momentum Template ${{ steps.release-version.outputs.next-tag }}" `
-            -NotesFile "${{ steps.release-notes.outputs.release-notes-file }}" `
+            -NotesFile "${{ steps.release-notes.outputs.notes-file }}" `
             ${{ steps.config.outputs.prerelease == 'true' && '-Prerelease' || '' }} `
             -Target "main"
         env:

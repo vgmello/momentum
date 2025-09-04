@@ -40,6 +40,6 @@ runs:
       shell: pwsh
       run: |
         & "${{ github.action_path }}/Calculate-Version.ps1" `
-        -VersionFile "${{ inputs.version-file }}" `
-        -Prerelease "${{ inputs.prerelease }}" `
-        -TagPrefix "${{ inputs.tag-prefix }}"
+          -VersionFile "${{ inputs.version-file }}" `
+          -TagPrefix "${{ inputs.tag-prefix }}" `
+          ${{ inputs.prerelease == 'true' && '-Prerelease' || '' }}
