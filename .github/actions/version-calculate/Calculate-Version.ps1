@@ -95,6 +95,22 @@ function Get-NextPrereleaseNumber {
     return 1
 }
 
+function Test-SameBaseVersion {
+    param(
+        [Parameter(Mandatory = $true)]
+        [System.Management.Automation.SemanticVersion]$FileVersion,
+        
+        [Parameter(Mandatory = $true)]
+        [System.Management.Automation.SemanticVersion]$ReleaseVersion
+    )
+    
+    # Compare the base version (major.minor.patch) ignoring prerelease labels
+    $fileBase = [System.Management.Automation.SemanticVersion]::new($FileVersion.Major, $FileVersion.Minor, $FileVersion.Patch)
+    $releaseBase = [System.Management.Automation.SemanticVersion]::new($ReleaseVersion.Major, $ReleaseVersion.Minor, $ReleaseVersion.Patch)
+    
+    return $fileBase.CompareTo($releaseBase) -eq 0
+}
+
 function New-PrereleaseVersionFromFile {
     param(
         [Parameter(Mandatory = $true)]
@@ -115,6 +131,48 @@ function New-PrereleaseVersionFromFile {
         $FileVersion.Patch,
         "$prereleaseLabel.1"
     )
+}
+
+function New-IncrementedPrereleaseVersion {
+    param(
+        [Parameter(Mandatory = $true)]
+        [System.Management.Automation.SemanticVersion]$BaseVersion,
+        
+        [Parameter(Mandatory = $false)]
+        [string]$PrereleaseLabel = $null
+    )
+    
+    $labelToUse = if ($PrereleaseLabel) {
+        $PrereleaseLabel
+    }
+    elseif ($BaseVersion.PreReleaseLabel) {
+        ($BaseVersion.PreReleaseLabel -split '\.')[0]
+    }
+    else {
+        "preview"
+    }
+    
+    $nextNumber = Get-NextPrereleaseNumber -PrereleaseString $BaseVersion.PreReleaseLabel
+    
+    return [System.Management.Automation.SemanticVersion]::new(
+        $BaseVersion.Major,
+        $BaseVersion.Minor,
+        $BaseVersion.Patch,
+        "$labelToUse.$nextNumber"
+    )
+}
+
+function Get-PrereleaseLabel {
+    param(
+        [Parameter(Mandatory = $true)]
+        [System.Management.Automation.SemanticVersion]$Version
+    )
+    
+    if ($Version.PreReleaseLabel) {
+        return ($Version.PreReleaseLabel -split '\.')[0]
+    }
+    
+    return $null
 }
 
 # Main script logic
@@ -167,33 +225,56 @@ else {
 if ($Prerelease) {
     Write-Host "🔧 Calculating pre-release version..."
 
-    if (-not $latestRelease -or $fileVersion.CompareTo($latestRelease) -gt 0) {
-        # File version is greater than latest - use file version as base
+    if (-not $latestRelease) {
+        # No previous releases - use file version as base
         $calculatedVersion = New-PrereleaseVersionFromFile -FileVersion $fileVersion
-
-        if (-not $latestRelease) {
-            Write-Host "ℹ️  First pre-release for version $($fileVersion.Major).$($fileVersion.Minor).$($fileVersion.Patch)"
+        Write-Host "ℹ️  First pre-release for version $($fileVersion.Major).$($fileVersion.Minor).$($fileVersion.Patch)"
+    }
+    elseif (Test-SameBaseVersion -FileVersion $fileVersion -ReleaseVersion $latestRelease) {
+        # File version and latest release have the same base version (e.g., file=0.0.1, latest=0.0.1-preview.1)
+        if ($latestRelease.PreReleaseLabel) {
+            $filePrereleaseLabel = Get-PrereleaseLabel -Version $fileVersion
+            $latestPrereleaseLabel = Get-PrereleaseLabel -Version $latestRelease
+            
+            if ($filePrereleaseLabel -and $filePrereleaseLabel -ne $latestPrereleaseLabel) {
+                # Different prerelease labels (e.g., file=0.0.1-rc, latest=0.0.1-preview.1)
+                $calculatedVersion = New-PrereleaseVersionFromFile -FileVersion $fileVersion
+                Write-Host "ℹ️  Same base version - changing prerelease type from $latestPrereleaseLabel to ${filePrereleaseLabel}: $calculatedVersion"
+            }
+            else {
+                # Same prerelease label or file has no prerelease label - increment existing
+                $calculatedVersion = New-IncrementedPrereleaseVersion -BaseVersion $latestRelease
+                if ($filePrereleaseLabel) {
+                    Write-Host "ℹ️  Same base version and prerelease type - incrementing: $latestRelease → $calculatedVersion"
+                }
+                else {
+                    Write-Host "ℹ️  Same base version ($fileVersion base) - incrementing pre-release: $latestRelease → $calculatedVersion"
+                }
+            }
         }
         else {
-            Write-Host "ℹ️  File version ($fileVersion) > latest release ($latestRelease)"
-            Write-Host "ℹ️  Creating pre-release: $calculatedVersion"
-        }
-    }
-    else {
-        # File version <= latest release - work from latest release
-        if ($latestRelease.PreReleaseLabel) {
-            # Latest is already a pre-release - increment it
-            $labelParts = $latestRelease.PreReleaseLabel -split '\.'
-            $prereleaseLabel = $labelParts[0]
-            $nextNumber = Get-NextPrereleaseNumber -PrereleaseString $latestRelease.PreReleaseLabel
-
+            # Latest is stable for the same base version - create next patch pre-release
             $calculatedVersion = [System.Management.Automation.SemanticVersion]::new(
                 $latestRelease.Major,
                 $latestRelease.Minor,
-                $latestRelease.Patch,
-                "$prereleaseLabel.$nextNumber"
+                $latestRelease.Patch + 1,
+                "preview.1"
             )
-            Write-Host "ℹ️  Incrementing pre-release: $latestRelease → $calculatedVersion"
+            Write-Host "ℹ️  Latest is stable for same base version - creating next patch pre-release: $latestRelease → $calculatedVersion"
+        }
+    }
+    elseif ($fileVersion.CompareTo($latestRelease) -gt 0) {
+        # File version is actually greater than latest release - use file version as base
+        $calculatedVersion = New-PrereleaseVersionFromFile -FileVersion $fileVersion
+        Write-Host "ℹ️  File version ($fileVersion) > latest release ($latestRelease)"
+        Write-Host "ℹ️  Creating pre-release: $calculatedVersion"
+    }
+    else {
+        # File version < latest release - work from latest release
+        if ($latestRelease.PreReleaseLabel) {
+            # Latest is already a pre-release - increment it
+            $calculatedVersion = New-IncrementedPrereleaseVersion -BaseVersion $latestRelease
+            Write-Host "ℹ️  File version < latest release - incrementing pre-release: $latestRelease → $calculatedVersion"
         }
         else {
             # Latest is stable - create new pre-release for next patch version
@@ -203,7 +284,7 @@ if ($Prerelease) {
                 $latestRelease.Patch + 1,
                 "preview.1"
             )
-            Write-Host "ℹ️  Creating pre-release from stable: $latestRelease → $calculatedVersion"
+            Write-Host "ℹ️  File version < latest stable release - creating next patch pre-release: $latestRelease → $calculatedVersion"
         }
     }
 }
