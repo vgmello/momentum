@@ -99,15 +99,15 @@ function Test-SameBaseVersion {
     param(
         [Parameter(Mandatory = $true)]
         [System.Management.Automation.SemanticVersion]$FileVersion,
-        
+
         [Parameter(Mandatory = $true)]
         [System.Management.Automation.SemanticVersion]$ReleaseVersion
     )
-    
+
     # Compare the base version (major.minor.patch) ignoring prerelease labels
     $fileBase = [System.Management.Automation.SemanticVersion]::new($FileVersion.Major, $FileVersion.Minor, $FileVersion.Patch)
     $releaseBase = [System.Management.Automation.SemanticVersion]::new($ReleaseVersion.Major, $ReleaseVersion.Minor, $ReleaseVersion.Patch)
-    
+
     return $fileBase.CompareTo($releaseBase) -eq 0
 }
 
@@ -137,11 +137,11 @@ function New-IncrementedPrereleaseVersion {
     param(
         [Parameter(Mandatory = $true)]
         [System.Management.Automation.SemanticVersion]$BaseVersion,
-        
+
         [Parameter(Mandatory = $false)]
         [string]$PrereleaseLabel = $null
     )
-    
+
     $labelToUse = if ($PrereleaseLabel) {
         $PrereleaseLabel
     }
@@ -151,9 +151,9 @@ function New-IncrementedPrereleaseVersion {
     else {
         "preview"
     }
-    
+
     $nextNumber = Get-NextPrereleaseNumber -PrereleaseString $BaseVersion.PreReleaseLabel
-    
+
     return [System.Management.Automation.SemanticVersion]::new(
         $BaseVersion.Major,
         $BaseVersion.Minor,
@@ -167,11 +167,11 @@ function Get-PrereleaseLabel {
         [Parameter(Mandatory = $true)]
         [System.Management.Automation.SemanticVersion]$Version
     )
-    
+
     if ($Version.PreReleaseLabel) {
         return ($Version.PreReleaseLabel -split '\.')[0]
     }
-    
+
     return $null
 }
 
@@ -235,7 +235,7 @@ if ($Prerelease) {
         if ($latestRelease.PreReleaseLabel) {
             $filePrereleaseLabel = Get-PrereleaseLabel -Version $fileVersion
             $latestPrereleaseLabel = Get-PrereleaseLabel -Version $latestRelease
-            
+
             if ($filePrereleaseLabel -and $filePrereleaseLabel -ne $latestPrereleaseLabel) {
                 # Different prerelease labels (e.g., file=0.0.1-rc, latest=0.0.1-preview.1)
                 $calculatedVersion = New-PrereleaseVersionFromFile -FileVersion $fileVersion

@@ -61,7 +61,8 @@ function Get-ChangelogLink {
     if ($GithubBaseUrl) {
         $changelogUrl = if ($LastRelease) {
             "$GithubBaseUrl/compare/$LastRelease...$Tag"
-        } else {
+        }
+        else {
             "$GithubBaseUrl/commits/$Tag"
         }
         return "**Full Changelog**: [$changelogUrl]($changelogUrl)"
@@ -80,16 +81,16 @@ Write-Host "📌 Previous tag: $(if ($lastRelease) { $lastRelease } else { 'none
 # Get commit information
 if ($lastRelease) {
     $commits = @(git log --pretty=format:"- %s (%an)" "${lastRelease}..HEAD" --no-merges |
-                 Where-Object { $_ -notmatch "skip ci" } |
-                 Select-Object -First 20)
+        Where-Object { $_ -notmatch "skip ci" } |
+        Select-Object -First 20)
 
     $commitCount = git rev-list --count "${lastRelease}..HEAD" --no-merges
     $filesChanged = (git diff --name-only "${lastRelease}..HEAD").Count
 }
 else {
     $commits = @(git log --pretty=format:"- %s (%an)" --no-merges |
-                 Where-Object { $_ -notmatch "skip ci" } |
-                 Select-Object -First 20)
+        Where-Object { $_ -notmatch "skip ci" } |
+        Select-Object -First 20)
 
     $commitCount = git rev-list --count HEAD --no-merges
     $filesChanged = "N/A"

@@ -1,5 +1,28 @@
 name: "Calculate Version"
-description: "Calculate version for releases and pre-releases"
+description: |
+  Calculate semantic version for releases and pre-releases based on file version and git tags.
+
+  Version Calculation Logic:
+  ─────────────────────────
+
+  PRERELEASE MODE:
+  • First prerelease: file version → adds '-preview.1' (or custom label from file)
+  • Same base version: increments existing prerelease number (0.0.1-preview.1 → 0.0.1-preview.2)
+  • Different prerelease type: starts new sequence (0.0.1-preview.1 + file:0.0.1-rc → 0.0.1-rc.1)
+  • File > Latest: creates new prerelease from file version
+  • File < Latest: increments latest prerelease or creates next patch prerelease
+
+  STABLE MODE:
+  • First release: uses file version as-is
+  • File > Latest: uses file version as stable release
+  • Prerelease → Stable: promotes to stable (removes prerelease suffix)
+  • Stable → Stable: increments patch version
+
+  Examples:
+  • File: 1.0.0, Tags: none, Prerelease: true → 1.0.0-preview.1
+  • File: 0.0.1, Tags: 0.0.1-preview.1, Prerelease: true → 0.0.1-preview.2
+  • File: 0.0.1-rc, Tags: 0.0.1-preview.1, Prerelease: true → 0.0.1-rc.1
+  • File: 1.0.0, Tags: 1.0.0-rc.2, Prerelease: false → 1.0.0
 
 inputs:
   version-file:
