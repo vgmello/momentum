@@ -36,23 +36,23 @@ message CreateInvoiceRequest {
   double amount = 2;
   string currency = 3;
   optional google.protobuf.Timestamp due_date = 4;
-  string cashierId = 5;
+  string cashier_id = 5;
 }
 
 message CancelInvoiceRequest {
-  string invoiceId = 1;
+  string invoice_id = 1;
   int32 version = 2;
 }
 
 message MarkInvoiceAsPaidRequest {
-  string invoiceId = 1;
+  string invoice_id = 1;
   int32 version = 2;
   double amount_paid = 3;
   google.protobuf.Timestamp payment_date = 4;
 }
 
 message SimulatePaymentRequest {
-  string invoiceId = 1;
+  string invoice_id = 1;
   int32 version = 2;
   double amount = 3;
   string currency = 4;

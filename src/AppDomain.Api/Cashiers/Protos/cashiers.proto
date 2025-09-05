@@ -34,12 +34,12 @@ message CreateCashierRequest {
 }
 
 message UpdateCashierRequest {
-  string cashierId = 1;
+  string cashier_id = 1;
   string name = 2;
   string email = 3;
   int32 version = 4;
 }
 
 message DeleteCashierRequest {
-  string cashierId = 1;
+  string cashier_id = 1;
 }
