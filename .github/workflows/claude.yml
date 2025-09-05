@@ -2,13 +2,23 @@ name: Claude Code
 
 on:
   issue_comment:
-    types: [created]
+    types: [created, edited]
   pull_request_review_comment:
-    types: [created]
+    types: [created, edited]
   issues:
     types: [opened, assigned]
   pull_request_review:
     types: [submitted]
+
+env:
+  DOTNET_VERSION: "9.0.x"
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  id-token: write
+  actions: read
 
 jobs:
   claude:
@@ -19,12 +29,6 @@ jobs:
       (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    permissions:
-      contents: write
-      pull-requests: write
-      issues: write
-      id-token: write
-      actions: read
 
     steps:
       - name: Checkout repository
@@ -32,14 +36,15 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
       - name: Run Claude Code
         id: claude
-        uses: anthropics/claude-code-action@beta
+        uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          additional_permissions: |
-            actions: read
-
-          model: "claude-opus-4-1-20250805"
-          assignee_trigger: "claude"
-          allowed_tools: "Bash(dotnet:*)"
+          claude_args: |
+            --model claude-sonnet-4-0
