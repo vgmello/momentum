@@ -75,7 +75,7 @@ jobs:
         with:
           deploy-type: ${{ github.event.inputs.deploy-type }}
 
-      - name: Calculate next momentum lib version
+      - name: Calculate momentum lib version
         id: latest-mmt-version
         uses: ./.github/actions/version-calculate
         with:
@@ -87,7 +87,11 @@ jobs:
         id: set-lib-version
         shell: pwsh
         run: |
-          $version = "${{ steps.latest-mmt-version.outputs.next-version }}"
+          $version = if ("${{ steps.config.outputs.prerelease }}" -eq "true") {
+              "${{ steps.latest-mmt-version.outputs.previous-version }}"
+          } else {
+              "${{ steps.latest-mmt-version.outputs.previous-stable-version }}"
+          }
           $filePath = ".template.config/template.json"
 
           Write-Host "Updating $filePath with version: $version"
