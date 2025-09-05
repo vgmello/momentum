@@ -35,13 +35,9 @@ catch {
 
 # Auto-detect project type from tag pattern
 $projectType = "libraries"
-$tagPattern = "v*"
-$projectName = "Momentum Libraries"
 
 if ($Tag -match '^template-v') {
     $projectType = "template"
-    $tagPattern = "template-v*"
-    $projectName = "Momentum Template"
 }
 
 # Get repository information for GitHub links
@@ -105,10 +101,6 @@ if ($commits.Count -eq 0) {
 $content = @()
 
 if ($ReleaseType -eq "prerelease") {
-    $content += "# ${projectName} ${Version}"
-    $content += ""
-    $content += "🚧 **Pre-release Version**"
-    $content += ""
     $content += "## What's Changed"
     $content += ""
     $content += $commits
@@ -119,8 +111,6 @@ if ($ReleaseType -eq "prerelease") {
     $content += "📊 **Statistics**: $commitCount commits | $filesChanged files changed"
 }
 else {
-    $content += "# ${projectName} v${Version}"
-
     # Add package list for libraries
     if ($projectType -eq "libraries") {
         $content += ""
