@@ -511,7 +511,7 @@
           ]
         },
         {
-          "condition": "(!USE_DB)",
+          "condition": "(!USE_LIQUIBASE)",
           "exclude": [
             "tests/AppDomain.Tests/Integration/_Internal/Containers/LiquibaseMigrationContainer.cs"
           ]

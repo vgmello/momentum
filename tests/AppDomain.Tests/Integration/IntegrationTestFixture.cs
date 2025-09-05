@@ -10,8 +10,10 @@ using Serilog.Events;
 using System.Diagnostics.CodeAnalysis;
 using Momentum.ServiceDefaults;
 using AppDomain;
-//#if (USE_DB)
+//#if (USE_LIQUIBASE)
 using AppDomain.Tests.Integration._Internal.Containers;
+//#endif
+//#if (USE_DB)
 using Testcontainers.PostgreSql;
 //#endif
 //#if (USE_KAFKA)
@@ -101,7 +103,7 @@ public class IntegrationTestFixture : IAsyncLifetime
         await _kafka.StartAsync();
 //#endif
 
-//#if (USE_DB)
+//#if (USE_LIQUIBASE)
         await using var liquibaseMigrationContainer = new LiquibaseMigrationContainer(_postgres.Name, _containerNetwork);
         await liquibaseMigrationContainer.StartAsync();
 //#endif

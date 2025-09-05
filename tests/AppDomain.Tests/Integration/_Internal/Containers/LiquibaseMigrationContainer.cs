@@ -52,9 +52,15 @@ public class LiquibaseMigrationContainer : IAsyncDisposable
         }
         catch (Exception e) when (!(e is InvalidOperationException))
         {
-            var logs = await _liquibaseContainer.GetLogsAsync();
-
-            throw new InvalidOperationException($"Liquibase migration failed. Logs: {logs}", e);
+            try
+            {
+                var logs = await _liquibaseContainer.GetLogsAsync();
+                throw new InvalidOperationException($"Liquibase migration failed. Logs: {logs}", e);
+            }
+            catch
+            {
+                throw new InvalidOperationException($"Liquibase migration failed. Unable to retrieve logs.", e);
+            }
         }
     }
 
