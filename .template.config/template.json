@@ -339,6 +339,12 @@
       },
       "replaces": "OrgName"
     },
+    "OrgNameXmlEncoded": {
+      "type": "derived",
+      "valueSource": "OrgName",
+      "valueTransform": "xmlEncode",
+      "replaces": "OrgNameXml"
+    },
     "OrgNameKebab": {
       "type": "derived",
       "valueSource": "OrgName",

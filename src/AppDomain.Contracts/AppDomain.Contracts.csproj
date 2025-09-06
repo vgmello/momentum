@@ -10,12 +10,12 @@
 <!--/+:msbuild-conditional:noEmit -->
 
     <PropertyGroup>
-        <Authors>OrgName</Authors>
-        <Company>OrgName</Company>
-        <Copyright>Copyright (c) OrgName. All rights reserved.</Copyright>
+        <Authors>OrgNameXml</Authors>
+        <Company>OrgNameXml</Company>
+        <Copyright>Copyright (c) OrgNameXml. All rights reserved.</Copyright>
         <PackageTags>app_domain;app_domain.contracts</PackageTags>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <RepositoryUrl>https://github.com/OrgName/AppDomain</RepositoryUrl>
+        <RepositoryUrl>https://github.com/OrgNameXml/AppDomain</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
     </PropertyGroup>
 
