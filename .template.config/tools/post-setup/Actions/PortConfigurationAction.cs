@@ -16,12 +16,12 @@ public class PortConfigurationAction
         public int ProcessedFiles { get; set; }
         public int ChangedFiles { get; set; }
         public int BasePort { get; set; }
-        public Dictionary<string, int> PortMappings { get; set; } = new();
+        public Dictionary<string, int> PortMappings { get; set; } = [];
     }
 
-    public PortConfigurationResult ConfigurePorts(string projectDir, JsonElement config, string[] args)
+    public PortConfigurationResult ConfigurePorts(string projectDir, JsonElement config)
     {
-        var basePort = GetBasePortFromConfig(config, args);
+        var basePort = GetBasePortFromConfig(config);
         var portMappings = BuildPortMappings(basePort);
 
         Console.WriteLine($"Configuring ports with base port: {basePort}");
@@ -49,7 +49,7 @@ public class PortConfigurationAction
         };
     }
 
-    private int GetBasePortFromConfig(JsonElement config, string[] args)
+    private static int GetBasePortFromConfig(JsonElement config)
     {
         if (config.TryGetProperty("basePort", out var basePortElement) && basePortElement.TryGetInt32(out var configPort))
         {
@@ -59,9 +59,8 @@ public class PortConfigurationAction
         return 8100;
     }
 
-    private Dictionary<string, int> BuildPortMappings(int basePort)
-    {
-        return new Dictionary<string, int>
+    private static Dictionary<string, int> BuildPortMappings(int basePort) =>
+        new()
         {
             { "8100", basePort }, // Aspire Resource Service HTTP
             { "8110", basePort + 10 }, // Aspire Resource Service HTTPS
@@ -78,7 +77,6 @@ public class PortConfigurationAction
             { "18100", basePort + 10000 }, // Aspire Dashboard HTTP
             { "18110", basePort + 10010 } // Aspire Dashboard HTTPS
         };
-    }
 
     private List<string> FindFilesToUpdate(string projectDir)
     {
@@ -104,7 +102,7 @@ public class PortConfigurationAction
         return files;
     }
 
-    private bool IsExcludedPath(string filePath)
+    private static bool IsExcludedPath(string filePath)
     {
         var excludedDirs = new[] { "bin", "obj", ".git", ".vs", "node_modules", ".local" };
 
@@ -112,7 +110,7 @@ public class PortConfigurationAction
                                        filePath.Contains($"{Path.DirectorySeparatorChar}{dir}"));
     }
 
-    private bool UpdatePortsInFile(string filePath, Dictionary<string, int> portMappings, string projectDir)
+    private static bool UpdatePortsInFile(string filePath, Dictionary<string, int> portMappings, string projectDir)
     {
         try
         {
@@ -121,6 +119,7 @@ public class PortConfigurationAction
 
             foreach (var mapping in portMappings)
             {
+                var mappingValueStr = mapping.Value.ToString();
                 var patterns = new[]
                 {
                     $@"\b{mapping.Key}\b",
@@ -132,7 +131,7 @@ public class PortConfigurationAction
                 foreach (var pattern in patterns)
                 {
                     content = Regex.Replace(content, pattern,
-                        match => match.Value.Replace(mapping.Key.ToString(), mapping.Value.ToString()));
+                        match => match.Value.Replace(mapping.Key, mappingValueStr));
                 }
             }
 

@@ -159,7 +159,7 @@ public static class PluralizationExtensions
         if (UncountableNouns.Contains(word) || UnchangingNouns.Contains(word) || !ShouldPluralize(word))
             return word;
 
-        // Preserve original casing pattern
+        // Preserve the original casing pattern
         var isUpperCase = char.IsUpper(word[0]);
         var isAllCaps = word.All(c => !char.IsLetter(c) || char.IsUpper(c));
 

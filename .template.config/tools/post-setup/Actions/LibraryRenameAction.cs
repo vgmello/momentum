@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 
 namespace PostSetup.Actions;
 
-public class LibraryRenameAction
+public static class LibraryRenameAction
 {
     public class LibraryRenameResult
     {
@@ -60,6 +60,7 @@ public class LibraryRenameAction
         if (importedTokens.Count == 0)
         {
             result.SkipReason = "No imported Momentum libraries found";
+
             return result;
         }
 
@@ -79,12 +80,14 @@ public class LibraryRenameAction
         if (!config.TryGetProperty("momentumLibImport", out var importConfig))
         {
             result.SkipReason = "No momentumLibImport configuration found";
+
             return false;
         }
 
         if (!importConfig.TryGetProperty("enabled", out var enabledElement) || !enabledElement.GetBoolean())
         {
             result.SkipReason = "Momentum library import is disabled";
+
             return false;
         }
 
@@ -96,6 +99,7 @@ public class LibraryRenameAction
         config.TryGetProperty("momentumLibImport", out var importConfig);
 
         var libPrefix = "";
+
         if (importConfig.TryGetProperty("libName", out var libNameElement))
         {
             libPrefix = libNameElement.GetString() ?? "";
@@ -109,12 +113,14 @@ public class LibraryRenameAction
         if (string.IsNullOrEmpty(libPrefix))
         {
             result.SkipReason = "libName not specified in momentumLibImport config";
+
             return false;
         }
 
         if (libPrefix == "Momentum")
         {
             result.SkipReason = "Library prefix is empty or unchanged (Momentum)";
+
             return false;
         }
 
@@ -140,15 +146,13 @@ public class LibraryRenameAction
 
         // Process regular files
         var regex = BuildMomentumLibraryRegex(importedTokens);
-        var (regularProcessed, regularChanged) = ProcessRegularFiles(
-            projectDir, libPrefix, importedTokens, config, regex);
+        var (regularProcessed, regularChanged) = ProcessRegularFiles(projectDir, libPrefix, config, regex);
 
         processedFiles += regularProcessed;
         changedFiles += regularChanged;
 
         // Process solution files
-        var (solutionProcessed, solutionChanged) = ProcessSolutionFiles(
-            projectDir, libPrefix, importedTokens);
+        var (solutionProcessed, solutionChanged) = ProcessSolutionFiles(projectDir, libPrefix, importedTokens);
 
         processedFiles += solutionProcessed;
         changedFiles += solutionChanged;
@@ -159,7 +163,6 @@ public class LibraryRenameAction
     private static (int processed, int changed) ProcessRegularFiles(
         string projectDir,
         string libPrefix,
-        List<string> importedTokens,
         ProcessingConfig config,
         Regex regex)
     {
@@ -169,6 +172,7 @@ public class LibraryRenameAction
         foreach (var root in config.ScanRoots)
         {
             var rootPath = Path.Combine(projectDir, root);
+
             if (!Directory.Exists(rootPath)) continue;
 
             var files = FindFilesToProcess(rootPath, config.FileExtensions, config.ExcludeDirs, config.MaxBytes);
@@ -176,6 +180,7 @@ public class LibraryRenameAction
             foreach (var filePath in files)
             {
                 processedFiles++;
+
                 if (ProcessFileContent(filePath, regex, libPrefix, projectDir))
                 {
                     changedFiles++;
@@ -195,9 +200,11 @@ public class LibraryRenameAction
         var changedFiles = 0;
 
         var solutionFiles = Directory.GetFiles(projectDir, "*.slnx", SearchOption.TopDirectoryOnly);
+
         foreach (var slnFile in solutionFiles)
         {
             processedFiles++;
+
             if (UpdateSolutionReferences(slnFile, libPrefix, projectDir, importedTokens))
             {
                 changedFiles++;
@@ -213,7 +220,7 @@ public class LibraryRenameAction
         var libsPath = Path.Combine(projectDir, "libs");
 
         if (!Directory.Exists(libsPath))
-            return tokens;
+            return [];
 
         var prefixedLibsPath = Path.Combine(libsPath, libPrefix);
         var searchPath = Directory.Exists(prefixedLibsPath) ? prefixedLibsPath : libsPath;
@@ -223,6 +230,7 @@ public class LibraryRenameAction
         foreach (var item in allItems)
         {
             var token = ExtractTokenFromItem(item, libPrefix);
+
             if (!string.IsNullOrEmpty(token))
             {
                 tokens.Add(token);
@@ -253,6 +261,7 @@ public class LibraryRenameAction
         {
             return item[(libPrefix.Length + 1)..];
         }
+
         return "";
     }
 
@@ -316,6 +325,7 @@ public class LibraryRenameAction
             {
                 WriteFileWithBomHandling(filePath, modifiedContent, hasBom);
                 Console.WriteLine($"  → Updated library references in: {Path.GetRelativePath(projectDir, filePath)}");
+
                 return true;
             }
         }
@@ -330,17 +340,9 @@ public class LibraryRenameAction
     private static (string content, bool hasBom) ReadFileWithBomDetection(string filePath)
     {
         var bytes = File.ReadAllBytes(filePath);
-        bool hasBom = bytes is [0xEF, 0xBB, 0xBF, ..];
+        var hasBom = bytes is [0xEF, 0xBB, 0xBF, ..];
 
-        string content;
-        if (hasBom)
-        {
-            content = Encoding.UTF8.GetString(bytes, 3, bytes.Length - 3);
-        }
-        else
-        {
-            content = Encoding.UTF8.GetString(bytes);
-        }
+        var content = hasBom ? Encoding.UTF8.GetString(bytes, 3, bytes.Length - 3) : Encoding.UTF8.GetString(bytes);
 
         return (content, hasBom);
     }
@@ -387,6 +389,7 @@ public class LibraryRenameAction
             {
                 File.WriteAllText(slnFile, modifiedContent);
                 Console.WriteLine($"  → Updated solution references in: {Path.GetRelativePath(projectDir, slnFile)}");
+
                 return true;
             }
         }
@@ -400,51 +403,63 @@ public class LibraryRenameAction
 
     private static List<PathReplacement> BuildPathReplacements(string token, string libPrefix)
     {
-        return new List<PathReplacement>
-        {
-            // Project file name replacements
-            new() {
+        return
+        [
+            new PathReplacement
+            {
                 OldPath = $"Momentum.{token}.csproj",
                 NewPath = $"{libPrefix}.{token}.csproj",
                 Description = "Project file name"
             },
 
             // Full path replacements with original structure
-            new() {
+
+            new PathReplacement
+            {
                 OldPath = $"libs\\Momentum\\src\\Momentum.{token}\\Momentum.{token}.csproj",
                 NewPath = $"libs\\{libPrefix}\\src\\{libPrefix}.{token}\\{libPrefix}.{token}.csproj",
                 Description = "Full backslash path (original structure)"
             },
-            new() {
+
+            new PathReplacement
+            {
                 OldPath = $"libs/Momentum/src/Momentum.{token}/Momentum.{token}.csproj",
                 NewPath = $"libs/{libPrefix}/src/{libPrefix}.{token}/{libPrefix}.{token}.csproj",
                 Description = "Full forward slash path (original structure)"
             },
 
             // Mixed path replacements (renamed files but old directory structure)
-            new() {
-                OldPath = $"libs\\Momentum\\src\\{libPrefix}.{token}\\{libPrefix}.{token}.csproj",
-                NewPath = $"libs\\{libPrefix}\\src\\{libPrefix}.{token}\\{libPrefix}.{token}.csproj",
+
+            new PathReplacement
+            {
+                OldPath = $@"libs\Momentum\src\{libPrefix}.{token}\{libPrefix}.{token}.csproj",
+                NewPath = $@"libs\{libPrefix}\src\{libPrefix}.{token}\{libPrefix}.{token}.csproj",
                 Description = "Mixed backslash path (renamed files, old dirs)"
             },
-            new() {
+
+            new PathReplacement
+            {
                 OldPath = $"libs/Momentum/src/{libPrefix}.{token}/{libPrefix}.{token}.csproj",
                 NewPath = $"libs/{libPrefix}/src/{libPrefix}.{token}/{libPrefix}.{token}.csproj",
                 Description = "Mixed forward slash path (renamed files, old dirs)"
             },
 
             // Partial path replacements
-            new() {
+
+            new PathReplacement
+            {
                 OldPath = $"Momentum.{token}/Momentum.{token}.csproj",
                 NewPath = $"{libPrefix}.{token}/{libPrefix}.{token}.csproj",
                 Description = "Partial path"
             },
-            new() {
+
+            new PathReplacement
+            {
                 OldPath = $"Momentum.{token}\\Momentum.{token}.csproj",
                 NewPath = $"{libPrefix}.{token}\\{libPrefix}.{token}.csproj",
                 Description = "Partial backslash path"
             }
-        };
+        ];
     }
 
     private static string[] GetStringArrayFromConfig(JsonElement config, string propertyName, string[] defaultValue)

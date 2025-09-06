@@ -6,7 +6,7 @@
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <CodeAnalysisRuleSet>../../Momentum.ruleset</CodeAnalysisRuleSet>
-        <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <NoWarn>$(NoWarn);CS1591;LOGGEN036</NoWarn>
     </PropertyGroup>
 
