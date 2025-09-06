@@ -26,7 +26,7 @@ const markdownOptions: MarkdownOptions = {
     },
 };
 
-const API_BASE_URL = process.env.API_BASE_URL || "https://app-domain.api.org_name.com"
+const API_BASE_URL = process.env.API_BASE_URL || "https://app-domain.api.OrgName.com"
 
 export default defineConfig({
     title: "AppDomain Solution",

@@ -1,4 +1,4 @@
-// Copyright (c) ORG_NAME. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
 namespace AppDomain.Api.Core.Extensions;
 
@@ -18,7 +18,7 @@ public static class GrpcExtensions
     {
         if (!Guid.TryParse(value, out var guid))
             throw new RpcException(new Status(StatusCode.InvalidArgument, error));
-            
+
         return guid;
     }
 }

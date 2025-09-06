@@ -1,4 +1,4 @@
-// Copyright (c) ORG_NAME. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
 var builder = DistributedApplication.CreateBuilder(args);
 
@@ -15,7 +15,7 @@ var pgsql = builder
         .WithEndpointProxySupport(false)
         .WithImage("dpage/pgadmin4", "latest")
         .WithLifetime(ContainerLifetime.Persistent)
-        .WithEndpointUrl("http","PgAdmin (DB Management)"))
+        .WithEndpointUrl("http", "PgAdmin (DB Management)"))
     .WithLifetime(ContainerLifetime.Persistent);
 
 var database = pgsql.AddDatabase(name: "AppDomainDb", databaseName: "app_domain");

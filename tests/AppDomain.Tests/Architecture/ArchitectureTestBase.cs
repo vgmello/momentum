@@ -1,4 +1,4 @@
-// Copyright (c) ORG_NAME. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
 using NetArchTest.Rules;
 
@@ -11,12 +11,12 @@ namespace AppDomain.Tests.Architecture;
 /// </summary>
 public abstract class ArchitectureTestBase
 {
-    /// <summary>
-    ///     Gets all types from the AppDomain assemblies for architecture testing.
-    /// </summary>
-    protected static Types GetAppDomainTypes() => Types
+        /// <summary>
+        ///     Gets all types from the AppDomain assemblies for architecture testing.
+        /// </summary>
+        protected static Types GetAppDomainTypes() => Types
 #if INCLUDE_API
-        .InAssemblies([typeof(IAppDomainAssembly).Assembly, typeof(Api.DependencyInjection).Assembly]);
+            .InAssemblies([typeof(IAppDomainAssembly).Assembly, typeof(Api.DependencyInjection).Assembly]);
 #else
         .InAssemblies([typeof(IAppDomainAssembly).Assembly]);
 #endif
