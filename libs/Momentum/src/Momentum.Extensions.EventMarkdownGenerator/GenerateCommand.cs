@@ -6,6 +6,7 @@ using Spectre.Console;
 using Spectre.Console.Cli;
 using System.ComponentModel;
 using System.Reflection;
+using System.Runtime.Loader;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
@@ -243,24 +244,55 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
 
     private static Assembly LoadAssemblyWithDependencyResolution(string assemblyPath)
     {
-        var assemblyDirectory = Path.GetDirectoryName(assemblyPath);
+        // Create an isolated context for loading the assembly and its dependencies
+        var loadContext = new IsolatedAssemblyLoadContext(assemblyPath);
+        return loadContext.LoadFromAssemblyPath(assemblyPath);
+    }
 
-        if (assemblyDirectory is not null)
+    /// <summary>
+    /// Isolated assembly load context to prevent version conflicts between the host app
+    /// and the assemblies being analyzed for documentation generation.
+    /// </summary>
+    private sealed class IsolatedAssemblyLoadContext : AssemblyLoadContext
+    {
+        private readonly string _assemblyDirectory;
+        private readonly AssemblyDependencyResolver _resolver;
+
+        public IsolatedAssemblyLoadContext(string assemblyPath) : base(isCollectible: true)
         {
-            AppDomain.CurrentDomain.AssemblyResolve += (_, args) =>
-            {
-                var assemblyName = new AssemblyName(args.Name);
-                var potentialPath = Path.Combine(assemblyDirectory, assemblyName.Name + ".dll");
-
-                if (File.Exists(potentialPath))
-                {
-                    return Assembly.LoadFrom(potentialPath);
-                }
-
-                return null;
-            };
+            _assemblyDirectory = Path.GetDirectoryName(assemblyPath) ?? string.Empty;
+            _resolver = new AssemblyDependencyResolver(assemblyPath);
         }
 
-        return Assembly.LoadFrom(assemblyPath);
+        protected override Assembly? Load(AssemblyName assemblyName)
+        {
+            // First try to resolve using the standard resolver (handles runtime assemblies)
+            var assemblyPath = _resolver.ResolveAssemblyToPath(assemblyName);
+            if (assemblyPath != null)
+            {
+                return LoadFromAssemblyPath(assemblyPath);
+            }
+
+            // Then try to load from the same directory as the main assembly
+            var localPath = Path.Combine(_assemblyDirectory, assemblyName.Name + ".dll");
+            if (File.Exists(localPath))
+            {
+                return LoadFromAssemblyPath(localPath);
+            }
+
+            // Let the default context handle it (for system assemblies)
+            return null;
+        }
+
+        protected override IntPtr LoadUnmanagedDll(string unmanagedDllName)
+        {
+            var libraryPath = _resolver.ResolveUnmanagedDllToPath(unmanagedDllName);
+            if (libraryPath != null)
+            {
+                return LoadUnmanagedDllFromPath(libraryPath);
+            }
+
+            return IntPtr.Zero;
+        }
     }
 }
