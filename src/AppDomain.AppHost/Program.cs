@@ -22,7 +22,7 @@ var database = pgsql.AddDatabase(name: "AppDomainDb", databaseName: "app_domain"
 var serviceBusDb = pgsql.AddDatabase(name: "ServiceBus", databaseName: "service_bus");
 
 #if (USE_LIQUIBASE)
-builder.AddLiquibaseMigrations(pgsql, dbPassword);
+var liquibaseMigrations = builder.AddLiquibaseMigrations(pgsql, dbPassword);
 #endif
 
 #endif
@@ -67,9 +67,12 @@ var appDomainApi = builder
 #endif
 #if (USE_DB)
     .WaitFor(database)
+#if (USE_LIQUIBASE)
+    .WaitFor(liquibaseMigrations)
+#endif
 #endif
     .WithEndpointUrl("http|https", "AppDomain API", "/scalar")
-    .WithHttpHealthCheck("/health/internal");
+    .WithHealthCheck("/health/internal");
 
 #endif
 #if (INCLUDE_BACK_OFFICE)
@@ -85,8 +88,11 @@ builder
 #endif
 #if (USE_DB)
     .WaitFor(database)
+#if (USE_LIQUIBASE)
+    .WaitFor(liquibaseMigrations)
 #endif
-    .WithHttpHealthCheck("/health/internal");
+#endif
+    .WithHealthCheck("/health/internal");
 
 #endif
 #if (INCLUDE_ORLEANS)
@@ -105,10 +111,13 @@ builder
 #endif
 #if (USE_DB)
     .WaitFor(pgsql)
+#if (USE_LIQUIBASE)
+    .WaitFor(liquibaseMigrations)
+#endif
 #endif
     .WithReplicas(3)
     .WithEndpointUrl("http|https", "Dashboard", "/dashboard")
-    .WithHttpHealthCheck("/health/internal");
+    .WithHealthCheck("/health/internal");
 
 #endif
 #if (INCLUDE_DOCS)

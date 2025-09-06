@@ -90,6 +90,19 @@ cd docs && pnpm install && pnpm dev
 # Documentation: http://localhost:8119
 ```
 
+**Aspire Database Setup**:
+- PostgreSQL with persistent storage
+- Automatic Liquibase migrations on startup
+- PgAdmin for database management
+- Health checks validate schema and constraints
+- Services wait for database and migrations before starting
+
+**Database Connection**:
+- Services automatically get connection strings from Aspire
+- Health checks validate connectivity and schema integrity
+- LinqToDB configured with snake_case naming conventions
+- Dapper available for custom queries and health checks
+
 ### Library Development
 
 ```bash
@@ -348,6 +361,88 @@ Uses Liquibase for version-controlled schema management:
 - Automatic migration via Docker Compose
 - Separate service_bus and application schemas
 
+**IMPORTANT - Database Organization Rules**:
+- **Table Definitions**: Each table should be in its own file under `tables/` directory
+- **Constraints & Indexes**: Should be defined WITHIN the same file as the table they apply to
+- **Avoid Separate Constraint Files**: Do NOT create separate `constraints_and_indexes.sql` files
+- **Logical Grouping**: Keep related constraints, indexes, triggers, and functions with their tables
+
+**Correct Structure**:
+```
+infra/YourService.Database/Liquibase/app_domain/
+├── app_domain.sql                    # Schema creation
+├── invoices/
+│   ├── tables/
+│   │   └── invoices.sql             # Table + constraints + indexes + triggers
+│   └── procedures/
+│       └── invoice_operations.sql
+└── customers/
+    ├── tables/
+        └── customers.sql            # Table + constraints + indexes + triggers
+    └── procedures/
+        └── customer_operations.sql
+```
+
+**Example Table File Structure**:
+```sql
+-- Table creation
+CREATE TABLE app_domain.invoices (...);
+
+-- Additional columns (if needed)
+ALTER TABLE app_domain.invoices ADD COLUMN ...;
+
+-- Constraints
+ALTER TABLE app_domain.invoices ADD CONSTRAINT chk_amount_positive CHECK (amount > 0);
+
+-- Foreign keys
+ALTER TABLE app_domain.invoices ADD CONSTRAINT fk_invoice_customer ...;
+
+-- Indexes
+CREATE INDEX idx_invoices_status ON app_domain.invoices(tenant_id, status);
+
+-- Triggers and functions
+CREATE OR REPLACE FUNCTION update_invoice_version() ...;
+CREATE TRIGGER tr_invoice_version BEFORE UPDATE ON app_domain.invoices ...;
+```
+
+### Troubleshooting Database Issues
+
+**Common Problems and Solutions**:
+
+1. **Health Checks Failing**:
+   ```bash
+   # Check if database is running
+   curl http://localhost:8101/health/internal
+
+   # Check Aspire dashboard for service status
+   open https://localhost:18110
+   ```
+
+2. **Migration Issues**:
+   ```bash
+   # Check Liquibase logs in Aspire dashboard
+   # Verify changelog.xml includes all table files
+   # Ensure changesets have unique IDs
+   ```
+
+3. **Missing Constraints/Indexes**:
+   ```sql
+   -- Verify constraints exist
+   SELECT constraint_name, constraint_type
+   FROM information_schema.table_constraints
+   WHERE table_schema = 'app_domain';
+
+   -- Verify indexes exist
+   SELECT schemaname, tablename, indexname
+   FROM pg_indexes
+   WHERE schemaname = 'app_domain';
+   ```
+
+4. **Connection String Issues**:
+   - Aspire automatically configures connection strings
+   - Check appsettings.json for overrides
+   - Verify service references in AppHost Program.cs
+
 ### Observability Integration
 
 Complete observability stack configured by default:
@@ -355,6 +450,23 @@ Complete observability stack configured by default:
 - **Metrics**: OpenTelemetry with custom meters
 - **Tracing**: Distributed tracing across services
 - **Health Checks**: Built-in health endpoints
+
+**Health Check Endpoints**:
+- `/status` - Liveness probe (simple status)
+- `/health/internal` - Internal health check (localhost only, detailed)
+- `/health` - Public health check (requires auth, detailed)
+
+**Database Health Checks**:
+- Connectivity validation
+- Schema verification (tables, constraints, indexes)
+- Basic data access testing
+- Constraint and foreign key validation
+
+**Aspire Configuration**:
+- Database resources with health checks
+- Liquibase migration dependencies
+- Service orchestration with proper wait conditions
+- Automatic service discovery and load balancing
 
 ### Development vs Production Configuration
 

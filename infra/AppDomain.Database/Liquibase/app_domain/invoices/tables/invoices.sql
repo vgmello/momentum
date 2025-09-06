@@ -27,3 +27,22 @@ ADD COLUMN IF NOT EXISTS amount DECIMAL(18, 2),
 ALTER TABLE app_domain.invoices
 ADD COLUMN IF NOT EXISTS amount_paid DECIMAL(18, 2),
     ADD COLUMN IF NOT EXISTS payment_date TIMESTAMP WITH TIME ZONE;
+
+--changeset dev_user:"add performance indexes to invoices table"
+-- Index for querying invoices by status and tenant
+CREATE INDEX IF NOT EXISTS idx_invoices_tenant_status
+ON app_domain.invoices(tenant_id, status);
+
+-- Index for querying invoices by due date
+CREATE INDEX IF NOT EXISTS idx_invoices_due_date
+ON app_domain.invoices(due_date)
+WHERE due_date IS NOT NULL;
+
+-- Index for querying invoices by cashier
+CREATE INDEX IF NOT EXISTS idx_invoices_cashier
+ON app_domain.invoices(tenant_id, cashier_id)
+WHERE cashier_id IS NOT NULL;
+
+-- Index for querying invoices by created date
+CREATE INDEX IF NOT EXISTS idx_invoices_created_date
+ON app_domain.invoices(tenant_id, created_date_utc);

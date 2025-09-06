@@ -12,7 +12,7 @@ namespace AppDomain.Invoices.Contracts.IntegrationEvents;
 /// <param name="Currency">Currency of the payment</param>
 /// <param name="PaymentDate">Date and time when the payment was received</param>
 /// <param name="PaymentMethod">Method used for the payment (optional)</param>
-/// <param name="PaymentReference">TODO</param>
+/// <param name="PaymentReference">Unique reference or transaction ID for the payment, used for tracking and reconciliation</param>
 /// <remarks>
 ///     ## When It's Triggered
 ///

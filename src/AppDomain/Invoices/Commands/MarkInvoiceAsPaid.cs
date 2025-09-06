@@ -1,5 +1,6 @@
 // Copyright (c) OrgName. All rights reserved.
 
+using AppDomain.Core.Enums;
 using AppDomain.Invoices.Contracts.IntegrationEvents;
 using AppDomain.Invoices.Contracts.Models;
 using AppDomain.Invoices.Data;
@@ -11,7 +12,7 @@ namespace AppDomain.Invoices.Commands;
 /// </summary>
 /// <param name="TenantId">Unique identifier for the tenant</param>
 /// <param name="InvoiceId">Unique identifier for the invoice to mark as paid</param>
-/// <param name="Version">TODO</param>
+/// <param name="Version">Current version of the invoice entity for optimistic concurrency control</param>
 /// <param name="AmountPaid">Amount that was paid</param>
 /// <param name="PaymentDate">Date when the payment was received</param>
 public record MarkInvoiceAsPaidCommand(
