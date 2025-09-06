@@ -1,5 +1,7 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Momentum.Extensions.Abstractions.Extensions;
 
 public static class PluralizationExtensions
@@ -176,6 +178,7 @@ public static class PluralizationExtensions
         return result;
     }
 
+    [SuppressMessage("Critical Code Smell", "S3776:Cognitive Complexity of methods should not be too high")]
     private static string ApplyRegularPluralizationRules(string word)
     {
         var length = word.Length;

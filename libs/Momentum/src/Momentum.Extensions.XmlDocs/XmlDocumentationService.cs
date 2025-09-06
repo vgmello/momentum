@@ -2,6 +2,7 @@
 
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
 using System.Xml;
@@ -100,7 +101,7 @@ public class XmlDocumentationService(ILogger<XmlDocumentationService> logger) : 
         }
     }
 
-#pragma warning disable S3776
+    [SuppressMessage("Critical Code Smell", "S3776:Cognitive Complexity of methods should not be too high")]
     private static async Task<XmlDocumentationInfo?> ParseMemberDocumentationAsync(XmlReader reader)
     {
         var docInfo = new XmlDocumentationInfo();
