@@ -30,7 +30,7 @@ public static class DomainDiscovery
         return allTypes
             .Where(t => t.Namespace != null &&
                         t.Namespace.StartsWith("AppDomain.") &&
-                        !t.Namespace.StartsWith("AppDomain.Core") &&
+                        !t.Namespace.StartsWith("AppDomain.Common") &&
                         !t.Namespace.StartsWith("AppDomain.BackOffice") &&
                         !t.Namespace.StartsWith("AppDomain.Api") &&
                         !t.Namespace.StartsWith("AppDomain.Contracts") &&

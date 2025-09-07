@@ -1,6 +1,6 @@
 // Copyright (c) OrgName. All rights reserved.
 
-using AppDomain.Core.Enums;
+using AppDomain.Common.Enums;
 using AppDomain.Invoices.Commands;
 using FluentValidation.TestHelper;
 

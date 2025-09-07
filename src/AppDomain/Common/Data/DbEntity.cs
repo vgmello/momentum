@@ -13,7 +13,7 @@ namespace AppDomain.Common.Data;
 /// </summary>
 [Table(Schema = "app_domain")]
 [GenerateSerializer]
-[Alias("AppDomain.Core.Data.DbEntity")]
+[Alias("AppDomain.Common.Data.DbEntity")]
 public abstract record DbEntity
 {
     /// <summary>
