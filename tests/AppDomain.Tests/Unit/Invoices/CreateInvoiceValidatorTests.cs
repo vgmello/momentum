@@ -3,7 +3,7 @@
 using AppDomain.Invoices.Commands;
 using FluentValidation.TestHelper;
 
-namespace AppDomain.Tests.Invoices.Commands;
+namespace AppDomain.Tests.Unit.Invoices;
 
 /// <summary>
 ///     Tests for CreateInvoiceValidator to ensure proper validation rules.

@@ -1,6 +1,7 @@
 // Copyright (c) OrgName. All rights reserved.
 
 //#if (INCLUDE_SAMPLE)
+
 using AppDomain.Cashiers.Data.Entities;
 using AppDomain.Invoices.Data.Entities;
 //#endif

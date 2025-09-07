@@ -28,12 +28,12 @@ public class DataAccessRulesTests : ArchitectureTestBase
             .Distinct()
             .ToList();
 
-        foreach (var prefix in dataNamespaces.Where(ns => !ns.EndsWith(".Core")))
+        foreach (var prefix in dataNamespaces.Where(ns => !ns.EndsWith(".Common")))
         {
             var result = Types
                 .InAssemblies(assemblies)
                 .That().HaveDependencyOn($"{prefix}.Data")
-                .And().DoNotResideInNamespace($"{prefix}.Core.Data") // Allow Core data context to reference domain entities
+                .And().DoNotResideInNamespace($"{prefix}.Common.Data") // Allow Core data context to reference domain entities
                 .And().DoNotHaveName("AppDomainDb") // Allow AppDomainDb to reference all domain data
                 .And().DoNotResideInNamespace("Internal")
 #if (INCLUDE_ORLEANS)
