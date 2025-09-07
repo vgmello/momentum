@@ -1,5 +1,6 @@
 // Copyright (c) OrgName. All rights reserved.
 
+using AppDomain.Common.Grpc;
 using AppDomain.Invoices.Grpc;
 using AppDomain.Tests.Integration._Internal;
 using AppDomain.Tests.Integration._Internal.TestDataGenerators;
@@ -21,14 +22,14 @@ public class SimulatePaymentIntegrationTests(IntegrationTestFixture fixture) : I
 
         // Arrange - Create an invoice first
         var createRequest = _invoiceFaker
-            .WithAmount(200.00)
+            .WithAmount(200.00m)
             .WithCurrency("USD")
             .Generate();
 
         var createdInvoice = await _client.CreateInvoiceAsync(createRequest, cancellationToken: TestContext.Current.CancellationToken);
 
         var simulateFaker = new SimulatePaymentFaker(createdInvoice.InvoiceId)
-            .WithAmount(200.00)
+            .WithAmount(200.00m)
             .WithPaymentMethod("credit_card");
         var simulateRequest = simulateFaker.Generate();
         simulateRequest.Version = createdInvoice.Version;
@@ -62,14 +63,14 @@ public class SimulatePaymentIntegrationTests(IntegrationTestFixture fixture) : I
 
         // Arrange - Create an invoice first
         var createRequest = _invoiceFaker
-            .WithAmount(100.00)
+            .WithAmount(100.00m)
             .WithCurrency("EUR")
             .Generate();
 
         var createdInvoice = await _client.CreateInvoiceAsync(createRequest, cancellationToken: TestContext.Current.CancellationToken);
 
         var simulateFaker = new SimulatePaymentFaker(createdInvoice.InvoiceId)
-            .WithAmount(100.00);
+            .WithAmount(100.00m);
         var simulateRequest = simulateFaker.Generate();
         simulateRequest.Version = createdInvoice.Version;
         simulateRequest.Currency = "EUR"; // Use invoice currency as default
@@ -89,7 +90,7 @@ public class SimulatePaymentIntegrationTests(IntegrationTestFixture fixture) : I
     {
         // Arrange
         var simulateFaker = new SimulatePaymentFaker(Guid.NewGuid().ToString())
-            .WithAmount(100.00);
+            .WithAmount(100.00m);
         var simulateRequest = simulateFaker.Generate();
         simulateRequest.Version = 1;
         simulateRequest.Currency = "USD";
@@ -110,7 +111,7 @@ public class SimulatePaymentIntegrationTests(IntegrationTestFixture fixture) : I
 
         // Arrange - Create an invoice first
         var createRequest = _invoiceFaker
-            .WithAmount(100.00)
+            .WithAmount(100.00m)
             .WithCurrency("USD")
             .Generate();
 
@@ -120,7 +121,7 @@ public class SimulatePaymentIntegrationTests(IntegrationTestFixture fixture) : I
         {
             InvoiceId = createdInvoice.InvoiceId,
             Version = createdInvoice.Version,
-            Amount = -50.00m, // Invalid negative amount
+            Amount = -50m, // Invalid negative amount
             Currency = "USD"
         };
 
@@ -143,7 +144,7 @@ public class SimulatePaymentIntegrationTests(IntegrationTestFixture fixture) : I
         var createRequest = new CreateInvoiceRequest
         {
             Name = "Invoice for Empty Payment Method Simulation",
-            Amount = 100.00m,
+            Amount = 100m,
             Currency = "USD"
         };
 
@@ -153,7 +154,7 @@ public class SimulatePaymentIntegrationTests(IntegrationTestFixture fixture) : I
         {
             InvoiceId = createdInvoice.InvoiceId,
             Version = createdInvoice.Version,
-            Amount = 100.00m,
+            Amount = 100m,
             Currency = "USD",
             PaymentMethod = "" // Empty payment method
         };

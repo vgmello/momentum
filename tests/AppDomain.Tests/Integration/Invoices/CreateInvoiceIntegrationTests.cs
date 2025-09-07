@@ -1,5 +1,6 @@
 // Copyright (c) OrgName. All rights reserved.
 
+using AppDomain.Common.Grpc;
 using AppDomain.Invoices.Grpc;
 using AppDomain.Tests.Integration._Internal;
 using AppDomain.Tests.Integration._Internal.TestDataGenerators;
@@ -21,7 +22,7 @@ public class CreateInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
 
         // Arrange
         var createRequest = _invoiceFaker
-            .WithAmount(100.50)
+            .WithAmount(100.50m)
             .WithCurrency("USD")
             .Generate();
 
@@ -31,7 +32,7 @@ public class CreateInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
         // Assert
         createdInvoice.ShouldNotBeNull();
         createdInvoice.Name.ShouldBe(createRequest.Name);
-        createdInvoice.Amount.ShouldBe(100.50);
+        ((decimal)createdInvoice.Amount).ShouldBe(100.50m);
         createdInvoice.Currency.ShouldBe("USD");
         createdInvoice.Status.ShouldBe("Draft");
         createdInvoice.InvoiceId.ShouldNotBeNullOrEmpty();
@@ -76,7 +77,7 @@ public class CreateInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
         // Arrange
         var createRequest = _invoiceFaker
             .WithCashier(cashierId.ToString())
-            .WithAmount(250.75)
+            .WithAmount(250.75m)
             .WithCurrency("EUR")
             .Generate();
 
@@ -122,7 +123,7 @@ public class CreateInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
 
         // Arrange
         var createRequest = _invoiceFaker
-            .WithAmount(50.00)
+            .WithAmount(50.00m)
             .WithoutDueDate()
             .Generate();
         createRequest.Currency = string.Empty; // Clear currency to test defaults
@@ -133,7 +134,7 @@ public class CreateInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
 
         // Assert
         createdInvoice.Name.ShouldBe(createRequest.Name);
-        createdInvoice.Amount.ShouldBe(50.00);
+        ((decimal)createdInvoice.Amount).ShouldBe(50.00m);
         createdInvoice.Currency.ShouldBeNullOrEmpty();
         createdInvoice.Status.ShouldBe("Draft");
         createdInvoice.CashierId.ShouldBeNullOrEmpty();

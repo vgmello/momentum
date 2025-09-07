@@ -1,5 +1,6 @@
 // Copyright (c) OrgName. All rights reserved.
 
+using AppDomain.Common.Grpc;
 using AppDomain.Invoices.Grpc;
 using AppDomain.Tests.Integration._Internal;
 using System.Data.Common;
@@ -20,8 +21,8 @@ public class GetInvoicesIntegrationTests(IntegrationTestFixture fixture) : Integ
         // Arrange - Create a few invoices first
         var createRequests = new[]
         {
-            new CreateInvoiceRequest { Name = "Invoice 1", Amount = 100.00m, Currency = "USD" },
-            new CreateInvoiceRequest { Name = "Invoice 2", Amount = 200.00m, Currency = "EUR" }
+            new CreateInvoiceRequest { Name = "Invoice 1", Amount = 100m, Currency = "USD" },
+            new CreateInvoiceRequest { Name = "Invoice 2", Amount = 200m, Currency = "EUR" }
         };
 
         var createdInvoices = new List<AppDomain.Invoices.Grpc.Models.Invoice>();
@@ -49,12 +50,12 @@ public class GetInvoicesIntegrationTests(IntegrationTestFixture fixture) : Integ
         var invoice2 = response.Invoices.FirstOrDefault(i => i.Name == "Invoice 2");
 
         invoice1.ShouldNotBeNull();
-        invoice1.Amount.ShouldBe(100.00);
+        ((decimal)invoice1.Amount).ShouldBe(100.00m);
         invoice1.Currency.ShouldBe("USD");
         invoice1.Status.ShouldBe("Draft");
 
         invoice2.ShouldNotBeNull();
-        invoice2.Amount.ShouldBe(200.00);
+        ((decimal)invoice2.Amount).ShouldBe(200.00m);
         invoice2.Currency.ShouldBe("EUR");
         invoice2.Status.ShouldBe("Draft");
     }
@@ -72,7 +73,7 @@ public class GetInvoicesIntegrationTests(IntegrationTestFixture fixture) : Integ
             await _client.CreateInvoiceAsync(new CreateInvoiceRequest
             {
                 Name = $"Invoice {i}",
-                Amount = i * 50.00m,
+                Amount = i * 50m,
                 Currency = "USD"
             }, cancellationToken: TestContext.Current.CancellationToken);
         }
@@ -101,7 +102,7 @@ public class GetInvoicesIntegrationTests(IntegrationTestFixture fixture) : Integ
         var draftInvoice = await _client.CreateInvoiceAsync(new CreateInvoiceRequest
         {
             Name = "Draft Invoice",
-            Amount = 100.00m,
+            Amount = 100m,
             Currency = "USD"
         }, cancellationToken: TestContext.Current.CancellationToken);
 

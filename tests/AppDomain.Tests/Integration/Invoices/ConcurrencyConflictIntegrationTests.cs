@@ -1,5 +1,6 @@
 // Copyright (c) OrgName. All rights reserved.
 
+using AppDomain.Common.Grpc;
 using AppDomain.Invoices.Grpc;
 using AppDomain.Tests.Integration._Internal;
 using System.Data.Common;
@@ -21,7 +22,7 @@ public class ConcurrencyConflictIntegrationTests(IntegrationTestFixture fixture)
         var createRequest = new CreateInvoiceRequest
         {
             Name = "Invoice for Concurrency Test",
-            Amount = 100.00m,
+            Amount = 100m,
             Currency = "USD"
         };
 
@@ -64,7 +65,7 @@ public class ConcurrencyConflictIntegrationTests(IntegrationTestFixture fixture)
         var createRequest = new CreateInvoiceRequest
         {
             Name = "Invoice for Payment Concurrency Test",
-            Amount = 200.00m,
+            Amount = 200m,
             Currency = "USD"
         };
 
@@ -75,14 +76,14 @@ public class ConcurrencyConflictIntegrationTests(IntegrationTestFixture fixture)
         {
             InvoiceId = createdInvoice.InvoiceId,
             Version = createdInvoice.Version,
-            AmountPaid = 200.00
+            AmountPaid = 200m
         };
 
         var secondUserPayRequest = new MarkInvoiceAsPaidRequest
         {
             InvoiceId = createdInvoice.InvoiceId,
             Version = createdInvoice.Version, // Same version - should cause conflict
-            AmountPaid = 200.00
+            AmountPaid = 200m
         };
 
         // Act - First user pays successfully
