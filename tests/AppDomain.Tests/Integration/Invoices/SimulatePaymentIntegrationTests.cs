@@ -120,7 +120,7 @@ public class SimulatePaymentIntegrationTests(IntegrationTestFixture fixture) : I
         {
             InvoiceId = createdInvoice.InvoiceId,
             Version = createdInvoice.Version,
-            Amount = -50.00, // Invalid negative amount
+            Amount = -50.00m, // Invalid negative amount
             Currency = "USD"
         };
 
@@ -143,7 +143,7 @@ public class SimulatePaymentIntegrationTests(IntegrationTestFixture fixture) : I
         var createRequest = new CreateInvoiceRequest
         {
             Name = "Invoice for Empty Payment Method Simulation",
-            Amount = 100.00,
+            Amount = 100.00m,
             Currency = "USD"
         };
 
@@ -153,7 +153,7 @@ public class SimulatePaymentIntegrationTests(IntegrationTestFixture fixture) : I
         {
             InvoiceId = createdInvoice.InvoiceId,
             Version = createdInvoice.Version,
-            Amount = 100.00,
+            Amount = 100.00m,
             Currency = "USD",
             PaymentMethod = "" // Empty payment method
         };

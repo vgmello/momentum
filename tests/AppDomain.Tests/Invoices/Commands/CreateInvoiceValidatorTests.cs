@@ -208,7 +208,7 @@ public class CreateInvoiceValidatorTests
             100.00m,
             null, // Currency is optional
             null, // DueDate is optional
-            null  // CashierId is optional
+            null // CashierId is optional
         );
 
         // Act & Assert

@@ -1,6 +1,6 @@
 // Copyright (c) OrgName. All rights reserved.
 
-using AppDomain.Core.Data;
+using AppDomain.Common.Data;
 using NetArchTest.Rules;
 
 namespace AppDomain.Tests.Architecture;

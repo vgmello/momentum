@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "Invoices/Protos/Models/invoice.proto";
+import "Common/Protos/decimal.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 
@@ -33,7 +34,7 @@ message GetInvoicesResponse {
 
 message CreateInvoiceRequest {
   string name = 1;
-  double amount = 2;
+  DecimalValue amount = 2;
   string currency = 3;
   optional google.protobuf.Timestamp due_date = 4;
   string cashier_id = 5;
@@ -47,14 +48,14 @@ message CancelInvoiceRequest {
 message MarkInvoiceAsPaidRequest {
   string invoice_id = 1;
   int32 version = 2;
-  double amount_paid = 3;
+  DecimalValue amount_paid = 3;
   google.protobuf.Timestamp payment_date = 4;
 }
 
 message SimulatePaymentRequest {
   string invoice_id = 1;
   int32 version = 2;
-  double amount = 3;
+  DecimalValue amount = 3;
   string currency = 4;
   string payment_method = 5;
   string payment_reference = 6;

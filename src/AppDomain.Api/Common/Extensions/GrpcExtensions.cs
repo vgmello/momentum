@@ -1,6 +1,6 @@
 // Copyright (c) OrgName. All rights reserved.
 
-namespace AppDomain.Api.Core.Extensions;
+namespace AppDomain.Api.Common.Extensions;
 
 /// <summary>
 ///     Extensions for gRPC-specific operations and conversions.

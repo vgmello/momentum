@@ -21,7 +21,7 @@ public class GetInvoiceIntegrationTests(IntegrationTestFixture fixture) : Integr
         var createRequest = new CreateInvoiceRequest
         {
             Name = "Test Invoice",
-            Amount = 150.75,
+            Amount = 150.75m,
             Currency = "USD"
         };
 
@@ -39,7 +39,7 @@ public class GetInvoiceIntegrationTests(IntegrationTestFixture fixture) : Integr
         retrievedInvoice.ShouldNotBeNull();
         retrievedInvoice.InvoiceId.ShouldBe(createdInvoice.InvoiceId);
         retrievedInvoice.Name.ShouldBe("Test Invoice");
-        retrievedInvoice.Amount.ShouldBe(150.75);
+        ((decimal)retrievedInvoice.Amount).ShouldBe(150.75m);
         retrievedInvoice.Currency.ShouldBe("USD");
         retrievedInvoice.Status.ShouldBe("Draft");
     }

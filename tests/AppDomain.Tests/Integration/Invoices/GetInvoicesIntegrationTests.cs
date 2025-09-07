@@ -20,8 +20,8 @@ public class GetInvoicesIntegrationTests(IntegrationTestFixture fixture) : Integ
         // Arrange - Create a few invoices first
         var createRequests = new[]
         {
-            new CreateInvoiceRequest { Name = "Invoice 1", Amount = 100.00, Currency = "USD" },
-            new CreateInvoiceRequest { Name = "Invoice 2", Amount = 200.00, Currency = "EUR" }
+            new CreateInvoiceRequest { Name = "Invoice 1", Amount = 100.00m, Currency = "USD" },
+            new CreateInvoiceRequest { Name = "Invoice 2", Amount = 200.00m, Currency = "EUR" }
         };
 
         var createdInvoices = new List<AppDomain.Invoices.Grpc.Models.Invoice>();
@@ -72,7 +72,7 @@ public class GetInvoicesIntegrationTests(IntegrationTestFixture fixture) : Integ
             await _client.CreateInvoiceAsync(new CreateInvoiceRequest
             {
                 Name = $"Invoice {i}",
-                Amount = i * 50.00,
+                Amount = i * 50.00m,
                 Currency = "USD"
             }, cancellationToken: TestContext.Current.CancellationToken);
         }
@@ -101,7 +101,7 @@ public class GetInvoicesIntegrationTests(IntegrationTestFixture fixture) : Integ
         var draftInvoice = await _client.CreateInvoiceAsync(new CreateInvoiceRequest
         {
             Name = "Draft Invoice",
-            Amount = 100.00,
+            Amount = 100.00m,
             Currency = "USD"
         }, cancellationToken: TestContext.Current.CancellationToken);
 

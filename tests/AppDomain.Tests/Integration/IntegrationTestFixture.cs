@@ -168,7 +168,7 @@ public class IntegrationTestFixture : IAsyncLifetime
         _app.ConfigureApiUsingDefaults(requireAuth: false);
         _app.MapDefaultHealthCheckEndpoints();
 
-        _app.MapGrpcServices(typeof(AppDomain.Api.Program));
+        _app.MapGrpcServices(typeof(Program));
 
         await _app.StartAsync();
 

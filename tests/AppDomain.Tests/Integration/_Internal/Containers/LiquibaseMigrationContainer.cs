@@ -55,6 +55,7 @@ public class LiquibaseMigrationContainer : IAsyncDisposable
             try
             {
                 var logs = await _liquibaseContainer.GetLogsAsync();
+
                 throw new InvalidOperationException($"Liquibase migration failed. Logs: {logs}", e);
             }
             catch

@@ -21,7 +21,7 @@ public class ConcurrencyConflictIntegrationTests(IntegrationTestFixture fixture)
         var createRequest = new CreateInvoiceRequest
         {
             Name = "Invoice for Concurrency Test",
-            Amount = 100.00,
+            Amount = 100.00m,
             Currency = "USD"
         };
 
@@ -64,7 +64,7 @@ public class ConcurrencyConflictIntegrationTests(IntegrationTestFixture fixture)
         var createRequest = new CreateInvoiceRequest
         {
             Name = "Invoice for Payment Concurrency Test",
-            Amount = 200.00,
+            Amount = 200.00m,
             Currency = "USD"
         };
 

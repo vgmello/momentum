@@ -155,7 +155,7 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
         var createRequest = new CreateInvoiceRequest
         {
             Name = "Invoice to Pay Twice",
-            Amount = 100.00,
+            Amount = 100.00m,
             Currency = "USD"
         };
 

@@ -102,7 +102,7 @@ public class CreateInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
         // Arrange
         var createRequest = _invoiceFaker.Generate();
         createRequest.Name = ""; // Invalid empty name
-        createRequest.Amount = -10; // Invalid negative amount
+        createRequest.Amount = -10m; // Invalid negative amount
 
         // Act & Assert
         var exception = await Should.ThrowAsync<RpcException>(async () =>

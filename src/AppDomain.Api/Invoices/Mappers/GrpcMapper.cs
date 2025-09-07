@@ -109,22 +109,6 @@ public static partial class GrpcMapper
     private static string ToString(string? value) => value ?? string.Empty;
 
     /// <summary>
-    ///     Converts a decimal value to double precision for gRPC Protocol Buffer compatibility.
-    ///     Used for monetary amounts in gRPC message fields.
-    /// </summary>
-    /// <param name="value">The decimal value to convert</param>
-    /// <returns>The equivalent double value</returns>
-    private static double ToDouble(decimal value) => Convert.ToDouble(value);
-
-    /// <summary>
-    ///     Converts a double value to decimal precision for domain model compatibility.
-    ///     Used when receiving monetary amounts from gRPC Protocol Buffer messages.
-    /// </summary>
-    /// <param name="value">The double value to convert</param>
-    /// <returns>The equivalent decimal value</returns>
-    private static decimal ToDecimal(double value) => Convert.ToDecimal(value);
-
-    /// <summary>
     ///     Parses a string representation of a GUID into a Guid object.
     ///     Used for converting string-based identifiers from gRPC to strongly-typed domain identifiers.
     /// </summary>

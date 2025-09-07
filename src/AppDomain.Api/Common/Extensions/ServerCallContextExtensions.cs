@@ -1,6 +1,6 @@
 // Copyright (c) OrgName. All rights reserved.
 
-namespace AppDomain.Api.Core.Extensions;
+namespace AppDomain.Api.Common.Extensions;
 
 /// <summary>
 ///     Provides extension methods for <see cref="ServerCallContext" /> to extract tenant information from gRPC calls.

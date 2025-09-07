@@ -3,7 +3,7 @@
 using LinqToDB.Concurrency;
 using LinqToDB.Mapping;
 
-namespace AppDomain.Core.Data;
+namespace AppDomain.Common.Data;
 
 #if INCLUDE_ORLEANS
 /// <summary>
