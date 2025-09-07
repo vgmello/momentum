@@ -1,6 +1,5 @@
 // Copyright (c) OrgName. All rights reserved.
 
-using AppDomain.Common.Grpc;
 using AppDomain.Invoices.Grpc;
 using AppDomain.Tests.Integration._Internal;
 using AppDomain.Tests.Integration._Internal.TestDataGenerators;

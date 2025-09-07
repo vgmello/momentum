@@ -38,7 +38,7 @@ public abstract record DbEntity
     [Column("xmin", SkipOnInsert = true, SkipOnUpdate = true)]
     [OptimisticLockProperty(VersionBehavior.Auto)]
     [Id(2)]
-    public int Version { get; init; } = 0;
+    public int Version { get; init; }
 }
 #else
 /// <summary>
@@ -67,6 +67,6 @@ public abstract record DbEntity
     /// </summary>
     [Column("xmin", SkipOnInsert = true, SkipOnUpdate = true)]
     [OptimisticLockProperty(VersionBehavior.Auto)]
-    public int Version { get; init; } = 0;
+    public int Version { get; init; }
 }
 #endif

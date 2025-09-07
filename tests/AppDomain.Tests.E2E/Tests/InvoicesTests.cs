@@ -50,7 +50,7 @@ public class InvoicesTests(End2EndTestFixture fixture) : End2EndTest(fixture)
         invoice.ShouldNotBeNull();
         invoice.InvoiceId.ShouldNotBe(Guid.Empty);
         invoice.CashierId.ShouldBe(cashier.CashierId);
-        invoice.Amount.ShouldBe(100.50);
+        invoice.Amount.ShouldBe(100.50m);
         invoice.Currency.ShouldBe("USD");
         invoice.Status.ShouldNotBeNullOrEmpty();
         invoice.CreatedDateUtc.ShouldBeGreaterThan(DateTime.UtcNow.AddMinutes(-1));
@@ -80,7 +80,7 @@ public class InvoicesTests(End2EndTestFixture fixture) : End2EndTest(fixture)
         getInvoice.ShouldNotBeNull();
         getInvoice.InvoiceId.ShouldBe(createdInvoice.InvoiceId);
         getInvoice.CashierId.ShouldBe(cashier.CashierId);
-        getInvoice.Amount.ShouldBe(250.75);
+        getInvoice.Amount.ShouldBe(250.75m);
         getInvoice.Currency.ShouldBe("EUR");
     }
 
@@ -115,7 +115,7 @@ public class InvoicesTests(End2EndTestFixture fixture) : End2EndTest(fixture)
         invoice.ShouldNotBeNull();
         invoice.InvoiceId.ShouldNotBe(Guid.Empty);
         invoice.CashierId.ShouldBe(nonExistentCashierId);
-        invoice.Amount.ShouldBe(100.00);
+        invoice.Amount.ShouldBe(100.00m);
         invoice.Currency.ShouldBe("USD");
         invoice.Status.ShouldNotBeNullOrEmpty();
     }

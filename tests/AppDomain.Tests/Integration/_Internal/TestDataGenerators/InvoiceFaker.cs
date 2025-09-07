@@ -11,7 +11,7 @@ public sealed class InvoiceFaker : Faker<CreateInvoiceRequest>
     public InvoiceFaker(string? cashierId = null)
     {
         RuleFor(i => i.Name, f => f.Commerce.ProductName() + " Invoice");
-        RuleFor(i => i.Amount, (f, i) => (decimal)Math.Round(f.Random.Double(10, 10000), 2));
+        RuleFor(i => i.Amount, f => (DecimalValue)f.Finance.Amount(40, 10000));
         RuleFor(i => i.Currency, f => f.PickRandom("USD", "EUR", "GBP", "JPY", "CAD", "AUD"));
         RuleFor(i => i.DueDate, f => Timestamp.FromDateTime(f.Date.Future(6, DateTime.UtcNow).ToUniversalTime()));
         RuleFor(i => i.CashierId, f => cashierId ?? (f.Random.Bool(0.3f) ? f.Random.Guid().ToString() : string.Empty));
@@ -60,12 +60,12 @@ public sealed class SimulatePaymentFaker : Faker<SimulatePaymentRequest>
         RuleFor(p => p.InvoiceId, invoiceId);
         RuleFor(p => p.PaymentMethod, f => f.PickRandom("credit_card", "debit_card", "bank_transfer", "cash", "paypal"));
         RuleFor(p => p.PaymentReference, f => f.Random.AlphaNumeric(12).ToUpper());
-        RuleFor(p => p.Amount, (f, p) => (decimal)Math.Round(f.Random.Double(10, 10000), 2));
+        RuleFor(p => p.Amount, f => (DecimalValue)f.Finance.Amount(40, 10000));
     }
 
     public SimulatePaymentFaker WithAmount(decimal amount)
     {
-        RuleFor(p => p.Amount, amount);
+        RuleFor(p => p.Amount, f => (DecimalValue)f.Finance.Amount(40, 10000));
 
         return this;
     }
@@ -83,7 +83,7 @@ public sealed class MarkInvoiceAsPaidFaker : Faker<MarkInvoiceAsPaidRequest>
     public MarkInvoiceAsPaidFaker(string invoiceId)
     {
         RuleFor(p => p.InvoiceId, invoiceId);
-        RuleFor(p => p.AmountPaid, (f, p) => (decimal)Math.Round(f.Random.Double(10, 10000), 2));
+        RuleFor(p => p.AmountPaid, f => (DecimalValue)f.Finance.Amount(40, 10000));
         RuleFor(p => p.PaymentDate, f => Timestamp.FromDateTime(f.Date.Recent(7).ToUniversalTime()));
     }
 }
@@ -93,7 +93,5 @@ public sealed class CancelInvoiceFaker : Faker<CancelInvoiceRequest>
     public CancelInvoiceFaker(string invoiceId)
     {
         RuleFor(c => c.InvoiceId, invoiceId);
-        // CancelInvoiceRequest doesn't have a Reason field in the proto definition
-        // Only InvoiceId and Version are required
     }
 }
