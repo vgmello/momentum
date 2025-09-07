@@ -13,7 +13,7 @@ message Invoice {
     string invoice_id = 2;
     string name = 3;
     string status = 4;
-    DecimalValue amount = 5;
+    app_domain.common.DecimalValue amount = 5;
     string currency = 6;
     optional google.protobuf.Timestamp due_date = 7;
     google.protobuf.StringValue cashier_id = 8;

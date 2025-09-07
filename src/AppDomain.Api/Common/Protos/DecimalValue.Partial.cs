@@ -1,6 +1,6 @@
 // Copyright (c) OrgName. All rights reserved.
 
-namespace AppDomain.Api.Common.Protos;
+namespace AppDomain.Common.Grpc;
 
 public partial class DecimalValue
 {

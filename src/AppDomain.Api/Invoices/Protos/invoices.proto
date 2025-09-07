@@ -34,7 +34,7 @@ message GetInvoicesResponse {
 
 message CreateInvoiceRequest {
   string name = 1;
-  DecimalValue amount = 2;
+  app_domain.common.DecimalValue amount = 2;
   string currency = 3;
   optional google.protobuf.Timestamp due_date = 4;
   string cashier_id = 5;
@@ -48,14 +48,14 @@ message CancelInvoiceRequest {
 message MarkInvoiceAsPaidRequest {
   string invoice_id = 1;
   int32 version = 2;
-  DecimalValue amount_paid = 3;
+  app_domain.common.DecimalValue amount_paid = 3;
   google.protobuf.Timestamp payment_date = 4;
 }
 
 message SimulatePaymentRequest {
   string invoice_id = 1;
   int32 version = 2;
-  DecimalValue amount = 3;
+  app_domain.common.DecimalValue amount = 3;
   string currency = 4;
   string payment_method = 5;
   string payment_reference = 6;

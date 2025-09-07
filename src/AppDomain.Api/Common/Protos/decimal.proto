@@ -1,7 +1,8 @@
 syntax = "proto3";
+
 package app_domain.common;
 
-option csharp_namespace = "AppDomain.Common.Grpc.Models";
+option csharp_namespace = "AppDomain.Common.Grpc";
 
 message DecimalValue {
   int64 units = 1;

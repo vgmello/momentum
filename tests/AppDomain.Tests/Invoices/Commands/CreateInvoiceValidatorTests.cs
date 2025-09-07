@@ -1,6 +1,5 @@
 // Copyright (c) OrgName. All rights reserved.
 
-using AppDomain.Common.Enums;
 using AppDomain.Invoices.Commands;
 using FluentValidation.TestHelper;
 
@@ -11,12 +10,7 @@ namespace AppDomain.Tests.Invoices.Commands;
 /// </summary>
 public class CreateInvoiceValidatorTests
 {
-    private readonly CreateInvoiceValidator _validator;
-
-    public CreateInvoiceValidatorTests()
-    {
-        _validator = new CreateInvoiceValidator();
-    }
+    private readonly CreateInvoiceValidator _validator = new();
 
     [Fact]
     public void Should_Have_Error_When_TenantId_Is_Empty()
