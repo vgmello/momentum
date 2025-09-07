@@ -26,7 +26,7 @@ public sealed class InvoiceFaker : Faker<CreateInvoiceRequest>
 
     public InvoiceFaker WithAmount(decimal amount)
     {
-        RuleFor(i => i.Amount, amount);
+        RuleFor(i => i.Amount, (DecimalValue)amount);
 
         return this;
     }
@@ -65,7 +65,7 @@ public sealed class SimulatePaymentFaker : Faker<SimulatePaymentRequest>
 
     public SimulatePaymentFaker WithAmount(decimal amount)
     {
-        RuleFor(p => p.Amount, f => (DecimalValue)f.Finance.Amount(40, 10000));
+        RuleFor(p => p.Amount, (DecimalValue)amount);
 
         return this;
     }
