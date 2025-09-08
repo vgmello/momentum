@@ -7,7 +7,7 @@ export const endpoints = {
   // Base URLs
   baseUrl: BASE_URL,
   grpcEndpoint: GRPC_ENDPOINT,
-  
+
   // Cashiers endpoints
   cashiers: {
     list: `${BASE_URL}/cashiers`,
@@ -16,7 +16,7 @@ export const endpoints = {
     update: (id) => `${BASE_URL}/cashiers/${id}`,
     delete: (id) => `${BASE_URL}/cashiers/${id}`,
   },
-  
+
   // Invoices endpoints
   invoices: {
     list: `${BASE_URL}/invoices`,
@@ -26,10 +26,10 @@ export const endpoints = {
     markPaid: (id) => `${BASE_URL}/invoices/${id}/mark-paid`,
     simulatePayment: (id) => `${BASE_URL}/invoices/${id}/simulate-payment`,
   },
-  
+
   // Health check endpoints
   health: {
-    ready: `${BASE_URL}/health/ready`,
+    ready: `${BASE_URL}/health/internal`,
     live: `${BASE_URL}/health/live`,
   },
 };
@@ -40,7 +40,7 @@ export const headers = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
-  
+
   // Multi-tenancy support
   withTenant: (tenantId = 'test-tenant') => ({
     ...headers.json,
@@ -51,7 +51,7 @@ export const headers = {
 // Orleans endpoints (if Orleans testing is enabled)
 export const orleansEndpoints = {
   baseUrl: __ENV.ORLEANS_URL || 'http://localhost:8104',
-  
+
   // Orleans dashboard and grain endpoints
   dashboard: `${__ENV.ORLEANS_URL || 'http://localhost:8104'}/`,
   grains: `${__ENV.ORLEANS_URL || 'http://localhost:8104'}/grains`,

@@ -51,7 +51,7 @@ public static class CreateCashierCommandHandler
         ILogger<CreateCashierCommandHandler> logger,
         CancellationToken cancellationToken)
     {
-        logger.LogInformation("Creating cashier for tenant {TenantId} with name {Name}", 
+        logger.LogInformation("Creating cashier for tenant {TenantId} with name {Name}",
             command.TenantId, command.Name);
 
         try
@@ -62,7 +62,7 @@ public static class CreateCashierCommandHandler
             var result = insertedCashier.ToModel();
             var createdEvent = new CashierCreated(result.TenantId, 0, result);
 
-            logger.LogInformation("Successfully created cashier {CashierId} for tenant {TenantId}", 
+            logger.LogInformation("Successfully created cashier {CashierId} for tenant {TenantId}",
                 result.Id, result.TenantId);
 
             return (result, createdEvent);
@@ -205,15 +205,15 @@ public class CashierMetrics
     public CashierMetrics(IMeterProvider meterProvider)
     {
         var meter = meterProvider.GetMeter("AppDomain.Cashiers");
-        
+
         _cashierCreatedCounter = meter.CreateCounter<int>(
             "cashiers_created_total",
             "Total number of cashiers created");
-            
+
         _cashierCreationDuration = meter.CreateHistogram<double>(
             "cashier_creation_duration",
             "Duration of cashier creation operations");
-            
+
         _activeCashiersGauge = meter.CreateGauge<int>(
             "active_cashiers_count",
             "Current number of active cashiers");
@@ -226,7 +226,7 @@ public class CashierMetrics
 
     public void RecordCreationDuration(TimeSpan duration, Guid tenantId)
     {
-        _cashierCreationDuration.Record(duration.TotalMilliseconds, 
+        _cashierCreationDuration.Record(duration.TotalMilliseconds,
             new KeyValuePair<string, object?>("tenant.id", tenantId.ToString()));
     }
 }
@@ -289,7 +289,7 @@ app.MapDefaultHealthCheckEndpoints();
 
 // Available endpoints:
 // /health - Overall health
-// /health/ready - Readiness probe
+// /health/internal - Readiness probe
 // /health/live - Liveness probe
 ```
 
@@ -316,9 +316,9 @@ public class DatabaseHealthCheck : IHealthCheck
         try
         {
             using var activity = Activity.Current?.Source.StartActivity("HealthCheck.Database");
-            
+
             await _db.Database.CanConnectAsync(cancellationToken);
-            
+
             _logger.LogDebug("Database health check passed");
             return HealthCheckResult.Healthy("Database is accessible");
         }
@@ -349,14 +349,14 @@ public class KafkaHealthCheck : IHealthCheck
         {
             // Check Kafka connectivity
             var metadata = _producer.GetMetadata(TimeSpan.FromSeconds(5));
-            
+
             if (metadata.Brokers.Any())
             {
-                _logger.LogDebug("Kafka health check passed - {BrokerCount} brokers available", 
+                _logger.LogDebug("Kafka health check passed - {BrokerCount} brokers available",
                     metadata.Brokers.Count);
                 return HealthCheckResult.Healthy($"Kafka is accessible with {metadata.Brokers.Count} brokers");
             }
-            
+
             return HealthCheckResult.Degraded("Kafka is accessible but no brokers available");
         }
         catch (Exception ex)
@@ -375,12 +375,12 @@ builder.Services.AddHealthChecks()
     {
         var gc = GC.GetTotalMemory(false);
         var workingSet = Environment.WorkingSet;
-        
+
         if (workingSet > 500_000_000) // 500MB
         {
             return HealthCheckResult.Degraded($"High memory usage: {workingSet / 1024 / 1024}MB");
         }
-        
+
         return HealthCheckResult.Healthy($"Memory usage: {workingSet / 1024 / 1024}MB");
     }, tags: ["live"]);
 ```
@@ -389,7 +389,7 @@ builder.Services.AddHealthChecks()
 
 ```csharp
 // Different endpoints for different purposes
-app.MapHealthChecks("/health/ready", new HealthCheckOptions
+app.MapHealthChecks("/health/internal", new HealthCheckOptions
 {
     Predicate = check => check.Tags.Contains("ready"),
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
@@ -418,7 +418,7 @@ app.MapHealthChecks("/health/detailed", new HealthCheckOptions
             }),
             totalDuration = report.TotalDuration
         };
-        
+
         await context.Response.WriteAsync(JsonSerializer.Serialize(response));
     }
 });
@@ -450,9 +450,9 @@ public class PerformanceLoggingMiddleware
         try
         {
             await _next(context);
-            
+
             stopwatch.Stop();
-            
+
             if (stopwatch.ElapsedMilliseconds > 1000) // Log slow requests
             {
                 _logger.LogWarning("Slow request: {Method} {Path} took {Duration}ms",
@@ -464,12 +464,12 @@ public class PerformanceLoggingMiddleware
         catch (Exception ex)
         {
             stopwatch.Stop();
-            
+
             _logger.LogError(ex, "Request failed: {Method} {Path} after {Duration}ms",
                 context.Request.Method,
                 context.Request.Path,
                 stopwatch.ElapsedMilliseconds);
-            
+
             throw;
         }
         finally
@@ -508,23 +508,23 @@ public class CommandPerformanceWrapper<TCommand, TResult>
     {
         var commandName = typeof(TCommand).Name;
         using var activity = Activity.Current?.Source.StartActivity($"Command.{commandName}");
-        
+
         var stopwatch = Stopwatch.StartNew();
-        
+
         try
         {
             _logger.LogInformation("Executing command {CommandName}", commandName);
-            
+
             var result = await handler(command);
-            
+
             stopwatch.Stop();
-            _duration.Record(stopwatch.ElapsedMilliseconds, 
+            _duration.Record(stopwatch.ElapsedMilliseconds,
                 new KeyValuePair<string, object?>("command.name", commandName),
                 new KeyValuePair<string, object?>("command.success", true));
-                
-            _logger.LogInformation("Command {CommandName} completed in {Duration}ms", 
+
+            _logger.LogInformation("Command {CommandName} completed in {Duration}ms",
                 commandName, stopwatch.ElapsedMilliseconds);
-            
+
             return result;
         }
         catch (Exception ex)
@@ -533,10 +533,10 @@ public class CommandPerformanceWrapper<TCommand, TResult>
             _duration.Record(stopwatch.ElapsedMilliseconds,
                 new KeyValuePair<string, object?>("command.name", commandName),
                 new KeyValuePair<string, object?>("command.success", false));
-                
-            _logger.LogError(ex, "Command {CommandName} failed after {Duration}ms", 
+
+            _logger.LogError(ex, "Command {CommandName} failed after {Duration}ms",
                 commandName, stopwatch.ElapsedMilliseconds);
-            
+
             activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
             throw;
         }
@@ -575,7 +575,7 @@ public class ErrorTrackingMiddleware
         {
             var errorType = ex.GetType().Name;
             var endpoint = context.Request.Path.Value ?? "unknown";
-            
+
             _errorCounter.Add(1,
                 new KeyValuePair<string, object?>("error.type", errorType),
                 new KeyValuePair<string, object?>("endpoint", endpoint),

@@ -315,16 +315,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Start services
         run: docker compose --profile db --profile api up -d
-        
+
       - name: Wait for services
         run: sleep 30
-        
+
       - name: Run performance tests
         run: docker compose run k6-performance
-        
+
       - name: Upload results
         uses: actions/upload-artifact@v3
         with:
@@ -363,7 +363,7 @@ DEBUG=true k6 run scenarios/cashiers/baseline.js
 Verify services are healthy:
 ```bash
 # Check API health
-curl http://localhost:8101/health/ready
+curl http://localhost:8101/health/internal
 
 # Check Orleans dashboard
 curl http://localhost:8104/dashboard
