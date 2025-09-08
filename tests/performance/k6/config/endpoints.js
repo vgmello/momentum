@@ -29,8 +29,8 @@ export const endpoints = {
 
   // Health check endpoints
   health: {
-    ready: `${BASE_URL}/health/internal`,
-    live: `${BASE_URL}/health/live`,
+    ready: `${BASE_URL}/status`,
+    live: `${BASE_URL}/status`,
   },
 };
 
@@ -50,17 +50,17 @@ export const headers = {
 
 // Orleans endpoints (if Orleans testing is enabled)
 export const orleansEndpoints = {
-  baseUrl: __ENV.ORLEANS_URL || 'http://localhost:8104',
+  baseUrl: 'http://localhost:8104',
 
   // Orleans dashboard and grain endpoints
-  dashboard: `${__ENV.ORLEANS_URL || 'http://localhost:8104'}/`,
-  grains: `${__ENV.ORLEANS_URL || 'http://localhost:8104'}/grains`,
+  dashboard: 'http://localhost:8104/',
+  grains: 'http://localhost:8104/grains',
 };
 
 // Kafka configuration (if event validation is enabled)
 export const kafkaConfig = {
-  enabled: __ENV.ENABLE_KAFKA_VALIDATION === 'true',
-  bootstrapServers: __ENV.KAFKA_BOOTSTRAP_SERVERS || 'localhost:59092',
+  enabled: false,
+  bootstrapServers: 'localhost:59092',
   topics: {
     cashiers: 'app-domain.cashiers',
     invoices: 'app-domain.invoices',

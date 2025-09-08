@@ -42,14 +42,10 @@ case $ENVIRONMENT in
     local)
         export API_BASE_URL="${API_BASE_URL:-http://localhost:8101}"
         export GRPC_ENDPOINT="${GRPC_ENDPOINT:-localhost:8102}"
-        export ORLEANS_URL="${ORLEANS_URL:-http://localhost:8104}"
-        export KAFKA_BOOTSTRAP_SERVERS="${KAFKA_BOOTSTRAP_SERVERS:-localhost:59092}"
         ;;
     staging)
         export API_BASE_URL="${API_BASE_URL:-http://staging-api:8101}"
         export GRPC_ENDPOINT="${GRPC_ENDPOINT:-staging-api:8102}"
-        export ORLEANS_URL="${ORLEANS_URL:-http://staging-orleans:8104}"
-        export KAFKA_BOOTSTRAP_SERVERS="${KAFKA_BOOTSTRAP_SERVERS:-staging-kafka:9092}"
         ;;
     production)
         print_error "Production testing not allowed from this script for safety reasons."
@@ -64,7 +60,6 @@ esac
 
 # Set common environment variables
 export ENVIRONMENT="$ENVIRONMENT"
-export ENABLE_KAFKA_VALIDATION="${ENABLE_KAFKA_VALIDATION:-false}"
 export K6_WEB_DASHBOARD="${K6_WEB_DASHBOARD:-true}"
 export K6_WEB_DASHBOARD_PORT="${K6_WEB_DASHBOARD_PORT:-5665}"
 

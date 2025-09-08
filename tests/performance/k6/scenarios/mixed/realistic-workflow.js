@@ -22,7 +22,6 @@ export function setup() {
   console.log('Starting Mixed Realistic Workflow performance test');
   console.log('Environment:', __ENV.ENVIRONMENT || 'local');
   console.log('API URL:', endpoints.baseUrl);
-  console.log('Kafka Validation:', __ENV.ENABLE_KAFKA_VALIDATION || 'false');
 
   // Verify API is accessible
   const healthCheck = http.get(endpoints.health.ready);
@@ -393,6 +392,5 @@ export function teardown(data) {
     'End Time': new Date().toISOString(),
     'Environment': __ENV.ENVIRONMENT || 'local',
     'API URL': endpoints.baseUrl,
-    'Kafka Validation': __ENV.ENABLE_KAFKA_VALIDATION || 'false',
   });
 }

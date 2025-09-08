@@ -143,19 +143,10 @@ var k6Performance = builder
     .WithBindMount("../../tests/performance/results", "/results")
     .WithHttpEndpoint(port: 5665, name: "web-dashboard")
     .WithEnvironment("ENVIRONMENT", builder.Configuration["Environment"] ?? "local")
-    .WithEnvironment("ENABLE_KAFKA_VALIDATION", builder.Configuration["EnableKafkaValidation"] ?? "false")
-    .WithEnvironment("K6_WEB_DASHBOARD", "true")
-    .WithEnvironment("K6_WEB_DASHBOARD_EXPORT", "/results/web-dashboard-export.html")
 #if (INCLUDE_API)
     .WithEnvironment("API_BASE_URL", appDomainApi.GetEndpoint("http"))
     .WithEnvironment("GRPC_ENDPOINT", appDomainApi.GetEndpoint("grpc"))
     .WaitFor(appDomainApi)
-#endif
-#if (INCLUDE_ORLEANS)
-    .WithEnvironment("ORLEANS_URL", "http://localhost:8104")
-#endif
-#if (USE_KAFKA)
-    .WithEnvironment("KAFKA_BOOTSTRAP_SERVERS", kafka.GetEndpoint("tcp"))
 #endif
     .WithArgs("run", "--web-dashboard", "--web-dashboard-export=/results/web-dashboard-export.html", "--out", "json=/results/results.json", "/scripts/scenarios/mixed/realistic-workflow.js")
     .WithEndpointUrl("web-dashboard", "k6 Performance Dashboard");

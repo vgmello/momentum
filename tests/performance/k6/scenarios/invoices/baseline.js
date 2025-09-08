@@ -215,15 +215,10 @@ export default function (data) {
 
   // Test search and filtering
   group('Invoices Search and Filter', () => {
-    const searchParams = new URLSearchParams({
-      status: 'Pending',
-      page: 1,
-      pageSize: 10,
-      sortBy: 'dueDate',
-    });
+    const queryString = 'status=Pending&page=1&pageSize=10&sortBy=dueDate';
 
     const searchResponse = http.get(
-      `${endpoints.invoices.list}?${searchParams}`,
+      `${endpoints.invoices.list}?${queryString}`,
       {
         headers: headers.withTenant(tenantId),
         tags: { operation: 'search_invoices' }

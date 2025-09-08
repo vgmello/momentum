@@ -140,14 +140,10 @@ export default function () {
 
   // Test search and filtering
   group('Cashiers Search and Filter', () => {
-    const searchParams = new URLSearchParams({
-      page: 1,
-      pageSize: 10,
-      sortBy: 'name',
-    });
+    const queryString = 'page=1&pageSize=10&sortBy=name';
 
     const searchResponse = http.get(
-      `${endpoints.cashiers.list}?${searchParams}`,
+      `${endpoints.cashiers.list}?${queryString}`,
       {
         headers: headers.withTenant(tenantId),
         tags: { operation: 'search_cashiers' }

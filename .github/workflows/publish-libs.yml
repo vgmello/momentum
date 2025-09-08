@@ -56,7 +56,7 @@ jobs:
           fetch-depth: 0 # Fetching all history for version calculation and release notes (prev vs now)
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 

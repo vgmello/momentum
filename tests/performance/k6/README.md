@@ -194,18 +194,8 @@ Create a `.env` file based on `.env.example`:
 API_BASE_URL=http://localhost:8101
 GRPC_ENDPOINT=localhost:8102
 
-# Orleans Configuration
-ORLEANS_URL=http://localhost:8104
-
-# Kafka Configuration
-ENABLE_KAFKA_VALIDATION=false
-KAFKA_BOOTSTRAP_SERVERS=localhost:59092
-
 # Environment Profile
 ENVIRONMENT=local
-
-# Prometheus Configuration
-K6_PROMETHEUS_RW_SERVER_URL=http://localhost:18890/api/v1/write
 ```
 
 ### Custom Metrics
@@ -230,8 +220,8 @@ k6 run --vus 50 --duration 5m scenarios/invoices/baseline.js
 # With specific environment
 ENVIRONMENT=staging k6 run scenarios/mixed/realistic-workflow.js
 
-# With Kafka validation enabled
-ENABLE_KAFKA_VALIDATION=true k6 run scenarios/mixed/realistic-workflow.js
+# Run realistic workflow scenario
+k6 run scenarios/mixed/realistic-workflow.js
 
 # Output to JSON
 k6 run --out json=results/test-results.json scenarios/cashiers/baseline.js
@@ -258,8 +248,8 @@ docker compose run k6-performance run --web-dashboard /scripts/scenarios/cashier
 # Run with environment override
 docker compose run -e ENVIRONMENT=staging k6-performance
 
-# Run without web dashboard
-docker compose run -e K6_WEB_DASHBOARD=false k6-performance
+# Run specific scenario
+docker compose run k6-performance run /scripts/scenarios/cashiers/baseline.js
 
 # Run with volume for results
 docker compose run -v $(pwd)/results:/results k6-performance
