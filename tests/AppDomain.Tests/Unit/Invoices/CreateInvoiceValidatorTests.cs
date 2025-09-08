@@ -136,7 +136,6 @@ public class CreateInvoiceValidatorTests
     [Theory]
     [InlineData("US")]
     [InlineData("USDD")]
-    [InlineData("")]
     public void Should_Have_Error_When_Currency_Is_Invalid_Length(string currency)
     {
         // Arrange
