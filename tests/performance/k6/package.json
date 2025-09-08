@@ -1,0 +1,25 @@
+{
+  "name": "momentum-k6-performance-tests",
+  "version": "1.0.0",
+  "description": "k6 performance tests for .NET microservices",
+  "private": true,
+  "scripts": {
+    "test:local": "k6 run scenarios/mixed/realistic-workflow.js",
+    "test:staging": "ENVIRONMENT=staging k6 run scenarios/mixed/realistic-workflow.js",
+    "test:cashiers": "k6 run scenarios/cashiers/baseline.js",
+    "test:cashiers:simple": "k6 run scenarios/cashiers/simple-create.js",
+    "test:cashiers:stress": "k6 run scenarios/cashiers/stress.js",
+    "test:cashiers:spike": "k6 run scenarios/cashiers/spike.js",
+    "test:invoices": "k6 run scenarios/invoices/baseline.js",
+    "test:mixed": "k6 run scenarios/mixed/realistic-workflow.js"
+  },
+  "dependencies": {
+    "k6": "^0.0.0"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^8.4.1"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

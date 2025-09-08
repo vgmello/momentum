@@ -6,7 +6,9 @@ services:
     profiles: [ "db", "api", "backoffice" ]
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password@}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password@} # IMPORTANT: Use a secure, managed secret for production!
+      POSTGRES_DB: postgres
+      POSTGRES_INITDB_ARGS: "--data-checksums"
     ports:
       - "54320:5432"
     healthcheck:
@@ -14,6 +16,37 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    # These command-line arguments are tuned for a local performance server.
+    command: |
+      postgres \
+        # --- Connection Settings ---
+        -c max_connections=200 \
+        \
+        # --- Memory Settings (Tuned for 10GB total RAM) ---
+        -c shared_buffers=2GB \
+        -c effective_cache_size=7GB \
+        -c maintenance_work_mem=256MB \
+        -c work_mem=32MB \
+        \
+        # --- Checkpoint & WAL Settings ---
+        -c checkpoint_completion_target=0.9 \
+        -c wal_buffers=16MB \
+        -c min_wal_size=1GB \
+        -c max_wal_size=4GB \
+        \
+        # --- Parallelism (UPDATED for 8 CPU Cores) ---
+        -c max_worker_processes=8 \
+        -c max_parallel_workers=8 \
+        -c max_parallel_workers_per_gather=4 \
+        -c max_parallel_maintenance_workers=4 \
+        \
+        # --- Query Planner & I/O Settings ---
+        -c random_page_cost=1.1 \
+        -c effective_io_concurrency=200 \
+        -c default_statistics_target=100
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
   # #if (USE_LIQUIBASE)
   app-domain-db-migrations:
@@ -202,15 +235,15 @@ services:
     image: mcr.microsoft.com/azure-storage/azurite:latest
     profiles: [ "storage", "backoffice" ]
     ports:
-      - "10000:10000"  # Blob service
-      - "10001:10001"  # Queue service
-      - "10002:10002"  # Table service
+      - "10000:10000" # Blob service
+      - "10001:10001" # Queue service
+      - "10002:10002" # Table service
     # Using default Azurite account (devstoreaccount1) - no environment needed
     volumes:
       - azurite-data:/data
     command: "azurite --silent --location /data --debug /data/debug.log --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0"
     healthcheck:
-      test: ["CMD-SHELL", "netstat -ltn | grep :10000 || exit 1"]
+      test: [ "CMD-SHELL", "netstat -ltn | grep :10000 || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -235,12 +268,41 @@ services:
       retries: 3
       start_period: 10s
   # #endif
+
+  # k6 Performance Testing
+  k6-performance:
+    build:
+      context: ./tests/performance/k6
+      dockerfile: Dockerfile
+    profiles: [ "performance" ]
+    ports:
+      - "5665:5665" # k6 web dashboard
+    volumes:
+      - ./tests/performance/k6:/scripts
+      - ./tests/performance/results:/results
+    environment:
+      - API_BASE_URL=http://app-domain-api:8080
+      - GRPC_ENDPOINT=app-domain-api:8102
+      - ORLEANS_URL=http://app-domain-orleans:8080
+      - K6_PROMETHEUS_RW_SERVER_URL=http://aspire-dashboard:18890/api/v1/write
+      - ENVIRONMENT=${ENVIRONMENT:-local}
+      - ENABLE_KAFKA_VALIDATION=${ENABLE_KAFKA_VALIDATION:-false}
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - K6_WEB_DASHBOARD=${K6_WEB_DASHBOARD:-true}
+      - K6_WEB_DASHBOARD_EXPORT=/results/web-dashboard-export.html
+    depends_on:
+      app-domain-api:
+        condition: service_healthy
+    networks:
+      - default
+    command: run --web-dashboard --web-dashboard-export=/results/web-dashboard-export.html --out json=/results/results.json /scripts/scenarios/mixed/realistic-workflow.js
 # #if (INCLUDE_ORLEANS || INCLUDE_DOCS)
 volumes:
-# #endif
-# #if (INCLUDE_ORLEANS)
-  azurite-data:
-# #endif
-# #if (INCLUDE_DOCS)
-  pnpm_node_modules:
-# #endif
+  # #endif
+  # #if (INCLUDE_ORLEANS)
+  azurite-data: # #endif
+
+  # #if (INCLUDE_DOCS)
+  pnpm_node_modules: # #endif
+
+  postgres_data:
