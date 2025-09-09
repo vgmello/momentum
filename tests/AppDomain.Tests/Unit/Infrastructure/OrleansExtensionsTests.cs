@@ -6,15 +6,29 @@ namespace AppDomain.Tests.Unit.Infrastructure;
 
 public class OrleansExtensionsTests
 {
+    private static WebApplicationBuilder CreateEmptyTestBuilder(Dictionary<string, string?>? config = null)
+    {
+        // Create a builder with minimal configuration
+        var builder = WebApplication.CreateEmptyBuilder(new WebApplicationOptions
+        {
+            Args = [],
+            EnvironmentName = "Test"
+        });
+        
+        // Add only the configuration we need for testing
+        builder.Configuration.AddInMemoryCollection(config ?? new Dictionary<string, string?>
+        {
+            ["Orleans:UseLocalhostClustering"] = "true"
+        });
+        
+        return builder;
+    }
+
     [Fact]
     public void AddOrleansClient_ConfigurationValidation_ShouldWork()
     {
         // Test with localhost clustering (should work)
-        var builder1 = WebApplication.CreateBuilder([]);
-        builder1.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
-        {
-            ["Orleans:UseLocalhostClustering"] = "true"
-        });
+        var builder1 = CreateEmptyTestBuilder();
 
         Should.NotThrow(() => builder1.AddOrleansClient());
 
@@ -27,11 +41,7 @@ public class OrleansExtensionsTests
     public void AddOrleansClient_WithValidConfig_ShouldNotThrow()
     {
         // Arrange
-        var builder = WebApplication.CreateBuilder([]);
-        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
-        {
-            ["Orleans:UseLocalhostClustering"] = "true"
-        });
+        var builder = CreateEmptyTestBuilder();
 
         // Act & Assert
         Should.NotThrow(() => builder.AddOrleansClient());
@@ -41,11 +51,7 @@ public class OrleansExtensionsTests
     public void AddOrleansClient_ShouldRegisterLazyClusterClientManager()
     {
         // Arrange
-        var builder = WebApplication.CreateBuilder([]);
-        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
-        {
-            ["Orleans:UseLocalhostClustering"] = "true"
-        });
+        var builder = CreateEmptyTestBuilder();
 
         // Act
         builder.AddOrleansClient();
@@ -60,11 +66,7 @@ public class OrleansExtensionsTests
     public void AddOrleansClient_ShouldRegisterOpenTelemetryMetrics()
     {
         // Arrange
-        var builder = WebApplication.CreateBuilder([]);
-        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
-        {
-            ["Orleans:UseLocalhostClustering"] = "true"
-        });
+        var builder = CreateEmptyTestBuilder();
 
         // Act
         builder.AddOrleansClient();
@@ -81,11 +83,7 @@ public class OrleansExtensionsTests
     public void SetupLazyClusterClients_ShouldRemoveOriginalHostedServices()
     {
         // Arrange
-        var builder = WebApplication.CreateBuilder([]);
-        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
-        {
-            ["Orleans:UseLocalhostClustering"] = "true"
-        });
+        var builder = CreateEmptyTestBuilder();
 
         // Add a mock cluster client that implements IHostedService
         var mockClient = Substitute.For<IClusterClient, IHostedService>();
@@ -113,11 +111,7 @@ public class OrleansExtensionsTests
     public void SetupLazyClusterClients_ShouldSetupCorrectly()
     {
         // Arrange
-        var builder = WebApplication.CreateBuilder([]);
-        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
-        {
-            ["Orleans:UseLocalhostClustering"] = "true"
-        });
+        var builder = CreateEmptyTestBuilder();
 
         // Act
         builder.AddOrleansClient();
@@ -139,11 +133,7 @@ public class OrleansExtensionsTests
     public void SetupLazyClusterClients_ShouldPreservePrimaryClientLifetime()
     {
         // Arrange
-        var builder = WebApplication.CreateBuilder([]);
-        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
-        {
-            ["Orleans:UseLocalhostClustering"] = "true"
-        });
+        var builder = CreateEmptyTestBuilder();
 
         var mockClient = Substitute.For<IClusterClient>();
         builder.Services.AddSingleton<IClusterClient>(_ => mockClient);
@@ -162,11 +152,7 @@ public class OrleansExtensionsTests
     public void AddOrleansClient_ServiceRegistration_ShouldWork()
     {
         // Arrange
-        var builder = WebApplication.CreateBuilder([]);
-        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
-        {
-            ["Orleans:UseLocalhostClustering"] = "true"
-        });
+        var builder = CreateEmptyTestBuilder();
 
         // Act
         builder.AddOrleansClient();
@@ -192,8 +178,7 @@ public class OrleansExtensionsTests
     public void AddOrleansClient_ConfigurationEdgeCases_ShouldHandleCorrectly()
     {
         // Test with custom service key
-        var builder1 = WebApplication.CreateBuilder([]);
-        builder1.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
+        var builder1 = CreateEmptyTestBuilder(new Dictionary<string, string?>
         {
             ["Orleans:UseLocalhostClustering"] = "false",
             ["Orleans:Clustering:ServiceKey"] = "CustomOrleansKey",
@@ -204,8 +189,7 @@ public class OrleansExtensionsTests
         Should.NotThrow(() => builder1.AddOrleansClient());
 
         // Test with default service key (null)
-        var builder2 = WebApplication.CreateBuilder([]);
-        builder2.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
+        var builder2 = CreateEmptyTestBuilder(new Dictionary<string, string?>
         {
             ["Orleans:UseLocalhostClustering"] = "false",
             ["Orleans:Clustering:ProviderType"] = "Development",
@@ -219,11 +203,7 @@ public class OrleansExtensionsTests
     public void LazyClusterClientManager_Integration_ShouldRegisterCorrectly()
     {
         // Arrange
-        var builder = WebApplication.CreateBuilder([]);
-        builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
-        {
-            ["Orleans:UseLocalhostClustering"] = "true"
-        });
+        var builder = CreateEmptyTestBuilder();
 
         var mockClient = Substitute.For<IClusterClient, IHostedService>();
         builder.Services.AddSingleton<IClusterClient>(_ => mockClient);
