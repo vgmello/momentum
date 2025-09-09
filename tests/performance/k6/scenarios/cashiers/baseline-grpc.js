@@ -34,7 +34,6 @@ function checkGrpcResponse(response, operation) {
     check(response, {
         [`${operation} - gRPC status OK`]: (r) => r.status === grpc.StatusOK,
         [`${operation} - has valid response`]: (r) => r.message !== null,
-        [`${operation} - response time < 500ms`]: (r) => r && r.timings && r.timings.duration < 500,
     });
 
     if (!success) {

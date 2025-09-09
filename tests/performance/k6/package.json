@@ -12,6 +12,7 @@
     "test:cashiers:simple": "pnpm k6 -e K6_WEB_DASHBOARD_EXPORT=../results/k6-cashiers-simple-create-report.html scenarios/cashiers/simple-create.js",
     "test:cashiers:grpc:simple": "pnpm k6 -e K6_WEB_DASHBOARD_EXPORT=../results/k6-cashiers-grpc-simple-create-report.html scenarios/cashiers/simple-create-grpc.js",
     "test:cashiers:stress": "pnpm k6 -e K6_WEB_DASHBOARD_EXPORT=../results/k6-cashiers-stress-report.html scenarios/cashiers/stress.js",
+    "test:cashiers:grpc:stress": "pnpm k6 -e K6_WEB_DASHBOARD_EXPORT=../results/k6-cashiers-grpc-stress-report.html scenarios/cashiers/stress-grpc.js",
     "test:cashiers:spike": "pnpm k6 -e K6_WEB_DASHBOARD_EXPORT=../results/k6-cashiers-spike-report.html scenarios/cashiers/spike.js",
     "test:invoices": "pnpm k6 -e K6_WEB_DASHBOARD_EXPORT=../results/k6-invoices-baseline-report.html scenarios/invoices/baseline.js",
     "test:mixed": "pnpm k6 -e K6_WEB_DASHBOARD_EXPORT=../results/k6-mixed-realistic-workflow-report.html scenarios/mixed/realistic-workflow.js"

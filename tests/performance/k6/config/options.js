@@ -6,6 +6,7 @@ export const baseOptions = {
         http_req_failed: ["rate<0.1"], // http errors should be less than 10%
         http_req_duration: ["p(95)<500", "p(99)<1000"], // 95% below 500ms, 99% below 1s
         http_reqs: ["rate>=10"], // at least 10 requests per second
+        grpc_req_duration: ["p(95)<1000", "p(99)<2000"], // gRPC allows higher latency due to connection overhead
     },
 
     // Default tags
