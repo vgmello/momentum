@@ -1,4 +1,4 @@
-// Copyright (c) ORG_NAME. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
-global using AppDomain.Core.Data;
+global using AppDomain.Common.Data;
 global using LinqToDB;

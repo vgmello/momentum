@@ -219,7 +219,7 @@ app.MapDefaultHealthCheckEndpoints();
 // Add custom health checks
 builder.Services.AddHealthChecks()
     .AddNpgSql(connectionString)
-    .AddKafka(kafkaOptions => 
+    .AddKafka(kafkaOptions =>
     {
         kafkaOptions.BootstrapServers = "localhost:9092";
     });
@@ -230,7 +230,7 @@ builder.Services.AddHealthChecks()
 The default endpoints are:
 
 - `/health` - Overall health status
-- `/health/ready` - Readiness probe
+- `/health/internal` - Readiness probe
 - `/health/live` - Liveness probe
 
 ## Application Lifecycle
@@ -465,7 +465,7 @@ builder.Configuration.AddAzureKeyVault(
     new DefaultAzureCredential());
 
 // Example: AWS Systems Manager Parameter Store
-builder.Configuration.AddSystemsManager("/myapp", 
+builder.Configuration.AddSystemsManager("/myapp",
     options => options.Optional = true);
 ```
 

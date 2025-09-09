@@ -3,20 +3,17 @@ description: "Configure deployment settings for both templates and libraries"
 
 inputs:
   deploy-type:
-    description: "Type of deployment from workflow_dispatch"
+    description: "Deployment type from workflow_dispatch"
     required: false
     default: ""
 
 outputs:
-  deploy-prerelease:
+  prerelease:
     description: "Whether to deploy a prerelease (false = release)"
-    value: ${{ steps.config.outputs.deploy-prerelease }}
+    value: ${{ steps.config.outputs.prerelease }}
   deploy-docs:
     description: "Whether to deploy documentation"
     value: ${{ steps.config.outputs.deploy-docs }}
-  release-type:
-    description: "Type of release (stable/prerelease)"
-    value: ${{ steps.config.outputs.release-type }}
 
 runs:
   using: "composite"

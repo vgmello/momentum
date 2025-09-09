@@ -1,4 +1,4 @@
-// Copyright (c) ORG_NAME. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
 using AppDomain.Invoices.Commands;
 using AppDomain.Invoices.Grpc;
@@ -107,22 +107,6 @@ public static partial class GrpcMapper
     /// <param name="value">The nullable string value to convert</param>
     /// <returns>The original string or empty string if null</returns>
     private static string ToString(string? value) => value ?? string.Empty;
-
-    /// <summary>
-    ///     Converts a decimal value to double precision for gRPC Protocol Buffer compatibility.
-    ///     Used for monetary amounts in gRPC message fields.
-    /// </summary>
-    /// <param name="value">The decimal value to convert</param>
-    /// <returns>The equivalent double value</returns>
-    private static double ToDouble(decimal value) => Convert.ToDouble(value);
-
-    /// <summary>
-    ///     Converts a double value to decimal precision for domain model compatibility.
-    ///     Used when receiving monetary amounts from gRPC Protocol Buffer messages.
-    /// </summary>
-    /// <param name="value">The double value to convert</param>
-    /// <returns>The equivalent decimal value</returns>
-    private static decimal ToDecimal(double value) => Convert.ToDecimal(value);
 
     /// <summary>
     ///     Parses a string representation of a GUID into a Guid object.

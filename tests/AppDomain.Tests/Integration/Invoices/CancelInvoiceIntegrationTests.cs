@@ -1,4 +1,4 @@
-// Copyright (c) ORG_NAME. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
 using AppDomain.Invoices.Grpc;
 using AppDomain.Tests.Integration._Internal;
@@ -21,7 +21,7 @@ public class CancelInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
 
         // Arrange - Create an invoice first
         var createRequest = _invoiceFaker
-            .WithAmount(100.00)
+            .WithAmount(100.00m)
             .WithCurrency("USD")
             .Generate();
 
@@ -39,7 +39,7 @@ public class CancelInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
         cancelledInvoice.InvoiceId.ShouldBe(createdInvoice.InvoiceId);
         cancelledInvoice.Status.ShouldBe("Cancelled");
         cancelledInvoice.Name.ShouldBe(createRequest.Name);
-        cancelledInvoice.Amount.ShouldBe(100.00);
+        ((decimal)cancelledInvoice.Amount).ShouldBe(100.00m);
 
         // Verify in database
         var dbInvoice = await connection.QuerySingleOrDefaultAsync(
@@ -91,7 +91,7 @@ public class CancelInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
 
         // Arrange - Create and cancel an invoice
         var createRequest = _invoiceFaker
-            .WithAmount(100.00)
+            .WithAmount(100.00m)
             .WithCurrency("USD")
             .Generate();
 

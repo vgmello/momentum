@@ -1,10 +1,11 @@
-// Copyright (c) ORG_NAME. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
 namespace AppDomain.AppHost.Extensions;
 
 public static class UrlExtensions
 {
-    public static IResourceBuilder<T> WithEndpointUrl<T>(this IResourceBuilder<T> builder, string endpoints, string displayText, string url = "/")
+    public static IResourceBuilder<T> WithEndpointUrl<T>(this IResourceBuilder<T> builder, string endpoints, string displayText,
+        string url = "/")
         where T : IResource
     {
         var endpointsList = endpoints.Split("|");

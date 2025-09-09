@@ -6,7 +6,9 @@ services:
     profiles: [ "db", "api", "backoffice" ]
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password@}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password@} # IMPORTANT: Use a secure, managed secret for production!
+      POSTGRES_DB: postgres
+      POSTGRES_INITDB_ARGS: "--data-checksums"
     ports:
       - "54320:5432"
     healthcheck:
@@ -14,6 +16,28 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    # These command-line arguments are tuned for a local performance server.
+    command: >
+      postgres
+      -c max_connections=200
+      -c shared_buffers=2GB
+      -c effective_cache_size=7GB
+      -c maintenance_work_mem=256MB
+      -c work_mem=32MB
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=16MB
+      -c min_wal_size=1GB
+      -c max_wal_size=4GB
+      -c max_worker_processes=8
+      -c max_parallel_workers=8
+      -c max_parallel_workers_per_gather=4
+      -c max_parallel_maintenance_workers=4
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c default_statistics_target=100
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
   # #if (USE_LIQUIBASE)
   app-domain-db-migrations:
@@ -60,6 +84,30 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
       KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
       CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+    healthcheck:
+      test: [ "CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092 || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    # #endif
+
+    # #if (INCLUDE_ORLEANS)
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite:latest
+    profiles: [ "storage", "api", "backoffice" ]
+    ports:
+      - "10000:10000" # Blob service
+      - "10001:10001" # Queue service
+      - "10002:10002" # Table service
+    volumes:
+      - azurite-data:/data
+    command: "azurite --silent --location /data --debug /data/debug.log --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0"
+    healthcheck:
+      test: [ "CMD-SHELL", "netstat -ltn | grep :10000 || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   # #endif
   # Aspire Dashboard
@@ -116,11 +164,13 @@ services:
       - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
       - OTEL_SERVICE_NAME=app-domain-api
       - OTEL_SERVICE_VERSION=1.0.0
-      - Serilog__MinimumLevel__Default=Verbose
+      # Serilog configuration
+      - Serilog__MinimumLevel__Default=Warning
+      - Serilog__MinimumLevel__Override__AppDomain=Information
       - Serilog__WriteTo__0__Name=Console
 
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:8080/health/internal || exit 1" ]
+      test: [ "CMD-SHELL", "wget -nv -t 1 -S -O /dev/null http://localhost:8080/health/internal 2>&1 | grep -q 'HTTP/1.[01] 200' || exit 1" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -152,8 +202,12 @@ services:
       - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
       - OTEL_SERVICE_NAME=app-domain-backoffice
       - OTEL_SERVICE_VERSION=1.0.0
+      # Serilog configuration
+      - Serilog__MinimumLevel__Default=Warning
+      - Serilog__MinimumLevel__Override__AppDomain=Information
+      - Serilog__WriteTo__0__Name=Console
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:8080/health/internal || exit 1" ]
+      test: [ "CMD-SHELL", "wget -nv -t 1 -S -O /dev/null http://localhost:8080/health/internal 2>&1 | grep -q 'HTTP/1.[01] 200' || exit 1" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -189,31 +243,16 @@ services:
       - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
       - OTEL_SERVICE_NAME=app-domain-orleans
       - OTEL_SERVICE_VERSION=1.0.0
+      # Serilog configuration
+      - Serilog__MinimumLevel__Default=Warning
+      - Serilog__MinimumLevel__Override__AppDomain=Information
+      - Serilog__WriteTo__0__Name=Console
     healthcheck:
-      test: [ "CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:8080/dashboard || exit 1" ]
+      test: [ "CMD-SHELL", "wget -nv -t 1 -S -O /dev/null http://localhost:8080/dashboard 2>&1 | grep -q 'HTTP/1.[01] 200' || exit 1" ]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
-
-  # #endif
-  # #if (INCLUDE_ORLEANS)
-  azurite:
-    image: mcr.microsoft.com/azure-storage/azurite:latest
-    profiles: [ "storage", "backoffice" ]
-    ports:
-      - "10000:10000"  # Blob service
-      - "10001:10001"  # Queue service
-      - "10002:10002"  # Table service
-    # Using default Azurite account (devstoreaccount1) - no environment needed
-    volumes:
-      - azurite-data:/data
-    command: "azurite --silent --location /data --debug /data/debug.log --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0"
-    healthcheck:
-      test: ["CMD-SHELL", "netstat -ltn | grep :10000 || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
 
   # #endif
   # #if (INCLUDE_DOCS)
@@ -224,6 +263,7 @@ services:
     profiles: [ "docs" ]
     ports:
       - "8119:5173"
+    user: "1001:1001"
     volumes:
       - ./:/app
       - pnpm_node_modules:/app/docs/node_modules
@@ -235,12 +275,38 @@ services:
       retries: 3
       start_period: 10s
   # #endif
+
+    # k6 Performance Testing - Run on-demand with: docker compose run --rm k6-performance run /scripts/scenarios/mixed/realistic-workflow.js
+  k6-performance:
+    image: grafana/k6:latest
+    profiles: [ "performance" ]
+    ports:
+      - "5665:5665" # k6 web dashboard
+    volumes:
+      - ./tests/performance/k6:/scripts
+      - ./tests/performance/results:/results
+    environment:
+      - API_BASE_URL=http://app-domain-api:8080
+      - GRPC_ENDPOINT=app-domain-api:8102
+      - ENVIRONMENT=${ENVIRONMENT:-local}
+      # k6 Web Dashboard configuration
+      - K6_WEB_DASHBOARD=true
+      - K6_WEB_DASHBOARD_EXPORT=/results/docker-k6-report.html
+    depends_on:
+      app-domain-api:
+        condition: service_healthy
+    networks:
+      - default
+    # No default command - run tests on-demand with custom arguments
 # #if (INCLUDE_ORLEANS || INCLUDE_DOCS)
 volumes:
-# #endif
-# #if (INCLUDE_ORLEANS)
+  # #endif
+  # #if (INCLUDE_ORLEANS)
   azurite-data:
-# #endif
-# #if (INCLUDE_DOCS)
+
+  # #endif
+  # #if (INCLUDE_DOCS)
   pnpm_node_modules:
-# #endif
+
+  # #endif
+  postgres_data:

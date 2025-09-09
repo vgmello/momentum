@@ -1,28 +1,4 @@
 <Project>
-    <PropertyGroup>
-        <BaseVersion>1000.0.0-pre</BaseVersion>
-    </PropertyGroup>
-
-    <Target Name="GenerateLocalVersion" BeforeTargets="Build" Condition="'$(MSBuildProjectName)' == 'Momentum.Extensions.Abstractions' and '$(Configuration)' == 'Debug'">
-        <PropertyGroup>
-            <LocalVersionSuffix>$([System.DateTime]::UtcNow.ToString("yyMMddHHmmss"))</LocalVersionSuffix>
-            <LocalVersion>$(BaseVersion)$(LocalVersionSuffix)</LocalVersion>
-            <LocalFeedAbsolutePath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory).local/nuget'))</LocalFeedAbsolutePath>
-        </PropertyGroup>
-
-        <Message Text="Generating local version: $(LocalVersion)" Importance="high"/>
-        <WriteLinesToFile File="$(MSBuildThisFileDirectory)../../local-mmt-version.txt" Lines="$(LocalVersion)" Overwrite="true"/>
-        <WriteLinesToFile File="$(MSBuildThisFileDirectory)../../local-feed-path.txt" Lines="$(LocalFeedAbsolutePath)" Overwrite="true"/>
-    </Target>
-
-    <Target Name="UseConsistentLocalVersion" BeforeTargets="Build;GenerateNuspec;Pack" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' and Exists('$(MSBuildThisFileDirectory)../../local-mmt-version.txt') ">
-        <PropertyGroup>
-            <PackageVersion>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)../../local-mmt-version.txt').Trim())</PackageVersion>
-            <Version>$(PackageVersion)</Version>
-        </PropertyGroup>
-        <Message Text="Using local version: $(PackageId).$(PackageVersion)" Importance="high"/>
-    </Target>
-
     <Target Name="CleanOldPackages" BeforeTargets="Build;Clean" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' ">
         <ItemGroup>
             <OldPackagesToDelete Include="$(TargetDir)../*.*upkg"/>

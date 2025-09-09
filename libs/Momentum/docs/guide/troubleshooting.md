@@ -957,7 +957,7 @@ app.MapHealthChecks("/health/live", new HealthCheckOptions
     Predicate = check => check.Tags.Contains("live")
 });
 
-app.MapHealthChecks("/health/ready", new HealthCheckOptions
+app.MapHealthChecks("/health/internal", new HealthCheckOptions
 {
     Predicate = check => check.Tags.Contains("ready"),
     Timeout = TimeSpan.FromSeconds(30)

@@ -1,9 +1,9 @@
-// Copyright (c) ORG_NAME. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
 using LinqToDB.Concurrency;
 using LinqToDB.Mapping;
 
-namespace AppDomain.Core.Data;
+namespace AppDomain.Common.Data;
 
 #if INCLUDE_ORLEANS
 /// <summary>
@@ -13,7 +13,7 @@ namespace AppDomain.Core.Data;
 /// </summary>
 [Table(Schema = "app_domain")]
 [GenerateSerializer]
-[Alias("AppDomain.Core.Data.DbEntity")]
+[Alias("AppDomain.Common.Data.DbEntity")]
 public abstract record DbEntity
 {
     /// <summary>
@@ -38,7 +38,7 @@ public abstract record DbEntity
     [Column("xmin", SkipOnInsert = true, SkipOnUpdate = true)]
     [OptimisticLockProperty(VersionBehavior.Auto)]
     [Id(2)]
-    public int Version { get; init; } = 0;
+    public int Version { get; init; }
 }
 #else
 /// <summary>
@@ -67,6 +67,6 @@ public abstract record DbEntity
     /// </summary>
     [Column("xmin", SkipOnInsert = true, SkipOnUpdate = true)]
     [OptimisticLockProperty(VersionBehavior.Auto)]
-    public int Version { get; init; } = 0;
+    public int Version { get; init; }
 }
 #endif

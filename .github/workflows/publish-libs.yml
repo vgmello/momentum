@@ -9,12 +9,11 @@ on:
       - "libs/Momentum/docs/**"
     tags:
       - "release"
-      - "v*.*.*"
 
   workflow_dispatch:
     inputs:
       deploy-type:
-        description: "Type of deployment"
+        description: "Deployment type"
         required: true
         default: "prerelease"
         type: choice
@@ -51,15 +50,15 @@ jobs:
       url: ${{ steps.docs-deployment.outputs.page_url }}
 
     steps:
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-
       - name: Checkout code
         uses: actions/checkout@v5
         with:
           fetch-depth: 0 # Fetching all history for version calculation and release notes (prev vs now)
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Configure deployment
         id: config
@@ -72,39 +71,29 @@ jobs:
         with:
           build-target: libs/Momentum/Momentum.slnx
 
-      - name: Verify main branch for release
-        if: steps.config.outputs.deploy-prerelease == 'false'
-        shell: pwsh
-        run: |
-          $currentBranch = git rev-parse --abbrev-ref HEAD
-          if ($currentBranch -ne "main") {
-            Write-Error "❌ Release must be created from main branch. Current: $currentBranch"
-            exit 1
-          }
-          Write-Host "✅ Confirmed on main branch"
-
       - name: Calculate release version
         id: release-version
         uses: ./.github/actions/version-calculate
         with:
-          release-type: ${{ steps.config.outputs.release-type }}
+          version-file: libs/Momentum/version.txt
+          prerelease: ${{ steps.config.outputs.prerelease }}
 
       - name: Generate release notes
+        id: release-notes
         uses: ./.github/actions/generate-release-notes
         with:
-          version: ${{ steps.release-version.outputs.version }}
-          tag: ${{ steps.release-version.outputs.tag }}
-          release-type: ${{ steps.config.outputs.release-type }}
-          output-file: ${{ steps.config.outputs.release-type }}_notes.md
+          version: ${{ steps.release-version.outputs.next-version }}
+          tag: ${{ steps.release-version.outputs.next-tag }}
+          previous-tag: ${{ steps.release-version.outputs.previous-tag }}
 
       - name: Create GitHub release
         shell: pwsh
         run: |
           & ./.github/scripts/Create-GitHubRelease.ps1 `
-            -Tag "${{ steps.release-version.outputs.tag }}" `
-            -Title "Momentum Libraries ${{ steps.release-version.outputs.tag }}" `
-            -NotesFile "${{ steps.config.outputs.release-type }}_notes.md" `
-            ${{ steps.config.outputs.deploy-prerelease == 'true' && '-Prerelease' || '' }} `
+            -Tag "${{ steps.release-version.outputs.next-tag }}" `
+            -Title "Momentum Libraries ${{ steps.release-version.outputs.next-tag }}" `
+            -NotesFile "${{ steps.release-notes.outputs.notes-file }}" `
+            ${{ steps.config.outputs.prerelease == 'true' && '-Prerelease' || '' }} `
             -Target "main"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -113,7 +102,7 @@ jobs:
         uses: ./.github/actions/nuget-publish
         with:
           path: libs/Momentum/Momentum.slnx
-          package-version: ${{ steps.release-version.outputs.version }}
+          package-version: ${{ steps.release-version.outputs.next-version }}
           nuget-api-key: ${{ secrets.NUGET_API_KEY }}
           nuget-source: ${{ env.NUGET_SOURCE }}
 
@@ -143,12 +132,12 @@ jobs:
         shell: pwsh
         run: |
           $args = @(
-            "-ReleaseVersion", "${{ steps.release-version.outputs.version }}",
-            "-ReleaseTag", "${{ steps.release-version.outputs.tag }}",
+            "-ReleaseVersion", "${{ steps.release-version.outputs.next-version }}",
+            "-ReleaseTag", "${{ steps.release-version.outputs.next-tag }}",
             "-NugetSource", "${{ env.NUGET_SOURCE }}"
           )
 
-          if ("${{ steps.config.outputs.deploy-prerelease }}" -eq "true") {
+          if ("${{ steps.config.outputs.prerelease }}" -eq "true") {
             $args += "-DeployPrerelease"
           }
 

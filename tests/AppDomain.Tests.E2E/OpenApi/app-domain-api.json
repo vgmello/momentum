@@ -892,7 +892,7 @@
           "amount": {
             "type": "number",
             "description": "The invoice amount (required).",
-            "format": "double"
+            "format": "decimal"
           },
           "currency": {
             "type": "string",
@@ -951,7 +951,7 @@
           },
           "amount": {
             "type": "number",
-            "format": "double"
+            "format": "decimal"
           },
           "currency": {
             "type": "string",
@@ -969,7 +969,7 @@
           },
           "amountPaid": {
             "type": "number",
-            "format": "double",
+            "format": "decimal",
             "nullable": true
           },
           "paymentDate": {
@@ -1006,7 +1006,7 @@
           "amountPaid": {
             "type": "number",
             "description": "The amount that was paid (required).",
-            "format": "double"
+            "format": "decimal"
           },
           "paymentDate": {
             "type": "string",
@@ -1084,7 +1084,7 @@
           "amount": {
             "type": "number",
             "description": "The payment amount to simulate (required).",
-            "format": "double"
+            "format": "decimal"
           },
           "currency": {
             "type": "string",

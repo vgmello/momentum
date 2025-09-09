@@ -1,8 +1,8 @@
-// Copyright (c) ORG_NAME. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
 using FluentValidation.Results;
 
-namespace AppDomain.Api.Core.Extensions;
+namespace AppDomain.Api.Common.Extensions;
 
 /// <summary>
 ///     Extensions for validation operations.

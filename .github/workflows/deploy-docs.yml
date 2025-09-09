@@ -6,6 +6,9 @@ on:
       - main
     paths:
       - "libs/Momentum/docs/**"
+    tags:
+      - "release"
+
   workflow_dispatch:
     inputs:
       docs-path:
@@ -41,7 +44,7 @@ jobs:
 
     steps:
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
@@ -54,6 +57,7 @@ jobs:
         uses: actions/configure-pages@v5
 
       - name: Build documentation
+        id: docs-build
         uses: ./.github/actions/docs-build
         with:
           docs-path: ${{ github.event.inputs.docs-path || 'libs/Momentum/docs' }}
@@ -62,7 +66,7 @@ jobs:
       - name: Upload to GitHub Pages
         uses: actions/upload-pages-artifact@v4
         with:
-          path: ${{ github.event.inputs.docs-path || 'libs/Momentum/docs' }}/.vitepress/dist
+          path: ${{ steps.docs-build.outputs.dist-path }}
 
       - name: Deploy to GitHub Pages
         id: docs-deployment
@@ -76,5 +80,5 @@ jobs:
             "-DocsPath", "${{ github.event.inputs.docs-path || 'libs/Momentum/docs' }}",
             "-DeployDocs"
           )
-          
+
           & ./.github/scripts/Write-DeploymentSummary.ps1 @args

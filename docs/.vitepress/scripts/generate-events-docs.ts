@@ -1,6 +1,7 @@
 import { execSync } from 'node:child_process';
 import path from 'node:path';
 import fs from 'node:fs';
+import { glob } from 'glob';
 
 const log = (message: string) => console.log(`[${new Date().toISOString()}] ${message}`);
 
@@ -34,28 +35,43 @@ function getGitHubUrl(): string | null {
     }
 }
 
+async function getAssemblyFiles(patterns: string[]): Promise<string[]> {
+    const allFiles: string[] = [];
+
+    for (const pattern of patterns) {
+        const matches = await glob(pattern, {
+            absolute: true
+        });
+        allFiles.push(...matches);
+    }
+
+    return [...new Set(allFiles)];
+}
+
 try {
     const startTime = Date.now();
     const args = process.argv.slice(2);
-    const assemblyPathsArg = args[0];
+    const patternsArg = args[0];
 
-    if (!assemblyPathsArg) {
-        log('Usage: tsx generate-events-docs.ts <path-to-assemblies>');
-        log('Example: tsx generate-events-docs.ts ../src/AppDomain/bin/Debug/net9.0/AppDomain.dll');
-        log('Multiple: tsx generate-events-docs.ts "assembly1.dll,assembly2.dll"');
+    if (!patternsArg) {
+        log('Usage: tsx generate-events-docs.ts <glob-patterns>');
+        log('Example: tsx generate-events-docs.ts "../src/**/bin/**/AppDomain*.dll"');
+        log('Multiple: tsx generate-events-docs.ts "pattern1.dll,pattern2.dll"');
         process.exit(1);
     }
 
     log('Generating events documentation...');
 
-    // Parse comma-delimited assembly paths
-    const assemblyPaths = assemblyPathsArg
+    // Parse comma-delimited glob patterns
+    const patterns = patternsArg
         .split(',')
         .map(p => p.trim())
-        .filter(p => p.length > 0)
-        .map(p => path.resolve(p));
+        .filter(p => p.length > 0);
 
-    log(`Processing ${assemblyPaths.length} assemblies:`);
+    log('Scanning for assembly files...');
+    const assemblyPaths = await getAssemblyFiles(patterns);
+
+    log(`Found ${assemblyPaths.length} assemblies:`);
 
     const existingAssemblies = assemblyPaths.filter(assemblyPath => {
         const exists = fs.existsSync(assemblyPath);

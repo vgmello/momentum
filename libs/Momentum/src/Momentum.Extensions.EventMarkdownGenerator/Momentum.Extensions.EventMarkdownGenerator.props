@@ -1,43 +1,41 @@
 <Project>
-
-  <PropertyGroup>
-    <GenerateEventMarkdown Condition="'$(GenerateEventMarkdown)' == ''">true</GenerateEventMarkdown>
-    <EventMarkdownOutput Condition="'$(EventMarkdownOutput)' == ''">$(MSBuildProjectDirectory)/docs/events</EventMarkdownOutput>
-    <EventSidebarFileName Condition="'$(EventSidebarFileName)' == ''">events-sidebar.json</EventSidebarFileName>
-    <EventMarkdownVerbose Condition="'$(EventMarkdownVerbose)' == ''">false</EventMarkdownVerbose>
-  </PropertyGroup>
-
-  <!-- Target to generate individual event markdown files after build -->
-  <Target Name="GenerateEventMarkdown"
-          AfterTargets="Build"
-          Condition="'$(GenerateEventMarkdown)' == 'true' AND '$(TargetPath)' != '' AND '$(MSBuildProjectName)' != 'Momentum.Extensions.EventMarkdownGenerator'">
-
     <PropertyGroup>
-      <EventMarkdownGenArgs>--assemblies "$(TargetPath)" --output "$(EventMarkdownOutput)" --sidebar-file "$(EventSidebarFileName)"</EventMarkdownGenArgs>
-      <EventMarkdownGenArgs Condition="'$(DocumentationFile)' != ''">$(EventMarkdownGenArgs) --xml-docs "$(DocumentationFile)"</EventMarkdownGenArgs>
-      <EventMarkdownGenArgs Condition="'$(EventMarkdownVerbose)' == 'true'">$(EventMarkdownGenArgs) --verbose</EventMarkdownGenArgs>
+        <GenerateEventMarkdown Condition="'$(GenerateEventMarkdown)' == ''">true</GenerateEventMarkdown>
+        <EventMarkdownOutput Condition="'$(EventMarkdownOutput)' == ''">$(MSBuildProjectDirectory)/docs/events</EventMarkdownOutput>
+        <EventSidebarFileName Condition="'$(EventSidebarFileName)' == ''">events-sidebar.json</EventSidebarFileName>
+        <EventMarkdownVerbose Condition="'$(EventMarkdownVerbose)' == ''">false</EventMarkdownVerbose>
     </PropertyGroup>
 
-    <MakeDir Directories="$(EventMarkdownOutput)" Condition="!Exists('$(EventMarkdownOutput)')" />
+    <!-- Target to generate individual event markdown files after build -->
+    <Target Name="GenerateEventMarkdown"
+            AfterTargets="Build"
+            Condition="'$(GenerateEventMarkdown)' == 'true' AND '$(TargetPath)' != '' AND '$(MSBuildProjectName)' != 'Momentum.Extensions.EventMarkdownGenerator'">
 
-    <!-- Execute the event markdown generator -->
-    <Exec Command="dotnet &quot;$(MSBuildThisFileDirectory)../tools/net9.0/Momentum.Extensions.EventMarkdownGenerator.dll&quot; $(EventMarkdownGenArgs)"
-          ContinueOnError="true"
-          Condition="Exists('$(TargetPath)')" />
+        <PropertyGroup>
+            <EventMarkdownGenArgs>--assemblies "$(TargetPath)" --output "$(EventMarkdownOutput)" --sidebar-file "$(EventSidebarFileName)"</EventMarkdownGenArgs>
+            <EventMarkdownGenArgs Condition="'$(DocumentationFile)' != ''">$(EventMarkdownGenArgs) --xml-docs "$(DocumentationFile)"</EventMarkdownGenArgs>
+            <EventMarkdownGenArgs Condition="'$(EventMarkdownVerbose)' == 'true'">$(EventMarkdownGenArgs) --verbose</EventMarkdownGenArgs>
+        </PropertyGroup>
 
-    <Message Text="Individual event markdown files generated in: $(EventMarkdownOutput)"
-             Importance="normal"
-             Condition="Exists('$(EventMarkdownOutput)')" />
-  </Target>
+        <MakeDir Directories="$(EventMarkdownOutput)" Condition="!Exists('$(EventMarkdownOutput)')"/>
 
-  <!-- Target to clean generated markdown files -->
-  <Target Name="CleanEventMarkdown" BeforeTargets="Clean">
-    <ItemGroup>
-      <EventMarkdownFiles Include="$(EventMarkdownOutput)/*.md" />
-      <EventMarkdownFiles Include="$(EventMarkdownOutput)/$(EventSidebarFileName)" />
-    </ItemGroup>
-    <Delete Files="@(EventMarkdownFiles)" ContinueOnError="true" />
-    <Message Text="Cleaned individual event markdown files" Importance="normal" />
-  </Target>
+        <!-- Execute the event markdown generator -->
+        <Exec Command="dotnet &quot;$(MSBuildThisFileDirectory)../tools/net9.0/Momentum.Extensions.EventMarkdownGenerator.dll&quot; $(EventMarkdownGenArgs)"
+              ContinueOnError="true"
+              Condition="Exists('$(TargetPath)')"/>
 
+        <Message Text="Individual event markdown files generated in: $(EventMarkdownOutput)"
+                 Importance="normal"
+                 Condition="Exists('$(EventMarkdownOutput)')"/>
+    </Target>
+
+    <!-- Target to clean generated markdown files -->
+    <Target Name="CleanEventMarkdown" BeforeTargets="Clean">
+        <ItemGroup>
+            <EventMarkdownFiles Include="$(EventMarkdownOutput)/*.md"/>
+            <EventMarkdownFiles Include="$(EventMarkdownOutput)/$(EventSidebarFileName)"/>
+        </ItemGroup>
+        <Delete Files="@(EventMarkdownFiles)" ContinueOnError="true"/>
+        <Message Text="Cleaned individual event markdown files" Importance="normal"/>
+    </Target>
 </Project>

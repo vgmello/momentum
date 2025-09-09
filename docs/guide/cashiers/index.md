@@ -136,7 +136,7 @@ When an invoice is paid:
 
 The cashiers data is stored in PostgreSQL:
 
-**Table**: [`app_domain.cashiers`](https://github.com/org-name/app-domain/blob/main/infra/AppDomain.Database/Liquibase/AppDomain/tables/cashiers.sql)
+**Table**: [`app_domain.cashiers`](https://github.com/org-name/app-domain/blob/main/infra/AppDomain.Database/Liquibase/app_domain/tables/cashiers.sql)
 
 **Stored Procedures**:
 

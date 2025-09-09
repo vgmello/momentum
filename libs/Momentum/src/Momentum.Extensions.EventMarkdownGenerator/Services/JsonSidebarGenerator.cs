@@ -23,113 +23,152 @@ public class JsonSidebarGenerator
 
     public List<SidebarItem> GenerateSidebarItems(ICollection<EventWithDocumentation> events)
     {
-        var sidebarItems = new List<SidebarItem>();
-
-        // Separate integration events and domain events
-        var integrationEvents = events.Where(e => !e.Metadata.IsInternal).ToList();
-        var domainEvents = events.Where(e => e.Metadata.IsInternal).ToList();
-
-        // Group all events by subdomain
-        var allEventGroups = new Dictionary<string, Dictionary<string, List<EventWithDocumentation>>>();
-
-        // Process integration events
-        foreach (var eventWithDoc in integrationEvents)
-        {
-            var namespaceParts = ParseNamespaceHierarchy(eventWithDoc.Metadata.Namespace);
-            var subdomain = namespaceParts.subdomain;
-            var section = namespaceParts.section;
-
-            if (!allEventGroups.ContainsKey(subdomain))
-            {
-                allEventGroups[subdomain] = [];
-            }
-
-            if (!allEventGroups[subdomain].ContainsKey(section))
-            {
-                allEventGroups[subdomain][section] = [];
-            }
-
-            allEventGroups[subdomain][section].Add(eventWithDoc);
-        }
-
-        // Process domain events - add them under their respective subdomains
-        foreach (var eventWithDoc in domainEvents)
-        {
-            var namespaceParts = ParseNamespaceHierarchy(eventWithDoc.Metadata.Namespace);
-            var subdomain = namespaceParts.subdomain;
-            var section = "Domain Events"; // Fixed section name for domain events
-
-            if (!allEventGroups.ContainsKey(subdomain))
-            {
-                allEventGroups[subdomain] = [];
-            }
-
-            if (!allEventGroups[subdomain].ContainsKey(section))
-            {
-                allEventGroups[subdomain][section] = [];
-            }
-
-            allEventGroups[subdomain][section].Add(eventWithDoc);
-        }
-
-        // Build sidebar structure
-        foreach (var (subdomain, sections) in allEventGroups.OrderBy(x => x.Key))
-        {
-            var subdomainItem = new SidebarItem
-            {
-                Text = CapitalizeDomain(subdomain),
-                Link = null,
-                Collapsed = false,
-                Items = []
-            };
-
-            // If there are multiple sections, create nested structure
-            if (sections.Count > 1 || (sections.Count == 1 && sections.Keys.First() != ""))
-            {
-                foreach (var (section, sectionEvents) in sections.OrderBy(x => x.Key))
-                {
-                    if (!string.IsNullOrEmpty(section))
-                    {
-                        var sectionItem = new SidebarItem
-                        {
-                            Text = CapitalizeDomain(section),
-                            Link = null,
-                            Collapsed = false,
-                            Items = sectionEvents
-                                .OrderBy(e => e.Metadata.EventName)
-                                .Select(CreateEventSidebarItem)
-                                .ToList()
-                        };
-                        subdomainItem.Items.Add(sectionItem);
-                    }
-                    else
-                    {
-                        // Add events directly to subdomain if no section
-                        subdomainItem.Items.AddRange(sectionEvents
-                            .OrderBy(e => e.Metadata.EventName)
-                            .Select(CreateEventSidebarItem));
-                    }
-                }
-            }
-            else
-            {
-                var sectionEvents = sections.Values.First();
-                subdomainItem.Items.AddRange(sectionEvents
-                    .OrderBy(e => e.Metadata.EventName)
-                    .Select(CreateEventSidebarItem));
-            }
-
-            sidebarItems.Add(subdomainItem);
-        }
-
+        var eventGroups = GroupEventsBySubdomainAndSection(events);
+        var sidebarItems = BuildSidebarStructure(eventGroups);
+        
         var schemasSection = GenerateSchemasSection(events);
-
         if (schemasSection != null)
         {
             sidebarItems.Add(schemasSection);
         }
 
         return sidebarItems;
+    }
+
+    private static Dictionary<string, Dictionary<string, List<EventWithDocumentation>>> GroupEventsBySubdomainAndSection(
+        ICollection<EventWithDocumentation> events)
+    {
+        var integrationEvents = events.Where(e => !e.Metadata.IsInternal);
+        var domainEvents = events.Where(e => e.Metadata.IsInternal);
+        
+        var eventGroups = new Dictionary<string, Dictionary<string, List<EventWithDocumentation>>>();
+        
+        GroupEventsByType(integrationEvents, eventGroups, e => ParseNamespaceHierarchy(e.Metadata.Namespace).section);
+        GroupEventsByType(domainEvents, eventGroups, _ => "Domain Events");
+        
+        return eventGroups;
+    }
+
+    private static void GroupEventsByType(
+        IEnumerable<EventWithDocumentation> events,
+        Dictionary<string, Dictionary<string, List<EventWithDocumentation>>> eventGroups,
+        Func<EventWithDocumentation, string> sectionSelector)
+    {
+        foreach (var eventWithDoc in events)
+        {
+            var (subdomain, _) = ParseNamespaceHierarchy(eventWithDoc.Metadata.Namespace);
+            var section = sectionSelector(eventWithDoc);
+            
+            AddEventToGroup(eventGroups, subdomain, section, eventWithDoc);
+        }
+    }
+
+    private static void AddEventToGroup(
+        Dictionary<string, Dictionary<string, List<EventWithDocumentation>>> eventGroups,
+        string subdomain,
+        string section,
+        EventWithDocumentation eventWithDoc)
+    {
+        if (!eventGroups.ContainsKey(subdomain))
+        {
+            eventGroups[subdomain] = new Dictionary<string, List<EventWithDocumentation>>();
+        }
+
+        if (!eventGroups[subdomain].ContainsKey(section))
+        {
+            eventGroups[subdomain][section] = new List<EventWithDocumentation>();
+        }
+
+        eventGroups[subdomain][section].Add(eventWithDoc);
+    }
+
+    private static List<SidebarItem> BuildSidebarStructure(
+        Dictionary<string, Dictionary<string, List<EventWithDocumentation>>> eventGroups)
+    {
+        var sidebarItems = new List<SidebarItem>();
+        
+        foreach (var (subdomain, sections) in eventGroups.OrderBy(x => x.Key))
+        {
+            var subdomainItem = CreateSubdomainItem(subdomain, sections);
+            sidebarItems.Add(subdomainItem);
+        }
+        
+        return sidebarItems;
+    }
+
+    private static SidebarItem CreateSubdomainItem(
+        string subdomain, 
+        Dictionary<string, List<EventWithDocumentation>> sections)
+    {
+        var subdomainItem = new SidebarItem
+        {
+            Text = CapitalizeDomain(subdomain),
+            Link = null,
+            Collapsed = false,
+            Items = new List<SidebarItem>()
+        };
+
+        if (HasMultipleSectionsOrNamedSection(sections))
+        {
+            AddSectionsToSubdomain(subdomainItem, sections);
+        }
+        else
+        {
+            AddEventsDirectlyToSubdomain(subdomainItem, sections.Values.First());
+        }
+
+        return subdomainItem;
+    }
+
+    private static bool HasMultipleSectionsOrNamedSection(Dictionary<string, List<EventWithDocumentation>> sections)
+    {
+        return sections.Count > 1 || (sections.Count == 1 && !string.IsNullOrEmpty(sections.Keys.First()));
+    }
+
+    private static void AddSectionsToSubdomain(
+        SidebarItem subdomainItem,
+        Dictionary<string, List<EventWithDocumentation>> sections)
+    {
+        foreach (var (section, sectionEvents) in sections.OrderBy(x => x.Key))
+        {
+            if (!string.IsNullOrEmpty(section))
+            {
+                var sectionItem = CreateSectionItem(section, sectionEvents);
+                subdomainItem.Items.Add(sectionItem);
+            }
+            else
+            {
+                AddEventsDirectlyToSubdomain(subdomainItem, sectionEvents);
+            }
+        }
+    }
+
+    private static SidebarItem CreateSectionItem(
+        string section,
+        List<EventWithDocumentation> sectionEvents)
+    {
+        return new SidebarItem
+        {
+            Text = CapitalizeDomain(section),
+            Link = null,
+            Collapsed = false,
+            Items = CreateEventItems(sectionEvents)
+        };
+    }
+
+    private static void AddEventsDirectlyToSubdomain(
+        SidebarItem subdomainItem,
+        List<EventWithDocumentation> events)
+    {
+        subdomainItem.Items.AddRange(CreateEventItems(events));
+    }
+
+    private static List<SidebarItem> CreateEventItems(List<EventWithDocumentation> events)
+    {
+        return events
+            .OrderBy(e => e.Metadata.EventName)
+            .Select(CreateEventSidebarItem)
+            .ToList();
     }
 
     private static (string subdomain, string section) ParseNamespaceHierarchy(string namespaceName)

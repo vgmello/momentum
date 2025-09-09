@@ -1,4 +1,4 @@
-// Copyright (c) ORG_NAME. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
 using AppDomain.Invoices.Actors;
 using AppDomain.Invoices.Contracts.IntegrationEvents;

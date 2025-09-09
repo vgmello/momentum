@@ -57,10 +57,6 @@
         <!--#endif -->
     </Folder>
     <!--#endif -->
-    <!--#if (HAS_BACKEND) -->
-    <Project Path="src\AppDomain\AppDomain.csproj" />
-    <Project Path="src\AppDomain.Contracts\AppDomain.Contracts.csproj" />
-    <!--#endif -->
     <!--#if (INCLUDE_API) -->
     <Project Path="src\AppDomain.Api\AppDomain.Api.csproj" />
     <!--#endif -->
@@ -72,5 +68,9 @@
     <!--#endif -->
     <!--#if (INCLUDE_BACK_OFFICE) -->
     <Project Path="src\AppDomain.BackOffice\AppDomain.BackOffice.csproj" />
+    <!--#endif -->
+    <!--#if (HAS_BACKEND) -->
+    <Project Path="src\AppDomain.Contracts\AppDomain.Contracts.csproj" />
+    <Project Path="src\AppDomain\AppDomain.csproj" />
     <!--#endif -->
 </Solution>

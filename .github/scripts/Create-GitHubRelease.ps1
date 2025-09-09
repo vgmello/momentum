@@ -1,21 +1,21 @@
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [string]$Tag,
-    
-    [Parameter(Mandatory=$true)]
+
+    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [string]$Title,
-    
-    [Parameter(Mandatory=$true)]
+
+    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [string]$NotesFile,
-    
+
     [switch]$Prerelease,
-    
+
     [switch]$Draft,
-    
+
     [ValidateNotNullOrEmpty()]
     [string]$Target = "main"
 )

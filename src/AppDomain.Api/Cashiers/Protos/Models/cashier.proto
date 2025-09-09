@@ -6,7 +6,7 @@ package app_domain.cashiers;
 
 message Cashier {
   string tenant_id = 1;
-  string cashierId = 2;
+  string cashier_id = 2;
   string name = 3;
   string email = 4;
 }

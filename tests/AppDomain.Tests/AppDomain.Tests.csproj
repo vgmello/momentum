@@ -63,6 +63,9 @@
                   ProtoRoot="..\..\src\AppDomain.Api\"
                   GrpcServices="Client"
                   Link="Integration\%(RecursiveDir)%(Filename)%(Extension)"/>
+
+            <Compile Include="..\..\src\AppDomain.Api\**\Protos\**\*.Partial.cs"
+                     Link="Integration\%(RecursiveDir)%(Filename)%(Extension)"/>
     </ItemGroup>
 <!--#endif -->
     <ItemGroup>

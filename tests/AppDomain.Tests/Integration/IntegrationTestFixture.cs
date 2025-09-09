@@ -1,4 +1,4 @@
-// Copyright (c) ORG_NAME. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
 using AppDomain.Tests.Integration._Internal;
 using AppDomain.Tests.Integration._Internal.Extensions;
@@ -10,8 +10,10 @@ using Serilog.Events;
 using System.Diagnostics.CodeAnalysis;
 using Momentum.ServiceDefaults;
 using AppDomain;
-//#if (USE_DB)
+//#if (USE_LIQUIBASE)
 using AppDomain.Tests.Integration._Internal.Containers;
+//#endif
+//#if (USE_DB)
 using Testcontainers.PostgreSql;
 //#endif
 //#if (USE_KAFKA)
@@ -40,32 +42,32 @@ public class IntegrationTestFixture : IAsyncLifetime
 {
     private readonly INetwork _containerNetwork = new NetworkBuilder().Build();
 
-//#if (INCLUDE_API)
+    //#if (INCLUDE_API)
     private WebApplication? _app;
-//#endif
+    //#endif
 
-//#if (USE_DB)
+    //#if (USE_DB)
     private readonly PostgreSqlContainer _postgres;
 
-//#endif
-//#if (USE_KAFKA)
+    //#endif
+    //#if (USE_KAFKA)
     private readonly KafkaContainer _kafka;
-//#endif
+    //#endif
 
-//#if (INCLUDE_API)
+    //#if (INCLUDE_API)
     public GrpcChannel GrpcChannel { get; private set; } = null!;
     public IServiceProvider Services => _app?.Services ?? throw new InvalidOperationException("Application not initialized");
-//#endif
+    //#endif
 
-//#if (USE_DB)
+    //#if (USE_DB)
     public string AppDomainDbConnectionString => _postgres.GetDbConnectionString("app_domain");
 
     public string ServiceBusDbConnectionString => _postgres.GetDbConnectionString("service_bus");
 
-//#endif
-//#if (USE_KAFKA)
+    //#endif
+    //#if (USE_KAFKA)
     public string KafkaBootstrapAddress => _kafka.GetBootstrapAddress();
-//#endif
+    //#endif
 
     public ITestOutputHelper? TestOutput { get; set; }
 
@@ -73,7 +75,7 @@ public class IntegrationTestFixture : IAsyncLifetime
     {
         // Enable HTTP/2 over unencrypted connections for gRPC testing
         AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
-//#if (USE_DB)
+        //#if (USE_DB)
         _postgres = new PostgreSqlBuilder()
             .WithImage("postgres:17-alpine")
             .WithUsername("postgres")
@@ -81,37 +83,37 @@ public class IntegrationTestFixture : IAsyncLifetime
             .WithDatabase("postgres")
             .WithNetwork(_containerNetwork)
             .Build();
-//#endif
+        //#endif
 
-//#if (USE_KAFKA)
+        //#if (USE_KAFKA)
         _kafka = new KafkaBuilder()
             .WithImage("confluentinc/cp-kafka:7.6.0")
             .WithNetwork(_containerNetwork)
             .Build();
-//#endif
+        //#endif
     }
 
     public async ValueTask InitializeAsync()
     {
         await _containerNetwork.CreateAsync();
-//#if (USE_DB)
+        //#if (USE_DB)
         await _postgres.StartAsync();
-//#endif
-//#if (USE_KAFKA)
+        //#endif
+        //#if (USE_KAFKA)
         await _kafka.StartAsync();
-//#endif
+        //#endif
 
-//#if (USE_DB)
+        //#if (USE_LIQUIBASE)
         await using var liquibaseMigrationContainer = new LiquibaseMigrationContainer(_postgres.Name, _containerNetwork);
         await liquibaseMigrationContainer.StartAsync();
-//#endif
+        //#endif
 
-//#if (INCLUDE_API)
+        //#if (INCLUDE_API)
         await CreateTestWebApplicationAsync();
-//#endif
+        //#endif
     }
 
-//#if (INCLUDE_API)
+    //#if (INCLUDE_API)
     private async Task CreateTestWebApplicationAsync()
     {
         var builder = WebApplication.CreateEmptyBuilder(new WebApplicationOptions());
@@ -123,7 +125,7 @@ public class IntegrationTestFixture : IAsyncLifetime
             //#endif
         };
 
-//#if (USE_KAFKA)
+        //#if (USE_KAFKA)
         var kafkaAddress = _kafka.GetBootstrapAddress();
         configData["ConnectionStrings:Messaging"] = kafkaAddress;
         configData["Aspire:Confluent:Kafka:Messaging:BootstrapServers"] = kafkaAddress;
@@ -132,7 +134,7 @@ public class IntegrationTestFixture : IAsyncLifetime
         configData["Aspire:Confluent:Kafka:Messaging:Consumer:Config:EnableAutoCommit"] = "true";
         configData["Aspire:Confluent:Kafka:Messaging:Security:Protocol"] = "Plaintext";
 
-//#endif
+        //#endif
         configData["Orleans:UseLocalhostClustering"] = "true";
         configData["ServiceBus:Wolverine:CodegenEnabled"] = "true";
 
@@ -154,9 +156,9 @@ public class IntegrationTestFixture : IAsyncLifetime
 
         builder.AddServiceDefaults();
         builder.AddApiServiceDefaults();
-//#if (USE_KAFKA)
+        //#if (USE_KAFKA)
         builder.AddKafkaMessagingExtensions();
-//#endif
+        //#endif
 
         builder.AddAppDomainServices();
         builder.AddApplicationServices();
@@ -166,7 +168,7 @@ public class IntegrationTestFixture : IAsyncLifetime
         _app.ConfigureApiUsingDefaults(requireAuth: false);
         _app.MapDefaultHealthCheckEndpoints();
 
-        _app.MapGrpcServices(typeof(AppDomain.Api.Program));
+        _app.MapGrpcServices(typeof(Program));
 
         await _app.StartAsync();
 
@@ -181,11 +183,11 @@ public class IntegrationTestFixture : IAsyncLifetime
             HttpClient = httpClient
         });
     }
-//#endif
+    //#endif
 
     public async ValueTask DisposeAsync()
     {
-//#if (INCLUDE_API)
+        //#if (INCLUDE_API)
         if (_app != null)
         {
             await _app.StopAsync();
@@ -193,7 +195,7 @@ public class IntegrationTestFixture : IAsyncLifetime
         }
 
         GrpcChannel.Dispose();
-//#endif
+        //#endif
 
         var disposeTasks = new List<Task>
         {

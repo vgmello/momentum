@@ -258,9 +258,8 @@ Ready to begin? Follow our comprehensive getting started guide:
 
 ### API Documentation
 
--   [REST API Reference](/api/)
+-   [REST API Reference](${API_BASE_URL}/scalar)
 -   [Integration Events](/events/)
--   [gRPC Services](/api/grpc)
 
 ### Advanced Topics
 
@@ -275,4 +274,4 @@ The design makes the codebase intuitive for developers, product teams, and even 
 -   **Explore the Domains**: Deep dive into [Cashiers](/guide/cashiers/), [Invoices](/guide/invoices/), or [Bills](/guide/bills/)
 -   **Understand the Architecture**: Learn about our [architectural patterns](/arch/)
 -   **Start Contributing**: Follow our [development guide](/guide/dev-setup)
--   **Review the APIs**: Check out the [API documentation](/api/)
+-   **Review the APIs**: Check out the [API documentation](${API_BASE_URL}/scalar)

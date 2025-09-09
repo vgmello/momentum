@@ -1,4 +1,4 @@
-// Copyright (c) ORG_NAME. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
 using System;
 using System.IO;
@@ -25,7 +25,7 @@ try
     Console.WriteLine("═══════════════════════════════");
 
     var portAction = new PortConfigurationAction();
-    var portResult = portAction.ConfigurePorts(projectDir, config, args);
+    var portResult = portAction.ConfigurePorts(projectDir, config);
 
     Console.WriteLine(portResult.ChangedFiles > 0
         ? $"✅ Port configuration completed: {portResult.ChangedFiles}/{portResult.ProcessedFiles} files updated"

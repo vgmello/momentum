@@ -1,7 +1,12 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <AspireAppHostSdkVersion>9.4</AspireAppHostSdkVersion>
+    <AspireVersion>9.4.2</AspireVersion>
+    <MicrosoftExtensionsVersion>9.0.8</MicrosoftExtensionsVersion>
+    <MicrosoftOrleansVersion>9.2.1</MicrosoftOrleansVersion>
+    <OpenTelemetryVersion>1.12.0</OpenTelemetryVersion>
+    <AspireAppHostSdkVersion>$(AspireVersion)</AspireAppHostSdkVersion>
+    <GrpcVersion>[2.67]</GrpcVersion>
     <MomentumVersion>$(TemplateMomentumVersion)</MomentumVersion>
     <!--#if (USE_LOCAL) -->
     <MomentumVersion>$(LocalMomentumVersion)</MomentumVersion>
@@ -11,16 +16,16 @@
     <!--#endif -->
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="Aspire.Azure.Data.Tables" Version="9.4.1" />
-    <PackageVersion Include="Aspire.Azure.Storage.Blobs" Version="9.4.1" />
-    <PackageVersion Include="Aspire.Confluent.Kafka" Version="9.4.1" />
-    <PackageVersion Include="Aspire.Hosting.AppHost" Version="9.4.1" />
-    <PackageVersion Include="Aspire.Hosting.Azure.Storage" Version="9.4.1" />
-    <PackageVersion Include="Aspire.Hosting.Kafka" Version="9.4.1" />
-    <PackageVersion Include="Aspire.Hosting.NodeJS" Version="9.4.1" />
-    <PackageVersion Include="Aspire.Hosting.Orleans" Version="9.4.1" />
-    <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="9.4.1" />
-    <PackageVersion Include="Aspire.Npgsql" Version="9.4.1" />
+    <PackageVersion Include="Aspire.Azure.Data.Tables" Version="$(AspireVersion)" />
+    <PackageVersion Include="Aspire.Azure.Storage.Blobs" Version="$(AspireVersion)" />
+    <PackageVersion Include="Aspire.Confluent.Kafka" Version="$(AspireVersion)" />
+    <PackageVersion Include="Aspire.Hosting.AppHost" Version="$(AspireVersion)" />
+    <PackageVersion Include="Aspire.Hosting.Azure.Storage" Version="$(AspireVersion)" />
+    <PackageVersion Include="Aspire.Hosting.Kafka" Version="$(AspireVersion)" />
+    <PackageVersion Include="Aspire.Hosting.NodeJS" Version="$(AspireVersion)" />
+    <PackageVersion Include="Aspire.Hosting.Orleans" Version="$(AspireVersion)" />
+    <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="$(AspireVersion)" />
+    <PackageVersion Include="Aspire.Npgsql" Version="$(AspireVersion)" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.14.0" />
     <PackageVersion Include="Bogus" Version="35.6.3" />
     <PackageVersion Include="CloudNative.CloudEvents.Kafka" Version="2.8.0" />
@@ -32,11 +37,11 @@
     <PackageVersion Include="FluentValidation" Version="12.0.0" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
     <PackageVersion Include="Google.Protobuf" Version="3.32.0" />
-    <PackageVersion Include="Grpc.AspNetCore" Version="[2.67]" />
-    <PackageVersion Include="Grpc.AspNetCore.Server.Reflection" Version="[2.67]" />
-    <PackageVersion Include="Grpc.AspNetCore.Web" Version="[2.67]" />
-    <PackageVersion Include="Grpc.Net.Client" Version="[2.67]" />
-    <PackageVersion Include="Grpc.Net.Client.Web" Version="[2.67]" />
+    <PackageVersion Include="Grpc.AspNetCore" Version="$(GrpcVersion)" />
+    <PackageVersion Include="Grpc.AspNetCore.Server.Reflection" Version="$(GrpcVersion)" />
+    <PackageVersion Include="Grpc.AspNetCore.Web" Version="$(GrpcVersion)" />
+    <PackageVersion Include="Grpc.Net.Client" Version="$(GrpcVersion)" />
+    <PackageVersion Include="Grpc.Net.Client.Web" Version="$(GrpcVersion)" />
     <PackageVersion Include="Grpc.Tools" Version="[2.68.1]">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -47,8 +52,8 @@
     </PackageVersion>
     <PackageVersion Include="linq2db" Version="5.4.1" />
     <PackageVersion Include="linq2db.AspNet" Version="5.4.1" />
-    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.8" />
-    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="$(MicrosoftExtensionsVersion)" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="4.14.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -65,33 +70,33 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
-    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="9.0.8" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.8" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.CommandLine" Version="9.0.8" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.8" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="9.0.8" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.8" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="$(MicrosoftExtensionsVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="$(MicrosoftExtensionsVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.CommandLine" Version="$(MicrosoftExtensionsVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="$(MicrosoftExtensionsVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftExtensionsVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Diagnostics.Testing" Version="9.8.0" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.8" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.8" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftExtensionsVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="9.8.0" />
     <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="9.4.2" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-    <PackageVersion Include="Microsoft.Orleans.Analyzers" Version="9.2.1">
+    <PackageVersion Include="Microsoft.Orleans.Analyzers" Version="$(MicrosoftOrleansVersion)">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
-    <PackageVersion Include="Microsoft.Orleans.Client" Version="9.2.1" />
-    <PackageVersion Include="Microsoft.Orleans.Clustering.AdoNet" Version="9.2.1" />
-    <PackageVersion Include="Microsoft.Orleans.Clustering.AzureStorage" Version="9.2.1" />
-    <PackageVersion Include="Microsoft.Orleans.Core.Abstractions" Version="9.2.1" />
-    <PackageVersion Include="Microsoft.Orleans.Persistence.AdoNet" Version="9.2.1" />
-    <PackageVersion Include="Microsoft.Orleans.Persistence.AzureStorage" Version="9.2.1" />
-    <PackageVersion Include="Microsoft.Orleans.Reminders.AdoNet" Version="9.2.1" />
-    <PackageVersion Include="Microsoft.Orleans.Reminders.AzureStorage" Version="9.2.1" />
-    <PackageVersion Include="Microsoft.Orleans.Server" Version="9.2.1" />
-    <PackageVersion Include="Microsoft.Orleans.Streaming" Version="9.2.1" />
-    <PackageVersion Include="Microsoft.Orleans.TestingHost" Version="9.2.1" />
+    <PackageVersion Include="Microsoft.Orleans.Client" Version="$(MicrosoftOrleansVersion)" />
+    <PackageVersion Include="Microsoft.Orleans.Clustering.AdoNet" Version="$(MicrosoftOrleansVersion)" />
+    <PackageVersion Include="Microsoft.Orleans.Clustering.AzureStorage" Version="$(MicrosoftOrleansVersion)" />
+    <PackageVersion Include="Microsoft.Orleans.Core.Abstractions" Version="$(MicrosoftOrleansVersion)" />
+    <PackageVersion Include="Microsoft.Orleans.Persistence.AdoNet" Version="$(MicrosoftOrleansVersion)" />
+    <PackageVersion Include="Microsoft.Orleans.Persistence.AzureStorage" Version="$(MicrosoftOrleansVersion)" />
+    <PackageVersion Include="Microsoft.Orleans.Reminders.AdoNet" Version="$(MicrosoftOrleansVersion)" />
+    <PackageVersion Include="Microsoft.Orleans.Reminders.AzureStorage" Version="$(MicrosoftOrleansVersion)" />
+    <PackageVersion Include="Microsoft.Orleans.Server" Version="$(MicrosoftOrleansVersion)" />
+    <PackageVersion Include="Microsoft.Orleans.Streaming" Version="$(MicrosoftOrleansVersion)" />
+    <PackageVersion Include="Microsoft.Orleans.TestingHost" Version="$(MicrosoftOrleansVersion)" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
     <PackageVersion Include="Momentum.Extensions" Version="$(MomentumVersion)" />
     <PackageVersion Include="Momentum.Extensions.Abstractions" Version="$(MomentumVersion)" />
@@ -115,12 +120,12 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
-    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.12.0" />
-    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.12.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.12.0" />
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemetryVersion)" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryVersion)" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="$(OpenTelemetryVersion)" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.GrpcNetClient" Version="1.12.0-beta.1" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.12.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.12.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="$(OpenTelemetryVersion)" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="$(OpenTelemetryVersion)" />
     <PackageVersion Include="OrleansDashboard" Version="8.2.0" />
     <PackageVersion Include="Riok.Mapperly" Version="4.2.1" />
     <PackageVersion Include="Scalar.AspNetCore" Version="2.7.2" />
@@ -134,15 +139,15 @@
     </PackageVersion>
     <PackageVersion Include="Spectre.Console.Cli" Version="0.50" />
     <PackageVersion Include="System.ComponentModel.Annotations" Version="5.0.0" />
-    <PackageVersion Include="System.Net.Http.Json" Version="9.0.8" />
+    <PackageVersion Include="System.Net.Http.Json" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Testcontainers" Version="4.7.0" />
     <PackageVersion Include="Testcontainers.Kafka" Version="4.7.0" />
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.7.0" />
-    <PackageVersion Include="WolverineFx" Version="4.10.1" />
+    <PackageVersion Include="WolverineFx" Version="4.11.0" />
     <PackageVersion Include="WolverineFx.Http" Version="4.9.3" />
     <PackageVersion Include="WolverineFx.Http.FluentValidation" Version="4.9.3" />
-    <PackageVersion Include="WolverineFx.Kafka" Version="4.10.1" />
-    <PackageVersion Include="WolverineFx.Postgresql" Version="4.10.1" />
+    <PackageVersion Include="WolverineFx.Kafka" Version="4.11.0" />
+    <PackageVersion Include="WolverineFx.Postgresql" Version="4.11.0" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

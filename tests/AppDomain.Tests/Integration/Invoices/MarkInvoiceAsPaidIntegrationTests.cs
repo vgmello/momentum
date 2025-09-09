@@ -1,4 +1,4 @@
-// Copyright (c) ORG_NAME. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
 using AppDomain.Invoices.Grpc;
 using AppDomain.Tests.Integration._Internal;
@@ -21,7 +21,7 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
 
         // Arrange - Create an invoice first
         var createRequest = _invoiceFaker
-            .WithAmount(150.75)
+            .WithAmount(150.75m)
             .WithCurrency("USD")
             .Generate();
 
@@ -31,7 +31,7 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
         var markPaidFaker = new MarkInvoiceAsPaidFaker(createdInvoice.InvoiceId);
         var markPaidRequest = markPaidFaker.Generate();
         markPaidRequest.Version = createdInvoice.Version;
-        markPaidRequest.AmountPaid = 150.75;
+        markPaidRequest.AmountPaid = 150.75m;
         markPaidRequest.PaymentDate = Timestamp.FromDateTime(paymentDate);
 
         // Act
@@ -42,7 +42,7 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
         paidInvoice.InvoiceId.ShouldBe(createdInvoice.InvoiceId);
         paidInvoice.Status.ShouldBe("Paid");
         paidInvoice.Name.ShouldBe(createRequest.Name);
-        paidInvoice.Amount.ShouldBe(150.75);
+        ((decimal)paidInvoice.Amount).ShouldBe(150.75m);
 
         // Verify in database
         var dbInvoice = await connection.QuerySingleOrDefaultAsync(
@@ -67,7 +67,7 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
 
         // Arrange - Create an invoice first
         var createRequest = _invoiceFaker
-            .WithAmount(100.00)
+            .WithAmount(100.00m)
             .WithCurrency("USD")
             .Generate();
 
@@ -76,7 +76,7 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
         var markPaidFaker = new MarkInvoiceAsPaidFaker(createdInvoice.InvoiceId);
         var markPaidRequest = markPaidFaker.Generate();
         markPaidRequest.Version = createdInvoice.Version;
-        markPaidRequest.AmountPaid = 100.00;
+        markPaidRequest.AmountPaid = 100m;
         markPaidRequest.PaymentDate = null; // Should use current time
 
         var beforePayment = DateTime.UtcNow;
@@ -106,7 +106,7 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
         var markPaidFaker = new MarkInvoiceAsPaidFaker(Guid.NewGuid().ToString());
         var markPaidRequest = markPaidFaker.Generate();
         markPaidRequest.Version = 1;
-        markPaidRequest.AmountPaid = 100.00;
+        markPaidRequest.AmountPaid = 100m;
 
         // Act & Assert
         var exception = await Should.ThrowAsync<RpcException>(async () =>
@@ -125,7 +125,7 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
 
         // Arrange - Create an invoice first
         var createRequest = _invoiceFaker
-            .WithAmount(100.00)
+            .WithAmount(100.00m)
             .WithCurrency("USD")
             .Generate();
 
@@ -134,7 +134,7 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
         var markPaidFaker = new MarkInvoiceAsPaidFaker(createdInvoice.InvoiceId);
         var markPaidRequest = markPaidFaker.Generate();
         markPaidRequest.Version = createdInvoice.Version;
-        markPaidRequest.AmountPaid = -50.00; // Invalid negative amount
+        markPaidRequest.AmountPaid = -50m; // Invalid negative amount
 
         // Act & Assert
         var exception = await Should.ThrowAsync<RpcException>(async () =>
@@ -155,7 +155,7 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
         var createRequest = new CreateInvoiceRequest
         {
             Name = "Invoice to Pay Twice",
-            Amount = 100.00,
+            Amount = 100m,
             Currency = "USD"
         };
 
@@ -166,7 +166,7 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
         {
             InvoiceId = createdInvoice.InvoiceId,
             Version = createdInvoice.Version,
-            AmountPaid = 100.00
+            AmountPaid = 100m
         };
 
         await _client.MarkInvoiceAsPaidAsync(markPaidRequest, cancellationToken: TestContext.Current.CancellationToken);
@@ -176,7 +176,7 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
         {
             InvoiceId = createdInvoice.InvoiceId,
             Version = createdInvoice.Version, // Using old version should fail
-            AmountPaid = 100.00
+            AmountPaid = 100m
         };
         var exception = await Should.ThrowAsync<RpcException>(async () =>
             await _client.MarkInvoiceAsPaidAsync(secondPayRequest, cancellationToken: TestContext.Current.CancellationToken));

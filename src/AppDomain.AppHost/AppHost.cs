@@ -1,4 +1,4 @@
-// Copyright (c) ORG_NAME. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
 var builder = DistributedApplication.CreateBuilder(args);
 
@@ -15,14 +15,14 @@ var pgsql = builder
         .WithEndpointProxySupport(false)
         .WithImage("dpage/pgadmin4", "latest")
         .WithLifetime(ContainerLifetime.Persistent)
-        .WithEndpointUrl("http","PgAdmin (DB Management)"))
+        .WithEndpointUrl("http", "PgAdmin (DB Management)"))
     .WithLifetime(ContainerLifetime.Persistent);
 
 var database = pgsql.AddDatabase(name: "AppDomainDb", databaseName: "app_domain");
 var serviceBusDb = pgsql.AddDatabase(name: "ServiceBus", databaseName: "service_bus");
 
 #if (USE_LIQUIBASE)
-builder.AddLiquibaseMigrations(pgsql, dbPassword);
+var liquibaseMigrations = builder.AddLiquibaseMigrations(pgsql, dbPassword);
 #endif
 
 #endif
@@ -67,6 +67,9 @@ var appDomainApi = builder
 #endif
 #if (USE_DB)
     .WaitFor(database)
+#if (USE_LIQUIBASE)
+    .WaitFor(liquibaseMigrations)
+#endif
 #endif
     .WithEndpointUrl("http|https", "AppDomain API", "/scalar")
     .WithHttpHealthCheck("/health/internal");
@@ -85,6 +88,9 @@ builder
 #endif
 #if (USE_DB)
     .WaitFor(database)
+#if (USE_LIQUIBASE)
+    .WaitFor(liquibaseMigrations)
+#endif
 #endif
     .WithHttpHealthCheck("/health/internal");
 
@@ -105,6 +111,9 @@ builder
 #endif
 #if (USE_DB)
     .WaitFor(pgsql)
+#if (USE_LIQUIBASE)
+    .WaitFor(liquibaseMigrations)
+#endif
 #endif
     .WithReplicas(3)
     .WithEndpointUrl("http|https", "Dashboard", "/dashboard")
