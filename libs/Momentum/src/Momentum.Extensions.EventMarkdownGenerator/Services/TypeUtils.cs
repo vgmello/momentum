@@ -98,6 +98,50 @@ public static class TypeUtils
     }
 
     /// <summary>
+    /// Gets the full namespace + type name without assembly qualification.
+    /// This is useful for creating clean filenames and identifiers while preserving full type identification.
+    /// </summary>
+    /// <param name="type">The type to get the clean name for</param>
+    /// <returns>Full namespace + type name without assembly info (e.g., "System.Collections.Generic.Dictionary&lt;System.String, System.Object&gt;")</returns>
+    public static string GetCleanTypeName(Type type)
+    {
+        if (type.FullName != null && !type.FullName.Contains("[["))
+        {
+            // Simple case - no assembly qualification
+            return type.FullName;
+        }
+        
+        // For generic types or types with assembly qualification, build the name manually
+        if (type.IsGenericType)
+        {
+            var genericTypeDef = type.GetGenericTypeDefinition();
+            var namespaceName = genericTypeDef.Namespace ?? "";
+            var typeName = genericTypeDef.Name;
+            
+            // Remove the backtick and number for generic types (e.g., Dictionary`2 -> Dictionary)
+            var backtickIndex = typeName.IndexOf('`');
+            if (backtickIndex > 0)
+            {
+                typeName = typeName.Substring(0, backtickIndex);
+            }
+            
+            var genericArgs = type.GetGenericArguments()
+                .Select(GetCleanTypeName)
+                .ToArray();
+            
+            if (genericArgs.Length > 0)
+            {
+                return $"{namespaceName}.{typeName}<{string.Join(", ", genericArgs)}>";
+            }
+            
+            return $"{namespaceName}.{typeName}";
+        }
+        
+        // Non-generic type
+        return $"{type.Namespace}.{type.Name}";
+    }
+
+    /// <summary>
     ///     Gets a friendly display name for a type (e.g., "string" instead of "String").
     ///     Handles nullable types and generics appropriately.
     /// </summary>
