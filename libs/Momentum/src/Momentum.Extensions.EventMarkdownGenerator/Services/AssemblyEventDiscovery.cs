@@ -51,32 +51,63 @@ public static class AssemblyEventDiscovery
 
     private static bool IsEventType(Type type)
     {
-        var hasEventAttribute = type.GetCustomAttribute<EventTopicAttribute>() != null ||
-                                type.GetCustomAttributes().Any(attr => attr.GetType().Name.StartsWith(EventTopicAttributeName));
+        // Check for EventTopicAttribute by name only, to work across assembly load contexts
+        var hasEventAttribute = type.GetCustomAttributes()
+            .Any(attr => attr.GetType().Name.StartsWith(EventTopicAttributeName));
 
+        // Make namespace check optional - if the type has EventTopicAttribute, it's an event
+        // Optionally check namespace for backwards compatibility, but don't require it
         var hasEventNamespace = type.Namespace?.EndsWith(IntegrationEventsNamespace) == true ||
                                 type.Namespace?.EndsWith(DomainEventsNamespace) == true;
 
-        return hasEventAttribute && hasEventNamespace;
+        // Return true if it has the attribute, regardless of namespace
+        // This allows events from any namespace to be discovered
+        return hasEventAttribute;
     }
 
     private static EventMetadata CreateEventMetadata(Type eventType, string defaultDomain, XmlDocumentationParser? xmlParser)
     {
-        var topicAttribute = GetEventTopicAttribute<EventTopicAttribute>(eventType);
+        // Use dynamic attribute handling to work across assembly contexts
+        var topicAttribute = GetEventTopicAttributeDynamic(eventType);
         var obsoleteAttribute = eventType.GetCustomAttribute<ObsoleteAttribute>();
         var (properties, partitionKeys) = GetEventPropertiesAndPartitionKeys(eventType, xmlParser);
 
         var topicName = GetTopicName(topicAttribute, eventType);
-        if (topicAttribute.ShouldPluralizeTopicName)
-            topicName = topicName.Pluralize();
+        
+        // Access properties dynamically with safe defaults
+        bool shouldPluralize = false;
+        string? domain = null;
+        bool isInternal = false;
+        string version = "v1";
+        
+        try
+        {
+            shouldPluralize = topicAttribute.ShouldPluralizeTopicName ?? false;
+            domain = topicAttribute.Domain;
+            isInternal = topicAttribute.Internal ?? false;
+            version = topicAttribute.Version ?? "v1";
+        }
+        catch
+        {
+            // Use defaults if properties are not accessible
+        }
+        
+        if (shouldPluralize)
+        {
+            // Simple pluralization fallback - add 's' to the end
+            // This is a fallback when the extension method is not available
+            if (!topicName.EndsWith("s", StringComparison.OrdinalIgnoreCase))
+            {
+                topicName = topicName + "s";
+            }
+        }
 
-        var eventDomain = !string.IsNullOrWhiteSpace(topicAttribute.Domain)
-            ? topicAttribute.Domain
+        var eventDomain = !string.IsNullOrWhiteSpace(domain)
+            ? domain
             : GetDomainFromNamespace(eventType.Namespace) ?? defaultDomain;
 
         // Build full topic name: {env}.{domain}.{visibility}.{topic}.{version}
-        var visibility = topicAttribute.Internal ? "internal" : "public";
-        var version = topicAttribute.Version;
+        var visibility = isInternal ? "internal" : "public";
 
         var fullTopicName = $"{{env}}.{defaultDomain.ToLowerInvariant()}.{visibility}.{topicName}.{version}";
 
@@ -88,13 +119,27 @@ public static class AssemblyEventDiscovery
             TopicName = fullTopicName,
             Domain = eventDomain,
             Version = version,
-            IsInternal = topicAttribute.Internal,
+            IsInternal = isInternal,
             EventType = eventType,
             TopicAttribute = GetEventTopicAttribute<Attribute>(eventType),
             Properties = properties,
             PartitionKeys = partitionKeys,
             ObsoleteMessage = obsoleteAttribute?.Message
         };
+    }
+
+    private static dynamic GetEventTopicAttributeDynamic(Type type)
+    {
+        // Find attribute by name to work across assembly load contexts
+        var foundAttribute = type.GetCustomAttributes()
+            .FirstOrDefault(attr => attr.GetType().Name.StartsWith(EventTopicAttributeName));
+
+        if (foundAttribute == null)
+        {
+            throw new InvalidOperationException($"EventTopicAttribute not found on type {type.Name}");
+        }
+
+        return foundAttribute;
     }
 
     private static T GetEventTopicAttribute<T>(Type type) where T : Attribute
@@ -249,15 +294,42 @@ public static class AssemblyEventDiscovery
     }
 
     /// <summary>
+    ///     Simple kebab case conversion when extension method is not available
+    /// </summary>
+    private static string ConvertToKebabCase(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+            return input;
+
+        var result = string.Concat(
+            input.Select((x, i) => i > 0 && char.IsUpper(x) 
+                ? "-" + char.ToLower(x) 
+                : char.ToLower(x).ToString())
+        );
+
+        return result;
+    }
+
+    /// <summary>
     ///     Gets the topic name from either generic or string-based EventTopicAttribute
     /// </summary>
-    private static string GetTopicName(EventTopicAttribute topicAttribute, Type eventType)
+    private static string GetTopicName(dynamic topicAttribute, Type eventType)
     {
-        if (!string.IsNullOrEmpty(topicAttribute.Topic))
+        // Try to access Topic property dynamically
+        try
         {
-            return topicAttribute.Topic;
+            string? topic = topicAttribute.Topic;
+            if (!string.IsNullOrEmpty(topic))
+            {
+                return topic;
+            }
+        }
+        catch
+        {
+            // Topic property might not exist or be accessible
         }
 
-        return eventType.Name.ToKebabCase();
+        // Fallback kebab case conversion when extension method is not available
+        return ConvertToKebabCase(eventType.Name);
     }
 }

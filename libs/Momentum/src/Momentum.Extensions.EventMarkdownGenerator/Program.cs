@@ -7,6 +7,7 @@ var app = new CommandApp();
 app.Configure(config =>
 {
     config.SetApplicationName("events-docsgen");
+    config.UseAssemblyInformationalVersion();
 
     config.AddCommand<GenerateCommand>("generate")
         .WithDescription("Generate markdown documentation from event assemblies");

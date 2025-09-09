@@ -1,0 +1,25 @@
+FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine
+
+ENV PNPM_HOME="/pnpm"
+ENV PATH="${PNPM_HOME}:${PATH}:/root/.dotnet/tools"
+
+# Install node and pnpm
+RUN apk add --no-cache git nodejs && \
+    wget -qO- https://get.pnpm.io/install.sh | ENV="$HOME/.shrc" SHELL="$(which sh)" sh - && \
+    dotnet tool install -g docfx
+
+# Copy the locally built tool package
+COPY *.nupkg /tmp/
+
+# Install the local tool package (use wildcard to match any version)
+RUN dotnet tool install -g Momentum.Extensions.EventMarkdownGenerator --add-source /tmp/ --prerelease && \
+    events-docsgen --version
+
+# Install dependencies into the isolated /build directory.
+# This directory will NOT be affected by the volume mount.
+WORKDIR /app/docs
+COPY docs/package.json docs/pnpm-lock.yaml ./
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+
+WORKDIR /app/docs
+CMD ["pnpm", "dev", "--host"]
