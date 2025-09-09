@@ -25,4 +25,3 @@ public partial class DecimalValue
         return new DecimalValue(decimal.ToInt64(units), nanos);
     }
 }
-}

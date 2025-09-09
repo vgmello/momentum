@@ -14,13 +14,13 @@ public class OrleansExtensionsTests
             Args = [],
             EnvironmentName = "Test"
         });
-        
+
         // Add only the configuration we need for testing
         builder.Configuration.AddInMemoryCollection(config ?? new Dictionary<string, string?>
         {
             ["Orleans:UseLocalhostClustering"] = "true"
         });
-        
+
         return builder;
     }
 

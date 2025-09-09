@@ -38,8 +38,10 @@ public class CreateInvoiceValidator : AbstractValidator<CreateInvoiceCommand>
         RuleFor(c => c.Name).MaximumLength(100).WithMessage("Invoice name cannot exceed 100 characters");
         RuleFor(c => c.Amount).GreaterThan(0).WithMessage("Amount must be greater than zero");
         RuleFor(c => c.Amount).LessThanOrEqualTo(1_000_000).WithMessage("Amount cannot exceed 1,000,000");
-        RuleFor(c => c.Currency).Length(3).WithMessage("Currency must be a 3-character ISO code").When(c => !string.IsNullOrWhiteSpace(c.Currency));
-        RuleFor(c => c.DueDate).GreaterThanOrEqualTo(DateTime.Today).WithMessage("Due date cannot be in the past").When(c => c.DueDate.HasValue);
+        RuleFor(c => c.Currency).Length(3).WithMessage("Currency must be a 3-character ISO code")
+            .When(c => !string.IsNullOrWhiteSpace(c.Currency));
+        RuleFor(c => c.DueDate).GreaterThanOrEqualTo(DateTime.Today).WithMessage("Due date cannot be in the past")
+            .When(c => c.DueDate.HasValue);
     }
 }
 

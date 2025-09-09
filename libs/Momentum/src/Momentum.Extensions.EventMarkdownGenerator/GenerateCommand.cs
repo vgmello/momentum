@@ -137,9 +137,10 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
 
         foreach (var assemblyPath in options.AssemblyPaths)
         {
+            IsolatedAssemblyLoadContext? loadContext = null;
             try
             {
-                var assembly = LoadAssemblyWithDependencyResolution(assemblyPath);
+                var assembly = LoadAssemblyWithDependencyResolution(assemblyPath, out loadContext);
                 var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser);
 
                 foreach (var eventMetadata in events)
@@ -159,6 +160,10 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
             catch (Exception ex)
             {
                 AnsiConsole.MarkupLine($"[yellow]Warning:[/] Failed to process assembly {assemblyPath}: {ex.Message}");
+            }
+            finally
+            {
+                loadContext?.Dispose();
             }
         }
 
@@ -234,7 +239,6 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
 
     private static string GetExpectedXmlDocumentationPath(string assemblyPath)
     {
-        // Replace .dll/.exe with .xml in the same directory
         var directory = Path.GetDirectoryName(assemblyPath) ?? string.Empty;
         var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(assemblyPath);
 
@@ -242,10 +246,9 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
     }
 
 
-    private static Assembly LoadAssemblyWithDependencyResolution(string assemblyPath)
+    private static Assembly LoadAssemblyWithDependencyResolution(string assemblyPath, out IsolatedAssemblyLoadContext loadContext)
     {
-        // Create an isolated context for loading the assembly and its dependencies
-        var loadContext = new IsolatedAssemblyLoadContext(assemblyPath);
+        loadContext = new IsolatedAssemblyLoadContext(assemblyPath);
         return loadContext.LoadFromAssemblyPath(assemblyPath);
     }
 
@@ -253,10 +256,11 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
     /// Isolated assembly load context to prevent version conflicts between the host app
     /// and the assemblies being analyzed for documentation generation.
     /// </summary>
-    private sealed class IsolatedAssemblyLoadContext : AssemblyLoadContext
+    private sealed class IsolatedAssemblyLoadContext : AssemblyLoadContext, IDisposable
     {
         private readonly string _assemblyDirectory;
         private readonly AssemblyDependencyResolver _resolver;
+        private bool _disposed;
 
         public IsolatedAssemblyLoadContext(string assemblyPath) : base(isCollectible: true)
         {
@@ -266,21 +270,18 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
 
         protected override Assembly? Load(AssemblyName assemblyName)
         {
-            // First try to resolve using the standard resolver (handles runtime assemblies)
             var assemblyPath = _resolver.ResolveAssemblyToPath(assemblyName);
             if (assemblyPath != null)
             {
                 return LoadFromAssemblyPath(assemblyPath);
             }
 
-            // Then try to load from the same directory as the main assembly
             var localPath = Path.Combine(_assemblyDirectory, assemblyName.Name + ".dll");
             if (File.Exists(localPath))
             {
                 return LoadFromAssemblyPath(localPath);
             }
 
-            // Let the default context handle it (for system assemblies)
             return null;
         }
 
@@ -293,6 +294,15 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
             }
 
             return IntPtr.Zero;
+        }
+
+        public void Dispose()
+        {
+            if (!_disposed)
+            {
+                Unload();
+                _disposed = true;
+            }
         }
     }
 }
