@@ -13,13 +13,13 @@
         <PropertyGroup>
             <LocalVersionSuffix>$([System.DateTime]::UtcNow.ToString("yyMMddHHmmss"))</LocalVersionSuffix>
             <LocalVersion>$(BaseVersion)-pre.$(LocalVersionSuffix)</LocalVersion>
-            <LocalFeedAbsolutePath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory).local/nuget'))</LocalFeedAbsolutePath>
+            <LocalFeedAbsolutePath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../.local/nuget'))</LocalFeedAbsolutePath>
             <PackageVersion>$(LocalVersion)</PackageVersion>
             <Version>$(LocalVersion)</Version>
         </PropertyGroup>
 
         <Message Text="Generating local version: $(LocalVersion)" Importance="high"/>
-        <WriteLinesToFile File="$(MSBuildThisFileDirectory)../../local-mmt-version.txt" Lines="$(LocalVersion)" Overwrite="true"/>
-        <WriteLinesToFile File="$(MSBuildThisFileDirectory)../../local-feed-path.txt" Lines="$(LocalFeedAbsolutePath)" Overwrite="true"/>
+        <WriteLinesToFile File="$(MSBuildThisFileDirectory)../../../../local-mmt-version.txt" Lines="$(LocalVersion)" Overwrite="true"/>
+        <WriteLinesToFile File="$(MSBuildThisFileDirectory)../../../../local-feed-path.txt" Lines="$(LocalFeedAbsolutePath)" Overwrite="true"/>
     </Target>
 </Project>
