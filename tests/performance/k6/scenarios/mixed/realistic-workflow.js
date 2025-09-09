@@ -61,8 +61,7 @@ export default function (data) {
             break;
     }
 
-    // Random think time between actions (1-3 seconds)
-    sleep(1 + Math.random() * 2);
+    sleep(1);
 }
 
 // Power user workflow

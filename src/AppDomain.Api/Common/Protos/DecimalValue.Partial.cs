@@ -18,9 +18,11 @@ public partial class DecimalValue
 
     public static implicit operator DecimalValue(decimal value)
     {
-        var units = decimal.ToInt64(value);
-        var nanos = decimal.ToInt32((value - units) * NanoFactor);
+        var units = decimal.Truncate(value);
+        var nanosDecimal = (value - units) * NanoFactor;
+        var nanos = decimal.ToInt32(decimal.Truncate(nanosDecimal));
 
-        return new DecimalValue(units, nanos);
+        return new DecimalValue(decimal.ToInt64(units), nanos);
     }
+}
 }

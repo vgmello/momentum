@@ -35,7 +35,163 @@ export const options = {
     },
 };
 
-// Track spike phases per VU is handled inside the default function below.
+// Global variable to track spike phases per VU
+let __VU_PHASE;
+
+// Helper functions to reduce cognitive complexity
+function determinePhase(vuCount) {
+    if (vuCount <= 10) {
+        return "baseline";
+    } else if (vuCount <= 200) {
+        return "spike1";
+    } else {
+        return "spike2";
+    }
+}
+
+function handlePhaseTransition(currentPhase, newPhase, phaseStartTime, vuCount, data) {
+    const transitionTime = Date.now() - phaseStartTime;
+    console.log(`\n📈 Phase transition: ${currentPhase} → ${newPhase}`);
+    console.log(`   Transition time: ${transitionTime}ms`);
+    console.log(`   Active VUs: ${vuCount}`);
+
+    if (currentPhase.includes("spike")) {
+        recoveryTime.add(transitionTime);
+    }
+
+    if (newPhase.includes("spike")) {
+        data.spikeTimes.push(new Date().toISOString());
+    }
+}
+
+function executeCashierOperations(tenantId, currentPhase) {
+    let cashierId;
+    let cashierVersion;
+
+    // Create cashier - measure spike impact
+    const cashierData = generateCashierData();
+    const createStartTime = new Date().getTime();
+
+    const createResponse = http.post(endpoints.cashiers.create, JSON.stringify(cashierData), {
+        headers: headers.withTenant(tenantId),
+        tags: {
+            operation: "create_cashier_spike",
+            phase: currentPhase,
+        },
+        timeout: "15s", // Longer timeout for spike conditions
+    });
+
+    const createDuration = new Date().getTime() - createStartTime;
+    spikeResponseTime.add(createDuration);
+
+    // Track spike-specific metrics
+    if (currentPhase.includes("spike")) {
+        handleSpikeMetrics(createResponse, createDuration, currentPhase);
+        if (createResponse.status === 201) {
+            const cashier = parseResponse(createResponse);
+            cashierId = cashier.cashierId;
+            cashierVersion = cashier.version;
+        }
+    } else {
+        handleBaselineMetrics(createResponse);
+        if (createResponse.status === 201) {
+            const cashier = parseResponse(createResponse);
+            cashierId = cashier.cashierId;
+            cashierVersion = cashier.version;
+        }
+    }
+
+    return { cashierId, cashierVersion };
+}
+
+function handleSpikeMetrics(createResponse, createDuration, currentPhase) {
+    if (createResponse.status === 201) {
+        spikeErrorRate.add(0);
+        customMetrics.cashierCreationRate.add(1);
+
+        // Log performance during spike
+        if (createDuration > 1000) {
+            console.log(`⚠️ SPIKE IMPACT: ${createDuration}ms (VU: ${__VU}, Phase: ${currentPhase})`);
+        }
+    } else {
+        spikeErrorRate.add(1);
+        customMetrics.cashierCreationRate.add(0);
+
+        if (createResponse.status === 503) {
+            console.error(`🔴 SERVICE OVERLOAD during ${currentPhase} (VU: ${__VU})`);
+        } else if (createResponse.status === 429) {
+            console.error(`🔴 RATE LIMITED during ${currentPhase} (VU: ${__VU})`);
+        } else if (createResponse.status === 0) {
+            console.error(`🔴 TIMEOUT during ${currentPhase} (VU: ${__VU})`);
+        }
+    }
+}
+
+function handleBaselineMetrics(createResponse) {
+    const success = checkResponse(createResponse, 201, "Create cashier (baseline)");
+    customMetrics.cashierCreationRate.add(success ? 1 : 0);
+}
+
+function performAdditionalOperations(testResult, tenantId, currentPhase) {
+    const { cashierId, cashierVersion } = testResult;
+
+    // Read operations to test cache/connection pool behavior
+    const getResponse = http.get(endpoints.cashiers.get(cashierId), {
+        headers: headers.withTenant(tenantId),
+        tags: {
+            operation: "get_cashier_spike",
+            phase: currentPhase,
+        },
+        timeout: "10s",
+    });
+
+    if (currentPhase.includes("spike") && getResponse.status !== 200) {
+        console.error(`Read failed during spike: ${getResponse.status}`);
+    }
+
+    // Update operation during spike
+    if (cashierVersion && Math.random() < 0.5) {
+        const updateData = {
+            name: `Spike Test ${generateCashierData().name}`,
+            email: generateCashierData().email,
+            version: cashierVersion,
+        };
+
+        http.put(endpoints.cashiers.update(cashierId), JSON.stringify(updateData), {
+            headers: headers.withTenant(tenantId),
+            tags: {
+                operation: "update_cashier_spike",
+                phase: currentPhase,
+            },
+            timeout: "10s",
+        });
+    }
+
+    // Clean up
+    if (Math.random() < 0.3) {
+        http.del(endpoints.cashiers.delete(cashierId), null, {
+            headers: headers.withTenant(tenantId),
+            tags: {
+                operation: "delete_cashier_spike",
+                phase: currentPhase,
+            },
+            timeout: "5s",
+        });
+    }
+}
+
+function performListOperations(tenantId, currentPhase) {
+    if (Math.random() < 0.2) {
+        http.get(`${endpoints.cashiers.list}?pageSize=50`, {
+            headers: headers.withTenant(tenantId),
+            tags: {
+                operation: "list_cashiers_spike",
+                phase: currentPhase,
+            },
+            timeout: "10s",
+        });
+    }
+}
 
 // Test setup
 export function setup() {
@@ -64,162 +220,36 @@ export function setup() {
 export default function (data) {
     const tenantId = `spike_tenant_${__VU}`;
 
-    // Per-VU phase tracking
+    // VU-scoped phase tracking using function-scoped variable
     if (!__VU_PHASE) {
-        // Use globalThis to store per-VU state
-        globalThis.__VU_PHASE = { currentPhase: "baseline", phaseStartTime: Date.now() };
+        __VU_PHASE = { currentPhase: "baseline", phaseStartTime: Date.now() };
     }
-    let { currentPhase, phaseStartTime } = globalThis.__VU_PHASE;
+    let { currentPhase, phaseStartTime } = __VU_PHASE;
 
     // Determine current phase based on VU count
     const vuCount = __VU;
-    let newPhase = currentPhase;
-
-    if (vuCount <= 10) {
-        newPhase = "baseline";
-    } else if (vuCount <= 200) {
-        newPhase = "spike1";
-    } else {
-        newPhase = "spike2";
-    }
+    const newPhase = determinePhase(vuCount);
 
     // Log phase transitions
     if (newPhase !== currentPhase) {
-        const transitionTime = Date.now() - phaseStartTime;
-        console.log(`\n📈 Phase transition: ${currentPhase} → ${newPhase}`);
-        console.log(`   Transition time: ${transitionTime}ms`);
-        console.log(`   Active VUs: ${vuCount}`);
+        handlePhaseTransition(currentPhase, newPhase, phaseStartTime, vuCount, data);
 
-        if (currentPhase.includes("spike")) {
-            recoveryTime.add(transitionTime);
-        }
-
-        // Update per-VU phase state
-        globalThis.__VU_PHASE.currentPhase = newPhase;
-        globalThis.__VU_PHASE.phaseStartTime = Date.now();
+        // Update VU-scoped phase state
+        __VU_PHASE.currentPhase = newPhase;
+        __VU_PHASE.phaseStartTime = Date.now();
         currentPhase = newPhase;
-        phaseStartTime = globalThis.__VU_PHASE.phaseStartTime;
-
-        if (newPhase.includes("spike")) {
-            data.spikeTimes.push(new Date().toISOString());
-        }
     }
 
     group("Cashier Spike Operations", () => {
-        let cashierId;
-        let cashierVersion;
+        const testResult = executeCashierOperations(tenantId, currentPhase);
 
-        // Create cashier - measure spike impact
-        const cashierData = generateCashierData();
-        const createStartTime = new Date().getTime();
-
-        const createResponse = http.post(endpoints.cashiers.create, JSON.stringify(cashierData), {
-            headers: headers.withTenant(tenantId),
-            tags: {
-                operation: "create_cashier_spike",
-                phase: currentPhase,
-            },
-            timeout: "15s", // Longer timeout for spike conditions
-        });
-
-        const createDuration = new Date().getTime() - createStartTime;
-        spikeResponseTime.add(createDuration);
-
-        // Track spike-specific metrics
-        if (currentPhase.includes("spike")) {
-            if (createResponse.status === 201) {
-                spikeErrorRate.add(0);
-                customMetrics.cashierCreationRate.add(1);
-
-                const cashier = parseResponse(createResponse);
-                cashierId = cashier.cashierId;
-                cashierVersion = cashier.version;
-
-                // Log performance during spike
-                if (createDuration > 1000) {
-                    console.log(`⚠️ SPIKE IMPACT: ${createDuration}ms (VU: ${__VU}, Phase: ${currentPhase})`);
-                }
-            } else {
-                spikeErrorRate.add(1);
-                customMetrics.cashierCreationRate.add(0);
-
-                if (createResponse.status === 503) {
-                    console.error(`🔴 SERVICE OVERLOAD during ${currentPhase} (VU: ${__VU})`);
-                } else if (createResponse.status === 429) {
-                    console.error(`🔴 RATE LIMITED during ${currentPhase} (VU: ${__VU})`);
-                } else if (createResponse.status === 0) {
-                    console.error(`🔴 TIMEOUT during ${currentPhase} (VU: ${__VU})`);
-                }
-            }
-        } else {
-            // Normal phase metrics
-            const success = checkResponse(createResponse, 201, "Create cashier (baseline)");
-            customMetrics.cashierCreationRate.add(success ? 1 : 0);
-
-            if (success) {
-                const cashier = parseResponse(createResponse);
-                cashierId = cashier.cashierId;
-                cashierVersion = cashier.version;
-            }
-        }
-
-        // Read operations to test cache/connection pool behavior
-        if (cashierId) {
-            const getResponse = http.get(endpoints.cashiers.get(cashierId), {
-                headers: headers.withTenant(tenantId),
-                tags: {
-                    operation: "get_cashier_spike",
-                    phase: currentPhase,
-                },
-                timeout: "10s",
-            });
-
-            if (currentPhase.includes("spike") && getResponse.status !== 200) {
-                console.error(`Read failed during spike: ${getResponse.status}`);
-            }
-
-            // Update operation during spike
-            if (cashierVersion && Math.random() < 0.5) {
-                const updateData = {
-                    name: `Spike Test ${generateCashierData().name}`,
-                    email: generateCashierData().email,
-                    version: cashierVersion,
-                };
-
-                http.put(endpoints.cashiers.update(cashierId), JSON.stringify(updateData), {
-                    headers: headers.withTenant(tenantId),
-                    tags: {
-                        operation: "update_cashier_spike",
-                        phase: currentPhase,
-                    },
-                    timeout: "10s",
-                });
-            }
-
-            // Clean up
-            if (Math.random() < 0.3) {
-                http.del(endpoints.cashiers.delete(cashierId), null, {
-                    headers: headers.withTenant(tenantId),
-                    tags: {
-                        operation: "delete_cashier_spike",
-                        phase: currentPhase,
-                    },
-                    timeout: "5s",
-                });
-            }
+        // Additional operations based on test result
+        if (testResult.cashierId) {
+            performAdditionalOperations(testResult, tenantId, currentPhase);
         }
 
         // List operations to test query performance under spike
-        if (Math.random() < 0.2) {
-            http.get(`${endpoints.cashiers.list}?pageSize=50`, {
-                headers: headers.withTenant(tenantId),
-                tags: {
-                    operation: "list_cashiers_spike",
-                    phase: currentPhase,
-                },
-                timeout: "10s",
-            });
-        }
+        performListOperations(tenantId, currentPhase);
     });
 
     // Variable sleep based on phase

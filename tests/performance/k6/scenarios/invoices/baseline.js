@@ -200,7 +200,18 @@ export default function (data) {
 export function teardown(data) {
     // Clean up test cashier if created
     if (data.testCashierId) {
-        http.del(endpoints.cashiers.delete(data.testCashierId), null, { headers: headers.withTenant("setup_tenant") });
+        try {
+            const delResponse = http.del(endpoints.cashiers.delete(data.testCashierId), null, {
+                headers: headers.withTenant("setup_tenant"),
+            });
+            if (delResponse.status !== 200 && delResponse.status !== 204) {
+                console.error(`Failed to delete test cashier (ID: ${data.testCashierId}). Status: ${delResponse.status}`);
+            } else {
+                console.log(`Successfully deleted test cashier (ID: ${data.testCashierId}).`);
+            }
+        } catch (err) {
+            console.error(`Error during cashier cleanup: ${err}`);
+        }
     }
 
     logTestSummary("Invoices Baseline Test", {
