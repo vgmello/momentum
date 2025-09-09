@@ -1,4 +1,4 @@
-// Copyright (c) ORG_NAME. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;

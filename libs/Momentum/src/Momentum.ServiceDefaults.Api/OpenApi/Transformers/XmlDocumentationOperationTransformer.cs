@@ -86,7 +86,8 @@ public class XmlDocumentationOperationTransformer(
         }
     }
 
-    private static void EnrichParameterWithReflectionInfo(OpenApiParameter parameter, Dictionary<string, ParameterInfo> parametersByName, XmlDocumentationInfo xmlDocs)
+    private static void EnrichParameterWithReflectionInfo(OpenApiParameter parameter, Dictionary<string, ParameterInfo> parametersByName,
+        XmlDocumentationInfo xmlDocs)
     {
         if (!parametersByName.TryGetValue(parameter.Name, out var paramInfo))
             return;
@@ -109,6 +110,7 @@ public class XmlDocumentationOperationTransformer(
             return;
 
         var defaultValue = paramInfo.DefaultValue?.ToString();
+
         if (string.IsNullOrEmpty(defaultValue))
             return;
 

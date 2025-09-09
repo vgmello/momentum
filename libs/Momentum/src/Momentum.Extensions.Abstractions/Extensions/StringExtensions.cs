@@ -40,9 +40,7 @@ public static class StringExtensions
     public static string ToLowerCaseWithSeparator(this string input, char separator)
     {
         if (string.IsNullOrEmpty(input))
-        {
             return input;
-        }
 
         var inputSpan = input.AsSpan();
         var needsChange = false;
@@ -63,38 +61,38 @@ public static class StringExtensions
         }
 
         if (!needsChange)
-        {
             return input;
-        }
 
         var state = (Source: input, Separator: separator);
 
         // Second Pass: Build the new string
-        return string.Create(inputSpan.Length + separatorCount, state, static (destinationSpan, state) =>
+        return string.Create(inputSpan.Length + separatorCount, state, BuildLowerCaseString);
+    }
+
+    private static void BuildLowerCaseString(Span<char> destinationSpan, (string Source, char Separator) state)
+    {
+        var sourceSpan = state.Source.AsSpan();
+        var separatorChar = state.Separator;
+        var writeIndex = 0;
+
+        for (var readIndex = 0; readIndex < sourceSpan.Length; readIndex++)
         {
-            var sourceSpan = state.Source.AsSpan();
-            var separatorChar = state.Separator;
-            var writeIndex = 0;
+            var currentChar = sourceSpan[readIndex];
 
-            for (var readIndex = 0; readIndex < sourceSpan.Length; readIndex++)
+            if (char.IsUpper(currentChar))
             {
-                var currentChar = sourceSpan[readIndex];
-
-                if (char.IsUpper(currentChar))
+                if (readIndex > 0 && IsWordBoundary(sourceSpan, readIndex))
                 {
-                    if (readIndex > 0 && IsWordBoundary(sourceSpan, readIndex))
-                    {
-                        destinationSpan[writeIndex++] = separatorChar;
-                    }
+                    destinationSpan[writeIndex++] = separatorChar;
+                }
 
-                    destinationSpan[writeIndex++] = char.ToLowerInvariant(currentChar);
-                }
-                else
-                {
-                    destinationSpan[writeIndex++] = currentChar;
-                }
+                destinationSpan[writeIndex++] = char.ToLowerInvariant(currentChar);
             }
-        });
+            else
+            {
+                destinationSpan[writeIndex++] = currentChar;
+            }
+        }
     }
 
     private static bool IsWordBoundary(ReadOnlySpan<char> source, int currentIndex)
@@ -103,15 +101,11 @@ public static class StringExtensions
 
         // Boundary 1 & 2: Lowercase or digit followed by uppercase.
         if (char.IsLower(prevChar) || char.IsDigit(prevChar))
-        {
             return true;
-        }
 
         // Boundary 3: An acronym followed by a regular word (e.g., "APIName").
         if (char.IsUpper(prevChar) && currentIndex + 1 < source.Length && char.IsLower(source[currentIndex + 1]))
-        {
             return true;
-        }
 
         return false;
     }

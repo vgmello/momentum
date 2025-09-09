@@ -1,4 +1,4 @@
-// Copyright (c) ORG_NAME. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
 using AppDomain.Invoices.Grpc;
 using AppDomain.Tests.Integration._Internal;
@@ -21,7 +21,7 @@ public class CreateInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
 
         // Arrange
         var createRequest = _invoiceFaker
-            .WithAmount(100.50)
+            .WithAmount(100.50m)
             .WithCurrency("USD")
             .Generate();
 
@@ -31,7 +31,7 @@ public class CreateInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
         // Assert
         createdInvoice.ShouldNotBeNull();
         createdInvoice.Name.ShouldBe(createRequest.Name);
-        createdInvoice.Amount.ShouldBe(100.50);
+        ((decimal)createdInvoice.Amount).ShouldBe(100.50m);
         createdInvoice.Currency.ShouldBe("USD");
         createdInvoice.Status.ShouldBe("Draft");
         createdInvoice.InvoiceId.ShouldNotBeNullOrEmpty();
@@ -76,7 +76,7 @@ public class CreateInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
         // Arrange
         var createRequest = _invoiceFaker
             .WithCashier(cashierId.ToString())
-            .WithAmount(250.75)
+            .WithAmount(250.75m)
             .WithCurrency("EUR")
             .Generate();
 
@@ -102,7 +102,7 @@ public class CreateInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
         // Arrange
         var createRequest = _invoiceFaker.Generate();
         createRequest.Name = ""; // Invalid empty name
-        createRequest.Amount = -10; // Invalid negative amount
+        createRequest.Amount = -10m; // Invalid negative amount
 
         // Act & Assert
         var exception = await Should.ThrowAsync<RpcException>(async () =>
@@ -122,7 +122,7 @@ public class CreateInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
 
         // Arrange
         var createRequest = _invoiceFaker
-            .WithAmount(50.00)
+            .WithAmount(50.00m)
             .WithoutDueDate()
             .Generate();
         createRequest.Currency = string.Empty; // Clear currency to test defaults
@@ -133,7 +133,7 @@ public class CreateInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
 
         // Assert
         createdInvoice.Name.ShouldBe(createRequest.Name);
-        createdInvoice.Amount.ShouldBe(50.00);
+        ((decimal)createdInvoice.Amount).ShouldBe(50.00m);
         createdInvoice.Currency.ShouldBeNullOrEmpty();
         createdInvoice.Status.ShouldBe("Draft");
         createdInvoice.CashierId.ShouldBeNullOrEmpty();

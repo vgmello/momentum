@@ -12,7 +12,7 @@
     "docs:preview": "vitepress preview",
     "docs:dotnet": "tsx .vitepress/scripts/docs-dotnet.ts",
     "docs:adr": "tsx .vitepress/scripts/adrlogs-table-gen.ts",
-    "docs:events": "tsx .vitepress/scripts/generate-events-docs.ts \"../src/AppDomain.BackOffice/bin/Debug/net9.0/AppDomain.BackOffice.dll,../src/AppDomain/bin/Debug/net9.0/AppDomain.dll\""
+    "docs:events": "tsx .vitepress/scripts/generate-events-docs.ts \"../src/AppDomain.BackOffice/bin/**/**/AppDomain.*.dll,../src/AppDomain/bin/**/**/AppDomain.dll\""
   },
   "dependencies": {
     "glob": "^11.0.3",

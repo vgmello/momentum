@@ -1,4 +1,4 @@
-// Copyright (c) ORG_NAME. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
 using AppDomain.Invoices.Contracts.DomainEvents;
 using AppDomain.Invoices.Contracts.IntegrationEvents;
@@ -32,12 +32,16 @@ public class CreateInvoiceValidator : AbstractValidator<CreateInvoiceCommand>
 {
     public CreateInvoiceValidator()
     {
-        RuleFor(c => c.TenantId).NotEmpty();
-        RuleFor(c => c.Name).NotEmpty();
-        RuleFor(c => c.Name).MinimumLength(2);
-        RuleFor(c => c.Name).MaximumLength(100);
-        RuleFor(c => c.Amount).GreaterThan(0);
-        RuleFor(c => c.Currency).MaximumLength(3).When(c => !string.IsNullOrEmpty(c.Currency));
+        RuleFor(c => c.TenantId).NotEmpty().WithMessage("Tenant ID is required");
+        RuleFor(c => c.Name).NotEmpty().WithMessage("Invoice name is required");
+        RuleFor(c => c.Name).MinimumLength(2).WithMessage("Invoice name must be at least 2 characters");
+        RuleFor(c => c.Name).MaximumLength(100).WithMessage("Invoice name cannot exceed 100 characters");
+        RuleFor(c => c.Amount).GreaterThan(0).WithMessage("Amount must be greater than zero");
+        RuleFor(c => c.Amount).LessThanOrEqualTo(1_000_000).WithMessage("Amount cannot exceed 1,000,000");
+        RuleFor(c => c.Currency).Length(3).WithMessage("Currency must be a 3-character ISO code")
+            .When(c => !string.IsNullOrWhiteSpace(c.Currency));
+        RuleFor(c => c.DueDate).GreaterThanOrEqualTo(DateTime.Today).WithMessage("Due date cannot be in the past")
+            .When(c => c.DueDate.HasValue);
     }
 }
 

@@ -5,7 +5,7 @@
 | Event Name                                 | Description                                                                 | Status |
 | ------------------------------------------ | --------------------------------------------------------------------------- | ------ |
 <!--#if (INCLUDE_SAMPLE) -->
-| [InvoiceGenerated](./invoice-generated.md) | Internal event triggered when an invoice is generated for domain processing | Active |
+| [InvoiceGenerated](./AppDomain.Invoices.Contracts.DomainEvents.InvoiceGenerated.md) | Internal event triggered when an invoice is generated for domain processing | Active |
 <!--#endif -->
 
 <!-- prettier-ignore-end -->

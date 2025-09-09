@@ -1,4 +1,4 @@
-// Copyright (c) ORG_NAME. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
 using AppDomain.Cashiers.Contracts.IntegrationEvents;
 
@@ -19,7 +19,11 @@ public static class CashierCreatedHandler
     /// <returns>A completed task.</returns>
     public static Task Handle(CashierCreated @event, ILogger logger, IMessageBus messaging, CancellationToken cancellationToken)
     {
-        logger.LogDebug("Nice !!, It works. CashierCreated received by the backoffice {@Cashier}", @event.Cashier);
+        logger.LogInformation("Cashier created event received for tenant {TenantId}, cashier {CashierId}",
+            @event.TenantId, @event.Cashier.CashierId);
+
+        // TODO: Add business logic for processing cashier creation
+        // Examples: Update read models, send notifications, sync with external systems
 
         return Task.CompletedTask;
     }

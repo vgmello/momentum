@@ -97,7 +97,7 @@ public static class WolverineSetupExtensions
             opts.ConfigureAppHandlers(opts.ApplicationAssembly);
 
             var codegenEnabled = wolverineConfig.GetValue<bool>("CodegenEnabled");
-            opts.CodeGeneration.TypeLoadMode = codegenEnabled ? TypeLoadMode.Auto : TypeLoadMode.Static;
+            opts.CodeGeneration.TypeLoadMode = codegenEnabled ? TypeLoadMode.Dynamic : TypeLoadMode.Static;
 
             var autoProvision = configuration.GetValue<bool>("AutoProvision");
             var configAutoProvisionStorage = configuration.GetValue<string>("AutoBuildMessageStorageOnStartup");

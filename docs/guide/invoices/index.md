@@ -175,7 +175,7 @@ Published to trigger payment processing.
 
 Invoice data is stored in PostgreSQL:
 
-**Table**: [`app_domain.invoices`](https://github.com/org-name/app-domain/blob/main/infra/AppDomain.Database/Liquibase/AppDomain/tables/invoices.sql)
+**Table**: [`app_domain.invoices`](https://github.com/org-name/app-domain/blob/main/infra/AppDomain.Database/Liquibase/app_domain/tables/invoices.sql)
 
 **Key Stored Procedures**:
 

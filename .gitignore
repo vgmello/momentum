@@ -448,3 +448,6 @@ docs/obj**
 # Local development version files
 local-mmt-version.txt
 local-feed-path.txt
+
+# Perf Tests Results
+**/tests/**/results

@@ -1,5 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
-<!--/-:msbuild-conditional:noEmit -->
+    <!--/-:msbuild-conditional:noEmit -->
     <PropertyGroup>
         <IsPackable>True</IsPackable>
         <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Debug'">True</GeneratePackageOnBuild>
@@ -7,15 +7,15 @@
         <VersionPrefix>0.0.1</VersionPrefix>
         <VersionSuffix Condition="'$(Configuration)' == 'Debug'">pre</VersionSuffix>
     </PropertyGroup>
-<!--/+:msbuild-conditional:noEmit -->
+    <!--/+:msbuild-conditional:noEmit -->
 
     <PropertyGroup>
-        <Authors>ORG_NAME</Authors>
-        <Company>ORG_NAME</Company>
-        <Copyright>Copyright (c) ORG_NAME. All rights reserved.</Copyright>
+        <Authors>OrgNameXml</Authors>
+        <Company>OrgNameXml</Company>
+        <Copyright>Copyright (c) OrgNameXml. All rights reserved.</Copyright>
         <PackageTags>app_domain;app_domain.contracts</PackageTags>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <RepositoryUrl>https://github.com/ORG_NAME/AppDomain</RepositoryUrl>
+        <RepositoryUrl>https://github.com/OrgNameXml/AppDomain</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
     </PropertyGroup>
 
@@ -50,21 +50,23 @@
         <!--#endif -->
     </ItemGroup>
 
-<!--/-:msbuild-conditional:noEmit -->
-    <!-- Target to generate nuget during development -->
-    <Target Name="SetPackageVersionSuffix" BeforeTargets="GenerateNuspec;Pack" Condition=" '$(Configuration)' == 'Debug' ">
+    <!--/-:msbuild-conditional:noEmit -->
+    <!-- Targets to generate nuget during development -->
+    <Target Name="CleanOldPackages" BeforeTargets="Build;Clean">
         <ItemGroup>
             <OldPackagesToDelete Include="$(TargetDir)../*.*upkg"/>
         </ItemGroup>
         <Message Text="Cleaning up $(ProjectName) nupkg files. Target: $(TargetDir)" Importance="high"/>
         <Delete Files="@(OldPackagesToDelete)"/>
+    </Target>
 
+    <Target Name="SetPackageVersionSuffix" BeforeTargets="GenerateNuspec;Pack" Condition=" '$(Configuration)' == 'Debug' ">
         <PropertyGroup>
             <VersionSuffix>$([System.DateTime]::UtcNow.ToString("yyyyMMdd-HHmmss"))</VersionSuffix>
             <PackageVersion>$(VersionPrefix)-$(VersionSuffix)</PackageVersion>
         </PropertyGroup>
         <Message Text="Packaging version: $(ProjectName)-$(PackageVersion)" Importance="high"/>
     </Target>
-<!--/+:msbuild-conditional:noEmit -->
+    <!--/+:msbuild-conditional:noEmit -->
 
 </Project>

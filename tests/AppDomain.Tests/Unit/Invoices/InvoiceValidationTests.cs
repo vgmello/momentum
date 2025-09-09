@@ -1,4 +1,4 @@
-// Copyright (c) ORG_NAME. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
 using AppDomain.Invoices.Commands;
 using FluentValidation.TestHelper;
@@ -37,7 +37,7 @@ public class InvoiceValidationTests
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.Name)
-            .WithErrorMessage("'Name' must not be empty.");
+            .WithErrorMessage("Invoice name is required");
     }
 
     [Fact]
@@ -52,7 +52,7 @@ public class InvoiceValidationTests
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.Name)
-            .WithErrorMessage("The length of 'Name' must be at least 2 characters. You entered 1 characters.");
+            .WithErrorMessage("Invoice name must be at least 2 characters");
     }
 
     [Fact]
@@ -68,7 +68,7 @@ public class InvoiceValidationTests
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.Name)
-            .WithErrorMessage("The length of 'Name' must be 100 characters or fewer. You entered 101 characters.");
+            .WithErrorMessage("Invoice name cannot exceed 100 characters");
     }
 
     [Theory]
@@ -86,7 +86,7 @@ public class InvoiceValidationTests
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.Amount)
-            .WithErrorMessage("'Amount' must be greater than '0'.");
+            .WithErrorMessage("Amount must be greater than zero");
     }
 
     [Fact]
@@ -116,7 +116,7 @@ public class InvoiceValidationTests
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.Currency)
-            .WithErrorMessage("The length of 'Currency' must be 3 characters or fewer. You entered 4 characters.");
+            .WithErrorMessage("Currency must be a 3-character ISO code");
     }
 
     [Theory]

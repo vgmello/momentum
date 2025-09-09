@@ -52,7 +52,7 @@ Here's a simple query example from the AppDomain reference implementation:
 ```csharp
 // Queries/GetCashier.cs
 using AppDomain.Cashiers.Contracts.Models;
-using AppDomain.Core.Data;
+using AppDomain.Common.Data;
 using FluentValidation.Results;
 using LinqToDB;
 

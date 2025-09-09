@@ -1,6 +1,6 @@
-// Copyright (c) ORG_NAME. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
-namespace AppDomain.Api.Core.Extensions;
+namespace AppDomain.Api.Common.Extensions;
 
 /// <summary>
 ///     Extensions for gRPC-specific operations and conversions.
@@ -18,7 +18,7 @@ public static class GrpcExtensions
     {
         if (!Guid.TryParse(value, out var guid))
             throw new RpcException(new Status(StatusCode.InvalidArgument, error));
-            
+
         return guid;
     }
 }

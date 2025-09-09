@@ -1,4 +1,4 @@
-// Copyright (c) ORG_NAME. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
 using AppDomain.Invoices.Contracts.Models;
 
@@ -15,14 +15,14 @@ namespace AppDomain.Invoices.Contracts.IntegrationEvents;
 /// <param name="FinalTotalAmount">Final total amount of the invoice</param>
 /// <remarks>
 ///     ## When It's Triggered
-/// 
+///
 ///     This event is published when:
 ///     - An invoice completes the finalization process
 ///     - All invoice line items and calculations are confirmed
 ///     - Invoice is ready for customer delivery or payment collection
-/// 
+///
 ///     ## Event Usage
-/// 
+///
 ///     This event can be used by other services to:
 ///     - Generate invoice documents for customer delivery
 ///     - Initialize payment collection processes

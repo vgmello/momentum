@@ -1,8 +1,8 @@
-// Copyright (c) ORG_NAME. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
 using System.Security.Claims;
 
-namespace AppDomain.Api.Core.Extensions;
+namespace AppDomain.Api.Common.Extensions;
 
 /// <summary>
 ///     Provides extension methods for <see cref="ClaimsPrincipal" /> to extract tenant information.

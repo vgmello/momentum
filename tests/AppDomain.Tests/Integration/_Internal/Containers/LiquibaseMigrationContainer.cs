@@ -1,4 +1,4 @@
-// Copyright (c) ORG_NAME. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
@@ -52,9 +52,16 @@ public class LiquibaseMigrationContainer : IAsyncDisposable
         }
         catch (Exception e) when (!(e is InvalidOperationException))
         {
-            var logs = await _liquibaseContainer.GetLogsAsync();
+            try
+            {
+                var logs = await _liquibaseContainer.GetLogsAsync();
 
-            throw new InvalidOperationException($"Liquibase migration failed. Logs: {logs}", e);
+                throw new InvalidOperationException($"Liquibase migration failed. Logs: {logs}", e);
+            }
+            catch
+            {
+                throw new InvalidOperationException($"Liquibase migration failed. Unable to retrieve logs.", e);
+            }
         }
     }
 

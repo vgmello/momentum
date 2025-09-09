@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+option csharp_namespace = "AppDomain.Cashiers.Grpc";
+
+package app_domain.cashiers;
+
+message Cashier {
+  string tenant_id = 1;
+  string cashier_id = 2;
+  string name = 3;
+  string email = 4;
+}
+
+service CashiersService {
+  rpc GetCashier (GetCashierRequest) returns (Cashier);
+  rpc GetCashiers (GetCashiersRequest) returns (GetCashiersResponse);
+  rpc CreateCashier (CreateCashierRequest) returns (Cashier);
+  rpc UpdateCashier (UpdateCashierRequest) returns (Cashier);
+  rpc DeleteCashier (DeleteCashierRequest) returns (Empty);
+}
+
+message Empty {}
+
+message GetCashierRequest {
+  string id = 1;
+}
+
+message GetCashiersRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+}
+
+message GetCashiersResponse {
+  repeated Cashier cashiers = 1;
+}
+
+message CreateCashierRequest {
+  string name = 1;
+  string email = 2;
+}
+
+message UpdateCashierRequest {
+  string cashier_id = 1;
+  string name = 2;
+  string email = 3;
+  int32 version = 4;
+}
+
+message DeleteCashierRequest {
+  string cashier_id = 1;
+}

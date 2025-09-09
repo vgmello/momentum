@@ -29,10 +29,37 @@ updates:
           - "NSubstitute"
       wolverine:
         patterns:
-          - "WolverineHQ.*"
+          - "WolverineFx.*"
+          - "JasperFx.*"
       opentelemetry:
         patterns:
           - "OpenTelemetry.*"
+      logging:
+        patterns:
+          - "Serilog.*"
+      data-access:
+        patterns:
+          - "Dapper"
+          - "linq2db*"
+          - "Npgsql*"
+      source-generators:
+        patterns:
+          - "Microsoft.CodeAnalysis.*"
+          - "*.SourceGenerator*"
+          - "Riok.Mapperly"
+      grpc-tools:
+        patterns:
+          - "Grpc.*"
+          - "Google.Protobuf"
+      dev-tools:
+        patterns:
+          - "Scalar.AspNetCore"
+          - "OrleansDashboard"
+          - "NSwag.*"
+      code-quality:
+        patterns:
+          - "SonarAnalyzer.*"
+          - "NetArchTest.*"
     ignore:
       # Ignore major version updates for stable packages
       - dependency-name: "Microsoft.EntityFrameworkCore.*"

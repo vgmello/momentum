@@ -1,4 +1,4 @@
-// Copyright (c) ORG_NAME. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
 //#if (INCLUDE_SAMPLE)
 
@@ -7,7 +7,7 @@ using AppDomain.Invoices.Data.Entities;
 //#endif
 using LinqToDB.Data;
 
-namespace AppDomain.Core.Data;
+namespace AppDomain.Common.Data;
 
 /// <summary>
 ///     Primary database context for the AppDomain application using LinqToDB.

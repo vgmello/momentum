@@ -1,4 +1,4 @@
-// Copyright (c) ORG_NAME. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 
 namespace PostSetup.Actions;
 
-public class LibraryRenameAction
+public static class LibraryRenameAction
 {
     public class LibraryRenameResult
     {
@@ -22,43 +22,34 @@ public class LibraryRenameAction
         public string SkipReason { get; set; } = string.Empty;
     }
 
+    private class ProcessingConfig
+    {
+        public string[] ScanRoots { get; set; } = [];
+        public string[] FileExtensions { get; set; } = [];
+        public string[] ExcludeDirs { get; set; } = [];
+        public int MaxBytes { get; set; }
+    }
+
+    private class PathReplacement
+    {
+        public string OldPath { get; set; } = "";
+        public string NewPath { get; set; } = "";
+        public string Description { get; set; } = "";
+    }
+
     public static LibraryRenameResult ProcessMomentumLibImport(string projectDir, JsonElement config)
     {
         var result = new LibraryRenameResult();
 
-        if (!config.TryGetProperty("momentumLibImport", out var importConfig))
-        {
-            result.SkipReason = "No momentumLibImport configuration found";
-
+        if (!ValidateConfiguration(config, result))
             return result;
-        }
 
-        if (!importConfig.TryGetProperty("enabled", out var enabledElement) ||
-            !enabledElement.GetBoolean())
-        {
-            result.SkipReason = "Momentum library import is disabled";
+        var (libPrefix, importConfig) = ExtractConfigurationData(config);
 
+        if (!ValidateLibraryPrefix(libPrefix, result))
             return result;
-        }
 
         result.Enabled = true;
-
-        if (!importConfig.TryGetProperty("libName", out var libNameElement))
-        {
-            result.SkipReason = "libName not specified in momentumLibImport config";
-
-            return result;
-        }
-
-        var libPrefix = libNameElement.GetString() ?? "";
-
-        if (string.IsNullOrEmpty(libPrefix) || libPrefix == "Momentum")
-        {
-            result.SkipReason = "Library prefix is empty or unchanged (Momentum)";
-
-            return result;
-        }
-
         result.LibPrefix = libPrefix;
 
         Console.WriteLine($"Processing Momentum library imports with prefix: {libPrefix}");
@@ -75,22 +66,116 @@ public class LibraryRenameAction
 
         Console.WriteLine($"  → Found {importedTokens.Count} imported library tokens: {string.Join(", ", importedTokens)}");
 
+        var processingConfig = BuildProcessingConfig(importConfig);
+        var (processedFiles, changedFiles) = ProcessAllFiles(projectDir, libPrefix, importedTokens, processingConfig);
+
+        result.ProcessedFiles = processedFiles;
+        result.ChangedFiles = changedFiles;
+
+        return result;
+    }
+
+    private static bool ValidateConfiguration(JsonElement config, LibraryRenameResult result)
+    {
+        if (!config.TryGetProperty("momentumLibImport", out var importConfig))
+        {
+            result.SkipReason = "No momentumLibImport configuration found";
+
+            return false;
+        }
+
+        if (!importConfig.TryGetProperty("enabled", out var enabledElement) || !enabledElement.GetBoolean())
+        {
+            result.SkipReason = "Momentum library import is disabled";
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private static (string libPrefix, JsonElement importConfig) ExtractConfigurationData(JsonElement config)
+    {
+        config.TryGetProperty("momentumLibImport", out var importConfig);
+
+        var libPrefix = "";
+
+        if (importConfig.TryGetProperty("libName", out var libNameElement))
+        {
+            libPrefix = libNameElement.GetString() ?? "";
+        }
+
+        return (libPrefix, importConfig);
+    }
+
+    private static bool ValidateLibraryPrefix(string libPrefix, LibraryRenameResult result)
+    {
+        if (string.IsNullOrEmpty(libPrefix))
+        {
+            result.SkipReason = "libName not specified in momentumLibImport config";
+
+            return false;
+        }
+
+        if (libPrefix == "Momentum")
+        {
+            result.SkipReason = "Library prefix is empty or unchanged (Momentum)";
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private static ProcessingConfig BuildProcessingConfig(JsonElement importConfig) => new()
+    {
+        ScanRoots = GetStringArrayFromConfig(importConfig, "scanRoots", ["src", "infra", "libs", "tests"]),
+        FileExtensions = GetStringArrayFromConfig(importConfig, "fileExtensions", [".cs", ".csproj"]),
+        ExcludeDirs = GetStringArrayFromConfig(importConfig, "excludeDirs", [".git", "bin", "obj"]),
+        MaxBytes = GetIntFromConfig(importConfig, "maxBytes", 2097152)
+    };
+
+    private static (int processedFiles, int changedFiles) ProcessAllFiles(
+        string projectDir,
+        string libPrefix,
+        List<string> importedTokens,
+        ProcessingConfig config)
+    {
         var processedFiles = 0;
         var changedFiles = 0;
+
+        // Process regular files
         var regex = BuildMomentumLibraryRegex(importedTokens);
+        var (regularProcessed, regularChanged) = ProcessRegularFiles(projectDir, libPrefix, config, regex);
 
-        var scanRoots = GetStringArrayFromConfig(importConfig, "scanRoots", ["src", "infra", "libs", "tests"]);
-        var fileExtensions = GetStringArrayFromConfig(importConfig, "fileExtensions", [".cs", ".csproj"]);
-        var excludeDirs = GetStringArrayFromConfig(importConfig, "excludeDirs", [".git", "bin", "obj"]);
-        var maxBytes = GetIntFromConfig(importConfig, "maxBytes", 2097152);
+        processedFiles += regularProcessed;
+        changedFiles += regularChanged;
 
-        foreach (var root in scanRoots)
+        // Process solution files
+        var (solutionProcessed, solutionChanged) = ProcessSolutionFiles(projectDir, libPrefix, importedTokens);
+
+        processedFiles += solutionProcessed;
+        changedFiles += solutionChanged;
+
+        return (processedFiles, changedFiles);
+    }
+
+    private static (int processed, int changed) ProcessRegularFiles(
+        string projectDir,
+        string libPrefix,
+        ProcessingConfig config,
+        Regex regex)
+    {
+        var processedFiles = 0;
+        var changedFiles = 0;
+
+        foreach (var root in config.ScanRoots)
         {
             var rootPath = Path.Combine(projectDir, root);
 
             if (!Directory.Exists(rootPath)) continue;
 
-            var files = FindFilesToProcess(rootPath, fileExtensions, excludeDirs, maxBytes);
+            var files = FindFilesToProcess(rootPath, config.FileExtensions, config.ExcludeDirs, config.MaxBytes);
 
             foreach (var filePath in files)
             {
@@ -103,59 +188,88 @@ public class LibraryRenameAction
             }
         }
 
-        result.ProcessedFiles = processedFiles;
-        result.ChangedFiles = changedFiles;
+        return (processedFiles, changedFiles);
+    }
 
-        return result;
+    private static (int processed, int changed) ProcessSolutionFiles(
+        string projectDir,
+        string libPrefix,
+        List<string> importedTokens)
+    {
+        var processedFiles = 0;
+        var changedFiles = 0;
+
+        var solutionFiles = Directory.GetFiles(projectDir, "*.slnx", SearchOption.TopDirectoryOnly);
+
+        foreach (var slnFile in solutionFiles)
+        {
+            processedFiles++;
+
+            if (UpdateSolutionReferences(slnFile, libPrefix, projectDir, importedTokens))
+            {
+                changedFiles++;
+            }
+        }
+
+        return (processedFiles, changedFiles);
     }
 
     private static List<string> BuildImportedTokensWhitelist(string projectDir, string libPrefix)
     {
-        var tokens = new List<string>();
+        var tokens = new HashSet<string>();
         var libsPath = Path.Combine(projectDir, "libs");
 
         if (!Directory.Exists(libsPath))
-            return tokens;
+            return [];
 
         var prefixedLibsPath = Path.Combine(libsPath, libPrefix);
         var searchPath = Directory.Exists(prefixedLibsPath) ? prefixedLibsPath : libsPath;
 
-        var directories = Directory.GetDirectories(searchPath, "*", SearchOption.AllDirectories)
-            .Where(d => Path.GetFileName(d).StartsWith($"{libPrefix}."))
-            .ToList();
-
-        var projectFiles = Directory.GetFiles(searchPath, "*.csproj", SearchOption.AllDirectories)
-            .Where(f => Path.GetFileNameWithoutExtension(f).StartsWith($"{libPrefix}."))
-            .ToList();
-
-        var allItems = directories
-            .Concat(projectFiles)
-            .Select(Path.GetFileNameWithoutExtension)
-            .Distinct()
-            .Where(i => i is not null);
+        var allItems = GetLibraryItems(searchPath, libPrefix);
 
         foreach (var item in allItems)
         {
-            if (item!.StartsWith($"{libPrefix}.") && item.Length > libPrefix.Length + 1)
-            {
-                var token = item[(libPrefix.Length + 1)..];
+            var token = ExtractTokenFromItem(item, libPrefix);
 
-                if (!tokens.Contains(token))
-                {
-                    tokens.Add(token);
-                }
+            if (!string.IsNullOrEmpty(token))
+            {
+                tokens.Add(token);
             }
         }
 
         return tokens.OrderByDescending(t => t.Length).ToList();
     }
 
+    private static IEnumerable<string> GetLibraryItems(string searchPath, string libPrefix)
+    {
+        var directories = Directory.GetDirectories(searchPath, "*", SearchOption.AllDirectories)
+            .Where(d => Path.GetFileName(d).StartsWith($"{libPrefix}."));
+
+        var projectFiles = Directory.GetFiles(searchPath, "*.csproj", SearchOption.AllDirectories)
+            .Where(f => Path.GetFileNameWithoutExtension(f).StartsWith($"{libPrefix}."));
+
+        return directories
+            .Concat(projectFiles)
+            .Select(Path.GetFileNameWithoutExtension)
+            .Distinct()
+            .Where(i => i is not null)!;
+    }
+
+    private static string ExtractTokenFromItem(string item, string libPrefix)
+    {
+        if (item.StartsWith($"{libPrefix}.") && item.Length > libPrefix.Length + 1)
+        {
+            return item[(libPrefix.Length + 1)..];
+        }
+
+        return "";
+    }
+
     private static Regex BuildMomentumLibraryRegex(List<string> tokens)
     {
         var escapedTokens = tokens.Select(Regex.Escape);
         var alternation = string.Join("|", escapedTokens);
-        // This ensures we don't match Momentum.Extensions.Abstractions when we want to rename Momentum.Extensions
-        var pattern = $@"\bMomentum\.(?<token>{alternation})(?!\.Abstractions)";
+        var pattern = $@"\bMomentum\.(?<token>{alternation})(?!\.|\w)";
 
         return new Regex(pattern, RegexOptions.Compiled);
     }
@@ -193,52 +307,23 @@ public class LibraryRenameAction
     {
         try
         {
-            var bytes = File.ReadAllBytes(filePath);
-            bool hasBom = bytes is [0xEF, 0xBB, 0xBF, ..];
-
-            // Read content properly handling BOM
-            string originalContent;
-            if (hasBom)
-            {
-                // Skip BOM bytes when reading content
-                originalContent = Encoding.UTF8.GetString(bytes, 3, bytes.Length - 3);
-            }
-            else
-            {
-                originalContent = Encoding.UTF8.GetString(bytes);
-            }
+            var (originalContent, hasBom) = ReadFileWithBomDetection(filePath);
 
             var modifiedContent = regex.Replace(originalContent, match =>
             {
                 var token = match.Groups["token"].Value;
 
+                if (ShouldSkipMatch(originalContent, match.Index))
+                {
+                    return match.Value; // Keep original
+                }
+
                 return $"{libPrefix}.{token}";
             });
 
-            // Also handle path renaming in solution files (libs\Momentum\ -> libs\libPrefix\)
-            if (Path.GetExtension(filePath).Equals(".slnx", StringComparison.OrdinalIgnoreCase) ||
-                Path.GetExtension(filePath).Equals(".sln", StringComparison.OrdinalIgnoreCase))
-            {
-                modifiedContent = modifiedContent.Replace($"libs\\Momentum\\", $"libs\\{libPrefix}\\");
-                modifiedContent = modifiedContent.Replace($"libs/Momentum/", $"libs/{libPrefix}/");
-            }
-
             if (modifiedContent != originalContent)
             {
-                var tempFile = filePath + ".tmp";
-                
-                // Write with same BOM handling as original file
-                if (hasBom)
-                {
-                    File.WriteAllText(tempFile, modifiedContent, new UTF8Encoding(true));
-                }
-                else
-                {
-                    File.WriteAllText(tempFile, modifiedContent, new UTF8Encoding(false));
-                }
-                
-                File.Move(tempFile, filePath, overwrite: true);
-
+                WriteFileWithBomHandling(filePath, modifiedContent, hasBom);
                 Console.WriteLine($"  → Updated library references in: {Path.GetRelativePath(projectDir, filePath)}");
 
                 return true;
@@ -250,6 +335,131 @@ public class LibraryRenameAction
         }
 
         return false;
+    }
+
+    private static (string content, bool hasBom) ReadFileWithBomDetection(string filePath)
+    {
+        var bytes = File.ReadAllBytes(filePath);
+        var hasBom = bytes is [0xEF, 0xBB, 0xBF, ..];
+
+        var content = hasBom ? Encoding.UTF8.GetString(bytes, 3, bytes.Length - 3) : Encoding.UTF8.GetString(bytes);
+
+        return (content, hasBom);
+    }
+
+    private static void WriteFileWithBomHandling(string filePath, string content, bool hasBom)
+    {
+        var tempFile = filePath + ".tmp";
+        var encoding = hasBom ? new UTF8Encoding(true) : new UTF8Encoding(false);
+
+        File.WriteAllText(tempFile, content, encoding);
+        File.Move(tempFile, filePath, overwrite: true);
+    }
+
+    private static bool ShouldSkipMatch(string originalContent, int matchIndex)
+    {
+        var beforeMatch = originalContent.Substring(0, matchIndex);
+        var lineStart = beforeMatch.LastIndexOf('\n') + 1;
+        var lineEndIndex = originalContent.IndexOfAny(['\n', '\r'], matchIndex);
+        if (lineEndIndex == -1) lineEndIndex = originalContent.Length;
+
+        var currentLine = originalContent.Substring(lineStart, lineEndIndex - lineStart);
+
+        return currentLine.TrimStart().StartsWith("<PackageReference") && currentLine.Contains("Include=");
+    }
+
+    private static bool UpdateSolutionReferences(string slnFile, string libPrefix, string projectDir, List<string> importedTokens)
+    {
+        try
+        {
+            var originalContent = File.ReadAllText(slnFile);
+            var modifiedContent = originalContent;
+
+            foreach (var token in importedTokens)
+            {
+                var replacements = BuildPathReplacements(token, libPrefix);
+
+                foreach (var replacement in replacements)
+                {
+                    modifiedContent = modifiedContent.Replace(replacement.OldPath, replacement.NewPath);
+                }
+            }
+
+            if (modifiedContent != originalContent)
+            {
+                File.WriteAllText(slnFile, modifiedContent);
+                Console.WriteLine($"  → Updated solution references in: {Path.GetRelativePath(projectDir, slnFile)}");
+
+                return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"  ⚠ Warning: Could not update solution file {slnFile}: {ex.Message}");
+        }
+
+        return false;
+    }
+
+    private static List<PathReplacement> BuildPathReplacements(string token, string libPrefix)
+    {
+        return
+        [
+            new PathReplacement
+            {
+                OldPath = $"Momentum.{token}.csproj",
+                NewPath = $"{libPrefix}.{token}.csproj",
+                Description = "Project file name"
+            },
+
+            // Full path replacements with original structure
+
+            new PathReplacement
+            {
+                OldPath = $"libs\\Momentum\\src\\Momentum.{token}\\Momentum.{token}.csproj",
+                NewPath = $"libs\\{libPrefix}\\src\\{libPrefix}.{token}\\{libPrefix}.{token}.csproj",
+                Description = "Full backslash path (original structure)"
+            },
+
+            new PathReplacement
+            {
+                OldPath = $"libs/Momentum/src/Momentum.{token}/Momentum.{token}.csproj",
+                NewPath = $"libs/{libPrefix}/src/{libPrefix}.{token}/{libPrefix}.{token}.csproj",
+                Description = "Full forward slash path (original structure)"
+            },
+
+            // Mixed path replacements (renamed files but old directory structure)
+
+            new PathReplacement
+            {
+                OldPath = $@"libs\Momentum\src\{libPrefix}.{token}\{libPrefix}.{token}.csproj",
+                NewPath = $@"libs\{libPrefix}\src\{libPrefix}.{token}\{libPrefix}.{token}.csproj",
+                Description = "Mixed backslash path (renamed files, old dirs)"
+            },
+
+            new PathReplacement
+            {
+                OldPath = $"libs/Momentum/src/{libPrefix}.{token}/{libPrefix}.{token}.csproj",
+                NewPath = $"libs/{libPrefix}/src/{libPrefix}.{token}/{libPrefix}.{token}.csproj",
+                Description = "Mixed forward slash path (renamed files, old dirs)"
+            },
+
+            // Partial path replacements
+
+            new PathReplacement
+            {
+                OldPath = $"Momentum.{token}/Momentum.{token}.csproj",
+                NewPath = $"{libPrefix}.{token}/{libPrefix}.{token}.csproj",
+                Description = "Partial path"
+            },
+
+            new PathReplacement
+            {
+                OldPath = $"Momentum.{token}\\Momentum.{token}.csproj",
+                NewPath = $"{libPrefix}.{token}\\{libPrefix}.{token}.csproj",
+                Description = "Partial backslash path"
+            }
+        ];
     }
 
     private static string[] GetStringArrayFromConfig(JsonElement config, string propertyName, string[] defaultValue)

@@ -1,4 +1,4 @@
-// Copyright (c) ORG_NAME. All rights reserved.
+// Copyright (c) OrgName. All rights reserved.
 
 using AppDomain.Tests.E2E.OpenApi.Generated;
 using Microsoft.Extensions.Configuration;

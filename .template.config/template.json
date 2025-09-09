@@ -339,6 +339,12 @@
       },
       "replaces": "OrgName"
     },
+    "OrgNameXmlEncoded": {
+      "type": "derived",
+      "valueSource": "OrgName",
+      "valueTransform": "xmlEncode",
+      "replaces": "OrgNameXml"
+    },
     "OrgNameKebab": {
       "type": "derived",
       "valueSource": "OrgName",
@@ -404,7 +410,6 @@
         "**/*.user",
         "**/*.lock.json",
         "**/_temp/**/*",
-        "**/scripts/**/*",
         "**/_template_tests/**/*",
         "**/.local/**/*",
         "**/.vitepress/cache/**/*",
@@ -512,7 +517,7 @@
           ]
         },
         {
-          "condition": "(!USE_DB)",
+          "condition": "(!USE_LIQUIBASE)",
           "exclude": [
             "tests/AppDomain.Tests/Integration/_Internal/Containers/LiquibaseMigrationContainer.cs"
           ]

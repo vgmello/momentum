@@ -2,6 +2,7 @@
 
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
 using System.Xml;
@@ -100,6 +101,7 @@ public class XmlDocumentationService(ILogger<XmlDocumentationService> logger) : 
         }
     }
 
+    [SuppressMessage("Critical Code Smell", "S3776:Cognitive Complexity of methods should not be too high")]
     private static async Task<XmlDocumentationInfo?> ParseMemberDocumentationAsync(XmlReader reader)
     {
         var docInfo = new XmlDocumentationInfo();
@@ -113,63 +115,63 @@ public class XmlDocumentationService(ILogger<XmlDocumentationService> logger) : 
             if (reader is { NodeType: XmlNodeType.EndElement, Name: "member" })
                 break;
 
-            if (reader.NodeType == XmlNodeType.Element)
+            if (reader.NodeType != XmlNodeType.Element)
+                continue;
+
+            switch (reader.Name.ToLowerInvariant())
             {
-                switch (reader.Name.ToLowerInvariant())
-                {
-                    case "summary":
-                        docInfo.Summary = await ReadElementContentAsync(reader);
+                case "summary":
+                    docInfo.Summary = await ReadElementContentAsync(reader);
+                    hasContent = true;
+
+                    break;
+                case "remarks":
+                    docInfo.Remarks = await ReadElementContentAsync(reader);
+                    hasContent = true;
+
+                    break;
+                case "returns":
+                    docInfo.Returns = await ReadElementContentAsync(reader);
+                    hasContent = true;
+
+                    break;
+                case "param":
+                    var paramName = reader.GetAttribute("name");
+
+                    if (!string.IsNullOrEmpty(paramName))
+                    {
+                        var paramExample = reader.GetAttribute("example");
+                        var paramDoc = await ReadElementContentAsync(reader);
+
+                        docInfo.Parameters[paramName] = new XmlDocumentationInfo.ParameterInfo(paramDoc, paramExample);
                         hasContent = true;
+                    }
 
-                        break;
-                    case "remarks":
-                        docInfo.Remarks = await ReadElementContentAsync(reader);
+                    break;
+                case "response":
+                    var responseCode = reader.GetAttribute("code");
+                    var responseDoc = await ReadElementContentAsync(reader);
+
+                    if (!string.IsNullOrEmpty(responseCode))
+                    {
+                        docInfo.Responses[responseCode] = responseDoc;
                         hasContent = true;
+                    }
 
-                        break;
-                    case "returns":
-                        docInfo.Returns = await ReadElementContentAsync(reader);
-                        hasContent = true;
+                    break;
+                case "example":
+                    docInfo.Example = await ReadElementContentAsync(reader);
+                    hasContent = true;
 
-                        break;
-                    case "param":
-                        var paramName = reader.GetAttribute("name");
+                    break;
+                default:
+                    // Unknown element
+                    if (!reader.IsEmptyElement)
+                    {
+                        await reader.ReadAsync();
+                    }
 
-                        if (!string.IsNullOrEmpty(paramName))
-                        {
-                            var paramDoc = await ReadElementContentAsync(reader);
-                            var paramExample = reader.GetAttribute("example");
-
-                            docInfo.Parameters[paramName] = new XmlDocumentationInfo.ParameterInfo(paramDoc, paramExample);
-                            hasContent = true;
-                        }
-
-                        break;
-                    case "response":
-                        var responseCode = reader.GetAttribute("code");
-                        var responseDoc = await ReadElementContentAsync(reader);
-
-                        if (!string.IsNullOrEmpty(responseCode))
-                        {
-                            docInfo.Responses[responseCode] = responseDoc;
-                            hasContent = true;
-                        }
-
-                        break;
-                    case "example":
-                        docInfo.Example = await ReadElementContentAsync(reader);
-                        hasContent = true;
-
-                        break;
-                    default:
-                        // Unknown element
-                        if (!reader.IsEmptyElement)
-                        {
-                            await reader.ReadAsync();
-                        }
-
-                        break;
-                }
+                    break;
             }
         }
 

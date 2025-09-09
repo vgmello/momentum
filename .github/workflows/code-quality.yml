@@ -10,6 +10,7 @@ on:
       - "*.slnx"
       - "*.csproj"
       - "Directory.*.props"
+
   pull_request:
     branches: [ "main" ]
     paths:
@@ -19,8 +20,10 @@ on:
       - "*.slnx"
       - "*.csproj"
       - "Directory.*.props"
+
   schedule:
     - cron: '0 6 * * 1'  # Weekly on Monday at 6 AM UTC
+
   workflow_dispatch:
 
 env:
@@ -54,7 +57,7 @@ jobs:
         fetch-depth: 0
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v5
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
