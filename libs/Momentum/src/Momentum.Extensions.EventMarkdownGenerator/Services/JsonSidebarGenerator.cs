@@ -243,7 +243,7 @@ public class JsonSidebarGenerator
                 .Select(t => new SidebarItem
                 {
                     Text = t.Name,
-                    Link = $"/schemas/{(t.Name ?? "UnknownType").ToSafeFileName()}"
+                    Link = $"/schemas/{GetCleanTypeName(t).ToSafeFileName()}"
                 })
                 .ToList();
 
@@ -274,6 +274,47 @@ public class JsonSidebarGenerator
         return parts.Length > 1 ? parts[1] : parts[0];
     }
 
+
+    /// <summary>
+    /// Gets the full namespace + type name without assembly qualification
+    /// </summary>
+    private static string GetCleanTypeName(Type type)
+    {
+        if (type.FullName != null && !type.FullName.Contains("[["))
+        {
+            // Simple case - no assembly qualification
+            return type.FullName;
+        }
+        
+        // For generic types or types with assembly qualification, build the name manually
+        if (type.IsGenericType)
+        {
+            var genericTypeDef = type.GetGenericTypeDefinition();
+            var namespaceName = genericTypeDef.Namespace ?? "";
+            var typeName = genericTypeDef.Name;
+            
+            // Remove the backtick and number for generic types (e.g., Dictionary`2 -> Dictionary)
+            var backtickIndex = typeName.IndexOf('`');
+            if (backtickIndex > 0)
+            {
+                typeName = typeName.Substring(0, backtickIndex);
+            }
+            
+            var genericArgs = type.GetGenericArguments()
+                .Select(GetCleanTypeName)
+                .ToArray();
+            
+            if (genericArgs.Length > 0)
+            {
+                return $"{namespaceName}.{typeName}<{string.Join(", ", genericArgs)}>";
+            }
+            
+            return $"{namespaceName}.{typeName}";
+        }
+        
+        // Non-generic type
+        return $"{type.Namespace}.{type.Name}";
+    }
 
     public async Task WriteSidebarAsync(ICollection<EventWithDocumentation> events, string filePath)
     {

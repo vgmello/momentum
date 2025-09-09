@@ -56,7 +56,7 @@ public class FluidMarkdownGenerator
 
     public IndividualMarkdownOutput GenerateSchemaMarkdown(Type schemaType, string outputDirectory)
     {
-        var fileName = $"{(schemaType.Name ?? "UnknownType").ToSafeFileName()}.md";
+        var fileName = $"{GetCleanTypeName(schemaType).ToSafeFileName()}.md";
         var filePath = GenerateFilePath(outputDirectory, fileName, "schemas");
 
         var context = CreateTemplateContext();
@@ -78,6 +78,47 @@ public class FluidMarkdownGenerator
         return schemaTypes.Select(schemaType => GenerateSchemaMarkdown(schemaType, outputDirectory));
     }
 
+
+    /// <summary>
+    /// Gets the full namespace + type name without assembly qualification
+    /// </summary>
+    private static string GetCleanTypeName(Type type)
+    {
+        if (type.FullName != null && !type.FullName.Contains("[["))
+        {
+            // Simple case - no assembly qualification
+            return type.FullName;
+        }
+        
+        // For generic types or types with assembly qualification, build the name manually
+        if (type.IsGenericType)
+        {
+            var genericTypeDef = type.GetGenericTypeDefinition();
+            var namespaceName = genericTypeDef.Namespace ?? "";
+            var typeName = genericTypeDef.Name;
+            
+            // Remove the backtick and number for generic types (e.g., Dictionary`2 -> Dictionary)
+            var backtickIndex = typeName.IndexOf('`');
+            if (backtickIndex > 0)
+            {
+                typeName = typeName.Substring(0, backtickIndex);
+            }
+            
+            var genericArgs = type.GetGenericArguments()
+                .Select(GetCleanTypeName)
+                .ToArray();
+            
+            if (genericArgs.Length > 0)
+            {
+                return $"{namespaceName}.{typeName}<{string.Join(", ", genericArgs)}>";
+            }
+            
+            return $"{namespaceName}.{typeName}";
+        }
+        
+        // Non-generic type
+        return $"{type.Namespace}.{type.Name}";
+    }
 
     public static void CopyDefaultTemplatesToDirectory(string targetDirectory)
     {
