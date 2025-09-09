@@ -72,7 +72,7 @@ var appDomainApi = builder
 #endif
 #endif
     .WithEndpointUrl("http|https", "AppDomain API", "/scalar")
-    .WithHealthCheck("/health/internal");
+    .WithHttpHealthCheck("/health/internal");
 
 #endif
 #if (INCLUDE_BACK_OFFICE)
@@ -92,7 +92,7 @@ builder
     .WaitFor(liquibaseMigrations)
 #endif
 #endif
-    .WithHealthCheck("/health/internal");
+    .WithHttpHealthCheck("/health/internal");
 
 #endif
 #if (INCLUDE_ORLEANS)
@@ -117,7 +117,7 @@ builder
 #endif
     .WithReplicas(3)
     .WithEndpointUrl("http|https", "Dashboard", "/dashboard")
-    .WithHealthCheck("/health/internal");
+    .WithHttpHealthCheck("/health/internal");
 
 #endif
 #if (INCLUDE_DOCS)
