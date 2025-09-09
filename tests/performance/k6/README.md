@@ -18,7 +18,7 @@ The k6 performance testing suite provides comprehensive load testing capabilitie
 1. Start the application with performance testing profile:
 ```bash
 # Start all services including k6 with web dashboard
-docker compose --profile db --profile messaging --profile api --profile performance up
+docker compose --profile api up --build
 
 # Or just run the performance tests (assuming services are running)
 docker compose run k6-performance

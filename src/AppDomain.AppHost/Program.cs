@@ -135,20 +135,4 @@ builder
 
 #endif
 
-// k6 Performance Testing Container
-var k6Performance = builder
-    .AddContainer("k6-performance", "k6-performance")
-    .WithDockerfile("../../tests/performance/k6", "Dockerfile")
-    .WithBindMount("../../tests/performance/k6", "/scripts")
-    .WithBindMount("../../tests/performance/results", "/results")
-    .WithHttpEndpoint(port: 5665, name: "web-dashboard")
-    .WithEnvironment("ENVIRONMENT", builder.Configuration["Environment"] ?? "local")
-#if (INCLUDE_API)
-    .WithEnvironment("API_BASE_URL", appDomainApi.GetEndpoint("http"))
-    .WithEnvironment("GRPC_ENDPOINT", appDomainApi.GetEndpoint("grpc"))
-    .WaitFor(appDomainApi)
-#endif
-    .WithArgs("run", "--web-dashboard", "--web-dashboard-export=/results/web-dashboard-export.html", "--out", "json=/results/results.json", "/scripts/scenarios/mixed/realistic-workflow.js")
-    .WithEndpointUrl("web-dashboard", "k6 Performance Dashboard");
-
 await builder.Build().RunAsync();
