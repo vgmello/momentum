@@ -51,7 +51,7 @@ public sealed class CopyTemplatesCommand : Command<CopyTemplatesCommand.Settings
         }
         catch (Exception ex)
         {
-            AnsiConsole.MarkupLine($"[red]Error:[/] {ex.Message}");
+            AnsiConsole.MarkupLine($"[red]Error:[/] {ex.Message.EscapeMarkup()}");
 
             return 1;
         }

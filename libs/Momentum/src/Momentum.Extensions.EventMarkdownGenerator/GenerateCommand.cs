@@ -95,7 +95,7 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
         }
         catch (Exception ex)
         {
-            AnsiConsole.MarkupLine($"[red]Error:[/] {ex.Message}");
+            AnsiConsole.MarkupLine($"[red]Error:[/] {ex.Message.EscapeMarkup()}");
 
             if (settings.Verbose)
             {
@@ -159,7 +159,7 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
             }
             catch (Exception ex)
             {
-                AnsiConsole.MarkupLine($"[yellow]Warning:[/] Failed to process assembly {assemblyPath}: {ex.Message}");
+                AnsiConsole.MarkupLine($"[yellow]Warning:[/] Failed to process assembly {assemblyPath}: {ex.Message.EscapeMarkup()}");
             }
             finally
             {

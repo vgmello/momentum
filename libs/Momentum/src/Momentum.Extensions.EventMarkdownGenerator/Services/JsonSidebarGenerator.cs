@@ -243,7 +243,7 @@ public class JsonSidebarGenerator
                 .Select(t => new SidebarItem
                 {
                     Text = t.Name,
-                    Link = $"/schemas/{(t.FullName ?? "UnknownType").ToSafeFileName()}"
+                    Link = $"/schemas/{(t.Name ?? "UnknownType").ToSafeFileName()}"
                 })
                 .ToList();
 
