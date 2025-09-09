@@ -15,8 +15,8 @@ export const options = {
 };
 
 // Configuration
-import { API_BASE_URL as BASE_URL } from "../../config/endpoints.js";
-const API_BASE_URL = __ENV.API_BASE_URL || BASE_URL;
+import { endpoints } from "../../config/endpoints.js";
+const API_BASE_URL = __ENV.API_BASE_URL || endpoints.baseUrl;
 
 // Headers
 const headers = {

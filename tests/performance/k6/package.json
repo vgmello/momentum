@@ -4,17 +4,17 @@
   "description": "k6 performance tests for .NET microservices",
   "private": true,
   "scripts": {
-    "test:local": "K6_WEB_DASHBOARD=true K6_WEB_DASHBOARD_EXPORT=../results/k6-local-realistic-workflow-report.html k6 run scenarios/mixed/realistic-workflow.js",
-    "test:staging": "ENVIRONMENT=staging K6_WEB_DASHBOARD=true K6_WEB_DASHBOARD_EXPORT=../results/k6-staging-realistic-workflow-report.html k6 run scenarios/mixed/realistic-workflow.js",
-    "test:cashiers": "K6_WEB_DASHBOARD=true K6_WEB_DASHBOARD_EXPORT=../results/k6-cashiers-baseline-report.html k6 run scenarios/cashiers/baseline.js",
-    "test:cashiers:simple": "K6_WEB_DASHBOARD=true K6_WEB_DASHBOARD_EXPORT=../results/k6-cashiers-simple-create-report.html k6 run scenarios/cashiers/simple-create.js",
-    "test:cashiers:stress": "K6_WEB_DASHBOARD=true K6_WEB_DASHBOARD_EXPORT=../results/k6-cashiers-stress-report.html k6 run scenarios/cashiers/stress.js",
-    "test:cashiers:spike": "K6_WEB_DASHBOARD=true K6_WEB_DASHBOARD_EXPORT=../results/k6-cashiers-spike-report.html k6 run scenarios/cashiers/spike.js",
-    "test:invoices": "K6_WEB_DASHBOARD=true K6_WEB_DASHBOARD_EXPORT=../results/k6-invoices-baseline-report.html k6 run scenarios/invoices/baseline.js",
-    "test:mixed": "K6_WEB_DASHBOARD=true K6_WEB_DASHBOARD_EXPORT=../results/k6-mixed-realistic-workflow-report.html k6 run scenarios/mixed/realistic-workflow.js"
-  },
-  "dependencies": {
-    "k6": "^0.0.0"
+    "k6": "docker run --rm --network host -v $(pwd):/scripts -w /scripts -e K6_WEB_DASHBOARD=true grafana/k6 run",
+    "test:local": "pnpm k6 -e K6_WEB_DASHBOARD_EXPORT=../results/k6-local-realistic-workflow-report.html scenarios/mixed/realistic-workflow.js",
+    "test:staging": "pnpm k6 -e ENVIRONMENT=staging -e K6_WEB_DASHBOARD_EXPORT=../results/k6-staging-realistic-workflow-report.html scenarios/mixed/realistic-workflow.js",
+    "test:cashiers": "pnpm k6 -e K6_WEB_DASHBOARD_EXPORT=../results/k6-cashiers-baseline-report.html scenarios/cashiers/baseline.js",
+    "test:cashiers:grpc": "pnpm k6 -e K6_WEB_DASHBOARD_EXPORT=../results/k6-cashiers-grpc-baseline-report.html scenarios/cashiers/baseline-grpc.js",
+    "test:cashiers:simple": "pnpm k6 -e K6_WEB_DASHBOARD_EXPORT=../results/k6-cashiers-simple-create-report.html scenarios/cashiers/simple-create.js",
+    "test:cashiers:grpc:simple": "pnpm k6 -e K6_WEB_DASHBOARD_EXPORT=../results/k6-cashiers-grpc-simple-create-report.html scenarios/cashiers/simple-create-grpc.js",
+    "test:cashiers:stress": "pnpm k6 -e K6_WEB_DASHBOARD_EXPORT=../results/k6-cashiers-stress-report.html scenarios/cashiers/stress.js",
+    "test:cashiers:spike": "pnpm k6 -e K6_WEB_DASHBOARD_EXPORT=../results/k6-cashiers-spike-report.html scenarios/cashiers/spike.js",
+    "test:invoices": "pnpm k6 -e K6_WEB_DASHBOARD_EXPORT=../results/k6-invoices-baseline-report.html scenarios/invoices/baseline.js",
+    "test:mixed": "pnpm k6 -e K6_WEB_DASHBOARD_EXPORT=../results/k6-mixed-realistic-workflow-report.html scenarios/mixed/realistic-workflow.js"
   },
   "devDependencies": {
     "@faker-js/faker": "^8.4.1"
