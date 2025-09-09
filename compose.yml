@@ -263,6 +263,7 @@ services:
     profiles: [ "docs" ]
     ports:
       - "8119:5173"
+    user: "1001:1001"
     volumes:
       - ./:/app
       - pnpm_node_modules:/app/docs/node_modules

@@ -6,38 +6,43 @@ This directory contains k6 performance tests for the Cashiers and Invoices micro
 
 The k6 performance testing suite provides comprehensive load testing capabilities for:
 - REST API endpoints (Cashiers and Invoices)
-- gRPC endpoints
+- gRPC endpoints (with Protocol Buffers)
 - Realistic user workflows
-- Orleans actor grain performance (isolated)
-- Kafka event streaming validation (configurable)
+- Mixed service scenarios
 
 ## Quick Start
 
-### Using Docker Compose
+### Using pnpm Scripts (Recommended)
 
-1. Start the application with performance testing profile:
+1. Install dependencies:
 ```bash
-# Start all services including k6 with web dashboard
-docker compose --profile api up --build
-
-# Or just run the performance tests (assuming services are running)
-docker compose run k6-performance
+pnpm install
 ```
 
-2. Access the k6 Web Dashboard:
+2. Run test scenarios with built-in web dashboard:
+```bash
+# Run realistic mixed workflow test
+pnpm test:mixed
+
+# Run cashiers baseline test (REST API)
+pnpm test:cashiers
+
+# Run cashiers gRPC test
+pnpm test:cashiers:grpc
+
+# Run invoices baseline test
+pnpm test:invoices
+
+# Run stress and spike tests
+pnpm test:cashiers:stress
+pnpm test:cashiers:spike
+```
+
+3. Access the k6 Web Dashboard during tests:
    - **URL**: http://localhost:5665
    - **Real-time metrics**: CPU, Memory, HTTP requests, response times
    - **Interactive charts**: Customize views and time ranges
-   - **Export**: Download HTML reports after test completion
-
-2. Run specific test scenario:
-```bash
-# Run cashiers baseline test
-docker compose run k6-performance run /scripts/scenarios/cashiers/baseline.js
-
-# Run invoices baseline test
-docker compose run k6-performance run /scripts/scenarios/invoices/baseline.js
-```
+   - **Export**: HTML reports automatically saved to `results/` directory
 
 ### Using Aspire
 
@@ -47,47 +52,55 @@ dotnet run --project src/AppDomain.AppHost
 ```
 
 2. Access the dashboards:
-   - **Aspire Dashboard**: https://localhost:18100 (orchestration and service health)
+   - **Aspire Dashboard**: https://localhost:18110 (orchestration and service health)
 
-The k6 container will be available in the Aspire dashboard and can be executed from there.
+### Direct k6 Usage
 
-### Local Development
-
-TBD
+You can also run k6 directly using Docker:
+```bash
+# Run with web dashboard
+docker run --rm --network host -v $(pwd):/scripts -w /scripts \
+  -e K6_WEB_DASHBOARD=true \
+  grafana/k6 run scenarios/cashiers/baseline.js
+```
 
 ## Project Structure
 
 ```
 k6/
-├── Dockerfile              # k6 container configuration
-├── package.json           # Node.js dependencies
-├── run-tests.sh          # Test runner script
-├── .env.example          # Environment variables template
+├── package.json           # Node.js dependencies and npm scripts
+├── pnpm-lock.yaml        # Locked dependency versions
 ├── config/
 │   ├── options.js        # k6 test options and stages
 │   └── endpoints.js      # API endpoint configurations
 ├── lib/
 │   └── helpers.js        # Utility functions and custom metrics
+├── protos/
+│   └── cashiers.proto    # Protocol Buffers definitions for gRPC
 ├── scenarios/
 │   ├── cashiers/
-│   │   ├── baseline.js          # Cashiers CRUD operations
-│   │   ├── simple-create.js     # Quick smoke test
+│   │   ├── baseline.js          # Cashiers CRUD operations (REST)
+│   │   ├── baseline-grpc.js     # Cashiers CRUD operations (gRPC)
+│   │   ├── simple-create.js     # Quick smoke test (REST)
+│   │   ├── simple-create-grpc.js # Quick smoke test (gRPC)
 │   │   ├── stress.js            # Cashiers stress test (300 users)
 │   │   └── spike.js             # Cashiers spike test (sudden load)
 │   ├── invoices/
 │   │   └── baseline.js          # Invoices lifecycle test
 │   └── mixed/
 │       └── realistic-workflow.js # Mixed user scenarios
-└── results/              # Test output directory
+└── results/              # Test output and HTML reports
 ```
 
 ## Test Scenarios
 
 ### 1. Baseline Tests
 Basic CRUD operations with steady load:
-- **Cashiers**: Create, Read, Update, Delete operations (`scenarios/cashiers/baseline.js`)
+- **Cashiers (REST)**: Create, Read, Update, Delete operations (`scenarios/cashiers/baseline.js`)
+- **Cashiers (gRPC)**: Create, Read, Update, Delete operations (`scenarios/cashiers/baseline-grpc.js`)
 - **Invoices**: Create, Pay, Cancel operations (`scenarios/invoices/baseline.js`)
-- **Simple Create**: Quick smoke test for cashier creation (`scenarios/cashiers/simple-create.js`)
+- **Simple Create (REST)**: Quick smoke test for cashier creation (`scenarios/cashiers/simple-create.js`)
+- **Simple Create (gRPC)**: Quick smoke test for cashier creation (`scenarios/cashiers/simple-create-grpc.js`)
 
 ### 2. Realistic Workflow
 Simulates different user types (`scenarios/mixed/realistic-workflow.js`):
@@ -153,15 +166,21 @@ stages: [
 
 ### Environment Variables
 
-Create a `.env` file based on `.env.example`:
+The tests use environment variables for configuration:
 
 ```bash
-# API Configuration
+# API Configuration (defaults)
 API_BASE_URL=http://localhost:8101
 GRPC_ENDPOINT=localhost:8102
 
-# Environment Profile
-ENVIRONMENT=local
+# Environment Profile (controls test duration and load)
+ENVIRONMENT=local              # Default: light load for development
+ENVIRONMENT=staging           # Medium load for staging environment
+ENVIRONMENT=stress           # Heavy load for stress testing
+
+# k6 Web Dashboard
+K6_WEB_DASHBOARD=true        # Enable web dashboard (set by npm scripts)
+K6_WEB_DASHBOARD_EXPORT=path # Export HTML report after test completion
 ```
 
 ### Custom Metrics
@@ -174,51 +193,48 @@ The tests track custom business metrics:
 
 ## Running Tests
 
-### Command Line Options
+### Available npm Scripts
+
+All scripts automatically enable the web dashboard and save HTML reports:
 
 ```bash
-# Basic run
-k6 run scenarios/cashiers/baseline.js
+# Mixed scenarios
+pnpm test:mixed              # Realistic workflow test
+pnpm test:local              # Local environment test
+pnpm test:staging            # Staging environment test
 
-# With custom VUs and duration
-k6 run --vus 50 --duration 5m scenarios/invoices/baseline.js
+# Cashiers tests
+pnpm test:cashiers           # REST API baseline
+pnpm test:cashiers:grpc      # gRPC baseline
+pnpm test:cashiers:simple    # REST simple create
+pnpm test:cashiers:grpc:simple # gRPC simple create
+pnpm test:cashiers:stress    # Stress test (300 users)
+pnpm test:cashiers:spike     # Spike test
 
-# With specific environment
-ENVIRONMENT=staging k6 run scenarios/mixed/realistic-workflow.js
-
-# Run realistic workflow scenario
-k6 run scenarios/mixed/realistic-workflow.js
-
-# Output to JSON
-k6 run --out json=results/test-results.json scenarios/cashiers/baseline.js
-
-# With HTML report
-k6 run --out html=results/report.html scenarios/invoices/baseline.js
+# Invoices tests
+pnpm test:invoices           # Invoices baseline
 ```
 
-### Docker Compose Commands
+### Direct k6 Commands
 
 ```bash
-# Run default scenario (cashiers baseline) with web dashboard
-docker compose run k6-performance
-# Access dashboard at http://localhost:5665
+# Basic run with web dashboard
+docker run --rm --network host -v $(pwd):/scripts -w /scripts \
+  -e K6_WEB_DASHBOARD=true \
+  grafana/k6 run scenarios/cashiers/baseline.js
 
-# Run specific scenarios
-docker compose run k6-performance run /scripts/scenarios/cashiers/stress.js
-docker compose run k6-performance run /scripts/scenarios/cashiers/spike.js
-docker compose run k6-performance run /scripts/scenarios/cashiers/simple-create.js
+# With custom VUs and duration
+docker run --rm --network host -v $(pwd):/scripts -w /scripts \
+  grafana/k6 run --vus 50 --duration 5m scenarios/invoices/baseline.js
 
-# Run with web dashboard enabled
-docker compose run k6-performance run --web-dashboard /scripts/scenarios/cashiers/stress.js
+# With specific environment
+docker run --rm --network host -v $(pwd):/scripts -w /scripts \
+  -e ENVIRONMENT=staging \
+  grafana/k6 run scenarios/mixed/realistic-workflow.js
 
-# Run with environment override
-docker compose run -e ENVIRONMENT=staging k6-performance
-
-# Run specific scenario
-docker compose run k6-performance run /scripts/scenarios/cashiers/baseline.js
-
-# Run with volume for results
-docker compose run -v $(pwd)/results:/results k6-performance
+# Output to JSON (in addition to web dashboard)
+docker run --rm --network host -v $(pwd):/scripts -w /scripts \
+  grafana/k6 run --out json=results/test-results.json scenarios/cashiers/baseline.js
 ```
 
 ## Analyzing Results
