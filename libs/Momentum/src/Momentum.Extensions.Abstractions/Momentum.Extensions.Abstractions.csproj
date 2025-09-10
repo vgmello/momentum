@@ -9,7 +9,7 @@
         <BaseVersion>1000.0.0</BaseVersion>
    </PropertyGroup>
 
-    <Target Name="GenerateLocalVersion" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug'">
+    <Target Name="GenerateLocalVersion" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' ">
         <PropertyGroup>
             <LocalVersionSuffix>$([System.DateTime]::UtcNow.ToString("yyMMddHHmmss"))</LocalVersionSuffix>
             <LocalVersion>$(BaseVersion)-pre.$(LocalVersionSuffix)</LocalVersion>
