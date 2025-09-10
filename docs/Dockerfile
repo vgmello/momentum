@@ -12,7 +12,7 @@ RUN apk add --no-cache git nodejs && \
 # Install dependencies into the isolated /build directory.
 # This directory will NOT be affected by the volume mount.
 WORKDIR /app/docs
-COPY docs/package.json docs/pnpm-lock.yaml ./
+COPY --link docs/package.json docs/pnpm-lock.yaml ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 WORKDIR /app/docs

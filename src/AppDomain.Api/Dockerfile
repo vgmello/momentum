@@ -33,14 +33,14 @@ ENV GRPC_PROTOC_PLUGIN=/usr/bin/grpc_csharp_plugin
 WORKDIR /src
 
 ## Copy all project files to restore dependencies
-COPY --parents **/**/**/*.csproj .
-COPY Directory.Build.props Directory.Packages.props ./
+COPY --link --parents **/**/**/*.csproj .
+COPY --link Directory.Build.props Directory.Packages.props ./
 
 ## Restore packages - this layer is cached unless dependencies change
 RUN dotnet restore "src/AppDomain.Api/AppDomain.Api.csproj"
 
 ## Copy source code (this layer invalidates on any code change)
-COPY . .
+COPY --link . .
 WORKDIR /src/src/AppDomain.Api/
 
 ## Create Wolverine generated source files
@@ -57,6 +57,6 @@ RUN dotnet publish \
 
 # Final stage
 FROM base AS final
-COPY --from=build --chown=appuser:appuser /app/publish .
+COPY --link --from=build --chown=appuser:appuser /app/publish .
 
 ENTRYPOINT ["dotnet", "AppDomain.Api.dll"]
