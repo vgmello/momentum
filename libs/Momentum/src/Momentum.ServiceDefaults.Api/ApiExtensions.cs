@@ -36,7 +36,10 @@ public static class ApiExtensions
         builder.Services.AddOpenApiWithXmlDocSupport();
         builder.Services.AddHttpLogging();
 
-        builder.Services.AddGrpc();
+        builder.Services.AddGrpc(options =>
+        {
+            options.EnableDetailedErrors = builder.Environment.IsDevelopment();
+        });
         builder.Services.AddGrpcReflection();
 
         // Authentication and authorization services
