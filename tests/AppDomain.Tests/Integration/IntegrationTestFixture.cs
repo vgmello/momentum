@@ -155,7 +155,9 @@ public class IntegrationTestFixture : IAsyncLifetime
         ServiceDefaultsExtensions.EntryAssembly = typeof(IAppDomainAssembly).Assembly;
 
         builder.AddServiceDefaults();
+        //#if (INCLUDE_API)
         builder.AddApiServiceDefaults();
+        //#endif
         //#if (USE_KAFKA)
         builder.AddKafkaMessagingExtensions();
         //#endif
