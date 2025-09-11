@@ -8,6 +8,7 @@ using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
 using Momentum.ServiceDefaults;
 using AppDomain;
 //#if (USE_LIQUIBASE)
@@ -21,13 +22,22 @@ using Testcontainers.Kafka;
 //#endif
 //#if (INCLUDE_API)
 using Grpc.Net.Client;
-using System.Net;
 using AppDomain.Api;
-using AppDomain.Infrastructure;
-using Momentum.Extensions.Messaging.Kafka;
 using Momentum.ServiceDefaults.Api;
+//#endif
+//#if (HAS_BACKEND)
+using AppDomain.Infrastructure;
 using Momentum.ServiceDefaults.HealthChecks;
-
+//#endif
+//#if (USE_KAFKA)
+using Momentum.Extensions.Messaging.Kafka;
+//#endif
+//#if (INCLUDE_BACK_OFFICE)
+using AppDomain.BackOffice;
+//#endif
+//#if (INCLUDE_ORLEANS)
+using AppDomain.BackOffice.Orleans;
+using AppDomain.BackOffice.Orleans.Infrastructure.Extensions;
 //#endif
 //#if (INCLUDE_API && INCLUDE_ORLEANS)
 
@@ -42,7 +52,7 @@ public class IntegrationTestFixture : IAsyncLifetime
 {
     private readonly INetwork _containerNetwork = new NetworkBuilder().Build();
 
-    //#if (INCLUDE_API)
+    //#if (HAS_BACKEND)
     private WebApplication? _app;
     //#endif
 
@@ -56,6 +66,8 @@ public class IntegrationTestFixture : IAsyncLifetime
 
     //#if (INCLUDE_API)
     public GrpcChannel GrpcChannel { get; private set; } = null!;
+    //#endif
+    //#if (HAS_BACKEND)
     public IServiceProvider Services => _app?.Services ?? throw new InvalidOperationException("Application not initialized");
     //#endif
 
@@ -108,12 +120,12 @@ public class IntegrationTestFixture : IAsyncLifetime
         await liquibaseMigrationContainer.StartAsync();
         //#endif
 
-        //#if (INCLUDE_API)
+        //#if (HAS_BACKEND)
         await CreateTestWebApplicationAsync();
         //#endif
     }
 
-    //#if (INCLUDE_API)
+    //#if (HAS_BACKEND)
     private async Task CreateTestWebApplicationAsync()
     {
         var builder = WebApplication.CreateEmptyBuilder(new WebApplicationOptions());
@@ -144,7 +156,11 @@ public class IntegrationTestFixture : IAsyncLifetime
         {
             options.Listen(IPAddress.Loopback, 0, listenOptions =>
             {
+                //#if (INCLUDE_API)
                 listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http2;
+                //#else
+                listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http1;
+                //#endif
             });
         });
 
@@ -154,26 +170,32 @@ public class IntegrationTestFixture : IAsyncLifetime
 
         ServiceDefaultsExtensions.EntryAssembly = typeof(IAppDomainAssembly).Assembly;
 
+        builder.AddAppDomainServices();
         builder.AddServiceDefaults();
-        //#if (INCLUDE_API)
-        builder.AddApiServiceDefaults();
-        //#endif
         //#if (USE_KAFKA)
         builder.AddKafkaMessagingExtensions();
         //#endif
-
-        builder.AddAppDomainServices();
-        builder.AddApplicationServices();
+        //#if (INCLUDE_API)
+        builder.AddApiServiceDefaults();
+        Api.DependencyInjection.AddApplicationServices(builder);
+        //#endif
+        //#if (INCLUDE_BACKOFFICE)
+        BackOffice.DependencyInjection.AddApplicationServices(builder);
+        //#if (INCLUDE_ORLEANS)
+        builder.AddOrleans();
+        BackOffice.Orleans.DependencyInjection.AddApplicationServices(builder);
+        //#endif
 
         _app = builder.Build();
 
+        //#if (INCLUDE_API)
         _app.ConfigureApiUsingDefaults(requireAuth: false);
-        _app.MapDefaultHealthCheckEndpoints();
-
         _app.MapGrpcServices(typeof(Program));
+        //#endif
 
         await _app.StartAsync();
 
+        //#if (INCLUDE_API)
         var httpClient = new HttpClient(new HttpClientHandler())
         {
             DefaultRequestVersion = HttpVersion.Version20,
@@ -184,18 +206,21 @@ public class IntegrationTestFixture : IAsyncLifetime
         {
             HttpClient = httpClient
         });
+        //#endif
     }
     //#endif
 
     public async ValueTask DisposeAsync()
     {
-        //#if (INCLUDE_API)
+        //#if (HAS_BACKEND)
         if (_app != null)
         {
             await _app.StopAsync();
             await _app.DisposeAsync();
         }
+        //#endif
 
+        //#if (INCLUDE_API)
         GrpcChannel.Dispose();
         //#endif
 
@@ -216,6 +241,7 @@ public class IntegrationTestFixture : IAsyncLifetime
         await Log.CloseAndFlushAsync();
     }
 
+    //#if (HAS_BACKEND)
     private Logger CreateTestLogger(string logNamespace) =>
         new LoggerConfiguration()
             .WriteTo.Sink(new XUnitSink(() => TestOutput))
@@ -225,4 +251,5 @@ public class IntegrationTestFixture : IAsyncLifetime
             .MinimumLevel.Override("AppDomain", LogEventLevel.Debug)
             .MinimumLevel.Override(logNamespace, LogEventLevel.Debug)
             .CreateLogger();
+    //#endif
 }
