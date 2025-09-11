@@ -181,6 +181,7 @@ public class IntegrationTestFixture : IAsyncLifetime
         //#endif
         //#if (INCLUDE_BACKOFFICE)
         BackOffice.DependencyInjection.AddApplicationServices(builder);
+        //#endif
         //#if (INCLUDE_ORLEANS)
         builder.AddOrleans();
         BackOffice.Orleans.DependencyInjection.AddApplicationServices(builder);
