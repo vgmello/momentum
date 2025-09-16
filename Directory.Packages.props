@@ -2,7 +2,7 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <AspireVersion>9.4.2</AspireVersion>
-    <MicrosoftExtensionsVersion>9.0.8</MicrosoftExtensionsVersion>
+    <MicrosoftExtensionsVersion>9.0.9</MicrosoftExtensionsVersion>
     <MicrosoftOrleansVersion>9.2.1</MicrosoftOrleansVersion>
     <OpenTelemetryVersion>1.12.0</OpenTelemetryVersion>
     <AspireAppHostSdkVersion>$(AspireVersion)</AspireAppHostSdkVersion>
@@ -79,7 +79,7 @@
     <PackageVersion Include="Microsoft.Extensions.Diagnostics.Testing" Version="9.8.0" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="9.8.0" />
+    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="9.9.0" />
     <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="9.4.2" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageVersion Include="Microsoft.Orleans.Analyzers" Version="$(MicrosoftOrleansVersion)">
@@ -128,7 +128,7 @@
     <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="$(OpenTelemetryVersion)" />
     <PackageVersion Include="OrleansDashboard" Version="8.2.0" />
     <PackageVersion Include="Riok.Mapperly" Version="4.2.1" />
-    <PackageVersion Include="Scalar.AspNetCore" Version="2.7.2" />
+    <PackageVersion Include="Scalar.AspNetCore" Version="2.8.4" />
     <PackageVersion Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageVersion Include="Serilog.Exceptions" Version="8.4.0" />
     <PackageVersion Include="Serilog.Sinks.OpenTelemetry" Version="4.2.0" />
@@ -143,11 +143,11 @@
     <PackageVersion Include="Testcontainers" Version="4.7.0" />
     <PackageVersion Include="Testcontainers.Kafka" Version="4.7.0" />
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.7.0" />
-    <PackageVersion Include="WolverineFx" Version="4.11.0" />
+    <PackageVersion Include="WolverineFx" Version="4.12.0" />
     <PackageVersion Include="WolverineFx.Http" Version="4.9.3" />
     <PackageVersion Include="WolverineFx.Http.FluentValidation" Version="4.9.3" />
-    <PackageVersion Include="WolverineFx.Kafka" Version="4.11.0" />
-    <PackageVersion Include="WolverineFx.Postgresql" Version="4.11.0" />
+    <PackageVersion Include="WolverineFx.Kafka" Version="4.12.0" />
+    <PackageVersion Include="WolverineFx.Postgresql" Version="4.12.0" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
