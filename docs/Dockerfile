@@ -9,8 +9,6 @@ RUN apk add --no-cache git nodejs && \
     dotnet tool install -g docfx  && \
     dotnet tool install -g Momentum.Extensions.EventMarkdownGenerator
 
-# Install dependencies into the isolated /build directory.
-# This directory will NOT be affected by the volume mount.
 WORKDIR /app/docs
 COPY --link docs/package.json docs/pnpm-lock.yaml ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
