@@ -1,6 +1,5 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-using Aspire.Confluent.Kafka;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
