@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <AspireVersion>9.4.2</AspireVersion>
+    <AspireVersion>9.5.0</AspireVersion>
     <MicrosoftExtensionsVersion>9.0.8</MicrosoftExtensionsVersion>
     <MicrosoftOrleansVersion>9.2.1</MicrosoftOrleansVersion>
     <OpenTelemetryVersion>1.12.0</OpenTelemetryVersion>
@@ -146,12 +146,12 @@
     <PackageVersion Include="WolverineFx" Version="4.11.0" />
     <PackageVersion Include="WolverineFx.Http" Version="4.9.3" />
     <PackageVersion Include="WolverineFx.Http.FluentValidation" Version="4.9.3" />
-    <PackageVersion Include="WolverineFx.Kafka" Version="4.11.0" />
-    <PackageVersion Include="WolverineFx.Postgresql" Version="4.11.0" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.4">
+    <PackageVersion Include="WolverineFx.Kafka" Version="4.12.2" />
+    <PackageVersion Include="WolverineFx.Postgresql" Version="4.12.2" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
-    <PackageVersion Include="xunit.v3" Version="3.0.1" />
+    <PackageVersion Include="xunit.v3" Version="3.1.0" />
   </ItemGroup>
 </Project>
