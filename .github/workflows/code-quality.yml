@@ -98,7 +98,7 @@ jobs:
         dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner --verbosity minimal
 
     - name: Initialize CodeQL and SonarQube
-      uses: github/codeql-action/init@v3
+      uses: github/codeql-action/init@v4
       with:
         languages: csharp
         build-mode: manual
@@ -146,7 +146,7 @@ jobs:
         }
 
     - name: Complete CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
+      uses: github/codeql-action/analyze@v4
       with:
         category: "/language:csharp"
 
