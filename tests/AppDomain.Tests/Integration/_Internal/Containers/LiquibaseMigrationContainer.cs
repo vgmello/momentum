@@ -1,6 +1,7 @@
 // Copyright (c) OrgName. All rights reserved.
 
 using DotNet.Testcontainers.Builders;
+using DotNet.Testcontainers.Configurations;
 using DotNet.Testcontainers.Containers;
 using DotNet.Testcontainers.Networks;
 
@@ -16,7 +17,7 @@ public class LiquibaseMigrationContainer : IAsyncDisposable
         var baseDirectory = Path.GetFullPath("../../../../../");
 
         _liquibaseContainer = new ContainerBuilder()
-            .WithImage("liquibase/liquibase:latest")
+            .WithImage("liquibase/liquibase:4.33-alpine")
             .WithNetwork(containerNetwork)
             .WithBindMount($"{baseDirectory}infra/AppDomain.Database/Liquibase", "/liquibase/changelog")
             .WithEnvironment("LIQUIBASE_COMMAND_USERNAME", "postgres")
@@ -32,8 +33,9 @@ public class LiquibaseMigrationContainer : IAsyncDisposable
                                 """)
             .WithWaitStrategy(
                 Wait.ForUnixContainer()
-                    .UntilMessageIsLogged("Migration Complete", opt => opt.WithTimeout(TimeSpan.FromMinutes(1))))
-            .Build();
+                    .UntilMessageIsLogged("Migration Complete", opt => opt
+                        .WithMode(WaitStrategyMode.OneShot)
+                        .WithTimeout(TimeSpan.FromMinutes(1)))).Build();
     }
 
     public async Task StartAsync()
@@ -50,18 +52,20 @@ public class LiquibaseMigrationContainer : IAsyncDisposable
                 throw new InvalidOperationException($"Liquibase migration failed with exit code {result}. Logs: {logs}");
             }
         }
-        catch (Exception e) when (!(e is InvalidOperationException))
+        catch (Exception e) when (e is not InvalidOperationException)
         {
+            (string Stdout, string Stderr)? logs;
+
             try
             {
-                var logs = await _liquibaseContainer.GetLogsAsync();
-
-                throw new InvalidOperationException($"Liquibase migration failed. Logs: {logs}", e);
+                logs = await _liquibaseContainer.GetLogsAsync();
             }
             catch
             {
                 throw new InvalidOperationException($"Liquibase migration failed. Unable to retrieve logs.", e);
             }
+
+            throw new InvalidOperationException($"Liquibase migration failed. Logs: {logs}", e);
         }
     }
 
