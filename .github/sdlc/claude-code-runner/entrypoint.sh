@@ -175,6 +175,32 @@ echo ""
 echo "Claude Code exit code: $CLAUDE_EXIT_CODE"
 echo ""
 
+# Post response as GitHub comment
+echo "=== Posting response to GitHub ==="
+
+if [ ! -s "$CLAUDE_OUTPUT_FILE" ]; then
+    echo "Error: Claude Code did not produce output" > "$CLAUDE_OUTPUT_FILE"
+fi
+
+COMMENT_BODY=$(jq -n \
+    --arg output "$(cat "$CLAUDE_OUTPUT_FILE")" \
+    --arg actor "$GITHUB_ACTOR" \
+    --arg type "$ISSUE_TYPE" \
+    --arg number "$ISSUE_NUMBER" \
+    '{
+        body: ("## Claude Code Response\n\n" + $output + "\n\n---\n*Triggered by @" + $actor + " on " + $type + " #" + $number + "*")
+    }')
+
+curl -sS -X POST \
+    -H "Accept: application/vnd.github+json" \
+    -H "Authorization: Bearer $GITHUB_TOKEN" \
+    -H "X-GitHub-Api-Version: 2022-11-28" \
+    "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/$ISSUE_NUMBER/comments" \
+    -d "$COMMENT_BODY"
+
+echo "Comment posted successfully"
+echo ""
+
 # Final commit and push Claude state changes
 echo "=== Final commit of Claude state changes ==="
 commit_claude_state
