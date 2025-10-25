@@ -15,8 +15,8 @@ public static class LiquibaseExtensions
     /// <param name="dbPassword">The database password parameter resource.</param>
     /// <returns>A container resource builder configured to run Liquibase migrations.</returns>
     /// <remarks>
-    ///     This method configures a Liquibase container that will run migrations for both the
-    ///     service_bus and app_domain databases using changelog files from the mounted volume.
+    ///     This method configures a Liquibase container that will run migrations against the postgres database,
+    ///     creating the service_bus and app_domain databases and their schemas using the master changelog.
     ///     The container waits for the database server to be ready before executing migrations.
     /// </remarks>
     public static IResourceBuilder<ContainerResource> AddLiquibaseMigrations(
@@ -35,9 +35,6 @@ public static class LiquibaseExtensions
             .WithReference(dbServerResource)
             .WithEntrypoint("/bin/sh")
             .WithArgs("-c",
-                """
-                liquibase --url=jdbc:postgresql://app-domain-db:5432/service_bus update --changelog-file=service_bus/changelog.xml && \
-                liquibase --url=jdbc:postgresql://app-domain-db:5432/app_domain update --changelog-file=app_domain/changelog.xml
-                """);
+                "liquibase --url=jdbc:postgresql://app-domain-db:5432/postgres update");
     }
 }

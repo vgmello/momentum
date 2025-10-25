@@ -54,9 +54,7 @@ services:
       - -c
       - |
         echo 'Running database migrations...' && \
-        liquibase update --defaults-file liquibase.setup.properties --url=jdbc:postgresql://app-domain-db:5432/postgres && \
-        liquibase update --defaults-file liquibase.servicebus.properties --url=jdbc:postgresql://app-domain-db:5432/service_bus && \
-        liquibase update --url=jdbc:postgresql://app-domain-db:5432/app_domain && \
+        liquibase update --changeLogFile=changelog.xml --url=jdbc:postgresql://app-domain-db:5432/postgres --username=${POSTGRES_USER:-postgres} --password=${POSTGRES_PASSWORD:-password@} && \
         echo 'Database migrations completed successfully!'
 
   # #endif

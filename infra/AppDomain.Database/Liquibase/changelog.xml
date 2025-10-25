@@ -5,6 +5,10 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
+    <!-- Create databases first -->
+    <include file="databases.sql"/>
+
+    <!-- Include all domain changelogs -->
     <includeAll path="" minDepth="2" relativeToChangelogFile="true" endsWithFilter="changelog.xml"/>
 
 </databaseChangeLog>
