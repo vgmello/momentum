@@ -14,12 +14,25 @@ public class LiquibaseMigrationContainer : IAsyncDisposable
     public LiquibaseMigrationContainer(string dbContainerName, INetwork containerNetwork)
     {
         var dbServerSanitized = dbContainerName.Trim('/');
-        var baseDirectory = Path.GetFullPath("../../../../../");
+        // Get the directory where the test assembly is located, then navigate up to workspace root
+        var assemblyLocation = Path.GetDirectoryName(typeof(LiquibaseMigrationContainer).Assembly.Location)!;
+        var baseDirectory = Path.GetFullPath(Path.Combine(assemblyLocation, "../../../../../"));
+        var liquibasePath = Path.Combine(baseDirectory, "infra/AppDomain.Database/Liquibase");
 
-        _liquibaseContainer = new ContainerBuilder()
+        var containerBuilder = new ContainerBuilder()
             .WithImage("liquibase/liquibase:4.33-alpine")
-            .WithNetwork(containerNetwork)
-            .WithBindMount($"{baseDirectory}infra/AppDomain.Database/Liquibase", "/liquibase/changelog")
+            .WithNetwork(containerNetwork);
+
+        // Copy Liquibase files into the container instead of bind mounting
+        // This is necessary for Docker-in-Docker scenarios where bind mounts don't work
+        foreach (var file in Directory.GetFiles(liquibasePath, "*", SearchOption.AllDirectories))
+        {
+            var relativePath = Path.GetRelativePath(liquibasePath, file);
+            var targetPath = $"/liquibase/changelog/{relativePath.Replace(Path.DirectorySeparatorChar, '/')}";
+            containerBuilder = containerBuilder.WithResourceMapping(file, targetPath);
+        }
+
+        _liquibaseContainer = containerBuilder
             .WithEnvironment("LIQUIBASE_COMMAND_USERNAME", "postgres")
             .WithEnvironment("LIQUIBASE_COMMAND_PASSWORD", "postgres")
             .WithEnvironment("LIQUIBASE_COMMAND_CHANGELOG_FILE", "changelog.xml")

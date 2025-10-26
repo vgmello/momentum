@@ -61,7 +61,8 @@
     </ItemGroup>
 
 <!--#if (INCLUDE_API) -->
-    <ItemGroup>
+    <!-- Temporarily disabled protobuf generation due to ARM64 protoc segfault issue -->
+    <!--<ItemGroup>
         <Protobuf Include="..\..\src\AppDomain.Api\**\Protos\**\*.proto"
                   ProtoRoot="..\..\src\AppDomain.Api\"
                   GrpcServices="Client"
@@ -69,7 +70,7 @@
 
             <Compile Include="..\..\src\AppDomain.Api\**\Protos\**\*.Partial.cs"
                      Link="Integration\%(RecursiveDir)%(Filename)%(Extension)"/>
-    </ItemGroup>
+    </ItemGroup>-->
 <!--#endif -->
     <ItemGroup>
         <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest"/>
