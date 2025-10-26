@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <!--#if (!LIBS_INCLUDES_EVENTHUB) -->
+    <PropertyGroup>
+        <IsPackable>true</IsPackable>
+        <PackageId>Momentum.Extensions.Messaging.EventHub</PackageId>
+        <PackageDescription>Azure Event Hubs messaging integration for Momentum platform providing event-driven communication through Azure Event Hubs with CloudEvents and WolverineFx support.</PackageDescription>
+        <PackageProjectUrl>https://github.com/vgmello/momentum/blob/main/libs/Momentum/src/Momentum.Extensions.Messaging.EventHub/README.md</PackageProjectUrl>
+    </PropertyGroup>
+    <!--#endif -->
+
+    <ItemGroup>
+        <PackageReference Include="Azure.Messaging.EventHubs" Version="5.12.2"/>
+        <PackageReference Include="Azure.Messaging.EventHubs.Processor" Version="5.12.2"/>
+        <PackageReference Include="Azure.Storage.Blobs" Version="12.22.0"/>
+        <PackageReference Include="Azure.ResourceManager.EventHubs" Version="1.1.0"/>
+        <PackageReference Include="CloudNative.CloudEvents" Version="2.8.0"/>
+        <PackageReference Include="WolverineFx" Version="3.7.2"/>
+        <!--#if (!LIBS_INCLUDES_DEFAULTS)
+        <PackageReference Include="Momentum.ServiceDefaults"/>
+        #endif -->
+    </ItemGroup>
+    <!--#if (LIBS_INCLUDES_DEFAULTS) -->
+    <ItemGroup>
+        <!--#if (LIBS_INCLUDES_DEFAULTS)
+        <ProjectReference Include="..\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
+        #endif -->
+    </ItemGroup>
+    <!--#endif -->
+    <!--#if (!LIBS_INCLUDES_EVENTHUB) -->
+    <ItemGroup>
+        <ProjectReference Include="..\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
+        <ProjectReference Include="..\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
+    </ItemGroup>
+    <!--#endif -->
+</Project>
