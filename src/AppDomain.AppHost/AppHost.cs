@@ -124,6 +124,7 @@ builder
 builder
     .AddContainer("app-domain-docs", "app-domain-docs")
     .WithDockerfile("../../", "docs/Dockerfile")
+    .WithImageTag("latest")
     .WithBindMount("../../", "/app")
     .WithVolume("/app/docs/node_modules")
     .WithHttpEndpoint(port: 8119, targetPort: 5173, name: "http")

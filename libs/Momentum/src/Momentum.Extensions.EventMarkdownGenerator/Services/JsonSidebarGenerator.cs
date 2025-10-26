@@ -243,7 +243,7 @@ public class JsonSidebarGenerator
                 .Select(t => new SidebarItem
                 {
                     Text = t.Name,
-                    Link = $"/schemas/{(t.FullName ?? "UnknownType").ToSafeFileName()}"
+                    Link = $"/schemas/{TypeUtils.GetCleanTypeName(t).ToSafeFileName()}"
                 })
                 .ToList();
 
@@ -273,6 +273,7 @@ public class JsonSidebarGenerator
 
         return parts.Length > 1 ? parts[1] : parts[0];
     }
+
 
 
     public async Task WriteSidebarAsync(ICollection<EventWithDocumentation> events, string filePath)

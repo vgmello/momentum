@@ -6,6 +6,8 @@ namespace Momentum.ServiceDefaults.Messaging.Telemetry;
 
 public class MessagingMetrics(string metricName, Meter meter)
 {
+    public string MetricName => metricName;
+
     private readonly Counter<long> _messagesReceived = meter.CreateCounter<long>(
         name: $"{metricName}.count",
         unit: "invocations",

@@ -1,4 +1,38 @@
 <Project>
+    <Target Name="GenerateLocalVersion" BeforeTargets="Build" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' ">
+        <PropertyGroup>
+            <LocalVersionFilePath>$(MSBuildThisFileDirectory)../../local-mmt-version.txt</LocalVersionFilePath>
+            <IsAbstractionsProject Condition="'$(MSBuildProjectName)' == 'Momentum.Extensions.Abstractions'">true</IsAbstractionsProject>
+        </PropertyGroup>
+
+        <!-- Generate new version if this is the Abstractions project -->
+        <PropertyGroup Condition="'$(IsAbstractionsProject)' == 'true'">
+            <LocalVersionSuffix>$([System.DateTime]::UtcNow.ToString("yyMMddHHmmss"))</LocalVersionSuffix>
+            <LocalVersion>$(BaseVersion)-pre.$(LocalVersionSuffix)</LocalVersion>
+            <LocalFeedAbsolutePath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory).local/nuget'))</LocalFeedAbsolutePath>
+        </PropertyGroup>
+
+        <!-- Write version file if this is the Abstractions project -->
+        <WriteLinesToFile File="$(LocalVersionFilePath)" Lines="$(LocalVersion)" Overwrite="true" Condition="'$(IsAbstractionsProject)' == 'true'" />
+        <WriteLinesToFile File="$(MSBuildThisFileDirectory)../../local-feed-path.txt" Lines="$(LocalFeedAbsolutePath)" Overwrite="true" Condition="'$(IsAbstractionsProject)' == 'true'" />
+
+        <!-- Read version file if this is NOT the Abstractions project -->
+        <ReadLinesFromFile File="$(LocalVersionFilePath)" Condition="'$(IsAbstractionsProject)' != 'true' and Exists('$(LocalVersionFilePath)')">
+            <Output TaskParameter="Lines" PropertyName="LocalVersion"/>
+        </ReadLinesFromFile>
+
+        <!-- Set version properties for all packable projects -->
+        <PropertyGroup Condition=" '$(LocalVersion)' != '' ">
+            <PackageVersion>$(LocalVersion)</PackageVersion>
+            <Version>$(LocalVersion)</Version>
+        </PropertyGroup>
+
+        <!-- Logging -->
+        <Message Text="Generating local version: $(LocalVersion)" Importance="high" Condition="'$(IsAbstractionsProject)' == 'true'" />
+        <Message Text="Using shared local version: $(LocalVersion)" Importance="high" Condition="'$(IsAbstractionsProject)' != 'true' and '$(LocalVersion)' != ''" />
+        <Warning Text="No local version file found. Build Abstractions project first." Condition="'$(IsAbstractionsProject)' != 'true' and '$(LocalVersion)' == ''" />
+    </Target>
+
     <Target Name="CleanOldPackages" BeforeTargets="Build;Clean" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' ">
         <ItemGroup>
             <OldPackagesToDelete Include="$(TargetDir)../*.*upkg"/>

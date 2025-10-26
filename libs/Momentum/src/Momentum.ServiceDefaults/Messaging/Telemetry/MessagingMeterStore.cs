@@ -11,6 +11,11 @@ public class MessagingMeterStore([FromKeyedServices(MessagingMeterStore.Messagin
 {
     public const string MessagingMeterKey = "App.Messaging.Meter";
 
+    private const string CommandHandlerPattern = "_command_handler";
+    private const string QueryHandlerPattern = "_query_handler";
+    private const string CommandPattern = "_command";
+    private const string QueryPattern = "_query";
+
     private readonly ConcurrentDictionary<string, MessagingMetrics> _metrics = new();
 
     public MessagingMetrics GetOrCreateMetrics(string messageType)
@@ -21,14 +26,24 @@ public class MessagingMeterStore([FromKeyedServices(MessagingMeterStore.Messagin
     private static MessagingMetrics CreateMessagingMetrics(string messageType, Meter meter)
     {
         var metricName = string.Join('.', messageType.Split('.').Select(s => s.ToSnakeCase()));
-
-        metricName = metricName switch
-        {
-            _ when metricName.EndsWith("_command") => metricName[..^8],
-            _ when metricName.EndsWith("_query") => metricName[..^6],
-            _ => metricName
-        };
-
+        metricName = NormalizeMetricName(metricName);
         return new MessagingMetrics(metricName, meter);
+    }
+
+    private static string NormalizeMetricName(string metricName)
+    {
+        if (metricName.Contains(QueryHandlerPattern))
+            metricName = metricName.Replace(QueryHandlerPattern, string.Empty);
+
+        if (metricName.Contains(CommandHandlerPattern))
+            metricName = metricName.Replace(CommandHandlerPattern, string.Empty);
+
+        if (metricName.EndsWith(CommandPattern))
+            return metricName[..^CommandPattern.Length];
+
+        if (metricName.EndsWith(QueryPattern))
+            return metricName[..^QueryPattern.Length];
+
+        return metricName;
     }
 }

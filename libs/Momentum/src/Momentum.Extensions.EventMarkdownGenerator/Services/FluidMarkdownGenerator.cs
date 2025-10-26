@@ -56,7 +56,7 @@ public class FluidMarkdownGenerator
 
     public IndividualMarkdownOutput GenerateSchemaMarkdown(Type schemaType, string outputDirectory)
     {
-        var fileName = $"{(schemaType.FullName ?? "UnknownType").ToSafeFileName()}.md";
+        var fileName = $"{TypeUtils.GetCleanTypeName(schemaType).ToSafeFileName()}.md";
         var filePath = GenerateFilePath(outputDirectory, fileName, "schemas");
 
         var context = CreateTemplateContext();
@@ -77,6 +77,7 @@ public class FluidMarkdownGenerator
     {
         return schemaTypes.Select(schemaType => GenerateSchemaMarkdown(schemaType, outputDirectory));
     }
+
 
 
     public static void CopyDefaultTemplatesToDirectory(string targetDirectory)

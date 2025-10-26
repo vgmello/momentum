@@ -15,18 +15,22 @@ public static class StringExtensions
         if (string.IsNullOrEmpty(value))
             return "default";
 
-        // Handle generic types by replacing angle brackets with underscores
+        // Handle generic types by replacing invalid filename characters
         // e.g., List<string> becomes List_string_
         // e.g., Dictionary<string,int> becomes Dictionary_string_int_
         var result = value
             .Replace('<', '_')
             .Replace('>', '_')
+            .Replace('[', '_')
+            .Replace(']', '_')
             .Replace(',', '_')
-            .Replace(' ', '_');
+            .Replace(' ', '_')
+            .Replace('`', '_');
 
         // Remove any other unsafe file name characters
         var invalidChars = Path.GetInvalidFileNameChars();
         result = new string(result.Where(c => !invalidChars.Contains(c)).ToArray());
+
 
         if (string.IsNullOrWhiteSpace(result))
             return "default";
