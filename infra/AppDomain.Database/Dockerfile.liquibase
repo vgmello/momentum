@@ -1,0 +1,9 @@
+# Dockerfile for Liquibase with embedded migration scripts
+# This is used for integration tests in Docker-in-Docker scenarios
+FROM liquibase/liquibase:4.33-alpine
+
+# Copy Liquibase changelog files into the image
+COPY Liquibase/ /liquibase/changelog/
+
+# Set working directory
+WORKDIR /liquibase
