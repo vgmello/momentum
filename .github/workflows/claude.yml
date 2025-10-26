@@ -10,6 +10,11 @@ on:
   pull_request_review:
     types: [submitted, edited]
 
+# Ensure only one workflow runs at a time per issue/PR
+concurrency:
+  group: claude-${{ github.event_name }}-${{ github.event.issue.number || github.event.pull_request.number }}
+  cancel-in-progress: false
+
 jobs:
   claude:
     if: |
@@ -26,6 +31,8 @@ jobs:
     steps:
       - name: Extract Context
         id: context
+        env:
+          DIFF_HUNK: ${{ github.event.comment.diff_hunk }}
         run: |
           # Initialize variables
           NUMBER=""
@@ -61,7 +68,7 @@ jobs:
               echo "COMMENT_LINE=${{ github.event.comment.line }}" >> $GITHUB_OUTPUT
               {
                 echo "COMMENT_DIFF_HUNK<<EOF"
-                echo "${{ github.event.comment.diff_hunk }}" | head -n 5
+                printf '%s\n' "$DIFF_HUNK" | head -n 5
                 echo "EOF"
               } >> $GITHUB_OUTPUT
               BODY="${{ github.event.comment.body }}"
@@ -189,5 +196,8 @@ jobs:
             -e GITHUB_REF="${{ steps.context.outputs.REF }}" \
             -e CLAUDE_BRANCH_NAME="claude-${{ steps.context.outputs.CLAUDE_TYPE }}-${{ steps.context.outputs.CLAUDE_NUMBER }}" \
             -e USER_PROMPT="$USER_PROMPT" \
+            -e GITHUB_ACTOR="${{ steps.context.outputs.ACTOR }}" \
+            -e ISSUE_TYPE="${{ steps.context.outputs.TYPE }}" \
+            -e ISSUE_NUMBER="${{ steps.context.outputs.NUMBER }}" \
             -v /var/run/docker.sock:/var/run/docker.sock \
             sdlc-claude:latest
