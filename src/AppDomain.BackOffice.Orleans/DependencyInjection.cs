@@ -14,8 +14,6 @@ public static class DependencyInjection
     /// <returns>The configured host application builder.</returns>
     public static IHostApplicationBuilder AddApplicationServices(this IHostApplicationBuilder builder)
     {
-        builder.AddNpgsqlDataSource("AppDomainDb");
-
         return builder;
     }
 }
