@@ -42,6 +42,7 @@
     <!--#endif -->
     <!--#if (!LIBS_INCLUDES_API) -->
     <ItemGroup>
+      <PackageReference Include="Grpc.Tools" VersionOverride="2.76.0" />
         <ProjectReference Include="..\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
         <ProjectReference Include="..\Momentum.Extensions.XmlDocs\Momentum.Extensions.XmlDocs.csproj"/>
         <ProjectReference Include="..\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>

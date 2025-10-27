@@ -6,7 +6,7 @@
     <MicrosoftOrleansVersion>9.2.1</MicrosoftOrleansVersion>
     <OpenTelemetryVersion>1.12.0</OpenTelemetryVersion>
     <AspireAppHostSdkVersion>$(AspireVersion)</AspireAppHostSdkVersion>
-    <GrpcVersion>[2.67]</GrpcVersion>
+    <GrpcVersion>[2.71.0]</GrpcVersion>
     <MomentumVersion>$(TemplateMomentumVersion)</MomentumVersion>
     <!--#if (USE_LOCAL) -->
     <MomentumVersion>$(LocalMomentumVersion)</MomentumVersion>
@@ -42,7 +42,7 @@
     <PackageVersion Include="Grpc.AspNetCore.Web" Version="$(GrpcVersion)" />
     <PackageVersion Include="Grpc.Net.Client" Version="$(GrpcVersion)" />
     <PackageVersion Include="Grpc.Net.Client.Web" Version="$(GrpcVersion)" />
-    <PackageVersion Include="Grpc.Tools" Version="[2.68.1]">
+    <PackageVersion Include="Grpc.Tools" Version="[2.76.0]">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
