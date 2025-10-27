@@ -87,14 +87,15 @@ When you call `AddServiceDefaults()`, the following services are automatically c
 
 #### 1. Health Checks
 
--   **Endpoints**: `/health` (detailed) and `/alive` (simple)
+-   **Endpoints**: `/status` (liveness), `/health/internal` (readiness), `/health` (public)
 -   **Built-in Checks**: Database connectivity, messaging health
 -   **Custom Checks**: Extensible health check system
 
 ```csharp
 // Automatically available endpoints:
-// GET /health     - Detailed health status
-// GET /alive      - Simple alive check
+// GET /status            - Liveness probe (cached, fast)
+// GET /health/internal   - Readiness probe (localhost only)
+// GET /health            - Public health (requires auth, detailed)
 ```
 
 #### 2. OpenTelemetry Observability

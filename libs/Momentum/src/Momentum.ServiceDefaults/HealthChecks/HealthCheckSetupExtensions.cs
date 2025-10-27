@@ -84,6 +84,9 @@ public static partial class HealthCheckSetupExtensions
 
         healthCheckStore.LastHealthStatus = report.Status;
 
+        httpContext.Response.StatusCode = report.Status == HealthStatus.Unhealthy ?
+            StatusCodes.Status503ServiceUnavailable : StatusCodes.Status200OK;
+
         return outputResult
             ? WriteReportObject(httpContext, report)
             : httpContext.Response.WriteAsync(report.Status.ToString());

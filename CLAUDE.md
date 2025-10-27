@@ -412,7 +412,7 @@ CREATE TRIGGER tr_invoice_version BEFORE UPDATE ON app_domain.invoices ...;
 1. **Health Checks Failing**:
    ```bash
    # Check if database is running
-   curl http://localhost:8101/health/internal
+   curl http://localhost:8101/status
 
    # Check Aspire dashboard for service status
    open https://localhost:18110
@@ -452,8 +452,8 @@ Complete observability stack configured by default:
 - **Health Checks**: Built-in health endpoints
 
 **Health Check Endpoints**:
-- `/status` - Liveness probe (simple status)
-- `/health/internal` - Internal health check (localhost only, detailed)
+- `/status` - Liveness probe (cached status, no auth)
+- `/health/internal` - Readiness probe (localhost only, detailed in dev)
 - `/health` - Public health check (requires auth, detailed)
 
 **Database Health Checks**:

@@ -82,7 +82,7 @@ dotnet run --project AppDomain/src/AppDomain.BackOffice.Orleans
 
 ### 3. Verify Setup
 
--   **API Health**: http://localhost:8101/health
+-   **API Health**: http://localhost:8101/status (liveness) or http://localhost:8101/health/internal (detailed, localhost only)
 -   **OpenAPI UI**: http://localhost:8101/scalar
 -   **gRPC**: Connect to localhost:8102
 

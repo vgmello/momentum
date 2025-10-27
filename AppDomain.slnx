@@ -5,7 +5,7 @@
     </Folder>
     <!--#endif -->
     <!--#if (false) -->
-    <Folder Name="/Libs/Tests">
+    <Folder Name="/Libs/Tests/">
         <Project Path="libs\Momentum\tests\Momentum.Extensions.Tests\Momentum.Extensions.Tests.csproj"/>
     </Folder>
     <!--#endif -->

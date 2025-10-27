@@ -242,7 +242,7 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
-app.MapDefaultEndpoints(); // Health checks, metrics
+app.MapDefaultEndpoints(); // Health checks
 
 // Add your API endpoints
 app.MapPost("/orders", async (CreateOrderCommand command, IOrderService orderService) =>
@@ -377,8 +377,9 @@ dotnet run
 
 # The service starts with:
 # - API endpoints: https://localhost:7001
-# - Health check: https://localhost:7001/health
-# - Metrics: https://localhost:7001/metrics
+# - Health check: https://localhost:7001/health (requires auth)
+# - Internal health: https://localhost:7001/health/internal (localhost only)
+# - Liveness: https://localhost:7001/status
 
 # Test creating an order
 curl -X POST https://localhost:7001/orders \
@@ -392,8 +393,11 @@ curl -X POST https://localhost:7001/orders \
 # Test retrieving an order (use the ID from the response above)
 curl https://localhost:7001/orders/{order-id}
 
-# Check health status
-curl https://localhost:7001/health
+# Check health status (liveness)
+curl https://localhost:7001/status
+
+# Check detailed health (development only, localhost)
+curl https://localhost:7001/health/internal
 ```
 
 ## Library Integration Results
@@ -412,7 +416,7 @@ In just a few minutes, you added powerful capabilities to your application:
 
 ### Service Defaults (`builder.AddServiceDefaults()`)
 
--   **Health Checks**: `/health` (detailed) and `/alive` (simple) endpoints
+-   **Health Checks**: `/status` (liveness), `/health/internal` (readiness), `/health` (authorized detailed)
 -   **OpenTelemetry**: Metrics, tracing, and logging correlation
 -   **Serilog**: Structured logging with exception details
 -   **Resilience**: HTTP client retry and circuit breaker patterns

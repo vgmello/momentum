@@ -140,9 +140,9 @@ When you call `app.MapDefaultEndpoints()`, you get:
 
 | Endpoint     | Purpose                            |
 | ------------ | ---------------------------------- |
-| `/health`    | Detailed health checks             |
-| `/alive`     | Simple liveness check              |
-| `/metrics`   | Prometheus metrics (if configured) |
+| `/status`    | Liveness probe (cached, no auth)   |
+| `/health/internal` | Readiness probe (localhost only) |
+| `/health`    | Public health (requires auth)      |
 | `/scalar/v1` | Interactive API documentation      |
 
 ## Configuration
