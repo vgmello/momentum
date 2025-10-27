@@ -73,10 +73,6 @@ public class IntegrationTestFixture : IAsyncLifetime
         //#if (USE_DB)
         _postgres = new PostgreSqlBuilder()
             .WithImage("postgres:17-alpine")
-            .WithUsername("postgres")
-            .WithPassword("postgres")
-            .WithDatabase("postgres")
-            .WithPortBinding(5432, 5432)
             .WithNetwork(_containerNetwork)
             .Build();
 
@@ -129,8 +125,8 @@ public class IntegrationTestFixture : IAsyncLifetime
             ["Orleans:UseLocalhostClustering"] = "true",
             ["ServiceBus:Wolverine:CodegenEnabled"] = "true",
             //#if (USE_KAFKA)
-            ["ConnectionStrings:Messaging"] =  _kafka.GetBootstrapAddress(),
-            ["Aspire:Confluent:Kafka:Messaging:BootstrapServers"] =  _kafka.GetBootstrapAddress(),
+            ["ConnectionStrings:Messaging"] = _kafka.GetBootstrapAddress(),
+            ["Aspire:Confluent:Kafka:Messaging:BootstrapServers"] = _kafka.GetBootstrapAddress(),
             ["Aspire:Confluent:Kafka:Messaging:Consumer:Config:GroupId"] = "integration-test-group",
             ["Aspire:Confluent:Kafka:Messaging:Consumer:Config:AutoOffsetReset"] = "Latest",
             ["Aspire:Confluent:Kafka:Messaging:Consumer:Config:EnableAutoCommit"] = "true",

@@ -4,6 +4,7 @@ using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Configurations;
 using DotNet.Testcontainers.Containers;
 using DotNet.Testcontainers.Networks;
+using Testcontainers.PostgreSql;
 
 namespace AppDomain.Tests.Integration._Internal.Containers;
 
@@ -20,20 +21,19 @@ public class LiquibaseMigrationContainer : IAsyncDisposable
             .WithImage("liquibase/liquibase:4.33-alpine")
             .WithNetwork(containerNetwork)
             .WithBindMount($"{baseDirectory}infra/AppDomain.Database/Liquibase", "/liquibase/changelog")
-            .WithEnvironment("LIQUIBASE_COMMAND_USERNAME", "postgres")
-            .WithEnvironment("LIQUIBASE_COMMAND_PASSWORD", "postgres")
-            .WithEnvironment("LIQUIBASE_COMMAND_CHANGELOG_FILE", "changelog.xml")
             .WithEnvironment("LIQUIBASE_SEARCH_PATH", "/liquibase/changelog")
+            .WithEnvironment("LIQUIBASE_COMMAND_USERNAME", PostgreSqlBuilder.DefaultUsername)
+            .WithEnvironment("LIQUIBASE_COMMAND_PASSWORD", PostgreSqlBuilder.DefaultPassword)
             .WithEntrypoint("/bin/sh")
             .WithCommand("-c", $"""
-                                liquibase --url=jdbc:postgresql://{dbServerSanitized}:5432/postgres update --contexts @setup && \
-                                liquibase --url=jdbc:postgresql://{dbServerSanitized}:5432/service_bus update --changelog-file=service_bus/changelog.xml && \
-                                liquibase --url=jdbc:postgresql://{dbServerSanitized}:5432/app_domain update --changelog-file=app_domain/changelog.xml && \
-                                echo Migration Complete
+                                liquibase update --url=jdbc:postgresql://{dbServerSanitized}:5432/postgres --changelog-file=postgres/changelog.xml && \
+                                liquibase update --url=jdbc:postgresql://{dbServerSanitized}:5432/service_bus --changelog-file=service_bus/changelog.xml && \
+                                liquibase update --url=jdbc:postgresql://{dbServerSanitized}:5432/app_domain --changelog-file=app_domain/changelog.xml && \
+                                echo 'Database migrations completed successfully!'
                                 """)
             .WithWaitStrategy(
                 Wait.ForUnixContainer()
-                    .UntilMessageIsLogged("Migration Complete", opt => opt
+                    .UntilMessageIsLogged("Database migrations completed successfully!", opt => opt
                         .WithMode(WaitStrategyMode.OneShot)
                         .WithTimeout(TimeSpan.FromMinutes(1)))).Build();
     }

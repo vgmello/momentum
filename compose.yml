@@ -44,19 +44,21 @@ services:
     image: liquibase/liquibase:4.33-alpine
     profiles: [ "db", "api", "backoffice" ]
     volumes:
-      - ./infra/AppDomain.Database:/app
+      - ./infra/AppDomain.Database/Liquibase:/liquibase/changelog
     depends_on:
       app-domain-db:
         condition: service_healthy
-    working_dir: /app
+    environment:
+      - LIQUIBASE_SEARCH_PATH=/liquibase/changelog
+      - LIQUIBASE_COMMAND_USERNAME=${POSTGRES_USER:-postgres}
+      - LIQUIBASE_COMMAND_PASSWORD=${POSTGRES_PASSWORD:-password@}
     entrypoint: /bin/sh
     command:
       - -c
       - |
-        echo 'Running database migrations...' && \
-        liquibase update --defaults-file liquibase.setup.properties --url=jdbc:postgresql://app-domain-db:5432/postgres && \
-        liquibase update --defaults-file liquibase.servicebus.properties --url=jdbc:postgresql://app-domain-db:5432/service_bus && \
-        liquibase update --url=jdbc:postgresql://app-domain-db:5432/app_domain && \
+        liquibase update --url=jdbc:postgresql://app-domain-db:5432/postgres --changelog-file=postgres/changelog.xml && \
+        liquibase update --url=jdbc:postgresql://app-domain-db:5432/service_bus --changelog-file=service_bus/changelog.xml && \
+        liquibase update --url=jdbc:postgresql://app-domain-db:5432/app_domain --changelog-file=app_domain/changelog.xml && \
         echo 'Database migrations completed successfully!'
 
   # #endif
