@@ -29,6 +29,7 @@
     <!--#endif -->
     <!--#if (!LIBS_INCLUDES_KAFKA) -->
     <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.Http.Resilience" VersionOverride="9.10.0" />
         <ProjectReference Include="..\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
         <ProjectReference Include="..\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
     </ItemGroup>
