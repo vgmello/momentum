@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <AspireVersion>9.4.2</AspireVersion>
+    <AspireVersion>9.5.2</AspireVersion>
     <MicrosoftExtensionsVersion>9.0.8</MicrosoftExtensionsVersion>
     <MicrosoftOrleansVersion>9.2.1</MicrosoftOrleansVersion>
     <OpenTelemetryVersion>1.12.0</OpenTelemetryVersion>
