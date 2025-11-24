@@ -14,7 +14,7 @@
     "docs:adr": "tsx .vitepress/scripts/adrlogs-table-gen.ts"
   },
   "dependencies": {
-    "glob": "^11.0.3",
+    "glob": "^13.0.0",
     "gray-matter": "^4.0.3",
     "yaml": "^2.8.1"
   },
