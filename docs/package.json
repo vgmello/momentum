@@ -15,7 +15,7 @@
     "docs:events": "tsx .vitepress/scripts/generate-events-docs.ts \"../src/AppDomain.BackOffice/bin/**/**/AppDomain.*.dll,../src/AppDomain/bin/**/**/AppDomain.dll\""
   },
   "dependencies": {
-    "glob": "^11.0.3",
+    "glob": "^13.0.0",
     "gray-matter": "^4.0.3",
     "yaml": "^2.8.1"
   },
