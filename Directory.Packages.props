@@ -1,10 +1,10 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <AspireVersion>9.5.2</AspireVersion>
-    <MicrosoftExtensionsVersion>9.0.10</MicrosoftExtensionsVersion>
+    <AspireVersion>13.0.0</AspireVersion>
+    <MicrosoftExtensionsVersion>10.0.0</MicrosoftExtensionsVersion>
     <MicrosoftOrleansVersion>9.2.1</MicrosoftOrleansVersion>
-    <OpenTelemetryVersion>1.13.0</OpenTelemetryVersion>
+    <OpenTelemetryVersion>1.14.0</OpenTelemetryVersion>
     <AspireAppHostSdkVersion>$(AspireVersion)</AspireAppHostSdkVersion>
     <GrpcVersion>[2.67]</GrpcVersion>
     <MomentumVersion>$(TemplateMomentumVersion)</MomentumVersion>
@@ -126,9 +126,9 @@
     <PackageVersion Include="Testcontainers" Version="4.8.1" />
     <PackageVersion Include="Testcontainers.Kafka" Version="4.8.1" />
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.8.1" />
-    <PackageVersion Include="WolverineFx" Version="4.12.3" />
-    <PackageVersion Include="WolverineFx.Kafka" Version="4.12.3" />
-    <PackageVersion Include="WolverineFx.Postgresql" Version="4.12.3" />
+    <PackageVersion Include="WolverineFx" Version="5.2.0" />
+    <PackageVersion Include="WolverineFx.Kafka" Version="5.2.0" />
+    <PackageVersion Include="WolverineFx.Postgresql" Version="5.2.0" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

@@ -73,7 +73,7 @@ public class OpenApiCachingMiddleware(
             return;
         }
 
-        if (await TryServeCachedResponseAsync(context, filePath))
+        if (await TryServeCachedResponseAsync(context, filePath, cacheKey))
             return;
 
         await GenerateAndCacheResponseAsync(context, filePath, cacheKey);
@@ -86,7 +86,7 @@ public class OpenApiCachingMiddleware(
         try
         {
             // Double-check: if another request generated the cache while waiting for the lock, serve it instead of regenerating
-            if (await TryServeCachedResponseAsync(context, filePath))
+            if (await TryServeCachedResponseAsync(context, filePath, cacheKey))
             {
                 _cacheInitialized[cacheKey] = true;
 
@@ -129,9 +129,9 @@ public class OpenApiCachingMiddleware(
         }
     }
 
-    private async Task<bool> TryServeCachedResponseAsync(HttpContext context, string filePath)
+    private async Task<bool> TryServeCachedResponseAsync(HttpContext context, string filePath, string cacheKey)
     {
-        if (!File.Exists(filePath))
+        if (!_cacheInitialized.ContainsKey(cacheKey) || !File.Exists(filePath))
             return false;
 
         SetCacheHeaders(context, filePath);
