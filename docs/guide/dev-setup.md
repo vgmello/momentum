@@ -16,7 +16,7 @@ Before starting, ensure you have administrative privileges on your development m
 
 ### .NET Development
 
-**.NET 9 SDK**:
+**.NET 10 SDK**:
 
 ```bash
 # Windows (using winget)
@@ -29,14 +29,14 @@ brew install --cask dotnet
 wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
 sudo dpkg -i packages-microsoft-prod.deb
 sudo apt-get update
-sudo apt-get install -y dotnet-sdk-9.0
+sudo apt-get install -y dotnet-sdk-10.0
 ```
 
 **Verify Installation**:
 
 ```bash
 dotnet --version
-# Expected output: 9.0.x
+# Expected output: 10.0.x
 ```
 
 ### Container Platform
@@ -480,7 +480,7 @@ dotnet restore --force
     "Microsoft.Build.NoTargets": "3.7.0"
   },
   "sdk": {
-    "version": "9.0.0",
+    "version": "10.0.0",
     "rollForward": "latestMinor"
   }
 }
@@ -518,7 +518,7 @@ dotnet restore --force
       "name": "Launch AppHost",
       "type": "coreclr",
       "request": "launch",
-      "program": "${workspaceFolder}/src/AppDomain.AppHost/bin/Debug/net9.0/AppDomain.AppHost.dll",
+      "program": "${workspaceFolder}/src/AppDomain.AppHost/bin/Debug/net10.0/AppDomain.AppHost.dll",
       "args": [],
       "cwd": "${workspaceFolder}/src/AppDomain.AppHost",
       "preLaunchTask": "build"
@@ -575,7 +575,7 @@ Once your development environment is set up:
 
 ### External Resources
 
-- [.NET 9 Documentation](https://docs.microsoft.com/en-us/dotnet/)
+- [.NET 10 Documentation](https://docs.microsoft.com/en-us/dotnet/)
 - [.NET Aspire Documentation](https://learn.microsoft.com/en-us/dotnet/aspire/)
 - [Docker Documentation](https://docs.docker.com/)
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)

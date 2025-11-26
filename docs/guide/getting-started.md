@@ -5,7 +5,7 @@ This guide will help you set up the AppDomain Solution development environment a
 ## Prerequisites
 
 -   Docker or Docker compatible (Rancher, etc)
--   .NET 9 SDK with Aspire\* (Aspire is not required but recommended)
+-   .NET 10 SDK with Aspire\* (Aspire is not required but recommended)
 -   PostgreSQL client (optional, for database inspection)
 -   API testing tool (Postman, curl, or similar)
 -   Liquibase CLI (or use the Docker service defined in `compose.yml`)

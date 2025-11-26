@@ -45,7 +45,7 @@ public class ScenarioBasedIntegrationTests
         if (Directory.Exists(scenariosDir))
             return scenariosDir;
 
-        // Try project directory path (go up from bin/Debug/net9.0)
+        // Try project directory path (go up from bin/Debug/net10.0)
         var projectDir = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(baseDir)));
 
         if (projectDir != null)
@@ -195,15 +195,15 @@ public class ScenarioBasedIntegrationTests
         var possiblePaths = new[]
         {
             // Relative to current working directory (when running from Momentum root)
-            Path.Combine(Directory.GetCurrentDirectory(), "tests", "TestEvents", "bin", "Debug", "net9.0", "TestEvents.dll"),
+            Path.Combine(Directory.GetCurrentDirectory(), "tests", "TestEvents", "bin", "Debug", "net10.0", "TestEvents.dll"),
 
             // Relative to test assembly location (when running from test bin directory)
             Path.Combine(Path.GetDirectoryName(typeof(ScenarioBasedIntegrationTests).Assembly.Location)!,
-                "..", "..", "..", "..", "TestEvents", "bin", "Debug", "net9.0", "TestEvents.dll"),
+                "..", "..", "..", "..", "TestEvents", "bin", "Debug", "net10.0", "TestEvents.dll"),
 
             // Relative to solution root
             Path.Combine(Path.GetDirectoryName(typeof(ScenarioBasedIntegrationTests).Assembly.Location)!,
-                "..", "..", "..", "..", "..", "..", "tests", "TestEvents", "bin", "Debug", "net9.0", "TestEvents.dll")
+                "..", "..", "..", "..", "..", "..", "tests", "TestEvents", "bin", "Debug", "net10.0", "TestEvents.dll")
         };
 
         foreach (var path in possiblePaths)

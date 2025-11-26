@@ -3,10 +3,10 @@
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Momentum.Extensions.XmlDocs;
 using System.Reflection;
+using System.Text.Json.Nodes;
 
 namespace Momentum.ServiceDefaults.Api.OpenApi.Transformers;
 
@@ -41,6 +41,9 @@ public class XmlDocumentationDocumentTransformer(
 
     private void EnrichTags(OpenApiDocument document, OpenApiDocumentTransformerContext context)
     {
+        if (document.Tags is null)
+            return;
+
         foreach (var tag in document.Tags)
         {
             // try to get the controller type based on the tag name
@@ -92,10 +95,32 @@ public class XmlDocumentationDocumentTransformer(
 
     private static void AddMetadata(Assembly assembly, OpenApiDocument document)
     {
-        document.Extensions["x-assembly-version"] = new OpenApiString(assembly.GetName().Version?.ToString() ?? "Unknown");
+        // In OpenApi v2, extensions are added directly as IOpenApiExtension implementations
+        // or using the OpenApiExtensibleExtensions.AddExtension method
+        document.Extensions ??= new Dictionary<string, IOpenApiExtension>();
+        var versionValue = assembly.GetName().Version?.ToString() ?? "Unknown";
+        document.Extensions["x-assembly-version"] = new JsonNodeOpenApiExtension(JsonValue.Create(versionValue));
     }
 
     private static string? GetAssemblyCompany(Assembly assembly) => assembly.GetCustomAttribute<AssemblyCompanyAttribute>()?.Company;
 
     private static string? GetAssemblyCopyright(Assembly assembly) => assembly.GetCustomAttribute<AssemblyCopyrightAttribute>()?.Copyright;
+
+    /// <summary>
+    /// A simple IOpenApiExtension implementation that wraps a JsonNode value.
+    /// </summary>
+    private sealed class JsonNodeOpenApiExtension(JsonNode? value) : IOpenApiExtension
+    {
+        public void Write(IOpenApiWriter writer, OpenApiSpecVersion specVersion)
+        {
+            if (value is null)
+            {
+                writer.WriteNull();
+                return;
+            }
+
+            var jsonString = value.ToJsonString();
+            writer.WriteRaw(jsonString);
+        }
+    }
 }

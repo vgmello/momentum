@@ -5,7 +5,7 @@
 [![Downloads](https://img.shields.io/nuget/dt/Momentum.Extensions.Abstractions?style=flat-square)](https://www.nuget.org/packages/Momentum.Extensions.Abstractions)
 [![License](https://img.shields.io/github/license/vgmello/momentum?style=flat-square)](https://github.com/vgmello/momentum/blob/main/LICENSE)
 
-Welcome to **Momentum** - a comprehensive .NET 9 template system that generates complete, production-ready microservices solutions. Whether you're building APIs, event-driven backends, or stateful processing systems, Momentum provides the architecture, patterns, and infrastructure you need to get productive immediately.
+Welcome to **Momentum** - a comprehensive .NET 10 template system that generates complete, production-ready microservices solutions. Whether you're building APIs, event-driven backends, or stateful processing systems, Momentum provides the architecture, patterns, and infrastructure you need to get productive immediately.
 
 ## Quick Start (2 Minutes)
 
@@ -51,7 +51,7 @@ dotnet run --project src/OrderService.AppHost
 
 Momentum is built on modern, production-proven technologies:
 
--   **🎯 .NET 9**: Latest framework with performance optimizations
+-   **🎯 .NET 10**: Latest framework with performance optimizations
 -   **🏗️ .NET Aspire**: Local development orchestration and observability
 -   **🎭 Orleans**: Stateful actor-based processing for complex workflows
 -   **⚡ Wolverine**: CQRS/MediatR pattern with message handling
@@ -78,7 +78,7 @@ Momentum is built on modern, production-proven technologies:
 
 Before getting started, ensure you have:
 
--   **.NET 9 SDK** - [Download here](https://dotnet.microsoft.com/download/dotnet/9.0)
+-   **.NET 10 SDK** - [Download here](https://dotnet.microsoft.com/download/dotnet/10.0)
 -   **IDE**: Visual Studio, VS Code with C# Dev Kit, or JetBrains Rider
 -   **Local Container Solution (Docker, Rancher, Podman, etc)** - Required for databases, Kafka, and local development
 

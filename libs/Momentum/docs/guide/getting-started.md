@@ -1,12 +1,12 @@
 ---
 title: Getting Started with Momentum
-description: Learn how to build production-ready .NET 9 microservices with Momentum - featuring a comprehensive dotnet template system and powerful supporting libraries. Get up and running in minutes with Orleans, gRPC, Kafka, and PostgreSQL.
+description: Learn how to build production-ready .NET 10 microservices with Momentum - featuring a comprehensive dotnet template system and powerful supporting libraries. Get up and running in minutes with Orleans, gRPC, Kafka, and PostgreSQL.
 date: 2025-01-15
 ---
 
 # Getting Started with Momentum
 
-Welcome to **Momentum** - a comprehensive .NET 9 template system that generates complete, production-ready microservices solutions. Whether you're building APIs, event-driven backends, or stateful processing systems, Momentum provides the architecture, patterns, and infrastructure you need to get productive immediately.
+Welcome to **Momentum** - a comprehensive .NET 10 template system that generates complete, production-ready microservices solutions. Whether you're building APIs, event-driven backends, or stateful processing systems, Momentum provides the architecture, patterns, and infrastructure you need to get productive immediately.
 
 ## Quick Start (2 Minutes)
 
@@ -58,7 +58,7 @@ dotnet run --project src/OrderService.AppHost
 
 Momentum is built on modern, production-proven technologies:
 
--   **🎯 .NET 9**: Latest framework with performance optimizations
+-   **🎯 .NET 10**: Latest framework with performance optimizations
 -   **🏗️ .NET Aspire**: Local development orchestration and observability
 -   **🎭 Orleans**: Stateful actor-based processing for complex workflows
 -   **⚡ Wolverine**: CQRS/MediatR pattern with message handling
@@ -85,7 +85,7 @@ Momentum is built on modern, production-proven technologies:
 
 Before getting started, ensure you have:
 
--   **.NET 9 SDK** - [Download here](https://dotnet.microsoft.com/download/dotnet/9.0)
+-   **.NET 10 SDK** - [Download here](https://dotnet.microsoft.com/download/dotnet/9.0)
 -   **IDE**: Visual Studio, VS Code with C# Dev Kit, or JetBrains Rider
 -   **Docker Desktop** - Required for databases, Kafka, and local development
 

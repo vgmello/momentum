@@ -232,7 +232,7 @@ This entire flow is contained within the Invoices slice, making it easy to under
 
 ### Technology Stack
 
--   **.NET 9**: Latest framework features and performance
+-   **.NET 10**: Latest framework features and performance
 -   **PostgreSQL**: Robust data persistence with Liquibase migrations
 -   **Docker & Aspire**: Container orchestration and local development
 -   **Orleans**: Actor-based distributed processing

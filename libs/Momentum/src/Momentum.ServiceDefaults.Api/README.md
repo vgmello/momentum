@@ -32,7 +32,7 @@ Install-Package Momentum.ServiceDefaults.Api
 
 ### Prerequisites
 
--   .NET 9.0 or later
+-   .NET 10.0 or later
 -   ASP.NET Core 9.0 or later
 -   All prerequisites from Momentum.ServiceDefaults
 
@@ -227,7 +227,7 @@ This package includes:
 
 ## Target Frameworks
 
--   **.NET 9.0**: Primary target framework
+-   **.NET 10.0**: Primary target framework
 -   **ASP.NET Core 9.0**: Includes framework reference
 
 ## Use Cases

@@ -1,6 +1,6 @@
 # AppDomain Microservices Solution
 
-A comprehensive .NET 9 microservices solution implementing Domain-Driven Design principles with event-driven architecture. The solution
+A comprehensive .NET 10 microservices solution implementing Domain-Driven Design principles with event-driven architecture. The solution
 mirrors real-world business operations with separate front office (synchronous APIs) and back office (asynchronous event processing)
 components.
 
@@ -156,7 +156,7 @@ The solution uses the following port allocations (default base port: 8100):
 
 <!-- prettier-ignore-start -->
 
--   **.NET 9 SDK** or later
+-   **.NET 10 SDK** or later
 -   **Container Solution (Docker, Rancher, Podman, etc)** - Required for databases, Kafka, etc
 <!--#if (USE_PGSQL) -->
 -   **PostgreSQL** (handled by Docker Compose)

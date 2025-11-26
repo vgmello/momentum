@@ -9,18 +9,22 @@ namespace Momentum.Extensions.EventMarkdownGenerator.Services;
 
 public class FluidMarkdownGenerator
 {
+    private static readonly FluidParser s_parser = new();
+    private static readonly TemplateOptions s_templateOptions = new()
+    {
+        MemberAccessStrategy = new UnsafeMemberAccessStrategy()
+    };
+
     private readonly IFluidTemplate _eventTemplate;
     private readonly IFluidTemplate _schemaTemplate;
 
     public FluidMarkdownGenerator(string? customTemplatesDirectory = null)
     {
-        var parser = new FluidParser();
-
         var eventTemplateSource = GetTemplate("event.liquid", customTemplatesDirectory);
         var schemaTemplateSource = GetTemplate("schema.liquid", customTemplatesDirectory);
 
-        _eventTemplate = parser.Parse(eventTemplateSource);
-        _schemaTemplate = parser.Parse(schemaTemplateSource);
+        _eventTemplate = s_parser.Parse(eventTemplateSource);
+        _schemaTemplate = s_parser.Parse(schemaTemplateSource);
     }
 
     public IndividualMarkdownOutput GenerateMarkdown(EventWithDocumentation eventWithDoc, string outputDirectory,
@@ -165,17 +169,7 @@ public class FluidMarkdownGenerator
         }
     }
 
-    private static TemplateContext CreateTemplateContext()
-    {
-        return new TemplateContext
-        {
-            Options =
-            {
-                // Using UnsafeMemberAccessStrategy for now - TODO: Configure SafeMemberAccessStrategy with explicit type registration
-                MemberAccessStrategy = new UnsafeMemberAccessStrategy()
-            }
-        };
-    }
+    private static TemplateContext CreateTemplateContext() => new(s_templateOptions);
 
     private static string GenerateFilePath(string outputDirectory, string fileName, string? subdirectory = null)
     {

@@ -3,7 +3,7 @@
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Momentum.Extensions.XmlDocs;
 using Momentum.ServiceDefaults.Api.OpenApi.Extensions;
 using System.Reflection;
@@ -73,14 +73,17 @@ public class XmlDocumentationOperationTransformer(
 
         foreach (var parameter in operation.Parameters)
         {
-            EnrichParameterWithDocumentation(parameter, xmlDocs);
-            EnrichParameterWithReflectionInfo(parameter, parametersByName, xmlDocs);
+            if (parameter is OpenApiParameter openApiParam)
+            {
+                EnrichParameterWithDocumentation(openApiParam, xmlDocs);
+                EnrichParameterWithReflectionInfo(openApiParam, parametersByName, xmlDocs);
+            }
         }
     }
 
     private static void EnrichParameterWithDocumentation(OpenApiParameter parameter, XmlDocumentationInfo xmlDocs)
     {
-        if (xmlDocs.Parameters.TryGetValue(parameter.Name, out var paramDoc))
+        if (parameter.Name is not null && xmlDocs.Parameters.TryGetValue(parameter.Name, out var paramDoc))
         {
             parameter.Description = paramDoc.Description;
         }
@@ -89,7 +92,7 @@ public class XmlDocumentationOperationTransformer(
     private static void EnrichParameterWithReflectionInfo(OpenApiParameter parameter, Dictionary<string, ParameterInfo> parametersByName,
         XmlDocumentationInfo xmlDocs)
     {
-        if (!parametersByName.TryGetValue(parameter.Name, out var paramInfo))
+        if (parameter.Name is null || !parametersByName.TryGetValue(parameter.Name, out var paramInfo))
             return;
 
         SetParameterExample(parameter, xmlDocs, paramInfo);
@@ -98,9 +101,9 @@ public class XmlDocumentationOperationTransformer(
 
     private static void SetParameterExample(OpenApiParameter parameter, XmlDocumentationInfo xmlDocs, ParameterInfo paramInfo)
     {
-        if (xmlDocs.Parameters.TryGetValue(parameter.Name, out var paramDoc) && paramDoc.Example is not null)
+        if (parameter.Name is not null && xmlDocs.Parameters.TryGetValue(parameter.Name, out var paramDoc) && paramDoc.Example is not null)
         {
-            parameter.Example = paramInfo.ParameterType.ConvertToOpenApiType(paramDoc.Example);
+            parameter.Example = paramInfo.ParameterType.ConvertToJsonNode(paramDoc.Example);
         }
     }
 
@@ -121,6 +124,9 @@ public class XmlDocumentationOperationTransformer(
 
     private static void EnrichResponses(OpenApiOperation operation, XmlDocumentationInfo xmlDocs)
     {
+        if (operation.Responses is null)
+            return;
+
         ReplaceAutoProducedResponseToOperation(operation, xmlDocs);
 
         foreach (var (responseCode, responseDoc) in xmlDocs.Responses)
@@ -131,21 +137,27 @@ public class XmlDocumentationOperationTransformer(
                 operation.Responses[responseCode] = response;
             }
 
-            response.Description = responseDoc;
+            if (response is OpenApiResponse openApiResponse)
+            {
+                openApiResponse.Description = responseDoc;
+            }
         }
 
         if (xmlDocs.Returns is not null)
         {
             var successResponse = operation.Responses.FirstOrDefault(r => r.Key.StartsWith('2'));
 
-            if (successResponse.Key is not null)
-                successResponse.Value.Description ??= xmlDocs.Returns;
+            if (successResponse.Key is not null && successResponse.Value is OpenApiResponse openApiResponse)
+                openApiResponse.Description ??= xmlDocs.Returns;
         }
 
         // Ensure all responses have descriptions
-        foreach (var (statusCode, response) in operation.Responses.Where(r => r.Value.Description is null))
+        foreach (var (statusCode, response) in operation.Responses.Where(r => r.Value is OpenApiResponse { Description: null }))
         {
-            response.Description = GetDefaultResponseDescription(statusCode);
+            if (response is OpenApiResponse openApiResponse)
+            {
+                openApiResponse.Description = GetDefaultResponseDescription(statusCode);
+            }
         }
     }
 
@@ -154,6 +166,9 @@ public class XmlDocumentationOperationTransformer(
     /// </summary>
     private static void ReplaceAutoProducedResponseToOperation(OpenApiOperation operation, XmlDocumentationInfo xmlDocs)
     {
+        if (operation.Responses is null)
+            return;
+
         if (operation.Responses.TryGetValue(AutoProducesStatusCode, out var autoProducedResponse))
         {
             var successXmlResponse = xmlDocs.Responses.FirstOrDefault(r => r.Key.StartsWith('2'));

@@ -500,7 +500,7 @@ public class UserRepository : IUserRepository
 **File System Location:**
 
 ```
-obj/Debug/net9.0/generated/Momentum.Extensions.SourceGenerators/
+obj/Debug/net10.0/generated/Momentum.Extensions.SourceGenerators/
 ├── CreateUserCommand.DbExt.g.cs     # Parameter provider
 ├── CreateUserCommandHandler.g.cs    # Command handler
 ├── GetUserByIdQuery.DbExt.g.cs      # Parameter provider

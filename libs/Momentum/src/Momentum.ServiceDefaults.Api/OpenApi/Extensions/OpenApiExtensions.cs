@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi;
 using Momentum.Extensions.XmlDocs;
 using Momentum.ServiceDefaults.Api.OpenApi.Transformers;
 
@@ -41,9 +42,12 @@ public static class OpenApiExtensions
 
             options.AddDocumentTransformer((document, _, _) =>
             {
-                foreach (var openApiServer in document.Servers)
+                if (document.Servers is not null)
                 {
-                    openApiServer.Url = openApiServer.Url.TrimEnd('/');
+                    foreach (var openApiServer in document.Servers.OfType<OpenApiServer>())
+                    {
+                        openApiServer.Url = openApiServer.Url?.TrimEnd('/');
+                    }
                 }
 
                 return Task.CompletedTask;

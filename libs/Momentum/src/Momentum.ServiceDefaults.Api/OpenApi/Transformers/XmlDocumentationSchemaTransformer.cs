@@ -2,11 +2,11 @@
 
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Momentum.Extensions.XmlDocs;
 using Momentum.ServiceDefaults.Api.OpenApi.Extensions;
 using System.Reflection;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace Momentum.ServiceDefaults.Api.OpenApi.Transformers;
@@ -71,27 +71,33 @@ public class XmlDocumentationSchemaTransformer(
         }
     }
 
-    private void EnrichPropertySchema(OpenApiSchema propertySchema, PropertyInfo propertyInfo)
+    private void EnrichPropertySchema(IOpenApiSchema propertySchema, PropertyInfo propertyInfo)
     {
         var propDoc = xmlDocumentationService.GetPropertyDocumentation(propertyInfo);
 
-        if (propDoc is not null)
+        if (propDoc is not null && propertySchema is OpenApiSchema openApiSchema)
         {
-            propertySchema.EnrichWithXmlDocInfo(propDoc, propertyInfo.PropertyType);
+            openApiSchema.EnrichWithXmlDocInfo(propDoc, propertyInfo.PropertyType);
         }
 
         AddTypeSpecificInformation(propertySchema, propertyInfo);
     }
 
-    private static void AddTypeSpecificInformation(OpenApiSchema propertySchema, PropertyInfo propertyInfo)
+    private static void AddTypeSpecificInformation(IOpenApiSchema propertySchema, PropertyInfo propertyInfo)
     {
+        if (propertySchema is not OpenApiSchema openApiSchema)
+            return;
+
         var propertyType = propertyInfo.PropertyType;
         var underlyingType = Nullable.GetUnderlyingType(propertyType);
 
+        // Note: OpenApiSchema.Nullable was removed in OpenApi v2
+        // Nullable types are now represented via the Type property using JsonSchemaType flags
         if (underlyingType is not null)
         {
             propertyType = underlyingType;
-            propertySchema.Nullable = true;
+            // Mark as nullable using the type system
+            openApiSchema.Type |= JsonSchemaType.Null;
         }
 
         if (propertyType.IsEnum)
@@ -100,8 +106,9 @@ public class XmlDocumentationSchemaTransformer(
 
             if (enumValues.Length > 0)
             {
-                propertySchema.Enum = enumValues
-                    .Select(e => (IOpenApiAny)new OpenApiString(e))
+                openApiSchema.Enum = enumValues
+                    .Select(e => JsonValue.Create(e)!)
+                    .Cast<JsonNode>()
                     .ToList();
             }
         }

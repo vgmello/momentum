@@ -1,14 +1,15 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
 using Momentum.Extensions.XmlDocs;
+using System.Globalization;
+using System.Text.Json.Nodes;
+using Microsoft.OpenApi;
 
 namespace Momentum.ServiceDefaults.Api.OpenApi.Extensions;
 
 public static class OpenApiDocExtensions
 {
-    public static IOpenApiPrimitive? ConvertToOpenApiType(this Type type, string value)
+    public static JsonNode? ConvertToJsonNode(this Type type, string value)
     {
         if (string.IsNullOrEmpty(value))
             return null;
@@ -17,26 +18,25 @@ public static class OpenApiDocExtensions
 
         return Type.GetTypeCode(underlyingType) switch
         {
-            TypeCode.String or TypeCode.Char => new OpenApiString(value),
-            TypeCode.Boolean => Parse<bool>(bool.TryParse, r => new OpenApiBoolean(r), value),
-            TypeCode.Int16 => Parse<short>(short.TryParse, r => new OpenApiInteger(r), value),
-            TypeCode.Int32 => Parse<int>(int.TryParse, r => new OpenApiInteger(r), value),
-            TypeCode.Int64 => Parse<long>(long.TryParse, r => new OpenApiLong(r), value),
-            TypeCode.Single => Parse<float>(float.TryParse, r => new OpenApiFloat(r), value),
-            TypeCode.Double => Parse<double>(double.TryParse, r => new OpenApiDouble(r), value),
-            TypeCode.Decimal => Parse<double>(double.TryParse, r => new OpenApiDouble(r), value), // openapi does not have a Decimal type
-            TypeCode.Byte => Parse<byte>(byte.TryParse, r => new OpenApiInteger(r), value),
-            TypeCode.DateTime => Parse<DateTime>(DateTime.TryParse, r => new OpenApiDateTime(r), value),
+            TypeCode.String or TypeCode.Char => JsonValue.Create(value),
+            TypeCode.Boolean => ParseBoolean(value),
+            TypeCode.Int16 => ParseShort(value),
+            TypeCode.Int32 => ParseInt(value),
+            TypeCode.Int64 => ParseLong(value),
+            TypeCode.Single => ParseFloat(value),
+            TypeCode.Double => ParseDouble(value),
+            TypeCode.Decimal => ParseDecimal(value),
+            TypeCode.Byte => ParseByte(value),
+            TypeCode.DateTime => ParseDateTime(value),
             _ => NonStandardTypesHandler(underlyingType, value)
         };
 
-        static IOpenApiPrimitive? NonStandardTypesHandler(Type type, string value) =>
+        static JsonNode? NonStandardTypesHandler(Type type, string value) =>
             type switch
             {
-                _ when type == typeof(Guid) => new OpenApiString(value),
-                _ when type == typeof(DateTimeOffset) => Parse<DateTimeOffset>(DateTimeOffset.TryParse, r => new OpenApiDateTime(r), value),
-                _ when type == typeof(DateOnly)
-                    => Parse<DateOnly>(DateOnly.TryParse, r => new OpenApiDate(r.ToDateTime(TimeOnly.MinValue)), value),
+                _ when type == typeof(Guid) => JsonValue.Create(value),
+                _ when type == typeof(DateTimeOffset) => ParseDateTimeOffset(value),
+                _ when type == typeof(DateOnly) => ParseDateOnly(value),
                 _ => null
             };
     }
@@ -55,12 +55,43 @@ public static class OpenApiDocExtensions
 
         if (xmlDoc.Example is not null)
         {
-            schema.Example = type.ConvertToOpenApiType(xmlDoc.Example);
+            schema.Example = type.ConvertToJsonNode(xmlDoc.Example);
         }
     }
 
-    private delegate bool ParseDelegate<T>(string value, out T result);
+    private static JsonNode? ParseBoolean(string value) =>
+        bool.TryParse(value, out var result) ? JsonValue.Create(result) : null;
 
-    private static IOpenApiPrimitive? Parse<T>(ParseDelegate<T> parser, Func<T, IOpenApiPrimitive> fact, string value)
-        => parser.Invoke(value, out var parseResult) ? fact(parseResult) : null;
+    private static JsonNode? ParseShort(string value) =>
+        short.TryParse(value, out var result) ? JsonValue.Create(result) : null;
+
+    private static JsonNode? ParseInt(string value) =>
+        int.TryParse(value, out var result) ? JsonValue.Create(result) : null;
+
+    private static JsonNode? ParseLong(string value) =>
+        long.TryParse(value, out var result) ? JsonValue.Create(result) : null;
+
+    private static JsonNode? ParseFloat(string value) =>
+        float.TryParse(value, out var result) ? JsonValue.Create(result) : null;
+
+    private static JsonNode? ParseDouble(string value) =>
+        double.TryParse(value, out var result) ? JsonValue.Create(result) : null;
+
+    private static JsonNode? ParseDecimal(string value) =>
+        decimal.TryParse(value, out var result) ? JsonValue.Create(result) : null;
+
+    private static JsonNode? ParseByte(string value) =>
+        byte.TryParse(value, out var result) ? JsonValue.Create((int)result) : null;
+
+    private static JsonNode? ParseDateTime(string value) =>
+        DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out var result)
+            ? JsonValue.Create(result.ToString("O", CultureInfo.InvariantCulture)) : null;
+
+    private static JsonNode? ParseDateTimeOffset(string value) =>
+        DateTimeOffset.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out var result)
+            ? JsonValue.Create(result.ToString("O", CultureInfo.InvariantCulture)) : null;
+
+    private static JsonNode? ParseDateOnly(string value) =>
+        DateOnly.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out var result)
+            ? JsonValue.Create(result.ToString("O", CultureInfo.InvariantCulture)) : null;
 }

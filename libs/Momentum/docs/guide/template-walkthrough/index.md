@@ -14,7 +14,7 @@ This walkthrough demonstrates how to create a complete Momentum application, exp
 
 ## Prerequisites
 
-- .NET 9.0 SDK
+- .NET 10.0 SDK
 - Docker and Docker Compose
 - Node.js and pnpm (for documentation)
 - Visual Studio 2022 or VS Code
@@ -326,7 +326,7 @@ docker compose up
 - **Port conflicts**: Ensure configured ports are available
 - **Database connection**: Verify PostgreSQL is running
 - **Missing dependencies**: Run `dotnet restore`
-- **Build errors**: Check .NET 9.0 SDK installation
+- **Build errors**: Check .NET 10.0 SDK installation
 
 ### Getting Help
 - Check the documentation

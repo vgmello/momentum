@@ -14,8 +14,8 @@ public class XmlParsingDebugTests
     {
         // Arrange
         var parser = new XmlDocumentationParser();
-        var xmlPath = "../TestEvents/bin/Debug/net9.0/TestEvents.xml";
-        var assemblyPath = "../TestEvents/bin/Debug/net9.0/TestEvents.dll";
+        var xmlPath = "../TestEvents/bin/Debug/net10.0/TestEvents.xml";
+        var assemblyPath = "../TestEvents/bin/Debug/net10.0/TestEvents.dll";
 
         // Act
         var result = await parser.LoadMultipleDocumentationAsync([xmlPath]);
@@ -82,7 +82,7 @@ public class XmlParsingDebugTests
     public void ValidateXmlFileContent_ShouldVerifyXmlStructure()
     {
         // Let's verify the XML file contains what we expect
-        var xmlPath = "/home/vgmello/shared/repos/momentum/libs/Momentum/tests/TestEvents/bin/Debug/net9.0/TestEvents.xml";
+        var xmlPath = "/home/vgmello/shared/repos/momentum/libs/Momentum/tests/TestEvents/bin/Debug/net10.0/TestEvents.xml";
         File.Exists(xmlPath).ShouldBeTrue("XML documentation file should exist");
 
         var xmlContent = File.ReadAllText(xmlPath);

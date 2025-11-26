@@ -34,8 +34,8 @@ Install-Package Momentum.ServiceDefaults
 
 ### Prerequisites
 
--   .NET 9.0 or later
--   ASP.NET Core 9.0 or later (includes `Microsoft.AspNetCore.App` framework reference)
+-   .NET 10.0 or later
+-   ASP.NET Core 10.0 or later (includes `Microsoft.AspNetCore.App` framework reference)
 
 ### Basic Setup
 
@@ -311,8 +311,8 @@ This package includes comprehensive integrations with:
 
 ## Target Frameworks
 
--   **.NET 9.0**: Primary target framework
--   **ASP.NET Core 9.0**: Includes framework reference for web applications
+-   **.NET 10.0**: Primary target framework
+-   **ASP.NET Core 10.0**: Includes framework reference for web applications
 -   Compatible with all .NET Aspire host types
 
 ## Use Cases

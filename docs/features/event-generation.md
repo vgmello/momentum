@@ -38,7 +38,7 @@ The system integrates seamlessly with the Momentum documentation workflow:
 
 ```bash
 # Executed as part of pnpm docs:events
-tsx .vitepress/scripts/generate-events-docs.ts "../src/AppDomain.BackOffice/bin/Debug/net9.0/AppDomain.BackOffice.dll,../src/AppDomain/bin/Debug/net9.0/AppDomain.dll"
+tsx .vitepress/scripts/generate-events-docs.ts "../src/AppDomain.BackOffice/bin/Debug/net10.0/AppDomain.BackOffice.dll,../src/AppDomain/bin/Debug/net10.0/AppDomain.dll"
 ```
 
 This script:
@@ -240,7 +240,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: '9.0.x'
+          dotnet-version: '10.0.x'
 
       - name: Build Projects
         run: dotnet build
@@ -250,7 +250,7 @@ jobs:
 
       - name: Generate Event Documentation
         run: |
-          events-docsgen --assemblies "src/App.Core/bin/Debug/net9.0/App.Core.dll" \
+          events-docsgen --assemblies "src/App.Core/bin/Debug/net10.0/App.Core.dll" \
             --output "./docs/events/" \
             --github-url "https://github.com/$&#123;&#123; github.repository &#125;&#125;/blob/main/src" \
             --verbose
@@ -279,7 +279,7 @@ echo "Building projects..."
 dotnet build
 
 echo "Generating event documentation..."
-events-docsgen --assemblies "$(find src -name '*.dll' -path '*/bin/Debug/net9.0/*' | tr '\n' ',')" \
+events-docsgen --assemblies "$(find src -name '*.dll' -path '*/bin/Debug/net10.0/*' | tr '\n' ',')" \
   --output "./docs/events/" \
   --github-url "https://github.com/your-org/your-repo/blob/main/src" \
   --verbose

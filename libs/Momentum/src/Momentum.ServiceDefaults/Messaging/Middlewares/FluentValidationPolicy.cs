@@ -1,10 +1,10 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
 using FluentValidation;
+using JasperFx;
 using JasperFx.CodeGeneration;
 using JasperFx.CodeGeneration.Frames;
 using Wolverine.Configuration;
-using Wolverine.Runtime;
 using Wolverine.Runtime.Handlers;
 
 namespace Momentum.ServiceDefaults.Messaging.Middlewares;

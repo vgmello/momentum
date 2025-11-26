@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-**Momentum .NET** is a comprehensive template system that generates production-ready microservices solutions using .NET 9. The repository contains both the template engine (`mmt`) and supporting library ecosystem.
+**Momentum .NET** is a comprehensive template system that generates production-ready microservices solutions using .NET 10. The repository contains both the template engine (`mmt`) and supporting library ecosystem.
 
 **Key Components**:
 - **Template System** (`dotnet new mmt`): Generates complete microservices solutions
@@ -184,7 +184,7 @@ YourService/
 ### Technology Stack Integration
 
 **Core Technologies**:
-- **.NET 9** with **Aspire**: Orchestration and observability
+- **.NET 10** with **Aspire**: Orchestration and observability
 - **Wolverine**: CQRS message handling with PostgreSQL persistence
 - **Orleans**: Stateful actor processing (optional)
 - **PostgreSQL** + **Liquibase**: Database with version-controlled migrations
@@ -330,7 +330,7 @@ await messageBus.PublishAsync(new CustomerCreated(customer.Id, customer.Name));
 ### MSBuild Properties
 
 Global configuration in `Directory.Build.props`:
-- **Target Framework**: .NET 9.0
+- **Target Framework**: .NET 10.0
 - **Nullable Reference Types**: Enabled
 - **Analyzers**: .NET analyzers + SonarAnalyzer enabled
 - **Code Style**: Enforced in build
