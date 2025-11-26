@@ -46,6 +46,10 @@ public class EventTopicAttribute(string topic, string? domain = null, string ver
     public bool Internal { get; set; } = false;
 
 
+    /// <summary>
+    ///     Gets a value indicating whether the topic name should be pluralized.
+    ///     Returns <c>false</c> for explicitly named topics.
+    /// </summary>
     public virtual bool ShouldPluralizeTopicName => false;
 }
 
