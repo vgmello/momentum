@@ -20,6 +20,15 @@ namespace Momentum.ServiceDefaults.OpenTelemetry;
 public static class OpenTelemetrySetupExtensions
 {
     /// <summary>
+    ///     Sampling rate for development environment (100% - capture all traces).
+    /// </summary>
+    private const double DevelopmentSamplingRate = 1.0;
+
+    /// <summary>
+    ///     Sampling rate for production environment (10% - balance between observability and performance).
+    /// </summary>
+    private const double ProductionSamplingRate = 0.1;
+    /// <summary>
     ///     Adds comprehensive OpenTelemetry instrumentation for production-ready observability including logging, metrics, and distributed
     ///     tracing.
     /// </summary>
@@ -101,7 +110,8 @@ public static class OpenTelemetrySetupExtensions
                         activity.SetTag("grpc.request.uri", message.RequestUri?.ToString());
                     };
                 })
-                .SetSampler(new TraceIdRatioBasedSampler(builder.Environment.IsDevelopment() ? 1.0 : 0.1)));
+                .SetSampler(new TraceIdRatioBasedSampler(
+                    builder.Environment.IsDevelopment() ? DevelopmentSamplingRate : ProductionSamplingRate)));
 
         return builder;
     }

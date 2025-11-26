@@ -1,5 +1,6 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
+using System.Diagnostics.CodeAnalysis;
 using Wolverine;
 
 namespace Momentum.ServiceDefaults.Messaging.Wolverine;
@@ -39,6 +40,7 @@ public static class WolverineExtensions
         return envelope.MessageType ?? "UnknownMessage";
     }
 
+    [return: NotNullIfNotNull(nameof(typeName))]
     private static string? SanitizeTypeName(string? typeName) => typeName?
             .Replace('+', '_')
             .Replace('<', '_')
