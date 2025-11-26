@@ -4,7 +4,11 @@ using System.Text;
 
 namespace Momentum.Extensions.SourceGenerators.DbCommand.Writers;
 
-internal class DbCommandDbParamsSourceGenWriter : SourceGenBaseWriter
+/// <summary>
+///     Generates the IDbParamsProvider implementation for DbCommand-attributed types.
+///     Creates a ToDbParams() method that maps record properties to database parameters.
+/// </summary>
+internal sealed class DbCommandDbParamsSourceGenWriter : SourceGenBaseWriter
 {
     private static readonly string DbParamsProviderInterfaceFullName = typeof(IDbParamsProvider).FullName!;
 

@@ -9,7 +9,7 @@ internal static class DbCommandAnalyzers
         title: "NonQuery attribute used with generic ICommand<TResult>",
         messageFormat:
         "DbCommandAttribute's NonQuery property is true for command '{0}' which implements ICommand<{1}>. " +
-        "NoQuery are only valid for ICommand<int>.",
+        "NonQuery is only valid for ICommand<int>.",
         category: "DbCommandSourceGenerator",
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true);

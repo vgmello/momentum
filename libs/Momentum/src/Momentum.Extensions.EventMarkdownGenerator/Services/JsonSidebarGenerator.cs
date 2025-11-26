@@ -6,6 +6,10 @@ using Momentum.Extensions.EventMarkdownGenerator.Models;
 
 namespace Momentum.Extensions.EventMarkdownGenerator.Services;
 
+/// <summary>
+///     Generates JSON sidebar navigation structure for documentation sites.
+///     Groups events by subdomain and section, with separate schemas section.
+/// </summary>
 public class JsonSidebarGenerator
 {
     private readonly JsonSerializerOptions _jsonOptions = new()
@@ -14,6 +18,11 @@ public class JsonSidebarGenerator
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
+    /// <summary>
+    ///     Generates a JSON string containing the sidebar navigation structure.
+    /// </summary>
+    /// <param name="events">The events to include in the sidebar.</param>
+    /// <returns>A formatted JSON string representing the sidebar structure.</returns>
     public string GenerateSidebar(ICollection<EventWithDocumentation> events)
     {
         var sidebarItems = GenerateSidebarItems(events);
@@ -25,7 +34,7 @@ public class JsonSidebarGenerator
     {
         var eventGroups = GroupEventsBySubdomainAndSection(events);
         var sidebarItems = BuildSidebarStructure(eventGroups);
-        
+
         var schemasSection = GenerateSchemasSection(events);
         if (schemasSection != null)
         {
@@ -40,12 +49,12 @@ public class JsonSidebarGenerator
     {
         var integrationEvents = events.Where(e => !e.Metadata.IsInternal);
         var domainEvents = events.Where(e => e.Metadata.IsInternal);
-        
+
         var eventGroups = new Dictionary<string, Dictionary<string, List<EventWithDocumentation>>>();
-        
+
         GroupEventsByType(integrationEvents, eventGroups, e => ParseNamespaceHierarchy(e.Metadata.Namespace).section);
         GroupEventsByType(domainEvents, eventGroups, _ => "Domain Events");
-        
+
         return eventGroups;
     }
 
@@ -58,7 +67,7 @@ public class JsonSidebarGenerator
         {
             var (subdomain, _) = ParseNamespaceHierarchy(eventWithDoc.Metadata.Namespace);
             var section = sectionSelector(eventWithDoc);
-            
+
             AddEventToGroup(eventGroups, subdomain, section, eventWithDoc);
         }
     }
@@ -71,12 +80,12 @@ public class JsonSidebarGenerator
     {
         if (!eventGroups.ContainsKey(subdomain))
         {
-            eventGroups[subdomain] = new Dictionary<string, List<EventWithDocumentation>>();
+            eventGroups[subdomain] = [];
         }
 
         if (!eventGroups[subdomain].ContainsKey(section))
         {
-            eventGroups[subdomain][section] = new List<EventWithDocumentation>();
+            eventGroups[subdomain][section] = [];
         }
 
         eventGroups[subdomain][section].Add(eventWithDoc);
@@ -86,18 +95,18 @@ public class JsonSidebarGenerator
         Dictionary<string, Dictionary<string, List<EventWithDocumentation>>> eventGroups)
     {
         var sidebarItems = new List<SidebarItem>();
-        
+
         foreach (var (subdomain, sections) in eventGroups.OrderBy(x => x.Key))
         {
             var subdomainItem = CreateSubdomainItem(subdomain, sections);
             sidebarItems.Add(subdomainItem);
         }
-        
+
         return sidebarItems;
     }
 
     private static SidebarItem CreateSubdomainItem(
-        string subdomain, 
+        string subdomain,
         Dictionary<string, List<EventWithDocumentation>> sections)
     {
         var subdomainItem = new SidebarItem
@@ -112,7 +121,7 @@ public class JsonSidebarGenerator
         {
             AddSectionsToSubdomain(subdomainItem, sections);
         }
-        else
+        else if (sections.Count > 0)
         {
             AddEventsDirectlyToSubdomain(subdomainItem, sections.Values.First());
         }
@@ -178,9 +187,9 @@ public class JsonSidebarGenerator
         var parts = namespaceName.Split('.');
 
         // Find the index of "Contracts", "IntegrationEvents", or "DomainEvents"
-        var contractsIndex = Array.IndexOf(parts, "Contracts");
-        var integrationEventsIndex = Array.IndexOf(parts, "IntegrationEvents");
-        var domainEventsIndex = Array.IndexOf(parts, "DomainEvents");
+        var contractsIndex = Array.IndexOf(parts, NamespaceConstants.Contracts);
+        var integrationEventsIndex = Array.IndexOf(parts, NamespaceConstants.IntegrationEvents);
+        var domainEventsIndex = Array.IndexOf(parts, NamespaceConstants.DomainEvents);
 
         int endIndex;
 
@@ -226,7 +235,7 @@ public class JsonSidebarGenerator
             complexTypes.UnionWith(eventComplexTypes);
         }
 
-        if (!complexTypes.Any())
+        if (complexTypes.Count == 0)
             return null;
 
         var schemaItems = new List<SidebarItem>();
@@ -276,10 +285,16 @@ public class JsonSidebarGenerator
 
 
 
-    public async Task WriteSidebarAsync(ICollection<EventWithDocumentation> events, string filePath)
+    /// <summary>
+    ///     Generates and writes the sidebar JSON to a file asynchronously.
+    /// </summary>
+    /// <param name="events">The events to include in the sidebar.</param>
+    /// <param name="filePath">The file path to write the sidebar JSON to.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    public async Task WriteSidebarAsync(ICollection<EventWithDocumentation> events, string filePath, CancellationToken cancellationToken = default)
     {
         var sidebarJson = GenerateSidebar(events);
-        await File.WriteAllTextAsync(filePath, sidebarJson);
+        await File.WriteAllTextAsync(filePath, sidebarJson, cancellationToken);
     }
 
     private static SidebarItem CreateEventSidebarItem(EventWithDocumentation eventWithDoc)

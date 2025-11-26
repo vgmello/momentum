@@ -18,7 +18,7 @@ public class XmlParsingDebugTests
         var assemblyPath = "../TestEvents/bin/Debug/net10.0/TestEvents.dll";
 
         // Act
-        var result = await parser.LoadMultipleDocumentationAsync([xmlPath]);
+        var result = await parser.LoadMultipleDocumentationAsync([xmlPath], TestContext.Current.CancellationToken);
         result.ShouldBeTrue("XML file should load successfully");
 
         var assembly = Assembly.LoadFrom(assemblyPath);

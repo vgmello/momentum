@@ -9,8 +9,6 @@ namespace Momentum.Extensions.EventMarkdownGenerator.Services;
 
 public static class AssemblyEventDiscovery
 {
-    private const string IntegrationEventsNamespace = ".IntegrationEvents";
-    private const string DomainEventsNamespace = ".DomainEvents";
     private const string EventTopicAttributeName = nameof(EventTopicAttribute);
 
     public static IEnumerable<EventMetadata> DiscoverEvents(Assembly assembly)
@@ -52,17 +50,9 @@ public static class AssemblyEventDiscovery
     private static bool IsEventType(Type type)
     {
         // Check for EventTopicAttribute by name only, to work across assembly load contexts
-        var hasEventAttribute = type.GetCustomAttributes()
-            .Any(attr => attr.GetType().Name.StartsWith(EventTopicAttributeName));
-
-        // Make namespace check optional - if the type has EventTopicAttribute, it's an event
-        // Optionally check namespace for backwards compatibility, but don't require it
-        var hasEventNamespace = type.Namespace?.EndsWith(IntegrationEventsNamespace) == true ||
-                                type.Namespace?.EndsWith(DomainEventsNamespace) == true;
-
         // Return true if it has the attribute, regardless of namespace
-        // This allows events from any namespace to be discovered
-        return hasEventAttribute;
+        return type.GetCustomAttributes()
+            .Any(attr => attr.GetType().Name.StartsWith(EventTopicAttributeName));
     }
 
     private static EventMetadata CreateEventMetadata(Type eventType, string defaultDomain, XmlDocumentationParser? xmlParser)
@@ -73,33 +63,15 @@ public static class AssemblyEventDiscovery
         var (properties, partitionKeys) = GetEventPropertiesAndPartitionKeys(eventType, xmlParser);
 
         var topicName = GetTopicName(topicAttribute, eventType);
-        
-        // Access properties dynamically with safe defaults
-        bool shouldPluralize = false;
-        string? domain = null;
-        bool isInternal = false;
-        string version = "v1";
-        
-        try
+
+        // Access properties via reflection for cross-assembly compatibility
+        var (shouldPluralize, domain, isInternal, version) = GetTopicAttributeProperties(topicAttribute);
+
+        // Simple pluralization fallback - add 's' to the end
+        // This is a fallback when the extension method is not available
+        if (shouldPluralize && !topicName.EndsWith("s", StringComparison.OrdinalIgnoreCase))
         {
-            shouldPluralize = topicAttribute.ShouldPluralizeTopicName ?? false;
-            domain = topicAttribute.Domain;
-            isInternal = topicAttribute.Internal ?? false;
-            version = topicAttribute.Version ?? "v1";
-        }
-        catch
-        {
-            // Use defaults if properties are not accessible
-        }
-        
-        if (shouldPluralize)
-        {
-            // Simple pluralization fallback - add 's' to the end
-            // This is a fallback when the extension method is not available
-            if (!topicName.EndsWith("s", StringComparison.OrdinalIgnoreCase))
-            {
-                topicName = topicName + "s";
-            }
+            topicName = topicName.Pluralize();
         }
 
         var eventDomain = !string.IsNullOrWhiteSpace(domain)
@@ -128,7 +100,7 @@ public static class AssemblyEventDiscovery
         };
     }
 
-    private static dynamic GetEventTopicAttributeDynamic(Type type)
+    private static Attribute GetEventTopicAttributeDynamic(Type type)
     {
         // Find attribute by name to work across assembly load contexts
         var foundAttribute = type.GetCustomAttributes()
@@ -159,7 +131,7 @@ public static class AssemblyEventDiscovery
             return typedAttribute;
         }
 
-        // If T is Attribute (base type), return any EventTopicAttribute found
+        // If T is an attribute (base type), return any EventTopicAttribute found
         if (typeof(T) == typeof(Attribute) && foundAttribute != null)
         {
             return (T)foundAttribute;
@@ -184,7 +156,7 @@ public static class AssemblyEventDiscovery
         foreach (var property in eventType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
         {
             var isComplexType = !TypeUtils.IsPrimitiveType(property.PropertyType);
-            var isRequired = IsRequiredProperty(property);
+            var isRequired = TypeUtils.IsRequiredProperty(property);
 
             // Check for PartitionKey attribute on the property
             var partitionKeyAttr = property.GetCustomAttribute<PartitionKeyAttribute>();
@@ -252,20 +224,6 @@ public static class AssemblyEventDiscovery
         return map;
     }
 
-
-    private static bool IsRequiredProperty(PropertyInfo property)
-    {
-        if (property.GetCustomAttribute<System.ComponentModel.DataAnnotations.RequiredAttribute>() is not null)
-        {
-            return true;
-        }
-
-        var nullableContext = new NullabilityInfoContext();
-        var nullabilityInfo = nullableContext.Create(property);
-
-        return nullabilityInfo.WriteState == NullabilityState.NotNull;
-    }
-
     private static string? GetDomainFromNamespace(string? namespaceName)
     {
         if (string.IsNullOrEmpty(namespaceName))
@@ -302,8 +260,8 @@ public static class AssemblyEventDiscovery
             return input;
 
         var result = string.Concat(
-            input.Select((x, i) => i > 0 && char.IsUpper(x) 
-                ? "-" + char.ToLower(x) 
+            input.Select((x, i) => i > 0 && char.IsUpper(x)
+                ? "-" + char.ToLower(x)
                 : char.ToLower(x).ToString())
         );
 
@@ -311,23 +269,46 @@ public static class AssemblyEventDiscovery
     }
 
     /// <summary>
+    ///     Extracts properties from EventTopicAttribute using reflection for cross-assembly compatibility.
+    /// </summary>
+    private static (bool shouldPluralize, string? domain, bool isInternal, string version) GetTopicAttributeProperties(
+        object topicAttribute)
+    {
+        var attrType = topicAttribute.GetType();
+
+        var shouldPluralize = GetPropertyValue<bool?>(attrType, topicAttribute, "ShouldPluralizeTopicName") ?? false;
+        var domain = GetPropertyValue<string?>(attrType, topicAttribute, "Domain");
+        var isInternal = GetPropertyValue<bool?>(attrType, topicAttribute, "Internal") ?? false;
+        var version = GetPropertyValue<string?>(attrType, topicAttribute, "Version") ?? "v1";
+
+        return (shouldPluralize, domain, isInternal, version);
+    }
+
+    /// <summary>
+    ///     Gets a property value from an object using reflection with safe null handling.
+    /// </summary>
+    private static T? GetPropertyValue<T>(Type type, object instance, string propertyName)
+    {
+        var property = type.GetProperty(propertyName);
+
+        if (property == null)
+            return default;
+
+        var value = property.GetValue(instance);
+
+        return value is T typedValue ? typedValue : default;
+    }
+
+    /// <summary>
     ///     Gets the topic name from either generic or string-based EventTopicAttribute
     /// </summary>
-    private static string GetTopicName(dynamic topicAttribute, Type eventType)
+    private static string GetTopicName(object topicAttribute, Type eventType)
     {
-        // Try to access Topic property dynamically
-        try
-        {
-            string? topic = topicAttribute.Topic;
-            if (!string.IsNullOrEmpty(topic))
-            {
-                return topic;
-            }
-        }
-        catch
-        {
-            // Topic property might not exist or be accessible
-        }
+        var attrType = topicAttribute.GetType();
+        var topic = GetPropertyValue<string?>(attrType, topicAttribute, "Topic");
+
+        if (!string.IsNullOrEmpty(topic))
+            return topic;
 
         // Fallback kebab case conversion when extension method is not available
         return ConvertToKebabCase(eventType.Name);

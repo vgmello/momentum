@@ -25,14 +25,15 @@ public class XmlDocumentationParser
         };
     }
 
-    public async Task<bool> LoadMultipleDocumentationAsync(IEnumerable<string>? xmlFilePaths)
+    public async Task<bool> LoadMultipleDocumentationAsync(IEnumerable<string>? xmlFilePaths, CancellationToken cancellationToken = default)
     {
         if (xmlFilePaths == null)
             return false;
 
-        var loadResults = await Task.WhenAll(
-            xmlFilePaths.Select(_xmlService.LoadDocumentationAsync)
-        );
+        var loadTasks = xmlFilePaths.Select(path => _xmlService.LoadDocumentationAsync(path));
+        var loadResults = await Task.WhenAll(loadTasks);
+
+        cancellationToken.ThrowIfCancellationRequested();
 
         return loadResults.Any(result => result);
     }

@@ -17,7 +17,7 @@ namespace Momentum.Extensions.SourceGenerators.DbCommand;
 ///         <strong>Analysis Responsibilities:</strong>
 ///     </para>
 ///     <para>This class performs deep analysis of annotated types to extract all information needed for code generation:</para>
-/// 
+///
 ///     <list type="bullet">
 ///         <item><strong>Attribute Parsing:</strong> Extracts and validates DbCommandAttribute constructor arguments</item>
 ///         <item>
@@ -29,7 +29,7 @@ namespace Momentum.Extensions.SourceGenerators.DbCommand;
 ///         <item><strong>Type Hierarchy:</strong> Handles nested types and namespace resolution</item>
 ///         <item><strong>Diagnostic Generation:</strong> Validates configuration and reports errors/warnings</item>
 ///     </list>
-/// 
+///
 ///     <para>
 ///         <strong>Roslyn Integration Pattern:</strong>
 ///     </para>
@@ -40,7 +40,7 @@ namespace Momentum.Extensions.SourceGenerators.DbCommand;
 ///         <item>Produces immutable data structures for code generation</item>
 ///         <item>Reports diagnostics back to the compilation process</item>
 ///     </list>
-/// 
+///
 ///     <para>
 ///         <strong>Property Analysis Strategy:</strong>
 ///     </para>
@@ -50,7 +50,7 @@ namespace Momentum.Extensions.SourceGenerators.DbCommand;
 ///         <item><strong>Parameter Naming:</strong> Applies case conversion and prefix rules</item>
 ///         <item><strong>Column Attributes:</strong> Overrides automatic naming with explicit values</item>
 ///     </list>
-/// 
+///
 ///     <para>
 ///         <strong>Return Type Analysis:</strong>
 ///     </para>
@@ -61,7 +61,7 @@ namespace Momentum.Extensions.SourceGenerators.DbCommand;
 ///         <item>Identifies collection types (IEnumerable&lt;T&gt;) for QueryAsync usage</item>
 ///         <item>Detects integral types for Execute vs ExecuteScalar selection</item>
 ///     </list>
-/// 
+///
 ///     <para>
 ///         <strong>Validation and Diagnostics:</strong>
 ///     </para>
@@ -72,7 +72,7 @@ namespace Momentum.Extensions.SourceGenerators.DbCommand;
 ///         <item><strong>NonQuery Flag Validation:</strong> Warns about incorrect nonQuery usage patterns</item>
 ///         <item><strong>Type Compatibility:</strong> Ensures return types are compatible with database operations</item>
 ///     </list>
-/// 
+///
 ///     <para>
 ///         <strong>Performance Considerations:</strong>
 ///     </para>
@@ -83,7 +83,7 @@ namespace Momentum.Extensions.SourceGenerators.DbCommand;
 ///         <item>Minimal allocations during analysis</item>
 ///     </list>
 /// </remarks>
-internal class DbCommandTypeInfoSourceGen : DbCommandTypeInfo
+internal sealed class DbCommandTypeInfoSourceGen : DbCommandTypeInfo
 {
     internal static string DbCommandAttributeFullName { get; } = typeof(DbCommandAttribute).FullName!;
 
@@ -260,13 +260,13 @@ internal class DbCommandTypeInfoSourceGen : DbCommandTypeInfo
             .Where(p => p is { DeclaredAccessibility: Accessibility.Public, IsStatic: false, GetMethod: not null })
             .Select(p => new PropertyInfo(p.Name, GetParameterName(p, paramsCase, settings)));
 
-        return [..primaryProperties.Values.Concat(normalProps)];
+        return [.. primaryProperties.Values.Concat(normalProps)];
     }
 
     private static string GetParameterName(ISymbol prop, DbParamsCase paramsCase, DbCommandSourceGenSettings settings)
     {
         var columnNameAttribute = prop.GetAttributes()
-            .FirstOrDefault(a => a.AttributeClass?.Name.StartsWith("Column") == true);
+            .FirstOrDefault(a => a.AttributeClass?.Name == "ColumnAttribute");
 
         var customColumnName = columnNameAttribute?.GetConstructorArgument<string>(index: 0);
 

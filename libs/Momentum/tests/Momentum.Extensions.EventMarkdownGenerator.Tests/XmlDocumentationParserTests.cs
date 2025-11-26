@@ -17,7 +17,7 @@ public class XmlDocumentationParserTests
         var xmlPath = TestPathHelper.GetTestEventsXmlPath();
 
         // Act
-        var result = await parser.LoadMultipleDocumentationAsync([xmlPath]);
+        var result = await parser.LoadMultipleDocumentationAsync([xmlPath], TestContext.Current.CancellationToken);
 
         // Assert
         result.ShouldBeTrue();

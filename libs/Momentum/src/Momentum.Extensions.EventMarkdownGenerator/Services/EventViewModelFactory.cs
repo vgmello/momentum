@@ -86,7 +86,7 @@ public static class EventViewModelFactory
             {
                 name = p.Name,
                 typeName = GetTypeDisplayName(p.PropertyType),
-                isRequired = IsPropertyRequired(p),
+                isRequired = TypeUtils.IsRequiredProperty(p),
                 isComplexType = TypeUtils.IsComplexType(p.PropertyType),
                 isCollectionType = TypeUtils.IsCollectionType(p.PropertyType),
                 description = GetPropertyDescription(p),
@@ -215,15 +215,4 @@ public static class EventViewModelFactory
         return TypeUtils.GetFriendlyTypeName(type);
     }
 
-    private static bool IsPropertyRequired(PropertyInfo property)
-    {
-        var requiredAttribute = property.GetCustomAttribute<System.ComponentModel.DataAnnotations.RequiredAttribute>();
-
-        if (requiredAttribute != null) return true;
-
-        var nullabilityContext = new NullabilityInfoContext();
-        var nullabilityInfo = nullabilityContext.Create(property);
-
-        return nullabilityInfo.WriteState == NullabilityState.NotNull;
-    }
 }

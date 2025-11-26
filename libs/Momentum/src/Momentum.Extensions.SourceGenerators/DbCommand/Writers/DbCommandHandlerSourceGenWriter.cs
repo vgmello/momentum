@@ -4,7 +4,11 @@ using System.Text;
 
 namespace Momentum.Extensions.SourceGenerators.DbCommand.Writers;
 
-internal class DbCommandHandlerSourceGenWriter : SourceGenBaseWriter
+/// <summary>
+///     Generates static handler classes with HandleAsync methods for DbCommand-attributed types.
+///     Selects the appropriate Dapper method based on return type and NonQuery setting.
+/// </summary>
+internal sealed class DbCommandHandlerSourceGenWriter : SourceGenBaseWriter
 {
     public static string Write(DbCommandTypeInfo dbCommandTypeInfo)
     {
