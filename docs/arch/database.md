@@ -8,7 +8,7 @@ The database is organized using Liquibase migrations with a single file per obje
 
 ```
 infra/AppDomain.Database/Liquibase/
-├── main/
+├── billing/
 │   ├── cashiers/
 │   │   ├── tables/       # Cashier-related tables
 │   │   │   ├── cashiers.sql
@@ -21,7 +21,7 @@ infra/AppDomain.Database/Liquibase/
 │   │   └── procedures/   # Invoice-related procedures
 │   │       ├── invoices_cancel.sql
 │   │       └── invoices_mark_paid.sql
-│   └── main.sql    # Main domain schema setup
+│   └── billing.sql    # Billing domain schema setup
 └── service_bus/
     └── service_bus.sql   # Messaging infrastructure
 ```
@@ -97,7 +97,7 @@ Each database object (table, procedure, function, etc.) is defined in its own SQ
 
 - **Tables**: Located in `{domain}/{subdomain}/tables/{object_name}.sql`
 - **Procedures**: Located in `{domain}/{subdomain}/procedures/{procedure_name}.sql`
-- **Schema Setup**: Domain-level files like `main.sql` for schema initialization
+- **Schema Setup**: Domain-level files like `billing.sql` for schema initialization
 
 ### Example Migration File
 

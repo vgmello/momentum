@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <include file="billing/billing.sql"/>
+<!--#if (INCLUDE_SAMPLE) -->
+    <!-- Sample domain content - remove with no-sample -->
+    <include file="billing/cashiers/tables/cashiers.sql"/>
+    <include file="billing/cashiers/tables/cashier_currencies.sql"/>
+    <include file="billing/cashiers/procedures/cashiers_get_all.sql"/>
+
+    <include file="billing/invoices/tables/invoices.sql"/>
+    <include file="billing/invoices/procedures/invoices_cancel.sql"/>
+    <include file="billing/invoices/procedures/invoices_mark_paid.sql"/>
+
+<!--#endif -->
+</databaseChangeLog>
