@@ -309,6 +309,7 @@ public static class LibraryRenameAction
         {
             var (originalContent, hasBom) = ReadFileWithBomDetection(filePath);
 
+            // First, apply regex replacement for namespace/type references
             var modifiedContent = regex.Replace(originalContent, match =>
             {
                 var token = match.Groups["token"].Value;
@@ -320,6 +321,13 @@ public static class LibraryRenameAction
 
                 return $"{libPrefix}.{token}";
             });
+
+            // Then, apply path replacements for project references in csproj files
+            if (filePath.EndsWith(".csproj", StringComparison.OrdinalIgnoreCase) ||
+                filePath.EndsWith(".props", StringComparison.OrdinalIgnoreCase))
+            {
+                modifiedContent = ApplyPathReplacements(modifiedContent, libPrefix);
+            }
 
             if (modifiedContent != originalContent)
             {
@@ -335,6 +343,29 @@ public static class LibraryRenameAction
         }
 
         return false;
+    }
+
+    private static string ApplyPathReplacements(string content, string libPrefix)
+    {
+        // Replace folder paths: libs/Momentum/ -> libs/{libPrefix}/
+        // Handle both forward slash and backslash variants
+        content = content.Replace("libs/Momentum/", $"libs/{libPrefix}/");
+        content = content.Replace("libs\\Momentum\\", $"libs\\{libPrefix}\\");
+
+        // Replace any remaining Momentum.*.csproj references with libPrefix.*.csproj
+        // This handles cases like: Momentum.ServiceDefaults.csproj -> MyLib.ServiceDefaults.csproj
+        content = Regex.Replace(
+            content,
+            @"Momentum\.([A-Za-z.]+)\.csproj",
+            $"{libPrefix}.$1.csproj");
+
+        // Replace Momentum.*.props references
+        content = Regex.Replace(
+            content,
+            @"Momentum\.([A-Za-z.]+)\.props",
+            $"{libPrefix}.$1.props");
+
+        return content;
     }
 
     private static (string content, bool hasBom) ReadFileWithBomDetection(string filePath)

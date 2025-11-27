@@ -97,7 +97,7 @@ The template supports extensive customization through parameters. Here are the m
 
 ```bash
 # Generate API-only service
-dotnet new mmt -n PaymentService --api --back-office false --orleans false --docs false
+dotnet new mmt -n PaymentService --api --backoffice false --orleans false --docs false
 ```
 
 ### **Orleans Processing Engine**
@@ -127,7 +127,7 @@ The template offers comprehensive configuration options:
 
 **Core Components:**
 -   `--api`: REST/gRPC API project (default: true)
--   `--back-office`: Background processing project (default: true)
+-   `--backoffice`: Background processing project (default: true)
 -   `--orleans`: Orleans stateful processing project (default: false)
 -   `--aspire`: .NET Aspire orchestration project (default: true)
 -   `--docs`: VitePress documentation project (default: true)

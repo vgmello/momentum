@@ -439,7 +439,7 @@ await app.RunAsync(args);
 dotnet new install .
 
 # Create a new project
-dotnet new mmt -n MyBusinessApp --aspire --api --back-office
+dotnet new mmt -n MyBusinessApp --aspire --api --backoffice
 ```
 
 ### 2. Configure Service Defaults

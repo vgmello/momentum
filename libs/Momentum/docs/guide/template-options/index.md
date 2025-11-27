@@ -27,7 +27,7 @@ Control which projects are generated in your solution:
 | Parameter       | Type | Default | Description                                                        |
 | --------------- | ---- | ------- | ------------------------------------------------------------------ |
 | `--api`         | bool | true    | Generate REST/gRPC API project for synchronous operations          |
-| `--back-office` | bool | true    | Generate background processing project for asynchronous operations |
+| `--backoffice` | bool | true    | Generate background processing project for asynchronous operations |
 | `--orleans`     | bool | false   | Generate Orleans-based stateful processing project                 |
 | `--aspire`      | bool | true    | Generate .NET Aspire orchestration project for local development   |
 | `--docs`        | bool | true    | Generate VitePress documentation project                           |
@@ -94,7 +94,7 @@ The template automatically computes these symbols based on your parameters:
 | Symbol                | Condition                                  | Purpose                            |
 | --------------------- | ------------------------------------------ | ---------------------------------- |
 | `INCLUDE_API`         | `--api` or all defaults                    | Include API-related code           |
-| `INCLUDE_BACK_OFFICE` | `--back-office` or all defaults            | Include background processing code |
+| `INCLUDE_BACK_OFFICE` | `--backoffice` or all defaults            | Include background processing code |
 | `INCLUDE_ORLEANS`     | `--orleans` is specified                   | Include Orleans-specific code      |
 | `INCLUDE_ASPIRE`      | `--aspire` or all defaults                 | Include Aspire orchestration       |
 | `INCLUDE_SAMPLE`      | `--no-sample` is NOT specified             | Include sample domain code         |
@@ -219,14 +219,14 @@ dotnet new mmt -n ServiceName --api --no-back-office --no-orleans
 
 ```bash
 # Asynchronous message processing
-dotnet new mmt -n ServiceName --back-office --no-web-api --kafka
+dotnet new mmt -n ServiceName --backoffice --no-web-api --kafka
 ```
 
 **Hybrid Services** (Full CQRS):
 
 ```bash
 # Both synchronous and asynchronous capabilities
-dotnet new mmt -n ServiceName --api --back-office --kafka
+dotnet new mmt -n ServiceName --api --backoffice --kafka
 ```
 
 **Stateful Processing** (Orleans-based):
@@ -262,7 +262,7 @@ dotnet new mmt -n ServiceName --orleans --kafka
 MyApp/                          # --project-only false (default)
 ├── src/
 │   ├── MyApp.Api/              # --api (default: true)
-│   ├── MyApp.BackOffice/       # --back-office (default: true)
+│   ├── MyApp.BackOffice/       # --backoffice (default: true)
 │   ├── MyApp.BackOffice.Orleans/ # --orleans (default: false)
 │   ├── MyApp.AppHost/          # --aspire (default: true)
 │   ├── MyApp/                  # Core domain (automatic with backend)
@@ -449,22 +449,22 @@ After generation, you'll need to configure environment-specific settings:
 dotnet new mmt -n ApiGateway --api --no-back-office --no-sample --port 8000
 
 # Processing service
-dotnet new mmt -n OrderProcessor --back-office --orleans --no-web-api --port 8100
+dotnet new mmt -n OrderProcessor --backoffice --orleans --no-web-api --port 8100
 
 # Notification service
-dotnet new mmt -n NotificationService --back-office --no-web-api --no-sample --port 8200
+dotnet new mmt -n NotificationService --backoffice --no-web-api --no-sample --port 8200
 ```
 
 **Monolithic Application** (Single comprehensive service):
 
 ```bash
-dotnet new mmt -n MonolithApp --api --back-office --orleans --docs --port 8000
+dotnet new mmt -n MonolithApp --api --backoffice --orleans --docs --port 8000
 ```
 
 **Event-Driven System** (Heavy messaging focus):
 
 ```bash
-dotnet new mmt -n EventProcessor --back-office --orleans --kafka --no-web-api --no-sample
+dotnet new mmt -n EventProcessor --backoffice --orleans --kafka --no-web-api --no-sample
 ```
 
 ### Custom Template Modification
@@ -496,7 +496,7 @@ For organizations needing custom template behavior:
     dotnet new mmt -n MyService --api --no-back-office --no-sample
 
     # Add components as requirements evolve
-    dotnet new mmt -n MyService --api --back-office --kafka
+    dotnet new mmt -n MyService --api --backoffice --kafka
     ```
 
 2. **Consider Deployment Target Early**
@@ -547,11 +547,11 @@ project-templates:
         use-case: "REST/gRPC endpoints without background processing"
 
     processing-service:
-        command: "dotnet new mmt -n {name} --back-office --orleans --no-web-api --kafka --port {port}"
+        command: "dotnet new mmt -n {name} --backoffice --orleans --no-web-api --kafka --port {port}"
         use-case: "Event-driven background processing with state"
 
     full-service:
-        command: "dotnet new mmt -n {name} --api --back-office --kafka --docs --port {port}"
+        command: "dotnet new mmt -n {name} --api --backoffice --kafka --docs --port {port}"
         use-case: "Complete CQRS service with API and processing"
 ```
 
@@ -575,17 +575,17 @@ dotnet new mmt -n ApiGateway \
 
 # User Management (CRUD operations)
 dotnet new mmt -n UserService \
-  --api --back-office \
+  --api --backoffice \
   --db-config default --port 8100
 
 # Order Processing (stateful workflows)
 dotnet new mmt -n OrderService \
-  --api --back-office --orleans \
+  --api --backoffice --orleans \
   --kafka --port 8200
 
 # Notification Service (pure messaging)
 dotnet new mmt -n NotificationService \
-  --back-office --no-web-api \
+  --backoffice --no-web-api \
   --kafka --db-config none --port 8300
 ```
 
@@ -595,7 +595,7 @@ Heavy messaging with complex state management:
 
 ```bash
 dotnet new mmt -n EventProcessor \
-  --back-office --orleans \
+  --backoffice --orleans \
   --kafka --no-web-api \
   --no-sample --port 8100
 ```
@@ -617,7 +617,7 @@ Integrate with existing systems:
 
 ```bash
 dotnet new mmt -n LegacyBridge \
-  --back-office --no-web-api \
+  --backoffice --no-web-api \
   --db-config none --no-kafka \
   --no-sample --port 8100
 ```
@@ -668,8 +668,8 @@ dotnet new mmt -n MyApp --port 9000
 | Scenario            | Command                                                             |
 | ------------------- | ------------------------------------------------------------------- |
 | **API Only**        | `dotnet new mmt -n App --api --no-back-office --no-sample`          |
-| **Processing Only** | `dotnet new mmt -n App --back-office --no-web-api --kafka`          |
-| **Full CQRS**       | `dotnet new mmt -n App --api --back-office --kafka`                 |
+| **Processing Only** | `dotnet new mmt -n App --backoffice --no-web-api --kafka`          |
+| **Full CQRS**       | `dotnet new mmt -n App --api --backoffice --kafka`                 |
 | **Orleans State**   | `dotnet new mmt -n App --orleans --kafka`                           |
 | **Development**     | `dotnet new mmt -n App --libs defaults,api,ext --no-sample`         |
 | **Minimal**         | `dotnet new mmt -n App --project-only --no-sample --db-config none` |

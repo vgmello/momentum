@@ -458,9 +458,9 @@ function Invoke-TestCategory {
             Test-Template -Name 'TestDefault' -Parameters '' -TestCategory 'Real-World Patterns'
             Test-Template -Name 'TestDefaultNoSample' -Parameters '--no-sample' -TestCategory 'Real-World Patterns'
             Test-Template -Name 'TestDefaultWithLibs' -Parameters '--libs defaults api kafka ext --lib-name Platform' -TestCategory 'Real-World Patterns'
-            Test-Template -Name 'TestApiNoBackOffice' -Parameters '--back-office false' -TestCategory 'Real-World Patterns'
+            Test-Template -Name 'TestApiNoBackOffice' -Parameters '--backoffice false' -TestCategory 'Real-World Patterns'
             Test-Template -Name 'TestBackOfficeNoApi' -Parameters '--api false' -TestCategory 'Real-World Patterns'
-            Test-Template -Name 'TestAPISimple' -Parameters '--no-sample --back-office false --docs false --kafka false' -TestCategory 'Real-World Patterns'
+            Test-Template -Name 'TestAPISimple' -Parameters '--no-sample --backoffice false --docs false --kafka false' -TestCategory 'Real-World Patterns'
             Test-Template -Name 'TestFullStack' -Parameters '--orleans true' -TestCategory 'Real-World Patterns'
         }
 
@@ -468,7 +468,7 @@ function Invoke-TestCategory {
             Write-ColoredMessage -Level 'INFO' -Message "Running Category 6: Orleans Combinations"
 
             Test-Template -Name 'TestOrleansAPI' -Parameters '--orleans true --api true --aspire true' -TestCategory 'Orleans Combinations'
-            Test-Template -Name 'TestOrleansFullStack' -Parameters '--orleans true --api true --back-office true --aspire true' -TestCategory 'Orleans Combinations'
+            Test-Template -Name 'TestOrleansFullStack' -Parameters '--orleans true --api true --backoffice true --aspire true' -TestCategory 'Orleans Combinations'
             Test-Template -Name 'TestOrleansNoKafka' -Parameters '--orleans true --kafka false' -TestCategory 'Orleans Combinations'
             Test-Template -Name 'TestOrleansNoSample' -Parameters '--orleans true --no-sample' -TestCategory 'Orleans Combinations'
         }
@@ -477,11 +477,11 @@ function Invoke-TestCategory {
             Write-ColoredMessage -Level 'INFO' -Message "Running Category 7: Edge Cases and Special Configurations"
 
             Test-Template -Name 'TestMinimal' -Parameters '--project-only --no-sample' -TestCategory 'Edge Cases'
-            Test-Template -Name 'TestBareMin' -Parameters '--api false --back-office false --aspire false --docs false' -TestCategory 'Edge Cases'
-            $allFalseParams = '--api false --back-office false --orleans false --docs false --aspire false --kafka false'
+            Test-Template -Name 'TestBareMin' -Parameters '--api false --backoffice false --aspire false --docs false' -TestCategory 'Edge Cases'
+            $allFalseParams = '--api false --backoffice false --orleans false --docs false --aspire false --kafka false'
             Test-Template -Name 'TestAllFalse' -Parameters $allFalseParams -TestCategory 'Edge Cases'
 
-            $allTrueParams = '--api true --back-office true --orleans true --docs true --aspire true --kafka true'
+            $allTrueParams = '--api true --backoffice true --orleans true --docs true --aspire true --kafka true'
             Test-Template -Name 'TestAllTrue' -Parameters $allTrueParams -TestCategory 'Edge Cases'
         }
 
