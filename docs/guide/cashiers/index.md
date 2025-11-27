@@ -136,15 +136,15 @@ When an invoice is paid:
 
 The cashiers data is stored in PostgreSQL:
 
-**Table**: [`app_domain.cashiers`](https://github.com/org-name/app-domain/blob/main/infra/AppDomain.Database/Liquibase/app_domain/tables/cashiers.sql)
+**Table**: [`main.cashiers`](https://github.com/org-name/app-domain/blob/main/infra/AppDomain.Database/Liquibase/main/tables/cashiers.sql)
 
 **Stored Procedures**:
 
--   `app_domain.cashiers_create` - Create new cashier
--   `app_domain.cashiers_update` - Update cashier details
--   `app_domain.cashiers_delete` - Remove cashier
--   `app_domain.cashiers_get` - Retrieve single cashier
--   `app_domain.cashiers_list` - List all cashiers
+-   `main.cashiers_create` - Create new cashier
+-   `main.cashiers_update` - Update cashier details
+-   `main.cashiers_delete` - Remove cashier
+-   `main.cashiers_get` - Retrieve single cashier
+-   `main.cashiers_list` - List all cashiers
 
 ## Testing Patterns
 

@@ -125,7 +125,7 @@ Location: [`src/AppDomain/*/Commands/`](https://github.com/org-name/app-domain/t
 ### Command Example
 
 ```csharp
-[DbCommand(sp: "app_domain.invoices_create")]
+[DbCommand(sp: "main.invoices_create")]
 public record CreateInvoiceCommand : IRequest<Result<Invoice>>
 {
     public required string Name { get; init; }

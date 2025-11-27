@@ -37,7 +37,7 @@ public static partial class GetCashiersQueryHandler
     ///         - If the function name starts with a $, the function gets executed as `select * from {dbFunction}`
     ///     </para>
     /// </remarks>
-    [DbCommand(fn: "$app_domain.cashiers_get_all")]
+    [DbCommand(fn: "$main.cashiers_get_all")]
     public partial record DbQuery(Guid TenantId, int Limit, int Offset) : IQuery<IEnumerable<Data.Entities.Cashier>>;
 
     /// <summary>

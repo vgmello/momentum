@@ -369,8 +369,8 @@ Uses Liquibase for version-controlled schema management:
 
 **Correct Structure**:
 ```
-infra/YourService.Database/Liquibase/app_domain/
-├── app_domain.sql                    # Schema creation
+infra/YourService.Database/Liquibase/main/
+├── main.sql                    # Schema creation
 ├── invoices/
 │   ├── tables/
 │   │   └── invoices.sql             # Table + constraints + indexes + triggers
@@ -386,23 +386,23 @@ infra/YourService.Database/Liquibase/app_domain/
 **Example Table File Structure**:
 ```sql
 -- Table creation
-CREATE TABLE app_domain.invoices (...);
+CREATE TABLE main.invoices (...);
 
 -- Additional columns (if needed)
-ALTER TABLE app_domain.invoices ADD COLUMN ...;
+ALTER TABLE main.invoices ADD COLUMN ...;
 
 -- Constraints
-ALTER TABLE app_domain.invoices ADD CONSTRAINT chk_amount_positive CHECK (amount > 0);
+ALTER TABLE main.invoices ADD CONSTRAINT chk_amount_positive CHECK (amount > 0);
 
 -- Foreign keys
-ALTER TABLE app_domain.invoices ADD CONSTRAINT fk_invoice_customer ...;
+ALTER TABLE main.invoices ADD CONSTRAINT fk_invoice_customer ...;
 
 -- Indexes
-CREATE INDEX idx_invoices_status ON app_domain.invoices(tenant_id, status);
+CREATE INDEX idx_invoices_status ON main.invoices(tenant_id, status);
 
 -- Triggers and functions
 CREATE OR REPLACE FUNCTION update_invoice_version() ...;
-CREATE TRIGGER tr_invoice_version BEFORE UPDATE ON app_domain.invoices ...;
+CREATE TRIGGER tr_invoice_version BEFORE UPDATE ON main.invoices ...;
 ```
 
 ### Troubleshooting Database Issues
@@ -430,12 +430,12 @@ CREATE TRIGGER tr_invoice_version BEFORE UPDATE ON app_domain.invoices ...;
    -- Verify constraints exist
    SELECT constraint_name, constraint_type
    FROM information_schema.table_constraints
-   WHERE table_schema = 'app_domain';
+   WHERE table_schema = 'main';
 
    -- Verify indexes exist
    SELECT schemaname, tablename, indexname
    FROM pg_indexes
-   WHERE schemaname = 'app_domain';
+   WHERE schemaname = 'main';
    ```
 
 4. **Connection String Issues**:

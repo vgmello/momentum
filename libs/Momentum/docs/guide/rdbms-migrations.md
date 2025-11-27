@@ -31,14 +31,14 @@ Momentum organizes database migrations in a dedicated infrastructure project tha
 ```
 infra/AppDomain.Database/
 ├── AppDomain.Database.csproj          # Minimal project file for build integration
-├── liquibase.properties               # Main app_domain database configuration
+├── liquibase.properties               # Main main database configuration
 ├── liquibase.servicebus.properties    # Service bus database configuration
 ├── liquibase.setup.properties         # Database setup and initial schemas
 └── Liquibase/                         # Migration files directory
     ├── changelog.xml                  # Root changelog with includeAll directive
-    ├── app_domain/                    # Application domain migrations
+    ├── main/                    # Application domain migrations
     │   ├── changelog.xml              # Domain-specific changelog
-    │   ├── app_domain.sql             # Schema initialization
+    │   ├── main.sql             # Schema initialization
     │   ├── cashiers/                  # Domain entity migrations
     │   │   ├── tables/                # Table definitions and modifications
     │   │   │   ├── cashiers.sql
@@ -60,7 +60,7 @@ infra/AppDomain.Database/
 
 Momentum uses a **dual-database approach** to separate concerns:
 
-#### 1. **app_domain Database**
+#### 1. **main Database**
 - Contains business domain entities and logic
 - Organized by domain boundaries (cashiers, invoices, etc.)
 - Supports complex business queries and transactions
@@ -125,7 +125,7 @@ The `includeAll` directive automatically discovers and includes all `changelog.x
 - **Consistent ordering** based on directory structure
 - **Minimal maintenance** when adding new domains
 
-#### Domain Changelog (`app_domain/changelog.xml`)
+#### Domain Changelog (`main/changelog.xml`)
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog
@@ -135,16 +135,16 @@ The `includeAll` directive automatically discovers and includes all `changelog.x
         https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <!-- Schema initialization -->
-    <include file="app_domain/app_domain.sql"/>
+    <include file="main/main.sql"/>
 
     <!-- Domain entity migrations -->
-    <include file="app_domain/cashiers/tables/cashiers.sql"/>
-    <include file="app_domain/cashiers/tables/cashier_currencies.sql"/>
-    <include file="app_domain/cashiers/procedures/cashiers_get_all.sql"/>
+    <include file="main/cashiers/tables/cashiers.sql"/>
+    <include file="main/cashiers/tables/cashier_currencies.sql"/>
+    <include file="main/cashiers/procedures/cashiers_get_all.sql"/>
 
-    <include file="app_domain/invoices/tables/invoices.sql"/>
-    <include file="app_domain/invoices/procedures/invoices_cancel.sql"/>
-    <include file="app_domain/invoices/procedures/invoices_mark_paid.sql"/>
+    <include file="main/invoices/tables/invoices.sql"/>
+    <include file="main/invoices/procedures/invoices_cancel.sql"/>
+    <include file="main/invoices/procedures/invoices_mark_paid.sql"/>
 </databaseChangeLog>
 ```
 
@@ -167,10 +167,10 @@ All migration files use **Liquibase formatted SQL** syntax with embedded changes
 ```sql
 --liquibase formatted sql
 --changeset dev_user:"create database" runInTransaction:false context:@setup
-CREATE DATABASE app_domain;
+CREATE DATABASE main;
 
---changeset dev_user:"create app_domain schema"
-CREATE SCHEMA IF NOT EXISTS app_domain;
+--changeset dev_user:"create main schema"
+CREATE SCHEMA IF NOT EXISTS main;
 ```
 
 Key attributes:
@@ -181,7 +181,7 @@ Key attributes:
 ```sql
 --liquibase formatted sql
 --changeset dev_user:"create cashiers table"
-CREATE TABLE IF NOT EXISTS app_domain.cashiers (
+CREATE TABLE IF NOT EXISTS main.cashiers (
     tenant_id UUID,
     cashier_id UUID,
     name VARCHAR(100) NOT NULL,
@@ -192,7 +192,7 @@ CREATE TABLE IF NOT EXISTS app_domain.cashiers (
 );
 
 --changeset dev_user:"add email to cashiers table"
-ALTER TABLE app_domain.cashiers
+ALTER TABLE main.cashiers
 ADD COLUMN IF NOT EXISTS email VARCHAR(100);
 ```
 
@@ -206,13 +206,13 @@ Best practices:
 ```sql
 --liquibase formatted sql
 --changeset dev_user:"create cashiers_get_all function" runOnChange:true splitStatements:false
-CREATE OR REPLACE FUNCTION app_domain.cashiers_get_all(
+CREATE OR REPLACE FUNCTION main.cashiers_get_all(
         IN p_tenant_id uuid,
         IN p_limit integer DEFAULT 1000,
         IN p_offset integer DEFAULT 0
-    ) RETURNS SETOF app_domain.cashiers LANGUAGE SQL AS $$
+    ) RETURNS SETOF main.cashiers LANGUAGE SQL AS $$
 SELECT *
-FROM app_domain.cashiers c
+FROM main.cashiers c
 WHERE c.tenant_id = p_tenant_id
 ORDER BY c.name
 LIMIT p_limit OFFSET p_offset;
@@ -227,7 +227,7 @@ Key attributes for procedures:
 
 #### Domain-Driven Structure
 ```
-app_domain/
+main/
 ├── [domain_name]/           # One directory per domain
 │   ├── tables/             # Table definitions and schema changes
 │   ├── procedures/         # Stored procedures and functions
@@ -276,7 +276,7 @@ public static class LiquibaseExtensions
             .WithArgs("-c",
                 """
                 liquibase --url=jdbc:postgresql://app-domain-db:5432/service_bus update --changelog-file=service_bus/changelog.xml && \
-                liquibase --url=jdbc:postgresql://app-domain-db:5432/app_domain update --changelog-file=app_domain/changelog.xml
+                liquibase --url=jdbc:postgresql://app-domain-db:5432/main update --changelog-file=main/changelog.xml
                 """);
     }
 }
@@ -342,7 +342,7 @@ builder.AddProject<Projects.AppDomain_Api>("app-domain-api")
 #### Sequential Database Creation
 The migration container executes databases in sequence:
 1. **service_bus** database (messaging infrastructure)
-2. **app_domain** database (business domain)
+2. **main** database (business domain)
 
 This ensures proper dependency ordering and prevents connection conflicts.
 
@@ -369,7 +369,7 @@ app-domain-db-migrations:
       echo 'Running database migrations...' && \
       liquibase update --defaults-file liquibase.setup.properties --url=jdbc:postgresql://app-domain-db:5432/postgres && \
       liquibase update --defaults-file liquibase.servicebus.properties --url=jdbc:postgresql://app-domain-db:5432/service_bus && \
-      liquibase update --url=jdbc:postgresql://app-domain-db:5432/app_domain && \
+      liquibase update --url=jdbc:postgresql://app-domain-db:5432/main && \
       echo 'Database migrations completed successfully!'
 ```
 
@@ -377,9 +377,9 @@ app-domain-db-migrations:
 
 #### Main Database (`liquibase.properties`)
 ```properties
-changeLogFile=app_domain/changelog.xml
+changeLogFile=main/changelog.xml
 liquibase.searchPath=./Liquibase/
-liquibase.command.url=jdbc:postgresql://localhost:5432/app_domain
+liquibase.command.url=jdbc:postgresql://localhost:5432/main
 username=postgres
 password=password@
 ```
@@ -412,7 +412,7 @@ Used for initial database and schema creation in containerized environments.
 **Step 2: Create Migration File**
 ```bash
 # Navigate to appropriate directory
-cd infra/AppDomain.Database/Liquibase/app_domain/[domain]/[type]/
+cd infra/AppDomain.Database/Liquibase/main/[domain]/[type]/
 
 # Create new migration file
 touch [descriptive_name].sql
@@ -427,8 +427,8 @@ touch [descriptive_name].sql
 
 **Step 4: Update Domain Changelog**
 ```xml
-<!-- Add to app_domain/[domain]/changelog.xml or main changelog -->
-<include file="app_domain/[domain]/[type]/[your_file].sql"/>
+<!-- Add to main/[domain]/changelog.xml or main changelog -->
+<include file="main/[domain]/[type]/[your_file].sql"/>
 ```
 
 #### 2. Testing Migrations Locally
@@ -480,20 +480,20 @@ liquibase validate
 **Database Verification:**
 ```sql
 -- Connect to database and verify changes
-\d app_domain.your_table_name    -- Replace with your actual table name
-\df app_domain.your_function_name -- Replace with your actual function name
+\d main.your_table_name    -- Replace with your actual table name
+\df main.your_function_name -- Replace with your actual function name
 ```
 
 ### Adding New Domain Entities
 
 #### 1. Create Domain Directory Structure
 ```bash
-mkdir -p infra/AppDomain.Database/Liquibase/app_domain/[new_domain]/{tables,procedures}
+mkdir -p infra/AppDomain.Database/Liquibase/main/[new_domain]/{tables,procedures}
 ```
 
 #### 2. Create Domain Changelog
 ```xml
-<!-- infra/AppDomain.Database/Liquibase/app_domain/[new_domain]/changelog.xml -->
+<!-- infra/AppDomain.Database/Liquibase/main/[new_domain]/changelog.xml -->
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
@@ -502,10 +502,10 @@ mkdir -p infra/AppDomain.Database/Liquibase/app_domain/[new_domain]/{tables,proc
         https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <!-- Include all tables first -->
-    <include file="app_domain/[new_domain]/tables/[entity].sql"/>
+    <include file="main/[new_domain]/tables/[entity].sql"/>
 
     <!-- Then procedures -->
-    <include file="app_domain/[new_domain]/procedures/[entity]_get_all.sql"/>
+    <include file="main/[new_domain]/procedures/[entity]_get_all.sql"/>
 </databaseChangeLog>
 ```
 
@@ -513,7 +513,7 @@ mkdir -p infra/AppDomain.Database/Liquibase/app_domain/[new_domain]/{tables,proc
 ```sql
 --liquibase formatted sql
 --changeset dev_user:"create [entity] table"
-CREATE TABLE IF NOT EXISTS app_domain.[entity_plural] (
+CREATE TABLE IF NOT EXISTS main.[entity_plural] (
     tenant_id UUID NOT NULL,
     [entity]_id UUID NOT NULL,
     name VARCHAR(100) NOT NULL,
@@ -527,13 +527,13 @@ CREATE TABLE IF NOT EXISTS app_domain.[entity_plural] (
 ```sql
 --liquibase formatted sql
 --changeset dev_user:"create [entity]_get_all function" runOnChange:true splitStatements:false
-CREATE OR REPLACE FUNCTION app_domain.[entity]_get_all(
+CREATE OR REPLACE FUNCTION main.[entity]_get_all(
         IN p_tenant_id uuid,
         IN p_limit integer DEFAULT 1000,
         IN p_offset integer DEFAULT 0
-    ) RETURNS SETOF app_domain.[entity_plural] LANGUAGE SQL AS $$
+    ) RETURNS SETOF main.[entity_plural] LANGUAGE SQL AS $$
 SELECT *
-FROM app_domain.[entity_plural] e
+FROM main.[entity_plural] e
 WHERE e.tenant_id = p_tenant_id
 ORDER BY e.name
 LIMIT p_limit OFFSET p_offset;
@@ -558,8 +558,8 @@ liquibase rollback-to-date 2024-01-15
 ```sql
 --liquibase formatted sql
 --changeset dev_user:"add email column" # Template example
-ALTER TABLE app_domain.customers ADD COLUMN email VARCHAR(100); # Replace 'cashiers' with your entity
---rollback ALTER TABLE app_domain.customers DROP COLUMN email; # Corresponding rollback
+ALTER TABLE main.customers ADD COLUMN email VARCHAR(100); # Replace 'cashiers' with your entity
+--rollback ALTER TABLE main.customers DROP COLUMN email; # Corresponding rollback
 ```
 
 Include rollback instructions for complex changes:
@@ -578,7 +578,7 @@ Include rollback instructions for complex changes:
 
 ```sql
 --changeset john_doe:"add invoice status index for performance - JIRA-1234"
-CREATE INDEX IF NOT EXISTS idx_invoices_status ON app_domain.invoices(status);
+CREATE INDEX IF NOT EXISTS idx_invoices_status ON main.invoices(status);
 ```
 
 #### 2. **Merge Conflict Prevention**
@@ -632,7 +632,7 @@ liquibase status --verbose
 ```sql
 --changeset dev_user:"add index concurrently"
 CREATE INDEX CONCURRENTLY idx_invoices_created_date
-ON app_domain.invoices(created_date_utc);
+ON main.invoices(created_date_utc);
 ```
 
 **Data Migrations:**
@@ -645,7 +645,7 @@ DECLARE
 BEGIN
     -- Process in batches to avoid lock contention
     LOOP
-        UPDATE app_domain.your_table_name  -- Replace with your actual table
+        UPDATE main.your_table_name  -- Replace with your actual table
         SET new_column = legacy_column
         WHERE new_column IS NULL
         LIMIT batch_size;
@@ -697,7 +697,7 @@ WHERE md5sum IS NULL;
 ```
 Validation Failed:
      1 changesets check sum
-          app_domain/customers/tables/customers.sql::dev_user::create customers table
+          main/customers/tables/customers.sql::dev_user::create customers table
 ```
 
 > [!NOTE]
@@ -719,7 +719,7 @@ liquibase update
 # Mark specific changeset as run with new checksum (template example)
 liquibase changeset-status --changeset-id="create customers table" \ # Replace with your entity
   --changeset-author="dev_user" \
-  --changeset-path="app_domain/customers/tables/customers.sql" # Use your actual path
+  --changeset-path="main/customers/tables/customers.sql" # Use your actual path
 ```
 
 **Prevention:**
@@ -732,7 +732,7 @@ liquibase changeset-status --changeset-id="create customers table" \ # Replace w
 **Problem:** Cannot connect to database during migration.
 
 ```
-Connection could not be created to jdbc:postgresql://localhost:5432/app_domain
+Connection could not be created to jdbc:postgresql://localhost:5432/main
 with driver org.postgresql.Driver.
 ```
 
@@ -753,7 +753,7 @@ psql -h localhost -p 5432 -U postgres -l
 cat liquibase.properties
 
 # Test with explicit parameters
-liquibase --url=jdbc:postgresql://localhost:5432/app_domain \
+liquibase --url=jdbc:postgresql://localhost:5432/main \
           --username=postgres \
           --password=your_password \
           status
@@ -774,7 +774,7 @@ docker exec -it [container_name] ping app-domain-db
 **Problem:** Liquibase cannot locate changelog files.
 
 ```
-Error: Could not find changelog file 'app_domain/changelog.xml'
+Error: Could not find changelog file 'main/changelog.xml'
 ```
 
 **Solutions:**
@@ -799,9 +799,9 @@ docker exec -it [container_name] ls -la /liquibase/changelog/
 **Relative Path Issues:**
 ```xml
 <!-- Use relative paths in changelog includes (example with template entity) -->
-<include file="app_domain/tables/customers.sql"/> <!-- Replace 'cashiers' with your entity -->
+<include file="main/tables/customers.sql"/> <!-- Replace 'cashiers' with your entity -->
 <!-- NOT absolute paths -->
-<include file="/liquibase/changelog/app_domain/tables/customers.sql"/> <!-- Absolute paths are incorrect -->
+<include file="/liquibase/changelog/main/tables/customers.sql"/> <!-- Absolute paths are incorrect -->
 ```
 
 #### 4. **PostgreSQL Permission Errors**
@@ -942,7 +942,7 @@ ORDER BY dateexecuted DESC;
 **Option A: Fix and Retry**
 ```bash
 # Fix the problematic changeset
-vim app_domain/[domain]/[file].sql
+vim main/[domain]/[file].sql
 
 # Clear lock if stuck
 liquibase release-locks
@@ -971,7 +971,7 @@ liquibase update
 **Database Restore:**
 ```bash
 # Restore from backup
-pg_restore -h localhost -p 5432 -U postgres -d app_domain backup.dump
+pg_restore -h localhost -p 5432 -U postgres -d main backup.dump
 
 # Re-run migrations from specific point
 liquibase update --starting-changeset="[changeset_id]"

@@ -73,7 +73,7 @@ We will adopt a mandatory, five-part, dot-separated naming convention for all Ka
 
 ### 1. Asymmetric Naming (Implied Public Scope)
 
--   **Description:** An alternative where `public` topics have no scope segment (e.g., `prod.app_domain.invoices.v1`) and only internal topics have a scope (e.g., `prod.AppDomain.internal.reconciliation.v1`).
+-   **Description:** An alternative where `public` topics have no scope segment (e.g., `prod.main.invoices.v1`) and only internal topics have a scope (e.g., `prod.AppDomain.internal.reconciliation.v1`).
 
 -   **Reason for Rejection:** While slightly less verbose for public topics, this model requires the use of `DENY` ACLs to properly secure internal topics, which we aim to avoid. A symmetric structure is safer and easier to manage.
 

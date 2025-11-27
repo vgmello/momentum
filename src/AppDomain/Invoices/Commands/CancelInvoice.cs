@@ -44,7 +44,7 @@ public static partial class CancelInvoiceCommandHandler
     ///         - If the function name starts with a $, the function gets executed as `select * from {dbFunction}`
     ///     </para>
     /// </remarks>
-    [DbCommand(fn: "$app_domain.invoices_cancel")]
+    [DbCommand(fn: "$main.invoices_cancel")]
     public partial record DbCommand(Guid TenantId, Guid InvoiceId, int Version) : ICommand<Data.Entities.Invoice?>;
 
     /// <summary>

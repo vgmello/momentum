@@ -106,7 +106,7 @@ public static partial class GetCashiersQueryHandler
 
         const string sql = """
                                SELECT null::uuid as tenant_id, cashier_id, name, email
-                               FROM app_domain.cashiers
+                               FROM main.cashiers
                                LIMIT @limit OFFSET @offset
                            """;
 
@@ -226,7 +226,7 @@ public record InsertCashierCommand(Data.Entities.Cashier Cashier) : ICommand&lt;
 ### Query Database Operations
 
 <pre v-pre class="language-csharp"><code>
-[DbCommand(fn: "SELECT * FROM app_domain.cashiers_get")]
+[DbCommand(fn: "SELECT * FROM main.cashiers_get")]
 public partial record GetCashiersDbQuery(
     int Limit,
     int Offset

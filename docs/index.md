@@ -21,7 +21,7 @@ hero:
 features:
 <!--#if (INCLUDE_SAMPLE) -->
     - title: 💰 Billing & Invoicing
-      details: Complete app_domain system with invoices, payments, and cashier management. Multi-tenant support with comprehensive audit trails and event-driven architecture.
+      details: Complete main system with invoices, payments, and cashier management. Multi-tenant support with comprehensive audit trails and event-driven architecture.
       link: /guide/bills/
     - title: 👥 Cashier Management
       details: Full cashier lifecycle management with role-based access control, activity tracking, and integration with invoice processing workflows.
