@@ -313,7 +313,7 @@ public class EventIntegrationTests(IntegrationTestFixture fixture) : Integration
         var eventCollector = new IntegrationEventCollector<CashierCreated>();
 
         // Subscribe to Kafka topic
-        await eventCollector.StartListening("app_domain.cashiers.created");
+        await eventCollector.StartListening("main.cashiers.created");
 
         var request = new CreateCashierRequest
         {

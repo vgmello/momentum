@@ -286,7 +286,7 @@ dotnet build --verbosity diagnostic
 Events must have proper XML documentation:
 
 ```csharp
-[EventTopic("app_domain.cashiers.cashier-created")]
+[EventTopic("main.cashiers.cashier-created")]
 public record CashierCreated(Guid CashierId, string Name);
 ```
 

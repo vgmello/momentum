@@ -68,7 +68,7 @@ Cross-bounded context events for service-to-service communication:
 
 ```csharp
 // src/AppDomain.Contracts/IntegrationEvents/OrderCreated.cs
-[EventTopic("app_domain.orders.order-created")]
+[EventTopic("main.orders.order-created")]
 public record OrderCreated(
     Guid TenantId,
     Guid OrderId,
@@ -140,7 +140,7 @@ public class OrderProcessingGrain : Grain, IOrderProcessingGrain
 All events include tenant-aware partitioning for scalability and isolation:
 
 ```csharp
-[EventTopic("app_domain.orders.order-created")]
+[EventTopic("main.orders.order-created")]
 public record OrderCreated(...) : IIntegrationEvent
 {
     // Automatic partition key: TenantId ensures tenant isolation
@@ -152,7 +152,7 @@ public record OrderCreated(...) : IIntegrationEvent
 
 Topics follow a hierarchical naming pattern:
 - Format: `{domain}.{subdomain}.{event-type}`
-- Example: `app_domain.orders.order-created`
+- Example: `main.orders.order-created`
 - Benefits: Clear routing, filtering, and security boundaries
 
 ## Configuration and Setup
@@ -167,7 +167,7 @@ builder.AddWolverine(opts =>
 {
     // Configure Kafka integration for integration events
     opts.PublishMessage<OrderCreated>()
-        .ToKafkaTopic("app_domain.orders.order-created")
+        .ToKafkaTopic("main.orders.order-created")
         .UseDurableOutbox();
         
     // Configure local queues for domain events
