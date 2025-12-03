@@ -1,23 +1,23 @@
 ---
 title: Event Documentation Generation System
-description: Comprehensive guide to the Momentum event generation system using EventMarkdownGenerator with Liquid templating
+description: Comprehensive guide to the event generation system using EventMarkdownGenerator with Liquid templating
 date: 2025-01-10
 ---
 
 # Event Documentation Generation System
 
-The Momentum platform includes an automated event documentation generation system that creates comprehensive markdown documentation for integration and domain events. This system uses the **Momentum.Extensions.EventMarkdownGenerator** tool with Liquid templating to generate structured documentation from .NET assemblies and XML documentation.
+The platform includes an automated event documentation generation system that creates comprehensive markdown documentation for integration and domain events. This system uses the **Momentum.Extensions.EventMarkdownGenerator** tool with Liquid templating to generate structured documentation from .NET assemblies and XML documentation.
 
 ## Overview
 
 The event generation system automatically discovers distributed events in your .NET assemblies, extracts their metadata, and generates well-structured markdown documentation. The system supports:
 
-- **Automatic Event Discovery**: Finds events decorated with `EventTopic` attributes
-- **Schema Documentation**: Generates documentation for complex types referenced by events
-- **Liquid Template Customization**: Fully customizable output using the Liquid templating engine
-- **MSBuild Integration**: Automatic generation during build process
-- **CLI Support**: Standalone command-line tool for CI/CD and manual generation
-- **VitePress Integration**: Structured sidebar generation for documentation sites
+-   **Automatic Event Discovery**: Finds events decorated with `EventTopic` attributes
+-   **Schema Documentation**: Generates documentation for complex types referenced by events
+-   **Liquid Template Customization**: Fully customizable output using the Liquid templating engine
+-   **MSBuild Integration**: Automatic generation during build process
+-   **CLI Support**: Standalone command-line tool for CI/CD and manual generation
+-   **VitePress Integration**: Structured sidebar generation for documentation sites
 
 ## How It Works with EventMarkdownGenerator
 
@@ -42,10 +42,11 @@ tsx .vitepress/scripts/generate-events-docs.ts "../src/AppDomain.BackOffice/bin/
 ```
 
 This script:
-- Locates the pre-built EventMarkdownGenerator tool
-- Passes assembly paths to the generator
-- Configures GitHub URL linking for source code references
-- Outputs documentation to `docs/events/` directory
+
+-   Locates the pre-built EventMarkdownGenerator tool
+-   Passes assembly paths to the generator
+-   Configures GitHub URL linking for source code references
+-   Outputs documentation to `docs/events/` directory
 
 ### Generated Output Structure
 
@@ -69,8 +70,8 @@ The EventMarkdownGenerator uses the [Liquid templating engine](https://shopify.g
 
 The system includes two embedded templates:
 
-- **`event.liquid`**: Template for individual event documentation
-- **`schema.liquid`**: Template for complex type schema documentation
+-   **`event.liquid`**: Template for individual event documentation
+-   **`schema.liquid`**: Template for complex type schema documentation
 
 ### Template Override Mechanism
 
@@ -227,41 +228,41 @@ Integrate event documentation generation into CI/CD pipeline:
 name: Generate Event Documentation
 
 on:
-  push:
-    branches: [main]
-    paths: ['src/**/*.cs']
+    push:
+        branches: [main]
+        paths: ["src/**/*.cs"]
 
 jobs:
-  generate-docs:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+    generate-docs:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: '10.0.x'
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v5
+              with:
+                  dotnet-version: "10.0.x"
 
-      - name: Build Projects
-        run: dotnet build
+            - name: Build Projects
+              run: dotnet build
 
-      - name: Install EventMarkdownGenerator
-        run: dotnet tool install --global Momentum.Extensions.EventMarkdownGenerator --prerelease
+            - name: Install EventMarkdownGenerator
+              run: dotnet tool install --global Momentum.Extensions.EventMarkdownGenerator --prerelease
 
-      - name: Generate Event Documentation
-        run: |
-          events-docsgen --assemblies "src/App.Core/bin/Debug/net10.0/App.Core.dll" \
-            --output "./docs/events/" \
-            --github-url "https://github.com/$&#123;&#123; github.repository &#125;&#125;/blob/main/src" \
-            --verbose
+            - name: Generate Event Documentation
+              run: |
+                  events-docsgen --assemblies "src/App.Core/bin/Debug/net10.0/App.Core.dll" \
+                    --output "./docs/events/" \
+                    --github-url "https://github.com/$&#123;&#123; github.repository &#125;&#125;/blob/main/src" \
+                    --verbose
 
-      - name: Commit Documentation
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add docs/events/
-          git diff --staged --quiet || git commit -m "docs: update event documentation"
-          git push
+            - name: Commit Documentation
+              run: |
+                  git config --local user.email "action@github.com"
+                  git config --local user.name "GitHub Action"
+                  git add docs/events/
+                  git diff --staged --quiet || git commit -m "docs: update event documentation"
+                  git push
 ```
 
 ### Development Workflow Integration
@@ -295,24 +296,26 @@ cd docs && pnpm dev
 **Problem**: Events not being discovered despite having `EventTopic` attributes.
 
 **Solutions**:
-- Ensure events implement `IDistributedEvent` interface
-- Verify `EventTopic` attribute is properly applied
-- Check that assemblies are built and accessible
-- Use `--verbose` flag to see discovery process details
+
+-   Ensure events implement `IDistributedEvent` interface
+-   Verify `EventTopic` attribute is properly applied
+-   Check that assemblies are built and accessible
+-   Use `--verbose` flag to see discovery process details
 
 ### XML Documentation Missing
 
 **Problem**: Generated documentation lacks descriptions.
 
 **Solutions**:
-- Enable XML documentation in project files:
-  ```xml
-  <PropertyGroup>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-  </PropertyGroup>
-  ```
-- Ensure XML documentation files are in assembly directory
-- Manually specify XML paths using `--xml-docs` option
+
+-   Enable XML documentation in project files:
+    ```xml
+    <PropertyGroup>
+      <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
+    ```
+-   Ensure XML documentation files are in assembly directory
+-   Manually specify XML paths using `--xml-docs` option
 
 ### Template Customization Best Practices
 
@@ -324,9 +327,9 @@ cd docs && pnpm dev
 
 ### Performance Optimization
 
-- **Assembly Filtering**: Only include assemblies that contain events
-- **XML Documentation**: Place XML files in same directory as assemblies for faster discovery
-- **Template Simplification**: Avoid complex logic in templates; use simple conditionals and loops
-- **Batch Processing**: Process multiple assemblies in single run rather than multiple executions
+-   **Assembly Filtering**: Only include assemblies that contain events
+-   **XML Documentation**: Place XML files in same directory as assemblies for faster discovery
+-   **Template Simplification**: Avoid complex logic in templates; use simple conditionals and loops
+-   **Batch Processing**: Process multiple assemblies in single run rather than multiple executions
 
 The event generation system provides powerful automation for maintaining up-to-date event documentation, ensuring your integration events are well-documented and easily discoverable by development teams.

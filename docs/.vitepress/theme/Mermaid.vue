@@ -35,10 +35,9 @@ const props = defineProps({
 
 const svg = ref("");
 const code = ref(decodeURIComponent(props.graph));
-const ctrlSymbol = ref(navigator.platform.includes("Mac") ? "⌘" : "Ctrl");
+const ctrlSymbol = ref("⌘");
 const editableContent = ref(null);
-const isFirefox = navigator.userAgent.toLowerCase().includes("firefox");
-const contentEditable = ref(isFirefox ? "true" : "plaintext-only");
+const contentEditable = ref("plaintext-only");
 
 let mut = null;
 
@@ -47,6 +46,11 @@ const updateCode = (event) => {
 };
 
 onMounted(async () => {
+    // Set browser-specific values (navigator not available during SSR)
+    ctrlSymbol.value = navigator.platform.includes("Mac") ? "⌘" : "Ctrl";
+    const isFirefox = navigator.userAgent.toLowerCase().includes("firefox");
+    contentEditable.value = isFirefox ? "true" : "plaintext-only";
+
     mut = new MutationObserver(() => renderChart());
     mut.observe(document.documentElement, { attributes: true });
 
