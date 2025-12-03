@@ -1,13 +1,13 @@
 // Copyright (c) OrgName. All rights reserved.
 
 //#if (INCLUDE_ORLEANS)
-
 using AppDomain.Api.Infrastructure.Extensions;
 //#endif
 using AppDomain.Infrastructure;
 using Momentum.Extensions.Messaging.Kafka;
 using Momentum.ServiceDefaults;
 using Momentum.ServiceDefaults.Api;
+using Momentum.ServiceDefaults.Api.OpenApi.Extensions;
 using Momentum.ServiceDefaults.HealthChecks;
 
 [assembly: DomainAssembly(typeof(IAppDomainAssembly))]
@@ -16,6 +16,13 @@ var builder = WebApplication.CreateSlimBuilder(args);
 
 builder.AddServiceDefaults();
 builder.AddApiServiceDefaults();
+
+// Configure OpenAPI with .NET 10 native support
+// NOTE: AddOpenApi must be called directly in the API project (not in a library)
+// for the .NET 10 source generator to intercept it and generate XML documentation
+// comment transformers. This enables automatic inclusion of XML docs in the OpenAPI document.
+builder.Services.AddOpenApi(options => options.ConfigureOpenApiDefaults());
+
 //#if (USE_KAFKA)
 builder.AddKafkaMessagingExtensions();
 //#endif

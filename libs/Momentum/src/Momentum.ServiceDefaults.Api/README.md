@@ -42,21 +42,23 @@ Install-Package Momentum.ServiceDefaults.Api
 
 ```csharp
 // Program.cs
+using Momentum.ServiceDefaults.Api;
+using Momentum.ServiceDefaults.Api.OpenApi.Extensions;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add API service defaults - includes all base features plus API-specific configurations
 builder.AddApiServiceDefaults();
 
-// Add your API services
-builder.Services.AddControllers();
+// Configure OpenAPI with .NET 10 native support and XML documentation
+// NOTE: AddOpenApi must be called directly in the API project (not in a library)
+// for the .NET 10 source generator to intercept it and generate XML documentation
+builder.Services.AddOpenApi(options => options.ConfigureOpenApiDefaults());
 
 var app = builder.Build();
 
-// Map default endpoints (health, metrics, documentation)
-app.MapDefaultEndpoints();
-
-// Map your API endpoints
-app.MapControllers();
+// Configure API defaults (routing, auth, OpenAPI endpoints, etc.)
+app.ConfigureApiUsingDefaults();
 
 app.Run();
 ```
@@ -65,16 +67,17 @@ app.Run();
 
 ```csharp
 // Program.cs
+using Momentum.ServiceDefaults.Api;
+using Momentum.ServiceDefaults.Api.OpenApi.Extensions;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddApiServiceDefaults();
-
-// Add gRPC services (automatically configured)
-builder.Services.AddGrpc();
+builder.Services.AddOpenApi(options => options.ConfigureOpenApiDefaults());
 
 var app = builder.Build();
 
-app.MapDefaultEndpoints();
+app.ConfigureApiUsingDefaults();
 
 // Map gRPC services
 app.MapGrpcService<UserService>();
@@ -87,20 +90,19 @@ app.Run();
 
 ```csharp
 // Program.cs
+using Momentum.ServiceDefaults.Api;
+using Momentum.ServiceDefaults.Api.OpenApi.Extensions;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddApiServiceDefaults();
-
-// Add both REST and gRPC support
-builder.Services.AddControllers();
-builder.Services.AddGrpc();
+builder.Services.AddOpenApi(options => options.ConfigureOpenApiDefaults());
 
 var app = builder.Build();
 
-app.MapDefaultEndpoints();
+app.ConfigureApiUsingDefaults();
 
-// Map both REST and gRPC endpoints
-app.MapControllers();
+// Map additional gRPC services
 app.MapGrpcService<UserService>();
 
 app.Run();
@@ -136,14 +138,13 @@ In addition to all `Momentum.ServiceDefaults` features, this package automatical
 
 ## Available Endpoints
 
-When you call `app.MapDefaultEndpoints()`, you get:
+When you call `app.ConfigureApiUsingDefaults()`, in development you get:
 
 | Endpoint     | Purpose                            |
 | ------------ | ---------------------------------- |
-| `/status`    | Liveness probe (cached, no auth)   |
-| `/health/internal` | Readiness probe (localhost only) |
-| `/health`    | Public health (requires auth)      |
+| `/openapi/v1.json` | OpenAPI specification (cached) |
 | `/scalar/v1` | Interactive API documentation      |
+| `/grpc-reflection` | gRPC reflection service       |
 
 ## Configuration
 
@@ -180,13 +181,20 @@ When you call `app.MapDefaultEndpoints()`, you get:
 ### Custom OpenAPI Configuration
 
 ```csharp
+using Momentum.ServiceDefaults.Api;
+using Momentum.ServiceDefaults.Api.OpenApi.Extensions;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddApiServiceDefaults();
 
-// Customize OpenAPI generation
+// Configure OpenAPI with custom transformers
 builder.Services.AddOpenApi(options =>
 {
+    // Apply Momentum defaults (server URL normalization, etc.)
+    options.ConfigureOpenApiDefaults();
+
+    // Add custom document transformers
     options.AddDocumentTransformer((document, context, cancellationToken) =>
     {
         document.Info.Contact = new() { Name = "Support", Email = "support@company.com" };
@@ -198,11 +206,13 @@ builder.Services.AddOpenApi(options =>
 ### Custom gRPC Configuration
 
 ```csharp
+using Momentum.ServiceDefaults.Api;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddApiServiceDefaults();
 
-// Customize gRPC services
+// Customize gRPC services (overrides defaults)
 builder.Services.AddGrpc(options =>
 {
     options.EnableDetailedErrors = true;
@@ -219,11 +229,16 @@ This package includes:
 | **Grpc.AspNetCore**                   | gRPC server framework                |
 | **Grpc.AspNetCore.Server.Reflection** | gRPC reflection support              |
 | **Grpc.AspNetCore.Web**               | gRPC-Web support for browsers        |
-| **Microsoft.AspNetCore.OpenApi**      | OpenAPI 3.0 specification generation |
+| **Microsoft.AspNetCore.OpenApi**      | OpenAPI 3.1 specification generation with .NET 10 source generator |
 | **Scalar.AspNetCore**                 | Modern API documentation UI          |
 | **OpenTelemetry.Extensions.Hosting**  | Enhanced telemetry                   |
 | **Momentum.Extensions.Abstractions**  | Core abstractions                    |
-| **Momentum.Extensions.XmlDocs**       | XML documentation processing         |
+
+> **Note:** For XML documentation in OpenAPI, ensure your project has `<GenerateDocumentationFile>true</GenerateDocumentationFile>`
+> and enable the OpenAPI source generator interceptors with:
+> ```xml
+> <InterceptorsNamespaces>$(InterceptorsNamespaces);Microsoft.AspNetCore.OpenApi.Generated</InterceptorsNamespaces>
+> ```
 
 ## Target Frameworks
 

@@ -3,11 +3,17 @@
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <UserSecretsId>4d1e9d4f-ee8a-4d91-8c2b-11e09987ac0b</UserSecretsId>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <!-- Enable OpenAPI source generator interceptors for XML documentation support -->
+        <InterceptorsNamespaces>$(InterceptorsNamespaces);Microsoft.AspNetCore.OpenApi.Generated</InterceptorsNamespaces>
+        <!-- OpenAPI build-time document generation settings -->
+        <OpenApiDocumentsDirectory>$(MSBuildProjectDirectory)/OpenApi</OpenApiDocumentsDirectory>
+        <OpenApiGenerateDocumentsOptions>--file-name openapi</OpenApiGenerateDocumentsOptions>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Grpc.AspNetCore"/>
         <PackageReference Include="Grpc.Tools"/>
+        <PackageReference Include="Microsoft.Extensions.ApiDescription.Server"/>
         <!--#if (!LIBS_INCLUDES_DEFAULTS) -->
         <PackageReference Include="Momentum.ServiceDefaults"/>
         <!--#endif -->

@@ -1,5 +1,7 @@
 // Copyright (c) OrgName. All rights reserved.
 
+using System.Reflection;
+
 namespace AppDomain.Api.Infrastructure.Extensions;
 
 public static class OrleansExtensions
@@ -8,6 +10,10 @@ public static class OrleansExtensions
 
     public static IHostApplicationBuilder AddOrleansClient(this IHostApplicationBuilder builder, string sectionName = SectionName)
     {
+        // Skip initialization during build-time OpenAPI document generation
+        if (Assembly.GetEntryAssembly()?.GetName().Name == "GetDocument.Insider")
+            return builder;
+
         var config = builder.Configuration.GetSection(sectionName);
 
         var useLocalCluster = config.GetValue<bool>("UseLocalhostClustering");
