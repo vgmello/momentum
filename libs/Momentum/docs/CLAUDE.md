@@ -63,7 +63,7 @@ dotnet test --filter "IntegrationTests"
 
 ```bash
 # Build and serve library documentation
-cd docs && pnpm install && pnpm dev
+cd docs && bun install && bun run dev
 
 # Generate DocFX documentation
 cd docs && dotnet build
@@ -250,7 +250,7 @@ Control source generation behavior:
 
 - .NET 10.0 SDK
 - Visual Studio 2022 17.8+ or VS Code with C# extension
-- Node.js and pnpm (for documentation)
+- Bun (for documentation)
 
 ### IDE Setup
 
@@ -319,7 +319,7 @@ The documentation build is failing with Vue parsing errors across multiple files
 **Required Solution:**
 - The plugin must identify and fix ALL files with Vue parsing issues
 - Every markdown file with XML/HTML content must render without errors
-- The build command `pnpm docs:build` must succeed completely
+- The build command `bun run docs:build` must succeed completely
 - No partial solutions - ALL files must work
 
 **Plugin Enhancement Needed:**

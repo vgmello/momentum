@@ -86,7 +86,7 @@ dotnet run --project src/AppDomain.AppHost
 # API: https://localhost:8101 (REST), :8102 (gRPC)
 
 # Start documentation site
-cd docs && pnpm install && pnpm dev
+cd docs && bun install && bun run dev
 # Documentation: http://localhost:8119
 ```
 
@@ -116,7 +116,7 @@ dotnet test libs/Momentum/tests/Momentum.Extensions.Tests
 dotnet pack libs/Momentum/src/Momentum.Extensions --configuration Release
 
 # Build library documentation
-cd libs/Momentum/docs && pnpm install && pnpm dev
+cd libs/Momentum/docs && bun install && bun run dev
 ```
 
 ### Source Generator Development

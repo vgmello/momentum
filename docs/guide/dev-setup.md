@@ -57,29 +57,22 @@ docker-compose --version
 docker run hello-world
 ```
 
-### Node.js and Package Management
+### Bun Runtime
 
-**Node.js (for documentation)**:
-
-```bash
-# Using Node Version Manager (recommended)
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-nvm install 18
-nvm use 18
-
-# Or direct installation
-# Windows: Download from https://nodejs.org/
-# macOS: brew install node@18
-# Linux: Use your distribution's package manager
-```
-
-**pnpm (for documentation build)**:
+**Bun (for documentation)**:
 
 ```bash
-npm install -g pnpm
+# macOS/Linux (recommended)
+curl -fsSL https://bun.sh/install | bash
+
+# Windows (using PowerShell)
+powershell -c "irm bun.sh/install.ps1 | iex"
+
+# Or using npm
+npm install -g bun
 
 # Verify installation
-pnpm --version
+bun --version
 ```
 
 ## Development Tools
@@ -176,10 +169,10 @@ echo $? # Should output 0 on success
 
 ```bash
 cd docs
-pnpm install
+bun install
 
 # Verify documentation build
-pnpm docs:build
+bun run docs:build
 ```
 
 ### Environment Configuration
@@ -314,7 +307,7 @@ dotnet run --project src/AppDomain.BackOffice.Orleans
 
 ```bash
 cd docs
-pnpm dev
+bun run dev
 
 # Access documentation at: http://localhost:5173
 ```
@@ -587,4 +580,4 @@ Once your development environment is set up:
 - Code review process for learning and collaboration
 
 > [!TIP]
-> Keep your development environment updated regularly by running `git pull`, `dotnet restore`, and `pnpm install` to stay current with the latest changes.
+> Keep your development environment updated regularly by running `git pull`, `dotnet restore`, and `bun install` to stay current with the latest changes.

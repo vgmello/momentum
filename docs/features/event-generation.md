@@ -37,7 +37,7 @@ The EventMarkdownGenerator uses reflection to scan .NET assemblies and discovers
 The system integrates seamlessly with the Momentum documentation workflow:
 
 ```bash
-# Executed as part of pnpm docs:events
+# Executed as part of bun run docs:events
 tsx .vitepress/scripts/generate-events-docs.ts "../src/AppDomain.BackOffice/bin/Debug/net10.0/AppDomain.BackOffice.dll,../src/AppDomain/bin/Debug/net10.0/AppDomain.dll"
 ```
 
@@ -286,7 +286,7 @@ events-docsgen --assemblies "$(find src -name '*.dll' -path '*/bin/Debug/net10.0
   --verbose
 
 echo "Starting documentation server..."
-cd docs && pnpm dev
+cd docs && bun run dev
 ```
 
 ## Troubleshooting and Best Practices

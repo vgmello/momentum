@@ -238,7 +238,7 @@ docker compose up AppDomain-db-migrations
 
 ```bash
 cd docs
-pnpm dev
+bun run dev
 
 # Verify your changes at http://localhost:5173
 # Check for broken links or formatting issues

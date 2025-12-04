@@ -16,7 +16,7 @@ This walkthrough demonstrates how to create a complete Momentum application, exp
 
 - .NET 10.0 SDK
 - Docker and Docker Compose
-- Node.js and pnpm (for documentation)
+- Bun (for documentation)
 - Visual Studio 2022 or VS Code
 
 ## Step 1: Template Installation
@@ -268,10 +268,10 @@ The OpenAPI documentation is automatically generated and available at:
 cd docs
 
 # Install dependencies
-pnpm install
+bun install
 
 # Start development server
-pnpm dev
+bun run dev
 ```
 
 ## Step 10: Deployment Preparation
