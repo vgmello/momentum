@@ -65,6 +65,8 @@
     <!--#endif -->
     <!--#if (!LIBS_INCLUDES_DEFAULTS) -->
     <ItemGroup>
+      <PackageReference Include="linq2db" VersionOverride="6.0.0" />
+      <PackageReference Include="Npgsql" VersionOverride="10.0.0" />
         <ProjectReference Include="..\Momentum.Extensions\Momentum.Extensions.csproj"/>
     </ItemGroup>
     <!--#endif -->
