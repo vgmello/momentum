@@ -451,5 +451,3 @@ local-feed-path.txt
 
 # Perf Tests Results
 **/tests/**/results
-json
-libs/Momentum/.local/
