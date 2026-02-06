@@ -76,8 +76,7 @@ public class IntegrationTestFixture : IAsyncLifetime
         // Enable HTTP/2 over unencrypted connections for gRPC testing
         AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
         //#if (USE_DB)
-        _postgres = new PostgreSqlBuilder()
-            .WithImage("postgres:17-alpine")
+        _postgres = new PostgreSqlBuilder("postgres:17-alpine")
             .WithUsername("postgres")
             .WithPassword("postgres")
             .WithDatabase("postgres")
@@ -86,8 +85,7 @@ public class IntegrationTestFixture : IAsyncLifetime
         //#endif
 
         //#if (USE_KAFKA)
-        _kafka = new KafkaBuilder()
-            .WithImage("confluentinc/cp-kafka:7.6.0")
+        _kafka = new KafkaBuilder("confluentinc/cp-kafka:7.6.0")
             .WithNetwork(_containerNetwork)
             .Build();
         //#endif

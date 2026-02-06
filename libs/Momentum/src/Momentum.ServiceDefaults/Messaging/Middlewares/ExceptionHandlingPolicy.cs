@@ -1,8 +1,8 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
+using JasperFx;
 using JasperFx.CodeGeneration;
 using Wolverine.Configuration;
-using Wolverine.Runtime;
 using Wolverine.Runtime.Handlers;
 
 namespace Momentum.ServiceDefaults.Messaging.Middlewares;

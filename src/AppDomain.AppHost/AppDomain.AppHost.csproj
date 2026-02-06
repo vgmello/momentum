@@ -21,7 +21,7 @@
         <PackageReference Include="Aspire.Hosting.Orleans"/>
         <!--#endif -->
         <!--#if (INCLUDE_DOCS) -->
-        <PackageReference Include="Aspire.Hosting.NodeJS"/>
+        <PackageReference Include="Aspire.Hosting.JavaScript"/>
         <!--#endif -->
     </ItemGroup>
 

@@ -15,8 +15,7 @@ public class LiquibaseMigrationContainer : IAsyncDisposable
         var dbServerSanitized = dbContainerName.Trim('/');
         var baseDirectory = Path.GetFullPath("../../../../../");
 
-        _liquibaseContainer = new ContainerBuilder()
-            .WithImage("liquibase/liquibase:latest")
+        _liquibaseContainer = new ContainerBuilder("liquibase/liquibase:latest")
             .WithNetwork(containerNetwork)
             .WithBindMount($"{baseDirectory}infra/AppDomain.Database/Liquibase", "/liquibase/changelog")
             .WithEnvironment("LIQUIBASE_COMMAND_USERNAME", "postgres")
