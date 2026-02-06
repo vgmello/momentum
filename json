@@ -1,0 +1,715 @@
+{
+  "Projects": [
+    {
+      "Name": "AppDomain",
+      "FilePath": "/home/runner/work/momentum/momentum/src/AppDomain/AppDomain.csproj",
+      "TargetFrameworks": [
+        {
+          "Name": "net9.0",
+          "Dependencies": [
+            {
+              "Name": "Aspire.Npgsql",
+              "ResolvedVersion": "9.4.2",
+              "LatestVersion": "13.1.0",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "linq2db.AspNet",
+              "ResolvedVersion": "5.4.1",
+              "LatestVersion": "5.4.1.9",
+              "UpgradeSeverity": "Patch"
+            },
+            {
+              "Name": "Microsoft.Orleans.Client",
+              "ResolvedVersion": "9.2.1",
+              "LatestVersion": "10.0.0",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "Microsoft.Orleans.Core.Abstractions",
+              "ResolvedVersion": "9.2.1",
+              "LatestVersion": "10.0.0",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "Npgsql",
+              "ResolvedVersion": "9.0.3",
+              "LatestVersion": "10.0.1",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "Riok.Mapperly",
+              "ResolvedVersion": "4.2.1",
+              "LatestVersion": "4.3.1",
+              "UpgradeSeverity": "Minor"
+            },
+            {
+              "Name": "SonarAnalyzer.CSharp",
+              "ResolvedVersion": "10.15.0.120848",
+              "LatestVersion": "10.19.0.132793",
+              "UpgradeSeverity": "Minor"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "AppDomain.Api",
+      "FilePath": "/home/runner/work/momentum/momentum/src/AppDomain.Api/AppDomain.Api.csproj",
+      "TargetFrameworks": [
+        {
+          "Name": "net9.0",
+          "Dependencies": [
+            {
+              "Name": "Aspire.Azure.Data.Tables",
+              "ResolvedVersion": "9.4.2",
+              "LatestVersion": "13.1.0",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "Microsoft.Orleans.Clustering.AzureStorage",
+              "ResolvedVersion": "9.2.1",
+              "LatestVersion": "10.0.0",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "SonarAnalyzer.CSharp",
+              "ResolvedVersion": "10.15.0.120848",
+              "LatestVersion": "10.19.0.132793",
+              "UpgradeSeverity": "Minor"
+            },
+            {
+              "Name": "WolverineFx.Kafka",
+              "ResolvedVersion": "4.11.0",
+              "LatestVersion": "5.14.0",
+              "UpgradeSeverity": "Major"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "AppDomain.AppHost",
+      "FilePath": "/home/runner/work/momentum/momentum/src/AppDomain.AppHost/AppDomain.AppHost.csproj",
+      "TargetFrameworks": [
+        {
+          "Name": "net9.0",
+          "Dependencies": [
+            {
+              "Name": "Aspire.Hosting.AppHost",
+              "ResolvedVersion": "9.4.2",
+              "LatestVersion": "13.1.0",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "Aspire.Hosting.Azure.Storage",
+              "ResolvedVersion": "9.4.2",
+              "LatestVersion": "13.1.0",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "Aspire.Hosting.Kafka",
+              "ResolvedVersion": "9.4.2",
+              "LatestVersion": "13.1.0",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "Aspire.Hosting.NodeJS",
+              "ResolvedVersion": "9.4.2",
+              "LatestVersion": "9.5.2",
+              "UpgradeSeverity": "Minor"
+            },
+            {
+              "Name": "Aspire.Hosting.Orleans",
+              "ResolvedVersion": "9.4.2",
+              "LatestVersion": "13.1.0",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "Aspire.Hosting.PostgreSQL",
+              "ResolvedVersion": "9.4.2",
+              "LatestVersion": "13.1.0",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "SonarAnalyzer.CSharp",
+              "ResolvedVersion": "10.15.0.120848",
+              "LatestVersion": "10.19.0.132793",
+              "UpgradeSeverity": "Minor"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "AppDomain.BackOffice",
+      "FilePath": "/home/runner/work/momentum/momentum/src/AppDomain.BackOffice/AppDomain.BackOffice.csproj",
+      "TargetFrameworks": [
+        {
+          "Name": "net9.0",
+          "Dependencies": [
+            {
+              "Name": "SonarAnalyzer.CSharp",
+              "ResolvedVersion": "10.15.0.120848",
+              "LatestVersion": "10.19.0.132793",
+              "UpgradeSeverity": "Minor"
+            },
+            {
+              "Name": "WolverineFx.Kafka",
+              "ResolvedVersion": "4.11.0",
+              "LatestVersion": "5.14.0",
+              "UpgradeSeverity": "Major"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "AppDomain.BackOffice.Orleans",
+      "FilePath": "/home/runner/work/momentum/momentum/src/AppDomain.BackOffice.Orleans/AppDomain.BackOffice.Orleans.csproj",
+      "TargetFrameworks": [
+        {
+          "Name": "net9.0",
+          "Dependencies": [
+            {
+              "Name": "Aspire.Azure.Data.Tables",
+              "ResolvedVersion": "9.4.2",
+              "LatestVersion": "13.1.0",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "Aspire.Azure.Storage.Blobs",
+              "ResolvedVersion": "9.4.2",
+              "LatestVersion": "13.1.0",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "Aspire.Npgsql",
+              "ResolvedVersion": "9.4.2",
+              "LatestVersion": "13.1.0",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "Microsoft.Orleans.Analyzers",
+              "ResolvedVersion": "9.2.1",
+              "LatestVersion": "10.0.0",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "Microsoft.Orleans.Clustering.AzureStorage",
+              "ResolvedVersion": "9.2.1",
+              "LatestVersion": "10.0.0",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "Microsoft.Orleans.Persistence.AzureStorage",
+              "ResolvedVersion": "9.2.1",
+              "LatestVersion": "10.0.0",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "Microsoft.Orleans.Reminders.AzureStorage",
+              "ResolvedVersion": "9.2.1",
+              "LatestVersion": "10.0.0",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "Microsoft.Orleans.Server",
+              "ResolvedVersion": "9.2.1",
+              "LatestVersion": "10.0.0",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "SonarAnalyzer.CSharp",
+              "ResolvedVersion": "10.15.0.120848",
+              "LatestVersion": "10.19.0.132793",
+              "UpgradeSeverity": "Minor"
+            },
+            {
+              "Name": "WolverineFx.Kafka",
+              "ResolvedVersion": "4.11.0",
+              "LatestVersion": "5.14.0",
+              "UpgradeSeverity": "Major"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "AppDomain.Contracts",
+      "FilePath": "/home/runner/work/momentum/momentum/src/AppDomain.Contracts/AppDomain.Contracts.csproj",
+      "TargetFrameworks": [
+        {
+          "Name": "net9.0",
+          "Dependencies": [
+            {
+              "Name": "Google.Protobuf",
+              "ResolvedVersion": "3.32.0",
+              "LatestVersion": "3.33.5",
+              "UpgradeSeverity": "Minor"
+            },
+            {
+              "Name": "SonarAnalyzer.CSharp",
+              "ResolvedVersion": "10.15.0.120848",
+              "LatestVersion": "10.19.0.132793",
+              "UpgradeSeverity": "Minor"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "AppDomain.Tests",
+      "FilePath": "/home/runner/work/momentum/momentum/tests/AppDomain.Tests/AppDomain.Tests.csproj",
+      "TargetFrameworks": [
+        {
+          "Name": "net9.0",
+          "Dependencies": [
+            {
+              "Name": "Bogus",
+              "ResolvedVersion": "35.6.3",
+              "LatestVersion": "35.6.5",
+              "UpgradeSeverity": "Patch"
+            },
+            {
+              "Name": "Microsoft.AspNetCore.Mvc.Testing",
+              "ResolvedVersion": "9.0.8",
+              "LatestVersion": "9.0.12",
+              "UpgradeSeverity": "Patch"
+            },
+            {
+              "Name": "Microsoft.NET.Test.Sdk",
+              "ResolvedVersion": "17.14.1",
+              "LatestVersion": "18.0.1",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "Microsoft.Orleans.Client",
+              "ResolvedVersion": "9.2.1",
+              "LatestVersion": "10.0.0",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "Microsoft.Orleans.TestingHost",
+              "ResolvedVersion": "9.2.1",
+              "LatestVersion": "10.0.0",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "SonarAnalyzer.CSharp",
+              "ResolvedVersion": "10.15.0.120848",
+              "LatestVersion": "10.19.0.132793",
+              "UpgradeSeverity": "Minor"
+            },
+            {
+              "Name": "Testcontainers",
+              "ResolvedVersion": "4.7.0",
+              "LatestVersion": "4.10.0",
+              "UpgradeSeverity": "Minor"
+            },
+            {
+              "Name": "Testcontainers.Kafka",
+              "ResolvedVersion": "4.7.0",
+              "LatestVersion": "4.10.0",
+              "UpgradeSeverity": "Minor"
+            },
+            {
+              "Name": "Testcontainers.PostgreSql",
+              "ResolvedVersion": "4.7.0",
+              "LatestVersion": "4.10.0",
+              "UpgradeSeverity": "Minor"
+            },
+            {
+              "Name": "xunit.runner.visualstudio",
+              "ResolvedVersion": "3.1.4",
+              "LatestVersion": "3.1.5",
+              "UpgradeSeverity": "Patch"
+            },
+            {
+              "Name": "xunit.v3",
+              "ResolvedVersion": "3.0.1",
+              "LatestVersion": "3.2.2",
+              "UpgradeSeverity": "Minor"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "AppDomain.Tests.E2E",
+      "FilePath": "/home/runner/work/momentum/momentum/tests/AppDomain.Tests.E2E/AppDomain.Tests.E2E.csproj",
+      "TargetFrameworks": [
+        {
+          "Name": "net9.0",
+          "Dependencies": [
+            {
+              "Name": "Microsoft.Extensions.Configuration",
+              "ResolvedVersion": "9.0.8",
+              "LatestVersion": "10.0.2",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "Microsoft.Extensions.Configuration.Binder",
+              "ResolvedVersion": "9.0.8",
+              "LatestVersion": "10.0.2",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "Microsoft.Extensions.Configuration.CommandLine",
+              "ResolvedVersion": "9.0.8",
+              "LatestVersion": "10.0.2",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "Microsoft.Extensions.Configuration.EnvironmentVariables",
+              "ResolvedVersion": "9.0.8",
+              "LatestVersion": "10.0.2",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "Microsoft.Extensions.Configuration.Json",
+              "ResolvedVersion": "9.0.8",
+              "LatestVersion": "10.0.2",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "Microsoft.NET.Test.Sdk",
+              "ResolvedVersion": "17.14.1",
+              "LatestVersion": "18.0.1",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "NSwag.MSBuild",
+              "ResolvedVersion": "14.5.0",
+              "LatestVersion": "14.6.3",
+              "UpgradeSeverity": "Minor"
+            },
+            {
+              "Name": "SonarAnalyzer.CSharp",
+              "ResolvedVersion": "10.15.0.120848",
+              "LatestVersion": "10.19.0.132793",
+              "UpgradeSeverity": "Minor"
+            },
+            {
+              "Name": "System.Net.Http.Json",
+              "ResolvedVersion": "9.0.8",
+              "LatestVersion": "10.0.2",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "xunit.runner.visualstudio",
+              "ResolvedVersion": "3.1.4",
+              "LatestVersion": "3.1.5",
+              "UpgradeSeverity": "Patch"
+            },
+            {
+              "Name": "xunit.v3",
+              "ResolvedVersion": "3.0.1",
+              "LatestVersion": "3.2.2",
+              "UpgradeSeverity": "Minor"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "Momentum.Extensions",
+      "FilePath": "/home/runner/work/momentum/momentum/libs/Momentum/src/Momentum.Extensions/Momentum.Extensions.csproj",
+      "TargetFrameworks": [
+        {
+          "Name": "net9.0",
+          "Dependencies": [
+            {
+              "Name": "FluentValidation",
+              "ResolvedVersion": "12.0.0",
+              "LatestVersion": "12.1.1",
+              "UpgradeSeverity": "Minor"
+            },
+            {
+              "Name": "linq2db",
+              "ResolvedVersion": "5.4.1",
+              "LatestVersion": "6.1.0",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "Microsoft.SourceLink.GitHub",
+              "ResolvedVersion": "8.0.0",
+              "LatestVersion": "10.0.102",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "SonarAnalyzer.CSharp",
+              "ResolvedVersion": "10.15.0.120848",
+              "LatestVersion": "10.19.0.132793",
+              "UpgradeSeverity": "Minor"
+            },
+            {
+              "Name": "WolverineFx",
+              "ResolvedVersion": "4.11.0",
+              "LatestVersion": "5.14.0",
+              "UpgradeSeverity": "Major"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "Momentum.Extensions.Abstractions",
+      "FilePath": "/home/runner/work/momentum/momentum/libs/Momentum/src/Momentum.Extensions.Abstractions/Momentum.Extensions.Abstractions.csproj",
+      "TargetFrameworks": [
+        {
+          "Name": ".NETStandard,Version=v2.1",
+          "Dependencies": [
+            {
+              "Name": "Microsoft.SourceLink.GitHub",
+              "ResolvedVersion": "8.0.0",
+              "LatestVersion": "10.0.102",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "SonarAnalyzer.CSharp",
+              "ResolvedVersion": "10.15.0.120848",
+              "LatestVersion": "10.19.0.132793",
+              "UpgradeSeverity": "Minor"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "Momentum.Extensions.Messaging.Kafka",
+      "FilePath": "/home/runner/work/momentum/momentum/libs/Momentum/src/Momentum.Extensions.Messaging.Kafka/Momentum.Extensions.Messaging.Kafka.csproj",
+      "TargetFrameworks": [
+        {
+          "Name": "net9.0",
+          "Dependencies": [
+            {
+              "Name": "Aspire.Confluent.Kafka",
+              "ResolvedVersion": "9.4.2",
+              "LatestVersion": "13.1.0",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "Microsoft.SourceLink.GitHub",
+              "ResolvedVersion": "8.0.0",
+              "LatestVersion": "10.0.102",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "SonarAnalyzer.CSharp",
+              "ResolvedVersion": "10.15.0.120848",
+              "LatestVersion": "10.19.0.132793",
+              "UpgradeSeverity": "Minor"
+            },
+            {
+              "Name": "WolverineFx.Kafka",
+              "ResolvedVersion": "4.11.0",
+              "LatestVersion": "5.14.0",
+              "UpgradeSeverity": "Major"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "Momentum.Extensions.SourceGenerators",
+      "FilePath": "/home/runner/work/momentum/momentum/libs/Momentum/src/Momentum.Extensions.SourceGenerators/Momentum.Extensions.SourceGenerators.csproj",
+      "TargetFrameworks": [
+        {
+          "Name": ".NETStandard,Version=v2.1",
+          "Dependencies": [
+            {
+              "Name": "Microsoft.CodeAnalysis.CSharp",
+              "ResolvedVersion": "4.14.0",
+              "LatestVersion": "5.0.0",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "Microsoft.SourceLink.GitHub",
+              "ResolvedVersion": "8.0.0",
+              "LatestVersion": "10.0.102",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "SonarAnalyzer.CSharp",
+              "ResolvedVersion": "10.15.0.120848",
+              "LatestVersion": "10.19.0.132793",
+              "UpgradeSeverity": "Minor"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "Momentum.Extensions.XmlDocs",
+      "FilePath": "/home/runner/work/momentum/momentum/libs/Momentum/src/Momentum.Extensions.XmlDocs/Momentum.Extensions.XmlDocs.csproj",
+      "TargetFrameworks": [
+        {
+          "Name": "net9.0",
+          "Dependencies": [
+            {
+              "Name": "Microsoft.Extensions.Logging.Abstractions",
+              "ResolvedVersion": "9.0.8",
+              "LatestVersion": "10.0.2",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "Microsoft.SourceLink.GitHub",
+              "ResolvedVersion": "8.0.0",
+              "LatestVersion": "10.0.102",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "SonarAnalyzer.CSharp",
+              "ResolvedVersion": "10.15.0.120848",
+              "LatestVersion": "10.19.0.132793",
+              "UpgradeSeverity": "Minor"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "Momentum.ServiceDefaults",
+      "FilePath": "/home/runner/work/momentum/momentum/libs/Momentum/src/Momentum.ServiceDefaults/Momentum.ServiceDefaults.csproj",
+      "TargetFrameworks": [
+        {
+          "Name": "net9.0",
+          "Dependencies": [
+            {
+              "Name": "Aspire.Npgsql",
+              "ResolvedVersion": "9.4.2",
+              "LatestVersion": "13.1.0",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "FluentValidation.DependencyInjectionExtensions",
+              "ResolvedVersion": "12.0.0",
+              "LatestVersion": "12.1.1",
+              "UpgradeSeverity": "Minor"
+            },
+            {
+              "Name": "Microsoft.Extensions.Http.Resilience",
+              "ResolvedVersion": "9.8.0",
+              "LatestVersion": "10.2.0",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "Microsoft.Extensions.ServiceDiscovery",
+              "ResolvedVersion": "9.4.2",
+              "LatestVersion": "10.2.0",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "Microsoft.SourceLink.GitHub",
+              "ResolvedVersion": "8.0.0",
+              "LatestVersion": "10.0.102",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "OpenTelemetry.Exporter.OpenTelemetryProtocol",
+              "ResolvedVersion": "1.12.0",
+              "LatestVersion": "1.15.0",
+              "UpgradeSeverity": "Minor"
+            },
+            {
+              "Name": "OpenTelemetry.Extensions.Hosting",
+              "ResolvedVersion": "1.12.0",
+              "LatestVersion": "1.15.0",
+              "UpgradeSeverity": "Minor"
+            },
+            {
+              "Name": "OpenTelemetry.Instrumentation.AspNetCore",
+              "ResolvedVersion": "1.12.0",
+              "LatestVersion": "1.15.0",
+              "UpgradeSeverity": "Minor"
+            },
+            {
+              "Name": "OpenTelemetry.Instrumentation.GrpcNetClient",
+              "ResolvedVersion": "1.12.0-beta.1",
+              "LatestVersion": "1.15.0-beta.1",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "OpenTelemetry.Instrumentation.Http",
+              "ResolvedVersion": "1.12.0",
+              "LatestVersion": "1.15.0",
+              "UpgradeSeverity": "Minor"
+            },
+            {
+              "Name": "OpenTelemetry.Instrumentation.Runtime",
+              "ResolvedVersion": "1.12.0",
+              "LatestVersion": "1.15.0",
+              "UpgradeSeverity": "Minor"
+            },
+            {
+              "Name": "Serilog.AspNetCore",
+              "ResolvedVersion": "9.0.0",
+              "LatestVersion": "10.0.0",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "SonarAnalyzer.CSharp",
+              "ResolvedVersion": "10.15.0.120848",
+              "LatestVersion": "10.19.0.132793",
+              "UpgradeSeverity": "Minor"
+            },
+            {
+              "Name": "WolverineFx",
+              "ResolvedVersion": "4.11.0",
+              "LatestVersion": "5.14.0",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "WolverineFx.Postgresql",
+              "ResolvedVersion": "4.11.0",
+              "LatestVersion": "5.14.0",
+              "UpgradeSeverity": "Major"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "Momentum.ServiceDefaults.Api",
+      "FilePath": "/home/runner/work/momentum/momentum/libs/Momentum/src/Momentum.ServiceDefaults.Api/Momentum.ServiceDefaults.Api.csproj",
+      "TargetFrameworks": [
+        {
+          "Name": "net9.0",
+          "Dependencies": [
+            {
+              "Name": "Microsoft.AspNetCore.OpenApi",
+              "ResolvedVersion": "9.0.8",
+              "LatestVersion": "9.0.12",
+              "UpgradeSeverity": "Patch"
+            },
+            {
+              "Name": "Microsoft.SourceLink.GitHub",
+              "ResolvedVersion": "8.0.0",
+              "LatestVersion": "10.0.102",
+              "UpgradeSeverity": "Major"
+            },
+            {
+              "Name": "OpenTelemetry.Extensions.Hosting",
+              "ResolvedVersion": "1.12.0",
+              "LatestVersion": "1.15.0",
+              "UpgradeSeverity": "Minor"
+            },
+            {
+              "Name": "Scalar.AspNetCore",
+              "ResolvedVersion": "2.7.2",
+              "LatestVersion": "2.12.35",
+              "UpgradeSeverity": "Minor"
+            },
+            {
+              "Name": "SonarAnalyzer.CSharp",
+              "ResolvedVersion": "10.15.0.120848",
+              "LatestVersion": "10.19.0.132793",
+              "UpgradeSeverity": "Minor"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
