@@ -15,7 +15,7 @@ public static class InvoicePaidEventHandler
     /// <param name="message">The invoice paid integration event containing payment details.</param>
     /// <param name="logger">Logger for tracking event processing.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    public static async Task Handle(InvoicePaid message, ILogger logger)
+    public static Task Handle(InvoicePaid message, ILogger logger)
     {
         logger.LogInformation(
             "Processing InvoicePaid event for Invoice {InvoiceId}, Amount: {AmountPaid}, PaymentDate: {PaymentDate}",
@@ -28,8 +28,8 @@ public static class InvoicePaidEventHandler
         // - Update analytics
         // - Trigger fulfillment process
 
-        await Task.CompletedTask;
-
         logger.LogInformation("Successfully processed InvoicePaid event for Invoice {InvoiceId}", message.Invoice.InvoiceId);
+
+        return Task.CompletedTask;
     }
 }

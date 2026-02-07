@@ -1,8 +1,6 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OpenApi;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi;
 
 namespace Momentum.ServiceDefaults.Api.OpenApi.Extensions;
@@ -47,21 +45,6 @@ public static class OpenApiExtensions
         });
 
         return options;
-    }
-
-    /// <summary>
-    ///     Registers the auto-produces response type convention for controllers.
-    /// </summary>
-    /// <param name="services">The service collection to configure.</param>
-    /// <returns>The configured service collection for method chaining.</returns>
-    /// <remarks>
-    ///     This method adds a convention that automatically infers response types
-    ///     for controller actions, improving OpenAPI schema generation.
-    /// </remarks>
-    public static IServiceCollection AddAutoProducesConvention(this IServiceCollection services)
-    {
-        services.Configure<MvcOptions>(opt => opt.Conventions.Add(new AutoProducesResponseTypeConvention()));
-        return services;
     }
 
 }

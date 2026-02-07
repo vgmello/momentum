@@ -30,7 +30,8 @@ public class SimulatePaymentCommandHandlerTests
             .Returns(new AppDomain.Invoices.Contracts.Models.Invoice(tenantId, invoiceId, "Test", "Draft", 100, "USD", DateTime.UtcNow,
                 null, null, null, DateTime.UtcNow, DateTime.UtcNow, 1));
 
-        var handlerResult = await SimulatePaymentCommandHandler.Handle(command, messagingMock, CancellationToken.None);
+        var logger = Substitute.For<ILogger>();
+        var handlerResult = await SimulatePaymentCommandHandler.Handle(command, messagingMock, logger, CancellationToken.None);
         var result = handlerResult.Item1;
         var integrationEvent = handlerResult.Item2;
 
@@ -68,7 +69,8 @@ public class SimulatePaymentCommandHandlerTests
             .Returns(new AppDomain.Invoices.Contracts.Models.Invoice(tenantId, invoiceId, "Test", "Draft", 100, "USD", DateTime.UtcNow,
                 null, null, null, DateTime.UtcNow, DateTime.UtcNow, 1));
 
-        var handlerResult = await SimulatePaymentCommandHandler.Handle(command, mockMessageBus, CancellationToken.None);
+        var logger = Substitute.For<ILogger>();
+        var handlerResult = await SimulatePaymentCommandHandler.Handle(command, mockMessageBus, logger, CancellationToken.None);
         var integrationEvent = handlerResult.Item2;
 
         integrationEvent!.Currency.ShouldBe("USD");

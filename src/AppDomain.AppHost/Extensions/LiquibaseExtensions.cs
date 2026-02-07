@@ -16,7 +16,7 @@ public static class LiquibaseExtensions
     /// <returns>A container resource builder configured to run Liquibase migrations.</returns>
     /// <remarks>
     ///     This method configures a Liquibase container that will run migrations for both the
-    ///     service_bus and main databases using changelog files from the mounted volume.
+    ///     service_bus and app_domain databases using changelog files from the mounted volume.
     ///     The container waits for the database server to be ready before executing migrations.
     /// </remarks>
     public static IResourceBuilder<ContainerResource> AddLiquibaseMigrations(
@@ -37,7 +37,7 @@ public static class LiquibaseExtensions
                 """
                 liquibase update --url=jdbc:postgresql://app-domain-db:5432/postgres --changelog-file=postgres/changelog.xml --contexts=aspire && \
                 liquibase update --url=jdbc:postgresql://app-domain-db:5432/service_bus --changelog-file=service_bus/changelog.xml && \
-                liquibase update --url=jdbc:postgresql://app-domain-db:5432/app_domain --changelog-file=main/changelog.xml && \
+                liquibase update --url=jdbc:postgresql://app-domain-db:5432/app_domain --changelog-file=app_domain/changelog.xml && \
                 echo 'Database migrations completed successfully!'
                 """);
     }

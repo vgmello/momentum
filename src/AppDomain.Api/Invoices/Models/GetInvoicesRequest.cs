@@ -13,7 +13,7 @@ public record GetInvoicesRequest
     ///     Maximum number of invoices to return (1-1000)
     /// </summary>
     [Range(1, 1000)]
-    public int Limit { get; init; } = 50;
+    public int Limit { get; init; } = 100;
 
     /// <summary>
     ///     Number of invoices to skip for pagination

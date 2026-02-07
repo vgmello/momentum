@@ -2,11 +2,8 @@
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Momentum.ServiceDefaults.Api.OpenApi.Extensions;
 using Scalar.AspNetCore;
 
 namespace Momentum.ServiceDefaults.Api;
@@ -39,14 +36,8 @@ public static class ApiExtensions
     /// </remarks>
     public static IHostApplicationBuilder AddApiServiceDefaults(this WebApplicationBuilder builder)
     {
-        builder.Services.AddControllers(opt =>
-        {
-            opt.Conventions.Add(new RouteTokenTransformerConvention(new KebabCaseRoutesTransformer()));
-        });
-
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddProblemDetails();
-        builder.Services.AddAutoProducesConvention();
 
         // NOTE: OpenAPI is NOT configured here.
         // Call AddOpenApi() directly in your Program.cs for XML documentation support.
@@ -84,7 +75,7 @@ public static class ApiExtensions
     /// </summary>
     /// <param name="app">The web application to configure.</param>
     /// <param name="requireAuth">
-    ///     Whether to require authorization for controller endpoints.
+    ///     Whether to require authorization for API endpoints.
     ///     Defaults to <c>true</c>.
     /// </param>
     /// <returns>The configured web application for method chaining.</returns>
@@ -115,11 +106,6 @@ public static class ApiExtensions
 
             app.MapGrpcReflectionService();
         }
-
-        var controllersEndpointBuilder = app.MapControllers();
-
-        if (requireAuth)
-            controllersEndpointBuilder.RequireAuthorization();
 
         app.MapGrpcServices();
 

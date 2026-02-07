@@ -7,6 +7,7 @@ global using AppDomain.Api.Cashiers.Mappers;
 //#endif
 global using AppDomain.Api.Common.Extensions;
 global using Grpc.Core;
-global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.AspNetCore.Http;
 global using Riok.Mapperly.Abstractions;
 global using System.Text.Json.Serialization;
+global using Wolverine;

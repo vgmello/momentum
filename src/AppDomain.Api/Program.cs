@@ -3,6 +3,10 @@
 //#if (INCLUDE_ORLEANS)
 using AppDomain.Api.Infrastructure.Extensions;
 //#endif
+//#if (INCLUDE_SAMPLE)
+using AppDomain.Api.Cashiers;
+using AppDomain.Api.Invoices;
+//#endif
 using AppDomain.Infrastructure;
 using Momentum.Extensions.Messaging.Kafka;
 using Momentum.ServiceDefaults;
@@ -36,6 +40,10 @@ builder.AddApplicationServices();
 var app = builder.Build();
 
 app.ConfigureApiUsingDefaults(requireAuth: false);
+//#if (INCLUDE_SAMPLE)
+app.MapCashierEndpoints();
+app.MapInvoiceEndpoints();
+//#endif
 app.MapDefaultHealthCheckEndpoints();
 
 await app.RunAsync(args);

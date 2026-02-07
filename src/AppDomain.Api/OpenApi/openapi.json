@@ -5,17 +5,291 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/cashiers/{id}": {
+      "get": {
+        "tags": [
+          "Cashiers"
+        ],
+        "summary": "Retrieves a specific cashier by their unique identifier",
+        "operationId": "GetCashier",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cashier"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Cashiers"
+        ],
+        "summary": "Updates an existing cashier's information",
+        "operationId": "UpdateCashier",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCashierRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cashier"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Cashiers"
+        ],
+        "summary": "Deletes a cashier from the system",
+        "operationId": "DeleteCashier",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cashiers": {
+      "get": {
+        "tags": [
+          "Cashiers"
+        ],
+        "summary": "Retrieves a list of cashiers with optional filtering",
+        "operationId": "GetCashiers",
+        "parameters": [
+          {
+            "name": "Limit",
+            "in": "query",
+            "description": "Maximum number of cashiers to return (1-1000).",
+            "required": true,
+            "schema": {
+              "maximum": 1000,
+              "minimum": 1,
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Offset",
+            "in": "query",
+            "description": "Number of cashiers to skip for pagination.",
+            "required": true,
+            "schema": {
+              "maximum": 2147483647,
+              "minimum": 0,
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Result"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Cashiers"
+        ],
+        "summary": "Creates a new cashier in the system",
+        "operationId": "CreateCashier",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCashierRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cashier"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/invoices": {
       "get": {
         "tags": [
           "Invoices"
         ],
         "summary": "Retrieves a list of invoices with optional filtering and pagination",
+        "operationId": "GetInvoices",
         "parameters": [
           {
             "name": "Limit",
             "in": "query",
             "description": "Maximum number of invoices to return (1-1000)",
+            "required": true,
             "schema": {
               "maximum": 1000,
               "minimum": 1,
@@ -31,6 +305,7 @@
             "name": "Offset",
             "in": "query",
             "description": "Number of invoices to skip for pagination",
+            "required": true,
             "schema": {
               "maximum": 2147483647,
               "minimum": 0,
@@ -52,17 +327,9 @@
           }
         ],
         "responses": {
-          "-299": {
-            "description": "A list of invoices matching the specified criteria",
+          "200": {
+            "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Invoice"
-                  }
-                }
-              },
               "application/json": {
                 "schema": {
                   "type": "array",
@@ -70,13 +337,15 @@
                     "$ref": "#/components/schemas/Invoice"
                   }
                 }
-              },
-              "text/json": {
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Invoice"
-                  }
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -88,20 +357,10 @@
           "Invoices"
         ],
         "summary": "Creates a new invoice in the system",
+        "operationId": "CreateInvoice",
         "requestBody": {
-          "description": "Cancellation token",
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateInvoiceRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateInvoiceRequest"
-              }
-            },
-            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateInvoiceRequest"
               }
@@ -110,36 +369,22 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "If the request data is invalid or validation fails",
+          "201": {
+            "description": "Created",
             "content": {
-              "text/plain": {
-                "schema": { }
-              },
               "application/json": {
-                "schema": { }
-              },
-              "text/json": {
-                "schema": { }
+                "schema": {
+                  "$ref": "#/components/schemas/Invoice"
+                }
               }
             }
           },
-          "-299": {
-            "description": "",
+          "400": {
+            "description": "Bad Request",
             "content": {
-              "text/plain": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Invoice"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Invoice"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Invoice"
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -153,11 +398,11 @@
           "Invoices"
         ],
         "summary": "Retrieves a specific invoice by its unique identifier",
+        "operationId": "GetInvoice",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "The unique identifier of the invoice",
             "required": true,
             "schema": {
               "type": "string",
@@ -166,36 +411,32 @@
           }
         ],
         "responses": {
-          "400": {
-            "description": "If the provided ID is invalid",
+          "200": {
+            "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": { }
-              },
               "application/json": {
-                "schema": { }
-              },
-              "text/json": {
-                "schema": { }
+                "schema": {
+                  "$ref": "#/components/schemas/Invoice"
+                }
               }
             }
           },
-          "-299": {
-            "description": "",
+          "404": {
+            "description": "Not Found",
             "content": {
-              "text/plain": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Invoice"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
-              },
-              "application/json": {
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Invoice"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Invoice"
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -209,11 +450,11 @@
           "Invoices"
         ],
         "summary": "Cancels an existing invoice, preventing further modifications",
+        "operationId": "CancelInvoice",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "The unique identifier of the invoice to cancel",
             "required": true,
             "schema": {
               "type": "string",
@@ -222,19 +463,8 @@
           }
         ],
         "requestBody": {
-          "description": "Cancellation token",
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CancelInvoiceRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CancelInvoiceRequest"
-              }
-            },
-            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/CancelInvoiceRequest"
               }
@@ -243,36 +473,32 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "If the invoice cannot be cancelled (already paid or cancelled)",
+          "200": {
+            "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": { }
-              },
               "application/json": {
-                "schema": { }
-              },
-              "text/json": {
-                "schema": { }
+                "schema": {
+                  "$ref": "#/components/schemas/Invoice"
+                }
               }
             }
           },
-          "-299": {
-            "description": "",
+          "409": {
+            "description": "Conflict",
             "content": {
-              "text/plain": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Invoice"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
-              },
-              "application/json": {
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Invoice"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Invoice"
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -286,11 +512,11 @@
           "Invoices"
         ],
         "summary": "Marks an invoice as paid with the specified payment amount and date",
+        "operationId": "MarkInvoiceAsPaid",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "The unique identifier of the invoice to mark as paid",
             "required": true,
             "schema": {
               "type": "string",
@@ -299,19 +525,8 @@
           }
         ],
         "requestBody": {
-          "description": "Cancellation token",
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/MarkInvoiceAsPaidRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/MarkInvoiceAsPaidRequest"
-              }
-            },
-            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/MarkInvoiceAsPaidRequest"
               }
@@ -320,36 +535,32 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "If the payment amount is insufficient or invoice is already paid/cancelled",
+          "200": {
+            "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": { }
-              },
               "application/json": {
-                "schema": { }
-              },
-              "text/json": {
-                "schema": { }
+                "schema": {
+                  "$ref": "#/components/schemas/Invoice"
+                }
               }
             }
           },
-          "-299": {
-            "description": "",
+          "409": {
+            "description": "Conflict",
             "content": {
-              "text/plain": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Invoice"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
-              },
-              "application/json": {
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Invoice"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Invoice"
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -362,12 +573,12 @@
         "tags": [
           "Testing"
         ],
-        "summary": "Simulates a payment for testing purposes, triggering payment processing workflow",
+        "summary": "Simulates a payment for testing purposes",
+        "operationId": "SimulatePayment",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "The unique identifier of the invoice to simulate payment for",
             "required": true,
             "schema": {
               "type": "string",
@@ -376,19 +587,8 @@
           }
         ],
         "requestBody": {
-          "description": "Cancellation token",
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SimulatePaymentRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SimulatePaymentRequest"
-              }
-            },
-            "application/*+json": {
               "schema": {
                 "$ref": "#/components/schemas/SimulatePaymentRequest"
               }
@@ -397,56 +597,18 @@
           "required": true
         },
         "responses": {
-          "400": {
-            "description": "If the payment details are invalid or invoice cannot be paid",
+          "200": {
+            "description": "OK",
             "content": {
-              "text/plain": {
-                "schema": { }
-              },
               "application/json": {
-                "schema": { }
-              },
-              "text/json": {
                 "schema": { }
               }
             }
-          }
-        }
-      }
-    },
-    "/cashiers/{id}": {
-      "get": {
-        "tags": [
-          "Cashiers"
-        ],
-        "summary": "Retrieves a specific cashier by their unique identifier",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "The unique identifier of the cashier",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "404": {
-            "description": "If the cashier is not found",
+          },
+          "409": {
+            "description": "Conflict",
             "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
+              "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
@@ -454,292 +616,11 @@
             }
           },
           "400": {
-            "description": "If the provided ID is invalid",
+            "description": "Bad Request",
             "content": {
-              "text/plain": {
-                "schema": { }
-              },
-              "application/json": {
-                "schema": { }
-              },
-              "text/json": {
-                "schema": { }
-              }
-            }
-          },
-          "-299": {
-            "description": "",
-            "content": {
-              "text/plain": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Cashier"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Cashier"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Cashier"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Cashiers"
-        ],
-        "summary": "Updates an existing cashier's information",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "The unique identifier of the cashier to update",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "Cancellation token",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateCashierRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateCashierRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateCashierRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "400": {
-            "description": "If the request data is invalid or validation fails",
-            "content": {
-              "text/plain": {
-                "schema": { }
-              },
-              "application/json": {
-                "schema": { }
-              },
-              "text/json": {
-                "schema": { }
-              }
-            }
-          },
-          "-299": {
-            "description": "",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/Cashier"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Cashier"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Cashier"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Cashiers"
-        ],
-        "summary": "Deletes a cashier from the system",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "The unique identifier of the cashier to delete",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "If the cashier ID is invalid or cashier has active invoices",
-            "content": {
-              "text/plain": {
-                "schema": { }
-              },
-              "application/json": {
-                "schema": { }
-              },
-              "text/json": {
-                "schema": { }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/cashiers": {
-      "get": {
-        "tags": [
-          "Cashiers"
-        ],
-        "summary": "Retrieves a list of cashiers with optional filtering",
-        "parameters": [
-          {
-            "name": "Limit",
-            "in": "query",
-            "description": "Maximum number of cashiers to return (1-1000).",
-            "schema": {
-              "maximum": 1000,
-              "minimum": 1,
-              "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
-              "format": "int32"
-            }
-          },
-          {
-            "name": "Offset",
-            "in": "query",
-            "description": "Number of cashiers to skip for pagination.",
-            "schema": {
-              "maximum": 2147483647,
-              "minimum": 0,
-              "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "If request parameters are invalid",
-            "content": {
-              "text/plain": {
-                "schema": { }
-              },
-              "application/json": {
-                "schema": { }
-              },
-              "text/json": {
-                "schema": { }
-              }
-            }
-          },
-          "-299": {
-            "description": "",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Result"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Result"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Result"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Cashiers"
-        ],
-        "summary": "Creates a new cashier in the system",
-        "requestBody": {
-          "description": "Cancellation token",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateCashierRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateCashierRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateCashierRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "400": {
-            "description": "If the request data is invalid or validation fails",
-            "content": {
-              "text/plain": {
-                "schema": { }
-              },
-              "application/json": {
-                "schema": { }
-              },
-              "text/json": {
-                "schema": { }
-              }
-            }
-          },
-          "-299": {
-            "description": "",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/Cashier"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Cashier"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Cashier"
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
                 }
               }
             }
@@ -807,20 +688,12 @@
         "type": "object",
         "properties": {
           "cashierId": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
-            "format": "int32"
+            "type": "string",
+            "format": "uuid"
           },
           "paymentId": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
-            "format": "int32"
+            "type": "string",
+            "format": "uuid"
           },
           "paymentDate": {
             "type": "string",
@@ -889,6 +762,53 @@
           }
         },
         "description": "Request to create a new invoice in the system."
+      },
+      "HttpValidationProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
       },
       "Invoice": {
         "required": [
@@ -1162,13 +1082,13 @@
   },
   "tags": [
     {
+      "name": "Cashiers"
+    },
+    {
       "name": "Invoices"
     },
     {
       "name": "Testing"
-    },
-    {
-      "name": "Cashiers"
     }
   ]
 }

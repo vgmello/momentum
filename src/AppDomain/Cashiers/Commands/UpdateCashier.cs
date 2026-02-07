@@ -81,7 +81,8 @@ public static class UpdateCashierCommandHandler
         var statement = db.Cashiers
             .Where(c => c.TenantId == command.TenantId && c.CashierId == command.CashierId)
             .Where(c => c.Version == command.Version)
-            .Set(p => p.Name, command.Name);
+            .Set(p => p.Name, command.Name)
+            .Set(p => p.UpdatedDateUtc, DateTime.UtcNow);
 
         if (!string.IsNullOrWhiteSpace(command.Email))
         {
