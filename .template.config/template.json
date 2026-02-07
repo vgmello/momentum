@@ -573,7 +573,6 @@
       "target": "./",
       "condition": "(USE_LOCAL)",
       "include": [
-        "Directory.Build.Local.props",
         "local-mmt-version.txt",
         "local-feed-path.txt"
       ]

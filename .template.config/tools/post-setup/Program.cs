@@ -53,6 +53,22 @@ try
         Console.WriteLine("ℹ️  Library rename enabled but no changes required");
     }
 
+    // Action 3: Local Package Configuration
+    Console.WriteLine();
+    Console.WriteLine("📦 Action 3: Local Package Configuration");
+    Console.WriteLine("═══════════════════════════════");
+
+    var localPackageResult = LocalPackageConfigurationAction.ConfigureLocalPackages(projectDir, config);
+
+    if (!localPackageResult.Enabled)
+    {
+        Console.WriteLine($"⏭️  Skipped: {localPackageResult.SkipReason}");
+    }
+    else
+    {
+        Console.WriteLine($"✅ Local packages configured: version {localPackageResult.Version}");
+    }
+
     // Final summary
     Console.WriteLine();
     Console.WriteLine("🎉 Post-setup Actions Summary");
@@ -85,6 +101,14 @@ try
         Console.WriteLine($"📦 Library Configuration:");
         Console.WriteLine($"   Prefix: {libraryResult.LibPrefix}");
         Console.WriteLine($"   Imported libraries: {string.Join(", ", libraryResult.ImportedTokens)}");
+    }
+
+    if (localPackageResult.Enabled)
+    {
+        Console.WriteLine();
+        Console.WriteLine($"🔗 Local Package Configuration:");
+        Console.WriteLine($"   Version: {localPackageResult.Version}");
+        Console.WriteLine($"   Feed: {localPackageResult.FeedPath}");
     }
 
     Console.WriteLine();

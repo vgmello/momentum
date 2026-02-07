@@ -215,30 +215,26 @@ YourService/
 The `--local` flag enables template testing with locally built Momentum libraries:
 
 **What it does**:
-- Includes `Directory.Build.Local.props` with local NuGet feed configuration
-- Copies `local-mmt-version.txt` and `local-feed-path.txt` to generated project
-- Configures MSBuild to use local packages from `libs/Momentum/.local/nuget/`
+- Copies `local-mmt-version.txt` and `local-feed-path.txt` to the generated project
+- The post-setup tool reads these files and:
+  - Hardcodes the local version into `Directory.Packages.props` (`MomentumVersion`)
+  - Creates a `nuget.config` with the local NuGet feed source
+  - Cleans up the text files
 - Automatically used by `Run-TemplateTests.ps1` for template testing
 
-**Generated Local Configuration**:
-```xml
-<!-- Directory.Build.Local.props -->
-<MomentumLocalFeedPath>libs/Momentum/.local/nuget</MomentumLocalFeedPath>
-<RestoreAdditionalProjectSources>$(MomentumLocalFeedPath)</RestoreAdditionalProjectSources>
-<LocalMomentumVersion>0.0.1-local.20250901-234411</LocalMomentumVersion>
-
-<!-- Directory.Packages.props with --local -->
-<MomentumVersion>__CI_MOMENTUM_VERSION__</MomentumVersion>
-<MomentumVersion>$(LocalMomentumVersion)</MomentumVersion> <!-- Overrides above -->
-```
+**How the lib build generates local packages**:
+- `libs/Momentum/Directory.Build.targets` generates version `1000.0.0-pre.{timestamp}`
+- Packs all libraries to `libs/Momentum/.local/nuget/`
+- Writes `local-mmt-version.txt` and `local-feed-path.txt` to the repo root
 
 **Usage**:
 ```bash
-# Generate template with local packages
-dotnet new mmt -n TestLocal --local --project-only
+# Build and pack libraries first
+dotnet build libs/Momentum/Momentum.slnx
 
-# ... pack libraries with NEW_VERSION ...
-dotnet new mmt -n TestUpdated --local
+# Install template and generate with local packages
+dotnet new install ./ --force
+dotnet new mmt -n TestLocal --allow-scripts yes --local --project-only
 ```
 
 ## Testing Strategy

@@ -8,9 +8,6 @@
     <AspireAppHostSdkVersion>$(AspireVersion)</AspireAppHostSdkVersion>
     <GrpcVersion>[2.67]</GrpcVersion>
     <MomentumVersion>$(TemplateMomentumVersion)</MomentumVersion>
-    <!--#if (USE_LOCAL) -->
-    <MomentumVersion>$(LocalMomentumVersion)</MomentumVersion>
-    <!--#endif -->
     <!--#if (False) -->
     <MomentumVersion>999999.0.0</MomentumVersion>
     <!--#endif -->
