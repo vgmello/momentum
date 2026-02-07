@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param(
-    [string]$DocsPath = "libs/Momentum/docs"
+    [string]$DocsPath = "libs/Momentum/docs",
+    [switch]$CI
 )
 
 # Import Common
@@ -49,7 +50,11 @@ Push-Location $DocsPath
 
 try {
     Write-Host "📦 Installing dependencies with Bun..."
-    bun install --no-frozen-lockfile
+    if ($CI) {
+        bun install --frozen-lockfile
+    } else {
+        bun install
+    }
 
     if ($LASTEXITCODE -ne 0) {
         Write-Error "❌ Dependency installation failed"

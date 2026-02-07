@@ -38,4 +38,4 @@ runs:
       id: paths
       shell: pwsh
       run: |
-        & "${{ github.action_path }}/Build-Documentation.ps1" -DocsPath "${{ inputs.docs-path }}"
+        & "${{ github.action_path }}/Build-Documentation.ps1" -DocsPath "${{ inputs.docs-path }}" -CI

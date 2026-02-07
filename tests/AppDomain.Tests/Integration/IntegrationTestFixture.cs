@@ -98,6 +98,9 @@ public class IntegrationTestFixture : IAsyncLifetime
                 await liquibaseMigrationContainer.StartAsync();
             }).Unwrap(),
             //#endif
+            //#if (USE_DB && !USE_LIQUIBASE)
+            _postgres.StartAsync(),
+            //#endif
             //#if (USE_KAFKA)
             _kafka.StartAsync()
             //#endif
