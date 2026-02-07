@@ -7,8 +7,14 @@
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <CodeAnalysisRuleSet>../../Momentum.ruleset</CodeAnalysisRuleSet>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <NoWarn>$(NoWarn);CS1591;LOGGEN036</NoWarn>
+        <NoWarn>$(NoWarn);CS1591;LOGGEN036;NU1603</NoWarn>
         <BaseVersion Condition="'$(BaseVersion)' == ''">1000.0.0</BaseVersion>
+        <!-- Set a base version for debug builds. The GenerateLocalVersion target in
+             Directory.Build.targets overrides this with a timestamped version.
+             Uses stable (non-prerelease) format so NuGet can resolve transitive dependencies
+             at any depth — prerelease versions fail for transitive deps beyond depth 1. -->
+        <Version Condition="'$(Configuration)' == 'Debug'">$(BaseVersion)</Version>
+        <PackageVersion Condition="'$(Configuration)' == 'Debug'">$(BaseVersion)</PackageVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(IsTestProject)' != 'True' ">

@@ -15,7 +15,7 @@ public class GetInvoiceIntegrationTests(IntegrationTestFixture fixture) : Integr
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
+        await connection.ExecuteAsync("TRUNCATE TABLE main.invoices;");
 
         // Arrange - Create an invoice first
         var createRequest = new CreateInvoiceRequest

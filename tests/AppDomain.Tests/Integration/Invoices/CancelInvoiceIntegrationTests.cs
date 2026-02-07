@@ -17,7 +17,7 @@ public class CancelInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
+        await connection.ExecuteAsync("TRUNCATE TABLE main.invoices;");
 
         // Arrange - Create an invoice first
         var createRequest = _invoiceFaker
@@ -43,7 +43,7 @@ public class CancelInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
 
         // Verify in database
         var dbInvoice = await connection.QuerySingleOrDefaultAsync(
-            "SELECT status FROM app_domain.invoices WHERE invoice_id = @Id",
+            "SELECT status FROM main.invoices WHERE invoice_id = @Id",
             new { Id = Guid.Parse(createdInvoice.InvoiceId) });
 
         dbInvoice!.ShouldNotBeNull();
@@ -87,7 +87,7 @@ public class CancelInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
+        await connection.ExecuteAsync("TRUNCATE TABLE main.invoices;");
 
         // Arrange - Create and cancel an invoice
         var createRequest = _invoiceFaker

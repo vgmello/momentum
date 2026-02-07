@@ -15,7 +15,7 @@ public class GetCashiersIntegrationTests(IntegrationTestFixture fixture) : Integ
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.cashiers;");
+        await connection.ExecuteAsync("TRUNCATE TABLE main.cashiers;");
 
         // Arrange - Create a few cashiers first
         var createRequests = new[]

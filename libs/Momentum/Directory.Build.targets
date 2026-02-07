@@ -5,10 +5,13 @@
             <IsAbstractionsProject Condition="'$(MSBuildProjectName)' == 'Momentum.Extensions.Abstractions'">true</IsAbstractionsProject>
         </PropertyGroup>
 
-        <!-- Generate new version if this is the Abstractions project -->
+        <!-- Generate new version if this is the Abstractions project.
+             Uses stable 3-part SemVer: 1000.yyMMdd.HHmmss (e.g. 1000.260207.113722).
+             Stable versions avoid NuGet's refusal to resolve prerelease transitive deps at depth > 1. -->
         <PropertyGroup Condition="'$(IsAbstractionsProject)' == 'true'">
-            <LocalVersionSuffix>$([System.DateTime]::UtcNow.ToString("yyMMddHHmmss"))</LocalVersionSuffix>
-            <LocalVersion>$(BaseVersion)-pre.$(LocalVersionSuffix)</LocalVersion>
+            <LocalVersionDate>$([System.DateTime]::UtcNow.ToString("yyMMdd"))</LocalVersionDate>
+            <LocalVersionTime>$([System.DateTime]::UtcNow.ToString("HHmmss"))</LocalVersionTime>
+            <LocalVersion>1000.$(LocalVersionDate).$(LocalVersionTime)</LocalVersion>
             <LocalFeedAbsolutePath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory).local/nuget'))</LocalFeedAbsolutePath>
         </PropertyGroup>
 
@@ -36,9 +39,9 @@
     <Target Name="CleanOldPackages" BeforeTargets="Build;Clean" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' ">
         <ItemGroup>
             <OldPackagesToDelete Include="$(TargetDir)../*.*upkg"/>
-            <OldPackagesToDelete Include="$(MSBuildThisFileDirectory).local/nuget/$(PackageId).$(BaseVersion)*.nupkg"/>
+            <OldPackagesToDelete Include="$(MSBuildThisFileDirectory).local/nuget/$(PackageId).1000.*.nupkg"/>
         </ItemGroup>
-        <Message Text="Cleaning up $(ProjectName) nupkg files ($(PackageId).$(BaseVersion)*.nupkg). Target: $(TargetDir)" Importance="high"/>
+        <Message Text="Cleaning up $(ProjectName) nupkg files ($(PackageId).1000.*.nupkg). Target: $(TargetDir)" Importance="high"/>
         <Delete Files="@(OldPackagesToDelete)"/>
     </Target>
 
