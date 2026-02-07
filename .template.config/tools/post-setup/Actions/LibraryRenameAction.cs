@@ -66,8 +66,13 @@ public static class LibraryRenameAction
 
         Console.WriteLine($"  → Found {importedTokens.Count} imported library tokens: {string.Join(", ", importedTokens)}");
 
+        var nonEmbeddedPackageNames = BuildNonEmbeddedPackageNames(projectDir, importedTokens);
+
+        if (nonEmbeddedPackageNames.Count > 0)
+            Console.WriteLine($"  → Found {nonEmbeddedPackageNames.Count} non-embedded Momentum packages (will preserve their namespaces)");
+
         var processingConfig = BuildProcessingConfig(importConfig);
-        var (processedFiles, changedFiles) = ProcessAllFiles(projectDir, libPrefix, importedTokens, processingConfig);
+        var (processedFiles, changedFiles) = ProcessAllFiles(projectDir, libPrefix, importedTokens, processingConfig, nonEmbeddedPackageNames);
 
         result.ProcessedFiles = processedFiles;
         result.ChangedFiles = changedFiles;
@@ -139,14 +144,15 @@ public static class LibraryRenameAction
         string projectDir,
         string libPrefix,
         List<string> importedTokens,
-        ProcessingConfig config)
+        ProcessingConfig config,
+        List<string> nonEmbeddedPackageNames)
     {
         var processedFiles = 0;
         var changedFiles = 0;
 
         // Process regular files
         var regex = BuildMomentumLibraryRegex(importedTokens);
-        var (regularProcessed, regularChanged) = ProcessRegularFiles(projectDir, libPrefix, config, regex);
+        var (regularProcessed, regularChanged) = ProcessRegularFiles(projectDir, libPrefix, config, regex, nonEmbeddedPackageNames);
 
         processedFiles += regularProcessed;
         changedFiles += regularChanged;
@@ -164,7 +170,8 @@ public static class LibraryRenameAction
         string projectDir,
         string libPrefix,
         ProcessingConfig config,
-        Regex regex)
+        Regex regex,
+        List<string> nonEmbeddedPackageNames)
     {
         var processedFiles = 0;
         var changedFiles = 0;
@@ -181,7 +188,7 @@ public static class LibraryRenameAction
             {
                 processedFiles++;
 
-                if (ProcessFileContent(filePath, regex, libPrefix, projectDir))
+                if (ProcessFileContent(filePath, regex, libPrefix, projectDir, nonEmbeddedPackageNames))
                 {
                     changedFiles++;
                 }
@@ -269,7 +276,7 @@ public static class LibraryRenameAction
     {
         var escapedTokens = tokens.Select(Regex.Escape);
         var alternation = string.Join("|", escapedTokens);
-        var pattern = $@"\bMomentum\.(?<token>{alternation})(?!\.|\w)";
+        var pattern = $@"\bMomentum\.(?<token>{alternation})(?!\w)";
 
         return new Regex(pattern, RegexOptions.Compiled);
     }
@@ -303,7 +310,7 @@ public static class LibraryRenameAction
                                       filePath.Contains($"{Path.DirectorySeparatorChar}{dir}"));
     }
 
-    private static bool ProcessFileContent(string filePath, Regex regex, string libPrefix, string projectDir)
+    private static bool ProcessFileContent(string filePath, Regex regex, string libPrefix, string projectDir, List<string> nonEmbeddedPackageNames)
     {
         try
         {
@@ -317,6 +324,12 @@ public static class LibraryRenameAction
                 if (ShouldSkipMatch(originalContent, match.Index))
                 {
                     return match.Value; // Keep original
+                }
+
+                // Don't rename if this is part of a non-embedded NuGet package namespace
+                if (IsNonEmbeddedPackageNamespace(originalContent, match.Index, nonEmbeddedPackageNames))
+                {
+                    return match.Value;
                 }
 
                 return $"{libPrefix}.{token}";
@@ -387,6 +400,53 @@ public static class LibraryRenameAction
         File.Move(tempFile, filePath, overwrite: true);
     }
 
+    private static List<string> BuildNonEmbeddedPackageNames(string projectDir, List<string> importedTokens)
+    {
+        var packagesPropsPath = Path.Combine(projectDir, "Directory.Packages.props");
+
+        if (!File.Exists(packagesPropsPath))
+            return [];
+
+        var content = File.ReadAllText(packagesPropsPath);
+        var nonEmbedded = new List<string>();
+        var packageVersionRegex = new Regex(@"<PackageVersion\s+Include=""(Momentum\.[^""]+)""");
+
+        foreach (Match match in packageVersionRegex.Matches(content))
+        {
+            var packageName = match.Groups[1].Value;
+
+            // Skip if this is an embedded package (exact match with an imported token)
+            if (importedTokens.Any(t => packageName == $"Momentum.{t}"))
+                continue;
+
+            // Only track if it starts with an embedded token prefix (could conflict with regex)
+            if (importedTokens.Any(t => packageName.StartsWith($"Momentum.{t}.")))
+                nonEmbedded.Add(packageName);
+        }
+
+        return nonEmbedded.OrderByDescending(n => n.Length).ToList();
+    }
+
+    private static bool IsNonEmbeddedPackageNamespace(string content, int matchIndex, List<string> nonEmbeddedPackageNames)
+    {
+        foreach (var packageName in nonEmbeddedPackageNames)
+        {
+            if (matchIndex + packageName.Length > content.Length)
+                continue;
+
+            if (string.Compare(content, matchIndex, packageName, 0, packageName.Length, StringComparison.Ordinal) != 0)
+                continue;
+
+            // Ensure it's a complete match (not a partial word match)
+            var afterIndex = matchIndex + packageName.Length;
+
+            if (afterIndex >= content.Length || !char.IsLetterOrDigit(content[afterIndex]))
+                return true;
+        }
+
+        return false;
+    }
+
     private static bool ShouldSkipMatch(string originalContent, int matchIndex)
     {
         var beforeMatch = originalContent.Substring(0, matchIndex);
@@ -396,7 +456,10 @@ public static class LibraryRenameAction
 
         var currentLine = originalContent.Substring(lineStart, lineEndIndex - lineStart);
 
-        return currentLine.TrimStart().StartsWith("<PackageReference") && currentLine.Contains("Include=");
+        var trimmedLine = currentLine.TrimStart();
+
+        return (trimmedLine.StartsWith("<PackageReference") || trimmedLine.StartsWith("<PackageVersion")) &&
+               trimmedLine.Contains("Include=");
     }
 
     private static bool UpdateSolutionReferences(string slnFile, string libPrefix, string projectDir, List<string> importedTokens)

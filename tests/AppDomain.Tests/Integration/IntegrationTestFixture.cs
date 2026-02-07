@@ -30,6 +30,8 @@ using Momentum.Extensions.Messaging.Kafka;
 //#endif
 //#if (INCLUDE_ORLEANS)
 using AppDomain.BackOffice.Orleans.Infrastructure.Extensions;
+//#endif
+//#if (HAS_BACKEND)
 using Microsoft.AspNetCore.TestHost;
 //#endif
 

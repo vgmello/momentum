@@ -546,6 +546,12 @@
           "exclude": [
             "libs/Momentum/src/Momentum.Extensions.Messaging.Kafka/**/*"
           ]
+        },
+        {
+          "condition": "(INCLUDE_LIBS)",
+          "include": [
+            "libs/Momentum/.editorconfig"
+          ]
         }
       ]
     },

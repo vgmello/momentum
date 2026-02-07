@@ -6,7 +6,7 @@
     <MicrosoftOrleansVersion>9.2.1</MicrosoftOrleansVersion>
     <OpenTelemetryVersion>1.15.0</OpenTelemetryVersion>
     <AspireAppHostSdkVersion>$(AspireVersion)</AspireAppHostSdkVersion>
-    <GrpcVersion>[2.67]</GrpcVersion>
+    <GrpcVersion>2.67.0</GrpcVersion>
     <MomentumVersion>$(TemplateMomentumVersion)</MomentumVersion>
     <!--#if (False) -->
     <MomentumVersion>999999.0.0</MomentumVersion>
@@ -39,6 +39,7 @@
     <PackageVersion Include="linq2db" Version="5.4.1.9" />
     <PackageVersion Include="linq2db.AspNet" Version="5.4.1.9" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="$(MicrosoftExtensionsVersion)" />
+    <PackageVersion Include="Microsoft.AspNetCore.TestHost" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="4.14.0" />

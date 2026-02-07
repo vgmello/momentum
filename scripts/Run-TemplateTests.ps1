@@ -401,7 +401,7 @@ function Invoke-TestCategory {
 
             $components = @(
                 @{ Name = 'api'; TestName = 'TestApiOnly' },
-                @{ Name = 'back-office'; TestName = 'TestBackOfficeOnly' },
+                @{ Name = 'backoffice'; TestName = 'TestBackOfficeOnly' },
                 @{ Name = 'orleans'; TestName = 'TestOrleansOnly' },
                 @{ Name = 'aspire'; TestName = 'TestAspireOnly' },
                 @{ Name = 'docs'; TestName = 'TestDocsOnly' }

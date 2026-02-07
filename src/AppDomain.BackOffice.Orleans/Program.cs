@@ -3,7 +3,9 @@
 using AppDomain.Infrastructure;
 using AppDomain.BackOffice.Orleans;
 using AppDomain.BackOffice.Orleans.Infrastructure.Extensions;
+//#if (USE_KAFKA)
 using Momentum.Extensions.Messaging.Kafka;
+//#endif
 using Momentum.ServiceDefaults;
 using Momentum.ServiceDefaults.HealthChecks;
 

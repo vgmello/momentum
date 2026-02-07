@@ -21,6 +21,9 @@
         </PackageReference>
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing"/>
 <!--#endif -->
+<!--#if (HAS_BACKEND) -->
+        <PackageReference Include="Microsoft.AspNetCore.TestHost"/>
+<!--#endif -->
         <PackageReference Include="Microsoft.NET.Test.Sdk"/>
 <!--#if (INCLUDE_ORLEANS) -->
         <PackageReference Include="Microsoft.Orleans.TestingHost"/>

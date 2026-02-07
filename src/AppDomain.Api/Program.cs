@@ -8,7 +8,9 @@ using AppDomain.Api.Cashiers;
 using AppDomain.Api.Invoices;
 //#endif
 using AppDomain.Infrastructure;
+//#if (USE_KAFKA)
 using Momentum.Extensions.Messaging.Kafka;
+//#endif
 using Momentum.ServiceDefaults;
 using Momentum.ServiceDefaults.Api;
 using Momentum.ServiceDefaults.Api.OpenApi.Extensions;
