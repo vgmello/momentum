@@ -51,7 +51,7 @@ public class FluidMarkdownGenerator
         var fileName = metadata.GetFileName();
         var filePath = GenerateFilePath(outputDirectory, fileName);
 
-        var context = CreateTemplateContext();
+        var context = new TemplateContext(TemplateOptions);
         var eventModel = EventViewModelFactory.CreateEventModel(metadata, documentation, options);
         context.SetValue("event", eventModel);
 
@@ -89,7 +89,7 @@ public class FluidMarkdownGenerator
         var fileName = $"{TypeUtils.GetCleanTypeName(schemaType).ToSafeFileName()}.md";
         var filePath = GenerateFilePath(outputDirectory, fileName, "schemas");
 
-        var context = CreateTemplateContext();
+        var context = new TemplateContext(TemplateOptions);
         var schemaModel = EventViewModelFactory.CreateSchemaModel(schemaType);
         context.SetValue("schema", schemaModel);
 
@@ -203,8 +203,6 @@ public class FluidMarkdownGenerator
             throw new InvalidOperationException($"Failed to load template '{templateName}': {ex.Message}", ex);
         }
     }
-
-    private static TemplateContext CreateTemplateContext() => new(TemplateOptions);
 
     private static string GenerateFilePath(string outputDirectory, string fileName, string? subdirectory = null)
     {
