@@ -71,15 +71,13 @@ public class IntegrationTestFixture : IAsyncLifetime
     public IntegrationTestFixture()
     {
         //#if (USE_DB)
-        _postgres = new PostgreSqlBuilder()
-            .WithImage("postgres:17-alpine")
+        _postgres = new PostgreSqlBuilder("postgres:17-alpine")
             .WithNetwork(_containerNetwork)
             .Build();
 
         //#endif
         //#if (USE_KAFKA)
-        _kafka = new KafkaBuilder()
-            .WithImage("confluentinc/cp-kafka:7.6.0")
+        _kafka = new KafkaBuilder("confluentinc/cp-kafka:7.6.0")
             .WithNetwork(_containerNetwork)
             .Build();
         //#endif
