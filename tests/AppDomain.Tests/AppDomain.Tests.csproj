@@ -15,7 +15,10 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
 <!--#if (INCLUDE_API) -->
-        <PackageReference Include="Grpc.Tools"/>
+        <PackageReference Include="Grpc.Tools">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing"/>
 <!--#endif -->
         <PackageReference Include="Microsoft.NET.Test.Sdk"/>

@@ -42,7 +42,10 @@
         <!--#if (INCLUDE_API) -->
         <PackageReference Include="Google.Protobuf"/>
         <PackageReference Include="Grpc.Net.Client"/>
-        <PackageReference Include="Grpc.Tools"/>
+        <PackageReference Include="Grpc.Tools">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <!--#endif -->
         <PackageReference Include="Momentum.Extensions.Abstractions"/>
         <!--#if (false) -->

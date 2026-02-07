@@ -10,7 +10,10 @@
         <PackageReference Include="Aspire.Azure.Data.Tables"/>
         <PackageReference Include="Aspire.Azure.Storage.Blobs"/>
         <PackageReference Include="Aspire.Npgsql"/>
-        <PackageReference Include="Microsoft.Orleans.Analyzers" PrivateAssets="all"/>
+        <PackageReference Include="Microsoft.Orleans.Analyzers">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="Microsoft.Orleans.Clustering.AzureStorage"/>
         <PackageReference Include="Microsoft.Orleans.Persistence.AzureStorage"/>
         <PackageReference Include="Microsoft.Orleans.Reminders.AzureStorage"/>

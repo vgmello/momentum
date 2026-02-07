@@ -38,30 +38,15 @@
     <PackageVersion Include="Grpc.AspNetCore.Server.Reflection" Version="$(GrpcVersion)" />
     <PackageVersion Include="Grpc.AspNetCore.Web" Version="$(GrpcVersion)" />
     <PackageVersion Include="Grpc.Net.Client" Version="$(GrpcVersion)" />
-    <PackageVersion Include="Grpc.Tools" Version="2.68.1">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageVersion>
+    <PackageVersion Include="Grpc.Tools" Version="2.68.1" />
     <PackageVersion Include="linq2db" Version="5.4.1.9" />
     <PackageVersion Include="linq2db.AspNet" Version="5.4.1.9" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="$(MicrosoftExtensionsVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="$(MicrosoftExtensionsVersion)">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageVersion>
-    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="4.14.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageVersion>
-    <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="4.14.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageVersion>
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageVersion>
+    <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="$(MicrosoftExtensionsVersion)" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="4.14.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="4.14.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.CommandLine" Version="$(MicrosoftExtensionsVersion)" />
@@ -74,10 +59,7 @@
     <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="9.10.0" />
     <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="9.5.1" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
-    <PackageVersion Include="Microsoft.Orleans.Analyzers" Version="$(MicrosoftOrleansVersion)">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageVersion>
+    <PackageVersion Include="Microsoft.Orleans.Analyzers" Version="$(MicrosoftOrleansVersion)" />
     <PackageVersion Include="Microsoft.Orleans.Client" Version="$(MicrosoftOrleansVersion)" />
     <PackageVersion Include="Microsoft.Orleans.Clustering.AzureStorage" Version="$(MicrosoftOrleansVersion)" />
     <PackageVersion Include="Microsoft.Orleans.Core.Abstractions" Version="$(MicrosoftOrleansVersion)" />
@@ -85,29 +67,20 @@
     <PackageVersion Include="Microsoft.Orleans.Reminders.AzureStorage" Version="$(MicrosoftOrleansVersion)" />
     <PackageVersion Include="Microsoft.Orleans.Server" Version="$(MicrosoftOrleansVersion)" />
     <PackageVersion Include="Microsoft.Orleans.TestingHost" Version="$(MicrosoftOrleansVersion)" />
-    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
     <PackageVersion Include="Momentum.Extensions" Version="$(MomentumVersion)" />
     <PackageVersion Include="Momentum.Extensions.Abstractions" Version="$(MomentumVersion)" />
     <PackageVersion Include="Momentum.Extensions.Messaging.Kafka" Version="$(MomentumVersion)" />
-    <PackageVersion Include="Momentum.Extensions.SourceGenerators" Version="$(MomentumVersion)">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageVersion>
+    <PackageVersion Include="Momentum.Extensions.SourceGenerators" Version="$(MomentumVersion)" />
     <PackageVersion Include="Momentum.Extensions.XmlDocs" Version="$(MomentumVersion)" />
     <PackageVersion Include="Momentum.ServiceDefaults" Version="$(MomentumVersion)" />
     <PackageVersion Include="Momentum.ServiceDefaults.Api" Version="$(MomentumVersion)" />
     <PackageVersion Include="NetArchTest.Rules" Version="1.3.2" />
     <PackageVersion Include="Npgsql" Version="9.0.4" />
     <PackageVersion Include="NSubstitute" Version="5.3.0" />
-    <PackageVersion Include="NSwag.MSBuild" Version="14.6.3">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageVersion>
+    <PackageVersion Include="NSwag.MSBuild" Version="14.6.3" />
     <PackageVersion Include="OneOf" Version="3.0.271" />
-    <PackageVersion Include="OneOf.SourceGenerator" Version="3.0.271">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageVersion>
+    <PackageVersion Include="OneOf.SourceGenerator" Version="3.0.271" />
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemetryVersion)" />
     <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryVersion)" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="$(OpenTelemetryVersion)" />
@@ -121,10 +94,7 @@
     <PackageVersion Include="Serilog.Exceptions" Version="8.4.0" />
     <PackageVersion Include="Serilog.Sinks.OpenTelemetry" Version="4.2.0" />
     <PackageVersion Include="Shouldly" Version="4.3.0" />
-    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.15.0.120848">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageVersion>
+    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.15.0.120848" />
     <PackageVersion Include="Spectre.Console.Cli" Version="0.50" />
     <PackageVersion Include="System.Net.Http.Json" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Testcontainers" Version="4.8.1" />
@@ -133,10 +103,7 @@
     <PackageVersion Include="WolverineFx" Version="5.2.0" />
     <PackageVersion Include="WolverineFx.Kafka" Version="5.2.0" />
     <PackageVersion Include="WolverineFx.Postgresql" Version="5.2.0" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageVersion>
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
     <PackageVersion Include="xunit.v3" Version="3.1.0" />
   </ItemGroup>
 </Project>

@@ -36,7 +36,10 @@
         <PackageReference Include="Momentum.Extensions"/>
         <!--#endif -->
         <!--#if (!LIBS_INCLUDES_GENERATORS) -->
-        <PackageReference Include="Momentum.Extensions.SourceGenerators"/>
+        <PackageReference Include="Momentum.Extensions.SourceGenerators">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <!--#endif -->
     </ItemGroup>
 
