@@ -202,8 +202,8 @@ psql -h localhost -p 5432 -U postgres -d AppDomain
 
 Key tables:
 
--   `main.cashiers` - Cashier records (in billing database)
--   `main.invoices` - Invoice records (in billing database)
+-   `main.cashiers` - Cashier records (in app_domain database)
+-   `main.invoices` - Invoice records (in app_domain database)
 -   `AppDomain.cashier_payments` - Payment history
 
 ## Next Steps

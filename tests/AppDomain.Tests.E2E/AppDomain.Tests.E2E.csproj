@@ -36,7 +36,7 @@
     <Target Name="GenerateOpenApiClient" BeforeTargets="CoreCompile">
         <Message Text="Generating OpenApiClient from OpenApi/app-domain-api.json" Importance="high"/>
         <MakeDir Directories="OpenApi/Generated" Condition="!Exists('OpenApi/Generated')"/>
-        <Exec Command="$(NSwagExe_Net90) openapi2csclient /input:OpenApi/app-domain-api.json /classname:AppDomainApiClient /namespace:AppDomain.Tests.E2E.OpenApi.Generated /output:OpenApi/Generated/AppDomainApiClient.cs /generateResponseClasses:true /generateJsonMethods:true /useHttpClientCreationMethod:true"/>
+        <Exec Command="$(NSwagExe_Net100) openapi2csclient /input:OpenApi/app-domain-api.json /classname:AppDomainApiClient /namespace:AppDomain.Tests.E2E.OpenApi.Generated /output:OpenApi/Generated/AppDomainApiClient.cs /generateResponseClasses:true /generateJsonMethods:true /useHttpClientCreationMethod:true"/>
         <ItemGroup>
             <Compile Include="OpenApi/Generated/AppDomainApiClient.cs"/>
         </ItemGroup>

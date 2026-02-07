@@ -5,7 +5,7 @@
     "ms-dotnettools.csdevkit",
     "ms-azuretools.vscode-docker",
     "ms-azuretools.vscode-containers",
-    "zxh404.vscode-proto3",
+    "drblury.protobuf-vsc",
     "sonarsource.sonarlint-vscode",
     "editorconfig.editorconfig",
     "ms-ossdata.vscode-pgsql",

@@ -17,23 +17,23 @@ services:
       timeout: 5s
       retries: 5
     # These command-line arguments are tuned for a local performance server.
-    command: >
-      postgres
-      -c max_connections=200
-      -c shared_buffers=2GB
-      -c effective_cache_size=7GB
-      -c maintenance_work_mem=256MB
-      -c work_mem=32MB
-      -c checkpoint_completion_target=0.9
-      -c wal_buffers=16MB
-      -c min_wal_size=1GB
-      -c max_wal_size=4GB
-      -c max_worker_processes=8
-      -c max_parallel_workers=8
-      -c max_parallel_workers_per_gather=4
-      -c max_parallel_maintenance_workers=4
-      -c random_page_cost=1.1
-      -c effective_io_concurrency=200
+    command: |
+      postgres \
+      -c max_connections=200 \
+      -c shared_buffers=2GB \
+      -c effective_cache_size=7GB \
+      -c maintenance_work_mem=256MB \
+      -c work_mem=32MB \
+      -c checkpoint_completion_target=0.9 \
+      -c wal_buffers=16MB \
+      -c min_wal_size=1GB \
+      -c max_wal_size=4GB \
+      -c max_worker_processes=8 \
+      -c max_parallel_workers=8 \
+      -c max_parallel_workers_per_gather=4 \
+      -c max_parallel_maintenance_workers=4 \
+      -c random_page_cost=1.1 \
+      -c effective_io_concurrency=200 \
       -c default_statistics_target=100
 
     volumes:
@@ -58,7 +58,7 @@ services:
       - |
         liquibase update --url=jdbc:postgresql://app-domain-db:5432/postgres --changelog-file=postgres/changelog.xml && \
         liquibase update --url=jdbc:postgresql://app-domain-db:5432/service_bus --changelog-file=service_bus/changelog.xml && \
-        liquibase update --url=jdbc:postgresql://app-domain-db:5432/app_domain --changelog-file=main/changelog.xml && \
+        liquibase update --url=jdbc:postgresql://app-domain-db:5432/app_domain --changelog-file=app_domain/changelog.xml && \
         echo 'Database migrations completed successfully!'
 
   # #endif
@@ -276,7 +276,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
-  # #endif
+    # #endif
 
     # k6 Performance Testing - Run on-demand with: docker compose run --rm k6-performance run /scripts/scenarios/mixed/realistic-workflow.js
   k6-performance:
@@ -300,7 +300,7 @@ services:
     networks:
       - default
     # No default command - run tests on-demand with custom arguments
-# #if (INCLUDE_ORLEANS || INCLUDE_DOCS)
+    # #if (INCLUDE_ORLEANS || INCLUDE_DOCS)
 volumes:
   # #endif
   # #if (INCLUDE_ORLEANS)
