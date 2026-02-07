@@ -13,11 +13,7 @@ public class ScenarioBasedIntegrationTests
 {
     private const string ScenariosPath = "IntegrationTestScenarios";
 
-    private static readonly JsonSerializerOptions JsonSerializerOptions = new()
-    {
-        PropertyNameCaseInsensitive = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-    };
+    private static readonly JsonSerializerOptions JsonOptions = System.Text.Json.JsonSerializerOptions.Web;
 
     public static TheoryData<string> GetTestScenarios()
     {
@@ -165,7 +161,7 @@ public class ScenarioBasedIntegrationTests
         if (File.Exists(configPath))
         {
             var configJson = await File.ReadAllTextAsync(configPath);
-            scenario.Config = JsonSerializer.Deserialize<TestScenarioConfig>(configJson, JsonSerializerOptions);
+            scenario.Config = JsonSerializer.Deserialize<TestScenarioConfig>(configJson, JsonOptions);
         }
 
         // Load expected files

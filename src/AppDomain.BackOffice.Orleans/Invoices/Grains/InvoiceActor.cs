@@ -157,7 +157,7 @@ public class InvoiceActor(
             amount,
             DateTime.UtcNow,
             paymentMethod,
-            Guid.NewGuid().ToString()));
+            Guid.CreateVersion7().ToString()));
 
         return true;
     }

@@ -21,8 +21,8 @@ public class DummyInvoiceGenerator(IMessageBus bus) : BackgroundService
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            var tenantId = Guid.NewGuid();
-            var invoiceId = Guid.NewGuid();
+            var tenantId = Guid.CreateVersion7();
+            var invoiceId = Guid.CreateVersion7();
             var now = DateTime.UtcNow;
 
             var invoice = new Invoice(

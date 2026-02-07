@@ -99,7 +99,7 @@ public static partial class GrpcMapper
             (decimal)request.Amount,
             request.Currency,
             request.PaymentMethod ?? string.Empty,
-            request.PaymentReference ?? $"SIM-{Guid.NewGuid():N}"[..16]
+            request.PaymentReference ?? $"SIM-{Guid.CreateVersion7():N}"[..16]
         );
     }
 

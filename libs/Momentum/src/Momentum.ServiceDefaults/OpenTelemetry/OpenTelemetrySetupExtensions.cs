@@ -9,6 +9,7 @@ using OpenTelemetry.Context.Propagation;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 
@@ -116,9 +117,9 @@ public static class OpenTelemetrySetupExtensions
         return builder;
     }
 
-    private static readonly List<string> ExcludedClientPaths =
-    [
+    private static readonly FrozenSet<string> ExcludedClientPaths = new[]
+    {
         "/OrleansSiloInstances",
         "/$batch"
-    ];
+    }.ToFrozenSet();
 }

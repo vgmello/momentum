@@ -10,6 +10,7 @@ using Momentum.ServiceDefaults.Logging;
 using Momentum.ServiceDefaults.Messaging;
 using Momentum.ServiceDefaults.OpenTelemetry;
 using Serilog;
+using System.Collections.Frozen;
 using System.Reflection;
 
 namespace Momentum.ServiceDefaults;
@@ -19,7 +20,7 @@ namespace Momentum.ServiceDefaults;
 /// </summary>
 public static class ServiceDefaultsExtensions
 {
-    private static readonly object EntryAssemblyLock = new();
+    private static readonly Lock EntryAssemblyLock = new();
     private static Assembly? _entryAssembly;
 
     /// <summary>
@@ -205,8 +206,8 @@ public static class ServiceDefaultsExtensions
     }
 #pragma warning restore S2139
 
-    private static readonly HashSet<string> WolverineCommands =
-    [
+    private static readonly FrozenSet<string> WolverineCommands = new[]
+    {
         "check-env",
         "codegen",
         "db-apply",
@@ -217,7 +218,7 @@ public static class ServiceDefaultsExtensions
         "help",
         "resources",
         "storage"
-    ];
+    }.ToFrozenSet();
 
     private static Assembly GetEntryAssembly()
     {

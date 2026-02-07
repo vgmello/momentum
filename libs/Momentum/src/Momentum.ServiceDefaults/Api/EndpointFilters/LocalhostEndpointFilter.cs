@@ -2,6 +2,7 @@
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using System.Collections.Frozen;
 using System.Net;
 
 namespace Momentum.ServiceDefaults.Api.EndpointFilters;
@@ -24,13 +25,13 @@ namespace Momentum.ServiceDefaults.Api.EndpointFilters;
 /// </remarks>
 public partial class LocalhostEndpointFilter(ILogger logger) : IEndpointFilter
 {
-    private static readonly string[] ForwardedHeaders =
-    [
+    private static readonly FrozenSet<string> ForwardedHeaders = new[]
+    {
         "X-Forwarded-For",
         "X-Real-IP",
         "Forwarded",
         "X-Original-Forwarded-For"
-    ];
+    }.ToFrozenSet(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     ///     Validates that the request originates from a loopback address.

@@ -144,7 +144,7 @@ public static class InvoiceEndpoints
             request.Amount,
             request.Currency ?? "USD",
             request.PaymentMethod ?? "Credit Card",
-            request.PaymentReference ?? $"SIM-{Guid.NewGuid():N}"[..16]
+            request.PaymentReference ?? $"SIM-{Guid.CreateVersion7():N}"[..16]
         );
 
         var commandResult = await bus.InvokeCommandAsync(command, cancellationToken);
