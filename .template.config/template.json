@@ -579,7 +579,6 @@
       "target": "./",
       "condition": "(USE_LOCAL)",
       "include": [
-        "local-mmt-version.txt",
         "local-feed-path.txt"
       ]
     }

@@ -580,15 +580,13 @@ function Invoke-Cleanup {
     if ((Test-Path -Path $script:ExecutionTestDir) -and (@($remainingDirs).Count -eq 0)) {
         try {
             [System.IO.Directory]::Delete($script:ExecutionTestDir, $true)
-            Write-ColoredMessage -Level 'INFO' -Message "Cleaned up empty execution directory: $script:ExecutionTimestamp"
         }
         catch {
             try {
                 Remove-Item -Path $script:ExecutionTestDir -Recurse -Force -ErrorAction Stop
-                Write-ColoredMessage -Level 'INFO' -Message "Cleaned up execution directory (fallback): $script:ExecutionTimestamp"
             }
             catch {
-                Write-ColoredMessage -Level 'WARN' -Message "Failed to clean up execution directory: $script:ExecutionTimestamp - $($_.Exception.Message)"
+                Write-Host "$($Colors.Yellow)[WARN]$($Colors.Reset) Failed to clean up execution directory: $script:ExecutionTimestamp - $($_.Exception.Message)"
             }
         }
     }

@@ -66,7 +66,7 @@ try
     }
     else
     {
-        Console.WriteLine($"✅ Local packages configured: version {localPackageResult.Version}");
+        Console.WriteLine($"✅ Local packages configured: feed {localPackageResult.FeedPath}");
     }
 
     // Final summary
@@ -107,7 +107,6 @@ try
     {
         Console.WriteLine();
         Console.WriteLine($"🔗 Local Package Configuration:");
-        Console.WriteLine($"   Version: {localPackageResult.Version}");
         Console.WriteLine($"   Feed: {localPackageResult.FeedPath}");
     }
 

@@ -1,48 +1,19 @@
 <Project>
-    <Target Name="GenerateLocalVersion" BeforeTargets="Build" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' ">
-        <PropertyGroup>
-            <LocalVersionFilePath>$(MSBuildThisFileDirectory)../../local-mmt-version.txt</LocalVersionFilePath>
-            <IsAbstractionsProject Condition="'$(MSBuildProjectName)' == 'Momentum.Extensions.Abstractions'">true</IsAbstractionsProject>
-        </PropertyGroup>
-
-        <!-- Generate new version if this is the Abstractions project.
-             Uses stable 3-part SemVer: 1000.yyMMdd.HHmmss (e.g. 1000.260207.113722).
-             Stable versions avoid NuGet's refusal to resolve prerelease transitive deps at depth > 1. -->
-        <PropertyGroup Condition="'$(IsAbstractionsProject)' == 'true'">
-            <LocalVersionDate>$([System.DateTime]::UtcNow.ToString("yyMMdd"))</LocalVersionDate>
-            <LocalVersionTime>$([System.Convert]::ToInt32($([System.DateTime]::UtcNow.ToString("HHmmss"))))</LocalVersionTime>
-            <LocalVersion>1000.$(LocalVersionDate).$(LocalVersionTime)</LocalVersion>
-            <LocalFeedAbsolutePath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory).local/nuget'))</LocalFeedAbsolutePath>
-        </PropertyGroup>
-
-        <!-- Write version file if this is the Abstractions project -->
-        <WriteLinesToFile File="$(LocalVersionFilePath)" Lines="$(LocalVersion)" Overwrite="true" Condition="'$(IsAbstractionsProject)' == 'true'" />
-        <WriteLinesToFile File="$(MSBuildThisFileDirectory)../../local-feed-path.txt" Lines="$(LocalFeedAbsolutePath)" Overwrite="true" Condition="'$(IsAbstractionsProject)' == 'true'" />
-
-        <!-- Read version file if this is NOT the Abstractions project -->
-        <ReadLinesFromFile File="$(LocalVersionFilePath)" Condition="'$(IsAbstractionsProject)' != 'true' and Exists('$(LocalVersionFilePath)')">
-            <Output TaskParameter="Lines" PropertyName="LocalVersion"/>
-        </ReadLinesFromFile>
-
-        <!-- Set version properties for all packable projects -->
-        <PropertyGroup Condition=" '$(LocalVersion)' != '' ">
-            <PackageVersion>$(LocalVersion)</PackageVersion>
-            <Version>$(LocalVersion)</Version>
-        </PropertyGroup>
-
-        <!-- Logging -->
-        <Message Text="Generating local version: $(LocalVersion)" Importance="high" Condition="'$(IsAbstractionsProject)' == 'true'" />
-        <Message Text="Using shared local version: $(LocalVersion)" Importance="high" Condition="'$(IsAbstractionsProject)' != 'true' and '$(LocalVersion)' != ''" />
-        <Warning Text="No local version file found. Build Abstractions project first." Condition="'$(IsAbstractionsProject)' != 'true' and '$(LocalVersion)' == ''" />
-    </Target>
-
     <Target Name="CleanOldPackages" BeforeTargets="Build;Clean" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' ">
         <ItemGroup>
             <OldPackagesToDelete Include="$(TargetDir)../*.*upkg"/>
-            <OldPackagesToDelete Include="$(MSBuildThisFileDirectory).local/nuget/$(PackageId).1000.*.nupkg"/>
+            <OldPackagesToDelete Include="$(MSBuildThisFileDirectory).local/nuget/$(PackageId).*.nupkg"/>
         </ItemGroup>
-        <Message Text="Cleaning up $(ProjectName) nupkg files ($(PackageId).1000.*.nupkg). Target: $(TargetDir)" Importance="high"/>
+        <Message Text="Cleaning up $(ProjectName) nupkg files ($(PackageId).*.nupkg). Target: $(TargetDir)" Importance="high"/>
         <Delete Files="@(OldPackagesToDelete)"/>
+    </Target>
+
+    <Target Name="WriteLocalFeedPath" BeforeTargets="Build" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' and '$(MSBuildProjectName)' == 'Momentum.Extensions.Abstractions' ">
+        <PropertyGroup>
+            <LocalFeedAbsolutePath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory).local/nuget'))</LocalFeedAbsolutePath>
+        </PropertyGroup>
+        <WriteLinesToFile File="$(MSBuildThisFileDirectory)../../local-feed-path.txt" Lines="$(LocalFeedAbsolutePath)" Overwrite="true" />
+        <Message Text="Wrote local feed path: $(LocalFeedAbsolutePath)" Importance="high" />
     </Target>
 
     <Target Name="PushToLocalFeed" AfterTargets="Pack" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug'">

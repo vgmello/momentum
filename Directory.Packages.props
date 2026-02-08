@@ -7,9 +7,10 @@
     <OpenTelemetryVersion>1.15.0</OpenTelemetryVersion>
     <AspireAppHostSdkVersion>$(AspireVersion)</AspireAppHostSdkVersion>
     <GrpcVersion>2.67.0</GrpcVersion>
+    <!--#if (!USE_LOCAL) -->
     <MomentumVersion>$(TemplateMomentumVersion)</MomentumVersion>
-    <!--#if (False) -->
-    <MomentumVersion>999999.0.0</MomentumVersion>
+    <!--#else -->
+    <MomentumVersion>1000.0.0</MomentumVersion>
     <!--#endif -->
   </PropertyGroup>
   <ItemGroup>
