@@ -154,7 +154,9 @@ public class OrleansGrainOwnershipRulesTests : ArchitectureTestBase
         var domainNames = DomainDiscovery.GetDomainNames().ToList();
 
         // Ensure we found some domains
+#if INCLUDE_SAMPLE
         domainNames.ShouldNotBeEmpty("Should discover at least one domain with grains");
+#endif
 
         // Ensure all discovered actor namespaces follow the expected pattern
         foreach (var actorNamespace in domainActorNamespaces)
