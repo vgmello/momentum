@@ -10,7 +10,7 @@
              Stable versions avoid NuGet's refusal to resolve prerelease transitive deps at depth > 1. -->
         <PropertyGroup Condition="'$(IsAbstractionsProject)' == 'true'">
             <LocalVersionDate>$([System.DateTime]::UtcNow.ToString("yyMMdd"))</LocalVersionDate>
-            <LocalVersionTime>$([System.DateTime]::UtcNow.ToString("HHmmss"))</LocalVersionTime>
+            <LocalVersionTime>$([System.Convert]::ToInt32($([System.DateTime]::UtcNow.ToString("HHmmss"))))</LocalVersionTime>
             <LocalVersion>1000.$(LocalVersionDate).$(LocalVersionTime)</LocalVersion>
             <LocalFeedAbsolutePath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory).local/nuget'))</LocalFeedAbsolutePath>
         </PropertyGroup>
