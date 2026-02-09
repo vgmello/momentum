@@ -2,6 +2,7 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using Momentum.Extensions.EventMarkdownGenerator.Models;
 
 namespace Momentum.Extensions.EventMarkdownGenerator.Services;
 
@@ -228,33 +229,15 @@ public static class PayloadSizeCalculator
 
     private static DataAnnotationConstraints GetDataAnnotationConstraints(PropertyInfo property)
     {
-        var result = new DataAnnotationConstraints();
-
-        // Check MaxLength attribute
         var maxLengthAttr = property.GetCustomAttribute<MaxLengthAttribute>();
-
-        if (maxLengthAttr != null)
-        {
-            result.MaxLength = maxLengthAttr.Length;
-        }
-
-        // Check StringLength attribute
         var stringLengthAttr = property.GetCustomAttribute<StringLengthAttribute>();
-
-        if (stringLengthAttr != null)
-        {
-            result.MaxLength = stringLengthAttr.MaximumLength;
-        }
-
-        // Check Range attribute
         var rangeAttr = property.GetCustomAttribute<RangeAttribute>();
 
-        if (rangeAttr is { Maximum: int maxRange })
+        return new DataAnnotationConstraints
         {
-            result.MaxRange = maxRange;
-        }
-
-        return result;
+            MaxLength = stringLengthAttr?.MaximumLength ?? maxLengthAttr?.Length,
+            MaxRange = rangeAttr is { Maximum: int maxRange } ? maxRange : null
+        };
     }
 
     private static int GetPrimitiveTypeSize(Type type)
@@ -284,14 +267,7 @@ public static class PayloadSizeCalculator
 
     private sealed record DataAnnotationConstraints
     {
-        public int? MaxLength { get; set; }
-        public int? MaxRange { get; set; }
+        public int? MaxLength { get; init; }
+        public int? MaxRange { get; init; }
     }
-}
-
-public record PayloadSizeResult
-{
-    public int SizeBytes { get; init; }
-    public bool IsAccurate { get; init; }
-    public string? Warning { get; init; }
 }

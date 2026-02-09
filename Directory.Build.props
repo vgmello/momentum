@@ -8,6 +8,7 @@
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)AppDomain.ruleset</CodeAnalysisRuleSet>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
     <NoWarn>$(NoWarn);CS1591;LOGGEN036;NU1603</NoWarn>
   </PropertyGroup>
 

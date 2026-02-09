@@ -12,7 +12,7 @@ namespace Momentum.Extensions.EventMarkdownGenerator.Services;
 /// </summary>
 public class JsonSidebarGenerator
 {
-    private readonly JsonSerializerOptions _jsonOptions = new()
+    private static readonly JsonSerializerOptions JsonOptions = new()
     {
         WriteIndented = true,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
@@ -27,7 +27,7 @@ public class JsonSidebarGenerator
     {
         var sidebarItems = GenerateSidebarItems(events);
 
-        return JsonSerializer.Serialize(sidebarItems, _jsonOptions);
+        return JsonSerializer.Serialize(sidebarItems, JsonOptions);
     }
 
     public List<SidebarItem> GenerateSidebarItems(ICollection<EventWithDocumentation> events)
@@ -78,23 +78,25 @@ public class JsonSidebarGenerator
         string section,
         EventWithDocumentation eventWithDoc)
     {
-        if (!eventGroups.ContainsKey(subdomain))
+        if (!eventGroups.TryGetValue(subdomain, out var sections))
         {
-            eventGroups[subdomain] = [];
+            sections = [];
+            eventGroups[subdomain] = sections;
         }
 
-        if (!eventGroups[subdomain].ContainsKey(section))
+        if (!sections.TryGetValue(section, out var list))
         {
-            eventGroups[subdomain][section] = [];
+            list = [];
+            sections[section] = list;
         }
 
-        eventGroups[subdomain][section].Add(eventWithDoc);
+        list.Add(eventWithDoc);
     }
 
     private static List<SidebarItem> BuildSidebarStructure(
         Dictionary<string, Dictionary<string, List<EventWithDocumentation>>> eventGroups)
     {
-        var sidebarItems = new List<SidebarItem>();
+        List<SidebarItem> sidebarItems = [];
 
         foreach (var (subdomain, sections) in eventGroups.OrderBy(x => x.Key))
         {
@@ -114,7 +116,7 @@ public class JsonSidebarGenerator
             Text = CapitalizeDomain(subdomain),
             Link = null,
             Collapsed = false,
-            Items = new List<SidebarItem>()
+            Items = []
         };
 
         if (HasMultipleSectionsOrNamedSection(sections))
@@ -238,7 +240,7 @@ public class JsonSidebarGenerator
         if (complexTypes.Count == 0)
             return null;
 
-        var schemaItems = new List<SidebarItem>();
+        List<SidebarItem> schemaItems = [];
 
         // Group schemas by namespace (subdomain)
         var schemasByNamespace = complexTypes

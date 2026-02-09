@@ -197,7 +197,7 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
             $"[green]✓[/] Successfully generated documentation for [bold]{allEvents.Count}[/] events from [bold]{processedAssemblies}[/] assemblies");
         AnsiConsole.MarkupLine($"[green]✓[/] Created [bold]{markdownFiles.Count}[/] markdown files in: {options.OutputDirectory}");
 
-        if (schemaFiles.Any())
+        if (schemaFiles.Count > 0)
         {
             AnsiConsole.MarkupLine($"[green]✓[/] Created [bold]{schemaFiles.Count}[/] schema files");
         }
@@ -242,7 +242,7 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
         var explicitPath = explicitXmlPaths.Where(File.Exists);
         var autoDiscoveredPath = assemblyPaths.Select(GetExpectedXmlDocumentationPath).Where(File.Exists);
 
-        return explicitPath.Concat(autoDiscoveredPath).ToHashSet(StringComparer.InvariantCultureIgnoreCase);
+        return explicitPath.Concat(autoDiscoveredPath).ToHashSet(StringComparer.OrdinalIgnoreCase);
     }
 
     private static string GetExpectedXmlDocumentationPath(string assemblyPath)
@@ -301,7 +301,7 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
                 return LoadUnmanagedDllFromPath(libraryPath);
             }
 
-            return IntPtr.Zero;
+            return 0;
         }
 
         public void Dispose()

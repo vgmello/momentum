@@ -8,6 +8,12 @@
         <NoWarn>$(NoWarn);CS0436;</NoWarn>
     </PropertyGroup>
 
+<!--#if (INCLUDE_API) -->
+    <PropertyGroup>
+        <InterceptorsNamespaces>$(InterceptorsNamespaces);Microsoft.AspNetCore.OpenApi.Generated</InterceptorsNamespaces>
+    </PropertyGroup>
+<!--#endif -->
+
     <ItemGroup>
         <PackageReference Include="Bogus"/>
         <PackageReference Include="coverlet.collector">

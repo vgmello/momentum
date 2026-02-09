@@ -1,5 +1,6 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using System.Reflection;
 using Momentum.Extensions.EventMarkdownGenerator.Models;
@@ -7,9 +8,9 @@ using Momentum.Extensions.XmlDocs;
 
 namespace Momentum.Extensions.EventMarkdownGenerator.Services;
 
-public class XmlDocumentationParser
+public class XmlDocumentationParser(ILogger<XmlDocumentationService>? logger = null)
 {
-    private readonly XmlDocumentationService _xmlService = new(new NullLogger<XmlDocumentationService>());
+    private readonly XmlDocumentationService _xmlService = new(logger ?? NullLogger<XmlDocumentationService>.Instance);
 
     public EventDocumentation GetEventDocumentation(Type eventType)
     {
@@ -31,9 +32,7 @@ public class XmlDocumentationParser
             return false;
 
         var loadTasks = xmlFilePaths.Select(path => _xmlService.LoadDocumentationAsync(path));
-        var loadResults = await Task.WhenAll(loadTasks);
-
-        cancellationToken.ThrowIfCancellationRequested();
+        var loadResults = await Task.WhenAll(loadTasks).WaitAsync(cancellationToken);
 
         return loadResults.Any(result => result);
     }

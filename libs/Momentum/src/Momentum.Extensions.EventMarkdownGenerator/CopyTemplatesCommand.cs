@@ -7,7 +7,7 @@ using System.ComponentModel;
 
 namespace Momentum.Extensions.EventMarkdownGenerator;
 
-public sealed class CopyTemplatesCommand : Command<CopyTemplatesCommand.Settings>
+public sealed class CopyTemplatesCommand : AsyncCommand<CopyTemplatesCommand.Settings>
 {
     public sealed class Settings : CommandSettings
     {
@@ -21,7 +21,7 @@ public sealed class CopyTemplatesCommand : Command<CopyTemplatesCommand.Settings
         public bool Force { get; init; }
     }
 
-    public override int Execute(CommandContext context, Settings settings, CancellationToken cancellationToken)
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellationToken)
     {
         try
         {
@@ -40,7 +40,7 @@ public sealed class CopyTemplatesCommand : Command<CopyTemplatesCommand.Settings
                 }
             }
 
-            FluidMarkdownGenerator.CopyDefaultTemplatesToDirectory(outputPath);
+            await FluidMarkdownGenerator.CopyDefaultTemplatesToDirectoryAsync(outputPath, cancellationToken);
 
             AnsiConsole.MarkupLine($"[green]✓[/] Successfully copied default templates to: {outputPath}");
             AnsiConsole.MarkupLine("");

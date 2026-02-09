@@ -137,7 +137,7 @@ public static class TypeUtils
             var backtickIndex = typeName.IndexOf('`');
             if (backtickIndex > 0)
             {
-                typeName = typeName.Substring(0, backtickIndex);
+                typeName = typeName[..backtickIndex];
             }
             
             var genericArgs = type.GetGenericArguments()

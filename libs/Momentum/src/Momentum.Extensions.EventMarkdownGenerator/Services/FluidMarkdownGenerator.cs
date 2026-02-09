@@ -118,8 +118,9 @@ public class FluidMarkdownGenerator
     ///     Copies the default Liquid templates to a target directory for customization.
     /// </summary>
     /// <param name="targetDirectory">The directory to copy templates to.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
     /// <exception cref="ArgumentException">Thrown when targetDirectory is null or empty.</exception>
-    public static void CopyDefaultTemplatesToDirectory(string targetDirectory)
+    public static async Task CopyDefaultTemplatesToDirectoryAsync(string targetDirectory, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(targetDirectory))
         {
@@ -128,13 +129,13 @@ public class FluidMarkdownGenerator
 
         Directory.CreateDirectory(targetDirectory);
 
-        var templateNames = new[] { "event.liquid", "schema.liquid" };
+        string[] templateNames = ["event.liquid", "schema.liquid"];
 
         foreach (var templateName in templateNames)
         {
             var templateContent = GetEmbeddedTemplate(templateName);
             var targetPath = Path.Combine(targetDirectory, templateName);
-            File.WriteAllText(targetPath, templateContent);
+            await File.WriteAllTextAsync(targetPath, templateContent, cancellationToken);
         }
     }
 

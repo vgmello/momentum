@@ -7,6 +7,8 @@ namespace Momentum.Extensions.EventMarkdownGenerator.Extensions;
 /// </summary>
 public static class StringExtensions
 {
+    private static readonly HashSet<char> InvalidFileNameChars = new(Path.GetInvalidFileNameChars());
+
     /// <summary>
     ///     Converts a string to a safe filename by replacing invalid characters.
     /// </summary>
@@ -28,8 +30,7 @@ public static class StringExtensions
             .Replace('`', '_');
 
         // Remove any other unsafe file name characters
-        var invalidChars = Path.GetInvalidFileNameChars();
-        result = new string(result.Where(c => !invalidChars.Contains(c)).ToArray());
+        result = new string(result.Where(c => !InvalidFileNameChars.Contains(c)).ToArray());
 
 
         if (string.IsNullOrWhiteSpace(result))
