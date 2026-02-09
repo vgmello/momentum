@@ -268,8 +268,8 @@ services:
     user: "1001:1001"
     volumes:
       - ./:/app
-      - pnpm_node_modules:/app/docs/node_modules
-    command: [ "pnpm", "dev", "--host" ]
+      - bun_node_modules:/app/docs/node_modules
+    command: [ "bun", "run", "dev", "--", "--host" ]
     healthcheck:
       test: [ "CMD-SHELL", "curl -f http://localhost:5173/index.html || exit 1" ]
       interval: 30s
@@ -308,7 +308,7 @@ volumes:
 
   # #endif
   # #if (INCLUDE_DOCS)
-  pnpm_node_modules:
+  bun_node_modules:
 
   # #endif
   postgres_data:
