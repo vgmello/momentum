@@ -16,6 +16,9 @@ CREATE TABLE IF NOT EXISTS main.invoices (
     PRIMARY KEY (tenant_id, invoice_id)
 );
 
+-- Example: ALTER TABLE changeset demonstrating how to add columns to an existing table.
+-- These columns already exist in the CREATE TABLE above, but this shows the Liquibase
+-- pattern for evolving a schema over time with separate changesets.
 --changeset dev_user:"add amount and other fields to invoices table"
 ALTER TABLE main.invoices
 ADD COLUMN IF NOT EXISTS amount DECIMAL(18, 2),
@@ -46,3 +49,9 @@ WHERE cashier_id IS NOT NULL;
 -- Index for querying invoices by created date
 CREATE INDEX IF NOT EXISTS idx_invoices_created_date
 ON main.invoices(tenant_id, created_date_utc);
+
+--changeset dev_user:"add foreign key constraint for cashier"
+ALTER TABLE main.invoices
+ADD CONSTRAINT fk_invoices_cashier
+    FOREIGN KEY (tenant_id, cashier_id)
+    REFERENCES main.cashiers(tenant_id, cashier_id);

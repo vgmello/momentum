@@ -58,8 +58,7 @@ public class CreateInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE main.invoices;");
-        await connection.ExecuteAsync("TRUNCATE TABLE main.cashiers;");
+        await connection.ExecuteAsync("TRUNCATE TABLE main.invoices, main.cashiers CASCADE;");
 
         // Create a cashier first
         var cashierId = Guid.NewGuid();

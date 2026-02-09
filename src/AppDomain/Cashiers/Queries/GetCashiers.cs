@@ -7,8 +7,8 @@ namespace AppDomain.Cashiers.Queries;
 /// </summary>
 /// <param name="TenantId">Unique identifier for the tenant</param>
 /// <param name="Offset">Number of records to skip for pagination (default: 0)</param>
-/// <param name="Limit">Maximum number of records to return (default: 1000)</param>
-public record GetCashiersQuery(Guid TenantId, int Offset = 0, int Limit = 1000) : IQuery<IEnumerable<GetCashiersQuery.Result>>
+/// <param name="Limit">Maximum number of records to return (default: 100)</param>
+public record GetCashiersQuery(Guid TenantId, int Offset = 0, int Limit = 100) : IQuery<IEnumerable<GetCashiersQuery.Result>>
 {
     /// <summary>
     ///     Represents a cashier result with essential information.
@@ -53,6 +53,6 @@ public static partial class GetCashiersQueryHandler
         var dbQuery = new DbQuery(query.TenantId, query.Limit, query.Offset);
         var cashiers = await messaging.InvokeQueryAsync(dbQuery, cancellationToken);
 
-        return cashiers.Select(c => new GetCashiersQuery.Result(c.TenantId, c.CashierId, c.Name, c.Email ?? "N/A"));
+        return cashiers.Select(c => new GetCashiersQuery.Result(c.TenantId, c.CashierId, c.Name, c.Email ?? string.Empty));
     }
 }

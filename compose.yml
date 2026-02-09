@@ -114,7 +114,7 @@ services:
   # #endif
   # Aspire Dashboard
   aspire-dashboard:
-    image: mcr.microsoft.com/dotnet/aspire-dashboard:9.4
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:13
     profiles: [ "aspire" ]
     ports:
       - "18100:18888"

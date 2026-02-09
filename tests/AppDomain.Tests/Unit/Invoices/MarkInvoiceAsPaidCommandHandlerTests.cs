@@ -9,7 +9,7 @@ namespace AppDomain.Tests.Unit.Invoices;
 
 public class MarkInvoiceAsPaidCommandHandlerTests
 {
-    [Fact(Skip = "Not ready yet")]
+    [Fact]
     public async Task Handle_WithValidInvoice_ShouldMarkAsPaidAndReturnResult()
     {
         // Arrange
@@ -26,6 +26,8 @@ public class MarkInvoiceAsPaidCommandHandlerTests
             Name = "Test Invoice",
             Status = "Paid",
             Amount = amountPaid,
+            AmountPaid = amountPaid,
+            PaymentDate = paymentDate,
             Currency = "USD",
             CreatedDateUtc = DateTime.UtcNow,
             UpdatedDateUtc = DateTime.UtcNow
@@ -64,7 +66,7 @@ public class MarkInvoiceAsPaidCommandHandlerTests
             Arg.Any<CancellationToken>());
     }
 
-    [Fact(Skip = "Not ready yet")]
+    [Fact]
     public async Task Handle_WithNullPaymentDate_ShouldUseUtcNow()
     {
         // Arrange
@@ -72,6 +74,7 @@ public class MarkInvoiceAsPaidCommandHandlerTests
         var tenantId = Guid.NewGuid();
         var invoiceId = Guid.NewGuid();
         const decimal amountPaid = 100.00m;
+        var now = DateTime.UtcNow;
 
         var mockInvoice = new AppDomain.Invoices.Data.Entities.Invoice
         {
@@ -80,9 +83,11 @@ public class MarkInvoiceAsPaidCommandHandlerTests
             Name = "Test Invoice",
             Status = "Paid",
             Amount = amountPaid,
+            AmountPaid = amountPaid,
+            PaymentDate = now,
             Currency = "USD",
-            CreatedDateUtc = DateTime.UtcNow,
-            UpdatedDateUtc = DateTime.UtcNow
+            CreatedDateUtc = now,
+            UpdatedDateUtc = now
         };
 
         messagingMock.InvokeCommandAsync(

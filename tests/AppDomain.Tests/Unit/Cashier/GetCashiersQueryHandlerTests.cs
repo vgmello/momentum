@@ -22,7 +22,7 @@ public class GetCashiersQueryHandlerTests
             new() { TenantId = tenantId, CashierId = Guid.NewGuid(), Name = "Cashier 2", Email = "cashier2@test.com" }
         };
 
-        var expectedResults = cashierEntities.Select(c => new GetCashiersQuery.Result(c.TenantId, c.CashierId, c.Name, c.Email ?? "N/A"))
+        var expectedResults = cashierEntities.Select(c => new GetCashiersQuery.Result(c.TenantId, c.CashierId, c.Name, c.Email ?? string.Empty))
             .ToList();
 
         var messagingMock = Substitute.For<IMessageBus>();
@@ -64,7 +64,7 @@ public class GetCashiersQueryHandlerTests
         await messagingMock.Received(1).InvokeQueryAsync(
             Arg.Is<GetCashiersQueryHandler.DbQuery>(dbQuery =>
                 dbQuery.TenantId == tenantId &&
-                dbQuery.Limit == 1000 &&
+                dbQuery.Limit == 100 &&
                 dbQuery.Offset == 0),
             Arg.Any<CancellationToken>());
     }

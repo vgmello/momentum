@@ -181,10 +181,10 @@
           {
             "name": "Limit",
             "in": "query",
-            "description": "Maximum number of cashiers to return (1-1000).",
+            "description": "Maximum number of cashiers to return (1-100).",
             "required": true,
             "schema": {
-              "maximum": 1000,
+              "maximum": 100,
               "minimum": 1,
               "pattern": "^-?(?:0|[1-9]\\d*)$",
               "type": [

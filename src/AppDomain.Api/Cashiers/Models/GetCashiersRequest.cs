@@ -10,10 +10,10 @@ namespace AppDomain.Api.Cashiers.Models;
 public record GetCashiersRequest
 {
     /// <summary>
-    ///     Maximum number of cashiers to return (1-1000).
+    ///     Maximum number of cashiers to return (1-100).
     /// </summary>
-    [Range(1, 1000)]
-    public int Limit { get; init; } = 1000;
+    [Range(1, 100)]
+    public int Limit { get; init; } = 100;
 
     /// <summary>
     ///     Number of cashiers to skip for pagination.
