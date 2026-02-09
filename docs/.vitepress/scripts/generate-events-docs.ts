@@ -68,7 +68,7 @@ try {
 
     if (!patternsArg) {
         log('Usage: tsx generate-events-docs.ts <glob-patterns>');
-        log('Example: tsx generate-events-docs.ts "../src/**/bin/**/Reservations*.dll"');
+        log('Example: tsx generate-events-docs.ts "../src/**/bin/**/AppDomain*.dll"');
         log('Multiple: tsx generate-events-docs.ts "pattern1.dll,pattern2.dll"');
         process.exit(1);
     }

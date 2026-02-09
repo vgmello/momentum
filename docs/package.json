@@ -12,7 +12,7 @@
     "docs:preview": "vitepress preview",
     "docs:dotnet": "bun .vitepress/scripts/docs-dotnet.ts",
     "docs:adr": "bun .vitepress/scripts/adrlogs-table-gen.ts",
-    "docs:events": "bun .vitepress/scripts/generate-events-docs.ts \"../src/Reservations.Contracts/bin/**/Reservations.Contracts.dll\""
+    "docs:events": "bun .vitepress/scripts/generate-events-docs.ts \"../src/AppDomain.Contracts/bin/**/AppDomain.Contracts.dll\""
   },
   "dependencies": {
     "glob": "^11.0.3",
