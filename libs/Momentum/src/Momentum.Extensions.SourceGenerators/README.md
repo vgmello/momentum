@@ -583,14 +583,14 @@ The source generator includes compile-time analyzers that validate your DbComman
 
 | ID | Severity | Description |
 |----|----------|-------------|
-| DB_COMMAND_GEN001 | Warning | NonQuery attribute used with non-int result type. NonQuery is only valid for `ICommand<int>`. |
-| DB_COMMAND_GEN002 | Error | Command specifies sp/sql/fn but doesn't implement `ICommand<T>` or `IQuery<T>`. Handler cannot be generated without a result type. |
-| DB_COMMAND_GEN003 | Error | Multiple command properties specified. The properties `sp`, `sql`, and `fn` are mutually exclusive. |
+| MMT001 | Warning | NonQuery attribute used with non-int result type. NonQuery is only valid for `ICommand<int>`. |
+| MMT002 | Error | Command specifies sp/sql/fn but doesn't implement `ICommand<T>` or `IQuery<T>`. Handler cannot be generated without a result type. |
+| MMT003 | Error | Multiple command properties specified. The properties `sp`, `sql`, and `fn` are mutually exclusive. |
 
 **Example Fixes:**
 
 ```csharp
-// DB_COMMAND_GEN001: NonQuery with non-int result
+// MMT001: NonQuery with non-int result
 // ❌ Warning: NonQuery should be used with ICommand<int>
 [DbCommand(sp: "create_user", nonQuery: true)]
 public partial record CreateUserCommand(string Name) : ICommand<User>;
@@ -599,7 +599,7 @@ public partial record CreateUserCommand(string Name) : ICommand<User>;
 [DbCommand(sp: "create_user", nonQuery: true)]
 public partial record CreateUserCommand(string Name) : ICommand<int>;
 
-// DB_COMMAND_GEN002: Missing interface
+// MMT002: Missing interface
 // ❌ Error: Handler cannot be generated
 [DbCommand(sp: "create_user")]
 public partial record CreateUserCommand(string Name);
@@ -608,7 +608,7 @@ public partial record CreateUserCommand(string Name);
 [DbCommand(sp: "create_user")]
 public partial record CreateUserCommand(string Name) : ICommand<int>;
 
-// DB_COMMAND_GEN003: Mutually exclusive properties
+// MMT003: Mutually exclusive properties
 // ❌ Error: Cannot specify both sp and sql
 [DbCommand(sp: "create_user", sql: "INSERT INTO users...")]
 public partial record CreateUserCommand(string Name) : ICommand<int>;

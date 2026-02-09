@@ -83,7 +83,7 @@ namespace Momentum.Extensions.SourceGenerators.DbCommand;
 ///         <item>Minimal allocations during analysis</item>
 ///     </list>
 /// </remarks>
-internal sealed class DbCommandTypeInfoSourceGen : DbCommandTypeInfo
+internal sealed class DbCommandTypeInfoSourceGen : DbCommandTypeInfo, IEquatable<DbCommandTypeInfoSourceGen>
 {
     internal static string DbCommandAttributeFullName { get; } = typeof(DbCommandAttribute).FullName!;
 
@@ -119,7 +119,12 @@ internal sealed class DbCommandTypeInfoSourceGen : DbCommandTypeInfo
         Namespace = typeSymbol.ContainingNamespace.IsGlobalNamespace ? null : typeSymbol.ContainingNamespace.ToDisplayString();
         DbProperties = GetDbCommandObjProperties(typeSymbol, DbCommandAttribute.ParamsCase, settings);
         ResultType = GetDbCommandResultInfo(typeSymbol);
-        ParentTypes = typeSymbol.GetContainingTypesTree();
+        ParentTypes = typeSymbol.GetContainingTypesTree()
+            .Select(t => new ContainingTypeInfo(
+                t.GetTypeDeclaration(),
+                t.GetQualifiedName(),
+                t.ContainingNamespace.IsGlobalNamespace))
+            .ToImmutableArray();
         DiagnosticsToReport = ExecuteAnalyzers(typeSymbol);
     }
 
@@ -128,7 +133,7 @@ internal sealed class DbCommandTypeInfoSourceGen : DbCommandTypeInfo
     ///     These diagnostics are reported back to the compilation process and shown to developers.
     /// </summary>
     /// <value>
-    ///     An immutable list of Roslyn Diagnostic objects representing validation results.
+    ///     An immutable array of Roslyn Diagnostic objects representing validation results.
     ///     Empty if no issues were found during analysis.
     /// </value>
     /// <remarks>
@@ -140,7 +145,7 @@ internal sealed class DbCommandTypeInfoSourceGen : DbCommandTypeInfo
     ///         <item><strong>Type Compatibility:</strong> Validates that return types are compatible with database operations</item>
     ///     </list>
     /// </remarks>
-    public ImmutableList<Diagnostic> DiagnosticsToReport { get; }
+    public ImmutableArray<Diagnostic> DiagnosticsToReport { get; }
 
     /// <summary>
     ///     Gets a value indicating whether any error-level diagnostics were generated during analysis.
@@ -166,15 +171,50 @@ internal sealed class DbCommandTypeInfoSourceGen : DbCommandTypeInfo
     /// </remarks>
     public bool HasErrors => DiagnosticsToReport.Any(d => d.Severity == DiagnosticSeverity.Error);
 
-    private ImmutableList<Diagnostic> ExecuteAnalyzers(INamedTypeSymbol typeSymbol)
+    public bool Equals(DbCommandTypeInfoSourceGen? other)
     {
-        var diagnostics = new List<Diagnostic>();
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+
+        return TypeName == other.TypeName
+               && QualifiedTypeName == other.QualifiedTypeName
+               && TypeDeclaration == other.TypeDeclaration
+               && Namespace == other.Namespace
+               && DbCommandAttribute.Sp == other.DbCommandAttribute.Sp
+               && DbCommandAttribute.Sql == other.DbCommandAttribute.Sql
+               && DbCommandAttribute.Fn == other.DbCommandAttribute.Fn
+               && DbCommandAttribute.ParamsCase == other.DbCommandAttribute.ParamsCase
+               && DbCommandAttribute.NonQuery == other.DbCommandAttribute.NonQuery
+               && DbCommandAttribute.DataSource == other.DbCommandAttribute.DataSource
+               && ResultType == other.ResultType
+               && DbProperties.SequenceEqual(other.DbProperties)
+               && ParentTypes.SequenceEqual(other.ParentTypes);
+    }
+
+    public override bool Equals(object? obj) => Equals(obj as DbCommandTypeInfoSourceGen);
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            var hash = 17;
+            hash = hash * 31 + (TypeName?.GetHashCode() ?? 0);
+            hash = hash * 31 + (QualifiedTypeName?.GetHashCode() ?? 0);
+            hash = hash * 31 + (Namespace?.GetHashCode() ?? 0);
+            hash = hash * 31 + DbCommandAttribute.ParamsCase.GetHashCode();
+            return hash;
+        }
+    }
+
+    private ImmutableArray<Diagnostic> ExecuteAnalyzers(INamedTypeSymbol typeSymbol)
+    {
+        var diagnostics = ImmutableArray.CreateBuilder<Diagnostic>();
 
         DbCommandAnalyzers.ExecuteMissingInterfaceAnalyzer(typeSymbol, ResultType, DbCommandAttribute, diagnostics);
         DbCommandAnalyzers.ExecuteNonQueryWithNonIntegralResultAnalyzer(typeSymbol, ResultType, DbCommandAttribute, diagnostics);
         DbCommandAnalyzers.ExecuteMutuallyExclusivePropertiesAnalyzer(typeSymbol, DbCommandAttribute, diagnostics);
 
-        return diagnostics.ToImmutableList();
+        return diagnostics.ToImmutable();
     }
 
     private static DbCommandAttribute GetDbCommandAttribute(INamedTypeSymbol typeSymbol)
@@ -200,13 +240,13 @@ internal sealed class DbCommandTypeInfoSourceGen : DbCommandTypeInfo
     private static ResultTypeInfo? GetDbCommandResultInfo(INamedTypeSymbol typeSymbol)
     {
         var commandInterface = typeSymbol.AllInterfaces.FirstOrDefault(it =>
-            it.OriginalDefinition.ToDisplayString().StartsWith(CommandInterfaceFullName));
+            it.OriginalDefinition.ToDisplayString() == CommandInterfaceFullName);
 
         if (commandInterface is not null)
             return GetResultInfo(commandInterface);
 
         var queryInterface = typeSymbol.AllInterfaces.FirstOrDefault(it =>
-            it.OriginalDefinition.ToDisplayString().StartsWith(QueryInterfaceFullName));
+            it.OriginalDefinition.ToDisplayString() == QueryInterfaceFullName);
 
         return queryInterface is not null ? GetResultInfo(queryInterface) : null;
     }

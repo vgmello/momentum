@@ -12,7 +12,7 @@ namespace Momentum.Extensions.SourceGenerators.DbCommand;
 /// <remarks>
 ///     <!--@include: @code/source-generation/dbcommand-generator-detailed.md#generator-capabilities -->
 /// </remarks>
-[Generator]
+[Generator(LanguageNames.CSharp)]
 public class DbCommandSourceGenerator : IIncrementalGenerator
 {
     /// <summary>
@@ -40,7 +40,10 @@ public class DbCommandSourceGenerator : IIncrementalGenerator
 
         context.RegisterSourceOutput(commandTypes, static (spc, dbCommandTypeInfo) =>
         {
-            dbCommandTypeInfo.DiagnosticsToReport.ForEach(spc.ReportDiagnostic);
+            foreach (var diagnostic in dbCommandTypeInfo.DiagnosticsToReport)
+            {
+                spc.ReportDiagnostic(diagnostic);
+            }
 
             // Only proceed with generation if there are no errors
             if (dbCommandTypeInfo.HasErrors)
@@ -96,6 +99,6 @@ public class DbCommandSourceGenerator : IIncrementalGenerator
 
         var parentType = dbCommandTypeInfo.ParentTypes.Last();
 
-        return parentType.GetQualifiedName().GetFileName(parentType.ContainingNamespace.IsGlobalNamespace);
+        return parentType.QualifiedName.GetFileName(parentType.IsGlobalNamespace);
     }
 }

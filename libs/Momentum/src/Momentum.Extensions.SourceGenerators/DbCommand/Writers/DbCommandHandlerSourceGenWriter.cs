@@ -14,7 +14,7 @@ internal sealed class DbCommandHandlerSourceGenWriter : SourceGenBaseWriter
     {
         var returnTypeDeclaration = dbCommandTypeInfo.ResultType is null
             ? "global::System.Threading.Tasks.Task"
-            : $"global::System.Threading.Tasks.Task<{dbCommandTypeInfo.ResultType!.QualifiedTypeName}>";
+            : $"global::System.Threading.Tasks.Task<{dbCommandTypeInfo.ResultType.QualifiedTypeName}>";
 
         var dapperCall = CreateDapperCall(dbCommandTypeInfo.ResultType, dbCommandTypeInfo);
 
@@ -108,7 +108,7 @@ internal sealed class DbCommandHandlerSourceGenWriter : SourceGenBaseWriter
                 : $"ExecuteScalarAsync<{resultTypeInfo.GenericArgumentResultFullTypeName}>";
         }
 
-        // ICommand<IEnumerable<TResul>>
+        // ICommand<IEnumerable<TResult>>
         if (resultTypeInfo.IsEnumerableResult)
         {
             return $"QueryAsync<{resultTypeInfo.GenericArgumentResultFullTypeName}>";

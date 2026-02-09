@@ -213,7 +213,15 @@ internal abstract class DbCommandTypeInfo(
 
     public bool ImplementsICommandInterface => ResultType is not null;
 
-    public ImmutableArray<INamedTypeSymbol> ParentTypes { get; protected init; }
+    /// <summary>
+    ///     Represents metadata about a containing (parent) type for nested type generation.
+    /// </summary>
+    /// <param name="TypeDeclaration">The type declaration string (e.g., "public partial class ParentType").</param>
+    /// <param name="QualifiedName">The fully qualified type name.</param>
+    /// <param name="IsGlobalNamespace">True if the containing type is in the global namespace.</param>
+    internal record ContainingTypeInfo(string TypeDeclaration, string QualifiedName, bool IsGlobalNamespace);
+
+    public ImmutableArray<ContainingTypeInfo> ParentTypes { get; protected init; }
 
     public bool IsNestedType => ParentTypes.Length > 0;
 

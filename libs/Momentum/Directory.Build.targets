@@ -1,10 +1,18 @@
 <Project>
     <Target Name="CleanOldPackages" BeforeTargets="Build;Clean" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' ">
+        <PropertyGroup>
+            <_PackageIdPattern>^$([System.Text.RegularExpressions.Regex]::Escape($(PackageId)))\.\d</_PackageIdPattern>
+        </PropertyGroup>
         <ItemGroup>
             <OldPackagesToDelete Include="$(TargetDir)../*.*upkg"/>
-            <OldPackagesToDelete Include="$(MSBuildThisFileDirectory).local/nuget/$(PackageId).*.nupkg"/>
+            <!-- Use regex to match only this exact PackageId followed by a version (digit),
+                 avoiding deletion of similarly-prefixed packages (e.g. Momentum.ServiceDefaults
+                 must not delete Momentum.ServiceDefaults.Api) -->
+            <_FeedCandidates Include="$(MSBuildThisFileDirectory).local/nuget/$(PackageId).*.*upkg"/>
+            <OldPackagesToDelete Include="@(_FeedCandidates)"
+                Condition="$([System.Text.RegularExpressions.Regex]::IsMatch('%(Filename)', '$(_PackageIdPattern)'))" />
         </ItemGroup>
-        <Message Text="Cleaning up $(ProjectName) nupkg files ($(PackageId).*.nupkg). Target: $(TargetDir)" Importance="high"/>
+        <Message Text="Cleaning up $(ProjectName) nupkg files. Target: $(TargetDir)" Importance="high"/>
         <Delete Files="@(OldPackagesToDelete)"/>
     </Target>
 
@@ -14,6 +22,13 @@
         </PropertyGroup>
         <WriteLinesToFile File="$(MSBuildThisFileDirectory)../../local-feed-path.txt" Lines="$(LocalFeedAbsolutePath)" Overwrite="true" />
         <Message Text="Wrote local feed path: $(LocalFeedAbsolutePath)" Importance="high" />
+    </Target>
+
+    <Target Name="ClearNuGetCache" BeforeTargets="PushToLocalFeed" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug'">
+        <PropertyGroup>
+            <_NuGetCachePath>$([System.IO.Path]::Combine('$(NuGetPackageRoot)', '$(PackageId.ToLowerInvariant())', '$(PackageVersion)'))</_NuGetCachePath>
+        </PropertyGroup>
+        <RemoveDir Directories="$(_NuGetCachePath)" Condition="Exists('$(_NuGetCachePath)')"/>
     </Target>
 
     <Target Name="PushToLocalFeed" AfterTargets="Pack" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug'">

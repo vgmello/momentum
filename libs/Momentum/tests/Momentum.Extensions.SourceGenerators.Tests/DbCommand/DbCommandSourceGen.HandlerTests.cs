@@ -227,7 +227,7 @@ public class DbCommandSourceGenHandlerTests : DbCommandSourceGenTestsBase
         var (_, diagnostics) = TestHelpers.GetGeneratedSources<DbCommandSourceGenerator>(SourceImports + source);
 
         // Assert
-        diagnostics.ShouldContain(d => d.Severity == DiagnosticSeverity.Error && d.Id == "DB_COMMAND_GEN003");
+        diagnostics.ShouldContain(d => d.Severity == DiagnosticSeverity.Error && d.Id == "MMT003");
         diagnostics.Length.ShouldBe(1);
     }
 
@@ -243,7 +243,7 @@ public class DbCommandSourceGenHandlerTests : DbCommandSourceGenTestsBase
         var (_, diagnostics) = TestHelpers.GetGeneratedSources<DbCommandSourceGenerator>(SourceImports + source);
 
         // Assert
-        diagnostics.ShouldContain(d => d.Severity == DiagnosticSeverity.Error && d.Id == "DB_COMMAND_GEN003");
+        diagnostics.ShouldContain(d => d.Severity == DiagnosticSeverity.Error && d.Id == "MMT003");
         diagnostics.Length.ShouldBe(1);
     }
 

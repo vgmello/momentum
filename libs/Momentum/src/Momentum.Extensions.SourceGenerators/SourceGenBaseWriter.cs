@@ -1,6 +1,6 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-using Momentum.Extensions.SourceGenerators.Extensions;
+using Momentum.Extensions.SourceGenerators.DbCommand;
 using System.Collections.Immutable;
 using System.Text;
 
@@ -17,11 +17,11 @@ internal abstract class SourceGenBaseWriter
     /// </summary>
     /// <param name="sb">The StringBuilder to append to.</param>
     /// <param name="containingTypes">The hierarchy of parent types, ordered from outermost to innermost.</param>
-    protected static void AppendContainingTypeStarts(StringBuilder sb, ImmutableArray<INamedTypeSymbol> containingTypes)
+    protected static void AppendContainingTypeStarts(StringBuilder sb, ImmutableArray<DbCommandTypeInfo.ContainingTypeInfo> containingTypes)
     {
         foreach (var type in containingTypes)
         {
-            sb.AppendLine(type.GetTypeDeclaration());
+            sb.AppendLine(type.TypeDeclaration);
             sb.AppendLine("{");
         }
     }
@@ -31,7 +31,7 @@ internal abstract class SourceGenBaseWriter
     /// </summary>
     /// <param name="sb">The StringBuilder to append to.</param>
     /// <param name="containingTypes">The hierarchy of parent types.</param>
-    protected static void AppendContainingTypeEnds(StringBuilder sb, ImmutableArray<INamedTypeSymbol> containingTypes)
+    protected static void AppendContainingTypeEnds(StringBuilder sb, ImmutableArray<DbCommandTypeInfo.ContainingTypeInfo> containingTypes)
     {
         for (var i = 0; i < containingTypes.Length; i++)
         {
