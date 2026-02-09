@@ -22,6 +22,9 @@ public class FluentValidationPolicy : IHandlerPolicy
         var validatorInterface = typeof(IValidator<>).MakeGenericType(chain.MessageType);
         var registeredValidators = container.RegistrationsFor(validatorInterface);
 
+        if (registeredValidators.Count == 0)
+            return;
+
         var methodName = registeredValidators.Count == 1
             ? nameof(FluentValidationExecutor.ExecuteOne)
             : nameof(FluentValidationExecutor.ExecuteMany);

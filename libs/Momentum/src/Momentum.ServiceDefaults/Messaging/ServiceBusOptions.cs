@@ -1,8 +1,6 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Momentum.Extensions.Abstractions.Extensions;
 using System.Text.RegularExpressions;
@@ -106,15 +104,15 @@ public partial class ServiceBusOptions
     /// <remarks>
     ///     See <see cref="ServiceBusOptions" /> for detailed configuration information.
     /// </remarks>
-    public partial class Configurator(ILogger<Configurator> logger, IHostEnvironment env, IConfiguration config)
+    public partial class Configurator(IHostEnvironment env)
         : IPostConfigureOptions<ServiceBusOptions>
     {
         // Valid service name: lowercase alphanumeric with hyphens (kebab-case)
-        [GeneratedRegex(@"^[a-z0-9]+(-[a-z0-9]+)*$", RegexOptions.Compiled)]
+        [GeneratedRegex(@"^[a-z0-9]+(-[a-z0-9]+)*$")]
         private static partial Regex ServiceNameValidationRegex();
 
         // Valid domain name: alphanumeric starting with a letter (PascalCase or simple)
-        [GeneratedRegex(@"^[A-Za-z][A-Za-z0-9]*$", RegexOptions.Compiled)]
+        [GeneratedRegex(@"^[A-Za-z][A-Za-z0-9]*$")]
         private static partial Regex DomainNameValidationRegex();
 
         /// <summary>
@@ -160,14 +158,6 @@ public partial class ServiceBusOptions
                 throw new InvalidOperationException($"Failed to create valid URN from path: {urnPath}");
 
             options.ServiceUrn = serviceUrn;
-
-            var connectionString = config.GetConnectionString(SectionName);
-
-            if (string.IsNullOrWhiteSpace(connectionString))
-            {
-                logger.LogWarning("ConnectionStrings:ServiceBus is not set. " +
-                                  "Transactional Inbox/Outbox and Message Persistence features disabled");
-            }
         }
 
         private static string GetServiceName(string appName) => appName.ToLowerInvariant().Replace('.', '-');

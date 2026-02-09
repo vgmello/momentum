@@ -291,15 +291,15 @@ function Test-Template {
                 $testOut = Join-Path -Path $tempDir -ChildPath "03-test-stdout.log"
                 $testErr = Join-Path -Path $tempDir -ChildPath "03-test-stderr.log"
 
-                # Exclude E2E tests by filtering out tests with Type=E2E trait
-                $testArgs = @('test', '--verbosity', 'normal', '--filter', 'Type!=E2E')
+                # Exclude E2E and Integration tests (require Docker/Testcontainers infrastructure)
+                $testArgs = @('test', '--verbosity', 'normal', '--filter', 'Type!=E2E&Type!=Integration')
 
                 $testProcess = Start-Process -FilePath 'dotnet' -ArgumentList $testArgs `
                     -NoNewWindow -Wait -PassThru `
                     -RedirectStandardOutput $testOut -RedirectStandardError $testErr
 
                 if ($testProcess.ExitCode -eq 0) {
-                    Write-ColoredMessage -Level 'SUCCESS' -Message "[$TestCategory] $Name`: Tests passed (E2E tests excluded)"
+                    Write-ColoredMessage -Level 'SUCCESS' -Message "[$TestCategory] $Name`: Tests passed (E2E and Integration tests excluded)"
                 }
                 else {
                     $testOutput = Get-Content $testErr -Raw -ErrorAction SilentlyContinue

@@ -34,7 +34,7 @@ public class HealthCheckStatusStore
     /// </remarks>
     public HealthStatus LastHealthStatus
     {
-        get => (HealthStatus)Interlocked.CompareExchange(ref _lastHealthStatus, 0, 0);
+        get => (HealthStatus)Volatile.Read(ref _lastHealthStatus);
         set => Interlocked.Exchange(ref _lastHealthStatus, (int)value);
     }
 }

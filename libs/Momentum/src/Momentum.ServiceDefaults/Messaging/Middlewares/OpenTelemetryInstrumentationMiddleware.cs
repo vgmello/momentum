@@ -82,7 +82,7 @@ public static class OpenTelemetryInstrumentationMiddleware
             activity.SetTag("error.type", envelope.Failure.GetType().Name);
         }
 
-        activity.Stop();
+        activity.Dispose();
     }
 
     private static bool IsCommand(object message) =>
