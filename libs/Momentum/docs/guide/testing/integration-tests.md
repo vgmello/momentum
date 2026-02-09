@@ -77,7 +77,7 @@ public class IntegrationTestFixture : IAsyncLifetime
 
         // Run database migrations
         await RunMigrationsAsync();
-        
+
         // Wait for Kafka to be ready
         await WaitForKafkaAsync();
     }
@@ -101,7 +101,7 @@ public class IntegrationTestFixture : IAsyncLifetime
     {
         using var scope = Services.CreateScope();
         var producer = scope.ServiceProvider.GetRequiredService<IProducer<Null, string>>();
-        
+
         // Test Kafka connectivity
         var retries = 10;
         while (retries > 0)
@@ -116,7 +116,7 @@ public class IntegrationTestFixture : IAsyncLifetime
             {
                 // Kafka not ready yet
             }
-            
+
             retries--;
             await Task.Delay(1000);
         }
@@ -132,7 +132,7 @@ Create mock services for testing:
 public class TestEmailService : IEmailService
 {
     private readonly List<EmailMessage> _sentEmails = new();
-    
+
     public IReadOnlyList<EmailMessage> SentEmails => _sentEmails.AsReadOnly();
 
     public Task SendEmailAsync(string to, string subject, string body, CancellationToken cancellationToken = default)
@@ -183,7 +183,7 @@ public class CashierApiTests : IClassFixture<IntegrationTestFixture>
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Created);
-        
+
         var createdCashier = await response.Content.ReadFromJsonAsync<Cashier>();
         createdCashier.Should().NotBeNull();
         createdCashier!.TenantId.Should().Be(tenantId);
@@ -210,7 +210,7 @@ public class CashierApiTests : IClassFixture<IntegrationTestFixture>
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        
+
         var cashier = await response.Content.ReadFromJsonAsync<Cashier>();
         cashier.Should().NotBeNull();
         cashier!.Id.Should().Be(createdCashier.Id);
@@ -232,7 +232,7 @@ public class CashierApiTests : IClassFixture<IntegrationTestFixture>
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        
+
         var errorResponse = await response.Content.ReadAsStringAsync();
         errorResponse.Should().Contain("Cashier not found");
     }
@@ -243,17 +243,17 @@ public class CashierApiTests : IClassFixture<IntegrationTestFixture>
         // Arrange
         var tenantId = Guid.NewGuid();
         var createdCashier = await CreateTestCashierAsync(tenantId, "Original Name", "original@example.com");
-        
+
         var updateRequest = new UpdateCashierRequest("Updated Name", "updated@example.com");
 
         // Act
         var response = await _client.PutAsJsonAsync(
-            $"/api/cashiers/{createdCashier.Id}?tenantId={tenantId}", 
+            $"/api/cashiers/{createdCashier.Id}?tenantId={tenantId}",
             updateRequest);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        
+
         var updatedCashier = await response.Content.ReadFromJsonAsync<Cashier>();
         updatedCashier.Should().NotBeNull();
         updatedCashier!.Id.Should().Be(createdCashier.Id);
@@ -296,7 +296,7 @@ public class CashierApiTests : IClassFixture<IntegrationTestFixture>
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        
+
         var errorContent = await response.Content.ReadAsStringAsync();
         errorContent.Should().Contain("TenantId");
         errorContent.Should().Contain("Name");
@@ -308,7 +308,7 @@ public class CashierApiTests : IClassFixture<IntegrationTestFixture>
         var createRequest = new CreateCashierRequest(tenantId, name, email);
         var response = await _client.PostAsJsonAsync("/api/cashiers", createRequest);
         response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<Cashier>() 
+        return await response.Content.ReadFromJsonAsync<Cashier>()
                ?? throw new InvalidOperationException("Failed to create test cashier");
     }
 }
@@ -333,7 +333,7 @@ public class CashierListApiTests : IClassFixture<IntegrationTestFixture>
     {
         // Arrange
         var tenantId = Guid.NewGuid();
-        
+
         // Create test data
         var cashiers = new[]
         {
@@ -348,7 +348,7 @@ public class CashierListApiTests : IClassFixture<IntegrationTestFixture>
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        
+
         var pagedResult = await response.Content.ReadFromJsonAsync<PagedResult<Cashier>>();
         pagedResult.Should().NotBeNull();
         pagedResult!.Items.Should().HaveCount(2);
@@ -356,7 +356,7 @@ public class CashierListApiTests : IClassFixture<IntegrationTestFixture>
         pagedResult.Page.Should().Be(1);
         pagedResult.PageSize.Should().Be(2);
         pagedResult.TotalPages.Should().Be(2);
-        
+
         // Should be ordered by name
         pagedResult.Items[0].Name.Should().Be("Alice Johnson");
         pagedResult.Items[1].Name.Should().Be("Bob Smith");
@@ -367,7 +367,7 @@ public class CashierListApiTests : IClassFixture<IntegrationTestFixture>
     {
         // Arrange
         var tenantId = Guid.NewGuid();
-        
+
         await CreateTestCashierAsync(tenantId, "John Doe", "john@example.com");
         await CreateTestCashierAsync(tenantId, "Jane Smith", "jane@example.com");
         await CreateTestCashierAsync(tenantId, "Johnny Walker", "johnny@example.com");
@@ -378,7 +378,7 @@ public class CashierListApiTests : IClassFixture<IntegrationTestFixture>
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        
+
         var searchResults = await response.Content.ReadFromJsonAsync<List<Cashier>>();
         searchResults.Should().NotBeNull();
         searchResults.Should().HaveCount(2);
@@ -392,7 +392,7 @@ public class CashierListApiTests : IClassFixture<IntegrationTestFixture>
         var createRequest = new CreateCashierRequest(tenantId, name, email);
         var response = await _client.PostAsJsonAsync("/api/cashiers", createRequest);
         response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<Cashier>() 
+        return await response.Content.ReadFromJsonAsync<Cashier>()
                ?? throw new InvalidOperationException("Failed to create test cashier");
     }
 }
@@ -433,7 +433,7 @@ public class CashierDatabaseTests : IClassFixture<IntegrationTestFixture>
         // Verify in database
         var cashier = await db.Cashiers
             .FirstOrDefaultAsync(c => c.CashierId == result.Value.Id);
-        
+
         cashier.Should().NotBeNull();
         cashier!.TenantId.Should().Be(tenantId);
         cashier.Name.Should().Be("Database Test");
@@ -455,24 +455,24 @@ public class CashierDatabaseTests : IClassFixture<IntegrationTestFixture>
         var db = scope.ServiceProvider.GetRequiredService<AppDomainDb>();
 
         var tenantId = Guid.NewGuid();
-        
+
         // Create initial cashier
         var createCommand = new CreateCashierCommand(tenantId, "Original Name", "original@example.com");
         var (createResult, _) = await messageBus.InvokeAsync(createCommand);
         createResult.IsSuccess.Should().BeTrue();
 
         var originalUpdateDate = createResult.Value.UpdatedDate;
-        
+
         // Wait to ensure update timestamp is different
         await Task.Delay(100);
 
         // Act - Update cashier
         var updateCommand = new UpdateCashierCommand(
-            tenantId, 
-            createResult.Value.Id, 
-            "Updated Name", 
+            tenantId,
+            createResult.Value.Id,
+            "Updated Name",
             "updated@example.com");
-            
+
         var (updateResult, updateEvent) = await messageBus.InvokeAsync(updateCommand);
 
         // Assert
@@ -481,7 +481,7 @@ public class CashierDatabaseTests : IClassFixture<IntegrationTestFixture>
         // Verify in database
         var updatedCashier = await db.Cashiers
             .FirstOrDefaultAsync(c => c.CashierId == createResult.Value.Id);
-        
+
         updatedCashier.Should().NotBeNull();
         updatedCashier!.Name.Should().Be("Updated Name");
         updatedCashier.Email.Should().Be("updated@example.com");
@@ -501,7 +501,7 @@ public class CashierDatabaseTests : IClassFixture<IntegrationTestFixture>
         var db = scope.ServiceProvider.GetRequiredService<AppDomainDb>();
 
         var tenantId = Guid.NewGuid();
-        
+
         // Create cashier to delete
         var createCommand = new CreateCashierCommand(tenantId, "To Delete", "delete@example.com");
         var (createResult, _) = await messageBus.InvokeAsync(createCommand);
@@ -518,7 +518,7 @@ public class CashierDatabaseTests : IClassFixture<IntegrationTestFixture>
         // Verify deletion in database
         var deletedCashier = await db.Cashiers
             .FirstOrDefaultAsync(c => c.CashierId == createResult.Value.Id);
-        
+
         deletedCashier.Should().BeNull();
 
         // Verify event
@@ -543,11 +543,11 @@ public class CashierDatabaseTests : IClassFixture<IntegrationTestFixture>
 
         // Act & Assert
         var secondCommand = new CreateCashierCommand(tenantId, "Second User", email);
-        
+
         // Should throw due to unique constraint on email
-        var exception = await Assert.ThrowsAsync<PostgresException>(() => 
+        var exception = await Assert.ThrowsAsync<PostgresException>(() =>
             messageBus.InvokeAsync(secondCommand));
-            
+
         exception.SqlState.Should().Be("23505"); // Unique violation
     }
 }
@@ -576,7 +576,7 @@ public class TransactionIntegrationTests : IClassFixture<IntegrationTestFixture>
 
         // Act & Assert
         await using var transaction = await db.BeginTransactionAsync();
-        
+
         try
         {
             // Step 1: Create cashier (should succeed)
@@ -623,7 +623,7 @@ public class TransactionIntegrationTests : IClassFixture<IntegrationTestFixture>
 
         // Act
         await using var transaction = await db.BeginTransactionAsync();
-        
+
         // Step 1: Create cashier
         var cashier = new Data.Entities.Cashier
         {
@@ -700,7 +700,7 @@ public class EventPublishingTests : IClassFixture<IntegrationTestFixture>
         // Verify event was captured
         var capturedEvents = eventCapture.GetEvents<CashierCreated>();
         capturedEvents.Should().HaveCount(1);
-        
+
         var capturedEvent = capturedEvents.First();
         capturedEvent.TenantId.Should().Be(tenantId);
         capturedEvent.Cashier.Name.Should().Be("Event Test");
@@ -716,7 +716,7 @@ public class EventPublishingTests : IClassFixture<IntegrationTestFixture>
         var eventCapture = scope.ServiceProvider.GetRequiredService<TestEventCapture>();
 
         var tenantId = Guid.NewGuid();
-        
+
         // Create cashier first
         var createCommand = new CreateCashierCommand(tenantId, "Original", "original@example.com");
         var (createResult, _) = await messageBus.InvokeAsync(createCommand);
@@ -726,11 +726,11 @@ public class EventPublishingTests : IClassFixture<IntegrationTestFixture>
 
         // Act - Update cashier
         var updateCommand = new UpdateCashierCommand(
-            tenantId, 
-            createResult.Value.Id, 
-            "Updated", 
+            tenantId,
+            createResult.Value.Id,
+            "Updated",
             "updated@example.com");
-            
+
         var (updateResult, updateEvent) = await messageBus.InvokeAsync(updateCommand);
 
         // Assert
@@ -743,7 +743,7 @@ public class EventPublishingTests : IClassFixture<IntegrationTestFixture>
         // Verify update event was captured
         var capturedEvents = eventCapture.GetEvents<CashierUpdated>();
         capturedEvents.Should().HaveCount(1);
-        
+
         var capturedEvent = capturedEvents.First();
         capturedEvent.TenantId.Should().Be(tenantId);
         capturedEvent.Cashier.Name.Should().Be("Updated");
@@ -821,7 +821,7 @@ public class EventHandlerIntegrationTests : IClassFixture<IntegrationTestFixture
         using var scope = _fixture.Services.CreateScope();
         var messageBus = scope.ServiceProvider.GetRequiredService<IMessageBus>();
         var testEmailService = scope.ServiceProvider.GetRequiredService<IEmailService>() as TestEmailService;
-        
+
         var tenantId = Guid.NewGuid();
 
         // Act - Create multiple cashiers
@@ -891,7 +891,7 @@ public class AuthenticationIntegrationTests : IClassFixture<IntegrationTestFixtu
         var cashier = await CreateTestCashierWithAuthAsync(tenantId, "Auth Test", "auth@example.com");
 
         var token = GenerateTestJwtToken(tenantId, "test-user");
-        _client.DefaultRequestHeaders.Authorization = 
+        _client.DefaultRequestHeaders.Authorization =
             new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
         // Act
@@ -907,12 +907,12 @@ public class AuthenticationIntegrationTests : IClassFixture<IntegrationTestFixtu
         // Arrange
         var tenantId1 = Guid.NewGuid();
         var tenantId2 = Guid.NewGuid();
-        
+
         var cashier = await CreateTestCashierWithAuthAsync(tenantId1, "Tenant Test", "tenant@example.com");
 
         // Create token for different tenant
         var token = GenerateTestJwtToken(tenantId2, "test-user");
-        _client.DefaultRequestHeaders.Authorization = 
+        _client.DefaultRequestHeaders.Authorization =
             new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
         // Act
@@ -926,7 +926,7 @@ public class AuthenticationIntegrationTests : IClassFixture<IntegrationTestFixtu
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes("test-secret-key-that-is-long-enough-for-hmac");
-        
+
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(new[]
@@ -937,10 +937,10 @@ public class AuthenticationIntegrationTests : IClassFixture<IntegrationTestFixtu
             }),
             Expires = DateTime.UtcNow.AddHours(1),
             SigningCredentials = new SigningCredentials(
-                new SymmetricSecurityKey(key), 
+                new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256Signature)
         };
-        
+
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
     }
@@ -950,17 +950,17 @@ public class AuthenticationIntegrationTests : IClassFixture<IntegrationTestFixtu
         // Temporarily use admin token for creation
         var adminToken = GenerateTestJwtToken(tenantId, "admin");
         var originalAuth = _client.DefaultRequestHeaders.Authorization;
-        
+
         try
         {
-            _client.DefaultRequestHeaders.Authorization = 
+            _client.DefaultRequestHeaders.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", adminToken);
-                
+
             var createRequest = new CreateCashierRequest(tenantId, name, email);
             var response = await _client.PostAsJsonAsync("/api/cashiers", createRequest);
             response.EnsureSuccessStatusCode();
-            
-            return await response.Content.ReadFromJsonAsync<Cashier>() 
+
+            return await response.Content.ReadFromJsonAsync<Cashier>()
                    ?? throw new InvalidOperationException("Failed to create test cashier");
         }
         finally
@@ -1009,7 +1009,7 @@ public class PerformanceIntegrationTests : IClassFixture<IntegrationTestFixture>
     {
         // Arrange
         var tenantId = Guid.NewGuid();
-        
+
         // Create large dataset
         var tasks = Enumerable.Range(1, 100)
             .Select(i => CreateTestCashierAsync(tenantId, $"User {i}", $"user{i}@example.com"));
@@ -1023,7 +1023,7 @@ public class PerformanceIntegrationTests : IClassFixture<IntegrationTestFixture>
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         stopwatch.ElapsedMilliseconds.Should().BeLessThan(500); // Less than 500ms
-        
+
         var pagedResult = await response.Content.ReadFromJsonAsync<PagedResult<Cashier>>();
         pagedResult!.Items.Should().HaveCount(20);
         pagedResult.TotalCount.Should().Be(100);
@@ -1056,7 +1056,7 @@ public class PerformanceIntegrationTests : IClassFixture<IntegrationTestFixture>
         var createRequest = new CreateCashierRequest(tenantId, name, email);
         var response = await _client.PostAsJsonAsync("/api/cashiers", createRequest);
         response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<Cashier>() 
+        return await response.Content.ReadFromJsonAsync<Cashier>()
                ?? throw new InvalidOperationException("Failed to create test cashier");
     }
 }
@@ -1102,7 +1102,7 @@ public class TestDataManager
     public async Task CleanupAsync()
     {
         // Clean up in reverse order of dependencies
-        
+
         if (_createdCashiers.Any())
         {
             await _db.Cashiers
@@ -1147,10 +1147,10 @@ public class IntegrationTestWithCleanup : IClassFixture<IntegrationTestFixture>,
         // Test creates data using _testDataManager
         // Data is automatically cleaned up after test
         var cashier = await _testDataManager.CreateTestCashierAsync("Test", "test@example.com");
-        
+
         // Test logic here
         cashier.Should().NotBeNull();
-        
+
         // No manual cleanup needed
     }
 }
@@ -1204,21 +1204,21 @@ on:
 jobs:
   integration-tests:
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '9.0.x'
-    
+        dotnet-version: '10.0.x'
+
     - name: Restore dependencies
       run: dotnet restore
-    
+
     - name: Build
       run: dotnet build --no-restore
-    
+
     - name: Run Integration Tests
       run: |
         dotnet test tests/AppDomain.Tests/ \
@@ -1228,14 +1228,14 @@ jobs:
           --collect:"XPlat Code Coverage" \
           --logger trx \
           --results-directory TestResults/
-    
+
     - name: Upload Test Results
       uses: actions/upload-artifact@v3
       if: always()
       with:
         name: test-results
         path: TestResults/
-    
+
     - name: Upload Coverage Reports
       uses: codecov/codecov-action@v3
       with:
