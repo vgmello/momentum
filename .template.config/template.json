@@ -168,7 +168,7 @@
       "type": "parameter",
       "datatype": "string",
       "description": "Momentum lib version",
-      "defaultValue": "0.0.2",
+      "defaultValue": "__CI_MOMENTUM_VERSION__",
       "replaces": "$(TemplateMomentumVersion)"
     },
     "debug-symbols": {

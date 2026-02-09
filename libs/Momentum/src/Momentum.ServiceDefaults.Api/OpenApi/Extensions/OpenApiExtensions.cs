@@ -1,7 +1,6 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
 using Microsoft.AspNetCore.OpenApi;
-using Microsoft.OpenApi;
 
 namespace Momentum.ServiceDefaults.Api.OpenApi.Extensions;
 
@@ -35,9 +34,9 @@ public static class OpenApiExtensions
         {
             if (document.Servers is not null)
             {
-                foreach (var openApiServer in document.Servers.OfType<OpenApiServer>())
+                foreach (var server in document.Servers)
                 {
-                    openApiServer.Url = openApiServer.Url?.TrimEnd('/');
+                    server.Url = server.Url?.TrimEnd('/');
                 }
             }
 

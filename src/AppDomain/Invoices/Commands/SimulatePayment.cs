@@ -74,10 +74,10 @@ public static class SimulatePaymentCommandHandler
 
         if (!invoiceFound)
         {
-            var failures = new List<ValidationFailure>
-            {
+            List<ValidationFailure> failures =
+            [
                 new("InvoiceId", "Invoice not found.")
-            };
+            ];
 
             return (failures, null);
         }

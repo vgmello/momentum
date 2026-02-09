@@ -53,7 +53,7 @@ public static class DeleteCashierCommandHandler
             return (true, deletedEvent);
         }
 
-        var failures = new List<ValidationFailure> { new("CashierId", "Cashier not found") };
+        List<ValidationFailure> failures = [new("CashierId", "Cashier not found")];
 
         return (failures, null);
     }

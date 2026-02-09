@@ -8,32 +8,32 @@ namespace AppDomain.Cashiers.Contracts.Models;
 public record Cashier
 {
     /// <summary>
-    ///     Gets or sets the unique identifier for the tenant this cashier belongs to.
+    ///     Gets the unique identifier for the tenant this cashier belongs to.
     /// </summary>
-    public Guid TenantId { get; set; }
+    public Guid TenantId { get; init; }
 
     /// <summary>
-    ///     Gets or sets the unique identifier for the cashier.
+    ///     Gets the unique identifier for the cashier.
     /// </summary>
-    public Guid CashierId { get; set; }
+    public Guid CashierId { get; init; }
 
     /// <summary>
-    ///     Gets or sets the name of the cashier.
+    ///     Gets the name of the cashier.
     /// </summary>
-    public required string Name { get; set; }
+    public required string Name { get; init; }
 
     /// <summary>
-    ///     Gets or sets the email address of the cashier.
+    ///     Gets the email address of the cashier.
     /// </summary>
-    public required string Email { get; set; }
+    public required string Email { get; init; }
 
     /// <summary>
-    ///     Gets or sets the list of payment methods associated with this cashier.
+    ///     Gets the list of payment methods associated with this cashier.
     /// </summary>
-    public List<CashierPayment> CashierPayments { get; set; } = [];
+    public IReadOnlyList<CashierPayment> CashierPayments { get; init; } = [];
 
     /// <summary>
-    ///     Gets or sets the version for optimistic concurrency control.
+    ///     Gets the version for optimistic concurrency control.
     /// </summary>
-    public int Version { get; set; }
+    public int Version { get; init; }
 }

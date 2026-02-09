@@ -142,7 +142,7 @@ public class IntegrationTestFixture : IAsyncLifetime
 
         builder.AddServiceDefaults();
         //#if (INCLUDE_API)
-        builder.AddApiServiceDefaults();
+        builder.AddApiServiceDefaults(requireAuth: false);
         //#endif
         //#if (USE_KAFKA)
         builder.AddKafkaMessagingExtensions();
@@ -166,7 +166,7 @@ public class IntegrationTestFixture : IAsyncLifetime
         _app = builder.Build();
 
         //#if (INCLUDE_API)
-        _app.ConfigureApiUsingDefaults(requireAuth: false);
+        _app.ConfigureApiUsingDefaults();
         _app.MapGrpcServices(typeof(Api.Program));
         //#endif
 

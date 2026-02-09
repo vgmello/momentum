@@ -499,7 +499,6 @@ public static class OrdersEndpoints
     {
         var group = app.MapGroup("/orders")
             .WithTags("Orders")
-            .WithOpenApi()
             .RequireAuthorization(); // Ensure authentication for tenant context
 
         group.MapPost("/", CreateOrder)

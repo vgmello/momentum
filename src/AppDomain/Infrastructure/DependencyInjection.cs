@@ -29,10 +29,13 @@ public static class DependencyInjection
         DefaultTypeMap.MatchNamesWithUnderscores = true;
         builder.AddNpgsqlDataSource("AppDomainDb");
 
+        var connectionString = builder.Configuration.GetConnectionString("AppDomainDb")
+            ?? throw new InvalidOperationException("Connection string 'AppDomainDb' is not configured.");
+
         builder.Services.AddLinqToDBContext<AppDomainDb>((svcProvider, options) =>
             options
                 .UseMappingSchema(schema => schema.AddMetadataReader(new SnakeCaseNamingConventionMetadataReader()))
-                .UsePostgreSQL(builder.Configuration.GetConnectionString("AppDomainDb")!)
+                .UsePostgreSQL(connectionString)
                 .UseDefaultLogging(svcProvider)
         );
         //#endif

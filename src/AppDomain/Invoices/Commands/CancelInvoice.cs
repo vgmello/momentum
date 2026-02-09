@@ -62,11 +62,11 @@ public static partial class CancelInvoiceCommandHandler
 
         if (updatedInvoice is null)
         {
-            var failures = new List<ValidationFailure>
-            {
+            List<ValidationFailure> failures =
+            [
                 new("Version", "Invoice not found, cannot be cancelled, or was modified by another user. " +
                                "Please refresh and try again.")
-            };
+            ];
 
             return (failures, null);
         }

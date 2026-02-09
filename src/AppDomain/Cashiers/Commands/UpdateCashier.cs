@@ -58,7 +58,7 @@ public static class UpdateCashierCommandHandler
 
         if (updatedCashier is null)
         {
-            var failures = new List<ValidationFailure> { new("CashierId", "Cashier not found") };
+            List<ValidationFailure> failures = [new("CashierId", "Cashier not found")];
 
             return (failures, null);
         }

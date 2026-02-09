@@ -21,7 +21,7 @@ using Momentum.ServiceDefaults.HealthChecks;
 var builder = WebApplication.CreateSlimBuilder(args);
 
 builder.AddServiceDefaults();
-builder.AddApiServiceDefaults();
+builder.AddApiServiceDefaults(requireAuth: false);
 
 // Configure OpenAPI with .NET 10 native support
 // NOTE: AddOpenApi must be called directly in the API project (not in a library)
@@ -41,7 +41,7 @@ builder.AddApplicationServices();
 
 var app = builder.Build();
 
-app.ConfigureApiUsingDefaults(requireAuth: false);
+app.ConfigureApiUsingDefaults();
 //#if (INCLUDE_SAMPLE)
 app.MapCashierEndpoints();
 app.MapInvoiceEndpoints();

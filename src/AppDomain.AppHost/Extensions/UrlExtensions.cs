@@ -134,7 +134,7 @@ public static class UrlExtensions
 
             return endpointNameProperty?.GetValue(endpoint) as string;
         }
-        catch
+        catch (Exception)
         {
             return null;
         }
