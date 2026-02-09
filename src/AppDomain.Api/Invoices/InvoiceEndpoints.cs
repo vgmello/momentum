@@ -83,7 +83,7 @@ public static class InvoiceEndpoints
 
         return queryResult.Match<IResult>(
             invoice => Results.Ok(invoice),
-            errors => Results.NotFound(new { Errors = errors }));
+            errors => Results.Problem(statusCode: StatusCodes.Status404NotFound, detail: errors.First().ErrorMessage));
     }
 
     private static async Task<IResult> CreateInvoice(CreateInvoiceRequest request, IMessageBus bus,
@@ -102,7 +102,7 @@ public static class InvoiceEndpoints
 
         return commandResult.Match<IResult>(
             invoice => Results.Created($"/invoices/{invoice.InvoiceId}", invoice),
-            errors => Results.BadRequest(new { Errors = errors }));
+            errors => Results.ValidationProblem(errors.ToValidationErrors()));
     }
 
     private static async Task<IResult> CancelInvoice(Guid id, CancelInvoiceRequest request, IMessageBus bus,
@@ -115,8 +115,8 @@ public static class InvoiceEndpoints
         return commandResult.Match<IResult>(
             invoice => Results.Ok(invoice),
             errors => errors.IsConcurrencyConflict()
-                ? Results.Conflict(new { Errors = errors })
-                : Results.BadRequest(new { Errors = errors }));
+                ? Results.Problem(statusCode: StatusCodes.Status409Conflict, detail: errors.First().ErrorMessage)
+                : Results.ValidationProblem(errors.ToValidationErrors()));
     }
 
     private static async Task<IResult> MarkInvoiceAsPaid(Guid id, MarkInvoiceAsPaidRequest request, IMessageBus bus,
@@ -129,8 +129,8 @@ public static class InvoiceEndpoints
         return commandResult.Match<IResult>(
             invoice => Results.Ok(invoice),
             errors => errors.IsConcurrencyConflict()
-                ? Results.Conflict(new { Errors = errors })
-                : Results.BadRequest(new { Errors = errors }));
+                ? Results.Problem(statusCode: StatusCodes.Status409Conflict, detail: errors.First().ErrorMessage)
+                : Results.ValidationProblem(errors.ToValidationErrors()));
     }
 
     private static async Task<IResult> SimulatePayment(Guid id, SimulatePaymentRequest request, IMessageBus bus,
@@ -152,7 +152,7 @@ public static class InvoiceEndpoints
         return commandResult.Match<IResult>(
             _ => Results.Ok(new { Message = "Payment simulation triggered successfully" }),
             errors => errors.IsConcurrencyConflict()
-                ? Results.Conflict(new { Errors = errors })
-                : Results.BadRequest(new { Errors = errors }));
+                ? Results.Problem(statusCode: StatusCodes.Status409Conflict, detail: errors.First().ErrorMessage)
+                : Results.ValidationProblem(errors.ToValidationErrors()));
     }
 }

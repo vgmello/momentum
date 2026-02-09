@@ -15,7 +15,7 @@ public class LiquibaseMigrationContainer : IAsyncDisposable
     public LiquibaseMigrationContainer(string dbContainerName, INetwork containerNetwork)
     {
         var dbServerSanitized = dbContainerName.Trim('/');
-        var baseDirectory = Path.GetFullPath("../../../../../");
+        var baseDirectory = FindSolutionRoot();
 
         _liquibaseContainer = new ContainerBuilder("liquibase/liquibase:4.33-alpine")
             .WithNetwork(containerNetwork)
@@ -69,4 +69,19 @@ public class LiquibaseMigrationContainer : IAsyncDisposable
     }
 
     public async ValueTask DisposeAsync() => await _liquibaseContainer.DisposeAsync();
+
+    private static string FindSolutionRoot()
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+
+        while (directory is not null)
+        {
+            if (directory.GetFiles("*.slnx").Length > 0 || directory.GetFiles("*.sln").Length > 0)
+                return directory.FullName + Path.DirectorySeparatorChar;
+
+            directory = directory.Parent;
+        }
+
+        throw new InvalidOperationException("Could not find solution root directory from " + AppContext.BaseDirectory);
+    }
 }

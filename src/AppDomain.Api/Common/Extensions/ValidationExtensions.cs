@@ -30,4 +30,11 @@ public static class ValidationExtensions
         return errors.Any(e => e.PropertyName == "Version" &&
                                e.ErrorMessage.Contains("modified by another user"));
     }
+
+    public static IDictionary<string, string[]> ToValidationErrors(this IEnumerable<ValidationFailure> errors)
+    {
+        return errors
+            .GroupBy(e => e.PropertyName)
+            .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
+    }
 }

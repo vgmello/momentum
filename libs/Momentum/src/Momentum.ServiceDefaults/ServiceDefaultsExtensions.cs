@@ -172,9 +172,11 @@ public static class ServiceDefaultsExtensions
 #pragma warning disable S2139 // Exceptions should be either logged or rethrown but not both
     public static async Task RunAsync(this WebApplication app, string[] args)
     {
+        var isWolverineCommand = args.Length > 0 && WolverineCommands.Contains(args[0]);
+
         try
         {
-            if (args.Length > 0 && WolverineCommands.Contains(args[0]))
+            if (isWolverineCommand)
             {
                 await app.RunJasperFxCommands(args);
 
@@ -192,7 +194,10 @@ public static class ServiceDefaultsExtensions
         {
             try
             {
-                await app.DisposeAsync();
+                // Only dispose explicitly for Wolverine commands — the framework's
+                // RunAsync already disposes the application on the normal path.
+                if (isWolverineCommand)
+                    await app.DisposeAsync();
             }
             catch (Exception disposeEx)
             {

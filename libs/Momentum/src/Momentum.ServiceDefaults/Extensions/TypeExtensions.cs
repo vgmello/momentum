@@ -182,6 +182,9 @@ public static class TypeExtensions
 
     private static bool AllParametersMatchProperties(ParameterInfo[] parameters, List<PropertyInfo> properties)
     {
+        if (parameters.Length != properties.Count)
+            return false;
+
         foreach (var param in parameters)
         {
             if (!HasMatchingProperty(param, properties))

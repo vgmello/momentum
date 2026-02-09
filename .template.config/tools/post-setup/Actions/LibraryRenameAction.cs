@@ -307,7 +307,7 @@ public static class LibraryRenameAction
     private static bool IsExcludedFile(string filePath, string[] excludeDirs)
     {
         return excludeDirs.Any(dir => filePath.Contains($"{Path.DirectorySeparatorChar}{dir}{Path.DirectorySeparatorChar}") ||
-                                      filePath.Contains($"{Path.DirectorySeparatorChar}{dir}"));
+                                      filePath.EndsWith($"{Path.DirectorySeparatorChar}{dir}"));
     }
 
     private static bool ProcessFileContent(string filePath, Regex regex, string libPrefix, string projectDir, List<string> nonEmbeddedPackageNames)
