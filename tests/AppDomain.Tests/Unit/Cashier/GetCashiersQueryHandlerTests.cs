@@ -1,8 +1,8 @@
 // Copyright (c) OrgName. All rights reserved.
 
 using AppDomain.Cashiers.Queries;
-using NSubstitute.ExceptionExtensions;
 using Momentum.Extensions.Messaging;
+using NSubstitute.ExceptionExtensions;
 using Wolverine;
 
 namespace AppDomain.Tests.Unit.Cashier;

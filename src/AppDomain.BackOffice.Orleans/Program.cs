@@ -1,8 +1,8 @@
 // Copyright (c) OrgName. All rights reserved.
 
-using AppDomain.Infrastructure;
 using AppDomain.BackOffice.Orleans;
 using AppDomain.BackOffice.Orleans.Infrastructure.Extensions;
+using AppDomain.Infrastructure;
 //#if (USE_KAFKA)
 using Momentum.Extensions.Messaging.Kafka;
 //#endif

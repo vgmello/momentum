@@ -1,10 +1,10 @@
 // Copyright (c) OrgName. All rights reserved.
 
 using AppDomain.Invoices.Actors;
+using AppDomain.Invoices.Commands;
 using AppDomain.Invoices.Contracts.IntegrationEvents;
 using AppDomain.Invoices.Data.Entities;
 using AppDomain.Invoices.Queries;
-using AppDomain.Invoices.Commands;
 using ContractInvoice = AppDomain.Invoices.Contracts.Models.Invoice;
 
 namespace AppDomain.BackOffice.Orleans.Invoices.Grains;

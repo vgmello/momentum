@@ -1,13 +1,13 @@
 // Copyright (c) OrgName. All rights reserved.
 
 //#if (INCLUDE_API)
-using System.Net;
-using System.Net.Http.Headers;
 using AppDomain.Tests.Integration._Internal;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.TestHost;
 using Momentum.ServiceDefaults.Api;
 using Momentum.ServiceDefaults.Api.OpenApi.Extensions;
+using System.Net;
+using System.Net.Http.Headers;
 
 namespace AppDomain.Tests.Integration.Authorization;
 

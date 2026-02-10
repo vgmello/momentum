@@ -1,10 +1,10 @@
 // Copyright (c) OrgName. All rights reserved.
 
 //#if (INCLUDE_API)
-using System.Security.Claims;
-using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
+using System.Security.Claims;
+using System.Text.Encodings.Web;
 
 namespace AppDomain.Tests.Integration._Internal;
 

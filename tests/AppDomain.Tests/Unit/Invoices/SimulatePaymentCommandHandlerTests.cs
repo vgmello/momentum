@@ -2,10 +2,10 @@
 
 using AppDomain.Invoices.Commands;
 using AppDomain.Invoices.Contracts.IntegrationEvents;
+using Momentum.Extensions;
 using Momentum.Extensions.Abstractions.Messaging;
 using Momentum.Extensions.Messaging;
 using Wolverine;
-using Momentum.Extensions;
 
 namespace AppDomain.Tests.Unit.Invoices;
 
