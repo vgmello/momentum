@@ -142,8 +142,8 @@ public static class InvoiceEndpoints
             id,
             request.Version,
             request.Amount,
-            request.Currency ?? "USD",
-            request.PaymentMethod ?? "Credit Card",
+            request.Currency,
+            request.PaymentMethod,
             request.PaymentReference ?? $"SIM-{Guid.CreateVersion7():N}"[..16]
         );
 

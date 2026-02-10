@@ -55,7 +55,7 @@ public class CreateInvoiceCommandHandlerTests
         // Verify integration event
         createdEvent.ShouldNotBeNull();
         createdEvent.ShouldBeOfType<InvoiceCreated>();
-        createdEvent!.Invoice.InvoiceId.ShouldBe(invoice.InvoiceId);
+        createdEvent.Invoice.InvoiceId.ShouldBe(invoice.InvoiceId);
         createdEvent.Invoice.Name.ShouldBe(invoice.Name);
 
         // Verify that messaging was called with correct parameters

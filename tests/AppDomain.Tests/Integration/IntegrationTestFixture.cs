@@ -192,7 +192,7 @@ public class IntegrationTestFixture : IAsyncLifetime
         //#endif
 
         //#if (INCLUDE_API)
-        GrpcChannel?.Dispose();
+        GrpcChannel.Dispose();
         //#endif
 
         var disposeTasks = new List<Task>

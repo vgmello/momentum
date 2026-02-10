@@ -49,7 +49,7 @@ public class GetCashiersQueryHandlerTests
     {
         // Arrange
         var tenantId = Guid.NewGuid();
-        var query = new GetCashiersQuery(tenantId, 0); // Use constructor with default limit
+        var query = new GetCashiersQuery(tenantId); // Use constructor with default limit
 
         var messagingMock = Substitute.For<IMessageBus>();
         messagingMock.InvokeQueryAsync(

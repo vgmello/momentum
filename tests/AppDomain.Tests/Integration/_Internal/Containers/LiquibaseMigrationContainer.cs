@@ -61,7 +61,7 @@ public class LiquibaseMigrationContainer : IAsyncDisposable
             }
             catch
             {
-                throw new InvalidOperationException($"Liquibase migration failed. Unable to retrieve logs.", e);
+                throw new InvalidOperationException("Liquibase migration failed. Unable to retrieve logs.", e);
             }
 
             throw new InvalidOperationException($"Liquibase migration failed. Logs: {logs}", e);

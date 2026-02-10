@@ -24,12 +24,9 @@ public class GetInvoicesIntegrationTests(IntegrationTestFixture fixture) : Integ
             new CreateInvoiceRequest { Name = "Invoice 2", Amount = 200m, Currency = "EUR" }
         };
 
-        var createdInvoices = new List<AppDomain.Invoices.Grpc.Models.Invoice>();
-
         foreach (var createRequest in createRequests)
         {
-            var createResponse = await _client.CreateInvoiceAsync(createRequest, cancellationToken: TestContext.Current.CancellationToken);
-            createdInvoices.Add(createResponse);
+            await _client.CreateInvoiceAsync(createRequest, cancellationToken: TestContext.Current.CancellationToken);
         }
 
         var request = new GetInvoicesRequest

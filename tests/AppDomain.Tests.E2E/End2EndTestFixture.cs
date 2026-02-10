@@ -11,11 +11,11 @@ namespace AppDomain.Tests.E2E;
 /// </summary>
 public sealed class End2EndTestFixture : IDisposable
 {
-    public TestSettings TestSettings { get; private set; }
+    public TestSettings TestSettings { get; }
 
-    public HttpClient HttpClient { get; private set; }
+    public HttpClient HttpClient { get; }
 
-    public AppDomainApiClient ApiClient { get; private set; }
+    public AppDomainApiClient ApiClient { get; }
 
     public End2EndTestFixture()
     {
@@ -58,12 +58,12 @@ public sealed class End2EndTestFixture : IDisposable
 
     private void LogTestConfiguration()
     {
-        Console.WriteLine($"=== E2E Test Configuration ===");
+        Console.WriteLine("=== E2E Test Configuration ===");
         Console.WriteLine($"Environment: {TestSettings.Environment}");
         Console.WriteLine($"API Base URL: {TestSettings.ApiUrl}");
         Console.WriteLine($"Timeout: {TestSettings.TimeoutSeconds}s");
         Console.WriteLine($"Max Retries: {TestSettings.MaxRetries}");
-        Console.WriteLine($"================================");
+        Console.WriteLine("================================");
     }
 
     public void Dispose()
