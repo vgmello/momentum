@@ -32,7 +32,10 @@
     </Target>
 
     <Target Name="PushToLocalFeed" AfterTargets="Pack" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug'">
+        <PropertyGroup>
+            <_NupkgPath>$(PackageOutputPath)$(PackageId).$(PackageVersion).nupkg</_NupkgPath>
+        </PropertyGroup>
         <MakeDir Directories="$(MSBuildThisFileDirectory).local/nuget" Condition="!Exists('$(MSBuildThisFileDirectory).local/nuget')"/>
-        <Exec Command="dotnet nuget push &quot;$(PackageOutputPath)$(PackageId).$(PackageVersion).nupkg&quot; --source &quot;$(MSBuildThisFileDirectory).local/nuget&quot;"/>
+        <Exec Command="dotnet nuget push &quot;$(_NupkgPath)&quot; --source &quot;$(MSBuildThisFileDirectory).local/nuget&quot;"/>
     </Target>
 </Project>
