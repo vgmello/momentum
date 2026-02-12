@@ -34,7 +34,7 @@ public static class GetInvoicesQueryHandler
 
         if (query.Status.HasValue)
         {
-            var statusFilter = query.Status.Value.ToDbString();
+            var statusFilter = query.Status.Value.ToString();
             queryable = queryable.Where(i => i.Status == statusFilter);
         }
 

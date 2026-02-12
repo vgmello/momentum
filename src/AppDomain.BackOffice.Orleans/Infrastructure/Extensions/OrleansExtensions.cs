@@ -16,8 +16,9 @@ public static class OrleansExtensions
     /// </summary>
     /// <param name="builder">The host application builder.</param>
     /// <param name="sectionName">Section Name</param>
+    /// <param name="useDashboard">Whether to enable the Orleans Dashboard. Defaults to true.</param>
     /// <returns>The host application builder for method chaining.</returns>
-    public static IHostApplicationBuilder AddOrleans(this IHostApplicationBuilder builder, string sectionName = SectionName)
+    public static IHostApplicationBuilder AddOrleans(this IHostApplicationBuilder builder, string sectionName = SectionName, bool useDashboard = true)
     {
         var config = builder.Configuration.GetSection(sectionName);
 
@@ -50,11 +51,14 @@ public static class OrleansExtensions
 
             siloBuilder.Configure<GrainCollectionOptions>(builder.Configuration.GetSection("Orleans:GrainCollection"));
 
-            siloBuilder.UseDashboard(opt =>
+            if (useDashboard)
             {
-                opt.HostSelf = false;
-                opt.Host = "*";
-            });
+                siloBuilder.UseDashboard(opt =>
+                {
+                    opt.HostSelf = false;
+                    opt.Host = "*";
+                });
+            }
         });
 
         builder.Services

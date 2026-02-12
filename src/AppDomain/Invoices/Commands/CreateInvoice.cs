@@ -100,7 +100,7 @@ public static class CreateInvoiceCommandHandler
             TenantId = command.TenantId,
             InvoiceId = Guid.CreateVersion7(),
             Name = command.Name,
-            Status = InvoiceStatus.Draft.ToDbString(),
+            Status = nameof(InvoiceStatus.Draft),
             Amount = command.Amount,
             Currency = command.Currency,
             DueDate = command.DueDate,

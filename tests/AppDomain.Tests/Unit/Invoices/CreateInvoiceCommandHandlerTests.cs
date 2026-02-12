@@ -24,7 +24,7 @@ public class CreateInvoiceCommandHandlerTests
                 TenantId = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.TenantId,
                 InvoiceId = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.InvoiceId,
                 Name = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.Name,
-                Status = "draft",
+                Status = nameof(InvoiceStatus.Draft),
                 Amount = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.Amount,
                 Currency = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.Currency,
                 DueDate = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.DueDate,
@@ -65,7 +65,7 @@ public class CreateInvoiceCommandHandlerTests
                 cmd.Invoice.TenantId == tenantId &&
                 cmd.Invoice.InvoiceId == invoice.InvoiceId &&
                 cmd.Invoice.Name == "Test Invoice" &&
-                cmd.Invoice.Status == "draft" &&
+                cmd.Invoice.Status == nameof(InvoiceStatus.Draft) &&
                 cmd.Invoice.Amount == 100.50m &&
                 cmd.Invoice.Currency == "USD" &&
                 cmd.Invoice.DueDate == dueDate &&
@@ -84,7 +84,7 @@ public class CreateInvoiceCommandHandlerTests
                 TenantId = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.TenantId,
                 InvoiceId = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.InvoiceId,
                 Name = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.Name,
-                Status = "draft",
+                Status = nameof(InvoiceStatus.Draft),
                 Amount = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.Amount,
                 Currency = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.Currency,
                 DueDate = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.DueDate,
@@ -120,7 +120,7 @@ public class CreateInvoiceCommandHandlerTests
                 TenantId = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.TenantId,
                 InvoiceId = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.InvoiceId,
                 Name = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.Name,
-                Status = "draft",
+                Status = nameof(InvoiceStatus.Draft),
                 Amount = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.Amount,
                 Currency = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.Currency,
                 DueDate = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.DueDate,

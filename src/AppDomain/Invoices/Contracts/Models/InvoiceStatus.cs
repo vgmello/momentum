@@ -13,14 +13,3 @@ public enum InvoiceStatus
 
     Cancelled
 }
-
-/// <summary>
-///     Extension methods for <see cref="InvoiceStatus" />.
-/// </summary>
-public static class InvoiceStatusExtensions
-{
-    /// <summary>
-    ///     Converts the status to its lowercase database string representation.
-    /// </summary>
-    public static string ToDbString(this InvoiceStatus status) => status.ToString().ToLowerInvariant();
-}
