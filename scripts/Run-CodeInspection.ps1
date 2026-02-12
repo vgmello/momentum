@@ -90,20 +90,21 @@ try {
     }
 
     # Build command arguments
-    $args = @(
+    $inspectArgs = @(
         "jb", "inspectcode", $Solution,
         "--output=$outputFile",
         "--format=$Format",
         "--severity=$effectiveSeverity"
     )
 
-    if ($Include) { $args += "--include=$Include" }
-    if ($Exclude) { $args += "--exclude=$Exclude" }
+    if ($Include) { $inspectArgs += "--include=$Include" }
+    if ($Exclude) { $inspectArgs += "--exclude=$Exclude" }
 
     Write-Host "Running code inspection on $Solution (severity: $effectiveSeverity)..." -ForegroundColor Cyan
     Write-Host ""
 
-    & dotnet @args 2>&1 | Where-Object { $_ -notmatch "^Inspecting " }
+    # Discard stderr (JetBrains Roslyn analyzer compat noise), filter progress lines from stdout
+    & dotnet @inspectArgs 2>$null | Where-Object { $_ -notmatch "^Inspecting " }
 
     if ($LASTEXITCODE -ne 0) {
         Write-Host "Inspection failed with exit code $LASTEXITCODE" -ForegroundColor Red

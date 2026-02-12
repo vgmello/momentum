@@ -111,8 +111,8 @@ public class KafkaMessagingExtensionsTests
 
         // Act
         builder.AddKafkaMessagingExtensions(
-            configureProducerSettings: settings => { /* custom producer config */ },
-            configureConsumerSettings: settings => { /* custom consumer config */ });
+            configureProducerSettings: _ => { /* custom producer config */ },
+            configureConsumerSettings: _ => { /* custom consumer config */ });
 
         // Assert - Health checks are automatically registered by Aspire
         var wolverineExtension = builder.Services.FirstOrDefault(s =>

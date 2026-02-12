@@ -43,7 +43,7 @@ public class EventTopicAttribute(string topic, string? domain = null, string ver
     /// <summary>
     ///     Indicates if the event is internal or public (Default: public)
     /// </summary>
-    public bool Internal { get; set; } = false;
+    public bool Internal { get; set; }
 
 
     /// <summary>

@@ -8,4 +8,3 @@ global using Timestamp = Google.Protobuf.WellKnownTypes.Timestamp;
 //#if (INCLUDE_SAMPLE || INCLUDE_ORLEANS)
 global using NSubstitute;
 //#endif
-global using Xunit;

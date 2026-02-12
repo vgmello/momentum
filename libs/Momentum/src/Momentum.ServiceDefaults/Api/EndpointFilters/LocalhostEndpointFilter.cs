@@ -47,13 +47,11 @@ public partial class LocalhostEndpointFilter(ILogger logger) : IEndpointFilter
         var request = context.HttpContext.Request;
 
         // Check for proxy/forwarding headers - reject if present to prevent bypass attacks
-        foreach (var header in ForwardedHeaders)
+        var detectedHeader = ForwardedHeaders.FirstOrDefault(request.Headers.ContainsKey);
+        if (detectedHeader is not null)
         {
-            if (request.Headers.ContainsKey(header))
-            {
-                LogProxyHeaderDetected(logger, header);
-                return Results.Unauthorized();
-            }
+            LogProxyHeaderDetected(logger, detectedHeader);
+            return Results.Unauthorized();
         }
 
         var remoteIp = context.HttpContext.Connection.RemoteIpAddress;

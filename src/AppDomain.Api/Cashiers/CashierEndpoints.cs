@@ -64,8 +64,8 @@ public static class CashierEndpoints
         var queryResult = await bus.InvokeQueryAsync(query, cancellationToken);
 
         return queryResult.Match<IResult>(
-            cashier => TypedResults.Ok(cashier),
-            errors => TypedResults.Problem(statusCode: StatusCodes.Status404NotFound, detail: errors.First().ErrorMessage));
+            TypedResults.Ok,
+            errors => TypedResults.Problem(statusCode: StatusCodes.Status404NotFound, detail: errors[0].ErrorMessage));
     }
 
     private static async Task<IResult> GetCashiers([AsParameters] GetCashiersRequest request, IMessageBus bus,
@@ -95,10 +95,10 @@ public static class CashierEndpoints
         var commandResult = await bus.InvokeCommandAsync(command, cancellationToken);
 
         return commandResult.Match<IResult>(
-            cashier => TypedResults.Ok(cashier),
+            TypedResults.Ok,
             errors => errors.IsConcurrencyConflict()
-                ? TypedResults.Problem(statusCode: StatusCodes.Status409Conflict, detail: errors.First().ErrorMessage)
-                : TypedResults.Problem(statusCode: StatusCodes.Status404NotFound, detail: errors.First().ErrorMessage));
+                ? TypedResults.Problem(statusCode: StatusCodes.Status409Conflict, detail: errors[0].ErrorMessage)
+                : TypedResults.Problem(statusCode: StatusCodes.Status404NotFound, detail: errors[0].ErrorMessage));
     }
 
     private static async Task<IResult> DeleteCashier(Guid id, IMessageBus bus, HttpContext context,
@@ -109,6 +109,6 @@ public static class CashierEndpoints
 
         return commandResult.Match<IResult>(
             _ => TypedResults.NoContent(),
-            errors => TypedResults.Problem(statusCode: StatusCodes.Status404NotFound, detail: errors.First().ErrorMessage));
+            errors => TypedResults.Problem(statusCode: StatusCodes.Status404NotFound, detail: errors[0].ErrorMessage));
     }
 }

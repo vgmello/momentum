@@ -36,7 +36,7 @@ public static class GrpcRegistrationExtensions
                            "Unable to identify entry assembly for gRPC service discovery. " +
                            "Use the MapGrpcServices(assembly) overload to specify the assembly explicitly.");
 
-        routeBuilder.MapGrpcServices(assembly);
+        MapGrpcServices(routeBuilder, assembly);
     }
 
     /// <summary>
@@ -50,7 +50,7 @@ public static class GrpcRegistrationExtensions
     /// </remarks>
     public static void MapGrpcServices(this IEndpointRouteBuilder routeBuilder, Type assemblyMarker)
     {
-        routeBuilder.MapGrpcServices(assemblyMarker.Assembly);
+        MapGrpcServices(routeBuilder, assemblyMarker.Assembly);
     }
 
     /// <summary>

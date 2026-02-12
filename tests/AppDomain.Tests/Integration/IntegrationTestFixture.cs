@@ -167,7 +167,7 @@ public class IntegrationTestFixture : IAsyncLifetime
 
         //#if (INCLUDE_API)
         _app.ConfigureApiUsingDefaults();
-        _app.MapGrpcServices(typeof(Api.Program));
+        _app.MapGrpcServices(typeof(Api.DependencyInjection));
         //#endif
 
         await _app.StartAsync();

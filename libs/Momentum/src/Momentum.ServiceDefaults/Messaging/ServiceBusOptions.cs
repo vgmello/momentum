@@ -108,11 +108,11 @@ public partial class ServiceBusOptions
         : IPostConfigureOptions<ServiceBusOptions>
     {
         // Valid service name: lowercase alphanumeric with hyphens (kebab-case)
-        [GeneratedRegex(@"^[a-z0-9]+(-[a-z0-9]+)*$")]
+        [GeneratedRegex("^[a-z0-9]+(-[a-z0-9]+)*$")]
         private static partial Regex ServiceNameValidationRegex();
 
         // Valid domain name: alphanumeric starting with a letter (PascalCase or simple)
-        [GeneratedRegex(@"^[A-Za-z][A-Za-z0-9]*$")]
+        [GeneratedRegex("^[A-Za-z][A-Za-z0-9]*$")]
         private static partial Regex DomainNameValidationRegex();
 
         /// <summary>

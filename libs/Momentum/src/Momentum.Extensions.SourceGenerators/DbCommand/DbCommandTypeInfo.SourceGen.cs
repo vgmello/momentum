@@ -198,8 +198,8 @@ internal sealed class DbCommandTypeInfoSourceGen : DbCommandTypeInfo, IEquatable
         unchecked
         {
             var hash = 17;
-            hash = hash * 31 + (TypeName?.GetHashCode() ?? 0);
-            hash = hash * 31 + (QualifiedTypeName?.GetHashCode() ?? 0);
+            hash = hash * 31 + TypeName.GetHashCode();
+            hash = hash * 31 + QualifiedTypeName.GetHashCode();
             hash = hash * 31 + (Namespace?.GetHashCode() ?? 0);
             hash = hash * 31 + DbCommandAttribute.ParamsCase.GetHashCode();
             return hash;

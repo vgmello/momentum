@@ -32,7 +32,7 @@ public class InvoiceActor(
         var result = await messageBus.InvokeQueryAsync(query);
 
         var invoice = result.Match<Invoice?>(
-            contractInvoice => MapContractToDataEntity(contractInvoice),
+            MapContractToDataEntity,
             errors =>
             {
                 logger.LogWarning("Invoice {InvoiceId} not found for tenant {TenantId}: {Errors}",

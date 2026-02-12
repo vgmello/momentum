@@ -82,8 +82,8 @@ public static class InvoiceEndpoints
         var queryResult = await bus.InvokeQueryAsync(query, cancellationToken);
 
         return queryResult.Match<IResult>(
-            invoice => TypedResults.Ok(invoice),
-            errors => TypedResults.Problem(statusCode: StatusCodes.Status404NotFound, detail: errors.First().ErrorMessage));
+            TypedResults.Ok,
+            errors => TypedResults.Problem(statusCode: StatusCodes.Status404NotFound, detail: errors[0].ErrorMessage));
     }
 
     private static async Task<IResult> CreateInvoice(CreateInvoiceRequest request, IMessageBus bus,
@@ -113,9 +113,9 @@ public static class InvoiceEndpoints
         var commandResult = await bus.InvokeCommandAsync(command, cancellationToken);
 
         return commandResult.Match<IResult>(
-            invoice => TypedResults.Ok(invoice),
+            TypedResults.Ok,
             errors => errors.IsConcurrencyConflict()
-                ? TypedResults.Problem(statusCode: StatusCodes.Status409Conflict, detail: errors.First().ErrorMessage)
+                ? TypedResults.Problem(statusCode: StatusCodes.Status409Conflict, detail: errors[0].ErrorMessage)
                 : TypedResults.ValidationProblem(errors.ToValidationErrors()));
     }
 
@@ -127,9 +127,9 @@ public static class InvoiceEndpoints
         var commandResult = await bus.InvokeCommandAsync(command, cancellationToken);
 
         return commandResult.Match<IResult>(
-            invoice => TypedResults.Ok(invoice),
+            TypedResults.Ok,
             errors => errors.IsConcurrencyConflict()
-                ? TypedResults.Problem(statusCode: StatusCodes.Status409Conflict, detail: errors.First().ErrorMessage)
+                ? TypedResults.Problem(statusCode: StatusCodes.Status409Conflict, detail: errors[0].ErrorMessage)
                 : TypedResults.ValidationProblem(errors.ToValidationErrors()));
     }
 
@@ -152,7 +152,7 @@ public static class InvoiceEndpoints
         return commandResult.Match<IResult>(
             _ => TypedResults.Ok(new { Message = "Payment simulation triggered successfully" }),
             errors => errors.IsConcurrencyConflict()
-                ? TypedResults.Problem(statusCode: StatusCodes.Status409Conflict, detail: errors.First().ErrorMessage)
+                ? TypedResults.Problem(statusCode: StatusCodes.Status409Conflict, detail: errors[0].ErrorMessage)
                 : TypedResults.ValidationProblem(errors.ToValidationErrors()));
     }
 }
