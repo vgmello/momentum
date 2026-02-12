@@ -3,7 +3,6 @@
 using System.Data;
 using System.Data.Common;
 using Dapper;
-using Momentum.Extensions.Abstractions.Dapper;
 using Momentum.Extensions.Data;
 using NSubstitute;
 
