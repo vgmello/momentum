@@ -32,7 +32,7 @@ public static class DependencyInjection
         var connectionString = builder.Configuration.GetConnectionString("AppDomainDb")
             ?? throw new InvalidOperationException("Connection string 'AppDomainDb' is not configured.");
 
-        builder.Services.AddLinqToDBContext<AppDomainDb>((IServiceProvider svcProvider, DataOptions options) =>
+        builder.Services.AddLinqToDBContext<AppDomainDb>((svcProvider, options) =>
             options
                 .UseMappingSchema(schema => schema.AddMetadataReader(new SnakeCaseNamingConventionMetadataReader()))
                 .UsePostgreSQL(connectionString)
