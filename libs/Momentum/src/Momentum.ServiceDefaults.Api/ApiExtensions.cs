@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OpenTelemetry.Trace;
 using Scalar.AspNetCore;
 
 namespace Momentum.ServiceDefaults.Api;
@@ -75,6 +76,9 @@ public static class ApiExtensions
             options.EnableDetailedErrors = builder.Environment.IsDevelopment();
         });
         builder.Services.AddGrpcReflection();
+
+        builder.Services.AddOpenTelemetry()
+            .WithTracing(tracing => tracing.AddGrpcCoreInstrumentation());
 
         if (requireAuth)
         {

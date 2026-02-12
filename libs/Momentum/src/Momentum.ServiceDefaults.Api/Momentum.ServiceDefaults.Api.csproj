@@ -25,6 +25,10 @@
         <PackageReference Include="Grpc.AspNetCore.Web"/>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi"/>
         <PackageReference Include="OpenTelemetry.Extensions.Hosting"/>
+        <!-- Suppress prerelease warning - no stable version available for gRPC core instrumentation -->
+        <PackageReference Include="OpenTelemetry.Instrumentation.GrpcCore">
+            <NoWarn>NU5104</NoWarn>
+        </PackageReference>
         <PackageReference Include="Scalar.AspNetCore"/>
         <!--#if (LIBS_INCLUDES_API)
         <PackageReference Include="Momentum.Extensions.XmlDocs"/>

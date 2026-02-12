@@ -50,6 +50,17 @@ public static class DbDataSourceExtensions
             cancellationToken: cancellationToken);
     }
 
+    /// <summary>
+    ///     Core method that opens a connection and executes a Dapper function via stored procedure.
+    /// </summary>
+    /// <param name="dataSource">The DbDataSource data source.</param>
+    /// <param name="spName">The name of the stored procedure.</param>
+    /// <param name="parameters">Provider for command parameters.</param>
+    /// <param name="dbFunction">Factory that returns a Dapper execution function for the given connection.</param>
+    /// <param name="transaction">Optional database transaction to associate with the command.</param>
+    /// <param name="commandTimeout">Optional command timeout in seconds.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The result of the Dapper function execution.</returns>
     public static async Task<TResult> SpCall<TResult>(this DbDataSource dataSource,
         string spName,
         IDbParamsProvider parameters,
