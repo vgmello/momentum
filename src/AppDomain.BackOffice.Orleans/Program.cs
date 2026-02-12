@@ -24,7 +24,7 @@ builder.AddApplicationServices();
 
 var app = builder.Build();
 
-app.MapOrleansDashboard();
+app.MapDashboard();
 app.MapDefaultHealthCheckEndpoints();
 
 await app.RunAsync(args);
