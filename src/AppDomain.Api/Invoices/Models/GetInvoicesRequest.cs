@@ -1,6 +1,7 @@
 // Copyright (c) OrgName. All rights reserved.
 
 using System.ComponentModel.DataAnnotations;
+using AppDomain.Invoices.Contracts.Models;
 
 namespace AppDomain.Api.Invoices.Models;
 
@@ -22,7 +23,7 @@ public record GetInvoicesRequest
     public int Offset { get; init; } = 0;
 
     /// <summary>
-    ///     Optional status filter (e.g., "Draft", "Paid", "Cancelled")
+    ///     Optional status filter
     /// </summary>
-    public string? Status { get; init; }
+    public InvoiceStatus? Status { get; init; }
 }

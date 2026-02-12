@@ -12,7 +12,7 @@ namespace AppDomain.Invoices.Queries;
 /// <param name="Offset">The number of records to skip for pagination (default: 0).</param>
 /// <param name="Limit">The maximum number of records to return (default: 100).</param>
 /// <param name="Status">Optional status filter to restrict results to invoices with specific status.</param>
-public record GetInvoicesQuery(Guid TenantId, int Offset = 0, int Limit = 100, string? Status = null)
+public record GetInvoicesQuery(Guid TenantId, int Offset = 0, int Limit = 100, InvoiceStatus? Status = null)
     : IQuery<IEnumerable<Invoice>>;
 
 /// <summary>
@@ -32,9 +32,10 @@ public static class GetInvoicesQueryHandler
         var queryable = db.Invoices
             .Where(i => i.TenantId == query.TenantId);
 
-        if (!string.IsNullOrEmpty(query.Status))
+        if (query.Status.HasValue)
         {
-            queryable = queryable.Where(i => i.Status == query.Status);
+            var statusFilter = query.Status.Value.ToDbString();
+            queryable = queryable.Where(i => i.Status == statusFilter);
         }
 
         var invoices = await queryable

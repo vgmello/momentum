@@ -2,6 +2,7 @@
 
 using AppDomain.Invoices.Commands;
 using AppDomain.Invoices.Contracts.IntegrationEvents;
+using AppDomain.Invoices.Contracts.Models;
 using Momentum.Extensions.Messaging;
 using Wolverine;
 
@@ -24,7 +25,7 @@ public class MarkInvoiceAsPaidCommandHandlerTests
             TenantId = tenantId,
             InvoiceId = invoiceId,
             Name = "Test Invoice",
-            Status = "Paid",
+            Status = "paid",
             Amount = amountPaid,
             AmountPaid = amountPaid,
             PaymentDate = paymentDate,
@@ -46,7 +47,7 @@ public class MarkInvoiceAsPaidCommandHandlerTests
         var invoice = result.Match(success => success, _ => null!);
 
         invoice.InvoiceId.ShouldBe(invoiceId);
-        invoice.Status.ShouldBe("Paid");
+        invoice.Status.ShouldBe(InvoiceStatus.Paid);
         invoice.Amount.ShouldBe(amountPaid);
 
         // Verify integration event
@@ -81,7 +82,7 @@ public class MarkInvoiceAsPaidCommandHandlerTests
             TenantId = tenantId,
             InvoiceId = invoiceId,
             Name = "Test Invoice",
-            Status = "Paid",
+            Status = "paid",
             Amount = amountPaid,
             AmountPaid = amountPaid,
             PaymentDate = now,

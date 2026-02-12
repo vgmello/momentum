@@ -32,7 +32,7 @@ public class DummyInvoiceGenerator(IMessageBus bus, ILogger<DummyInvoiceGenerato
                     TenantId: tenantId,
                     InvoiceId: invoiceId,
                     Name: "Fake Invoice",
-                    Status: "Paid",
+                    Status: InvoiceStatus.Paid,
                     Amount: 100m,
                     Currency: "USD",
                     DueDate: now.AddDays(30),

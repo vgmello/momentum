@@ -3,9 +3,10 @@
 using AppDomain.Invoices.Actors;
 using AppDomain.Invoices.Commands;
 using AppDomain.Invoices.Contracts.IntegrationEvents;
-using AppDomain.Invoices.Data.Entities;
+using AppDomain.Invoices.Contracts.Models;
 using AppDomain.Invoices.Queries;
 using ContractInvoice = AppDomain.Invoices.Contracts.Models.Invoice;
+using Invoice = AppDomain.Invoices.Data.Entities.Invoice;
 
 namespace AppDomain.BackOffice.Orleans.Invoices.Grains;
 
@@ -80,7 +81,7 @@ public class InvoiceActor(
     }
 
     /// <inheritdoc />
-    public async Task<Invoice> UpdateStatusAsync(Guid tenantId, string newStatus)
+    public async Task<Invoice> UpdateStatusAsync(Guid tenantId, InvoiceStatus newStatus)
     {
         await EnsureInitialized(tenantId);
 
@@ -94,7 +95,7 @@ public class InvoiceActor(
         }
 
         // Update the status (this would typically be done via a command)
-        var updatedInvoice = currentInvoice with { Status = newStatus };
+        var updatedInvoice = currentInvoice with { Status = newStatus.ToDbString() };
 
         logger.LogInformation("Updated invoice {InvoiceId} status to {Status}",
             this.GetPrimaryKey(), newStatus);
@@ -126,7 +127,7 @@ public class InvoiceActor(
             return false;
         }
 
-        if (currentInvoice.Status == "Paid")
+        if (currentInvoice.Status == InvoiceStatus.Paid.ToDbString())
         {
             logger.LogWarning("Invoice {InvoiceId} is already paid", invoiceId);
 
@@ -181,7 +182,7 @@ public class InvoiceActor(
             TenantId = invoice.TenantId,
             InvoiceId = invoice.InvoiceId,
             Name = invoice.Name,
-            Status = invoice.Status,
+            Status = invoice.Status.ToDbString(),
             Amount = invoice.Amount,
             Currency = invoice.Currency,
             DueDate = invoice.DueDate,

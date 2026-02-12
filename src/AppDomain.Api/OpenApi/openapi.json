@@ -320,9 +320,9 @@
           {
             "name": "Status",
             "in": "query",
-            "description": "Optional status filter (e.g., \"Draft\", \"Paid\", \"Cancelled\")",
+            "description": "Optional status filter",
             "schema": {
-              "type": "string"
+              "$ref": "#/components/schemas/InvoiceStatus"
             }
           }
         ],
@@ -848,7 +848,7 @@
             "type": "string"
           },
           "status": {
-            "type": "string"
+            "$ref": "#/components/schemas/InvoiceStatus"
           },
           "amount": {
             "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
@@ -911,6 +911,9 @@
             "format": "int32"
           }
         }
+      },
+      "InvoiceStatus": {
+        "type": "integer"
       },
       "MarkInvoiceAsPaidRequest": {
         "required": [

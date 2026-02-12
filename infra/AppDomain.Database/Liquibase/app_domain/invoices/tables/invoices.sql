@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS main.invoices (
     invoice_id UUID,
     name VARCHAR(100) NOT NULL,
     status TEXT NOT NULL,
-    amount DECIMAL(18, 2),
+    amount DECIMAL(18, 2) NOT NULL,
     currency VARCHAR(3),
     due_date TIMESTAMP WITH TIME ZONE,
     cashier_id UUID,

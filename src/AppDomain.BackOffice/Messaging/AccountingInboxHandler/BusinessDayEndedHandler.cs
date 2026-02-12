@@ -2,6 +2,7 @@
 
 using AppDomain.Invoices.Contracts.DomainEvents;
 using AppDomain.Invoices.Contracts.IntegrationEvents;
+using AppDomain.Invoices.Contracts.Models;
 
 namespace AppDomain.BackOffice.Messaging.AccountingInboxHandler;
 
@@ -30,7 +31,7 @@ public class BusinessDayEndedHandler(ILogger<BusinessDayEndedHandler> logger, IM
             TenantId: tenantId,
             InvoiceId: invoiceId,
             Name: $"Invoice for {businessDayEnded.BusinessDate:yyyy-MM-dd}",
-            Status: "Generated",
+            Status: InvoiceStatus.Draft,
             Amount: 500.75m,
             Currency: "USD",
             DueDate: DateTime.UtcNow.AddDays(30),

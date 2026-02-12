@@ -1,9 +1,9 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <AspireVersion>13.1.0</AspireVersion>
-    <MicrosoftExtensionsVersion>10.0.2</MicrosoftExtensionsVersion>
-    <MicrosoftOrleansVersion>9.2.1</MicrosoftOrleansVersion>
+    <AspireVersion>13.1.1</AspireVersion>
+    <MicrosoftExtensionsVersion>10.0.3</MicrosoftExtensionsVersion>
+    <MicrosoftOrleansVersion>10.0.1</MicrosoftOrleansVersion>
     <OpenTelemetryVersion>1.15.0</OpenTelemetryVersion>
     <AspireAppHostSdkVersion>$(AspireVersion)</AspireAppHostSdkVersion>
     <GrpcVersion>2.67.0</GrpcVersion>
@@ -37,8 +37,8 @@
     <PackageVersion Include="Grpc.AspNetCore.Web" Version="$(GrpcVersion)" />
     <PackageVersion Include="Grpc.Net.Client" Version="$(GrpcVersion)" />
     <PackageVersion Include="Grpc.Tools" Version="2.68.1" />
-    <PackageVersion Include="linq2db" Version="5.4.1.9" />
-    <PackageVersion Include="linq2db.AspNet" Version="5.4.1.9" />
+    <PackageVersion Include="linq2db" Version="6.1.0" />
+    <PackageVersion Include="linq2db.Extensions" Version="6.1.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.TestHost" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="$(MicrosoftExtensionsVersion)" />
@@ -52,11 +52,11 @@
     <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Diagnostics.Testing" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Diagnostics.Testing" Version="10.3.0" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.2.0" />
-    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.2.0" />
+    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.3.0" />
+    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.3.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageVersion Include="Microsoft.Orleans.Analyzers" Version="$(MicrosoftOrleansVersion)" />
     <PackageVersion Include="Microsoft.Orleans.Client" Version="$(MicrosoftOrleansVersion)" />
@@ -66,7 +66,7 @@
     <PackageVersion Include="Microsoft.Orleans.Reminders.AzureStorage" Version="$(MicrosoftOrleansVersion)" />
     <PackageVersion Include="Microsoft.Orleans.Server" Version="$(MicrosoftOrleansVersion)" />
     <PackageVersion Include="Microsoft.Orleans.TestingHost" Version="$(MicrosoftOrleansVersion)" />
-    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.102" />
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.103" />
     <PackageVersion Include="Momentum.Extensions" Version="$(MomentumVersion)" />
     <PackageVersion Include="Momentum.Extensions.Abstractions" Version="$(MomentumVersion)" />
     <PackageVersion Include="Momentum.Extensions.Messaging.Kafka" Version="$(MomentumVersion)" />
@@ -88,7 +88,7 @@
     <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="$(OpenTelemetryVersion)" />
     <PackageVersion Include="OrleansDashboard" Version="8.2.0" />
     <PackageVersion Include="Riok.Mapperly" Version="4.3.1" />
-    <PackageVersion Include="Scalar.AspNetCore" Version="2.12.34" />
+    <PackageVersion Include="Scalar.AspNetCore" Version="2.12.38" />
     <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageVersion Include="Serilog.Exceptions" Version="8.4.0" />
     <PackageVersion Include="Serilog.Sinks.OpenTelemetry" Version="4.2.0" />
@@ -99,9 +99,9 @@
     <PackageVersion Include="Testcontainers" Version="4.10.0" />
     <PackageVersion Include="Testcontainers.Kafka" Version="4.10.0" />
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.10.0" />
-    <PackageVersion Include="WolverineFx" Version="5.14.0" />
-    <PackageVersion Include="WolverineFx.Kafka" Version="5.14.0" />
-    <PackageVersion Include="WolverineFx.Postgresql" Version="5.14.0" />
+    <PackageVersion Include="WolverineFx" Version="5.15.0" />
+    <PackageVersion Include="WolverineFx.Kafka" Version="5.15.0" />
+    <PackageVersion Include="WolverineFx.Postgresql" Version="5.15.0" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
     <PackageVersion Include="xunit.v3" Version="3.2.2" />
   </ItemGroup>

@@ -88,8 +88,8 @@ public static class UpdateCashierCommandHandler
             statement = statement.Set(p => p.Email, command.Email);
         }
 
-        var updatedRecords = await statement.UpdateWithOutputAsync((_, inserted) => inserted, token: cancellationToken);
+        var updatedRecords = statement.UpdateWithOutputAsync((_, inserted) => inserted);
 
-        return updatedRecords.FirstOrDefault();
+        return await updatedRecords.FirstOrDefaultAsync(cancellationToken);
     }
 }

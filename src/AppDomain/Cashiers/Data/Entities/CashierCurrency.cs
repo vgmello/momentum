@@ -30,6 +30,7 @@ public record CashierCurrency : DbEntity
     /// <summary>
     ///     Gets or sets the UTC date when this currency association becomes effective.
     /// </summary>
+    [PrimaryKey(order: 3)]
     public DateTime EffectiveDateUtc { get; set; }
 
     /// <summary>

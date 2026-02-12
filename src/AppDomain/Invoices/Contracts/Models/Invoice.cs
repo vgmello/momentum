@@ -22,7 +22,7 @@ public record Invoice(
     Guid TenantId,
     Guid InvoiceId,
     string Name,
-    string Status,
+    InvoiceStatus Status,
     decimal Amount,
     string? Currency,
     DateTime? DueDate,

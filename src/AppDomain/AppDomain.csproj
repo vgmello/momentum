@@ -17,7 +17,7 @@
         <PackageReference Include="Microsoft.Orleans.Core.Abstractions"/>
         <!--#endif -->
         <PackageReference Include="Riok.Mapperly"/>
-        <PackageReference Include="linq2db.AspNet"/>
+        <PackageReference Include="linq2db.Extensions"/>
     </ItemGroup>
 
     <ItemGroup>
