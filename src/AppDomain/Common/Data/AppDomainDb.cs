@@ -22,6 +22,8 @@ public class AppDomainDb(DataOptions<AppDomainDb> options) : DataConnection(opti
     /// </summary>
     public ITable<Cashier> Cashiers => this.GetTable<Cashier>();
 
+    public ITable<CashierCurrency> CashierCurrencies => this.GetTable<CashierCurrency>();
+
     public ITable<Invoice> Invoices => this.GetTable<Invoice>();
     //#else
     // Add your domain entities here when not using samples

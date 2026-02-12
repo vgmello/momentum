@@ -33,6 +33,16 @@ public record Cashier
     public IReadOnlyList<CashierPayment> CashierPayments { get; init; } = [];
 
     /// <summary>
+    ///     Gets the date and time when the cashier was created (UTC).
+    /// </summary>
+    public DateTime CreatedDateUtc { get; init; }
+
+    /// <summary>
+    ///     Gets the date and time when the cashier was last updated (UTC).
+    /// </summary>
+    public DateTime UpdatedDateUtc { get; init; }
+
+    /// <summary>
     ///     Gets the version for optimistic concurrency control.
     /// </summary>
     public int Version { get; init; }

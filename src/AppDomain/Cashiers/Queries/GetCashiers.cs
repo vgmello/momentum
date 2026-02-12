@@ -17,7 +17,10 @@ public record GetCashiersQuery(Guid TenantId, int Offset = 0, int Limit = 100) :
     /// <param name="CashierId">Unique identifier for the cashier</param>
     /// <param name="Name">Full name of the cashier</param>
     /// <param name="Email">Email address of the cashier</param>
-    public record Result(Guid TenantId, Guid CashierId, string Name, string Email);
+    /// <param name="CreatedDateUtc">Date and time when the cashier was created (UTC)</param>
+    /// <param name="UpdatedDateUtc">Date and time when the cashier was last updated (UTC)</param>
+    /// <param name="Version">Version for optimistic concurrency control</param>
+    public record Result(Guid TenantId, Guid CashierId, string Name, string Email, DateTime CreatedDateUtc, DateTime UpdatedDateUtc, int Version);
 }
 
 /// <summary>
@@ -53,6 +56,6 @@ public static partial class GetCashiersQueryHandler
         var dbQuery = new DbQuery(query.TenantId, query.Limit, query.Offset);
         var cashiers = await messaging.InvokeQueryAsync(dbQuery, cancellationToken);
 
-        return cashiers.Select(c => new GetCashiersQuery.Result(c.TenantId, c.CashierId, c.Name, c.Email ?? string.Empty));
+        return cashiers.Select(c => new GetCashiersQuery.Result(c.TenantId, c.CashierId, c.Name, c.Email ?? string.Empty, c.CreatedDateUtc, c.UpdatedDateUtc, c.Version));
     }
 }

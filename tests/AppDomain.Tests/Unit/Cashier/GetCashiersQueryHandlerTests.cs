@@ -22,7 +22,7 @@ public class GetCashiersQueryHandlerTests
             new() { TenantId = tenantId, CashierId = Guid.NewGuid(), Name = "Cashier 2", Email = "cashier2@test.com" }
         };
 
-        var expectedResults = cashierEntities.Select(c => new GetCashiersQuery.Result(c.TenantId, c.CashierId, c.Name, c.Email ?? string.Empty))
+        var expectedResults = cashierEntities.Select(c => new GetCashiersQuery.Result(c.TenantId, c.CashierId, c.Name, c.Email ?? string.Empty, c.CreatedDateUtc, c.UpdatedDateUtc, c.Version))
             .ToList();
 
         var messagingMock = Substitute.For<IMessageBus>();

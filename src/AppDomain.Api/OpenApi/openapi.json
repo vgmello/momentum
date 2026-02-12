@@ -674,6 +674,14 @@
               "$ref": "#/components/schemas/CashierPayment"
             }
           },
+          "createdDateUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedDateUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
           "version": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
             "type": [
@@ -983,7 +991,10 @@
           "tenantId",
           "cashierId",
           "name",
-          "email"
+          "email",
+          "createdDateUtc",
+          "updatedDateUtc",
+          "version"
         ],
         "type": "object",
         "properties": {
@@ -1000,6 +1011,22 @@
           },
           "email": {
             "type": "string"
+          },
+          "createdDateUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedDateUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
           }
         }
       },

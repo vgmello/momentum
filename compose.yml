@@ -52,6 +52,7 @@ services:
       - -c
       - default_statistics_target=100
 
+    restart: unless-stopped
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -108,6 +109,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
+    restart: unless-stopped
     # #endif
 
     # #if (INCLUDE_ORLEANS)
@@ -121,6 +123,7 @@ services:
     volumes:
       - azurite-data:/data
     command: "azurite --silent --location /data --debug /data/debug.log --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0"
+    restart: unless-stopped
     healthcheck:
       test: [ "CMD-SHELL", "netstat -ltn | grep :10000 || exit 1" ]
       interval: 10s
@@ -193,6 +196,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    restart: unless-stopped
 
   # #endif
   # #if (INCLUDE_BACK_OFFICE)
@@ -230,6 +234,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    restart: unless-stopped
 
   # #endif
   # #if (INCLUDE_ORLEANS)
@@ -271,6 +276,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    restart: unless-stopped
 
   # #endif
   # #if (INCLUDE_DOCS)
@@ -292,6 +298,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
+    restart: unless-stopped
     # #endif
 
     # k6 Performance Testing - Run on-demand with: docker compose run --rm k6-performance run /scripts/scenarios/mixed/realistic-workflow.js

@@ -2,6 +2,7 @@
 
 using AppDomain.Invoices.Commands;
 using AppDomain.Invoices.Contracts.IntegrationEvents;
+using AppDomain.Invoices.Contracts.Models;
 using AppDomain.Invoices.Queries;
 
 namespace AppDomain.BackOffice.Messaging.AppDomainInboxHandler;
@@ -19,7 +20,6 @@ public static class PaymentReceivedHandler
     /// <param name="logger">Logger for tracking payment processing.</param>
     /// <param name="cancellationToken">Cancellation token for async operations.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    /// <exception cref="InvalidOperationException">Thrown when the associated invoice cannot be retrieved.</exception>
     public static async Task Handle(PaymentReceived @event, IMessageBus messaging, ILogger logger, CancellationToken cancellationToken)
     {
         var tenantId = @event.TenantId;
@@ -28,11 +28,17 @@ public static class PaymentReceivedHandler
         var getInvoiceQuery = new GetInvoiceQuery(tenantId, @event.InvoiceId);
         var invoiceResult = await messaging.InvokeQueryAsync(getInvoiceQuery, cancellationToken);
 
-        var invoice = invoiceResult.Match(
+        var invoice = invoiceResult.Match<Invoice?>(
             success => success,
-            errors => throw new InvalidOperationException(
-                $"Failed to retrieve invoice {@event.InvoiceId} for payment processing: {string.Join(", ", errors)}")
+            errors =>
+            {
+                logger.LogWarning("Failed to retrieve invoice {InvoiceId} for payment processing: {Errors}",
+                    @event.InvoiceId, string.Join(", ", errors));
+                return null;
+            }
         );
+
+        if (invoice is null) return;
 
         var markPaidCommand = new MarkInvoiceAsPaidCommand(
             tenantId,

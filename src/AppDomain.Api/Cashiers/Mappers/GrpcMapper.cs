@@ -4,6 +4,7 @@ using AppDomain.Cashiers.Commands;
 using AppDomain.Cashiers.Contracts.Models;
 using AppDomain.Cashiers.Grpc;
 using AppDomain.Cashiers.Queries;
+using Google.Protobuf.WellKnownTypes;
 using GrpcCashier = AppDomain.Cashiers.Grpc.Models.Cashier;
 
 namespace AppDomain.Api.Cashiers.Mappers;
@@ -23,7 +24,6 @@ public static partial class GrpcMapper
     /// <param name="source">The domain cashier entity to transform.</param>
     /// <returns>A gRPC cashier model for client consumption.</returns>
     [MapperIgnoreSource(nameof(Cashier.CashierPayments))]
-    [MapperIgnoreSource(nameof(Cashier.Version))]
     public static partial GrpcCashier ToGrpc(this Cashier source);
 
     /// <summary>
@@ -84,4 +84,9 @@ public static partial class GrpcMapper
     /// <param name="guid">The GUID to convert.</param>
     /// <returns>The string representation of the GUID.</returns>
     private static string ToString(Guid guid) => guid.ToString();
+
+    /// <summary>
+    ///     Converts a DateTime to a Protocol Buffer Timestamp.
+    /// </summary>
+    private static Timestamp ToTimestamp(DateTime dateTime) => dateTime.ToUniversalTime().ToTimestamp();
 }

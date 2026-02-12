@@ -44,21 +44,19 @@ public class GetCashiersIntegrationTests(IntegrationTestFixture fixture) : Integ
         // Assert
         response.Cashiers.Count.ShouldBeGreaterThanOrEqualTo(2);
 
-        response.Cashiers[0].ShouldBe(new AppDomain.Cashiers.Grpc.Models.Cashier
-        {
-            TenantId = "12345678-0000-0000-0000-000000000000",
-            CashierId = createdCashiers[0].CashierId,
-            Name = createdCashiers[0].Name,
-            Email = createdCashiers[0].Email
-        });
+        response.Cashiers[0].TenantId.ShouldBe("12345678-0000-0000-0000-000000000000");
+        response.Cashiers[0].CashierId.ShouldBe(createdCashiers[0].CashierId);
+        response.Cashiers[0].Name.ShouldBe(createdCashiers[0].Name);
+        response.Cashiers[0].Email.ShouldBe(createdCashiers[0].Email);
+        response.Cashiers[0].CreatedDateUtc.ShouldNotBeNull();
+        response.Cashiers[0].UpdatedDateUtc.ShouldNotBeNull();
 
-        response.Cashiers[1].ShouldBe(new AppDomain.Cashiers.Grpc.Models.Cashier
-        {
-            TenantId = "12345678-0000-0000-0000-000000000000",
-            CashierId = createdCashiers[1].CashierId,
-            Name = createdCashiers[1].Name,
-            Email = createdCashiers[1].Email
-        });
+        response.Cashiers[1].TenantId.ShouldBe("12345678-0000-0000-0000-000000000000");
+        response.Cashiers[1].CashierId.ShouldBe(createdCashiers[1].CashierId);
+        response.Cashiers[1].Name.ShouldBe(createdCashiers[1].Name);
+        response.Cashiers[1].Email.ShouldBe(createdCashiers[1].Email);
+        response.Cashiers[1].CreatedDateUtc.ShouldNotBeNull();
+        response.Cashiers[1].UpdatedDateUtc.ShouldNotBeNull();
     }
 
     [Fact]
