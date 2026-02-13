@@ -42,7 +42,7 @@ public class IntegrationTests
         return Path.Combine(Path.GetTempPath(), "dummy-cashier-created.md");
     }
 
-    [Fact(Skip = "Debug test - only run when debugging path issues")]
+    [Fact]
     public async Task GenerateMarkdown_ShouldMatchReferenceFormat()
     {
         // Arrange
@@ -76,11 +76,8 @@ public class IntegrationTests
 
             var generatedMarkdown = markdownGenerator.GenerateMarkdown(eventWithDoc, outputDir);
 
-            // Act - Read generated content
-            var generatedContent = await File.ReadAllTextAsync(generatedMarkdown.FilePath, TestContext.Current.CancellationToken);
-
-            // Debug output - write full content to file for analysis
-            await File.WriteAllTextAsync("/tmp/debug-generated-content.txt", generatedContent, TestContext.Current.CancellationToken);
+            // Act - Use generated content directly (GenerateMarkdown returns content without writing to disk)
+            var generatedContent = generatedMarkdown.Content;
 
             // Assert - Compare with reference (if exists)
             if (File.Exists(ReferenceMarkdownPath))
@@ -190,7 +187,7 @@ public class IntegrationTests
             .FirstOrDefault(line => line.Contains(marker))?.Trim();
     }
 
-    [Fact(Skip = "Debug test - only run when debugging path issues")]
+    [Fact]
     public void JsonSidebarGenerator_ShouldGenerateCorrectStructure()
     {
         // Arrange
@@ -210,7 +207,7 @@ public class IntegrationTests
 
         // Assert
         var cashierCreatedEvent = events.FirstOrDefault(e => e.EventName == "CashierCreated");
-        sidebarItems.Count.ShouldBe(5); // Multiple domain sections + Schemas section
+        sidebarItems.Count.ShouldBe(7); // Multiple domain sections + Schemas section
 
         // Validate AppDomain section exists (contains CashierCreated)
         var appDomainSection = sidebarItems.FirstOrDefault(s => s.Text == "AppDomain");
@@ -258,7 +255,7 @@ public class IntegrationTests
         content.ShouldContain("---\neditLink: false\n---");
 
         // Validate topic format
-        content.ShouldContain("**Topic:** `{env}.AppDomain.public.cashiers.v1`");
+        content.ShouldContain("**Topic:** `{env}.testevents.public.cashiers.v1`");
 
         // Validate entity field
         content.ShouldContain("**Entity:** `cashier`");

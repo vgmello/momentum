@@ -19,7 +19,7 @@ public class XmlDocumentationService(ILogger<XmlDocumentationService> logger) : 
 {
     private readonly ConcurrentDictionary<string, XmlDocumentationInfo> _documentationCache = new();
 
-    public async Task<bool> LoadDocumentationAsync(string xmlFilePath)
+    public async Task<bool> LoadDocumentationAsync(string xmlFilePath, CancellationToken cancellationToken = default)
     {
         if (!File.Exists(xmlFilePath))
         {
@@ -45,7 +45,7 @@ public class XmlDocumentationService(ILogger<XmlDocumentationService> logger) : 
                 ConformanceLevel = ConformanceLevel.Document
             });
 
-            await ParseXmlDocumentationAsync(xmlReader).ConfigureAwait(false);
+            await ParseXmlDocumentationAsync(xmlReader, cancellationToken).ConfigureAwait(false);
 
             logger.LogInformation("Loaded XML documentation from {FilePath} with {Count} entries", xmlFilePath, _documentationCache.Count);
 
@@ -80,10 +80,12 @@ public class XmlDocumentationService(ILogger<XmlDocumentationService> logger) : 
 
     public void ClearCache() => _documentationCache.Clear();
 
-    private async Task ParseXmlDocumentationAsync(XmlReader reader)
+    private async Task ParseXmlDocumentationAsync(XmlReader reader, CancellationToken cancellationToken)
     {
         while (await reader.ReadAsync())
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             if (reader is not { NodeType: XmlNodeType.Element, Name: "member" })
                 continue;
 

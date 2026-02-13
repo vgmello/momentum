@@ -114,7 +114,7 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
         options.EnsureOutputDirectoryExists();
 
         var xmlParser = new XmlDocumentationParser();
-        var markdownGenerator = new FluidMarkdownGenerator(options.TemplatesDirectory);
+        var markdownGenerator = await FluidMarkdownGenerator.CreateAsync(options.TemplatesDirectory);
         var sidebarGenerator = new JsonSidebarGenerator();
 
         var xmlDocumentationPaths = DiscoverXmlDocumentationFiles(options.AssemblyPaths, options.XmlDocumentationPaths);
@@ -132,7 +132,13 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
             IsolatedAssemblyLoadContext? loadContext = null;
             try
             {
-                var assembly = LoadAssemblyWithDependencyResolution(assemblyPath, out loadContext);
+                using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                cts.CancelAfter(TimeSpan.FromSeconds(30));
+
+                var assembly = await Task.Run(
+                    () => LoadAssemblyWithDependencyResolution(assemblyPath, out loadContext),
+                    cts.Token);
+
                 var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser);
 
                 foreach (var eventMetadata in events)
@@ -148,6 +154,10 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
                 }
 
                 processedAssemblies++;
+            }
+            catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+            {
+                AnsiConsole.MarkupLine($"[yellow]Warning:[/] Timed out loading assembly {assemblyPath} (30s limit)");
             }
             catch (Exception ex)
             {
