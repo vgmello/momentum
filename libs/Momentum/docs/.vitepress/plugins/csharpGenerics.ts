@@ -1,5 +1,10 @@
 import MarkdownIt from "markdown-it";
 
+const hasAngleBracketPair = (content: string): boolean => {
+    const openIdx = content.indexOf("<");
+    return openIdx !== -1 && content.indexOf(">", openIdx + 2) !== -1;
+};
+
 /**
  * Plugin to handle C# generic types and prevent Vue parser issues.
  * Adds v-pre to fenced code blocks and inline code containing angle brackets,
@@ -14,7 +19,7 @@ const CSharpGenericsPlugin = (md: MarkdownIt) => {
         const token = tokens[idx];
 
         // Apply v-pre to any code fence that might contain content confusing to Vue parser
-        if (token.content && /<[^>]*>/.test(token.content)) {
+        if (token.content && hasAngleBracketPair(token.content)) {
             const originalAttrs = token.attrs ? [...token.attrs] : [];
             token.attrPush(["v-pre", ""]);
             const result = originalFenceRenderer(...args);
@@ -31,7 +36,7 @@ const CSharpGenericsPlugin = (md: MarkdownIt) => {
     md.renderer.rules.code_inline = (tokens, idx, options, env, slf) => {
         const token = tokens[idx];
 
-        if (token.content && /<[^>]*>/.test(token.content)) {
+        if (token.content && hasAngleBracketPair(token.content)) {
             return `<code v-pre>${md.utils.escapeHtml(token.content)}</code>`;
         }
 

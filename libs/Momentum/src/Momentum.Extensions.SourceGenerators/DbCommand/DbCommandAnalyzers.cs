@@ -56,12 +56,14 @@ internal static class DbCommandAnalyzers
     // SQL identifier: plain, [bracketed], or "quoted", with optional schema qualification
     private static readonly System.Text.RegularExpressions.Regex ValidSqlIdentifierPattern = new(
         @"^(""?[a-zA-Z_]\w*""?|\[[a-zA-Z_]\w*\])(\.\s*(""?[a-zA-Z_]\w*""?|\[[a-zA-Z_]\w*\]))*$",
-        System.Text.RegularExpressions.RegexOptions.Compiled);
+        System.Text.RegularExpressions.RegexOptions.Compiled,
+        System.TimeSpan.FromSeconds(1));
 
     // Dangerous SQL injection patterns
     private static readonly System.Text.RegularExpressions.Regex DangerousSqlPattern = new(
         @";|--\s|/\*",
-        System.Text.RegularExpressions.RegexOptions.Compiled);
+        System.Text.RegularExpressions.RegexOptions.Compiled,
+        System.TimeSpan.FromSeconds(1));
 
     /// <summary>
     ///     If <see cref="DbCommandTypeInfo.ResultTypeInfo" /> is null, it means ICommand/IQuery&lt;TResult&gt; was not found.
