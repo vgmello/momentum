@@ -32,17 +32,16 @@ public static partial class HealthCheckSetupExtensions
     /// </remarks>
     public static WebApplication MapDefaultHealthCheckEndpoints(this WebApplication app)
     {
-        // If the HealthCheckStatusStore is registered in the app DI container, we will use it,
-        // otherwise we will create a new one. This simplifies app registration in the majority of cases,
-        // while allowing the app to query for health status if it ever needs to.
-        var healthCheckStore = app.Services.GetService<HealthCheckStatusStore>() ?? new HealthCheckStatusStore();
+        var healthCheckStore = app.Services.GetRequiredService<HealthCheckStatusStore>();
 
         var logger = GetHealthCheckLogger(app.Services);
 
         // liveness probe
         app.MapGet("/status", () =>
             {
-                var statusCode = healthCheckStore.LastHealthStatus is not HealthStatus.Unhealthy
+                var isCacheStale = DateTime.UtcNow - healthCheckStore.LastUpdated > TimeSpan.FromSeconds(30);
+
+                var statusCode = healthCheckStore.LastHealthStatus is not HealthStatus.Unhealthy && !isCacheStale
                     ? StatusCodes.Status200OK
                     : StatusCodes.Status503ServiceUnavailable;
 
