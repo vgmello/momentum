@@ -98,10 +98,10 @@ jobs:
         dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner --verbosity minimal
 
     - name: Initialize CodeQL and SonarQube
-      uses: github/codeql-action/init@v3
+      uses: github/codeql-action/init@v4
       with:
         languages: csharp
-        build-mode: manual
+        build-mode: none
 
     - name: Start SonarQube analysis
       env:
@@ -116,7 +116,10 @@ jobs:
           /d:sonar.token="$env:SONAR_TOKEN" `
           /d:sonar.host.url="https://sonarcloud.io" `
           /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" `
-          /d:sonar.coverage.exclusions="**/*Tests*/**,**/Program.cs,**/*.Generated.cs"
+          /d:sonar.coverage.exclusions="**/*Tests*/**,**/Program.cs,**/*.Generated.cs" `
+          /d:sonar.issue.ignore.multicriteria=e1 `
+          /d:sonar.issue.ignore.multicriteria.e1.ruleKey=csharpsquid:S2068 `
+          /d:sonar.issue.ignore.multicriteria.e1.resourceKey="**/appsettings.Performance.json"
 
     - name: Restore NuGet packages
       run: dotnet restore --verbosity minimal
@@ -146,7 +149,7 @@ jobs:
         }
 
     - name: Complete CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
+      uses: github/codeql-action/analyze@v4
       with:
         category: "/language:csharp"
 

@@ -15,6 +15,7 @@
     <Project Path="tests\Momentum.Extensions.EventMarkdownGenerator.Tests\Momentum.Extensions.EventMarkdownGenerator.Tests.csproj" />
     <Project Path="tests\Momentum.Extensions.SourceGenerators.Tests\Momentum.Extensions.SourceGenerators.Tests.csproj" />
     <Project Path="tests\Momentum.Extensions.Tests\Momentum.Extensions.Tests.csproj" />
+    <Project Path="tests\Momentum.ServiceDefaults.Api.Tests\Momentum.ServiceDefaults.Api.Tests.csproj" />
     <Project Path="tests\TestEvents\TestEvents.csproj" />
   </Folder>
   <Project Path="src\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj" />
