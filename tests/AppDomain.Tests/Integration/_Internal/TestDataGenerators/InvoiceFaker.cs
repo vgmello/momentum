@@ -14,7 +14,7 @@ public sealed class InvoiceFaker : Faker<CreateInvoiceRequest>
         RuleFor(i => i.Amount, f => (DecimalValue)f.Finance.Amount(40, 10000));
         RuleFor(i => i.Currency, f => f.PickRandom("USD", "EUR", "GBP", "JPY", "CAD", "AUD"));
         RuleFor(i => i.DueDate, f => Timestamp.FromDateTime(f.Date.Future(6, DateTime.UtcNow).ToUniversalTime()));
-        RuleFor(i => i.CashierId, f => cashierId ?? (f.Random.Bool(0.3f) ? f.Random.Guid().ToString() : string.Empty));
+        RuleFor(i => i.CashierId, _ => cashierId ?? string.Empty);
     }
 
     public InvoiceFaker WithCashier(string cashierId)

@@ -59,6 +59,115 @@ graph TB
     Orleans -/-> EventStore
 ```
 
+## BackOffice Service Structure
+
+The BackOffice service handles background processing, event consumption, and scheduled tasks. It follows a specific folder structure organized by event source domains.
+
+### Folder Organization
+
+```
+{ServiceName}.BackOffice/
+├── Core/
+│   └── Jobs/                        # Background jobs and scheduled tasks
+│       └── {JobName}.cs             # e.g., DummyDataGenerator.cs
+├── Messaging/
+│   ├── {DomainName}InboxHandler/    # Event handlers for domain events
+│   │   ├── {EventName}Handler.cs    # e.g., CashierCreatedHandler.cs
+│   │   ├── InvoiceCreatedHandler.cs
+│   │   └── PaymentReceivedHandler.cs
+│   └── {ExternalDomain}InboxHandler/ # Event handlers for external domain events
+│       └── BusinessDayEndedHandler.cs
+├── DependencyInjection.cs
+└── Program.cs
+```
+
+**Naming Conventions:**
+- `{DomainName}InboxHandler/` - Handlers for events from a specific domain (e.g., `CashiersInboxHandler/`, `InvoicesInboxHandler/`)
+- `{ExternalDomain}InboxHandler/` - Handlers for events from external services (e.g., `AccountingInboxHandler/`)
+- Handlers are named after the event they handle with a `Handler` suffix
+
+### Event Handlers (Messaging/)
+
+Event handlers follow the static handler pattern with Wolverine conventions:
+
+```csharp
+public static class CashierCreatedHandler
+{
+    public static Task Handle(
+        CashierCreated @event,
+        ILogger logger,
+        IMessageBus messaging,
+        CancellationToken cancellationToken)
+    {
+        logger.LogInformation("Cashier created: {Id}", @event.Cashier.CashierId);
+
+        // Process the event:
+        // - Update read models
+        // - Send notifications
+        // - Trigger workflows
+        // - Forward to Orleans grains for stateful processing
+
+        return Task.CompletedTask;
+    }
+}
+```
+
+**Handler Responsibilities:**
+- Consume integration events from Kafka topics
+- Update read models or denormalized views
+- Trigger notifications or external integrations
+- Forward events to Orleans grains for stateful processing
+- Orchestrate cross-domain workflows
+
+### Background Jobs (Core/Jobs/)
+
+Background jobs implement `BackgroundService` for scheduled or recurring tasks:
+
+```csharp
+public class DataSyncJob(IMessageBus bus, ILogger<DataSyncJob> logger) : BackgroundService
+{
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            logger.LogInformation("Running data sync job...");
+
+            // Perform background work
+            await bus.PublishAsync(new DataSyncRequested(DateTime.UtcNow));
+
+            await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
+        }
+    }
+}
+```
+
+**Common Job Types:**
+- Data synchronization jobs
+- Report generation
+- Cache warming
+- Health check monitoring
+- Data cleanup and archival
+
+### Dependency Injection
+
+Register BackOffice services in `DependencyInjection.cs`:
+
+```csharp
+public static class DependencyInjection
+{
+    public static IHostApplicationBuilder AddBackOfficeServices(this IHostApplicationBuilder builder)
+    {
+        // Register background jobs
+        builder.Services.AddHostedService<DataSyncJob>();
+
+        // Register domain-specific services
+        builder.Services.AddScoped<INotificationService, NotificationService>();
+
+        return builder;
+    }
+}
+```
+
 ## Orleans Configuration
 
 ### Silo Setup

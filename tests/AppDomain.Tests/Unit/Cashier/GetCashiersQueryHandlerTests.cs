@@ -1,8 +1,8 @@
 // Copyright (c) OrgName. All rights reserved.
 
 using AppDomain.Cashiers.Queries;
-using NSubstitute.ExceptionExtensions;
 using Momentum.Extensions.Messaging;
+using NSubstitute.ExceptionExtensions;
 using Wolverine;
 
 namespace AppDomain.Tests.Unit.Cashier;
@@ -22,7 +22,7 @@ public class GetCashiersQueryHandlerTests
             new() { TenantId = tenantId, CashierId = Guid.NewGuid(), Name = "Cashier 2", Email = "cashier2@test.com" }
         };
 
-        var expectedResults = cashierEntities.Select(c => new GetCashiersQuery.Result(c.TenantId, c.CashierId, c.Name, c.Email ?? "N/A"))
+        var expectedResults = cashierEntities.Select(c => new GetCashiersQuery.Result(c.TenantId, c.CashierId, c.Name, c.Email ?? string.Empty, c.CreatedDateUtc, c.UpdatedDateUtc, c.Version))
             .ToList();
 
         var messagingMock = Substitute.For<IMessageBus>();
@@ -49,7 +49,7 @@ public class GetCashiersQueryHandlerTests
     {
         // Arrange
         var tenantId = Guid.NewGuid();
-        var query = new GetCashiersQuery(tenantId, 0); // Use constructor with default limit
+        var query = new GetCashiersQuery(tenantId); // Use constructor with default limit
 
         var messagingMock = Substitute.For<IMessageBus>();
         messagingMock.InvokeQueryAsync(
@@ -64,7 +64,7 @@ public class GetCashiersQueryHandlerTests
         await messagingMock.Received(1).InvokeQueryAsync(
             Arg.Is<GetCashiersQueryHandler.DbQuery>(dbQuery =>
                 dbQuery.TenantId == tenantId &&
-                dbQuery.Limit == 1000 &&
+                dbQuery.Limit == 100 &&
                 dbQuery.Offset == 0),
             Arg.Any<CancellationToken>());
     }

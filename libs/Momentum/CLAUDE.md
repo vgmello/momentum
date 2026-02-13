@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-**Momentum Libraries** is a collection of .NET 9 libraries that provide platform services, extensions, and source generators for the Momentum template system. These libraries work both standalone and as part of generated solutions.
+**Momentum Libraries** is a collection of .NET 10 libraries that provide platform services, extensions, and source generators for the Momentum template system. These libraries work both standalone and as part of generated solutions.
 
 **Key Libraries**:
 - **Momentum.Extensions**: Core utilities, result types, and messaging abstractions
@@ -52,7 +52,7 @@ dotnet build -p:EmitCompilerGeneratedFiles=true -p:CompilerGeneratedFilesOutputP
 ```bash
 # Generate event documentation from test assembly
 cd src/Momentum.Extensions.EventMarkdownGenerator
-dotnet run -- generate --assembly "../../tests/TestEvents/bin/Debug/net9.0/TestEvents.dll" --output "../../docs/generated"
+dotnet run -- generate --assembly "../../tests/TestEvents/bin/Debug/net10.0/TestEvents.dll" --output "../../docs/generated"
 
 # Test different generation scenarios
 cd tests/Momentum.Extensions.EventMarkdownGenerator.Tests
@@ -63,7 +63,7 @@ dotnet test --filter "IntegrationTests"
 
 ```bash
 # Build and serve library documentation
-cd docs && pnpm install && pnpm dev
+cd docs && bun install && bun run dev
 
 # Generate DocFX documentation
 cd docs && dotnet build
@@ -182,7 +182,7 @@ dotnet test --filter "ScenarioBasedIntegrationTests"
 dotnet build -p:MomentumGeneratorVerbose=true
 
 # View generated source files
-ls obj/Debug/net9.0/generated/Momentum.Extensions.SourceGenerators/
+ls obj/Debug/net10.0/generated/Momentum.Extensions.SourceGenerators/
 
 # Test generator with sample code
 dotnet new console -n GeneratorTest
@@ -199,7 +199,7 @@ dotnet build
 
 # Generate documentation
 cd ../../src/Momentum.Extensions.EventMarkdownGenerator
-dotnet run -- generate --assembly "../../../tests/TestEvents/bin/Debug/net9.0/TestEvents.dll" --output "./test-output"
+dotnet run -- generate --assembly "../../../tests/TestEvents/bin/Debug/net10.0/TestEvents.dll" --output "./test-output"
 
 # View generated markdown files
 ls test-output/
@@ -224,7 +224,7 @@ echo "1.2.0" > version.txt
 Global properties in `Directory.Build.props`:
 
 ```xml
-<TargetFramework>net9.0</TargetFramework>
+<TargetFramework>net10.0</TargetFramework>
 <Nullable>enable</Nullable>
 <ImplicitUsings>enable</ImplicitUsings>
 <EnableNETAnalyzers>true</EnableNETAnalyzers>
@@ -248,9 +248,9 @@ Control source generation behavior:
 
 ### Prerequisites
 
-- .NET 9.0 SDK
+- .NET 10.0 SDK
 - Visual Studio 2022 17.8+ or VS Code with C# extension
-- Node.js and pnpm (for documentation)
+- Bun (for documentation)
 
 ### IDE Setup
 
@@ -286,7 +286,7 @@ dotnet build --verbosity diagnostic
 Events must have proper XML documentation:
 
 ```csharp
-[EventTopic("app_domain.cashiers.cashier-created")]
+[EventTopic("main.cashiers.cashier-created")]
 public record CashierCreated(Guid CashierId, string Name);
 ```
 

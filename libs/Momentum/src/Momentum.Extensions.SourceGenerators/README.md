@@ -67,6 +67,27 @@ The DbCommand generator follows this pattern:
 2. **Decorate with `[DbCommand]`** specifying stored procedure, SQL, or function
 3. **Generated code provides** parameter mapping and database execution logic
 
+### ICommand vs IQuery
+
+Both interfaces serve the same purpose for the generator - they indicate the return type for the generated handler. The distinction is semantic:
+
+| Interface | Purpose | Example Use Cases |
+|-----------|---------|-------------------|
+| `ICommand<T>` | Operations that modify state | Create, Update, Delete operations |
+| `IQuery<T>` | Operations that only read data | Select, Count, Search operations |
+
+```csharp
+// Use ICommand for write operations
+[DbCommand(sp: "create_user", nonQuery: true)]
+public partial record CreateUserCommand(string Name) : ICommand<int>;
+
+// Use IQuery for read-only operations
+[DbCommand(sql: "SELECT * FROM users WHERE active = true")]
+public partial record GetActiveUsersQuery() : IQuery<IEnumerable<User>>;
+```
+
+The generator treats both interfaces identically - the choice is for code clarity and integration with CQRS patterns.
+
 ### 1. Stored Procedure Commands
 
 **Basic Stored Procedure Example:**
@@ -341,9 +362,23 @@ public partial record SearchUsersQuery(string? Name, int? MinAge) : ICommand<IEn
   <!-- Set default parameter case for all DbCommand attributes -->
   <DbCommandDefaultParamCase>SnakeCase</DbCommandDefaultParamCase>
 
+  <!-- Optional: Add prefix to all generated parameter names -->
+  <DbCommandParamPrefix>p_</DbCommandParamPrefix>
+
   <!-- Enable verbose logging for debugging -->
   <MomentumGeneratorVerbose>true</MomentumGeneratorVerbose>
 </PropertyGroup>
+```
+
+**Parameter Prefix Example:**
+
+```csharp
+// With DbCommandParamPrefix set to "p_" and SnakeCase:
+[DbCommand(sp: "create_user")]
+public partial record CreateUserCommand(int UserId, string FirstName) : ICommand<int>;
+
+// Generated parameter names: p_user_id, p_first_name
+// Note: [Column] attribute overrides the prefix
 ```
 
 **Per-Command Override:**
@@ -500,7 +535,7 @@ public class UserRepository : IUserRepository
 **File System Location:**
 
 ```
-obj/Debug/net9.0/generated/Momentum.Extensions.SourceGenerators/
+obj/Debug/net10.0/generated/Momentum.Extensions.SourceGenerators/
 ├── CreateUserCommand.DbExt.g.cs     # Parameter provider
 ├── CreateUserCommandHandler.g.cs    # Command handler
 ├── GetUserByIdQuery.DbExt.g.cs      # Parameter provider
@@ -541,6 +576,47 @@ dotnet build
 ```
 
 ## Troubleshooting Guide
+
+### Analyzer Diagnostics
+
+The source generator includes compile-time analyzers that validate your DbCommand configurations:
+
+| ID | Severity | Description |
+|----|----------|-------------|
+| MMT001 | Warning | NonQuery attribute used with non-int result type. NonQuery is only valid for `ICommand<int>`. |
+| MMT002 | Error | Command specifies sp/sql/fn but doesn't implement `ICommand<T>` or `IQuery<T>`. Handler cannot be generated without a result type. |
+| MMT003 | Error | Multiple command properties specified. The properties `sp`, `sql`, and `fn` are mutually exclusive. |
+
+**Example Fixes:**
+
+```csharp
+// MMT001: NonQuery with non-int result
+// ❌ Warning: NonQuery should be used with ICommand<int>
+[DbCommand(sp: "create_user", nonQuery: true)]
+public partial record CreateUserCommand(string Name) : ICommand<User>;
+
+// ✅ Fix: Use ICommand<int> for NonQuery operations
+[DbCommand(sp: "create_user", nonQuery: true)]
+public partial record CreateUserCommand(string Name) : ICommand<int>;
+
+// MMT002: Missing interface
+// ❌ Error: Handler cannot be generated
+[DbCommand(sp: "create_user")]
+public partial record CreateUserCommand(string Name);
+
+// ✅ Fix: Implement ICommand<T> or IQuery<T>
+[DbCommand(sp: "create_user")]
+public partial record CreateUserCommand(string Name) : ICommand<int>;
+
+// MMT003: Mutually exclusive properties
+// ❌ Error: Cannot specify both sp and sql
+[DbCommand(sp: "create_user", sql: "INSERT INTO users...")]
+public partial record CreateUserCommand(string Name) : ICommand<int>;
+
+// ✅ Fix: Use only one of sp, sql, or fn
+[DbCommand(sp: "create_user")]
+public partial record CreateUserCommand(string Name) : ICommand<int>;
+```
 
 ### Common Issues & Solutions
 

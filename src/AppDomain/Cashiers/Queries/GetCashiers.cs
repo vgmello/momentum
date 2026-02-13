@@ -7,8 +7,8 @@ namespace AppDomain.Cashiers.Queries;
 /// </summary>
 /// <param name="TenantId">Unique identifier for the tenant</param>
 /// <param name="Offset">Number of records to skip for pagination (default: 0)</param>
-/// <param name="Limit">Maximum number of records to return (default: 1000)</param>
-public record GetCashiersQuery(Guid TenantId, int Offset = 0, int Limit = 1000) : IQuery<IEnumerable<GetCashiersQuery.Result>>
+/// <param name="Limit">Maximum number of records to return (default: 100)</param>
+public record GetCashiersQuery(Guid TenantId, int Offset = 0, int Limit = 100) : IQuery<IEnumerable<GetCashiersQuery.Result>>
 {
     /// <summary>
     ///     Represents a cashier result with essential information.
@@ -17,7 +17,10 @@ public record GetCashiersQuery(Guid TenantId, int Offset = 0, int Limit = 1000) 
     /// <param name="CashierId">Unique identifier for the cashier</param>
     /// <param name="Name">Full name of the cashier</param>
     /// <param name="Email">Email address of the cashier</param>
-    public record Result(Guid TenantId, Guid CashierId, string Name, string Email);
+    /// <param name="CreatedDateUtc">Date and time when the cashier was created (UTC)</param>
+    /// <param name="UpdatedDateUtc">Date and time when the cashier was last updated (UTC)</param>
+    /// <param name="Version">Version for optimistic concurrency control</param>
+    public record Result(Guid TenantId, Guid CashierId, string Name, string Email, DateTime CreatedDateUtc, DateTime UpdatedDateUtc, int Version);
 }
 
 /// <summary>
@@ -37,7 +40,7 @@ public static partial class GetCashiersQueryHandler
     ///         - If the function name starts with a $, the function gets executed as `select * from {dbFunction}`
     ///     </para>
     /// </remarks>
-    [DbCommand(fn: "$app_domain.cashiers_get_all")]
+    [DbCommand(fn: "$main.cashiers_get_all")]
     public partial record DbQuery(Guid TenantId, int Limit, int Offset) : IQuery<IEnumerable<Data.Entities.Cashier>>;
 
     /// <summary>
@@ -53,6 +56,6 @@ public static partial class GetCashiersQueryHandler
         var dbQuery = new DbQuery(query.TenantId, query.Limit, query.Offset);
         var cashiers = await messaging.InvokeQueryAsync(dbQuery, cancellationToken);
 
-        return cashiers.Select(c => new GetCashiersQuery.Result(c.TenantId, c.CashierId, c.Name, c.Email ?? "N/A"));
+        return cashiers.Select(c => new GetCashiersQuery.Result(c.TenantId, c.CashierId, c.Name, c.Email ?? string.Empty, c.CreatedDateUtc, c.UpdatedDateUtc, c.Version));
     }
 }

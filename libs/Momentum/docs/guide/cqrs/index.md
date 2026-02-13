@@ -74,7 +74,7 @@ public static async Task<(Result<Order>, OrderCreated?)> Handle(
 }
 
 // Database handler with source generation
-[DbCommand(fn: "$app_domain.orders_create")]
+[DbCommand(fn: "$main.orders_create")]
 public partial record DbCommand(Guid TenantId, Guid CustomerId, string ItemsJson)
     : ICommand<Result<Guid>>;
 ```
@@ -101,7 +101,7 @@ public static async Task<IEnumerable<OrderSummary>> Handle(
 }
 
 // Source-generated database query
-[DbCommand(fn: "$app_domain.orders_get_by_customer")]
+[DbCommand(fn: "$main.orders_get_by_customer")]
 public partial record DbQuery(Guid TenantId, Guid CustomerId, int Limit, int Offset)
     : IQuery<IEnumerable<Data.Entities.Order>>;
 ```
@@ -158,7 +158,7 @@ All entities use **composite primary keys** with `TenantId` for complete data is
 
 ```sql
 -- Multi-tenant table structure
-CREATE TABLE app_domain.orders (
+CREATE TABLE main.orders (
     tenant_id UUID NOT NULL,
     order_id UUID NOT NULL,
     customer_id UUID NOT NULL,
@@ -169,7 +169,7 @@ CREATE TABLE app_domain.orders (
 );
 
 -- All queries must include tenant context
-CREATE OR REPLACE FUNCTION app_domain.orders_get_by_customer(
+CREATE OR REPLACE FUNCTION main.orders_get_by_customer(
     p_tenant_id UUID,
     p_customer_id UUID,
     p_limit INTEGER DEFAULT 10,
@@ -178,7 +178,7 @@ CREATE OR REPLACE FUNCTION app_domain.orders_get_by_customer(
 BEGIN
     RETURN QUERY
     SELECT o.tenant_id, o.order_id, o.customer_id, o.total_amount
-    FROM app_domain.orders o
+    FROM main.orders o
     WHERE o.tenant_id = p_tenant_id
       AND o.customer_id = p_customer_id
     ORDER BY o.order_date DESC
@@ -193,7 +193,7 @@ Momentum uses **compile-time source generation** for type-safe, high-performance
 
 ```csharp
 // The [DbCommand] attribute triggers source generation
-[DbCommand(fn: "$app_domain.orders_create")]
+[DbCommand(fn: "$main.orders_create")]
 public partial record CreateOrderDbCommand(
     Guid TenantId,
     Guid CustomerId,
@@ -208,9 +208,9 @@ public partial record CreateOrderDbCommand
         IDbConnection connection,
         CancellationToken cancellationToken)
     {
-        // Auto-generated SQL: SELECT * FROM app_domain.orders_create(@TenantId, @CustomerId, @ItemsJson)
+        // Auto-generated SQL: SELECT * FROM main.orders_create(@TenantId, @CustomerId, @ItemsJson)
         var result = await connection.QuerySingleAsync<Guid>(
-            "SELECT * FROM app_domain.orders_create(@TenantId, @CustomerId, @ItemsJson)",
+            "SELECT * FROM main.orders_create(@TenantId, @CustomerId, @ItemsJson)",
             command,
             cancellationToken);
 
@@ -257,7 +257,7 @@ Momentum provides a complete CQRS implementation with:
 
 ```csharp
 // Domain entities with multi-tenant support
-[Table(Schema = "app_domain", Name = "orders")]
+[Table(Schema = "main", Name = "orders")]
 public record Order : DbEntity
 {
     [PrimaryKey(Order = 0)] [Column("tenant_id")] public Guid TenantId { get; set; }
@@ -284,7 +284,7 @@ public record GetOrderByIdQuery(Guid TenantId, Guid OrderId) : IQuery<Order?>;
 public static partial class CreateOrderCommandHandler
 {
     // Source-generated database command
-    [DbCommand(fn: "$app_domain.orders_create")]
+    [DbCommand(fn: "$main.orders_create")]
     public partial record DbCommand(Guid TenantId, Guid CustomerId, string ItemsJson)
         : ICommand<Result<Guid>>;
 

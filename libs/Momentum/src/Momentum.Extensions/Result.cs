@@ -26,6 +26,4 @@ namespace Momentum.Extensions;
 /// </code>
 /// </example>
 [GenerateOneOf]
-public partial class Result<T> : OneOfBase<T, List<ValidationFailure>>
-{
-}
+public partial class Result<T> : OneOfBase<T, List<ValidationFailure>>;

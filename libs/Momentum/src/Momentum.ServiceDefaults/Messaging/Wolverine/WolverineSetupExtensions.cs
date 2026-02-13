@@ -86,11 +86,11 @@ public static class WolverineSetupExtensions
 
             opts.UseSystemTextJsonForSerialization();
 
+            // Middlewares & Policies
+            opts.Policies.AddMiddleware(typeof(OpenTelemetryInstrumentationMiddleware));
             opts.Policies.Add<ExceptionHandlingPolicy>();
             opts.Policies.Add<FluentValidationPolicy>();
-
             opts.Policies.AddMiddleware<RequestPerformanceMiddleware>();
-            opts.Policies.AddMiddleware(typeof(OpenTelemetryInstrumentationMiddleware));
 
             opts.Policies.ConventionalLocalRoutingIsAdditive();
 

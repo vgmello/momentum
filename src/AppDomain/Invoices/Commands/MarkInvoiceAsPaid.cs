@@ -43,7 +43,7 @@ public static partial class MarkInvoiceAsPaidCommandHandler
     /// <summary>
     ///     Database command for marking an invoice as paid.
     /// </summary>
-    [DbCommand(fn: "$app_domain.invoices_mark_paid")]
+    [DbCommand(fn: "$main.invoices_mark_paid")]
     public partial record DbCommand(
         Guid TenantId,
         Guid InvoiceId,
@@ -69,11 +69,11 @@ public static partial class MarkInvoiceAsPaidCommandHandler
 
         if (updatedInvoice is null)
         {
-            var failures = new List<ValidationFailure>
-            {
+            List<ValidationFailure> failures =
+            [
                 new("Version", "Invoice not found, already paid, or was modified by another user. " +
                                "Please refresh and try again.")
-            };
+            ];
 
             return (failures, null);
         }

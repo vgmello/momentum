@@ -1,6 +1,7 @@
 // Copyright (c) OrgName. All rights reserved.
 
 using AppDomain.Invoices.Data.Entities;
+using InvoiceStatus = AppDomain.Invoices.Contracts.Models.InvoiceStatus;
 
 namespace AppDomain.Invoices.Actors;
 
@@ -32,7 +33,7 @@ public interface IInvoiceActor : IGrainWithGuidKey
     /// <param name="tenantId">The tenant identifier</param>
     /// <param name="newStatus">New status to set</param>
     /// <returns>The updated invoice</returns>
-    Task<Invoice> UpdateStatusAsync(Guid tenantId, string newStatus);
+    Task<Invoice> UpdateStatusAsync(Guid tenantId, InvoiceStatus newStatus);
 
     /// <summary>
     ///     Processes a payment for this invoice.

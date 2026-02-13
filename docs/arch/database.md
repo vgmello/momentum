@@ -21,7 +21,7 @@ infra/AppDomain.Database/Liquibase/
 │   │   └── procedures/   # Invoice-related procedures
 │   │       ├── invoices_cancel.sql
 │   │       └── invoices_mark_paid.sql
-│   └── app_domain.sql    # Main domain schema setup
+│   └── app_domain.sql    # AppDomain domain schema setup
 └── service_bus/
     └── service_bus.sql   # Messaging infrastructure
 ```
@@ -35,7 +35,7 @@ infra/AppDomain.Database/Liquibase/
 
 **Tables**: Use singular entity names within appropriate schemas
 
--   Domain tables: `AppDomain.{entity}` (e.g., `app_domain.cashiers`, `app_domain.invoices`)
+-   Domain tables: `AppDomain.{entity}` (e.g., `main.cashiers`, `main.invoices`)
 -   Infrastructure tables: `service_bus.{entity}` (e.g., `service_bus.outbox`)
 
 ### Migration Configuration Files
@@ -76,7 +76,7 @@ infra/AppDomain.Database/Liquibase/
 The service uses source generators for type-safe database operations with stored procedures:
 
 ```csharp
-[DbCommand(fn: "select * from app_domain.cashiers_get")]
+[DbCommand(fn: "select * from main.cashiers_get")]
 public partial record GetCashierDbQuery(Guid CashierId) : IQuery<Cashier?>;
 ```
 
@@ -104,7 +104,7 @@ Each database object (table, procedure, function, etc.) is defined in its own SQ
 ```sql
 --liquibase formatted sql
 --changeset dev_user:"create cashiers table"
-CREATE TABLE IF NOT EXISTS app_domain.cashiers (
+CREATE TABLE IF NOT EXISTS main.cashiers (
     tenant_id UUID,
     cashier_id UUID,
     name VARCHAR(100) NOT NULL,
@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS app_domain.cashiers (
 );
 
 --changeset dev_user:"add email to cashiers table"
-ALTER TABLE app_domain.cashiers
+ALTER TABLE main.cashiers
 ADD COLUMN IF NOT EXISTS email VARCHAR(100);
 ```
 

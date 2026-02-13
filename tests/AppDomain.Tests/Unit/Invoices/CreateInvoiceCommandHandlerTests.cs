@@ -2,6 +2,7 @@
 
 using AppDomain.Invoices.Commands;
 using AppDomain.Invoices.Contracts.IntegrationEvents;
+using AppDomain.Invoices.Contracts.Models;
 using Momentum.Extensions.Messaging;
 using Wolverine;
 
@@ -23,7 +24,7 @@ public class CreateInvoiceCommandHandlerTests
                 TenantId = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.TenantId,
                 InvoiceId = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.InvoiceId,
                 Name = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.Name,
-                Status = "Draft",
+                Status = nameof(InvoiceStatus.Draft),
                 Amount = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.Amount,
                 Currency = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.Currency,
                 DueDate = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.DueDate,
@@ -44,7 +45,7 @@ public class CreateInvoiceCommandHandlerTests
 
         invoice.ShouldNotBeNull();
         invoice.Name.ShouldBe("Test Invoice");
-        invoice.Status.ShouldBe("Draft");
+        invoice.Status.ShouldBe(InvoiceStatus.Draft);
         invoice.Amount.ShouldBe(100.50m);
         invoice.Currency.ShouldBe("USD");
         invoice.DueDate.ShouldBe(dueDate);
@@ -55,7 +56,7 @@ public class CreateInvoiceCommandHandlerTests
         // Verify integration event
         createdEvent.ShouldNotBeNull();
         createdEvent.ShouldBeOfType<InvoiceCreated>();
-        createdEvent!.Invoice.InvoiceId.ShouldBe(invoice.InvoiceId);
+        createdEvent.Invoice.InvoiceId.ShouldBe(invoice.InvoiceId);
         createdEvent.Invoice.Name.ShouldBe(invoice.Name);
 
         // Verify that messaging was called with correct parameters
@@ -64,7 +65,7 @@ public class CreateInvoiceCommandHandlerTests
                 cmd.Invoice.TenantId == tenantId &&
                 cmd.Invoice.InvoiceId == invoice.InvoiceId &&
                 cmd.Invoice.Name == "Test Invoice" &&
-                cmd.Invoice.Status == "Draft" &&
+                cmd.Invoice.Status == nameof(InvoiceStatus.Draft) &&
                 cmd.Invoice.Amount == 100.50m &&
                 cmd.Invoice.Currency == "USD" &&
                 cmd.Invoice.DueDate == dueDate &&
@@ -83,7 +84,7 @@ public class CreateInvoiceCommandHandlerTests
                 TenantId = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.TenantId,
                 InvoiceId = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.InvoiceId,
                 Name = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.Name,
-                Status = "Draft",
+                Status = nameof(InvoiceStatus.Draft),
                 Amount = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.Amount,
                 Currency = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.Currency,
                 DueDate = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.DueDate,
@@ -119,7 +120,7 @@ public class CreateInvoiceCommandHandlerTests
                 TenantId = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.TenantId,
                 InvoiceId = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.InvoiceId,
                 Name = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.Name,
-                Status = "Draft",
+                Status = nameof(InvoiceStatus.Draft),
                 Amount = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.Amount,
                 Currency = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.Currency,
                 DueDate = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.DueDate,

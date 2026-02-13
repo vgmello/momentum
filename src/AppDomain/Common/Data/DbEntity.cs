@@ -1,6 +1,5 @@
 // Copyright (c) OrgName. All rights reserved.
 
-using LinqToDB.Concurrency;
 using LinqToDB.Mapping;
 
 namespace AppDomain.Common.Data;
@@ -11,7 +10,7 @@ namespace AppDomain.Common.Data;
 ///     Provides common auditing fields and optimistic concurrency control.
 ///     Includes Orleans serialization attributes.
 /// </summary>
-[Table(Schema = "app_domain")]
+[Table(Schema = "main")]
 [GenerateSerializer]
 [Alias("AppDomain.Common.Data.DbEntity")]
 public abstract record DbEntity
@@ -45,7 +44,7 @@ public abstract record DbEntity
 ///     Base record for all database entities in the AppDomain schema.
 ///     Provides common auditing fields and optimistic concurrency control.
 /// </summary>
-[Table(Schema = "app_domain")]
+[Table(Schema = "main")]
 public abstract record DbEntity
 {
     /// <summary>

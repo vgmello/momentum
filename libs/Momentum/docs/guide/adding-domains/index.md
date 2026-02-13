@@ -1,12 +1,12 @@
 ---
 title: Adding Domains
-description: Guide for adding new business domains to your Momentum application, following Domain-Driven Design principles and CQRS patterns.
+description: Guide for adding new business domains to your Momentum application using Domain-Oriented Vertical Slice patterns.
 date: 2024-01-15
 ---
 
 # Adding Domains
 
-Guide for adding new business domains to your Momentum application, following Domain-Driven Design principles and CQRS patterns.
+This guide walks you through adding new business domains to your Momentum application, following established patterns for consistency and maintainability.
 
 ## Overview
 
@@ -48,7 +48,7 @@ src/AppDomain/Orders/
 
 ### Multi-Tenant Database Functions
 ```
-infra/AppDomain.Database/Liquibase/app_domain/orders/functions/
+infra/AppDomain.Database/Liquibase/main/orders/functions/
 ├── orders_create.sql
 ├── orders_get_by_id.sql
 ├── orders_get_by_customer.sql
@@ -64,7 +64,7 @@ infra/AppDomain.Database/Liquibase/app_domain/orders/functions/
 using LinqToDB.Mapping;
 using Momentum.Extensions.Common.Data;
 
-[Table(Schema = "app_domain", Name = "orders")]
+[Table(Schema = "main", Name = "orders")]
 public record Order : DbEntity
 {
     [PrimaryKey(Order = 0)]
@@ -89,7 +89,7 @@ public record Order : DbEntity
 }
 
 // src/AppDomain/Orders/Data/Entities/OrderItem.cs
-[Table(Schema = "app_domain", Name = "order_items")]
+[Table(Schema = "main", Name = "order_items")]
 public record OrderItem : DbEntity
 {
     [PrimaryKey(Order = 0)]
@@ -150,7 +150,7 @@ public record CreateOrderItem(
 
 public static partial class CreateOrderCommandHandler
 {
-    [DbCommand(fn: "$app_domain.orders_create")]
+    [DbCommand(fn: "$main.orders_create")]
     public partial record DbCommand(
         Guid TenantId,
         Guid CustomerId,
@@ -202,7 +202,7 @@ public record GetOrderByIdQuery(Guid TenantId, Guid OrderId) : IQuery<Order?>;
 
 public static partial class GetOrderByIdQueryHandler
 {
-    [DbCommand(fn: "$app_domain.orders_get_by_id")]
+    [DbCommand(fn: "$main.orders_get_by_id")]
     public partial record DbQuery(Guid TenantId, Guid OrderId) : IQuery<Order?>;
 
     public static async Task<Order?> Handle(
@@ -224,7 +224,7 @@ public record GetOrdersByCustomerQuery(Guid TenantId, Guid CustomerId, int Limit
 
 public static partial class GetOrdersByCustomerQueryHandler
 {
-    [DbCommand(fn: "$app_domain.orders_get_by_customer")]
+    [DbCommand(fn: "$main.orders_get_by_customer")]
     public partial record DbQuery(Guid TenantId, Guid CustomerId, int Limit, int Offset)
         : IQuery<IEnumerable<Data.Entities.Order>>;
 
@@ -248,7 +248,7 @@ public static partial class GetOrdersByCustomerQueryHandler
 // src/AppDomain.Contracts/IntegrationEvents/OrderCreated.cs
 using Momentum.Extensions.Kafka.Events;
 
-[EventTopic("app_domain.orders.order-created")]
+[EventTopic("main.orders.order-created")]
 public record OrderCreated(
     Guid TenantId,
     Guid OrderId,
@@ -270,7 +270,7 @@ public record OrderStatusChanged(
 ) : IDomainEvent;
 
 // src/AppDomain/Orders/Contracts/IntegrationEvents/OrderCompleted.cs
-[EventTopic("app_domain.orders.order-completed")]
+[EventTopic("main.orders.order-completed")]
 public record OrderCompleted(
     Guid TenantId,
     Guid OrderId,
@@ -283,9 +283,9 @@ public record OrderCompleted(
 ### 5. Database Schema
 
 ```sql
--- infra/AppDomain.Database/Liquibase/app_domain/orders/changesets/001-orders-tables.sql
+-- infra/AppDomain.Database/Liquibase/main/orders/changesets/001-orders-tables.sql
 -- Multi-tenant table structure with composite primary keys
-CREATE TABLE app_domain.orders (
+CREATE TABLE main.orders (
     tenant_id UUID NOT NULL,
     order_id UUID NOT NULL,
     customer_id UUID NOT NULL,
@@ -303,7 +303,7 @@ CREATE TABLE app_domain.orders (
     CONSTRAINT chk_orders_status_valid CHECK (status IN ('Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled'))
 );
 
-CREATE TABLE app_domain.order_items (
+CREATE TABLE main.order_items (
     tenant_id UUID NOT NULL,
     order_item_id UUID NOT NULL,
     order_id UUID NOT NULL,
@@ -318,7 +318,7 @@ CREATE TABLE app_domain.order_items (
     PRIMARY KEY (tenant_id, order_item_id),
 
     -- Foreign key to orders table with tenant awareness
-    FOREIGN KEY (tenant_id, order_id) REFERENCES app_domain.orders(tenant_id, order_id) ON DELETE CASCADE,
+    FOREIGN KEY (tenant_id, order_id) REFERENCES main.orders(tenant_id, order_id) ON DELETE CASCADE,
 
     -- Business rule constraints
     CONSTRAINT chk_order_items_quantity_positive CHECK (quantity > 0),
@@ -326,26 +326,26 @@ CREATE TABLE app_domain.order_items (
 );
 
 -- Indexes for efficient queries within tenant boundaries
-CREATE INDEX idx_orders_customer_id ON app_domain.orders(tenant_id, customer_id);
-CREATE INDEX idx_orders_status ON app_domain.orders(tenant_id, status);
-CREATE INDEX idx_orders_order_date ON app_domain.orders(tenant_id, order_date DESC);
-CREATE INDEX idx_order_items_order_id ON app_domain.order_items(tenant_id, order_id);
-CREATE INDEX idx_order_items_product_id ON app_domain.order_items(tenant_id, product_id);
+CREATE INDEX idx_orders_customer_id ON main.orders(tenant_id, customer_id);
+CREATE INDEX idx_orders_status ON main.orders(tenant_id, status);
+CREATE INDEX idx_orders_order_date ON main.orders(tenant_id, order_date DESC);
+CREATE INDEX idx_order_items_order_id ON main.order_items(tenant_id, order_id);
+CREATE INDEX idx_order_items_product_id ON main.order_items(tenant_id, product_id);
 
 -- Add table comments for documentation
-COMMENT ON TABLE app_domain.orders IS 'Orders table with multi-tenant architecture using composite primary keys';
-COMMENT ON TABLE app_domain.order_items IS 'Order items table linked to orders with tenant-aware foreign keys';
+COMMENT ON TABLE main.orders IS 'Orders table with multi-tenant architecture using composite primary keys';
+COMMENT ON TABLE main.order_items IS 'Order items table linked to orders with tenant-aware foreign keys';
 ```
 
 ### 6. Database Functions
 
 ```sql
--- infra/AppDomain.Database/Liquibase/app_domain/orders/functions/orders_create.sql
+-- infra/AppDomain.Database/Liquibase/main/orders/functions/orders_create.sql
 /**
  * Creates a new order with items in a multi-tenant architecture.
  * Returns the newly created order ID or raises an exception on failure.
  */
-CREATE OR REPLACE FUNCTION app_domain.orders_create(
+CREATE OR REPLACE FUNCTION main.orders_create(
     p_tenant_id UUID,
     p_customer_id UUID,
     p_items_json TEXT
@@ -392,7 +392,7 @@ BEGIN
     END LOOP;
 
     -- Create order with tenant isolation
-    INSERT INTO app_domain.orders (
+    INSERT INTO main.orders (
         tenant_id, order_id, customer_id, total_amount, status
     ) VALUES (
         p_tenant_id, v_order_id, p_customer_id, v_total_amount, 'Pending'
@@ -401,7 +401,7 @@ BEGIN
     -- Create order items with tenant isolation
     FOR v_item IN SELECT * FROM jsonb_array_elements(v_items)
     LOOP
-        INSERT INTO app_domain.order_items (
+        INSERT INTO main.order_items (
             tenant_id, order_item_id, order_id, product_id,
             product_name, quantity, unit_price
         ) VALUES (
@@ -423,11 +423,11 @@ EXCEPTION
 END;
 $$ LANGUAGE plpgsql;
 
--- infra/AppDomain.Database/Liquibase/app_domain/orders/functions/orders_get_by_id.sql
+-- infra/AppDomain.Database/Liquibase/main/orders/functions/orders_get_by_id.sql
 /**
  * Retrieves an order by ID within tenant boundaries.
  */
-CREATE OR REPLACE FUNCTION app_domain.orders_get_by_id(
+CREATE OR REPLACE FUNCTION main.orders_get_by_id(
     p_tenant_id UUID,
     p_order_id UUID
 ) RETURNS TABLE(
@@ -444,17 +444,17 @@ BEGIN
     RETURN QUERY
     SELECT o.tenant_id, o.order_id, o.customer_id, o.order_date,
            o.status, o.total_amount, o.created_date_utc, o.updated_date_utc
-    FROM app_domain.orders o
+    FROM main.orders o
     WHERE o.tenant_id = p_tenant_id
       AND o.order_id = p_order_id;
 END;
 $$ LANGUAGE plpgsql;
 
--- infra/AppDomain.Database/Liquibase/app_domain/orders/functions/orders_get_by_customer.sql
+-- infra/AppDomain.Database/Liquibase/main/orders/functions/orders_get_by_customer.sql
 /**
  * Retrieves orders for a specific customer with pagination and tenant isolation.
  */
-CREATE OR REPLACE FUNCTION app_domain.orders_get_by_customer(
+CREATE OR REPLACE FUNCTION main.orders_get_by_customer(
     p_tenant_id UUID,
     p_customer_id UUID,
     p_limit INTEGER DEFAULT 10,
@@ -473,7 +473,7 @@ BEGIN
     RETURN QUERY
     SELECT o.tenant_id, o.order_id, o.customer_id, o.order_date,
            o.status, o.total_amount, o.created_date_utc, o.updated_date_utc
-    FROM app_domain.orders o
+    FROM main.orders o
     WHERE o.tenant_id = p_tenant_id
       AND o.customer_id = p_customer_id
     ORDER BY o.order_date DESC
@@ -499,7 +499,6 @@ public static class OrdersEndpoints
     {
         var group = app.MapGroup("/orders")
             .WithTags("Orders")
-            .WithOpenApi()
             .RequireAuthorization(); // Ensure authentication for tenant context
 
         group.MapPost("/", CreateOrder)
@@ -743,7 +742,7 @@ Momentum uses source generators to eliminate boilerplate code and ensure type sa
 
 ```csharp
 // Your partial class definition
-[DbCommand(fn: "$app_domain.orders_create")]
+[DbCommand(fn: "$main.orders_create")]
 public partial record DbCommand(Guid TenantId, Guid CustomerId, string ItemsJson)
     : ICommand<Result<Guid>>;
 
@@ -757,7 +756,7 @@ public partial record DbCommand
     {
         // Generated SQL execution code
         var result = await connection.QuerySingleAsync<Guid>(
-            "SELECT * FROM app_domain.orders_create(@TenantId, @CustomerId, @ItemsJson)",
+            "SELECT * FROM main.orders_create(@TenantId, @CustomerId, @ItemsJson)",
             command,
             cancellationToken);
         return Result.Success(result);
@@ -767,8 +766,8 @@ public partial record DbCommand
 
 ### Function Prefix Convention
 
-The `$` prefix in `fn: "$app_domain.orders_create"` tells the generator to:
-1. **Auto-generate SQL**: `SELECT * FROM app_domain.orders_create(...)`
+The `$` prefix in `fn: "$main.orders_create"` tells the generator to:
+1. **Auto-generate SQL**: `SELECT * FROM main.orders_create(...)`
 2. **Map parameters**: Automatically map record properties to function parameters
 3. **Handle results**: Convert database results to strongly-typed objects
 4. **Error handling**: Wrap exceptions in `Result<T>` pattern
@@ -779,7 +778,7 @@ The `$` prefix in `fn: "$app_domain.orders_create"` tells the generator to:
 // ✅ Correct: Partial class with static handler
 public static partial class CreateOrderCommandHandler
 {
-    [DbCommand(fn: "$app_domain.orders_create")]
+    [DbCommand(fn: "$main.orders_create")]
     public partial record DbCommand(...) : ICommand<Result<Guid>>;
 
     // Your business logic handler

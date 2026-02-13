@@ -12,30 +12,30 @@ The k6 performance testing suite provides comprehensive load testing capabilitie
 
 ## Quick Start
 
-### Using pnpm Scripts (Recommended)
+### Using bun Scripts (Recommended)
 
 1. Install dependencies:
 ```bash
-pnpm install
+bun install
 ```
 
 2. Run test scenarios with built-in web dashboard:
 ```bash
 # Run realistic mixed workflow test
-pnpm test:mixed
+bun test:mixed
 
 # Run cashiers baseline test (REST API)
-pnpm test:cashiers
+bun test:cashiers
 
 # Run cashiers gRPC test
-pnpm test:cashiers:grpc
+bun test:cashiers:grpc
 
 # Run invoices baseline test
-pnpm test:invoices
+bun test:invoices
 
 # Run stress and spike tests
-pnpm test:cashiers:stress
-pnpm test:cashiers:spike
+bun test:cashiers:stress
+bun test:cashiers:spike
 ```
 
 3. Access the k6 Web Dashboard during tests:
@@ -68,8 +68,8 @@ docker run --rm --network host -v $(pwd):/scripts -w /scripts \
 
 ```
 k6/
-├── package.json           # Node.js dependencies and npm scripts
-├── pnpm-lock.yaml        # Locked dependency versions
+├── package.json           # Dependencies and bun scripts
+├── bun.lock              # Locked dependency versions
 ├── config/
 │   ├── options.js        # k6 test options and stages
 │   └── endpoints.js      # API endpoint configurations
@@ -193,26 +193,26 @@ The tests track custom business metrics:
 
 ## Running Tests
 
-### Available npm Scripts
+### Available bun Scripts
 
 All scripts automatically enable the web dashboard and save HTML reports:
 
 ```bash
 # Mixed scenarios
-pnpm test:mixed              # Realistic workflow test
-pnpm test:local              # Local environment test
-pnpm test:staging            # Staging environment test
+bun test:mixed              # Realistic workflow test
+bun test:local              # Local environment test
+bun test:staging            # Staging environment test
 
 # Cashiers tests
-pnpm test:cashiers           # REST API baseline
-pnpm test:cashiers:grpc      # gRPC baseline
-pnpm test:cashiers:simple    # REST simple create
-pnpm test:cashiers:grpc:simple # gRPC simple create
-pnpm test:cashiers:stress    # Stress test (300 users)
-pnpm test:cashiers:spike     # Spike test
+bun test:cashiers           # REST API baseline
+bun test:cashiers:grpc      # gRPC baseline
+bun test:cashiers:simple    # REST simple create
+bun test:cashiers:grpc:simple # gRPC simple create
+bun test:cashiers:stress    # Stress test (300 users)
+bun test:cashiers:spike     # Spike test
 
 # Invoices tests
-pnpm test:invoices           # Invoices baseline
+bun test:invoices           # Invoices baseline
 ```
 
 ### Direct k6 Commands

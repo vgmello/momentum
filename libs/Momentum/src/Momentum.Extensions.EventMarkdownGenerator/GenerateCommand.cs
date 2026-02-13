@@ -26,7 +26,8 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
 
         [CommandOption("-o|--output")]
         [Description("Output directory for generated markdown files")]
-        public string? Output { get; init; }
+        [DefaultValue("./docs/events/")]
+        public string Output { get; init; } = "./docs/events/";
 
         [CommandOption("--sidebar-file")]
         [Description("Name of the JSON sidebar file")]
@@ -46,7 +47,7 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
         public bool Verbose { get; init; }
     }
 
-    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellationToken)
     {
         try
         {
@@ -54,15 +55,6 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
             if (string.IsNullOrWhiteSpace(settings.Assemblies))
             {
                 AnsiConsole.MarkupLine("[red]Error:[/] The --assemblies argument is required. Please specify one or more assembly paths.");
-                AnsiConsole.MarkupLine(
-                    "Usage: events-docsgen generate --assemblies [yellow]<path1>[/][gray],[/][yellow]<path2>[/]... --output [yellow]<output-path>[/]");
-
-                return 1;
-            }
-
-            if (string.IsNullOrWhiteSpace(settings.Output))
-            {
-                AnsiConsole.MarkupLine("[red]Error:[/] The --output argument is required. Please specify an output directory path.");
                 AnsiConsole.MarkupLine(
                     "Usage: events-docsgen generate --assemblies [yellow]<path1>[/][gray],[/][yellow]<path2>[/]... --output [yellow]<output-path>[/]");
 
@@ -83,19 +75,19 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
             {
                 AssemblyPaths = assemblyPaths,
                 XmlDocumentationPaths = xmlDocPaths,
-                OutputDirectory = settings.Output ?? Environment.CurrentDirectory,
+                OutputDirectory = settings.Output,
                 SidebarFileName = settings.SidebarFile,
                 TemplatesDirectory = settings.Templates,
                 GitHubBaseUrl = settings.GitHubUrl
             };
 
-            await GenerateDocumentationAsync(options);
+            await GenerateDocumentationAsync(options, cancellationToken);
 
             return 0;
         }
         catch (Exception ex)
         {
-            AnsiConsole.MarkupLine($"[red]Error:[/] {ex.Message}");
+            AnsiConsole.MarkupLine($"[red]Error:[/] {ex.Message.EscapeMarkup()}");
 
             if (settings.Verbose)
             {
@@ -106,7 +98,7 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
         }
     }
 
-    private static async Task GenerateDocumentationAsync(GeneratorOptions options)
+    private static async Task GenerateDocumentationAsync(GeneratorOptions options, CancellationToken cancellationToken = default)
     {
         if (options.AssemblyPaths.Count == 0)
             throw new ArgumentException("At least one assembly path must be provided", nameof(options));
@@ -129,7 +121,7 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
 
         if (xmlDocumentationPaths.Count > 0)
         {
-            await xmlParser.LoadMultipleDocumentationAsync(xmlDocumentationPaths);
+            await xmlParser.LoadMultipleDocumentationAsync(xmlDocumentationPaths, cancellationToken);
         }
 
         var allEvents = new List<EventWithDocumentation>();
@@ -159,7 +151,7 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
             }
             catch (Exception ex)
             {
-                AnsiConsole.MarkupLine($"[yellow]Warning:[/] Failed to process assembly {assemblyPath}: {ex.Message}");
+                AnsiConsole.MarkupLine($"[yellow]Warning:[/] Failed to process assembly {assemblyPath}: {ex.Message.EscapeMarkup()}");
             }
             finally
             {
@@ -173,22 +165,62 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
             AnsiConsole.WriteLine($"Processed {processedAssemblies} assemblies but found no types with EventTopic attributes.");
 
             // Still generate empty sidebar for consistency
-            await sidebarGenerator.WriteSidebarAsync(new List<EventWithDocumentation>(), options.GetSidebarPath());
+            await sidebarGenerator.WriteSidebarAsync(new List<EventWithDocumentation>(), options.GetSidebarPath(), cancellationToken);
             AnsiConsole.MarkupLine($"[green]✓[/] Generated empty sidebar file: {options.SidebarFileName}");
 
             return;
         }
 
+        cancellationToken.ThrowIfCancellationRequested();
+
         // Generate individual markdown files
         var markdownFiles = markdownGenerator.GenerateAllMarkdown(allEvents, options.OutputDirectory, options).ToList();
 
         // Write markdown files
-        foreach (var markdownFile in markdownFiles)
-        {
-            await File.WriteAllTextAsync(markdownFile.FilePath, markdownFile.Content);
-        }
+        await WriteMarkdownFilesAsync(markdownFiles, cancellationToken);
+
+        cancellationToken.ThrowIfCancellationRequested();
 
         // Extract and generate schema files
+        var schemaTypes = CollectAllSchemaTypes(allEvents);
+        var schemaFiles = markdownGenerator.GenerateAllSchemas(schemaTypes, options.OutputDirectory).ToList();
+
+        // Write schema files
+        await WriteMarkdownFilesAsync(schemaFiles, cancellationToken);
+
+        // Generate and write sidebar JSON
+        await sidebarGenerator.WriteSidebarAsync(allEvents, options.GetSidebarPath(), cancellationToken);
+
+        // Summary
+        AnsiConsole.WriteLine();
+        AnsiConsole.MarkupLine(
+            $"[green]✓[/] Successfully generated documentation for [bold]{allEvents.Count}[/] events from [bold]{processedAssemblies}[/] assemblies");
+        AnsiConsole.MarkupLine($"[green]✓[/] Created [bold]{markdownFiles.Count}[/] markdown files in: {options.OutputDirectory}");
+
+        if (schemaFiles.Count > 0)
+        {
+            AnsiConsole.MarkupLine($"[green]✓[/] Created [bold]{schemaFiles.Count}[/] schema files");
+        }
+
+        AnsiConsole.MarkupLine($"[green]✓[/] Generated sidebar file: {options.SidebarFileName}");
+    }
+
+    private static async Task WriteMarkdownFilesAsync(List<IndividualMarkdownOutput> files, CancellationToken cancellationToken)
+    {
+        foreach (var file in files)
+        {
+            var directory = Path.GetDirectoryName(file.FilePath);
+            if (!string.IsNullOrEmpty(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            await File.WriteAllTextAsync(file.FilePath, file.Content, cancellationToken);
+        }
+    }
+
+    private static HashSet<Type> CollectAllSchemaTypes(List<EventWithDocumentation> allEvents)
+    {
         var schemaTypes = new HashSet<Type>();
 
         foreach (var eventWithDoc in allEvents)
@@ -202,31 +234,7 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
             }
         }
 
-        // Generate schema markdown files
-        var schemaFiles = markdownGenerator.GenerateAllSchemas(schemaTypes, options.OutputDirectory).ToList();
-
-        // Write schema files
-        foreach (var schemaFile in schemaFiles)
-        {
-            Directory.CreateDirectory(Path.GetDirectoryName(schemaFile.FilePath)!);
-            await File.WriteAllTextAsync(schemaFile.FilePath, schemaFile.Content);
-        }
-
-        // Generate and write sidebar JSON
-        await sidebarGenerator.WriteSidebarAsync(allEvents, options.GetSidebarPath());
-
-        // Summary
-        AnsiConsole.WriteLine();
-        AnsiConsole.MarkupLine(
-            $"[green]✓[/] Successfully generated documentation for [bold]{allEvents.Count}[/] events from [bold]{processedAssemblies}[/] assemblies");
-        AnsiConsole.MarkupLine($"[green]✓[/] Created [bold]{markdownFiles.Count}[/] markdown files in: {options.OutputDirectory}");
-
-        if (schemaFiles.Any())
-        {
-            AnsiConsole.MarkupLine($"[green]✓[/] Created [bold]{schemaFiles.Count}[/] schema files");
-        }
-
-        AnsiConsole.MarkupLine($"[green]✓[/] Generated sidebar file: {options.SidebarFileName}");
+        return schemaTypes;
     }
 
     private static HashSet<string> DiscoverXmlDocumentationFiles(List<string> assemblyPaths, List<string> explicitXmlPaths)
@@ -234,7 +242,7 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
         var explicitPath = explicitXmlPaths.Where(File.Exists);
         var autoDiscoveredPath = assemblyPaths.Select(GetExpectedXmlDocumentationPath).Where(File.Exists);
 
-        return explicitPath.Concat(autoDiscoveredPath).ToHashSet(StringComparer.InvariantCultureIgnoreCase);
+        return explicitPath.Concat(autoDiscoveredPath).ToHashSet(StringComparer.OrdinalIgnoreCase);
     }
 
     private static string GetExpectedXmlDocumentationPath(string assemblyPath)
@@ -293,7 +301,7 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
                 return LoadUnmanagedDllFromPath(libraryPath);
             }
 
-            return IntPtr.Zero;
+            return 0;
         }
 
         public void Dispose()

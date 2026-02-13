@@ -1,10 +1,10 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
 using FluentValidation;
+using JasperFx;
 using JasperFx.CodeGeneration;
 using JasperFx.CodeGeneration.Frames;
 using Wolverine.Configuration;
-using Wolverine.Runtime;
 using Wolverine.Runtime.Handlers;
 
 namespace Momentum.ServiceDefaults.Messaging.Middlewares;
@@ -21,6 +21,9 @@ public class FluentValidationPolicy : IHandlerPolicy
     {
         var validatorInterface = typeof(IValidator<>).MakeGenericType(chain.MessageType);
         var registeredValidators = container.RegistrationsFor(validatorInterface);
+
+        if (registeredValidators.Count == 0)
+            return;
 
         var methodName = registeredValidators.Count == 1
             ? nameof(FluentValidationExecutor.ExecuteOne)

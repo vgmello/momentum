@@ -965,9 +965,9 @@ This package includes and pre-configures these essential dependencies:
 
 ## Target Frameworks
 
--   **.NET 9.0**: Primary target framework
--   **C# 12.0**: Required for discriminated union features
--   **Compatible with**: ASP.NET Core 9.0+, Entity Framework Core 9.0+
+-   **.NET 10.0**: Primary target framework
+-   **C# 13.0**: Required for discriminated union features
+-   **Compatible with**: ASP.NET Core 10.0+, Entity Framework Core 10.0+
 
 ## Related Packages
 

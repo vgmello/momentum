@@ -1,59 +1,49 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OpenApi;
-using Microsoft.Extensions.DependencyInjection;
-using Momentum.Extensions.XmlDocs;
-using Momentum.ServiceDefaults.Api.OpenApi.Transformers;
 
 namespace Momentum.ServiceDefaults.Api.OpenApi.Extensions;
 
 /// <summary>
-///     Provides extension methods for configuring OpenAPI with enhanced XML documentation support.
+///     Provides extension methods for configuring OpenAPI using the native .NET 10 source generator.
 /// </summary>
 public static class OpenApiExtensions
 {
     /// <summary>
-    ///     Adds OpenAPI services with XML documentation support and automatic response type conventions.
+    ///     Configures OpenAPI options with Momentum's default settings.
     /// </summary>
-    /// <param name="services">The service collection to configure.</param>
-    /// <param name="config">An optional action to configure additional OpenAPI options.</param>
-    /// <returns>The configured service collection for method chaining.</returns>
+    /// <param name="options">The OpenAPI options to configure.</param>
     /// <remarks>
-    ///     This method configures the following:
+    ///     This method applies Momentum's standard OpenAPI configuration:
     ///     <list type="bullet">
-    ///         <item>XML documentation service for reading XML comment files</item>
-    ///         <item>Document transformer for adding API-level XML documentation</item>
-    ///         <item>Operation transformer for adding endpoint-level XML documentation</item>
-    ///         <item>Schema transformer for adding model-level XML documentation</item>
-    ///         <item>Automatic response type convention for standardized API responses</item>
+    ///         <item>Server URL normalization (removes trailing slashes)</item>
     ///     </list>
+    ///     Call this from your project's <c>AddOpenApi()</c> configuration to apply defaults:
+    ///     <code>
+    ///     builder.Services.AddOpenApi(options =&gt;
+    ///     {
+    ///         options.ConfigureOpenApiDefaults();
+    ///         // Add your custom configuration here
+    ///     });
+    ///     </code>
     /// </remarks>
-    public static IServiceCollection AddOpenApiWithXmlDocSupport(this IServiceCollection services, Action<OpenApiOptions>? config = null)
+    public static OpenApiOptions ConfigureOpenApiDefaults(this OpenApiOptions options)
     {
-        services.AddSingleton<IXmlDocumentationService, XmlDocumentationService>();
-
-        services.AddOpenApi(options =>
+        // Normalize server URLs by removing trailing slashes
+        options.AddDocumentTransformer((document, _, _) =>
         {
-            options.AddDocumentTransformer<XmlDocumentationDocumentTransformer>();
-            options.AddOperationTransformer<XmlDocumentationOperationTransformer>();
-            options.AddSchemaTransformer<XmlDocumentationSchemaTransformer>();
-
-            options.AddDocumentTransformer((document, _, _) =>
+            if (document.Servers is not null)
             {
-                foreach (var openApiServer in document.Servers)
+                foreach (var server in document.Servers)
                 {
-                    openApiServer.Url = openApiServer.Url.TrimEnd('/');
+                    server.Url = server.Url?.TrimEnd('/');
                 }
+            }
 
-                return Task.CompletedTask;
-            });
-
-            config?.Invoke(options);
+            return Task.CompletedTask;
         });
 
-        services.Configure<MvcOptions>(opt => opt.Conventions.Add(new AutoProducesResponseTypeConvention()));
-
-        return services;
+        return options;
     }
+
 }

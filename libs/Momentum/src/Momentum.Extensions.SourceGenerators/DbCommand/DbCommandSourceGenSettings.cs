@@ -62,4 +62,4 @@ namespace Momentum.Extensions.SourceGenerators.DbCommand;
 /// &lt;/PropertyGroup&gt;
 /// </code>
 /// </example>
-public record DbCommandSourceGenSettings(DbParamsCase DbCommandDefaultParamCase, string DbCommandParamPrefix);
+internal record DbCommandSourceGenSettings(DbParamsCase DbCommandDefaultParamCase, string DbCommandParamPrefix);

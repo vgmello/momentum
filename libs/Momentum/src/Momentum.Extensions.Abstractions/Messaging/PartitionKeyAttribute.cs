@@ -21,5 +21,15 @@ namespace Momentum.Extensions.Abstractions.Messaging;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter)]
 public class PartitionKeyAttribute : Attribute
 {
+    /// <summary>
+    ///     Gets or sets the order of this partition key component when composing
+    ///     a composite partition key from multiple properties.
+    /// </summary>
+    /// <remarks>
+    ///     When multiple properties are marked with <see cref="PartitionKeyAttribute"/>,
+    ///     they are combined in ascending order to form the final partition key.
+    ///     Lower values are processed first.
+    /// </remarks>
+    /// <value>The sort order for composite keys. Default is 0.</value>
     public int Order { get; set; }
 }

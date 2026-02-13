@@ -88,15 +88,20 @@ public static partial class GrpcMapper
     /// <param name="tenantId">The tenant identifier for authorization</param>
     /// <returns>A command object for simulating a payment</returns>
     public static SimulatePaymentCommand ToCommand(this SimulatePaymentRequest request, Guid tenantId)
-        => new(
+    {
+        if (!Guid.TryParse(request.InvoiceId, out var invoiceId))
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid invoice ID format"));
+
+        return new(
             tenantId,
-            Guid.TryParse(request.InvoiceId, out var invoiceId) ? invoiceId : Guid.Empty,
+            invoiceId,
             request.Version,
             (decimal)request.Amount,
             request.Currency,
             request.PaymentMethod ?? string.Empty,
-            request.PaymentReference ?? $"SIM-{Guid.NewGuid():N}"[..8]
+            request.PaymentReference ?? $"SIM-{Guid.CreateVersion7():N}"[..16]
         );
+    }
 
     #region Support Mappers
 

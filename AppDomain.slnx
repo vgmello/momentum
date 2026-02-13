@@ -1,76 +1,81 @@
 <Solution>
     <!--#if (INCLUDE_INFRA_DB) -->
     <Folder Name="/Infra/">
-        <Project Path="infra\AppDomain.Database\AppDomain.Database.csproj" />
+        <Project Path="infra\AppDomain.Database\AppDomain.Database.csproj"/>
+    </Folder>
+    <!--#endif -->
+    <!--#if (false) -->
+    <Folder Name="/Libs/Tests/">
+        <Project Path="libs\Momentum\tests\Momentum.Extensions.Tests\Momentum.Extensions.Tests.csproj"/>
     </Folder>
     <!--#endif -->
     <!--#if (INCLUDE_LIBS) -->
     <Folder Name="/Libs/">
         <!--#if (false) -->
         <!-- These are only for source development, never included in generated templates -->
-        <File Path="libs\Momentum\Directory.Build.props" />
-        <File Path="libs\Momentum\Directory.Build.targets" />
-        <Project Path="libs\Momentum\src\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj" />
-        <Project Path="libs\Momentum\src\Momentum.Extensions.XmlDocs\Momentum.Extensions.XmlDocs.csproj" />
+        <File Path="libs\Momentum\Directory.Build.props"/>
+        <File Path="libs\Momentum\Directory.Build.targets"/>
+        <Project Path="libs\Momentum\src\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
+        <Project Path="libs\Momentum\src\Momentum.Extensions.XmlDocs\Momentum.Extensions.XmlDocs.csproj"/>
         <!--#endif -->
         <!--#if (LIBS_INCLUDES_KAFKA) -->
-        <Project Path="libs\Momentum\src\Momentum.Extensions.Messaging.Kafka\Momentum.Extensions.Messaging.Kafka.csproj" />
+        <Project Path="libs\Momentum\src\Momentum.Extensions.Messaging.Kafka\Momentum.Extensions.Messaging.Kafka.csproj"/>
         <!--#endif -->
         <!--#if (LIBS_INCLUDES_GENERATORS) -->
-        <Project Path="libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.csproj" />
+        <Project Path="libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.csproj"/>
         <!--#endif -->
         <!--#if (LIBS_INCLUDES_EXT) -->
-        <Project Path="libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.csproj" />
+        <Project Path="libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.csproj"/>
         <!--#endif -->
         <!--#if (LIBS_INCLUDES_API) -->
-        <Project Path="libs\Momentum\src\Momentum.ServiceDefaults.Api\Momentum.ServiceDefaults.Api.csproj" />
+        <Project Path="libs\Momentum\src\Momentum.ServiceDefaults.Api\Momentum.ServiceDefaults.Api.csproj"/>
         <!--#endif -->
         <!--#if (LIBS_INCLUDES_DEFAULTS) -->
-        <Project Path="libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj" />
+        <Project Path="libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
         <!--#endif -->
     </Folder>
     <!--#endif -->
     <Folder Name="/Solution Items/">
-        <File Path=".dockerignore" />
-        <File Path=".editorconfig" />
-        <File Path=".gitignore" />
-        <File Path="AppDomain.ruleset" />
-        <File Path="AppDomain.slnx.DotSettings" />
-        <File Path="compose.yml" />
-        <File Path="Directory.Build.props" />
-        <File Path="Directory.Packages.props" />
-        <File Path="README.md" />
+        <File Path=".dockerignore"/>
+        <File Path=".editorconfig"/>
+        <File Path=".gitignore"/>
+        <File Path="AppDomain.ruleset"/>
+        <File Path="AppDomain.slnx.DotSettings"/>
+        <File Path="compose.yml"/>
+        <File Path="Directory.Build.props"/>
+        <File Path="Directory.Packages.props"/>
+        <File Path="README.md"/>
         <!--#if (INCLUDE_DOCS) -->
-        <Project Path="docs\AppDomain.Docs.csproj" />
+        <Project Path="docs\AppDomain.Docs.csproj"/>
         <!--#endif -->
         <!--#if (false) -->
-        <File Path="ProjectREADME.md" />
+        <File Path="ProjectREADME.md"/>
         <!--#endif -->
     </Folder>
     <!--#if (HAS_BACKEND || INCLUDE_API) -->
     <Folder Name="/Tests/">
         <!--#if (INCLUDE_API && USE_DB) -->
-        <Project Path="tests\AppDomain.Tests.E2E\AppDomain.Tests.E2E.csproj" />
+        <Project Path="tests\AppDomain.Tests.E2E\AppDomain.Tests.E2E.csproj"/>
         <!--#endif -->
         <!--#if (HAS_BACKEND) -->
-        <Project Path="tests\AppDomain.Tests\AppDomain.Tests.csproj" />
+        <Project Path="tests\AppDomain.Tests\AppDomain.Tests.csproj"/>
         <!--#endif -->
     </Folder>
     <!--#endif -->
     <!--#if (INCLUDE_API) -->
-    <Project Path="src\AppDomain.Api\AppDomain.Api.csproj" />
+    <Project Path="src\AppDomain.Api\AppDomain.Api.csproj"/>
     <!--#endif -->
     <!--#if (INCLUDE_ASPIRE) -->
-    <Project Path="src\AppDomain.AppHost\AppDomain.AppHost.csproj" />
+    <Project Path="src\AppDomain.AppHost\AppDomain.AppHost.csproj"/>
     <!--#endif -->
     <!--#if (INCLUDE_ORLEANS) -->
-    <Project Path="src\AppDomain.BackOffice.Orleans\AppDomain.BackOffice.Orleans.csproj" />
+    <Project Path="src\AppDomain.BackOffice.Orleans\AppDomain.BackOffice.Orleans.csproj"/>
     <!--#endif -->
     <!--#if (INCLUDE_BACK_OFFICE) -->
-    <Project Path="src\AppDomain.BackOffice\AppDomain.BackOffice.csproj" />
+    <Project Path="src\AppDomain.BackOffice\AppDomain.BackOffice.csproj"/>
     <!--#endif -->
     <!--#if (HAS_BACKEND) -->
-    <Project Path="src\AppDomain.Contracts\AppDomain.Contracts.csproj" />
-    <Project Path="src\AppDomain\AppDomain.csproj" />
+    <Project Path="src\AppDomain.Contracts\AppDomain.Contracts.csproj"/>
+    <Project Path="src\AppDomain\AppDomain.csproj"/>
     <!--#endif -->
 </Solution>

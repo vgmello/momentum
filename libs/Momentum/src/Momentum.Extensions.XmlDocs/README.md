@@ -78,7 +78,7 @@ if (methodDoc != null)
 {
     Console.WriteLine($"Method: {methodDoc.Summary}");
     Console.WriteLine($"Returns: {methodDoc.Returns}");
-    
+
     // Access parameter documentation
     foreach (var param in methodDoc.Parameters)
     {
@@ -88,7 +88,7 @@ if (methodDoc != null)
             Console.WriteLine($"  Example: {param.Value.Example}");
         }
     }
-    
+
     // Access response documentation
     foreach (var response in methodDoc.Responses)
     {
@@ -124,17 +124,17 @@ services.AddSingleton<IXmlDocumentationService, XmlDocumentationService>();
 public class DocumentationGenerator
 {
     private readonly IXmlDocumentationService _xmlDocs;
-    
+
     public DocumentationGenerator(IXmlDocumentationService xmlDocs)
     {
         _xmlDocs = xmlDocs;
     }
-    
+
     public async Task GenerateDocsAsync(string assemblyPath)
     {
         var xmlPath = Path.ChangeExtension(assemblyPath, ".xml");
         await _xmlDocs.LoadDocumentationAsync(xmlPath);
-        
+
         // Use the loaded documentation...
     }
 }
@@ -165,17 +165,17 @@ Console.WriteLine($"Loaded {results.Count(r => r)} of {xmlFiles.Length} document
 public class EventDocumentationProcessor
 {
     private readonly IXmlDocumentationService _xmlService;
-    
+
     public EventDocumentationProcessor(IXmlDocumentationService xmlService)
     {
         _xmlService = xmlService;
     }
-    
+
     public EventDocumentation ProcessEvent(Type eventType)
     {
         var typeDoc = _xmlService.GetTypeDocumentation(eventType);
         var properties = GetPropertyDocumentation(eventType);
-        
+
         return new EventDocumentation
         {
             TypeName = eventType.Name,
@@ -185,17 +185,17 @@ public class EventDocumentationProcessor
             Properties = properties
         };
     }
-    
+
     private Dictionary<string, string> GetPropertyDocumentation(Type type)
     {
         var docs = new Dictionary<string, string>();
-        
+
         foreach (var property in type.GetProperties())
         {
             var propDoc = _xmlService.GetPropertyDocumentation(property);
             docs[property.Name] = propDoc?.Summary ?? "No description available";
         }
-        
+
         return docs;
     }
 }
@@ -208,23 +208,23 @@ public class EventDocumentationProcessor
 public class AdvancedDocumentationAccess
 {
     private readonly IXmlDocumentationService _xmlService;
-    
+
     public AdvancedDocumentationAccess(IXmlDocumentationService xmlService)
     {
         _xmlService = xmlService;
     }
-    
+
     public void AccessDocumentationDirectly()
     {
         // Access type documentation directly
         var typeDoc = _xmlService.GetDocumentation("T:MyNamespace.MyClass");
-        
+
         // Access method documentation directly
         var methodDoc = _xmlService.GetDocumentation("M:MyNamespace.MyClass.ProcessOrder(System.String,System.Int32)");
-        
-        // Access property documentation directly  
+
+        // Access property documentation directly
         var propertyDoc = _xmlService.GetDocumentation("P:MyNamespace.MyClass.OrderId");
-        
+
         // Access constructor documentation
         var constructorDoc = _xmlService.GetDocumentation("M:MyNamespace.MyClass.#ctor(System.String)");
     }
@@ -257,16 +257,16 @@ Rich documentation model containing all parsed information:
 public class XmlDocumentationInfo
 {
     public string? Summary { get; set; }           // <summary> content
-    public string? Remarks { get; set; }           // <remarks> content  
+    public string? Remarks { get; set; }           // <remarks> content
     public string? Returns { get; set; }           // <returns> content
     public string? Example { get; set; }           // <example> content
-    
+
     // Parameter documentation with optional examples
     public Dictionary<string, ParameterInfo> Parameters { get; }
-    
+
     // Response documentation keyed by status code
     public Dictionary<string, string?> Responses { get; }
-    
+
     public record ParameterInfo(string? Description, string? Example);
 }
 ```
@@ -285,21 +285,21 @@ public class XmlDocumentationInfo
 
 ### OpenAPI Documentation Enhancement
 
-The library integrates seamlessly with ASP.NET Core OpenAPI:
+The .NET 10 source generator automatically enriches OpenAPI with XML documentation:
 
 ```csharp
-// In Program.cs or Startup.cs
+// In Program.cs - call AddOpenApi() directly for source generator interception
 using Momentum.ServiceDefaults.Api.OpenApi.Extensions;
 
-builder.Services.AddOpenApiWithXmlDocSupport(options =>
-{
-    // Additional OpenAPI configuration
-    options.DocumentTitle = "My API";
-    options.DocumentVersion = "v1";
-});
+builder.Services.AddOpenApi(options => options.ConfigureOpenApiDefaults());
+builder.Services.AddAutoProducesConvention();
 
-// The service will automatically enrich OpenAPI specs with XML documentation
+// The source generator will automatically enrich OpenAPI specs with XML documentation
 ```
+
+Ensure your project has:
+- `<GenerateDocumentationFile>true</GenerateDocumentationFile>`
+- `<InterceptorsNamespaces>$(InterceptorsNamespaces);Microsoft.AspNetCore.OpenApi.Generated</InterceptorsNamespaces>`
 
 ### Source Generator Integration
 
@@ -311,11 +311,11 @@ public class DocumentationGenerator : ISourceGenerator
     public void Execute(GeneratorExecutionContext context)
     {
         var xmlService = new XmlDocumentationService(NullLogger<XmlDocumentationService>.Instance);
-        
+
         // Load XML documentation for the current compilation
         var xmlPath = GetXmlDocumentationPath(context);
         var loaded = xmlService.LoadDocumentationAsync(xmlPath).GetAwaiter().GetResult();
-        
+
         if (loaded)
         {
             // Generate code based on XML documentation
@@ -332,25 +332,25 @@ public class DocumentationGenerator : ISourceGenerator
 public class DocumentationAnalyzer
 {
     private readonly IXmlDocumentationService _xmlService;
-    
+
     public DocumentationAnalyzer(IXmlDocumentationService xmlService)
     {
         _xmlService = xmlService;
     }
-    
+
     public async Task<DocumentationReport> AnalyzeAssemblyAsync(string assemblyPath)
     {
         var xmlPath = Path.ChangeExtension(assemblyPath, ".xml");
         await _xmlService.LoadDocumentationAsync(xmlPath);
-        
+
         var assembly = Assembly.LoadFrom(assemblyPath);
         var report = new DocumentationReport();
-        
+
         foreach (var type in assembly.GetExportedTypes())
         {
             var typeDoc = _xmlService.GetTypeDocumentation(type);
             report.AddTypeAnalysis(type, typeDoc);
-            
+
             // Analyze methods
             foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.Instance))
             {
@@ -358,7 +358,7 @@ public class DocumentationAnalyzer
                 report.AddMethodAnalysis(method, methodDoc);
             }
         }
-        
+
         return report;
     }
 }
@@ -372,15 +372,15 @@ public class DocumentationAnalyzer
 public static class XmlDocumentationLoader
 {
     public static async Task<bool> LoadFromAssemblyLocationAsync(
-        this IXmlDocumentationService service, 
+        this IXmlDocumentationService service,
         Assembly assembly)
     {
         var assemblyLocation = assembly.Location;
         var xmlPath = Path.ChangeExtension(assemblyLocation, ".xml");
-        
+
         return await service.LoadDocumentationAsync(xmlPath);
     }
-    
+
     public static async Task<int> LoadFromDirectoryAsync(
         this IXmlDocumentationService service,
         string directory)
@@ -388,7 +388,7 @@ public static class XmlDocumentationLoader
         var xmlFiles = Directory.GetFiles(directory, "*.xml");
         var loadTasks = xmlFiles.Select(service.LoadDocumentationAsync);
         var results = await Task.WhenAll(loadTasks);
-        
+
         return results.Count(r => r);
     }
 }
@@ -400,28 +400,28 @@ public static class XmlDocumentationLoader
 public class DocumentationValidator
 {
     private readonly IXmlDocumentationService _xmlService;
-    
+
     public ValidationResult ValidateType(Type type)
     {
         var result = new ValidationResult();
         var typeDoc = _xmlService.GetTypeDocumentation(type);
-        
+
         // Validate type documentation
         if (string.IsNullOrEmpty(typeDoc?.Summary))
         {
             result.AddWarning($"Type {type.Name} missing summary documentation");
         }
-        
+
         // Validate public methods
         foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.Instance))
         {
             var methodDoc = _xmlService.GetMethodDocumentation(method);
-            
+
             if (string.IsNullOrEmpty(methodDoc?.Summary))
             {
                 result.AddWarning($"Method {method.Name} missing summary documentation");
             }
-            
+
             // Validate parameter documentation
             foreach (var param in method.GetParameters())
             {
@@ -431,7 +431,7 @@ public class DocumentationValidator
                 }
             }
         }
-        
+
         return result;
     }
 }
@@ -444,22 +444,22 @@ public class OptimizedDocumentationService
 {
     private readonly IXmlDocumentationService _xmlService;
     private readonly Dictionary<Assembly, bool> _loadedAssemblies = new();
-    
+
     public OptimizedDocumentationService(IXmlDocumentationService xmlService)
     {
         _xmlService = xmlService;
     }
-    
+
     public async Task EnsureDocumentationLoadedAsync(Assembly assembly)
     {
         if (_loadedAssemblies.ContainsKey(assembly))
             return;
-            
+
         var xmlPath = Path.ChangeExtension(assembly.Location, ".xml");
         var loaded = await _xmlService.LoadDocumentationAsync(xmlPath);
         _loadedAssemblies[assembly] = loaded;
     }
-    
+
     public async Task<XmlDocumentationInfo?> GetTypeDocumentationAsync(Type type)
     {
         await EnsureDocumentationLoadedAsync(type.Assembly);
@@ -478,10 +478,10 @@ The library provides robust error handling for common scenarios:
 public async Task HandleMissingFilesAsync()
 {
     var xmlService = new XmlDocumentationService(logger);
-    
+
     // LoadDocumentationAsync returns false for missing files (no exceptions)
     bool loaded = await xmlService.LoadDocumentationAsync("NonExistent.xml");
-    
+
     if (!loaded)
     {
         logger.LogWarning("XML documentation not found - API documentation may be incomplete");
@@ -499,7 +499,7 @@ public async Task HandleMalformedXmlAsync()
     {
         bool loaded = await xmlService.LoadDocumentationAsync("BadFile.xml");
         // Method returns false for malformed XML instead of throwing
-        
+
         if (!loaded)
         {
             // Log warning and continue with default documentation
@@ -520,11 +520,11 @@ public async Task HandleMalformedXmlAsync()
 public void HandleMissingDocumentation()
 {
     var typeDoc = xmlService.GetTypeDocumentation(typeof(MyClass));
-    
+
     // Always check for null - indicates no documentation found
     var summary = typeDoc?.Summary ?? "No documentation available";
     var remarks = typeDoc?.Remarks; // May be null even if typeDoc exists
-    
+
     // Safe parameter access
     if (typeDoc?.Parameters.TryGetValue("parameterName", out var paramDoc) == true)
     {
@@ -538,7 +538,7 @@ public void HandleMissingDocumentation()
 ### When to Use
 
 - **✅ Documentation Tools**: Perfect for generating API docs, markdown files, or OpenAPI specs
-- **✅ Development-Time Analysis**: Ideal for build-time source generators and analyzers  
+- **✅ Development-Time Analysis**: Ideal for build-time source generators and analyzers
 - **✅ Application Startup**: Suitable for loading documentation during application initialization
 - **❌ Runtime Hot Paths**: Avoid repeated loading in performance-critical application logic
 - **❌ Per-Request Operations**: Don't load XML files on every HTTP request
@@ -553,11 +553,11 @@ public void ConfigureServices(IServiceCollection services)
     {
         var logger = provider.GetRequiredService<ILogger<XmlDocumentationService>>();
         var service = new XmlDocumentationService(logger);
-        
+
         // Load documentation at startup
         var xmlPath = Path.Combine(AppContext.BaseDirectory, "MyApp.xml");
         service.LoadDocumentationAsync(xmlPath).GetAwaiter().GetResult();
-        
+
         return service;
     });
 }
@@ -582,7 +582,7 @@ foreach (var type in types)
 public class DocumentationService
 {
     private readonly IXmlDocumentationService _xmlService;
-    
+
     public async Task ProcessLargeDocumentationSetAsync(IEnumerable<string> xmlFiles)
     {
         try
@@ -591,7 +591,7 @@ public class DocumentationService
             {
                 await _xmlService.LoadDocumentationAsync(xmlFile);
                 ProcessDocumentation();
-                
+
                 // Clear cache periodically for large document sets
                 _xmlService.ClearCache();
             }

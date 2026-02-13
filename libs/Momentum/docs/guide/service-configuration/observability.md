@@ -288,9 +288,9 @@ var app = builder.Build();
 app.MapDefaultHealthCheckEndpoints();
 
 // Available endpoints:
-// /health - Overall health
-// /health/internal - Readiness probe
-// /health/live - Liveness probe
+// /status - Liveness probe (cached, no auth)
+// /health/internal - Readiness probe (localhost only)
+// /health - Public health (requires auth, detailed)
 ```
 
 ### Custom Health Checks

@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param(
-    [string]$DocsPath = "libs/Momentum/docs"
+    [string]$DocsPath = "libs/Momentum/docs",
+    [switch]$CI
 )
 
 # Import Common
@@ -48,16 +49,20 @@ catch {
 Push-Location $DocsPath
 
 try {
-    Write-Host "📦 Installing npm dependencies..."
-    pnpm install --no-frozen-lockfile
+    Write-Host "📦 Installing dependencies with Bun..."
+    if ($CI) {
+        bun install --frozen-lockfile
+    } else {
+        bun install
+    }
 
     if ($LASTEXITCODE -ne 0) {
-        Write-Error "❌ npm dependency installation failed"
+        Write-Error "❌ Dependency installation failed"
         exit 1
     }
 
     Write-Host "📚 Building documentation with VitePress..."
-    pnpm docs:build
+    bun run docs:build
 
     if ($LASTEXITCODE -ne 0) {
         Write-Error "❌ Documentation build failed"

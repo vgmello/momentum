@@ -2,11 +2,22 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using Momentum.Extensions.EventMarkdownGenerator.Models;
 
 namespace Momentum.Extensions.EventMarkdownGenerator.Services;
 
+/// <summary>
+///     Calculates estimated payload sizes for event properties based on type analysis
+///     and data annotation constraints (MaxLength, Range, StringLength).
+/// </summary>
 public static class PayloadSizeCalculator
 {
+    /// <summary>
+    ///     Calculates the estimated size in bytes for a property's serialized payload.
+    /// </summary>
+    /// <param name="property">The property to analyze for size constraints.</param>
+    /// <param name="propertyType">The type of the property.</param>
+    /// <returns>A result containing the estimated size, accuracy flag, and any warnings.</returns>
     public static PayloadSizeResult CalculatePropertySize(PropertyInfo property, Type propertyType)
     {
         return CalculatePropertySize(property, propertyType, []);
@@ -52,12 +63,18 @@ public static class PayloadSizeCalculator
         }
     }
 
+    /// <summary>
+    ///     Calculates string payload size using worst-case UTF-32 encoding (4 bytes per character).
+    ///     This provides a conservative upper bound for JSON serialization which typically uses UTF-8.
+    ///     Uses MaxLength or StringLength attributes when available for accurate estimation.
+    /// </summary>
     private static PayloadSizeResult CalculateStringSize(PropertyInfo property)
     {
         var constraints = GetDataAnnotationConstraints(property);
 
         if (constraints.MaxLength.HasValue)
         {
+            // Use 4 bytes per character (UTF-32) as worst-case estimate
             return new PayloadSizeResult
             {
                 SizeBytes = constraints.MaxLength.Value * 4,
@@ -212,33 +229,15 @@ public static class PayloadSizeCalculator
 
     private static DataAnnotationConstraints GetDataAnnotationConstraints(PropertyInfo property)
     {
-        var result = new DataAnnotationConstraints();
-
-        // Check MaxLength attribute
         var maxLengthAttr = property.GetCustomAttribute<MaxLengthAttribute>();
-
-        if (maxLengthAttr != null)
-        {
-            result.MaxLength = maxLengthAttr.Length;
-        }
-
-        // Check StringLength attribute
         var stringLengthAttr = property.GetCustomAttribute<StringLengthAttribute>();
-
-        if (stringLengthAttr != null)
-        {
-            result.MaxLength = stringLengthAttr.MaximumLength;
-        }
-
-        // Check Range attribute
         var rangeAttr = property.GetCustomAttribute<RangeAttribute>();
 
-        if (rangeAttr is { Maximum: int maxRange })
+        return new DataAnnotationConstraints
         {
-            result.MaxRange = maxRange;
-        }
-
-        return result;
+            MaxLength = stringLengthAttr?.MaximumLength ?? maxLengthAttr?.Length,
+            MaxRange = rangeAttr is { Maximum: int maxRange } ? maxRange : null
+        };
     }
 
     private static int GetPrimitiveTypeSize(Type type)
@@ -268,14 +267,7 @@ public static class PayloadSizeCalculator
 
     private sealed record DataAnnotationConstraints
     {
-        public int? MaxLength { get; set; }
-        public int? MaxRange { get; set; }
+        public int? MaxLength { get; init; }
+        public int? MaxRange { get; init; }
     }
-}
-
-public record PayloadSizeResult
-{
-    public int SizeBytes { get; init; }
-    public bool IsAccurate { get; init; }
-    public string? Warning { get; init; }
 }

@@ -21,14 +21,20 @@ public static class ValidationExtensions
     /// </remarks>
     public static Guid GetTenantId(this HttpContext context)
     {
-        // Placeholder implementation - replace with actual tenant resolution logic
-        // This could come from JWT claims, headers, route parameters, etc.
-        return Guid.Parse("00000000-0000-0000-0000-000000000001");
+        // Delegate to the ClaimsPrincipal-based implementation for consistency
+        return context.User.GetTenantId();
     }
 
     public static bool IsConcurrencyConflict(this IEnumerable<ValidationFailure> errors)
     {
         return errors.Any(e => e.PropertyName == "Version" &&
                                e.ErrorMessage.Contains("modified by another user"));
+    }
+
+    public static IDictionary<string, string[]> ToValidationErrors(this IEnumerable<ValidationFailure> errors)
+    {
+        return errors
+            .GroupBy(e => e.PropertyName)
+            .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
     }
 }

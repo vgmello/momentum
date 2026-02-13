@@ -1,6 +1,6 @@
 version: 2
 updates:
-  # .NET 9 packages - root solution and all projects
+  # .NET 10 packages - root solution and all projects
   - package-ecosystem: "nuget"
     directory: "/"
     schedule:

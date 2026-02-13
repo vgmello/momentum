@@ -10,7 +10,7 @@ Comprehensive testing strategies and tools for Momentum applications, covering u
 
 ## Overview
 
-Momentum provides a sophisticated testing framework built around Domain-Driven Design and CQRS patterns, supporting multiple testing strategies with real infrastructure provisioning through Testcontainers.
+Momentum provides a sophisticated testing framework supporting multiple testing strategies with real infrastructure provisioning through Testcontainers.
 
 ### Core Testing Principles
 
@@ -313,7 +313,7 @@ public class EventIntegrationTests(IntegrationTestFixture fixture) : Integration
         var eventCollector = new IntegrationEventCollector<CashierCreated>();
 
         // Subscribe to Kafka topic
-        await eventCollector.StartListening("app_domain.cashiers.created");
+        await eventCollector.StartListening("main.cashiers.created");
 
         var request = new CreateCashierRequest
         {

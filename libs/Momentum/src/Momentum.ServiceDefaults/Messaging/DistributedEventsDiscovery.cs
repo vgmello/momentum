@@ -1,5 +1,6 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
+using System.Collections.Frozen;
 using System.Reflection;
 using Wolverine.Runtime.Handlers;
 
@@ -11,7 +12,7 @@ public static class DistributedEventsDiscovery
 
     private const string Async = "Async";
 
-    private static readonly HashSet<string> HandlerMethodNames = new(StringComparer.OrdinalIgnoreCase)
+    private static readonly FrozenSet<string> HandlerMethodNames = new[]
     {
         HandlerChain.Handle,
         HandlerChain.Handle + Async,
@@ -21,7 +22,7 @@ public static class DistributedEventsDiscovery
         HandlerChain.Consume + Async,
         HandlerChain.Consumes,
         HandlerChain.Consumes + Async
-    };
+    }.ToFrozenSet(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     ///     Discovers and retrieves types that represent integration event types

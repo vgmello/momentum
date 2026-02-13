@@ -7,22 +7,41 @@ using Momentum.Extensions.EventMarkdownGenerator.Models;
 
 namespace Momentum.Extensions.EventMarkdownGenerator.Services;
 
+/// <summary>
+///     Generates markdown documentation from event metadata using Fluid (Liquid) templates.
+///     Supports custom template directories and generates both event and schema documentation.
+/// </summary>
 public class FluidMarkdownGenerator
 {
+    private static readonly FluidParser Parser = new();
+    private static readonly TemplateOptions TemplateOptions = new()
+    {
+        MemberAccessStrategy = new UnsafeMemberAccessStrategy()
+    };
+
     private readonly IFluidTemplate _eventTemplate;
     private readonly IFluidTemplate _schemaTemplate;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="FluidMarkdownGenerator"/> class.
+    /// </summary>
+    /// <param name="customTemplatesDirectory">Optional directory containing custom Liquid templates to override defaults.</param>
     public FluidMarkdownGenerator(string? customTemplatesDirectory = null)
     {
-        var parser = new FluidParser();
-
         var eventTemplateSource = GetTemplate("event.liquid", customTemplatesDirectory);
         var schemaTemplateSource = GetTemplate("schema.liquid", customTemplatesDirectory);
 
-        _eventTemplate = parser.Parse(eventTemplateSource);
-        _schemaTemplate = parser.Parse(schemaTemplateSource);
+        _eventTemplate = Parser.Parse(eventTemplateSource);
+        _schemaTemplate = Parser.Parse(schemaTemplateSource);
     }
 
+    /// <summary>
+    ///     Generates markdown content for a single event.
+    /// </summary>
+    /// <param name="eventWithDoc">The event metadata and documentation to render.</param>
+    /// <param name="outputDirectory">The base output directory for generated files.</param>
+    /// <param name="options">Optional generator options for customization.</param>
+    /// <returns>The generated markdown output containing content and file path.</returns>
     public IndividualMarkdownOutput GenerateMarkdown(EventWithDocumentation eventWithDoc, string outputDirectory,
         GeneratorOptions? options = null)
     {
@@ -32,13 +51,11 @@ public class FluidMarkdownGenerator
         var fileName = metadata.GetFileName();
         var filePath = GenerateFilePath(outputDirectory, fileName);
 
-        var context = CreateTemplateContext();
+        var context = new TemplateContext(TemplateOptions);
         var eventModel = EventViewModelFactory.CreateEventModel(metadata, documentation, options);
         context.SetValue("event", eventModel);
 
         var content = _eventTemplate.Render(context);
-
-        WriteMarkdownFile(filePath, content);
 
         return new IndividualMarkdownOutput
         {
@@ -48,18 +65,31 @@ public class FluidMarkdownGenerator
         };
     }
 
+    /// <summary>
+    ///     Generates markdown content for multiple events.
+    /// </summary>
+    /// <param name="events">The events to render.</param>
+    /// <param name="outputDirectory">The base output directory for generated files.</param>
+    /// <param name="options">Optional generator options for customization.</param>
+    /// <returns>An enumerable of generated markdown outputs.</returns>
     public IEnumerable<IndividualMarkdownOutput> GenerateAllMarkdown(IEnumerable<EventWithDocumentation> events, string outputDirectory,
         GeneratorOptions? options = null)
     {
         return events.Select(eventWithDoc => GenerateMarkdown(eventWithDoc, outputDirectory, options));
     }
 
+    /// <summary>
+    ///     Generates markdown content for a complex type schema.
+    /// </summary>
+    /// <param name="schemaType">The type to generate schema documentation for.</param>
+    /// <param name="outputDirectory">The base output directory for generated files.</param>
+    /// <returns>The generated markdown output containing content and file path.</returns>
     public IndividualMarkdownOutput GenerateSchemaMarkdown(Type schemaType, string outputDirectory)
     {
-        var fileName = $"{(schemaType.FullName ?? "UnknownType").ToSafeFileName()}.md";
+        var fileName = $"{TypeUtils.GetCleanTypeName(schemaType).ToSafeFileName()}.md";
         var filePath = GenerateFilePath(outputDirectory, fileName, "schemas");
 
-        var context = CreateTemplateContext();
+        var context = new TemplateContext(TemplateOptions);
         var schemaModel = EventViewModelFactory.CreateSchemaModel(schemaType);
         context.SetValue("schema", schemaModel);
 
@@ -73,13 +103,24 @@ public class FluidMarkdownGenerator
         };
     }
 
+    /// <summary>
+    ///     Generates markdown content for multiple complex type schemas.
+    /// </summary>
+    /// <param name="schemaTypes">The types to generate schema documentation for.</param>
+    /// <param name="outputDirectory">The base output directory for generated files.</param>
+    /// <returns>An enumerable of generated markdown outputs.</returns>
     public IEnumerable<IndividualMarkdownOutput> GenerateAllSchemas(IEnumerable<Type> schemaTypes, string outputDirectory)
     {
         return schemaTypes.Select(schemaType => GenerateSchemaMarkdown(schemaType, outputDirectory));
     }
 
-
-    public static void CopyDefaultTemplatesToDirectory(string targetDirectory)
+    /// <summary>
+    ///     Copies the default Liquid templates to a target directory for customization.
+    /// </summary>
+    /// <param name="targetDirectory">The directory to copy templates to.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <exception cref="ArgumentException">Thrown when targetDirectory is null or empty.</exception>
+    public static async Task CopyDefaultTemplatesToDirectoryAsync(string targetDirectory, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(targetDirectory))
         {
@@ -88,13 +129,13 @@ public class FluidMarkdownGenerator
 
         Directory.CreateDirectory(targetDirectory);
 
-        var templateNames = new[] { "event.liquid", "schema.liquid" };
+        string[] templateNames = ["event.liquid", "schema.liquid"];
 
         foreach (var templateName in templateNames)
         {
             var templateContent = GetEmbeddedTemplate(templateName);
             var targetPath = Path.Combine(targetDirectory, templateName);
-            File.WriteAllText(targetPath, templateContent);
+            await File.WriteAllTextAsync(targetPath, templateContent, cancellationToken);
         }
     }
 
@@ -164,18 +205,6 @@ public class FluidMarkdownGenerator
         }
     }
 
-    private static TemplateContext CreateTemplateContext()
-    {
-        return new TemplateContext
-        {
-            Options =
-            {
-                // Using UnsafeMemberAccessStrategy for now - TODO: Configure SafeMemberAccessStrategy with explicit type registration
-                MemberAccessStrategy = new UnsafeMemberAccessStrategy()
-            }
-        };
-    }
-
     private static string GenerateFilePath(string outputDirectory, string fileName, string? subdirectory = null)
     {
         var sanitizedFileName = Path.GetFileName(fileName);
@@ -183,17 +212,5 @@ public class FluidMarkdownGenerator
         return subdirectory != null
             ? Path.Combine(outputDirectory, subdirectory, sanitizedFileName)
             : Path.Combine(outputDirectory, sanitizedFileName);
-    }
-
-    private static void WriteMarkdownFile(string filePath, string content)
-    {
-        var directory = Path.GetDirectoryName(filePath);
-
-        if (!string.IsNullOrEmpty(directory))
-        {
-            Directory.CreateDirectory(directory);
-        }
-
-        File.WriteAllText(filePath, content);
     }
 }

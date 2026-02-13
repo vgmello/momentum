@@ -15,7 +15,7 @@ public class GetInvoicesIntegrationTests(IntegrationTestFixture fixture) : Integ
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
+        await connection.ExecuteAsync("TRUNCATE TABLE main.invoices;");
 
         // Arrange - Create a few invoices first
         var createRequests = new[]
@@ -24,12 +24,9 @@ public class GetInvoicesIntegrationTests(IntegrationTestFixture fixture) : Integ
             new CreateInvoiceRequest { Name = "Invoice 2", Amount = 200m, Currency = "EUR" }
         };
 
-        var createdInvoices = new List<AppDomain.Invoices.Grpc.Models.Invoice>();
-
         foreach (var createRequest in createRequests)
         {
-            var createResponse = await _client.CreateInvoiceAsync(createRequest, cancellationToken: TestContext.Current.CancellationToken);
-            createdInvoices.Add(createResponse);
+            await _client.CreateInvoiceAsync(createRequest, cancellationToken: TestContext.Current.CancellationToken);
         }
 
         var request = new GetInvoicesRequest
@@ -64,7 +61,7 @@ public class GetInvoicesIntegrationTests(IntegrationTestFixture fixture) : Integ
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
+        await connection.ExecuteAsync("TRUNCATE TABLE main.invoices;");
 
         // Arrange - Create multiple invoices
         for (var i = 1; i <= 5; i++)
@@ -95,7 +92,7 @@ public class GetInvoicesIntegrationTests(IntegrationTestFixture fixture) : Integ
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
+        await connection.ExecuteAsync("TRUNCATE TABLE main.invoices;");
 
         // Arrange - Create invoices with different statuses
         var draftInvoice = await _client.CreateInvoiceAsync(new CreateInvoiceRequest

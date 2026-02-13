@@ -1,6 +1,11 @@
 {
   "projectName": "AppDomain",
   "basePort": __SERVICE_BASE_PORT__,
+  "localPackages": {
+    //#if (USE_LOCAL)
+    "enabled": true
+    //#endif
+  },
   "momentumLibImport": {
     //#if (INCLUDE_LIBS)
     "enabled": true,

@@ -8,6 +8,12 @@
         <NoWarn>$(NoWarn);CS0436;</NoWarn>
     </PropertyGroup>
 
+<!--#if (INCLUDE_API) -->
+    <PropertyGroup>
+        <InterceptorsNamespaces>$(InterceptorsNamespaces);Microsoft.AspNetCore.OpenApi.Generated</InterceptorsNamespaces>
+    </PropertyGroup>
+<!--#endif -->
+
     <ItemGroup>
         <PackageReference Include="Bogus"/>
         <PackageReference Include="coverlet.collector">
@@ -15,8 +21,14 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
 <!--#if (INCLUDE_API) -->
-        <PackageReference Include="Grpc.Tools"/>
+        <PackageReference Include="Grpc.Tools">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing"/>
+<!--#endif -->
+<!--#if (HAS_BACKEND) -->
+        <PackageReference Include="Microsoft.AspNetCore.TestHost"/>
 <!--#endif -->
         <PackageReference Include="Microsoft.NET.Test.Sdk"/>
 <!--#if (INCLUDE_ORLEANS) -->
@@ -31,7 +43,10 @@
 <!--#endif -->
         <PackageReference Include="Testcontainers.Kafka"/>
         <PackageReference Include="Testcontainers"/>
-        <PackageReference Include="xunit.runner.visualstudio"/>
+        <PackageReference Include="xunit.runner.visualstudio">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="xunit.v3"/>
     </ItemGroup>
 

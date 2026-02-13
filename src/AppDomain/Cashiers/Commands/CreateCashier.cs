@@ -68,7 +68,7 @@ public static class CreateCashierCommandHandler
     /// <returns>The created cashier entity</returns>
     public static async Task<Data.Entities.Cashier> Handle(DbCommand command, AppDomainDb db, CancellationToken cancellationToken)
     {
-        var inserted = await db.Cashiers.InsertWithOutputAsync(command.Cashier, token: cancellationToken);
+        var inserted = await db.Cashiers.InsertWithOutputAsync(command.Cashier, cancellationToken);
 
         return inserted;
     }

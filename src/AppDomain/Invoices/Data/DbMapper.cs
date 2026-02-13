@@ -17,4 +17,7 @@ public static partial class DbMapper
     /// <param name="invoice">The invoice database entity to convert.</param>
     /// <returns>The converted invoice domain model.</returns>
     public static partial Invoice ToModel(this Entities.Invoice invoice);
+
+    private static InvoiceStatus MapStatus(string status) =>
+        Enum.Parse<InvoiceStatus>(status, ignoreCase: true);
 }

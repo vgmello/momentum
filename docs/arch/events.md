@@ -76,7 +76,7 @@ public record InvoiceGenerated : IDomainEvent
 **Usage in Command Handler**:
 
 ```csharp
-[DbCommand(sp: "app_domain.invoices_create")]
+[DbCommand(sp: "main.invoices_create")]
 public partial class CreateInvoiceCommandHandler : IRequestHandler<CreateInvoiceCommand, Result<Invoice>>
 {
     public async Task<Result<Invoice>> Handle(CreateInvoiceCommand request, CancellationToken cancellationToken)

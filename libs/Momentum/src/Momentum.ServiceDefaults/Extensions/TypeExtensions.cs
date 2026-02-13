@@ -35,29 +35,58 @@ public static class TypeExtensions
         var propertiesWithAttribute = new HashSet<PropertyInfo>();
         var allProperties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
-        foreach (var prop in allProperties.Where(p => p.IsDefined(typeof(TAttribute), inherit: true)))
-        {
-            propertiesWithAttribute.Add(prop);
-        }
-
-        var primaryConstructor = type.GetPrimaryConstructor();
-
-        if (primaryConstructor is not null)
-        {
-            var parametersWithAttribute = primaryConstructor.GetParameters()
-                .Where(p => p.IsDefined(typeof(TAttribute), inherit: true));
-
-            foreach (var param in parametersWithAttribute)
-            {
-                var matchingProperty = allProperties
-                    .FirstOrDefault(prop => prop.Name == param.Name && prop.PropertyType == param.ParameterType);
-
-                if (matchingProperty is not null)
-                    propertiesWithAttribute.Add(matchingProperty);
-            }
-        }
+        AddPropertiesWithDirectAttribute<TAttribute>(allProperties, propertiesWithAttribute);
+        AddPropertiesFromConstructorParameters<TAttribute>(type, allProperties, propertiesWithAttribute);
 
         return propertiesWithAttribute;
+    }
+
+    private static void AddPropertiesWithDirectAttribute<TAttribute>(
+        PropertyInfo[] allProperties,
+        HashSet<PropertyInfo> propertiesWithAttribute) where TAttribute : Attribute
+    {
+        foreach (var prop in allProperties)
+        {
+            if (prop.IsDefined(typeof(TAttribute), inherit: true))
+            {
+                propertiesWithAttribute.Add(prop);
+            }
+        }
+    }
+
+    private static void AddPropertiesFromConstructorParameters<TAttribute>(
+        Type type,
+        PropertyInfo[] allProperties,
+        HashSet<PropertyInfo> propertiesWithAttribute) where TAttribute : Attribute
+    {
+        var primaryConstructor = type.GetPrimaryConstructor();
+        if (primaryConstructor is null)
+            return;
+
+        var parameters = primaryConstructor.GetParameters();
+
+        foreach (var param in parameters)
+        {
+            if (!param.IsDefined(typeof(TAttribute), inherit: true))
+                continue;
+
+            var matchingProperty = FindMatchingProperty(allProperties, param);
+            if (matchingProperty is not null)
+            {
+                propertiesWithAttribute.Add(matchingProperty);
+            }
+        }
+    }
+
+    private static PropertyInfo? FindMatchingProperty(PropertyInfo[] properties, ParameterInfo param)
+    {
+        foreach (var prop in properties)
+        {
+            if (prop.Name == param.Name && prop.PropertyType == param.ParameterType)
+                return prop;
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -110,30 +139,70 @@ public static class TypeExtensions
     /// </example>
     public static ConstructorInfo? GetPrimaryConstructor(this Type type)
     {
-        var initOnlyProperties = type
-            .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .Where(p => p.IsInitOnly()).ToArray();
+        var initOnlyProperties = CollectInitOnlyProperties(type);
 
-        if (initOnlyProperties.Length == 0)
+        if (initOnlyProperties is null || initOnlyProperties.Count == 0)
             return null;
 
-        var constructorCandidates = type
-            .GetConstructors(BindingFlags.Public | BindingFlags.Instance)
-            .Where(c => c.GetCustomAttribute<CompilerGeneratedAttribute>() is null);
+        return FindMatchingConstructor(type, initOnlyProperties);
+    }
 
-        foreach (var constructor in constructorCandidates)
+    private static List<PropertyInfo>? CollectInitOnlyProperties(Type type)
+    {
+        var allProperties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        List<PropertyInfo>? initOnlyProperties = null;
+
+        foreach (var prop in allProperties)
         {
-            var parameters = constructor.GetParameters();
+            if (prop.IsInitOnly())
+            {
+                initOnlyProperties ??= [];
+                initOnlyProperties.Add(prop);
+            }
+        }
 
-            var allParamsMatch = parameters.All(param =>
-                initOnlyProperties.Any(prop => prop.Name == param.Name && prop.PropertyType == param.ParameterType)
-            );
+        return initOnlyProperties;
+    }
 
-            if (allParamsMatch)
+    private static ConstructorInfo? FindMatchingConstructor(Type type, List<PropertyInfo> initOnlyProperties)
+    {
+        var constructors = type.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
+
+        foreach (var constructor in constructors)
+        {
+            if (constructor.GetCustomAttribute<CompilerGeneratedAttribute>() is not null)
+                continue;
+
+            if (AllParametersMatchProperties(constructor.GetParameters(), initOnlyProperties))
                 return constructor;
         }
 
         return null;
+    }
+
+    private static bool AllParametersMatchProperties(ParameterInfo[] parameters, List<PropertyInfo> properties)
+    {
+        if (parameters.Length != properties.Count)
+            return false;
+
+        foreach (var param in parameters)
+        {
+            if (!HasMatchingProperty(param, properties))
+                return false;
+        }
+
+        return true;
+    }
+
+    private static bool HasMatchingProperty(ParameterInfo param, List<PropertyInfo> properties)
+    {
+        foreach (var prop in properties)
+        {
+            if (prop.Name == param.Name && prop.PropertyType == param.ParameterType)
+                return true;
+        }
+
+        return false;
     }
 
     /// <summary>

@@ -1,12 +1,12 @@
 ---
 title: Getting Started with Momentum
-description: Learn how to build production-ready .NET 9 microservices with Momentum - featuring a comprehensive dotnet template system and powerful supporting libraries. Get up and running in minutes with Orleans, gRPC, Kafka, and PostgreSQL.
+description: Learn how to build production-ready .NET 10 microservices with Momentum - featuring a comprehensive dotnet template system and powerful supporting libraries. Get up and running in minutes with Orleans, gRPC, Kafka, and PostgreSQL.
 date: 2025-01-15
 ---
 
 # Getting Started with Momentum
 
-Welcome to **Momentum** - a comprehensive .NET 9 template system that generates complete, production-ready microservices solutions. Whether you're building APIs, event-driven backends, or stateful processing systems, Momentum provides the architecture, patterns, and infrastructure you need to get productive immediately.
+Welcome to **Momentum** - a comprehensive .NET 10 template system that generates complete, production-ready microservices solutions. Whether you're building APIs, event-driven backends, or stateful processing systems, Momentum provides the architecture, patterns, and infrastructure you need to get productive immediately.
 
 ## Quick Start (2 Minutes)
 
@@ -58,7 +58,7 @@ dotnet run --project src/OrderService.AppHost
 
 Momentum is built on modern, production-proven technologies:
 
--   **🎯 .NET 9**: Latest framework with performance optimizations
+-   **🎯 .NET 10**: Latest framework with performance optimizations
 -   **🏗️ .NET Aspire**: Local development orchestration and observability
 -   **🎭 Orleans**: Stateful actor-based processing for complex workflows
 -   **⚡ Wolverine**: CQRS/MediatR pattern with message handling
@@ -85,7 +85,7 @@ Momentum is built on modern, production-proven technologies:
 
 Before getting started, ensure you have:
 
--   **.NET 9 SDK** - [Download here](https://dotnet.microsoft.com/download/dotnet/9.0)
+-   **.NET 10 SDK** - [Download here](https://dotnet.microsoft.com/download/dotnet/9.0)
 -   **IDE**: Visual Studio, VS Code with C# Dev Kit, or JetBrains Rider
 -   **Docker Desktop** - Required for databases, Kafka, and local development
 
@@ -97,7 +97,7 @@ The template supports extensive customization through parameters. Here are the m
 
 ```bash
 # Generate API-only service
-dotnet new mmt -n PaymentService --api --back-office false --orleans false --docs false
+dotnet new mmt -n PaymentService --api --backoffice false --orleans false --docs false
 ```
 
 ### **Orleans Processing Engine**
@@ -127,7 +127,7 @@ The template offers comprehensive configuration options:
 
 **Core Components:**
 -   `--api`: REST/gRPC API project (default: true)
--   `--back-office`: Background processing project (default: true)
+-   `--backoffice`: Background processing project (default: true)
 -   `--orleans`: Orleans stateful processing project (default: false)
 -   `--aspire`: .NET Aspire orchestration project (default: true)
 -   `--docs`: VitePress documentation project (default: true)
@@ -172,7 +172,7 @@ OrderService/
 
 ### **Business Domain Organization**
 
-Generated code follows Domain-Driven Design principles with Wolverine CQRS patterns:
+Generated code follows a Domain-Oriented Vertical Slice approach with Wolverine CQRS patterns and event-driven contracts:
 
 ```
 src/OrderService/
@@ -242,7 +242,7 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
-app.MapDefaultEndpoints(); // Health checks, metrics
+app.MapDefaultEndpoints(); // Health checks
 
 // Add your API endpoints
 app.MapPost("/orders", async (CreateOrderCommand command, IOrderService orderService) =>
@@ -377,8 +377,9 @@ dotnet run
 
 # The service starts with:
 # - API endpoints: https://localhost:7001
-# - Health check: https://localhost:7001/health
-# - Metrics: https://localhost:7001/metrics
+# - Health check: https://localhost:7001/health (requires auth)
+# - Internal health: https://localhost:7001/health/internal (localhost only)
+# - Liveness: https://localhost:7001/status
 
 # Test creating an order
 curl -X POST https://localhost:7001/orders \
@@ -392,8 +393,11 @@ curl -X POST https://localhost:7001/orders \
 # Test retrieving an order (use the ID from the response above)
 curl https://localhost:7001/orders/{order-id}
 
-# Check health status
-curl https://localhost:7001/health
+# Check health status (liveness)
+curl https://localhost:7001/status
+
+# Check detailed health (development only, localhost)
+curl https://localhost:7001/health/internal
 ```
 
 ## Library Integration Results
@@ -412,7 +416,7 @@ In just a few minutes, you added powerful capabilities to your application:
 
 ### Service Defaults (`builder.AddServiceDefaults()`)
 
--   **Health Checks**: `/health` (detailed) and `/alive` (simple) endpoints
+-   **Health Checks**: `/status` (liveness), `/health/internal` (readiness), `/health` (authorized detailed)
 -   **OpenTelemetry**: Metrics, tracing, and logging correlation
 -   **Serilog**: Structured logging with exception details
 -   **Resilience**: HTTP client retry and circuit breaker patterns

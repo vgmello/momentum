@@ -14,9 +14,9 @@ This walkthrough demonstrates how to create a complete Momentum application, exp
 
 ## Prerequisites
 
-- .NET 9.0 SDK
+- .NET 10.0 SDK
 - Docker and Docker Compose
-- Node.js and pnpm (for documentation)
+- Bun (for documentation)
 - Visual Studio 2022 or VS Code
 
 ## Step 1: Template Installation
@@ -268,10 +268,10 @@ The OpenAPI documentation is automatically generated and available at:
 cd docs
 
 # Install dependencies
-pnpm install
+bun install
 
 # Start development server
-pnpm dev
+bun run dev
 ```
 
 ## Step 10: Deployment Preparation
@@ -314,7 +314,7 @@ docker compose up
 
 ## Common Patterns Demonstrated
 
-- **Domain-Driven Design**: Clear domain boundaries and ubiquitous language
+- **DDD-Inspired Boundaries**: Clear domain boundaries and ubiquitous language in a pragmatic application-service style
 - **CQRS**: Separation of read and write operations
 - **Event-Driven Architecture**: Loose coupling through events
 - **Source Generation**: Compile-time code generation for performance
@@ -326,7 +326,7 @@ docker compose up
 - **Port conflicts**: Ensure configured ports are available
 - **Database connection**: Verify PostgreSQL is running
 - **Missing dependencies**: Run `dotnet restore`
-- **Build errors**: Check .NET 9.0 SDK installation
+- **Build errors**: Check .NET 10.0 SDK installation
 
 ### Getting Help
 - Check the documentation

@@ -2,6 +2,7 @@
 
 using AppDomain.Invoices.Commands;
 using AppDomain.Invoices.Contracts.IntegrationEvents;
+using AppDomain.Invoices.Contracts.Models;
 using Momentum.Extensions.Messaging;
 using Wolverine;
 
@@ -9,7 +10,7 @@ namespace AppDomain.Tests.Unit.Invoices;
 
 public class MarkInvoiceAsPaidCommandHandlerTests
 {
-    [Fact(Skip = "Not ready yet")]
+    [Fact]
     public async Task Handle_WithValidInvoice_ShouldMarkAsPaidAndReturnResult()
     {
         // Arrange
@@ -24,8 +25,10 @@ public class MarkInvoiceAsPaidCommandHandlerTests
             TenantId = tenantId,
             InvoiceId = invoiceId,
             Name = "Test Invoice",
-            Status = "Paid",
+            Status = nameof(InvoiceStatus.Paid),
             Amount = amountPaid,
+            AmountPaid = amountPaid,
+            PaymentDate = paymentDate,
             Currency = "USD",
             CreatedDateUtc = DateTime.UtcNow,
             UpdatedDateUtc = DateTime.UtcNow
@@ -44,7 +47,7 @@ public class MarkInvoiceAsPaidCommandHandlerTests
         var invoice = result.Match(success => success, _ => null!);
 
         invoice.InvoiceId.ShouldBe(invoiceId);
-        invoice.Status.ShouldBe("Paid");
+        invoice.Status.ShouldBe(InvoiceStatus.Paid);
         invoice.Amount.ShouldBe(amountPaid);
 
         // Verify integration event
@@ -64,7 +67,7 @@ public class MarkInvoiceAsPaidCommandHandlerTests
             Arg.Any<CancellationToken>());
     }
 
-    [Fact(Skip = "Not ready yet")]
+    [Fact]
     public async Task Handle_WithNullPaymentDate_ShouldUseUtcNow()
     {
         // Arrange
@@ -72,17 +75,20 @@ public class MarkInvoiceAsPaidCommandHandlerTests
         var tenantId = Guid.NewGuid();
         var invoiceId = Guid.NewGuid();
         const decimal amountPaid = 100.00m;
+        var now = DateTime.UtcNow;
 
         var mockInvoice = new AppDomain.Invoices.Data.Entities.Invoice
         {
             TenantId = tenantId,
             InvoiceId = invoiceId,
             Name = "Test Invoice",
-            Status = "Paid",
+            Status = nameof(InvoiceStatus.Paid),
             Amount = amountPaid,
+            AmountPaid = amountPaid,
+            PaymentDate = now,
             Currency = "USD",
-            CreatedDateUtc = DateTime.UtcNow,
-            UpdatedDateUtc = DateTime.UtcNow
+            CreatedDateUtc = now,
+            UpdatedDateUtc = now
         };
 
         messagingMock.InvokeCommandAsync(

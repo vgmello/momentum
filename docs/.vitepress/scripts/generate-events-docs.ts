@@ -45,7 +45,20 @@ async function getAssemblyFiles(patterns: string[]): Promise<string[]> {
         allFiles.push(...matches);
     }
 
-    return [...new Set(allFiles)];
+    // Remove duplicates by full path
+    const uniquePaths = [...new Set(allFiles)];
+
+    // Deduplicate by assembly name - keep only the first match for each assembly
+    // This prevents duplicate events when multiple builds exist (Debug/Release, different .NET versions)
+    const seenAssemblyNames = new Map<string, string>();
+    for (const assemblyPath of uniquePaths) {
+        const assemblyName = path.basename(assemblyPath);
+        if (!seenAssemblyNames.has(assemblyName)) {
+            seenAssemblyNames.set(assemblyName, assemblyPath);
+        }
+    }
+
+    return Array.from(seenAssemblyNames.values());
 }
 
 try {

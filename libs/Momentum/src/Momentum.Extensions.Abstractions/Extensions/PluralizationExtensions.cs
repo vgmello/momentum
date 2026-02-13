@@ -4,6 +4,14 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Momentum.Extensions.Abstractions.Extensions;
 
+/// <summary>
+///     Provides extension methods for English language noun pluralization.
+/// </summary>
+/// <remarks>
+///     Supports irregular nouns (80+ entries), unchanging nouns (sheep, fish, etc.),
+///     uncountable nouns (water, information, etc.), and standard English pluralization rules.
+///     Preserves original casing patterns (FirstName → FirstNames, CUSTOMER → CUSTOMERS).
+/// </remarks>
 public static class PluralizationExtensions
 {
     private static readonly Dictionary<string, string> IrregularNouns = new(StringComparer.OrdinalIgnoreCase)
@@ -151,6 +159,20 @@ public static class PluralizationExtensions
         "at", "et", "it", "ot", "ut" // formats, assets, units, robots, inputs
     };
 
+    /// <summary>
+    ///     Converts a singular English noun to its plural form.
+    /// </summary>
+    /// <param name="word">The singular noun to pluralize.</param>
+    /// <returns>
+    ///     The plural form of the word, or the original word if it's uncountable,
+    ///     unchanging, or already plural.
+    /// </returns>
+    /// <example>
+    ///     "customer" → "customers",
+    ///     "child" → "children",
+    ///     "sheep" → "sheep",
+    ///     "Country" → "Countries"
+    /// </example>
     public static string Pluralize(this string word)
     {
         if (string.IsNullOrWhiteSpace(word) || word.Length < 2)

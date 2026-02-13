@@ -30,7 +30,7 @@ All source files are linked from the AppDomain implementation, so this package s
 
 ## Target framework
 
--   net9.0
+-   net10.0
 
 ## Installation
 

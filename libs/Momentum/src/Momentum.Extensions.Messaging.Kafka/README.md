@@ -45,7 +45,7 @@ This package includes the following key dependencies:
 
 ### Prerequisites
 
--   .NET 9.0 or later
+-   .NET 10.0 or later
 -   Apache Kafka 2.8 or later
 -   Momentum.ServiceDefaults package
 
@@ -439,7 +439,7 @@ Enable debug logging for detailed troubleshooting:
 
 ## Requirements
 
--   **.NET 9.0** or later
+-   **.NET 10.0** or later
 -   **Apache Kafka 2.8** or later
 -   **Momentum.ServiceDefaults** package
 

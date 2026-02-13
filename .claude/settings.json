@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "filepath=\"$TOOL_INPUT_FILE_PATH\"; if echo \"$filepath\" | grep -qE '(\\.env|\\.github/workflows/|settings\\.local\\.json)$'; then echo 'BLOCK: Protected file - confirm with user first' >&2; exit 2; fi"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "filepath=\"$TOOL_INPUT_FILE_PATH\"; if [ \"${filepath##*.}\" = \"cs\" ]; then dotnet format --include \"$filepath\" --no-restore --verbosity quiet 2>/dev/null || true; fi"
+          }
+        ]
+      }
+    ]
+  }
+}

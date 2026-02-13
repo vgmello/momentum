@@ -1,6 +1,7 @@
 // Copyright (c) OrgName. All rights reserved.
 
 using DotNet.Testcontainers.Containers;
+using Testcontainers.PostgreSql;
 
 namespace AppDomain.Tests.Integration._Internal.Extensions;
 
@@ -11,6 +12,6 @@ public static class DatabaseContainerExtensions
         return $"Host={dbContainer.Hostname};" +
                $"Port={dbContainer.GetMappedPublicPort(5432)};" +
                $"Database={dbName};" +
-               $"Username=postgres;Password=postgres";
+               $"Username={PostgreSqlBuilder.DefaultUsername};Password={PostgreSqlBuilder.DefaultPassword}";
     }
 }

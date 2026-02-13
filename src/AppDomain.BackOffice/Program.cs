@@ -2,7 +2,9 @@
 
 using AppDomain.BackOffice;
 using AppDomain.Infrastructure;
+//#if (USE_KAFKA)
 using Momentum.Extensions.Messaging.Kafka;
+//#endif
 using Momentum.ServiceDefaults;
 using Momentum.ServiceDefaults.HealthChecks;
 

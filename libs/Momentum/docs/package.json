@@ -4,14 +4,14 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "dev": "pnpm docs:dev",
-    "docs:prep": "pnpm docs:dotnet && pnpm docs:adr",
-    "docs:dev": "pnpm docs:prep && vitepress dev",
-    "docs:build": "pnpm docs:prep && vitepress build",
-    "docs:build:debug": "DEBUG=* pnpm docs:build",
+    "dev": "bun run docs:dev",
+    "docs:prep": "bun run docs:dotnet && bun run docs:adr",
+    "docs:dev": "bun run docs:prep && vitepress dev",
+    "docs:build": "bun run docs:prep && vitepress build",
+    "docs:build:debug": "DEBUG=* bun run docs:build",
     "docs:preview": "vitepress preview",
-    "docs:dotnet": "tsx .vitepress/scripts/docs-dotnet.ts",
-    "docs:adr": "tsx .vitepress/scripts/adrlogs-table-gen.ts"
+    "docs:dotnet": "bun .vitepress/scripts/docs-dotnet.ts",
+    "docs:adr": "bun .vitepress/scripts/adrlogs-table-gen.ts"
   },
   "dependencies": {
     "glob": "^11.0.3",
@@ -19,12 +19,10 @@
     "yaml": "^2.8.1"
   },
   "devDependencies": {
+    "@types/bun": "^1.2.14",
     "@types/node": "^24.3.0",
-    "esbuild": "^0.25.9",
     "markdown-it": "^14.1.0",
     "mermaid": "^11.10.1",
-    "tsx": "^4.20.5",
-    "typescript": "^5.9.2",
     "vitepress": "^1.6.4"
   }
 }

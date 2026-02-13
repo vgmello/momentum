@@ -48,7 +48,7 @@ Database schema versioning and migration management using Liquibase for reliable
 All entities in Momentum use composite primary keys with `TenantId` as the first component, ensuring complete tenant isolation:
 
 ```csharp
-[Table(Schema = "app_domain", Name = "cashiers")]
+[Table(Schema = "main", Name = "cashiers")]
 public record Cashier : DbEntity
 {
     [PrimaryKey(Order = 0)]
@@ -71,7 +71,7 @@ public record Cashier : DbEntity
 Provides common auditing fields and optimistic concurrency control:
 
 ```csharp
-[Table(Schema = "app_domain")]
+[Table(Schema = "main")]
 public abstract record DbEntity
 {
     [Column("created_date_utc", SkipOnUpdate = true)]
@@ -95,7 +95,7 @@ Use PostgreSQL functions with the `$` prefix for automatic `SELECT * FROM` gener
 // Handler with source-generated database access
 public static partial class GetCashiersQueryHandler
 {
-    [DbCommand(fn: "$app_domain.cashiers_get_all")]
+    [DbCommand(fn: "$main.cashiers_get_all")]
     public partial record DbQuery(Guid TenantId, int Limit, int Offset) 
         : IQuery<IEnumerable<Data.Entities.Cashier>>;
         
@@ -117,7 +117,7 @@ public static partial class GetCashiersQueryHandler
 For simple queries that don't require custom functions:
 
 ```csharp
-[DbCommand(sql: "SELECT * FROM app_domain.orders WHERE tenant_id = @TenantId AND order_id = @OrderId")]
+[DbCommand(sql: "SELECT * FROM main.orders WHERE tenant_id = @TenantId AND order_id = @OrderId")]
 public partial record GetOrderQuery(Guid TenantId, Guid OrderId) : IQuery<Order?>;
 ```
 
@@ -125,7 +125,7 @@ public partial record GetOrderQuery(Guid TenantId, Guid OrderId) : IQuery<Order?
 For complex operations requiring transaction management:
 
 ```csharp
-[DbCommand(sp: "app_domain.orders_process_payment")]
+[DbCommand(sp: "main.orders_process_payment")]
 public partial record ProcessPaymentCommand(Guid TenantId, Guid OrderId, decimal Amount) 
     : ICommand<Result<PaymentResult>>;
 ```
@@ -162,11 +162,11 @@ Schema migration management with multi-tenant awareness:
 PRIMARY KEY (tenant_id, entity_id)
 
 -- Secondary indexes always start with tenant_id
-CREATE INDEX idx_cashiers_tenant_name ON app_domain.cashiers(tenant_id, name);
-CREATE INDEX idx_cashiers_tenant_email ON app_domain.cashiers(tenant_id, email) WHERE email IS NOT NULL;
+CREATE INDEX idx_cashiers_tenant_name ON main.cashiers(tenant_id, name);
+CREATE INDEX idx_cashiers_tenant_email ON main.cashiers(tenant_id, email) WHERE email IS NOT NULL;
 
 -- Filtered indexes for common queries
-CREATE INDEX idx_active_orders ON app_domain.orders(tenant_id, status) WHERE status IN ('pending', 'processing');
+CREATE INDEX idx_active_orders ON main.orders(tenant_id, status) WHERE status IN ('pending', 'processing');
 ```
 
 ### Query Performance Best Practices
@@ -223,7 +223,7 @@ WHERE cashier_id = @CashierId AND tenant_id = @TenantId
 Momentum uses LinqToDB attributes for precise database mapping:
 
 ```csharp
-[Table(Schema = "app_domain", Name = "cashiers")]
+[Table(Schema = "main", Name = "cashiers")]
 public record Cashier : DbEntity
 {
     // Composite primary key with explicit ordering
@@ -275,7 +275,7 @@ Tables with composite primary keys for tenant isolation:
 
 ```sql
 -- Multi-tenant table with composite primary key
-CREATE TABLE app_domain.cashiers (
+CREATE TABLE main.cashiers (
     tenant_id UUID,
     cashier_id UUID,
     name VARCHAR(100) NOT NULL,
@@ -286,21 +286,21 @@ CREATE TABLE app_domain.cashiers (
 );
 
 -- Tenant-aware indexes for performance
-CREATE INDEX idx_cashiers_tenant_name ON app_domain.cashiers(tenant_id, name);
-CREATE INDEX idx_cashiers_tenant_email ON app_domain.cashiers(tenant_id, email) WHERE email IS NOT NULL;
+CREATE INDEX idx_cashiers_tenant_name ON main.cashiers(tenant_id, name);
+CREATE INDEX idx_cashiers_tenant_email ON main.cashiers(tenant_id, email) WHERE email IS NOT NULL;
 ```
 
 ### PostgreSQL Functions for Data Access
 Functions that enforce tenant isolation:
 
 ```sql
-CREATE OR REPLACE FUNCTION app_domain.cashiers_get_all(
+CREATE OR REPLACE FUNCTION main.cashiers_get_all(
     IN p_tenant_id uuid,
     IN p_limit integer DEFAULT 1000,
     IN p_offset integer DEFAULT 0
-) RETURNS SETOF app_domain.cashiers LANGUAGE SQL AS $$
+) RETURNS SETOF main.cashiers LANGUAGE SQL AS $$
 SELECT *
-FROM app_domain.cashiers c
+FROM main.cashiers c
 WHERE c.tenant_id = p_tenant_id
 ORDER BY c.name
 LIMIT p_limit OFFSET p_offset;
@@ -373,7 +373,7 @@ public static async Task<Cashier?> Handle(
 ### Application-Level Error Handling
 ```csharp
 // Database function error handling
-CREATE OR REPLACE FUNCTION app_domain.orders_create(...)
+CREATE OR REPLACE FUNCTION main.orders_create(...)
 RETURNS UUID AS $$
 BEGIN
     -- Validation
@@ -469,7 +469,7 @@ The following examples are taken directly from the Momentum template's Cashiers 
 
 ### Cashier Entity with Composite Key
 ```csharp
-[Table(Schema = "app_domain", Name = "cashiers")]
+[Table(Schema = "main", Name = "cashiers")]
 public record Cashier : DbEntity
 {
     [PrimaryKey(Order = 0)]
@@ -487,7 +487,7 @@ public record Cashier : DbEntity
 ```csharp
 public static partial class GetCashiersQueryHandler
 {
-    [DbCommand(fn: "$app_domain.cashiers_get_all")]
+    [DbCommand(fn: "$main.cashiers_get_all")]
     public partial record DbQuery(Guid TenantId, int Limit, int Offset) 
         : IQuery<IEnumerable<Data.Entities.Cashier>>;
 
@@ -507,13 +507,13 @@ public static partial class GetCashiersQueryHandler
 
 ### PostgreSQL Function
 ```sql
-CREATE OR REPLACE FUNCTION app_domain.cashiers_get_all(
+CREATE OR REPLACE FUNCTION main.cashiers_get_all(
     IN p_tenant_id uuid,
     IN p_limit integer DEFAULT 1000,
     IN p_offset integer DEFAULT 0
-) RETURNS SETOF app_domain.cashiers LANGUAGE SQL AS $$
+) RETURNS SETOF main.cashiers LANGUAGE SQL AS $$
 SELECT *
-FROM app_domain.cashiers c
+FROM main.cashiers c
 WHERE c.tenant_id = p_tenant_id
 ORDER BY c.name
 LIMIT p_limit OFFSET p_offset;

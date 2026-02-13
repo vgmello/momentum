@@ -69,16 +69,21 @@ await app.RunAsync(args);
 var builder = WebApplication.CreateSlimBuilder(args);
 
 builder.AddServiceDefaults();
-builder.AddApiServiceDefaults();
+
+// Require authentication for all endpoints by default
+// Individual endpoints can opt out with .AllowAnonymous()
+builder.AddApiServiceDefaults(requireAuth: true);
 
 var app = builder.Build();
 
-// Require authentication
-app.ConfigureApiUsingDefaults(requireAuth: true);
+app.ConfigureApiUsingDefaults();
 
-// Protected endpoint
-app.MapGet("/protected", () => "Secured!")
-   .RequireAuthorization();
+// All endpoints require auth by default
+app.MapGet("/protected", () => "Secured!");
+
+// Opt out of auth for specific endpoints
+app.MapGet("/public", () => "Open to all!")
+   .AllowAnonymous();
 
 await app.RunAsync(args);
 ```
@@ -264,12 +269,11 @@ app.MapGet("/api/cashiers/{id}", async (
     var query = new GetCashierQuery(tenantId, id);
     var result = await messageBus.InvokeAsync(query, cancellationToken);
 
-    return result.IsSuccess 
+    return result.IsSuccess
         ? Results.Ok(result.Value)
         : Results.BadRequest(result.Errors);
 })
-.WithName("GetCashier")
-.WithOpenApi();
+.WithName("GetCashier");
 
 // POST endpoint
 app.MapPost("/api/cashiers", async (
@@ -284,16 +288,14 @@ app.MapPost("/api/cashiers", async (
         ? Results.CreatedAtRoute("GetCashier", new { id = result.Value.Id, tenantId = result.Value.TenantId }, result.Value)
         : Results.BadRequest(result.Errors);
 })
-.WithName("CreateCashier")
-.WithOpenApi();
+.WithName("CreateCashier");
 ```
 
 ### Grouped Endpoints
 
 ```csharp
 var cashierEndpoints = app.MapGroup("/api/cashiers")
-    .WithTags("Cashiers")
-    .WithOpenApi();
+    .WithTags("Cashiers");
 
 cashierEndpoints.MapGet("/", async (
     Guid tenantId,
@@ -446,7 +448,9 @@ await app.RunAsync(args);
 var builder = WebApplication.CreateSlimBuilder(args);
 
 builder.AddServiceDefaults();
-builder.AddApiServiceDefaults();
+
+// Require authentication for all endpoints by default
+builder.AddApiServiceDefaults(requireAuth: true);
 
 // Configure JWT authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -456,17 +460,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.Audience = builder.Configuration["Auth:Audience"];
     });
 
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("RequireAdmin", policy =>
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("RequireAdmin", policy =>
         policy.RequireClaim("role", "admin"));
-});
 
 var app = builder.Build();
 
-app.ConfigureApiUsingDefaults(requireAuth: true);
+app.ConfigureApiUsingDefaults();
 
-// Protected endpoint
+// All endpoints require auth by default (from requireAuth: true)
+// This endpoint additionally requires the "RequireAdmin" policy
 app.MapGet("/admin/users", () => "Admin only!")
    .RequireAuthorization("RequireAdmin");
 

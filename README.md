@@ -5,7 +5,7 @@
 [![Downloads](https://img.shields.io/nuget/dt/Momentum.Extensions.Abstractions?style=flat-square)](https://www.nuget.org/packages/Momentum.Extensions.Abstractions)
 [![License](https://img.shields.io/github/license/vgmello/momentum?style=flat-square)](https://github.com/vgmello/momentum/blob/main/LICENSE)
 
-Welcome to **Momentum** - a comprehensive .NET 9 template system that generates complete, production-ready microservices solutions. Whether you're building APIs, event-driven backends, or stateful processing systems, Momentum provides the architecture, patterns, and infrastructure you need to get productive immediately.
+Welcome to **Momentum** - a comprehensive .NET 10 template system that generates complete, production-ready microservices solutions. Whether you're building APIs, event-driven backends, or stateful processing systems, Momentum provides the architecture, patterns, and infrastructure you need to get productive immediately.
 
 ## Quick Start (2 Minutes)
 
@@ -33,7 +33,7 @@ cd OrderService
 dotnet run --project src/OrderService.AppHost
 
 # Access the Aspire Dashboard: https://localhost:18110
-# API endpoints: https://localhost:8101
+# API endpoints: http://localhost:8101 (REST), http://localhost:8102 (gRPC)
 # Documentation: http://localhost:8119
 ```
 
@@ -51,7 +51,7 @@ dotnet run --project src/OrderService.AppHost
 
 Momentum is built on modern, production-proven technologies:
 
--   **🎯 .NET 9**: Latest framework with performance optimizations
+-   **🎯 .NET 10**: Latest framework with performance optimizations
 -   **🏗️ .NET Aspire**: Local development orchestration and observability
 -   **🎭 Orleans**: Stateful actor-based processing for complex workflows
 -   **⚡ Wolverine**: CQRS/MediatR pattern with message handling
@@ -66,19 +66,22 @@ Momentum is built on modern, production-proven technologies:
 
 **Momentum Template** (`dotnet new mmt`) generates customized microservices solutions that mirror real-world business operations. The template leverages Wolverine for CQRS patterns and supports multiple architectures from simple APIs to complex event-driven systems with Orleans actors.
 
+**Architecture style**: Domain-Oriented Vertical Slice Architecture (CQRS + Event-Driven), using DDD-inspired boundaries (bounded contexts, domain language, contracts/events) with a pragmatic application-service style.
+
 ### **Core Architecture Principles**
 
 -   **🎯 Real-World Mirroring**: Code structure corresponds to business operations and processes
 -   **🚫 No Smart Objects**: Entities are data records, not self-modifying objects
 -   **🏢 Front/Back Office**: Synchronous APIs vs Asynchronous processing
 -   **📡 Event-Driven**: Integration events via Kafka with Wolverine message handling
+-   **🧭 Pragmatic Domain Boundaries**: Bounded contexts, domain language, and contracts/events without heavy domain object ceremony
 -   **🧪 Testing First**: Comprehensive testing with real infrastructure
 
 ## Prerequisites
 
 Before getting started, ensure you have:
 
--   **.NET 9 SDK** - [Download here](https://dotnet.microsoft.com/download/dotnet/9.0)
+-   **.NET 10 SDK** - [Download here](https://dotnet.microsoft.com/download/dotnet/10.0)
 -   **IDE**: Visual Studio, VS Code with C# Dev Kit, or JetBrains Rider
 -   **Local Container Solution (Docker, Rancher, Podman, etc)** - Required for databases, Kafka, and local development
 
@@ -90,7 +93,7 @@ The template supports extensive customization through parameters. Here are the m
 
 ```bash
 # Generate API-only service
-dotnet new mmt -n PaymentService --api --back-office false --orleans false --docs false
+dotnet new mmt -n PaymentService --api --backoffice false --orleans false --docs false
 ```
 
 ### **Orleans Processing Engine**
@@ -121,7 +124,7 @@ The template offers comprehensive configuration options:
 **Core Components:**
 
 -   `--api`: REST/gRPC API project (default: true)
--   `--back-office`: Background processing project (default: true)
+-   `--backoffice`: Background processing project (default: true)
 -   `--aspire`: .NET Aspire orchestration project (default: true)
 -   `--docs`: VitePress documentation project (default: true)
 -   `--orleans`: Orleans stateful processing project (default: false)
@@ -129,7 +132,7 @@ The template offers comprehensive configuration options:
 **Infrastructure:**
 
 -   `--kafka`: Apache Kafka messaging (default: true)
--   `--db`: Database setup (default, npgsql, liquibase)
+-   `--db-config`: Database setup (`default`, `npgsql`, `liquibase`, `none`)
 -   `--port`: Base port number (default: 8100)
 
 **Customization:**
@@ -139,6 +142,7 @@ The template offers comprehensive configuration options:
 -   `--project-only`: Generate only projects without solution files
 -   `--libs`: Include Momentum libraries as project references
 -   `--lib-name`: Custom prefix to replace "Momentum" in library names
+-   `--local`: Use local Momentum packages from `libs/Momentum/.local/nuget` (template development)
 
 > [!NOTE]
 > For complete parameter documentation and all available combinations, see the [`template.json`](.template.config/template.json) file and the [Template Options Guide](https://momentumlib.net/guide/template-options/) for detailed use cases and examples.
@@ -168,7 +172,7 @@ OrderService/
 
 ### **Business Domain Organization**
 
-Generated code follows Domain-Driven Design principles with Wolverine CQRS patterns:
+Generated code follows a Domain-Oriented Vertical Slice approach with Wolverine CQRS patterns and event-driven contracts:
 
 ```
 src/OrderService/
@@ -216,8 +220,9 @@ dotnet new webapi -n OrderService
 cd OrderService
 
 # Add the essential Momentum packages
-dotnet add package Momentum.ServiceDefaults --version 0.0.1
-dotnet add package Momentum.Extensions --version 0.0.1
+dotnet add package Momentum.ServiceDefaults
+dotnet add package Momentum.ServiceDefaults.Api
+dotnet add package Momentum.Extensions
 ```
 
 ## Library Integration Results
@@ -385,6 +390,7 @@ Create `Domain/Orders/Commands/CreateOrder.cs`:
 
 ```csharp
 using FluentValidation;
+using Momentum.Extensions.Abstractions.Messaging;
 using Momentum.Extensions;
 
 namespace EcommerceService.Domain.Orders.Commands;
@@ -429,6 +435,7 @@ Create `Domain/Orders/Data/OrderDbCommands.cs`:
 ```csharp
 using Dapper;
 using Momentum.Extensions.Abstractions.Dapper;
+using Momentum.Extensions.Abstractions.Messaging;
 using System.Data;
 
 namespace EcommerceService.Domain.Orders.Data;
@@ -501,7 +508,7 @@ public static class CreateOrderCommandHandler
         var validationResult = await validator.ValidateAsync(command, cancellationToken);
         if (!validationResult.IsValid)
         {
-            return Result<Order>.Failure(validationResult.Errors);
+            return validationResult.Errors;
         }
 
         // Create database entity
@@ -517,9 +524,9 @@ public static class CreateOrderCommandHandler
 
         // Save to database using generated command
         var dbCommand = new CreateOrderDbCommandHandler.DbCommand(orderEntity);
-        var savedOrder = await messageBus.InvokeAsync(dbCommand, cancellationToken);
+        var savedOrder = await messageBus.InvokeCommandAsync(dbCommand, cancellationToken);
 
-        return Result<Order>.Success(savedOrder.ToModel());
+        return savedOrder.ToModel();
     }
 }
 ```
@@ -532,6 +539,10 @@ Update `Program.cs`:
 using EcommerceService.Domain.Orders.Commands;
 using FluentValidation;
 using Momentum.Extensions;
+using Momentum.ServiceDefaults;
+using Momentum.ServiceDefaults.Api;
+using Momentum.ServiceDefaults.Api.OpenApi.Extensions;
+using Momentum.ServiceDefaults.HealthChecks;
 using Npgsql;
 using System.Data;
 
@@ -539,6 +550,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add Momentum service defaults
 builder.AddServiceDefaults();
+builder.AddApiServiceDefaults(requireAuth: false);
+builder.Services.AddOpenApi(options => options.ConfigureOpenApiDefaults());
 
 // Add database connection
 builder.Services.AddScoped<IDbConnection>(provider =>
@@ -551,13 +564,11 @@ builder.Services.AddScoped<IDbConnection>(provider =>
 // Add FluentValidation
 builder.Services.AddValidatorsFromAssemblyContaining<CreateOrderValidator>();
 
-// Add custom services
-builder.Services.AddScoped<IOrderService, OrderService>();
-
 var app = builder.Build();
 
 // Configure pipeline
-app.MapDefaultEndpoints();
+app.ConfigureApiUsingDefaults();
+app.MapDefaultHealthCheckEndpoints();
 
 // Add API endpoints
 app.MapPost("/orders", async (
@@ -568,9 +579,10 @@ app.MapPost("/orders", async (
 {
     var result = await CreateOrderCommandHandler.Handle(command, validator, messageBus, cancellationToken);
 
-    return result.IsSuccess
-        ? Results.Created($"/orders/{result.Value.Id}", result.Value)
-        : Results.BadRequest(result.Errors.Select(e => new { e.PropertyName, e.ErrorMessage }));
+    return result.Match(
+        onSuccess: order => Results.Created($"/orders/{order.Id}", order),
+        onFailure: errors => Results.BadRequest(errors.Select(e => new { e.PropertyName, e.ErrorMessage }))
+    );
 });
 
 app.MapGet("/orders/{id:guid}", async (
@@ -579,7 +591,7 @@ app.MapGet("/orders/{id:guid}", async (
     CancellationToken cancellationToken) =>
 {
     var dbCommand = new GetOrderDbCommandHandler.DbCommand(id);
-    var orderEntity = await messageBus.InvokeAsync(dbCommand, cancellationToken);
+    var orderEntity = await messageBus.InvokeCommandAsync(dbCommand, cancellationToken);
 
     return orderEntity is not null
         ? Results.Ok(orderEntity.ToModel())
@@ -670,7 +682,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 // API enhancements: OpenAPI, gRPC, route conventions
-builder.AddApiDefaults();
+builder.AddApiServiceDefaults(requireAuth: false);
+builder.Services.AddOpenApi(options => options.ConfigureOpenApiDefaults());
 
 // Extensions: Result types, validation, data access
 builder.Services.AddScoped<IOrderService, OrderService>();
@@ -680,13 +693,13 @@ builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 // (Automatically activated when package is referenced)
 
 // Messaging: Event-driven capabilities
-builder.AddKafkaMessaging(builder.Configuration);
+builder.AddKafkaMessagingExtensions();
 
 var app = builder.Build();
 
 // All the endpoints and middleware are configured
-app.MapDefaultEndpoints();
-app.MapApiEndpoints();
+app.ConfigureApiUsingDefaults();
+app.MapDefaultHealthCheckEndpoints();
 
 await app.RunAsync();
 ```
@@ -701,11 +714,9 @@ public async Task<Result<Customer>> GetCustomerAsync(Guid id)
 {
     var customer = await customerRepository.GetByIdAsync(id);
 
-    return customer switch
-    {
-        null => Result<Customer>.NotFound("Customer", id.ToString()),
-        _ => Result<Customer>.Success(customer)
-    };
+    return customer is null
+        ? [new ValidationFailure(nameof(id), "Customer not found")]
+        : customer;
 }
 
 // API layer
@@ -728,7 +739,7 @@ Publish and consume events across services:
 // Domain event
 [EventTopic("ecommerce.orders.order-created")]
 public record OrderCreated(
-    [PartitionKey] Guid CustomerId,
+    [PartitionKey] Guid OrderId,
     Order Order
 );
 
@@ -741,9 +752,9 @@ public static async Task<(Result<Order>, OrderCreated?)> Handle(
     var order = await CreateOrderInDatabase(command);
 
     // Create integration event
-    var orderCreated = new OrderCreated(order.CustomerId, order);
+    var orderCreated = new OrderCreated(order.Id, order);
 
-    return (Result<Order>.Success(order), orderCreated);
+    return (order, orderCreated);
 }
 
 // Event handler in another service
@@ -751,8 +762,8 @@ public class OrderCreatedHandler
 {
     public async Task Handle(OrderCreated orderCreated, CancellationToken cancellationToken)
     {
-        // Process the order creation in inventory service
-        await inventoryService.ReserveItemsAsync(orderCreated.Order.Items, cancellationToken);
+        // Process the order creation in another bounded context
+        await analyticsService.TrackOrderCreatedAsync(orderCreated.Order, cancellationToken);
     }
 }
 ```
@@ -767,8 +778,8 @@ builder.AddServiceDefaults();
 builder.Services.AddScoped<IMyService, MyService>();
 
 // Add capabilities as needed
-builder.AddApiDefaults();        // When you need enhanced APIs
-builder.AddKafkaMessaging();     // When you need events
+builder.AddApiServiceDefaults(requireAuth: false); // When you need enhanced APIs
+builder.AddKafkaMessagingExtensions();             // When you need events
 // Source generators activate automatically
 ```
 
@@ -781,18 +792,18 @@ public async Task<Result<Customer>> CreateCustomerAsync(CreateCustomerCommand co
     // Validation
     var validationResult = await validator.ValidateAsync(command);
     if (!validationResult.IsValid)
-        return Result<Customer>.Failure(validationResult.Errors);
+        return validationResult.Errors;
 
     // Business logic
     try
     {
         var customer = await customerRepository.CreateAsync(command.ToEntity());
-        return Result<Customer>.Success(customer.ToModel());
+        return customer.ToModel();
     }
     catch (Exception ex) when (ex is not ValidationException)
     {
         logger.LogError(ex, "Failed to create customer");
-        return Result<Customer>.Failure("An error occurred while creating the customer");
+        return [new ValidationFailure(string.Empty, "An error occurred while creating the customer")];
     }
 }
 ```

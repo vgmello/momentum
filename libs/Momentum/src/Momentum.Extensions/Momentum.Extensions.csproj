@@ -15,7 +15,10 @@
         <PackageReference Include="FluentValidation"/>
         <PackageReference Include="linq2db"/>
         <PackageReference Include="OneOf"/>
-        <PackageReference Include="OneOf.SourceGenerator"/>
+        <PackageReference Include="OneOf.SourceGenerator">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="Dapper"/>
         <PackageReference Include="WolverineFx"/>
         <!--#if (LIBS_INCLUDES_EXT)

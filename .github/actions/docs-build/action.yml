@@ -2,14 +2,10 @@ name: "Build Documentation"
 description: "Build VitePress documentation"
 
 inputs:
-  node-version:
-    description: "Node.js version"
+  bun-version:
+    description: "Bun version"
     required: false
-    default: "22"
-  pnpm-version:
-    description: "pnpm version"
-    required: false
-    default: "9"
+    default: "latest"
   docs-path:
     description: "Path to documentation directory"
     required: false
@@ -27,17 +23,10 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Setup pnpm
-      uses: pnpm/action-setup@v4
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v2
       with:
-        version: ${{ inputs.pnpm-version }}
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ inputs.node-version }}
-        cache: pnpm
-        cache-dependency-path: ${{ inputs.docs-path }}/pnpm-lock.yaml
+        bun-version: ${{ inputs.bun-version }}
 
     - name: Build .NET projects
       if: inputs.build-dotnet == 'true'
@@ -49,4 +38,4 @@ runs:
       id: paths
       shell: pwsh
       run: |
-        & "${{ github.action_path }}/Build-Documentation.ps1" -DocsPath "${{ inputs.docs-path }}"
+        & "${{ github.action_path }}/Build-Documentation.ps1" -DocsPath "${{ inputs.docs-path }}" -CI

@@ -53,6 +53,22 @@ try
         Console.WriteLine("ℹ️  Library rename enabled but no changes required");
     }
 
+    // Action 3: Local Package Configuration
+    Console.WriteLine();
+    Console.WriteLine("📦 Action 3: Local Package Configuration");
+    Console.WriteLine("═══════════════════════════════");
+
+    var localPackageResult = LocalPackageConfigurationAction.ConfigureLocalPackages(projectDir, config);
+
+    if (!localPackageResult.Enabled)
+    {
+        Console.WriteLine($"⏭️  Skipped: {localPackageResult.SkipReason}");
+    }
+    else
+    {
+        Console.WriteLine($"✅ Local packages configured: feed {localPackageResult.FeedPath}");
+    }
+
     // Final summary
     Console.WriteLine();
     Console.WriteLine("🎉 Post-setup Actions Summary");
@@ -85,6 +101,13 @@ try
         Console.WriteLine($"📦 Library Configuration:");
         Console.WriteLine($"   Prefix: {libraryResult.LibPrefix}");
         Console.WriteLine($"   Imported libraries: {string.Join(", ", libraryResult.ImportedTokens)}");
+    }
+
+    if (localPackageResult.Enabled)
+    {
+        Console.WriteLine();
+        Console.WriteLine($"🔗 Local Package Configuration:");
+        Console.WriteLine($"   Feed: {localPackageResult.FeedPath}");
     }
 
     Console.WriteLine();
@@ -124,13 +147,29 @@ static JsonElement LoadConfig(string projectDir)
     try
     {
         var configContent = File.ReadAllText(configFile);
-        var configDoc = JsonDocument.Parse(configContent);
+        using var configDoc = JsonDocument.Parse(configContent);
 
-        return configDoc.RootElement;
+        return configDoc.RootElement.Clone();
     }
     catch (Exception ex)
     {
         throw new InvalidOperationException($"Failed to parse post-setup config: {ex.Message}", ex);
+    }
+}
+
+static void DeleteWithRetry(string path, int maxAttempts = 3)
+{
+    for (var attempt = 1; attempt <= maxAttempts; attempt++)
+    {
+        try
+        {
+            Directory.Delete(path, recursive: true);
+            return;
+        }
+        catch (IOException) when (attempt < maxAttempts)
+        {
+            System.Threading.Thread.Sleep(attempt * 100);
+        }
     }
 }
 
@@ -147,9 +186,7 @@ static void CleanupPostSetupTools(string projectDir)
             Console.WriteLine();
             Console.WriteLine("🧹 Cleaning up post-setup tools...");
 
-            System.Threading.Thread.Sleep(100);
-
-            Directory.Delete(postSetupDir, recursive: true);
+            DeleteWithRetry(postSetupDir);
 
             // Delete config file if it exists
             var configFile = Path.Combine(toolsDir, "post-setup-config.json");
