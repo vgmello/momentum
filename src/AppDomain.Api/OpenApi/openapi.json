@@ -913,7 +913,11 @@
         }
       },
       "InvoiceStatus": {
-        "type": "integer"
+        "enum": [
+          "Draft",
+          "Paid",
+          "Cancelled"
+        ]
       },
       "MarkInvoiceAsPaidRequest": {
         "required": [
@@ -1107,6 +1111,14 @@
           }
         },
         "description": "Request to update an existing cashier."
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "Enter your JWT token",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     }
   },
