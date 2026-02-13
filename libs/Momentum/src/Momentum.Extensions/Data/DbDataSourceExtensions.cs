@@ -57,7 +57,11 @@ public static class DbDataSourceExtensions
     /// <param name="spName">The name of the stored procedure.</param>
     /// <param name="parameters">Provider for command parameters.</param>
     /// <param name="dbFunction">Factory that returns a Dapper execution function for the given connection.</param>
-    /// <param name="transaction">Optional database transaction to associate with the command.</param>
+    /// <param name="transaction">
+    ///     Optional database transaction to associate with the command.
+    ///     If provided, it must originate from a connection obtained from the same
+    ///     <paramref name="dataSource"/>, or the command will fail at runtime.
+    /// </param>
     /// <param name="commandTimeout">Optional command timeout in seconds.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The result of the Dapper function execution.</returns>

@@ -3,6 +3,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Momentum.Extensions.Abstractions.Extensions;
+using Momentum.Extensions.Abstractions.Messaging;
 using System.Text.RegularExpressions;
 
 namespace Momentum.ServiceDefaults.Messaging;
@@ -36,7 +37,7 @@ public partial class ServiceBusOptions
     /// <remarks>
     ///     See <see cref="ServiceBusOptions" /> for detailed configuration information.
     /// </remarks>
-    public string Domain { get; set; } = GetDomainName();
+    public string Domain { get; set; } = DefaultDomainAttribute.GetDomainName(ServiceDefaultsExtensions.EntryAssembly);
 
     /// <summary>
     ///     Gets or sets the public service name used for external identification and message routing.
@@ -88,15 +89,6 @@ public partial class ServiceBusOptions
     ///     in case of failures.
     /// </remarks>
     public bool ReliableMessaging { get; set; } = true;
-
-    private static string GetDomainName()
-    {
-        // TODO: maybe a dedicated assembly attribute or csproj property to override explicitly if needed
-        var simpleName = ServiceDefaultsExtensions.EntryAssembly.GetName().Name!;
-        var mainNamespaceIndex = simpleName.IndexOf('.');
-
-        return mainNamespaceIndex >= 0 ? simpleName[..mainNamespaceIndex] : simpleName;
-    }
 
     /// <summary>
     ///     Post-configuration processor that validates and completes ServiceBus configuration after binding.

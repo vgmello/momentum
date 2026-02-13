@@ -231,6 +231,22 @@ public class KafkaSetupExtensionsTests
         result.ShouldBe("dev.test-domain.public.test-topic");
     }
 
+    [Fact]
+    public void TopicNameGenerator_WithNoDomain_FallsBackToAssemblyName()
+    {
+        // Arrange
+        _environment.EnvironmentName.Returns("Development");
+        var generator = new TopicNameGenerator(_environment);
+        var messageType = typeof(TestEvent); // Assembly: Momentum.Extensions.Tests → first segment: Momentum
+        var topicAttribute = new EventTopicAttribute("test-topic"); // no domain
+
+        // Act
+        var result = generator.GetTopicName(messageType, topicAttribute);
+
+        // Assert
+        result.ShouldBe("dev.momentum.public.test-topic.v1");
+    }
+
     private record TestEvent;
 
     [AttributeUsage(AttributeTargets.Class)]
