@@ -20,6 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Asp.Versioning.Http"/>
         <PackageReference Include="Grpc.AspNetCore"/>
         <PackageReference Include="Grpc.AspNetCore.Server.Reflection"/>
         <PackageReference Include="Grpc.AspNetCore.Web"/>

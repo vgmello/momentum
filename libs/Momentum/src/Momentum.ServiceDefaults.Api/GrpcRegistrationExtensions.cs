@@ -3,6 +3,8 @@
 using Grpc.Core;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
@@ -64,7 +66,15 @@ public static class GrpcRegistrationExtensions
     public static void MapGrpcServices(this IEndpointRouteBuilder routeBuilder, Assembly assembly)
     {
         var grpcServiceTypes = assembly.GetTypes()
-            .Where(type => type is { IsClass: true, IsAbstract: false, IsInterface: false, IsGenericType: false } && IsGrpcService(type));
+            .Where(type => type is { IsClass: true, IsAbstract: false, IsInterface: false, IsGenericType: false } && IsGrpcService(type))
+            .ToList();
+
+        if (grpcServiceTypes.Count == 0)
+        {
+            var logger = routeBuilder.ServiceProvider.GetService<ILoggerFactory>()?.CreateLogger("GrpcRegistration");
+            logger?.LogWarning("No gRPC services found in assembly {AssemblyName}", assembly.GetName().Name);
+            return;
+        }
 
         foreach (var grpcServiceType in grpcServiceTypes)
         {

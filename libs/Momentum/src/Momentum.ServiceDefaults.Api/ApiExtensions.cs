@@ -2,11 +2,19 @@
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenTelemetry.Trace;
 using Scalar.AspNetCore;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 
 namespace Momentum.ServiceDefaults.Api;
 
@@ -63,7 +71,10 @@ public static class ApiExtensions
         // The .NET 10 source generator intercepts AddOpenApi() calls and generates
         // XML comment transformers for the calling project's documentation.
 
-        builder.Services.AddHttpLogging();
+        if (builder.Environment.IsDevelopment())
+        {
+            builder.Services.AddHttpLogging();
+        }
 
         // Add output caching for OpenAPI document caching
         builder.Services.AddOutputCache(options =>
@@ -74,6 +85,14 @@ public static class ApiExtensions
         builder.Services.AddGrpc(options =>
         {
             options.EnableDetailedErrors = builder.Environment.IsDevelopment();
+
+            var maxReceiveSize = builder.Configuration.GetValue<int?>("Grpc:Limits:MaxReceiveMessageSize");
+            var maxSendSize = builder.Configuration.GetValue<int?>("Grpc:Limits:MaxSendMessageSize");
+
+            if (maxReceiveSize.HasValue)
+                options.MaxReceiveMessageSize = maxReceiveSize.Value;
+            if (maxSendSize.HasValue)
+                options.MaxSendMessageSize = maxSendSize.Value;
         });
         builder.Services.AddGrpcReflection();
 
@@ -94,6 +113,33 @@ public static class ApiExtensions
             serverOptions.AddServerHeader = false;
         });
 
+        builder.Services.AddRateLimiter(options =>
+        {
+            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            options.AddFixedWindowLimiter("fixed", limiterOptions =>
+            {
+                limiterOptions.Window = TimeSpan.FromMinutes(1);
+                limiterOptions.PermitLimit = 100;
+                limiterOptions.QueueLimit = 10;
+                limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+            });
+        });
+
+        builder.Services.ConfigureHttpJsonOptions(options =>
+        {
+            options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+        });
+
+        builder.Services.AddApiVersioning(options =>
+        {
+            options.DefaultApiVersion = new Asp.Versioning.ApiVersion(1, 0);
+            options.AssumeDefaultVersionWhenUnspecified = true;
+            options.ReportApiVersions = true;
+            options.ApiVersionReader = new Asp.Versioning.UrlSegmentApiVersionReader();
+        });
+
         return builder;
     }
 
@@ -107,8 +153,13 @@ public static class ApiExtensions
     /// </remarks>
     public static WebApplication ConfigureApiUsingDefaults(this WebApplication app)
     {
-        app.UseHttpLogging();
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseHttpLogging();
+        }
+
         app.UseRouting();
+        app.UseRateLimiter();
 
         var requireAuth = app.Services.GetService<ApiAuthConfiguration>()?.RequireAuth == true;
 
@@ -123,7 +174,35 @@ public static class ApiExtensions
         if (!app.Environment.IsDevelopment())
         {
             app.UseHsts();
-            app.UseExceptionHandler();
+            app.UseExceptionHandler(exceptionApp =>
+            {
+                exceptionApp.Run(async context =>
+                {
+                    context.Response.ContentType = "application/problem+json";
+
+                    var exceptionFeature = context.Features.Get<IExceptionHandlerFeature>();
+                    var exception = exceptionFeature?.Error;
+
+                    var (statusCode, title) = exception switch
+                    {
+                        FluentValidation.ValidationException => (StatusCodes.Status400BadRequest, "Validation Error"),
+                        UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Unauthorized"),
+                        KeyNotFoundException => (StatusCodes.Status404NotFound, "Not Found"),
+                        _ => (StatusCodes.Status500InternalServerError, "Internal Server Error")
+                    };
+
+                    context.Response.StatusCode = statusCode;
+
+                    var problemDetails = new ProblemDetails
+                    {
+                        Status = statusCode,
+                        Title = title,
+                        Instance = context.Request.Path
+                    };
+
+                    await context.Response.WriteAsJsonAsync(problemDetails);
+                });
+            });
         }
 
         app.UseOutputCache();

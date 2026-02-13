@@ -17,6 +17,7 @@ public static class OpenApiExtensions
     ///     This method applies Momentum's standard OpenAPI configuration:
     ///     <list type="bullet">
     ///         <item>Server URL normalization (removes trailing slashes)</item>
+    ///         <item>Bearer authentication security scheme</item>
     ///     </list>
     ///     Call this from your project's <c>AddOpenApi()</c> configuration to apply defaults:
     ///     <code>
@@ -43,7 +44,23 @@ public static class OpenApiExtensions
             return Task.CompletedTask;
         });
 
+        // Add Bearer authentication security scheme
+        options.AddDocumentTransformer((document, _, _) =>
+        {
+            var components = document.Components ??= new Microsoft.OpenApi.OpenApiComponents();
+            components.SecuritySchemes ??= new Dictionary<string, Microsoft.OpenApi.IOpenApiSecurityScheme>();
+
+            components.SecuritySchemes["Bearer"] = new Microsoft.OpenApi.OpenApiSecurityScheme
+            {
+                Type = Microsoft.OpenApi.SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT",
+                Description = "Enter your JWT token"
+            };
+
+            return Task.CompletedTask;
+        });
+
         return options;
     }
-
 }
