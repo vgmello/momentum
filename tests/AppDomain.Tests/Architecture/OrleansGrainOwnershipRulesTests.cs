@@ -196,7 +196,7 @@ public class OrleansGrainOwnershipRulesTests : ArchitectureTestBase
 #endif
 
         var violations = grainTypes
-            .Where(t => !t.GetCustomAttributes(typeof(GrainDirectoryAttribute), false).Any())
+            .Where(t => t.GetCustomAttributes(typeof(GrainDirectoryAttribute), false).Length == 0)
             .Select(t => t.FullName)
             .ToList();
 

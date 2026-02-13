@@ -167,7 +167,7 @@ public class InvoiceActor(
             invoiceState.State.TenantId = tenantId;
             invoiceState.State.ActivatedAt = DateTime.UtcNow;
             invoiceState.State.IsInitialized = true;
-            invoiceState.State.Metadata ??= new Dictionary<string, string>();
+            invoiceState.State.Metadata ??= [];
             invoiceState.State.Metadata["InvoiceId"] = this.GetPrimaryKey().ToString();
             await invoiceState.WriteStateAsync();
         }

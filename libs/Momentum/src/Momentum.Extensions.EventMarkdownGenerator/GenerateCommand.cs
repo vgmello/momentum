@@ -175,7 +175,7 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
             AnsiConsole.WriteLine($"Processed {processedAssemblies} assemblies but found no types with EventTopic attributes.");
 
             // Still generate empty sidebar for consistency
-            await sidebarGenerator.WriteSidebarAsync(new List<EventWithDocumentation>(), options.GetSidebarPath(), cancellationToken);
+            await sidebarGenerator.WriteSidebarAsync([], options.GetSidebarPath(), cancellationToken);
             AnsiConsole.MarkupLine($"[green]✓[/] Generated empty sidebar file: {options.SidebarFileName}");
 
             return;

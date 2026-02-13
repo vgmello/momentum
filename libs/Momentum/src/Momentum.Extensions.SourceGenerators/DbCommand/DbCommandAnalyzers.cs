@@ -6,13 +6,15 @@ namespace Momentum.Extensions.SourceGenerators.DbCommand;
 
 internal static class DbCommandAnalyzers
 {
+    private const string Category = "DbCommandSourceGenerator";
+
     private static readonly DiagnosticDescriptor NonQueryWithGenericResultWarning = new(
         id: "MMT001",
         title: "NonQuery attribute used with generic ICommand<TResult>",
         messageFormat:
         "DbCommandAttribute's NonQuery property is true for command '{0}' which implements ICommand<{1}>. " +
         "NonQuery is only valid for ICommand<int>.",
-        category: "DbCommandSourceGenerator",
+        category: Category,
         DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
 
@@ -22,7 +24,7 @@ internal static class DbCommandAnalyzers
         messageFormat:
         "Class '{0}' is decorated with DbCommandAttribute specifying 'sp', 'sql', or 'fn' for handler generation, " +
         "but it does not implement ICommand<TResult> or IQuery<TResult>. Handler cannot be generated without a result type.",
-        category: "DbCommandSourceGenerator",
+        category: Category,
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
@@ -31,7 +33,7 @@ internal static class DbCommandAnalyzers
         title: "Mutually exclusive properties specified in DbCommandAttribute",
         messageFormat: "Class '{0}' has multiple command properties specified in DbCommandAttribute. " +
                        "The properties 'Sp', 'Sql', and 'Fn' are mutually exclusive - specify only one of these.",
-        category: "DbCommandSourceGenerator",
+        category: Category,
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
@@ -39,7 +41,7 @@ internal static class DbCommandAnalyzers
         id: "MMT004",
         title: "Unexpected error during source generation",
         messageFormat: "An unexpected error occurred while generating code for '{0}': {1}",
-        category: "DbCommandSourceGenerator",
+        category: Category,
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
@@ -49,7 +51,7 @@ internal static class DbCommandAnalyzers
         messageFormat: "Class '{0}' has an invalid function name '{1}' in DbCommandAttribute. " +
                        "Function names must be valid SQL identifiers (letters, digits, underscores) " +
                        "optionally schema-qualified (schema.name) or bracket/quote-delimited ([name] or \"name\").",
-        category: "DbCommandSourceGenerator",
+        category: Category,
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
@@ -134,7 +136,7 @@ internal static class DbCommandAnalyzers
 
         // $-prefixed names (e.g. "$schema.fn_name") must be valid SQL identifiers
         // since they become "SELECT * FROM <identifier>(@params)"
-        if (fnName.StartsWith("$"))
+        if (fnName.StartsWith('$'))
         {
             var identifier = fnName.Substring(1);
             if (!ValidSqlIdentifierPattern.IsMatch(identifier))

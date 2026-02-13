@@ -12,6 +12,8 @@ namespace Momentum.Extensions.EventMarkdownGenerator.Services;
 /// </summary>
 public class JsonSidebarGenerator
 {
+    private const string UnknownValue = "Unknown";
+
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         WriteIndented = true,
@@ -214,7 +216,7 @@ public class JsonSidebarGenerator
         }
 
         // Extract subdomain (second part) and section (if exists between subdomain and Contracts)
-        var subdomain = parts.Length > 1 ? parts[1] : "Unknown";
+        var subdomain = parts.Length > 1 ? parts[1] : UnknownValue;
         var section = "";
 
         // If there are parts between subdomain and Contracts/IntegrationEvents, it's a section
@@ -278,7 +280,7 @@ public class JsonSidebarGenerator
     private static string ExtractSubdomainFromType(Type type)
     {
         if (type.Namespace == null)
-            return "Unknown";
+            return UnknownValue;
 
         var parts = type.Namespace.Split('.');
 
@@ -315,11 +317,11 @@ public class JsonSidebarGenerator
     private static string CapitalizeDomain(string domain)
     {
         if (string.IsNullOrEmpty(domain))
-            return "Unknown";
+            return UnknownValue;
 
         // Handle special cases
         if (domain.Equals("unknown", StringComparison.OrdinalIgnoreCase))
-            return "Unknown";
+            return UnknownValue;
 
         return domain.CapitalizeFirst();
     }
