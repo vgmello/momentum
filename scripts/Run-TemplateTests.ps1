@@ -223,7 +223,10 @@ function Test-Template {
 
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
-        [string]$TestCategory
+        [string]$TestCategory,
+
+        [Parameter()]
+        [hashtable[]]$ContentMustNotContain = @()
     )
 
     $script:TotalTests++
@@ -306,6 +309,28 @@ function Test-Template {
                     $testErrorSummary = Get-ErrorSummary -ErrorOutput $testOutput -MaxLines 2 -Filter '(Failed|Error|Exception|Assert)'
 
                     Write-ColoredMessage -Level 'ERROR' -Message "[$TestCategory] $Name`: Tests failed$testErrorSummary"
+                    $script:FailedTests++
+                    $script:TestResults[$Name] = 'FAILED'
+
+                    Test-MaxFailuresReached -TestName $Name
+                    return
+                }
+            }
+
+            # Validate content exclusions if specified
+            if ($ContentMustNotContain.Count -gt 0) {
+                $contentFailed = $false
+                foreach ($check in $ContentMustNotContain) {
+                    $filePath = Join-Path -Path '.' -ChildPath $check.File
+                    if (Test-Path -Path $filePath) {
+                        $fileContent = Get-Content -Path $filePath -Raw
+                        if ($fileContent -match $check.Pattern) {
+                            Write-ColoredMessage -Level 'ERROR' -Message "[$TestCategory] $Name`: Content check failed - '$($check.Pattern)' found in $($check.File)"
+                            $contentFailed = $true
+                        }
+                    }
+                }
+                if ($contentFailed) {
                     $script:FailedTests++
                     $script:TestResults[$Name] = 'FAILED'
 
@@ -462,6 +487,13 @@ function Invoke-TestCategory {
             Test-Template -Name 'TestBackOfficeNoApi' -Parameters '--api false' -TestCategory 'Real-World Patterns'
             Test-Template -Name 'TestAPISimple' -Parameters '--no-sample --backoffice false --docs false --kafka false' -TestCategory 'Real-World Patterns'
             Test-Template -Name 'TestFullStack' -Parameters '--orleans true' -TestCategory 'Real-World Patterns'
+            Test-Template -Name 'TestBffEnabled' -Parameters '--bff' -TestCategory 'Real-World Patterns'
+
+            $bffExclusionChecks = @(
+                @{ File = 'src/TestBffDisabled.Api/Program.cs'; Pattern = 'FrontendIntegration' },
+                @{ File = 'src/TestBffDisabled.Api/appsettings.json'; Pattern = '"Cors"|"SecurityHeaders"' }
+            )
+            Test-Template -Name 'TestBffDisabled' -Parameters '--bff false' -TestCategory 'Real-World Patterns' -ContentMustNotContain $bffExclusionChecks
         }
 
         'orleans-combinations' {
