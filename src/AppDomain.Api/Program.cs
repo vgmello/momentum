@@ -14,6 +14,9 @@ using Momentum.Extensions.Messaging.Kafka;
 using Momentum.ServiceDefaults;
 using Momentum.ServiceDefaults.Api;
 using Momentum.ServiceDefaults.Api.OpenApi.Extensions;
+//#if (INCLUDE_BFF)
+using Momentum.ServiceDefaults.Api.FrontendIntegration;
+//#endif
 using Momentum.ServiceDefaults.HealthChecks;
 
 [assembly: DomainAssembly(typeof(IAppDomainAssembly))]
@@ -22,6 +25,9 @@ var builder = WebApplication.CreateSlimBuilder(args);
 
 builder.AddServiceDefaults();
 builder.AddApiServiceDefaults(requireAuth: false);
+//#if (INCLUDE_BFF)
+builder.AddFrontendIntegration();
+//#endif
 
 // Configure OpenAPI with .NET 10 native support
 // NOTE: AddOpenApi must be called directly in the API project (not in a library)
@@ -42,6 +48,9 @@ builder.AddApplicationServices();
 var app = builder.Build();
 
 app.ConfigureApiUsingDefaults();
+//#if (INCLUDE_BFF)
+app.UseFrontendIntegration();
+//#endif
 //#if (INCLUDE_SAMPLE)
 app.MapCashierEndpoints();
 app.MapInvoiceEndpoints();

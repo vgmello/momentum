@@ -50,4 +50,8 @@
         <ProjectReference Include="..\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
     </ItemGroup>
     <!--#endif -->
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Momentum.ServiceDefaults.Api.Tests"/>
+    </ItemGroup>
 </Project>

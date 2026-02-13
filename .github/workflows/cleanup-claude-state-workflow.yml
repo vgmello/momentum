@@ -10,7 +10,7 @@ jobs:
     if: |
       (github.event_name == 'delete' && github.event.ref_type == 'branch' && startswith(github.event.ref, 'issue-')) ||
       (github.event_name == 'pull_request')
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     permissions:
       contents: write
       issues: write

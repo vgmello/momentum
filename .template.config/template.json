@@ -89,6 +89,12 @@
       "defaultValue": "true",
       "replaces": "__KAFKA__"
     },
+    "bff": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "Configure frontend integration (CORS, security headers)",
+      "defaultValue": "false"
+    },
     "port": {
       "type": "parameter",
       "datatype": "int",
@@ -232,6 +238,10 @@
     "USE_KAFKA": {
       "type": "computed",
       "value": "kafka && HAS_BACKEND"
+    },
+    "INCLUDE_BFF": {
+      "type": "computed",
+      "value": "bff && INCLUDE_API"
     },
     "USE_LOCAL": {
       "type": "computed",
