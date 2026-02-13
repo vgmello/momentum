@@ -17,8 +17,10 @@ public class DbCommandSourceGenHandlerTests : DbCommandSourceGenTestsBase
             """,
             expected:
             """
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Momentum.SourceGenerators", "1.0")]
             public static class CreateUserCommandHandler
             {
+                /// <inheritdoc />
                 public static async global::System.Threading.Tasks.Task<int> HandleAsync(global::TestNamespace.CreateUserCommand command, global::System.Data.Common.DbDataSource datasource, global::System.Threading.CancellationToken cancellationToken = default)
                 {
                     await using var connection = await datasource.OpenConnectionAsync(cancellationToken);
@@ -37,8 +39,10 @@ public class DbCommandSourceGenHandlerTests : DbCommandSourceGenTestsBase
             """,
             expected:
             """
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Momentum.SourceGenerators", "1.0")]
             public static class CreateUserCommandHandler
             {
+                /// <inheritdoc />
                 public static async global::System.Threading.Tasks.Task<int> HandleAsync(global::TestNamespace.CreateUserCommand command, global::System.Data.Common.DbDataSource datasource, global::System.Threading.CancellationToken cancellationToken = default)
                 {
                     await using var connection = await datasource.OpenConnectionAsync(cancellationToken);
@@ -59,8 +63,10 @@ public class DbCommandSourceGenHandlerTests : DbCommandSourceGenTestsBase
             """,
             expected:
             """
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Momentum.SourceGenerators", "1.0")]
             public static class GetActiveUsersQueryHandler
             {
+                /// <inheritdoc />
                 public static async global::System.Threading.Tasks.Task<global::System.Collections.Generic.IEnumerable<global::TestNamespace.User>> HandleAsync(global::TestNamespace.GetActiveUsersQuery command, global::System.Data.Common.DbDataSource datasource, global::System.Threading.CancellationToken cancellationToken = default)
                 {
                     await using var connection = await datasource.OpenConnectionAsync(cancellationToken);
@@ -81,8 +87,10 @@ public class DbCommandSourceGenHandlerTests : DbCommandSourceGenTestsBase
             """,
             expected:
             """
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Momentum.SourceGenerators", "1.0")]
             public static class GetUserByIdQueryHandler
             {
+                /// <inheritdoc />
                 public static async global::System.Threading.Tasks.Task<global::TestNamespace.User> HandleAsync(global::TestNamespace.GetUserByIdQuery command, global::System.Data.Common.DbDataSource datasource, global::System.Threading.CancellationToken cancellationToken = default)
                 {
                     await using var connection = await datasource.OpenConnectionAsync(cancellationToken);
@@ -101,8 +109,10 @@ public class DbCommandSourceGenHandlerTests : DbCommandSourceGenTestsBase
             """,
             expected:
             """
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Momentum.SourceGenerators", "1.0")]
             public static class GetUserCountQueryHandler
             {
+                /// <inheritdoc />
                 public static async global::System.Threading.Tasks.Task<int> HandleAsync(global::TestNamespace.GetUserCountQuery command, global::System.Data.Common.DbDataSource datasource, global::System.Threading.CancellationToken cancellationToken = default)
                 {
                     await using var connection = await datasource.OpenConnectionAsync(cancellationToken);
@@ -123,8 +133,10 @@ public class DbCommandSourceGenHandlerTests : DbCommandSourceGenTestsBase
             """,
             expected:
             """
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Momentum.SourceGenerators", "1.0")]
             public static class GetReportQueryHandler
             {
+                /// <inheritdoc />
                 public static async global::System.Threading.Tasks.Task<global::TestNamespace.Report> HandleAsync(global::TestNamespace.GetReportQuery command, [global::Microsoft.Extensions.DependencyInjection.FromKeyedServicesAttribute("ReportingDb")] global::System.Data.Common.DbDataSource datasource, global::System.Threading.CancellationToken cancellationToken = default)
                 {
                     await using var connection = await datasource.OpenConnectionAsync(cancellationToken);
@@ -143,8 +155,10 @@ public class DbCommandSourceGenHandlerTests : DbCommandSourceGenTestsBase
             """,
             expected:
             """
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Momentum.SourceGenerators", "1.0")]
             public static class GetLastInsertIdQueryHandler
             {
+                /// <inheritdoc />
                 public static async global::System.Threading.Tasks.Task<long> HandleAsync(global::TestNamespace.GetLastInsertIdQuery command, global::System.Data.Common.DbDataSource datasource, global::System.Threading.CancellationToken cancellationToken = default)
                 {
                     await using var connection = await datasource.OpenConnectionAsync(cancellationToken);
@@ -165,8 +179,10 @@ public class DbCommandSourceGenHandlerTests : DbCommandSourceGenTestsBase
             """,
             expected:
             """
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Momentum.SourceGenerators", "1.0")]
             public static class GetInvoicesDbQueryHandler
             {
+                /// <inheritdoc />
                 public static async global::System.Threading.Tasks.Task<global::System.Collections.Generic.IEnumerable<global::TestNamespace.Invoice>> HandleAsync(global::TestNamespace.GetInvoicesDbQuery command, global::System.Data.Common.DbDataSource datasource, global::System.Threading.CancellationToken cancellationToken = default)
                 {
                     await using var connection = await datasource.OpenConnectionAsync(cancellationToken);
@@ -187,8 +203,10 @@ public class DbCommandSourceGenHandlerTests : DbCommandSourceGenTestsBase
             """,
             expected:
             """
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Momentum.SourceGenerators", "1.0")]
             public static class GetInvoicesDbQueryHandler
             {
+                /// <inheritdoc />
                 public static async global::System.Threading.Tasks.Task<global::System.Collections.Generic.IEnumerable<global::TestNamespace.Invoice>> HandleAsync(global::TestNamespace.GetInvoicesDbQuery command, global::System.Data.Common.DbDataSource datasource, global::System.Threading.CancellationToken cancellationToken = default)
                 {
                     await using var connection = await datasource.OpenConnectionAsync(cancellationToken);
@@ -264,6 +282,54 @@ public class DbCommandSourceGenHandlerTests : DbCommandSourceGenTestsBase
 
         generated.Length.ShouldBe(1);
         generated.ShouldNotContain(g => g.Contains("Handler"));
+    }
+
+    [Fact]
+    public void GenerateHandler_WhenInvalidFunctionName_ShouldReportDiagnostic()
+    {
+        // Arrange
+        const string source = """
+                              [DbCommand(fn: "$users); DROP TABLE users; --")]
+                              public partial record MaliciousQuery(int Id) : IQuery<int>;
+                              """;
+
+        // Act
+        var (_, diagnostics) = TestHelpers.GetGeneratedSources<DbCommandSourceGenerator>(SourceImports + source);
+
+        // Assert
+        diagnostics.ShouldContain(d => d.Severity == DiagnosticSeverity.Error && d.Id == "MMT005");
+    }
+
+    [Fact]
+    public void GenerateHandler_WhenSqlInjectionInFn_ShouldReportDiagnostic()
+    {
+        // Arrange
+        const string source = """
+                              [DbCommand(fn: "users); DROP TABLE users; --")]
+                              public partial record MaliciousQuery(int Id) : IQuery<int>;
+                              """;
+
+        // Act
+        var (_, diagnostics) = TestHelpers.GetGeneratedSources<DbCommandSourceGenerator>(SourceImports + source);
+
+        // Assert
+        diagnostics.ShouldContain(d => d.Severity == DiagnosticSeverity.Error && d.Id == "MMT005");
+    }
+
+    [Fact]
+    public void GenerateHandler_WhenValidSqlExpressionInFn_ShouldNotReportDiagnostic()
+    {
+        // Arrange - SQL expressions without injection markers are valid fn values
+        const string source = """
+                              [DbCommand(fn: "select * from schema.my_function")]
+                              public partial record ValidQuery(int Id) : IQuery<int>;
+                              """;
+
+        // Act
+        var (_, diagnostics) = TestHelpers.GetGeneratedSources<DbCommandSourceGenerator>(SourceImports + source);
+
+        // Assert
+        diagnostics.ShouldNotContain(d => d.Id == "MMT005");
     }
 
     private static TheoryDataRow<string, string> TestCase(string name, string source, string expected) =>

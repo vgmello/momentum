@@ -18,7 +18,7 @@ internal sealed class DbCommandHandlerSourceGenWriter : SourceGenBaseWriter
 
         var dapperCall = CreateDapperCall(dbCommandTypeInfo.ResultType, dbCommandTypeInfo);
 
-        var sourceBuilder = new StringBuilder();
+        var sourceBuilder = new StringBuilder(512);
 
         AppendFileHeader(sourceBuilder);
         AppendNamespace(sourceBuilder, dbCommandTypeInfo.Namespace);
@@ -30,6 +30,7 @@ internal sealed class DbCommandHandlerSourceGenWriter : SourceGenBaseWriter
         else
         {
             var handlerClassName = $"{dbCommandTypeInfo.TypeName}Handler";
+            sourceBuilder.AppendLine(GeneratedCodeAttribute);
             sourceBuilder.AppendLine($"public static class {handlerClassName}");
             sourceBuilder.AppendLine("{");
         }
@@ -39,6 +40,7 @@ internal sealed class DbCommandHandlerSourceGenWriter : SourceGenBaseWriter
             ? "global::System.Data.Common.DbDataSource datasource"
             : $"[global::Microsoft.Extensions.DependencyInjection.FromKeyedServicesAttribute(\"{dataSourceKey}\")] global::System.Data.Common.DbDataSource datasource";
 
+        sourceBuilder.AppendLine("    /// <inheritdoc />");
         sourceBuilder.AppendLine(
             $"    public static async {returnTypeDeclaration} HandleAsync(global::{dbCommandTypeInfo.QualifiedTypeName} command, {dataSourceParameterDeclaration}, global::System.Threading.CancellationToken cancellationToken = default)");
         sourceBuilder.AppendLine("    {");

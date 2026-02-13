@@ -35,6 +35,34 @@ internal static class DbCommandAnalyzers
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
+    internal static readonly DiagnosticDescriptor UnexpectedGeneratorError = new(
+        id: "MMT004",
+        title: "Unexpected error during source generation",
+        messageFormat: "An unexpected error occurred while generating code for '{0}': {1}",
+        category: "DbCommandSourceGenerator",
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true);
+
+    private static readonly DiagnosticDescriptor InvalidFunctionNameError = new(
+        id: "MMT005",
+        title: "Invalid SQL function name in DbCommandAttribute",
+        messageFormat: "Class '{0}' has an invalid function name '{1}' in DbCommandAttribute. " +
+                       "Function names must be valid SQL identifiers (letters, digits, underscores) " +
+                       "optionally schema-qualified (schema.name) or bracket/quote-delimited ([name] or \"name\").",
+        category: "DbCommandSourceGenerator",
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true);
+
+    // SQL identifier: plain, [bracketed], or "quoted", with optional schema qualification
+    private static readonly System.Text.RegularExpressions.Regex ValidSqlIdentifierPattern = new(
+        @"^(""?[a-zA-Z_]\w*""?|\[[a-zA-Z_]\w*\])(\.\s*(""?[a-zA-Z_]\w*""?|\[[a-zA-Z_]\w*\]))*$",
+        System.Text.RegularExpressions.RegexOptions.Compiled);
+
+    // Dangerous SQL injection patterns
+    private static readonly System.Text.RegularExpressions.Regex DangerousSqlPattern = new(
+        @";|--\s|/\*",
+        System.Text.RegularExpressions.RegexOptions.Compiled);
+
     /// <summary>
     ///     If <see cref="DbCommandTypeInfo.ResultTypeInfo" /> is null, it means ICommand/IQuery&lt;TResult&gt; was not found.
     ///     An error diagnostic MMT002 will be logged by ExtractTypeInfo and reported by Initialize's output action.
@@ -60,11 +88,11 @@ internal static class DbCommandAnalyzers
     public static void ExecuteNonQueryWithNonIntegralResultAnalyzer(INamedTypeSymbol typeSymbol,
         DbCommandTypeInfo.ResultTypeInfo? resultTypeInfo, DbCommandAttribute dbCommandAttribute, ImmutableArray<Diagnostic>.Builder diagnostics)
     {
-        if (dbCommandAttribute.NonQuery && resultTypeInfo?.TypeName != nameof(Int32))
+        if (dbCommandAttribute.NonQuery && resultTypeInfo is { IsIntegralType: false })
         {
             var typeLocation = typeSymbol.Locations.FirstOrDefault() ?? Location.None;
             var diagnostic = Diagnostic.Create(NonQueryWithGenericResultWarning,
-                typeLocation, typeSymbol.Name, resultTypeInfo?.TypeName ?? "null");
+                typeLocation, typeSymbol.Name, resultTypeInfo.TypeName);
 
             diagnostics.Add(diagnostic);
         }
@@ -90,6 +118,38 @@ internal static class DbCommandAnalyzers
             var typeLocation = typeSymbol.Locations.FirstOrDefault() ?? Location.None;
             var diagnostic = Diagnostic.Create(MutuallyExclusivePropertiesError, typeLocation, typeSymbol.Name);
 
+            diagnostics.Add(diagnostic);
+        }
+    }
+
+    public static void ExecuteInvalidFunctionNameAnalyzer(INamedTypeSymbol typeSymbol,
+        DbCommandAttribute dbCommandAttribute, ImmutableArray<Diagnostic>.Builder diagnostics)
+    {
+        if (string.IsNullOrWhiteSpace(dbCommandAttribute.Fn))
+            return;
+
+        var fnName = dbCommandAttribute.Fn;
+
+        // $-prefixed names (e.g. "$schema.fn_name") must be valid SQL identifiers
+        // since they become "SELECT * FROM <identifier>(@params)"
+        if (fnName.StartsWith("$"))
+        {
+            var identifier = fnName.Substring(1);
+            if (!ValidSqlIdentifierPattern.IsMatch(identifier))
+            {
+                var typeLocation = typeSymbol.Locations.FirstOrDefault() ?? Location.None;
+                var diagnostic = Diagnostic.Create(InvalidFunctionNameError, typeLocation, typeSymbol.Name, fnName);
+                diagnostics.Add(diagnostic);
+            }
+            return;
+        }
+
+        // Non-$-prefixed fn values can be SQL expressions (e.g. "select * from schema.fn")
+        // Only check for dangerous injection patterns
+        if (DangerousSqlPattern.IsMatch(fnName))
+        {
+            var typeLocation = typeSymbol.Locations.FirstOrDefault() ?? Location.None;
+            var diagnostic = Diagnostic.Create(InvalidFunctionNameError, typeLocation, typeSymbol.Name, fnName);
             diagnostics.Add(diagnostic);
         }
     }

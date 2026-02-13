@@ -213,6 +213,7 @@ internal sealed class DbCommandTypeInfoSourceGen : DbCommandTypeInfo, IEquatable
         DbCommandAnalyzers.ExecuteMissingInterfaceAnalyzer(typeSymbol, ResultType, DbCommandAttribute, diagnostics);
         DbCommandAnalyzers.ExecuteNonQueryWithNonIntegralResultAnalyzer(typeSymbol, ResultType, DbCommandAttribute, diagnostics);
         DbCommandAnalyzers.ExecuteMutuallyExclusivePropertiesAnalyzer(typeSymbol, DbCommandAttribute, diagnostics);
+        DbCommandAnalyzers.ExecuteInvalidFunctionNameAnalyzer(typeSymbol, DbCommandAttribute, diagnostics);
 
         return diagnostics.ToImmutable();
     }
@@ -277,6 +278,8 @@ internal sealed class DbCommandTypeInfoSourceGen : DbCommandTypeInfo, IEquatable
             IsEnumerableResult: isEnumerableResult);
     }
 
+    private static readonly string DbCommandIgnoreAttributeName = typeof(DbCommandIgnoreAttribute).FullName!;
+
     private static ImmutableArray<PropertyInfo> GetDbCommandObjProperties(
         INamedTypeSymbol typeSymbol, DbParamsCase paramsCase, DbCommandSourceGenSettings settings)
     {
@@ -286,6 +289,7 @@ internal sealed class DbCommandTypeInfoSourceGen : DbCommandTypeInfo, IEquatable
         {
             var primaryConstructor = typeSymbol.Constructors.FirstOrDefault(c => c.IsPrimaryConstructor());
             primaryProperties = primaryConstructor?.Parameters
+                .Where(p => p.GetAttribute(DbCommandIgnoreAttributeName) is null)
                 .Select(p => new PropertyInfo(p.Name, GetParameterName(p, paramsCase, settings)))
                 .ToDictionary(p => p.PropertyName, p => p) ?? [];
         }
@@ -298,6 +302,7 @@ internal sealed class DbCommandTypeInfoSourceGen : DbCommandTypeInfo, IEquatable
             .OfType<IPropertySymbol>()
             .Where(p => !primaryProperties.ContainsKey(p.Name))
             .Where(p => p is { DeclaredAccessibility: Accessibility.Public, IsStatic: false, GetMethod: not null })
+            .Where(p => p.GetAttributes().All(a => a.AttributeClass?.ToDisplayString() != DbCommandIgnoreAttributeName))
             .Select(p => new PropertyInfo(p.Name, GetParameterName(p, paramsCase, settings)));
 
         return [.. primaryProperties.Values.Concat(normalProps)];
