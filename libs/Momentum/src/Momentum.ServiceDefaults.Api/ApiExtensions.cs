@@ -118,9 +118,10 @@ public static class ApiExtensions
             options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
             options.AddFixedWindowLimiter("fixed", limiterOptions =>
             {
-                limiterOptions.Window = TimeSpan.FromMinutes(1);
-                limiterOptions.PermitLimit = 100;
-                limiterOptions.QueueLimit = 10;
+                var rateLimitConfig = builder.Configuration.GetSection("RateLimiting");
+                limiterOptions.Window = TimeSpan.FromSeconds(rateLimitConfig.GetValue<int?>("WindowSeconds") ?? 60);
+                limiterOptions.PermitLimit = rateLimitConfig.GetValue<int?>("PermitLimit") ?? 100;
+                limiterOptions.QueueLimit = rateLimitConfig.GetValue<int?>("QueueLimit") ?? 10;
                 limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
             });
         });
@@ -199,6 +200,13 @@ public static class ApiExtensions
                         Title = title,
                         Instance = context.Request.Path
                     };
+
+                    if (exception is FluentValidation.ValidationException validationException)
+                    {
+                        problemDetails.Extensions["errors"] = validationException.Errors
+                            .GroupBy(e => e.PropertyName)
+                            .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
+                    }
 
                     await context.Response.WriteAsJsonAsync(problemDetails);
                 });

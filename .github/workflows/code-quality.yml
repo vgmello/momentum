@@ -101,7 +101,7 @@ jobs:
         uses: github/codeql-action/init@v4
         with:
           languages: csharp
-          build-mode: none
+          build-mode: manual
 
       - name: Start SonarQube analysis
         env:
@@ -143,6 +143,7 @@ jobs:
             @{ Project = "libs/Momentum/tests/Momentum.Extensions.Tests"; Filter = $null; Include = "[Momentum.*]*" },
             @{ Project = "libs/Momentum/tests/Momentum.Extensions.SourceGenerators.Tests"; Filter = $null; Include = "[Momentum.*]*" },
             @{ Project = "libs/Momentum/tests/Momentum.Extensions.EventMarkdownGenerator.Tests"; Filter = $null; Include = "[Momentum.*]*" },
+            @{ Project = "libs/Momentum/tests/Momentum.ServiceDefaults.Api.Tests"; Filter = $null; Include = "[Momentum.*]*" },
             @{ Project = "tests/AppDomain.Tests"; Filter = "FullyQualifiedName~AppDomain.Tests.Unit"; Include = "[AppDomain]*,[AppDomain.*]*" }
           )
           $failed = $false
@@ -168,6 +169,7 @@ jobs:
           }
           if ($failed) {
             Write-Host "⚠️ Some test projects had failures"
+            exit 1
           }
 
       - name: Complete CodeQL Analysis

@@ -72,6 +72,12 @@ public static class FrontendIntegrationExtensions
             .GetSection("Cors")
             .Get<CorsSettings>() ?? new CorsSettings();
 
+        if (corsSettings.AllowCredentials && corsSettings.AllowedOrigins.Length == 0)
+        {
+            throw new InvalidOperationException(
+                "CORS: AllowCredentials requires explicit AllowedOrigins. Wildcard origins are not permitted with credentials.");
+        }
+
         builder.Services.AddCors(options =>
         {
             options.AddPolicy(CorsPolicyName, policy =>

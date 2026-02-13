@@ -40,7 +40,12 @@ internal sealed class DbCommandHandlerSourceGenWriter : SourceGenBaseWriter
             ? "global::System.Data.Common.DbDataSource datasource"
             : $"[global::Microsoft.Extensions.DependencyInjection.FromKeyedServicesAttribute(\"{dataSourceKey}\")] global::System.Data.Common.DbDataSource datasource";
 
-        sourceBuilder.AppendLine("    /// <inheritdoc />");
+        sourceBuilder.AppendLine("    /// <summary>Handles the command by executing the database operation.</summary>");
+
+        if (dbCommandTypeInfo.IsNestedType)
+        {
+            sourceBuilder.AppendLine($"    {GeneratedCodeAttribute}");
+        }
         sourceBuilder.AppendLine(
             $"    public static async {returnTypeDeclaration} HandleAsync(global::{dbCommandTypeInfo.QualifiedTypeName} command, {dataSourceParameterDeclaration}, global::System.Threading.CancellationToken cancellationToken = default)");
         sourceBuilder.AppendLine("    {");

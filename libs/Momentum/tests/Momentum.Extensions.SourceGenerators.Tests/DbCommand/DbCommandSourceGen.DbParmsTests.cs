@@ -214,6 +214,82 @@ public class DbCommandSourceGenDbParmsTests : DbCommandSourceGenTestsBase
         }
     }
 
+    [Fact]
+    public void GenerateDbParams_WhenDbCommandIgnoreOnPrimaryConstructorParam_ShouldExcludeParameter()
+    {
+        // Arrange
+        const string source = """
+                              [DbCommand(sp: "create_user", paramsCase: DbParamsCase.SnakeCase)]
+                              public partial record CreateUserCommand(
+                                  int UserId,
+                                  string Name,
+                                  [DbCommandIgnore] string InternalNote
+                              ) : ICommand<int>;
+                              """;
+
+        var expectedSource = """
+                             sealed public partial record CreateUserCommand : global::Momentum.Extensions.Abstractions.Dapper.IDbParamsProvider
+                             {
+                                 public global::System.Object ToDbParams()
+                                 {
+                                     var p = new
+                                     {
+                                         user_id = this.UserId,
+                                         name = this.Name
+                                     };
+                                     return p;
+                                 }
+                             }
+                             """;
+
+        // Act
+        var (generated, diagnostics) = TestHelpers.GetGeneratedSources<DbCommandSourceGenerator>(SourceImports + source);
+
+        // Assert
+        diagnostics.ShouldNotContain(d => d.Severity == DiagnosticSeverity.Error);
+        var expectedCode = GeneratedCodeHeader + Environment.NewLine + expectedSource;
+        GeneratedCodeShouldMatchExpected(generated[0], expectedCode);
+    }
+
+    [Fact]
+    public void GenerateDbParams_WhenDbCommandIgnoreOnProperty_ShouldExcludeProperty()
+    {
+        // Arrange
+        const string source = """
+                              [DbCommand(sp: "create_user", paramsCase: DbParamsCase.SnakeCase)]
+                              public partial class CreateUserCommand : ICommand<int>
+                              {
+                                  public int UserId { get; set; }
+                                  public string Name { get; set; }
+                                  [DbCommandIgnore]
+                                  public string InternalNote { get; set; }
+                              }
+                              """;
+
+        var expectedSource = """
+                             sealed public partial class CreateUserCommand : global::Momentum.Extensions.Abstractions.Dapper.IDbParamsProvider
+                             {
+                                 public global::System.Object ToDbParams()
+                                 {
+                                     var p = new
+                                     {
+                                         user_id = this.UserId,
+                                         name = this.Name
+                                     };
+                                     return p;
+                                 }
+                             }
+                             """;
+
+        // Act
+        var (generated, diagnostics) = TestHelpers.GetGeneratedSources<DbCommandSourceGenerator>(SourceImports + source);
+
+        // Assert
+        diagnostics.ShouldNotContain(d => d.Severity == DiagnosticSeverity.Error);
+        var expectedCode = GeneratedCodeHeader + Environment.NewLine + expectedSource;
+        GeneratedCodeShouldMatchExpected(generated[0], expectedCode);
+    }
+
     private static TheoryDataRow<string, string> TestCase(string name, string source, string expected, string? skip = null) =>
         new(source, expected) { TestDisplayName = name, Skip = skip };
 }

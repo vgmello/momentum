@@ -42,6 +42,12 @@ public static class OpenTelemetrySetupExtensions
         var otelOptions = new OpenTelemetryOptions();
         builder.Configuration.GetSection(OpenTelemetryOptions.SectionName).Bind(otelOptions);
 
+        if (otelOptions.ProductionSamplingRate is < 0.0 or > 1.0)
+        {
+            throw new InvalidOperationException(
+                $"OpenTelemetry:ProductionSamplingRate must be between 0.0 and 1.0, got {otelOptions.ProductionSamplingRate}");
+        }
+
         var activitySourceName = builder.Configuration.GetValue<string>("OpenTelemetry:ActivitySourceName")
                                  ?? builder.Environment.ApplicationName;
 

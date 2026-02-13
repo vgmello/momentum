@@ -284,12 +284,22 @@ internal sealed class DbCommandTypeInfoSourceGen : DbCommandTypeInfo, IEquatable
         INamedTypeSymbol typeSymbol, DbParamsCase paramsCase, DbCommandSourceGenSettings settings)
     {
         Dictionary<string, PropertyInfo> primaryProperties;
+        HashSet<string> ignoredPrimaryParams = [];
 
         if (typeSymbol.IsRecord)
         {
             var primaryConstructor = typeSymbol.Constructors.FirstOrDefault(c => c.IsPrimaryConstructor());
+            if (primaryConstructor is not null)
+            {
+                foreach (var p in primaryConstructor.Parameters)
+                {
+                    if (p.GetAttribute(DbCommandIgnoreAttributeName) is not null)
+                        ignoredPrimaryParams.Add(p.Name);
+                }
+            }
+
             primaryProperties = primaryConstructor?.Parameters
-                .Where(p => p.GetAttribute(DbCommandIgnoreAttributeName) is null)
+                .Where(p => !ignoredPrimaryParams.Contains(p.Name))
                 .Select(p => new PropertyInfo(p.Name, GetParameterName(p, paramsCase, settings)))
                 .ToDictionary(p => p.PropertyName, p => p) ?? [];
         }
@@ -301,6 +311,7 @@ internal sealed class DbCommandTypeInfoSourceGen : DbCommandTypeInfo, IEquatable
         var normalProps = typeSymbol.GetMembers()
             .OfType<IPropertySymbol>()
             .Where(p => !primaryProperties.ContainsKey(p.Name))
+            .Where(p => !ignoredPrimaryParams.Contains(p.Name))
             .Where(p => p is { DeclaredAccessibility: Accessibility.Public, IsStatic: false, GetMethod: not null })
             .Where(p => p.GetAttributes().All(a => a.AttributeClass?.ToDisplayString() != DbCommandIgnoreAttributeName))
             .Select(p => new PropertyInfo(p.Name, GetParameterName(p, paramsCase, settings)));

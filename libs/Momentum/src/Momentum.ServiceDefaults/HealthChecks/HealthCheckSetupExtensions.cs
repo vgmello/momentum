@@ -39,9 +39,7 @@ public static partial class HealthCheckSetupExtensions
         // liveness probe
         app.MapGet("/status", () =>
             {
-                var isCacheStale = DateTime.UtcNow - healthCheckStore.LastUpdated > TimeSpan.FromSeconds(30);
-
-                var statusCode = healthCheckStore.LastHealthStatus is not HealthStatus.Unhealthy && !isCacheStale
+                var statusCode = healthCheckStore.LastHealthStatus is not HealthStatus.Unhealthy
                     ? StatusCodes.Status200OK
                     : StatusCodes.Status503ServiceUnavailable;
 

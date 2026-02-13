@@ -20,7 +20,6 @@ namespace Momentum.ServiceDefaults.HealthChecks;
 public class HealthCheckStatusStore
 {
     private int _lastHealthStatus = (int)HealthStatus.Healthy;
-    private long _lastUpdatedTicks = DateTime.UtcNow.Ticks;
 
     /// <summary>
     ///     Gets or sets the last recorded health status.
@@ -36,15 +35,6 @@ public class HealthCheckStatusStore
     public HealthStatus LastHealthStatus
     {
         get => (HealthStatus)Volatile.Read(ref _lastHealthStatus);
-        set
-        {
-            Interlocked.Exchange(ref _lastHealthStatus, (int)value);
-            Interlocked.Exchange(ref _lastUpdatedTicks, DateTime.UtcNow.Ticks);
-        }
+        set => Interlocked.Exchange(ref _lastHealthStatus, (int)value);
     }
-
-    /// <summary>
-    ///     Gets the UTC time when the health status was last updated.
-    /// </summary>
-    public DateTime LastUpdated => new(Volatile.Read(ref _lastUpdatedTicks), DateTimeKind.Utc);
 }

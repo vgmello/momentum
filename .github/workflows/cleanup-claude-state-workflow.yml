@@ -69,9 +69,10 @@ jobs:
 
       - name: Delete corresponding Claude state branch
         if: steps.extract.outputs.ISSUE_NUMBER
+        env:
+          BRANCH_TYPE: ${{ steps.extract.outputs.BRANCH_TYPE }}
+          ISSUE_NUMBER: ${{ steps.extract.outputs.ISSUE_NUMBER }}
         run: |
-          BRANCH_TYPE="${{ steps.extract.outputs.BRANCH_TYPE }}"
-          ISSUE_NUMBER="${{ steps.extract.outputs.ISSUE_NUMBER }}"
           CLAUDE_BRANCH="claude-${BRANCH_TYPE}-${ISSUE_NUMBER}"
 
           echo "Looking for Claude state branch: $CLAUDE_BRANCH"
