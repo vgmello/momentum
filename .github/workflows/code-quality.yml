@@ -115,34 +115,56 @@ jobs:
           /o:"vgmello" `
           /d:sonar.token="$env:SONAR_TOKEN" `
           /d:sonar.host.url="https://sonarcloud.io" `
-          /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" `
+          /d:sonar.cs.opencover.reportsPaths="**/TestResults/*/coverage.opencover.xml" `
           /d:sonar.coverage.exclusions="**/*Tests*/**,**/Program.cs,**/*.Generated.cs"
 
     - name: Restore NuGet packages
-      run: dotnet restore --verbosity minimal
+      run: |
+        dotnet restore --verbosity minimal
+        dotnet restore libs/Momentum/Momentum.slnx --verbosity minimal
 
     - name: Build solution (for both CodeQL and SonarQube)
       run: |
-        # Single build for both CodeQL and SonarQube analysis
+        # Build both solutions for CodeQL and SonarQube analysis
         dotnet build --configuration Release --no-restore --verbosity minimal
+        dotnet build libs/Momentum/Momentum.slnx --configuration Release --no-restore --verbosity minimal
 
     - name: Run unit tests with coverage
       shell: pwsh
       run: |
         Write-Host "🧪 Running unit tests with coverage..."
-        try {
-          dotnet test `
-            --configuration Release `
-            --no-build `
-            --verbosity minimal `
-            --filter "Category=Unit" `
-            --collect:"XPlat Code Coverage" `
-            --results-directory ./TestResults/ `
-            --logger "trx;LogFileName=test_results.trx" `
-            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+        # Run each test project individually to avoid coverlet parallel instrumentation issues.
+        # xunit v3 does not support != in VSTest filters, so we use namespace-based positive filters
+        # for projects that contain mixed test types.
+        $testRuns = @(
+          @{ Project = "libs/Momentum/tests/Momentum.Extensions.Tests"; Filter = $null; Include = "[Momentum.*]*" },
+          @{ Project = "libs/Momentum/tests/Momentum.Extensions.SourceGenerators.Tests"; Filter = $null; Include = "[Momentum.*]*" },
+          @{ Project = "libs/Momentum/tests/Momentum.Extensions.EventMarkdownGenerator.Tests"; Filter = $null; Include = "[Momentum.*]*" },
+          @{ Project = "tests/AppDomain.Tests"; Filter = "FullyQualifiedName~AppDomain.Tests.Unit"; Include = "[AppDomain]*,[AppDomain.*]*" }
+        )
+        $failed = $false
+        foreach ($run in $testRuns) {
+          Write-Host "▶ Testing $($run.Project)..."
+          $filterArgs = if ($run.Filter) { @("--filter", $run.Filter) } else { @() }
+          try {
+            dotnet test $run.Project `
+              --configuration Release `
+              --no-build `
+              --verbosity minimal `
+              @filterArgs `
+              --collect:"XPlat Code Coverage" `
+              --results-directory ./TestResults/ `
+              --logger "trx;LogFilePrefix=test_results" `
+              -- "DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover" `
+                 "DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Include=$($run.Include)"
+          }
+          catch {
+            Write-Host "⚠️ Test execution failed for $($run.Project), continuing with analysis..."
+            $failed = $true
+          }
         }
-        catch {
-          Write-Host "⚠️ Test execution failed, continuing with analysis..."
+        if ($failed) {
+          Write-Host "⚠️ Some test projects had failures"
         }
 
     - name: Complete CodeQL Analysis

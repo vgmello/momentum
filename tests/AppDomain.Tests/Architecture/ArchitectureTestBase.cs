@@ -9,6 +9,7 @@ namespace AppDomain.Tests.Architecture;
 /// <summary>
 ///     Base class for all architecture tests providing common functionality.
 /// </summary>
+[Trait("Type", "Architecture")]
 public abstract class ArchitectureTestBase
 {
     /// <summary>

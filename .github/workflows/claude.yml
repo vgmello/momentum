@@ -19,7 +19,7 @@ permissions:
   issues: write
   id-token: write
   actions: read
-  
+
 # Ensure only one workflow runs at a time per issue/PR
 concurrency:
   group: claude-${{ github.event_name }}-${{ github.event.issue.number || github.event.pull_request.number }}
@@ -42,7 +42,20 @@ jobs:
       - name: Extract Context
         id: context
         env:
+          EVENT_NAME: ${{ github.event_name }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_USER_LOGIN: ${{ github.event.issue.user.login }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          COMMENT_USER_LOGIN: ${{ github.event.comment.user.login }}
+          COMMENT_ID: ${{ github.event.comment.id }}
+          COMMENT_PATH: ${{ github.event.comment.path }}
+          COMMENT_LINE: ${{ github.event.comment.line }}
           DIFF_HUNK: ${{ github.event.comment.diff_hunk }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          REVIEW_BODY: ${{ github.event.review.body }}
+          REVIEW_USER_LOGIN: ${{ github.event.review.user.login }}
         run: |
           # Initialize variables
           NUMBER=""
@@ -50,48 +63,48 @@ jobs:
           BODY=""
           ACTOR=""
 
-          case "${{ github.event_name }}" in
+          case "$EVENT_NAME" in
             issues)
-              echo "NUMBER=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
+              echo "NUMBER=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
               echo "TYPE=issue" >> $GITHUB_OUTPUT
-              NUMBER="${{ github.event.issue.number }}"
+              NUMBER="$ISSUE_NUMBER"
               TYPE="issue"
-              BODY="${{ github.event.issue.body }}"
-              ACTOR="${{ github.event.issue.user.login }}"
+              BODY="$ISSUE_BODY"
+              ACTOR="$ISSUE_USER_LOGIN"
               ;;
             issue_comment)
-              echo "NUMBER=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
+              echo "NUMBER=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
               echo "TYPE=issue" >> $GITHUB_OUTPUT
-              NUMBER="${{ github.event.issue.number }}"
+              NUMBER="$ISSUE_NUMBER"
               TYPE="issue"
-              BODY="${{ github.event.comment.body }}"
-              ACTOR="${{ github.event.comment.user.login }}"
+              BODY="$COMMENT_BODY"
+              ACTOR="$COMMENT_USER_LOGIN"
               ;;
             pull_request_review_comment)
-              echo "NUMBER=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+              echo "NUMBER=$PR_NUMBER" >> $GITHUB_OUTPUT
               echo "TYPE=pr" >> $GITHUB_OUTPUT
-              NUMBER="${{ github.event.pull_request.number }}"
+              NUMBER="$PR_NUMBER"
               TYPE="pr"
-              echo "REF=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
-              echo "COMMENT_ID=${{ github.event.comment.id }}" >> $GITHUB_OUTPUT
-              echo "COMMENT_PATH=${{ github.event.comment.path }}" >> $GITHUB_OUTPUT
-              echo "COMMENT_LINE=${{ github.event.comment.line }}" >> $GITHUB_OUTPUT
+              echo "REF=$PR_HEAD_REF" >> $GITHUB_OUTPUT
+              echo "COMMENT_ID=$COMMENT_ID" >> $GITHUB_OUTPUT
+              echo "COMMENT_PATH=$COMMENT_PATH" >> $GITHUB_OUTPUT
+              echo "COMMENT_LINE=$COMMENT_LINE" >> $GITHUB_OUTPUT
               {
                 echo "COMMENT_DIFF_HUNK<<EOF"
                 printf '%s\n' "$DIFF_HUNK" | head -n 5
                 echo "EOF"
               } >> $GITHUB_OUTPUT
-              BODY="${{ github.event.comment.body }}"
-              ACTOR="${{ github.event.comment.user.login }}"
+              BODY="$COMMENT_BODY"
+              ACTOR="$COMMENT_USER_LOGIN"
               ;;
             pull_request_review)
-              echo "NUMBER=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+              echo "NUMBER=$PR_NUMBER" >> $GITHUB_OUTPUT
               echo "TYPE=pr" >> $GITHUB_OUTPUT
-              NUMBER="${{ github.event.pull_request.number }}"
+              NUMBER="$PR_NUMBER"
               TYPE="pr"
-              echo "REF=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
-              BODY="${{ github.event.review.body }}"
-              ACTOR="${{ github.event.review.user.login }}"
+              echo "REF=$PR_HEAD_REF" >> $GITHUB_OUTPUT
+              BODY="$REVIEW_BODY"
+              ACTOR="$REVIEW_USER_LOGIN"
               ;;
           esac
 
@@ -101,8 +114,8 @@ jobs:
           # If so, use the issue number for Claude branch but keep PR number for comments
           CLAUDE_NUMBER="${NUMBER}"
           CLAUDE_TYPE="${TYPE}"
-          if [ "${{ github.event_name }}" == "pull_request_review_comment" ] || [ "${{ github.event_name }}" == "pull_request_review" ]; then
-            BRANCH_NAME="${{ github.event.pull_request.head.ref }}"
+          if [ "$EVENT_NAME" == "pull_request_review_comment" ] || [ "$EVENT_NAME" == "pull_request_review" ]; then
+            BRANCH_NAME="$PR_HEAD_REF"
             if [[ "$BRANCH_NAME" =~ ^issue-([0-9]+)$ ]]; then
               ISSUE_NUM="${BASH_REMATCH[1]}"
               echo "Detected issue branch pattern: $BRANCH_NAME -> issue #$ISSUE_NUM"
@@ -126,17 +139,21 @@ jobs:
 
       - name: Check User Permissions
         id: permission_check
+        env:
+          INPUT_TOKEN: ${{ secrets.GH_PAT }}
+          FALLBACK_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          ACTOR: ${{ steps.context.outputs.ACTOR }}
+          CTX_TYPE: ${{ steps.context.outputs.TYPE }}
+          CTX_NUMBER: ${{ steps.context.outputs.NUMBER }}
         run: |
           # Prefer an explicit PAT with repo + workflow scopes if provided; otherwise use the job token
-          TOKEN="${{ secrets.GH_PAT }}"
+          TOKEN="$INPUT_TOKEN"
           if [ -z "$TOKEN" ]; then
-            TOKEN="${{ github.token }}"
+            TOKEN="$FALLBACK_TOKEN"
           fi
 
           # Get the user's permission level using GitHub API
-          ACTOR="${{ steps.context.outputs.ACTOR }}"
-          REPO="${{ github.repository }}"
-
           echo "Checking permissions for user: $ACTOR"
 
           # Query GitHub API for user's permission level
@@ -156,58 +173,71 @@ jobs:
             echo "has_permission=false" >> $GITHUB_OUTPUT
             echo "❌ User $ACTOR does not have sufficient permissions (current: $PERMISSION, required: write or above)"
 
-            TYPE="${{ steps.context.outputs.TYPE }}"
-            NUMBER="${{ steps.context.outputs.NUMBER }}"
-
             COMMENT_BODY="⚠️ **Permission Denied**
 
             Hi @$ACTOR, you need write access or higher to use the Claude workflow."
-            
-            if [ "$TYPE" == "issue" ]; then
-              gh issue comment "$NUMBER" --body "$COMMENT_BODY"
+
+            if [ "$CTX_TYPE" == "issue" ]; then
+              gh issue comment "$CTX_NUMBER" --body "$COMMENT_BODY"
             else
-              gh pr comment "$NUMBER" --body "$COMMENT_BODY"
+              gh pr comment "$CTX_NUMBER" --body "$COMMENT_BODY"
             fi
           fi
 
       - name: Run Claude Code
         if: steps.permission_check.outputs.has_permission == 'true'
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          INPUT_TOKEN: ${{ secrets.GH_PAT }}
+          FALLBACK_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          CTX_TYPE: ${{ steps.context.outputs.TYPE }}
+          CTX_NUMBER: ${{ steps.context.outputs.NUMBER }}
+          CTX_REF: ${{ steps.context.outputs.REF }}
+          CTX_CLAUDE_TYPE: ${{ steps.context.outputs.CLAUDE_TYPE }}
+          CTX_CLAUDE_NUMBER: ${{ steps.context.outputs.CLAUDE_NUMBER }}
+          CTX_ACTOR: ${{ steps.context.outputs.ACTOR }}
+          CTX_COMMENT_PATH: ${{ steps.context.outputs.COMMENT_PATH }}
+          CTX_COMMENT_LINE: ${{ steps.context.outputs.COMMENT_LINE }}
+          CTX_COMMENT_ID: ${{ steps.context.outputs.COMMENT_ID }}
+          CTX_COMMENT_DIFF_HUNK: ${{ steps.context.outputs.COMMENT_DIFF_HUNK }}
+          CTX_BODY: ${{ steps.context.outputs.BODY }}
         run: |
           # Prefer an explicit PAT with repo + workflow scopes if provided; otherwise use the job token
-          TOKEN="${{ secrets.GH_PAT }}"
+          TOKEN="$INPUT_TOKEN"
           if [ -z "$TOKEN" ]; then
-            TOKEN="${{ github.token }}"
+            TOKEN="$FALLBACK_TOKEN"
           fi
 
-          USER_PROMPT="You are working on ${{ steps.context.outputs.TYPE }} #${{ steps.context.outputs.NUMBER }} in repository ${{ github.repository }}."
+          USER_PROMPT="You are working on $CTX_TYPE #$CTX_NUMBER in repository $REPO."
 
           # Add PR review comment context if available
-          if [ -n "${{ steps.context.outputs.COMMENT_PATH }}" ]; then
+          if [ -n "$CTX_COMMENT_PATH" ]; then
             USER_PROMPT="$USER_PROMPT
 
           This is a PR review comment on:
-          - File: ${{ steps.context.outputs.COMMENT_PATH }}
-          - Line: ${{ steps.context.outputs.COMMENT_LINE }}
-          - Comment ID: ${{ steps.context.outputs.COMMENT_ID }}
+          - File: $CTX_COMMENT_PATH
+          - Line: $CTX_COMMENT_LINE
+          - Comment ID: $CTX_COMMENT_ID
           - Code context:
           \`\`\`
-          ${{ steps.context.outputs.COMMENT_DIFF_HUNK }}
+          $CTX_COMMENT_DIFF_HUNK
           \`\`\`"
           fi
 
           USER_PROMPT="$USER_PROMPT
 
-          User request: ${{ steps.context.outputs.BODY }}"
+          User request: $CTX_BODY"
 
           docker run --rm \
-            -e CLAUDE_CODE_OAUTH_TOKEN="${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}" \
+            -e CLAUDE_CODE_OAUTH_TOKEN="$CLAUDE_CODE_OAUTH_TOKEN" \
             -e GITHUB_TOKEN="$TOKEN" \
-            -e GITHUB_REPOSITORY="${{ github.repository }}" \
-            -e GITHUB_REF="${{ steps.context.outputs.REF }}" \
-            -e CLAUDE_BRANCH_NAME="claude-${{ steps.context.outputs.CLAUDE_TYPE }}-${{ steps.context.outputs.CLAUDE_NUMBER }}" \
+            -e GITHUB_REPOSITORY="$REPO" \
+            -e GITHUB_REF="$CTX_REF" \
+            -e CLAUDE_BRANCH_NAME="claude-${CTX_CLAUDE_TYPE}-${CTX_CLAUDE_NUMBER}" \
             -e USER_PROMPT="$USER_PROMPT" \
-            -e GITHUB_ACTOR="${{ steps.context.outputs.ACTOR }}" \
-            -e ISSUE_TYPE="${{ steps.context.outputs.TYPE }}" \
-            -e ISSUE_NUMBER="${{ steps.context.outputs.NUMBER }}" \
+            -e GITHUB_ACTOR="$CTX_ACTOR" \
+            -e ISSUE_TYPE="$CTX_TYPE" \
+            -e ISSUE_NUMBER="$CTX_NUMBER" \
             -v /var/run/docker.sock:/var/run/docker.sock \
             sdlc-claude:latest

@@ -23,13 +23,17 @@ jobs:
 
       - name: Extract issue/PR number from deleted branch
         id: extract
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          DELETED_REF: ${{ github.event.ref }}
         run: |
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
             # Handle PR merge event
-            PR_NUMBER="${{ github.event.pull_request.number }}"
-            DELETED_BRANCH="${{ github.event.pull_request.head.ref }}"
+            DELETED_BRANCH="$PR_HEAD_REF"
             echo "PR #$PR_NUMBER merged, branch: $DELETED_BRANCH"
-            
+
             # Check if branch follows naming convention
             if [[ $DELETED_BRANCH =~ ^(issue|pr)-([0-9]+) ]]; then
               BRANCH_TYPE="${BASH_REMATCH[1]}"
@@ -39,14 +43,14 @@ jobs:
               BRANCH_TYPE="pr"
               ISSUE_NUMBER="$PR_NUMBER"
             fi
-            
+
             echo "BRANCH_TYPE=$BRANCH_TYPE" >> $GITHUB_OUTPUT
             echo "ISSUE_NUMBER=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
             echo "DELETED_BRANCH=$DELETED_BRANCH" >> $GITHUB_OUTPUT
             echo "Found $BRANCH_TYPE number: $ISSUE_NUMBER"
           else
             # Handle branch deletion event
-            DELETED_BRANCH="${{ github.event.ref }}"
+            DELETED_BRANCH="$DELETED_REF"
             echo "Deleted branch: $DELETED_BRANCH"
 
             # Extract number from branch name (format: issue-{#id}-description or pr-{#id}-description or just issue-{#id} or pr-{#id})
