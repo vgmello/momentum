@@ -28,74 +28,26 @@
     "aspire": {
       "type": "parameter",
       "description": "Generate AppHost Aspire project",
-      "replaces": "__ASPIRE__",
-      "datatype": "choice",
-      "defaultValue": "default",
-      "choices": [
-        {
-          "choice": "default"
-        },
-        {
-          "choice": "true"
-        },
-        {
-          "choice": "false"
-        }
-      ]
+      "datatype": "bool",
+      "defaultValue": "true"
     },
     "api": {
       "type": "parameter",
       "description": "Generate API project (REST/gRPC endpoints)",
-      "replaces": "__API__",
-      "datatype": "choice",
-      "defaultValue": "default",
-      "choices": [
-        {
-          "choice": "default"
-        },
-        {
-          "choice": "true"
-        },
-        {
-          "choice": "false"
-        }
-      ]
+      "datatype": "bool",
+      "defaultValue": "true"
     },
-    "back-office": {
+    "backoffice": {
       "type": "parameter",
       "description": "Generate BackOffice project (background event processing)",
-      "replaces": "__BACK_OFFICE__",
-      "datatype": "choice",
-      "defaultValue": "default",
-      "choices": [
-        {
-          "choice": "default"
-        },
-        {
-          "choice": "true"
-        },
-        {
-          "choice": "false"
-        }
-      ]
+      "datatype": "bool",
+      "defaultValue": "true"
     },
     "docs": {
       "type": "parameter",
       "description": "Generates documentation project",
-      "replaces": "__DOCS__",
-      "datatype": "choice",
-      "defaultValue": "default",
-      "choices": [
-        {
-          "choice": "default"
-        },
-        {
-          "choice": "true"
-        },
-        {
-          "choice": "false"
-        }
-      ]
+      "datatype": "bool",
+      "defaultValue": "true"
     },
     "orleans": {
       "type": "parameter",
@@ -227,19 +179,19 @@
     },
     "INCLUDE_ASPIRE": {
       "type": "computed",
-      "value": "aspire == 'true' || aspire == 'default' && !project-only"
+      "value": "aspire && !project-only"
     },
     "INCLUDE_API": {
       "type": "computed",
-      "value": "api == 'true' || api == 'default' && !project-only"
+      "value": "api && !project-only"
     },
     "INCLUDE_BACK_OFFICE": {
       "type": "computed",
-      "value": "back-office == 'true' || back-office == 'default' && !project-only"
+      "value": "backoffice && !project-only"
     },
     "INCLUDE_DOCS": {
       "type": "computed",
-      "value": "docs == 'true' || docs == 'default' && !project-only"
+      "value": "docs && !project-only"
     },
     "INCLUDE_ORLEANS": {
       "type": "computed",
@@ -594,6 +546,12 @@
           "exclude": [
             "libs/Momentum/src/Momentum.Extensions.Messaging.Kafka/**/*"
           ]
+        },
+        {
+          "condition": "(INCLUDE_LIBS)",
+          "include": [
+            "libs/Momentum/.editorconfig"
+          ]
         }
       ]
     },
@@ -621,8 +579,6 @@
       "target": "./",
       "condition": "(USE_LOCAL)",
       "include": [
-        "Directory.Build.Local.props",
-        "local-mmt-version.txt",
         "local-feed-path.txt"
       ]
     }

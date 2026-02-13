@@ -1,6 +1,6 @@
 --liquibase formatted sql
 --changeset dev_user:"create cashiers table"
-CREATE TABLE IF NOT EXISTS app_domain.cashiers (
+CREATE TABLE IF NOT EXISTS main.cashiers (
     tenant_id UUID,
     cashier_id UUID,
     name VARCHAR(100) NOT NULL,
@@ -11,15 +11,15 @@ CREATE TABLE IF NOT EXISTS app_domain.cashiers (
 );
 
 --changeset dev_user:"add email to cashiers table"
-ALTER TABLE app_domain.cashiers
+ALTER TABLE main.cashiers
 ADD COLUMN IF NOT EXISTS email VARCHAR(100);
 
 --changeset dev_user:"add unique constraints to cashiers table"
 -- Ensure email is unique per tenant for cashiers
 CREATE UNIQUE INDEX IF NOT EXISTS idx_cashiers_unique_email
-ON app_domain.cashiers(tenant_id, email)
+ON main.cashiers(tenant_id, email)
 WHERE email IS NOT NULL;
 
 -- Index for querying cashiers by name
 CREATE INDEX IF NOT EXISTS idx_cashiers_name
-ON app_domain.cashiers(tenant_id, name);
+ON main.cashiers(tenant_id, name);

@@ -28,7 +28,6 @@ public class UpdateCashierValidator : AbstractValidator<UpdateCashierCommand>
         RuleFor(c => c.Name).NotEmpty();
         RuleFor(c => c.Name).MinimumLength(2);
         RuleFor(c => c.Name).MaximumLength(100);
-        RuleFor(c => c.Email).NotEmpty().When(c => c.Email != null);
         RuleFor(c => c.Email).EmailAddress().When(c => !string.IsNullOrEmpty(c.Email));
     }
 }
@@ -58,7 +57,7 @@ public static class UpdateCashierCommandHandler
 
         if (updatedCashier is null)
         {
-            var failures = new List<ValidationFailure> { new("CashierId", "Cashier not found") };
+            List<ValidationFailure> failures = [new("CashierId", "Cashier not found")];
 
             return (failures, null);
         }
@@ -81,15 +80,16 @@ public static class UpdateCashierCommandHandler
         var statement = db.Cashiers
             .Where(c => c.TenantId == command.TenantId && c.CashierId == command.CashierId)
             .Where(c => c.Version == command.Version)
-            .Set(p => p.Name, command.Name);
+            .Set(p => p.Name, command.Name)
+            .Set(p => p.UpdatedDateUtc, DateTime.UtcNow);
 
         if (!string.IsNullOrWhiteSpace(command.Email))
         {
             statement = statement.Set(p => p.Email, command.Email);
         }
 
-        var updatedRecords = await statement.UpdateWithOutputAsync((_, inserted) => inserted, token: cancellationToken);
+        var updatedRecords = statement.UpdateWithOutputAsync((_, inserted) => inserted);
 
-        return updatedRecords.FirstOrDefault();
+        return await updatedRecords.FirstOrDefaultAsync(cancellationToken);
     }
 }

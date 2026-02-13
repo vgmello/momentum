@@ -1,13 +1,15 @@
 <Project>
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)AppDomain.ruleset</CodeAnalysisRuleSet>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <NoWarn>$(NoWarn);CS1591;LOGGEN036</NoWarn>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
+    <NoWarn>$(NoWarn);CS1591;LOGGEN036;NU1603</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,8 +31,5 @@
   <PropertyGroup>
     <DefineConstants>USE_PGSQL;USE_LIQUIBASE;USE_KAFKA;INCLUDE_ORLEANS;INCLUDE_API;USE_DB;USE_KAFKA;INCLUDE_DOCS;INCLUDE_BACK_OFFICE</DefineConstants>
   </PropertyGroup>
-  <!--#endif -->
-  <!--#if (local) -->
-  <Import Project="$(MSBuildThisFileDirectory)Directory.Build.Local.props" Condition="Exists('$(MSBuildThisFileDirectory)Directory.Build.Local.props')" />
   <!--#endif -->
 </Project>

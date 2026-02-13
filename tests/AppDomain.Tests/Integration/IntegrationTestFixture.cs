@@ -7,7 +7,6 @@ using DotNet.Testcontainers.Networks;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
-using System.Diagnostics.CodeAnalysis;
 using Momentum.ServiceDefaults;
 using AppDomain;
 //#if (USE_LIQUIBASE)
@@ -21,73 +20,66 @@ using Testcontainers.Kafka;
 //#endif
 //#if (INCLUDE_API)
 using Grpc.Net.Client;
-using System.Net;
-using AppDomain.Api;
-using AppDomain.Infrastructure;
-using Momentum.Extensions.Messaging.Kafka;
 using Momentum.ServiceDefaults.Api;
-using Momentum.ServiceDefaults.HealthChecks;
-
 //#endif
-//#if (INCLUDE_API && INCLUDE_ORLEANS)
-
+//#if (HAS_BACKEND)
+using AppDomain.Infrastructure;
+//#endif
+//#if (USE_KAFKA)
+using Momentum.Extensions.Messaging.Kafka;
+//#endif
+//#if (INCLUDE_ORLEANS)
+using AppDomain.BackOffice.Orleans.Infrastructure.Extensions;
+//#endif
+//#if (HAS_BACKEND)
+using Microsoft.AspNetCore.TestHost;
 //#endif
 
 [assembly: DomainAssembly(typeof(IAppDomainAssembly))]
 
 namespace AppDomain.Tests.Integration;
 
-[SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
 public class IntegrationTestFixture : IAsyncLifetime
 {
     private readonly INetwork _containerNetwork = new NetworkBuilder().Build();
 
-    //#if (INCLUDE_API)
+    //#if (HAS_BACKEND)
     private WebApplication? _app;
-    //#endif
 
+    public WebApplication App => _app ?? throw new InvalidOperationException("Application not initialized");
+    public IServiceProvider Services => _app?.Services ?? throw new InvalidOperationException("Application not initialized");
+
+    //#endif
     //#if (USE_DB)
     private readonly PostgreSqlContainer _postgres;
 
-    //#endif
-    //#if (USE_KAFKA)
-    private readonly KafkaContainer _kafka;
-    //#endif
-
-    //#if (INCLUDE_API)
-    public GrpcChannel GrpcChannel { get; private set; } = null!;
-    public IServiceProvider Services => _app?.Services ?? throw new InvalidOperationException("Application not initialized");
-    //#endif
-
-    //#if (USE_DB)
     public string AppDomainDbConnectionString => _postgres.GetDbConnectionString("app_domain");
 
     public string ServiceBusDbConnectionString => _postgres.GetDbConnectionString("service_bus");
 
     //#endif
     //#if (USE_KAFKA)
-    public string KafkaBootstrapAddress => _kafka.GetBootstrapAddress();
-    //#endif
+    private readonly KafkaContainer _kafka;
 
+    public string KafkaBootstrapAddress => _kafka.GetBootstrapAddress();
+
+    //#endif
+    //#if (INCLUDE_API)
+    public GrpcChannel GrpcChannel { get; private set; } = null!;
+
+    //#endif
     public ITestOutputHelper? TestOutput { get; set; }
 
     public IntegrationTestFixture()
     {
-        // Enable HTTP/2 over unencrypted connections for gRPC testing
-        AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
         //#if (USE_DB)
-        _postgres = new PostgreSqlBuilder()
-            .WithImage("postgres:17-alpine")
-            .WithUsername("postgres")
-            .WithPassword("postgres")
-            .WithDatabase("postgres")
+        _postgres = new PostgreSqlBuilder("postgres:17-alpine")
             .WithNetwork(_containerNetwork)
             .Build();
-        //#endif
 
+        //#endif
         //#if (USE_KAFKA)
-        _kafka = new KafkaBuilder()
-            .WithImage("confluentinc/cp-kafka:7.6.0")
+        _kafka = new KafkaBuilder("confluentinc/cp-kafka:7.6.0")
             .WithNetwork(_containerNetwork)
             .Build();
         //#endif
@@ -96,104 +88,110 @@ public class IntegrationTestFixture : IAsyncLifetime
     public async ValueTask InitializeAsync()
     {
         await _containerNetwork.CreateAsync();
-        //#if (USE_DB)
-        await _postgres.StartAsync();
-        //#endif
-        //#if (USE_KAFKA)
-        await _kafka.StartAsync();
-        //#endif
 
-        //#if (USE_LIQUIBASE)
-        await using var liquibaseMigrationContainer = new LiquibaseMigrationContainer(_postgres.Name, _containerNetwork);
-        await liquibaseMigrationContainer.StartAsync();
-        //#endif
+        var containersTasks = new List<Task>
+        {
+            //#if (USE_DB && USE_LIQUIBASE)
+            _postgres.StartAsync().ContinueWith(async _ =>
+            {
+                await using var liquibaseMigrationContainer = new LiquibaseMigrationContainer(_postgres.Name, _containerNetwork);
+                await liquibaseMigrationContainer.StartAsync();
+            }).Unwrap(),
+            //#endif
+            //#if (USE_DB && !USE_LIQUIBASE)
+            _postgres.StartAsync(),
+            //#endif
+            //#if (USE_KAFKA)
+            _kafka.StartAsync()
+            //#endif
+        };
 
-        //#if (INCLUDE_API)
+        await Task.WhenAll(containersTasks);
+
+        //#if (HAS_BACKEND)
         await CreateTestWebApplicationAsync();
         //#endif
     }
 
-    //#if (INCLUDE_API)
+    //#if (HAS_BACKEND)
     private async Task CreateTestWebApplicationAsync()
     {
+        ServiceDefaultsExtensions.EntryAssembly = typeof(IAppDomainAssembly).Assembly;
+
         var builder = WebApplication.CreateEmptyBuilder(new WebApplicationOptions());
         var configData = new Dictionary<string, string?>
         {
             //#if (USE_DB)
             ["ConnectionStrings:AppDomainDb"] = _postgres.GetDbConnectionString("app_domain"),
-            ["ConnectionStrings:ServiceBus"] = _postgres.GetDbConnectionString("service_bus")
+            ["ConnectionStrings:ServiceBus"] = _postgres.GetDbConnectionString("service_bus"),
+            //#endif
+            ["Orleans:UseLocalhostClustering"] = "true",
+            ["ServiceBus:Wolverine:CodegenEnabled"] = "true",
+            //#if (USE_KAFKA)
+            ["ConnectionStrings:Messaging"] = _kafka.GetBootstrapAddress(),
+            ["Aspire:Confluent:Kafka:Messaging:BootstrapServers"] = _kafka.GetBootstrapAddress(),
+            ["Aspire:Confluent:Kafka:Messaging:Consumer:Config:GroupId"] = "integration-test-group",
+            ["Aspire:Confluent:Kafka:Messaging:Consumer:Config:AutoOffsetReset"] = "Latest",
+            ["Aspire:Confluent:Kafka:Messaging:Consumer:Config:EnableAutoCommit"] = "true",
+            ["Aspire:Confluent:Kafka:Messaging:Security:Protocol"] = "Plaintext"
             //#endif
         };
 
-        //#if (USE_KAFKA)
-        var kafkaAddress = _kafka.GetBootstrapAddress();
-        configData["ConnectionStrings:Messaging"] = kafkaAddress;
-        configData["Aspire:Confluent:Kafka:Messaging:BootstrapServers"] = kafkaAddress;
-        configData["Aspire:Confluent:Kafka:Messaging:Consumer:Config:GroupId"] = "integration-test-group";
-        configData["Aspire:Confluent:Kafka:Messaging:Consumer:Config:AutoOffsetReset"] = "Latest";
-        configData["Aspire:Confluent:Kafka:Messaging:Consumer:Config:EnableAutoCommit"] = "true";
-        configData["Aspire:Confluent:Kafka:Messaging:Security:Protocol"] = "Plaintext";
-
-        //#endif
-        configData["Orleans:UseLocalhostClustering"] = "true";
-        configData["ServiceBus:Wolverine:CodegenEnabled"] = "true";
-
         builder.Configuration.AddInMemoryCollection(configData);
-
-        builder.WebHost.UseKestrel(options =>
-        {
-            options.Listen(IPAddress.Loopback, 0, listenOptions =>
-            {
-                listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http2;
-            });
-        });
-
-        builder.Services.AddLogging(logging => logging
-            .ClearProviders()
-            .AddSerilog(CreateTestLogger(nameof(AppDomain)).ForContext("Integration", "Test")));
-
-        ServiceDefaultsExtensions.EntryAssembly = typeof(IAppDomainAssembly).Assembly;
+        builder.WebHost.UseTestServer();
 
         builder.AddServiceDefaults();
-        builder.AddApiServiceDefaults();
+        //#if (INCLUDE_API)
+        builder.AddApiServiceDefaults(requireAuth: false);
+        //#endif
         //#if (USE_KAFKA)
         builder.AddKafkaMessagingExtensions();
         //#endif
 
         builder.AddAppDomainServices();
-        builder.AddApplicationServices();
+        //#if (INCLUDE_API)
+        Api.DependencyInjection.AddApplicationServices(builder);
+        //#endif
+        //#if (INCLUDE_BACKOFFICE)
+        BackOffice.DependencyInjection.AddApplicationServices(builder);
+        //#endif
+        //#if (INCLUDE_ORLEANS)
+        BackOffice.Orleans.DependencyInjection.AddApplicationServices(builder);
+
+        builder.AddOrleans();
+        //#endif
+
+        builder.Services.AddSerilog(CreateTestLogger(builder.Configuration));
 
         _app = builder.Build();
 
-        _app.ConfigureApiUsingDefaults(requireAuth: false);
-        _app.MapDefaultHealthCheckEndpoints();
-
-        _app.MapGrpcServices(typeof(Program));
+        //#if (INCLUDE_API)
+        _app.ConfigureApiUsingDefaults();
+        _app.MapGrpcServices(typeof(Api.DependencyInjection));
+        //#endif
 
         await _app.StartAsync();
 
-        var httpClient = new HttpClient(new HttpClientHandler())
+        //#if (INCLUDE_API)
+        GrpcChannel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions
         {
-            DefaultRequestVersion = HttpVersion.Version20,
-            DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher
-        };
-
-        GrpcChannel = GrpcChannel.ForAddress(_app.Urls.First(), new GrpcChannelOptions
-        {
-            HttpClient = httpClient
+            HttpClient = _app.GetTestClient()
         });
+        //#endif
     }
     //#endif
 
     public async ValueTask DisposeAsync()
     {
-        //#if (INCLUDE_API)
-        if (_app != null)
+        //#if (HAS_BACKEND)
+        if (_app is not null)
         {
             await _app.StopAsync();
             await _app.DisposeAsync();
         }
+        //#endif
 
+        //#if (INCLUDE_API)
         GrpcChannel.Dispose();
         //#endif
 
@@ -214,13 +212,15 @@ public class IntegrationTestFixture : IAsyncLifetime
         await Log.CloseAndFlushAsync();
     }
 
-    private Logger CreateTestLogger(string logNamespace) =>
+    //#if (HAS_BACKEND)
+    private Logger CreateTestLogger(IConfiguration configuration) =>
         new LoggerConfiguration()
             .WriteTo.Sink(new XUnitSink(() => TestOutput))
-            .MinimumLevel.Information()
-            .MinimumLevel.Override(nameof(Microsoft), LogEventLevel.Warning)
+            .MinimumLevel.Warning()
+            .MinimumLevel.Override(nameof(Microsoft), LogEventLevel.Information)
             .MinimumLevel.Override("LinqToDB", LogEventLevel.Debug)
             .MinimumLevel.Override("AppDomain", LogEventLevel.Debug)
-            .MinimumLevel.Override(logNamespace, LogEventLevel.Debug)
+            .ReadFrom.Configuration(configuration)
             .CreateLogger();
+    //#endif
 }

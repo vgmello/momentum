@@ -1,6 +1,5 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-using Aspire.Confluent.Kafka;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -112,8 +111,8 @@ public class KafkaMessagingExtensionsTests
 
         // Act
         builder.AddKafkaMessagingExtensions(
-            configureProducerSettings: settings => { /* custom producer config */ },
-            configureConsumerSettings: settings => { /* custom consumer config */ });
+            configureProducerSettings: _ => { /* custom producer config */ },
+            configureConsumerSettings: _ => { /* custom consumer config */ });
 
         // Assert - Health checks are automatically registered by Aspire
         var wolverineExtension = builder.Services.FirstOrDefault(s =>

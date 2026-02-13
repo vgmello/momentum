@@ -27,13 +27,13 @@ public class GetCashierIntegrationTests(IntegrationTestFixture fixture) : Integr
         var response = await _client.GetCashierAsync(getRequest, cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
-        response.ShouldBe(new AppDomain.Cashiers.Grpc.Models.Cashier
-        {
-            TenantId = "12345678-0000-0000-0000-000000000000",
-            CashierId = createResponse.CashierId,
-            Name = createRequest.Name,
-            Email = createRequest.Email
-        });
+        response.TenantId.ShouldBe("12345678-0000-0000-0000-000000000000");
+        response.CashierId.ShouldBe(createResponse.CashierId);
+        response.Name.ShouldBe(createRequest.Name);
+        response.Email.ShouldBe(createRequest.Email);
+        response.CreatedDateUtc.ShouldNotBeNull();
+        response.UpdatedDateUtc.ShouldNotBeNull();
+        response.Version.ShouldBeGreaterThan(0);
     }
 
     [Fact]

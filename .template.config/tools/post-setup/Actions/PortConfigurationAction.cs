@@ -107,7 +107,7 @@ public class PortConfigurationAction
         var excludedDirs = new[] { "bin", "obj", ".git", ".vs", "node_modules", ".local" };
 
         return excludedDirs.Any(dir => filePath.Contains($"{Path.DirectorySeparatorChar}{dir}{Path.DirectorySeparatorChar}") ||
-                                       filePath.Contains($"{Path.DirectorySeparatorChar}{dir}"));
+                                       filePath.EndsWith($"{Path.DirectorySeparatorChar}{dir}"));
     }
 
     private static bool UpdatePortsInFile(string filePath, Dictionary<string, int> portMappings, string projectDir)

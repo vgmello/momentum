@@ -10,7 +10,7 @@ Comprehensive service configuration and setup patterns for Momentum applications
 
 ## Overview
 
-Momentum provides opinionated service configuration that follows .NET best practices while adding specialized functionality for microservices and domain-driven design:
+Momentum provides opinionated service configuration that follows .NET best practices while adding specialized functionality for microservices:
 
 - **Service Defaults**: Pre-configured common services and middleware with automatic discovery
 - **Aspire Integration**: .NET Aspire orchestration for local development and service discovery
@@ -439,7 +439,7 @@ await app.RunAsync(args);
 dotnet new install .
 
 # Create a new project
-dotnet new mmt -n MyBusinessApp --aspire --api --back-office
+dotnet new mmt -n MyBusinessApp --aspire --api --backoffice
 ```
 
 ### 2. Configure Service Defaults

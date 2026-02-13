@@ -76,7 +76,7 @@ public static class InsertInvoiceCommandHandler
         await using var connection = await datasource.OpenConnectionAsync(cancellationToken);
         var dbParams = command.ToDbParams(); // [!code highlight]
         return await SqlMapper.ExecuteAsync(connection,
-            new CommandDefinition("app_domain.invoices_create", dbParams,
+            new CommandDefinition("main.invoices_create", dbParams,
                 commandType: CommandType.StoredProcedure, // [!code highlight]
                 cancellationToken: cancellationToken));
     }
@@ -139,7 +139,7 @@ public static class GetInvoiceDbQueryHandler
         await using var connection = await datasource.OpenConnectionAsync(cancellationToken);
         var dbParams = command.ToDbParams();
         return await SqlMapper.QueryFirstOrDefaultAsync<InvoiceModel>(connection,
-            new CommandDefinition("select * from app_domain.invoices_get_single(@InvoiceId)",
+            new CommandDefinition("select * from main.invoices_get_single(@InvoiceId)",
                 dbParams, commandType: CommandType.Text, cancellationToken: cancellationToken));
     }
 }
@@ -164,7 +164,7 @@ public static class GetInvoicesDbQueryHandler
         await using var connection = await datasource.OpenConnectionAsync(cancellationToken);
         var dbParams = command.ToDbParams();
         return await SqlMapper.QueryAsync<InvoiceModel>(connection,
-            new CommandDefinition("select * from app_domain.invoices_get(@Limit, @Offset, @Status)",
+            new CommandDefinition("select * from main.invoices_get(@Limit, @Offset, @Status)",
                 dbParams, commandType: CommandType.Text, cancellationToken: cancellationToken));
     }
 }
@@ -283,7 +283,7 @@ public record CreateInvoiceCommand(
 ) : ICommand<Result<InvoiceModel>>;
 
 // Database Command
-[DbCommand(sp: "app_domain.invoices_create", nonQuery: true)]
+[DbCommand(sp: "main.invoices_create", nonQuery: true)]
 public partial record InsertInvoiceCommand(
     Guid InvoiceId,
     string Name,
@@ -340,7 +340,7 @@ public record GetInvoicesQuery(
 ) : IQuery<IEnumerable<InvoiceModel>>;
 
 // Database Query
-[DbCommand(fn: "select * from app_domain.invoices_get")]
+[DbCommand(fn: "select * from main.invoices_get")]
 public partial record GetInvoicesDbQuery(
     int Limit,
     int Offset,
@@ -373,7 +373,7 @@ public static async Task<Cashier> Handle(
 {
     await using var connection = await dataSource.OpenConnectionAsync(cancellationToken);
 
-    const string sql = "SELECT cashier_id, name, email FROM app_domain.cashiers WHERE cashier_id = @id";
+    const string sql = "SELECT cashier_id, name, email FROM main.cashiers WHERE cashier_id = @id";
 
     var cashier = await connection.QuerySingleOrDefaultAsync<Data.Entities.Cashier>(
         sql,

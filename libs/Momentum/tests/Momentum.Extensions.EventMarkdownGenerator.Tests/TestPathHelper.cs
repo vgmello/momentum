@@ -25,12 +25,12 @@ internal static class TestPathHelper
         var possiblePaths = new[]
         {
             // When running from test project directory
-            Path.Combine(testAssemblyDirectory, "..", "TestEvents", "bin", "Debug", "net9.0", "TestEvents.xml"),
-            Path.Combine(testAssemblyDirectory, "..", "TestEvents", "bin", "Release", "net9.0", "TestEvents.xml"),
+            Path.Combine(testAssemblyDirectory, "..", "TestEvents", "bin", "Debug", "net10.0", "TestEvents.xml"),
+            Path.Combine(testAssemblyDirectory, "..", "TestEvents", "bin", "Release", "net10.0", "TestEvents.xml"),
 
             // When running from solution root
-            Path.Combine(testAssemblyDirectory, "..", "..", "..", "TestEvents", "bin", "Debug", "net9.0", "TestEvents.xml"),
-            Path.Combine(testAssemblyDirectory, "..", "..", "..", "TestEvents", "bin", "Release", "net9.0", "TestEvents.xml"),
+            Path.Combine(testAssemblyDirectory, "..", "..", "..", "TestEvents", "bin", "Debug", "net10.0", "TestEvents.xml"),
+            Path.Combine(testAssemblyDirectory, "..", "..", "..", "TestEvents", "bin", "Release", "net10.0", "TestEvents.xml"),
 
             // When running in CI/CD or different contexts
             Path.Combine(testAssemblyDirectory, "TestEvents.xml"),
@@ -65,8 +65,8 @@ internal static class TestPathHelper
             {
                 var xmlPaths = new[]
                 {
-                    Path.Combine(testEventsDir, "bin", "Debug", "net9.0", "TestEvents.xml"),
-                    Path.Combine(testEventsDir, "bin", "Release", "net9.0", "TestEvents.xml")
+                    Path.Combine(testEventsDir, "bin", "Debug", "net10.0", "TestEvents.xml"),
+                    Path.Combine(testEventsDir, "bin", "Release", "net10.0", "TestEvents.xml")
                 };
 
                 foreach (var xmlPath in xmlPaths)

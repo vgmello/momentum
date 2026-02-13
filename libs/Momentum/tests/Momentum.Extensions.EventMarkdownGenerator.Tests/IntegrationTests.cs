@@ -56,7 +56,7 @@ public class IntegrationTests
             var markdownGenerator = new FluidMarkdownGenerator();
 
             // Load XML documentation
-            await xmlParser.LoadMultipleDocumentationAsync([TestXmlPath]);
+            await xmlParser.LoadMultipleDocumentationAsync([TestXmlPath], TestContext.Current.CancellationToken);
 
             // Load and discover events
             var assembly = Assembly.LoadFrom(TestAssemblyPath);
@@ -151,7 +151,7 @@ public class IntegrationTests
     {
         // Arrange
         var parser = new XmlDocumentationParser();
-        await parser.LoadMultipleDocumentationAsync([TestXmlPath]);
+        await parser.LoadMultipleDocumentationAsync([TestXmlPath], TestContext.Current.CancellationToken);
 
         var assembly = Assembly.LoadFrom(TestAssemblyPath);
         var cashierCreatedType = assembly.GetType("TestEvents.AppDomain.Cashiers.Contracts.IntegrationEvents.CashierCreated");

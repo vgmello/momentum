@@ -1,6 +1,5 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-using JasperFx.Core.Reflection;
 using Microsoft.Extensions.Hosting;
 using Momentum.Extensions.Abstractions.Extensions;
 using Momentum.Extensions.Abstractions.Messaging;
@@ -26,7 +25,7 @@ public class TopicNameGenerator(IHostEnvironment environment) : ITopicNameGenera
     {
         var domainName = !string.IsNullOrWhiteSpace(topicAttribute.Domain)
             ? topicAttribute.Domain
-            : messageType.Assembly.GetAttribute<DefaultDomainAttribute>()!.Domain;
+            : DefaultDomainAttribute.GetDomainName(messageType.Assembly);
 
         var scope = topicAttribute.Internal ? "internal" : "public";
 

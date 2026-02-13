@@ -16,7 +16,7 @@ Before starting, ensure you have administrative privileges on your development m
 
 ### .NET Development
 
-**.NET 9 SDK**:
+**.NET 10 SDK**:
 
 ```bash
 # Windows (using winget)
@@ -29,14 +29,14 @@ brew install --cask dotnet
 wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
 sudo dpkg -i packages-microsoft-prod.deb
 sudo apt-get update
-sudo apt-get install -y dotnet-sdk-9.0
+sudo apt-get install -y dotnet-sdk-10.0
 ```
 
 **Verify Installation**:
 
 ```bash
 dotnet --version
-# Expected output: 9.0.x
+# Expected output: 10.0.x
 ```
 
 ### Container Platform
@@ -57,29 +57,22 @@ docker-compose --version
 docker run hello-world
 ```
 
-### Node.js and Package Management
+### Bun Runtime
 
-**Node.js (for documentation)**:
-
-```bash
-# Using Node Version Manager (recommended)
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-nvm install 18
-nvm use 18
-
-# Or direct installation
-# Windows: Download from https://nodejs.org/
-# macOS: brew install node@18
-# Linux: Use your distribution's package manager
-```
-
-**pnpm (for documentation build)**:
+**Bun (for documentation)**:
 
 ```bash
-npm install -g pnpm
+# macOS/Linux (recommended)
+curl -fsSL https://bun.sh/install | bash
+
+# Windows (using PowerShell)
+powershell -c "irm bun.sh/install.ps1 | iex"
+
+# Or using npm
+npm install -g bun
 
 # Verify installation
-pnpm --version
+bun --version
 ```
 
 ## Development Tools
@@ -176,10 +169,10 @@ echo $? # Should output 0 on success
 
 ```bash
 cd docs
-pnpm install
+bun install
 
 # Verify documentation build
-pnpm docs:build
+bun run docs:build
 ```
 
 ### Environment Configuration
@@ -314,7 +307,7 @@ dotnet run --project src/AppDomain.BackOffice.Orleans
 
 ```bash
 cd docs
-pnpm dev
+bun run dev
 
 # Access documentation at: http://localhost:5173
 ```
@@ -480,7 +473,7 @@ dotnet restore --force
     "Microsoft.Build.NoTargets": "3.7.0"
   },
   "sdk": {
-    "version": "9.0.0",
+    "version": "10.0.0",
     "rollForward": "latestMinor"
   }
 }
@@ -518,7 +511,7 @@ dotnet restore --force
       "name": "Launch AppHost",
       "type": "coreclr",
       "request": "launch",
-      "program": "${workspaceFolder}/src/AppDomain.AppHost/bin/Debug/net9.0/AppDomain.AppHost.dll",
+      "program": "${workspaceFolder}/src/AppDomain.AppHost/bin/Debug/net10.0/AppDomain.AppHost.dll",
       "args": [],
       "cwd": "${workspaceFolder}/src/AppDomain.AppHost",
       "preLaunchTask": "build"
@@ -575,7 +568,7 @@ Once your development environment is set up:
 
 ### External Resources
 
-- [.NET 9 Documentation](https://docs.microsoft.com/en-us/dotnet/)
+- [.NET 10 Documentation](https://docs.microsoft.com/en-us/dotnet/)
 - [.NET Aspire Documentation](https://learn.microsoft.com/en-us/dotnet/aspire/)
 - [Docker Documentation](https://docs.docker.com/)
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
@@ -587,4 +580,4 @@ Once your development environment is set up:
 - Code review process for learning and collaboration
 
 > [!TIP]
-> Keep your development environment updated regularly by running `git pull`, `dotnet restore`, and `pnpm install` to stay current with the latest changes.
+> Keep your development environment updated regularly by running `git pull`, `dotnet restore`, and `bun install` to stay current with the latest changes.

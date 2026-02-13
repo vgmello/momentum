@@ -12,9 +12,15 @@ namespace Momentum.ServiceDefaults.HealthChecks;
 ///     across multiple health check executions, allowing components to react
 ///     to health status changes or query the last known state without
 ///     triggering a new health check.
+///     <para>
+///         This class is thread-safe and can be accessed concurrently from multiple
+///         health check requests without synchronization issues.
+///     </para>
 /// </remarks>
 public class HealthCheckStatusStore
 {
+    private int _lastHealthStatus = (int)HealthStatus.Healthy;
+
     /// <summary>
     ///     Gets or sets the last recorded health status.
     /// </summary>
@@ -22,5 +28,13 @@ public class HealthCheckStatusStore
     ///     The most recent health status from the health check system.
     ///     Defaults to <see cref="HealthStatus.Healthy" />.
     /// </value>
-    public HealthStatus LastHealthStatus { get; set; } = HealthStatus.Healthy;
+    /// <remarks>
+    ///     This property is thread-safe and uses Interlocked operations
+    ///     to ensure atomicity and visibility across threads.
+    /// </remarks>
+    public HealthStatus LastHealthStatus
+    {
+        get => (HealthStatus)Volatile.Read(ref _lastHealthStatus);
+        set => Interlocked.Exchange(ref _lastHealthStatus, (int)value);
+    }
 }

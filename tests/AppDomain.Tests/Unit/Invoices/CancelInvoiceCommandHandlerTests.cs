@@ -2,7 +2,8 @@
 
 using AppDomain.Invoices.Commands;
 using AppDomain.Invoices.Contracts.IntegrationEvents;
-using AppDomain.Invoices.Data.Entities;
+using AppDomain.Invoices.Contracts.Models;
+using Invoice = AppDomain.Invoices.Data.Entities.Invoice;
 using Momentum.Extensions.Messaging;
 using Wolverine;
 
@@ -20,7 +21,7 @@ public class CancelInvoiceCommandHandlerTests
         {
             TenantId = tenantId,
             InvoiceId = Guid.NewGuid(),
-            Status = "Cancelled",
+            Status = nameof(InvoiceStatus.Cancelled),
             Name = "Test Invoice",
             Amount = 100.50m,
             Version = 10
@@ -39,7 +40,7 @@ public class CancelInvoiceCommandHandlerTests
         var invoice = result.Match(success => success, _ => null!);
 
         invoice.InvoiceId.ShouldBe(dbInvoice.InvoiceId);
-        invoice.Status.ShouldBe(dbInvoice.Status);
+        invoice.Status.ShouldBe(InvoiceStatus.Cancelled);
         invoice.Name.ShouldBe(dbInvoice.Name);
         invoice.Amount.ShouldBe(dbInvoice.Amount);
         invoice.Version.ShouldBe(dbInvoice.Version);

@@ -10,6 +10,7 @@ using Momentum.ServiceDefaults.Logging;
 using Momentum.ServiceDefaults.Messaging;
 using Momentum.ServiceDefaults.OpenTelemetry;
 using Serilog;
+using System.Collections.Frozen;
 using System.Reflection;
 
 namespace Momentum.ServiceDefaults;
@@ -19,6 +20,7 @@ namespace Momentum.ServiceDefaults;
 /// </summary>
 public static class ServiceDefaultsExtensions
 {
+    private static readonly Lock EntryAssemblyLock = new();
     private static Assembly? _entryAssembly;
 
     /// <summary>
@@ -31,10 +33,30 @@ public static class ServiceDefaultsExtensions
     /// <exception cref="InvalidOperationException">
     ///     Thrown when attempting to get the entry assembly, and it cannot be determined.
     /// </exception>
+    /// <remarks>
+    ///     This property is thread-safe. Setting the entry assembly should only be done
+    ///     during application startup, typically for testing scenarios.
+    /// </remarks>
     public static Assembly EntryAssembly
     {
-        get => _entryAssembly ??= GetEntryAssembly();
-        set => _entryAssembly = value;
+        get
+        {
+            var assembly = Volatile.Read(ref _entryAssembly);
+            if (assembly is not null)
+                return assembly;
+
+            lock (EntryAssemblyLock)
+            {
+                assembly = _entryAssembly;
+                if (assembly is not null)
+                    return assembly;
+
+                assembly = GetEntryAssembly();
+                Volatile.Write(ref _entryAssembly, assembly);
+                return assembly;
+            }
+        }
+        set => Volatile.Write(ref _entryAssembly, value);
     }
 
     /// <summary>
@@ -86,7 +108,7 @@ public static class ServiceDefaultsExtensions
     ///     </list>
     ///     Validators are registered as scoped services and integrated with Wolverine's
     ///     message handling pipeline for automatic validation of commands and queries.
-    /// 
+    ///
     ///     This approach supports the Domain-Driven Design pattern where validation
     ///     rules are defined close to the domain entities and business logic.
     /// </remarks>
@@ -116,7 +138,7 @@ public static class ServiceDefaultsExtensions
     ///         <item>Proper log flushing on application shutdown</item>
     ///         <item>Support for containerized environments and orchestrators</item>
     ///     </list>
-    /// 
+    ///
     ///     <para>
     ///         <strong>Supported Wolverine Commands:</strong>
     ///     </para>
@@ -142,11 +164,19 @@ public static class ServiceDefaultsExtensions
     /// <example>
     ///     See <see cref="AddServiceDefaults" /> for examples.
     /// </example>
+    /// <remarks>
+    ///     S2139 is suppressed because logging the exception before re-throwing is intentional
+    ///     to ensure fatal errors are captured before the process terminates. The exception is
+    ///     re-thrown to allow the runtime to handle it appropriately (e.g., for process exit codes).
+    /// </remarks>
+#pragma warning disable S2139 // Exceptions should be either logged or rethrown but not both
     public static async Task RunAsync(this WebApplication app, string[] args)
     {
+        var isWolverineCommand = args.Length > 0 && WolverineCommands.Contains(args[0]);
+
         try
         {
-            if (args.Length > 0 && WolverineCommands.Contains(args[0]))
+            if (isWolverineCommand)
             {
                 await app.RunJasperFxCommands(args);
 
@@ -158,15 +188,31 @@ public static class ServiceDefaultsExtensions
         catch (Exception e)
         {
             Log.Fatal(e, "Application terminated unexpectedly");
+            throw;
         }
         finally
         {
-            await Log.CloseAndFlushAsync();
+            try
+            {
+                // Only dispose explicitly for Wolverine commands — the framework's
+                // RunAsync already disposes the application on the normal path.
+                if (isWolverineCommand)
+                    await app.DisposeAsync();
+            }
+            catch (Exception disposeEx)
+            {
+                Log.Error(disposeEx, "Error disposing application");
+            }
+            finally
+            {
+                await Log.CloseAndFlushAsync();
+            }
         }
     }
+#pragma warning restore S2139
 
-    private static readonly HashSet<string> WolverineCommands =
-    [
+    private static readonly FrozenSet<string> WolverineCommands = new[]
+    {
         "check-env",
         "codegen",
         "db-apply",
@@ -177,7 +223,7 @@ public static class ServiceDefaultsExtensions
         "help",
         "resources",
         "storage"
-    ];
+    }.ToFrozenSet();
 
     private static Assembly GetEntryAssembly()
     {

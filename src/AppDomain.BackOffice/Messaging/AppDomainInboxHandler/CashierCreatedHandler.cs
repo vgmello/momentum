@@ -14,10 +14,10 @@ public static class CashierCreatedHandler
     /// </summary>
     /// <param name="event">The cashier created integration event.</param>
     /// <param name="logger">Logger for tracking event processing.</param>
-    /// <param name="messaging">Message bus for potential event publishing.</param>
-    /// <param name="cancellationToken">Cancellation token for async operation.</param>
+    /// <param name="_">Message bus for potential event publishing (unused).</param>
+    /// <param name="__">Cancellation token for async operation (unused).</param>
     /// <returns>A completed task.</returns>
-    public static Task Handle(CashierCreated @event, ILogger logger, IMessageBus messaging, CancellationToken cancellationToken)
+    public static Task Handle(CashierCreated @event, ILogger logger, IMessageBus _, CancellationToken __)
     {
         logger.LogInformation("Cashier created event received for tenant {TenantId}, cashier {CashierId}",
             @event.TenantId, @event.Cashier.CashierId);

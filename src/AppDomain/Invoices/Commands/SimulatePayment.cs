@@ -1,6 +1,7 @@
 // Copyright (c) OrgName. All rights reserved.
 
 using AppDomain.Invoices.Contracts.IntegrationEvents;
+using Microsoft.Extensions.Logging;
 
 namespace AppDomain.Invoices.Commands;
 
@@ -51,38 +52,32 @@ public static class SimulatePaymentCommandHandler
     /// </summary>
     /// <param name="command">The simulate payment command</param>
     /// <param name="messaging">The message bus for database operations (to check if invoice exists)</param>
+    /// <param name="logger">Logger for tracking simulation operations</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>A tuple containing the success result and payment received event</returns>
     public static async Task<(Result<bool>, PaymentReceived?)> Handle(
-        SimulatePaymentCommand command, IMessageBus messaging, CancellationToken cancellationToken)
+        SimulatePaymentCommand command, IMessageBus messaging, ILogger logger, CancellationToken cancellationToken)
     {
         var getInvoiceQuery = new Queries.GetInvoiceQuery(command.TenantId, command.InvoiceId);
 
-        try
-        {
-            var invoiceResult = await messaging.InvokeQueryAsync(getInvoiceQuery, cancellationToken);
+        var invoiceResult = await messaging.InvokeQueryAsync(getInvoiceQuery, cancellationToken);
 
-            var invoiceFound = invoiceResult.Match(
-                invoice => invoice != null,
-                _ => false
-            );
-
-            if (!invoiceFound)
+        var invoiceFound = invoiceResult.Match(
+            invoice => invoice != null,
+            errors =>
             {
-                var failures = new List<ValidationFailure>
-                {
-                    new("InvoiceId", "Invoice not found.")
-                };
-
-                return (failures, null);
+                logger.LogWarning("Failed to retrieve invoice {InvoiceId}: {Errors}",
+                    command.InvoiceId, string.Join(", ", errors.Select(e => e.ErrorMessage)));
+                return false;
             }
-        }
-        catch
+        );
+
+        if (!invoiceFound)
         {
-            var failures = new List<ValidationFailure>
-            {
+            List<ValidationFailure> failures =
+            [
                 new("InvoiceId", "Invoice not found.")
-            };
+            ];
 
             return (failures, null);
         }

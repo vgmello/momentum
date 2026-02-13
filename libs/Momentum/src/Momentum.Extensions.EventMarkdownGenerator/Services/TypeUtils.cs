@@ -1,5 +1,7 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
+using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 using Momentum.Extensions.EventMarkdownGenerator.Models;
 
 namespace Momentum.Extensions.EventMarkdownGenerator.Services;
@@ -27,16 +29,29 @@ public static class TypeUtils
     }
 
     /// <summary>
-    ///     Determines if a type is a collection type (arrays, lists, etc.).
+    ///     Determines if a type is a collection type (arrays, lists, dictionaries, sets, etc.).
     /// </summary>
     public static bool IsCollectionType(Type type)
     {
-        return type.IsArray ||
-               (type.IsGenericType &&
-                (type.GetGenericTypeDefinition() == typeof(List<>) ||
-                 type.GetGenericTypeDefinition() == typeof(IList<>) ||
-                 type.GetGenericTypeDefinition() == typeof(IEnumerable<>) ||
-                 type.GetGenericTypeDefinition() == typeof(ICollection<>)));
+        if (type.IsArray)
+            return true;
+
+        if (!type.IsGenericType)
+            return false;
+
+        var genericDef = type.GetGenericTypeDefinition();
+
+        return genericDef == typeof(List<>) ||
+               genericDef == typeof(IList<>) ||
+               genericDef == typeof(IEnumerable<>) ||
+               genericDef == typeof(ICollection<>) ||
+               genericDef == typeof(IReadOnlyList<>) ||
+               genericDef == typeof(IReadOnlyCollection<>) ||
+               genericDef == typeof(HashSet<>) ||
+               genericDef == typeof(ISet<>) ||
+               genericDef == typeof(Dictionary<,>) ||
+               genericDef == typeof(IDictionary<,>) ||
+               genericDef == typeof(IReadOnlyDictionary<,>);
     }
 
     /// <summary>
@@ -98,6 +113,50 @@ public static class TypeUtils
     }
 
     /// <summary>
+    /// Gets the full namespace + type name without assembly qualification.
+    /// This is useful for creating clean filenames and identifiers while preserving full type identification.
+    /// </summary>
+    /// <param name="type">The type to get the clean name for</param>
+    /// <returns>Full namespace + type name without assembly info (e.g., "System.Collections.Generic.Dictionary&lt;System.String, System.Object&gt;")</returns>
+    public static string GetCleanTypeName(Type type)
+    {
+        if (type.FullName != null && !type.FullName.Contains("[["))
+        {
+            // Simple case - no assembly qualification
+            return type.FullName;
+        }
+        
+        // For generic types or types with assembly qualification, build the name manually
+        if (type.IsGenericType)
+        {
+            var genericTypeDef = type.GetGenericTypeDefinition();
+            var namespaceName = genericTypeDef.Namespace ?? "";
+            var typeName = genericTypeDef.Name;
+            
+            // Remove the backtick and number for generic types (e.g., Dictionary`2 -> Dictionary)
+            var backtickIndex = typeName.IndexOf('`');
+            if (backtickIndex > 0)
+            {
+                typeName = typeName[..backtickIndex];
+            }
+            
+            var genericArgs = type.GetGenericArguments()
+                .Select(GetCleanTypeName)
+                .ToArray();
+            
+            if (genericArgs.Length > 0)
+            {
+                return $"{namespaceName}.{typeName}<{string.Join(", ", genericArgs)}>";
+            }
+            
+            return $"{namespaceName}.{typeName}";
+        }
+        
+        // Non-generic type
+        return $"{type.Namespace}.{type.Name}";
+    }
+
+    /// <summary>
     ///     Gets a friendly display name for a type (e.g., "string" instead of "String").
     ///     Handles nullable types and generics appropriately.
     /// </summary>
@@ -141,6 +200,7 @@ public static class TypeUtils
 
     /// <summary>
     ///     Gets the element type from a collection type (arrays or generic collections).
+    ///     For dictionaries, returns the value type (second generic argument).
     /// </summary>
     public static Type? GetElementType(Type type)
     {
@@ -151,7 +211,19 @@ public static class TypeUtils
 
         if (type.IsGenericType)
         {
-            return type.GetGenericArguments().FirstOrDefault();
+            var genericArgs = type.GetGenericArguments();
+            var genericDef = type.GetGenericTypeDefinition();
+
+            // For dictionary types, return the value type (second argument)
+            if (genericDef == typeof(Dictionary<,>) ||
+                genericDef == typeof(IDictionary<,>) ||
+                genericDef == typeof(IReadOnlyDictionary<,>))
+            {
+                return genericArgs.Length > 1 ? genericArgs[1] : null;
+            }
+
+            // For other collections, return the first (and typically only) type argument
+            return genericArgs.FirstOrDefault();
         }
 
         return null;
@@ -228,5 +300,21 @@ public static class TypeUtils
                 }
             }
         }
+    }
+
+    /// <summary>
+    ///     Determines if a property is required based on RequiredAttribute or nullability context.
+    /// </summary>
+    /// <param name="property">The property to check.</param>
+    /// <returns>True if the property is required; otherwise, false.</returns>
+    public static bool IsRequiredProperty(PropertyInfo property)
+    {
+        if (property.GetCustomAttribute<RequiredAttribute>() != null)
+            return true;
+
+        var nullabilityContext = new NullabilityInfoContext();
+        var nullabilityInfo = nullabilityContext.Create(property);
+
+        return nullabilityInfo.WriteState == NullabilityState.NotNull;
     }
 }

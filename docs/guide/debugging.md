@@ -93,7 +93,7 @@ docker compose up AppDomain-db AppDomain-db-migrations
 **Debugging Command Handlers**:
 
 ```csharp
-[DbCommand(sp: "app_domain.cashiers_create")]
+[DbCommand(sp: "main.cashiers_create")]
 public record CreateCashierCommand : IRequest<Result<Cashier>>
 {
     // Set breakpoints in generated handlers

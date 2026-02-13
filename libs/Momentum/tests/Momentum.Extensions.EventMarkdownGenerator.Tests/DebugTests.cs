@@ -14,7 +14,7 @@ public class DebugTests
         var currentDir = Directory.GetCurrentDirectory();
 
         // Let's check if the scenarios exist relative to the project file
-        var projectDir = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(baseDir))); // Go up from bin/Debug/net9.0
+        var projectDir = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(baseDir))); // Go up from bin/Debug/net10.0
 
         if (projectDir != null)
         {
@@ -65,11 +65,11 @@ public class DebugTests
     {
         var possiblePaths = new[]
         {
-            Path.Combine(Directory.GetCurrentDirectory(), "tests", "TestEvents", "bin", "Debug", "net9.0", "TestEvents.dll"),
+            Path.Combine(Directory.GetCurrentDirectory(), "tests", "TestEvents", "bin", "Debug", "net10.0", "TestEvents.dll"),
             Path.Combine(Path.GetDirectoryName(typeof(DebugTests).Assembly.Location)!, "..", "..", "..", "..", "TestEvents", "bin", "Debug",
-                "net9.0", "TestEvents.dll"),
+                "net10.0", "TestEvents.dll"),
             Path.Combine(Path.GetDirectoryName(typeof(DebugTests).Assembly.Location)!, "..", "..", "..", "..", "..", "..", "tests",
-                "TestEvents", "bin", "Debug", "net9.0", "TestEvents.dll")
+                "TestEvents", "bin", "Debug", "net10.0", "TestEvents.dll")
         };
 
         foreach (var path in possiblePaths)

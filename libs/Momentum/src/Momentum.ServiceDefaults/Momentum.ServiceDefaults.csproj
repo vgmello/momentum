@@ -1,6 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <IsAspireSharedProject>true</IsAspireSharedProject>
+        <!-- Disable configuration binding source generator - WolverineOptions has complex types
+             (Endpoint, MemberInfo) that the source generator cannot handle (SYSLIB1100/1101) -->
+        <EnableConfigurationBindingGenerator>false</EnableConfigurationBindingGenerator>
     </PropertyGroup>
     
     <!--#if (!LIBS_INCLUDES_DEFAULTS) -->

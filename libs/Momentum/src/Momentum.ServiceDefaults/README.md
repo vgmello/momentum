@@ -34,8 +34,8 @@ Install-Package Momentum.ServiceDefaults
 
 ### Prerequisites
 
--   .NET 9.0 or later
--   ASP.NET Core 9.0 or later (includes `Microsoft.AspNetCore.App` framework reference)
+-   .NET 10.0 or later
+-   ASP.NET Core 10.0 or later (includes `Microsoft.AspNetCore.App` framework reference)
 
 ### Basic Setup
 
@@ -87,14 +87,15 @@ When you call `AddServiceDefaults()`, the following services are automatically c
 
 #### 1. Health Checks
 
--   **Endpoints**: `/health` (detailed) and `/alive` (simple)
+-   **Endpoints**: `/status` (liveness), `/health/internal` (readiness), `/health` (public)
 -   **Built-in Checks**: Database connectivity, messaging health
 -   **Custom Checks**: Extensible health check system
 
 ```csharp
 // Automatically available endpoints:
-// GET /health     - Detailed health status
-// GET /alive      - Simple alive check
+// GET /status            - Liveness probe (cached, fast)
+// GET /health/internal   - Readiness probe (localhost only)
+// GET /health            - Public health (requires auth, detailed)
 ```
 
 #### 2. OpenTelemetry Observability
@@ -310,8 +311,8 @@ This package includes comprehensive integrations with:
 
 ## Target Frameworks
 
--   **.NET 9.0**: Primary target framework
--   **ASP.NET Core 9.0**: Includes framework reference for web applications
+-   **.NET 10.0**: Primary target framework
+-   **ASP.NET Core 10.0**: Includes framework reference for web applications
 -   Compatible with all .NET Aspire host types
 
 ## Use Cases

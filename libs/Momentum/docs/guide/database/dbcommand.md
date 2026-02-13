@@ -244,7 +244,7 @@ Momentum supports source-generated database commands for enhanced performance an
 ```csharp
 public static partial class GetCashiersQueryHandler
 {
-    [DbCommand(fn: "$app_domain.cashiers_get_all")]
+    [DbCommand(fn: "$main.cashiers_get_all")]
     public partial record DbQuery(
         Guid TenantId,
         int Limit,
@@ -281,7 +281,7 @@ public static partial class GetCashiersQueryHandler
 The corresponding PostgreSQL function:
 
 ```sql
--- SQL function: app_domain.cashiers_get_all
+-- SQL function: main.cashiers_get_all
 CREATE OR REPLACE FUNCTION "AppDomain".cashiers_get_all(
     p_tenant_id UUID,
     p_limit INTEGER,

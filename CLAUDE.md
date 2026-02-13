@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-**Momentum .NET** is a comprehensive template system that generates production-ready microservices solutions using .NET 9. The repository contains both the template engine (`mmt`) and supporting library ecosystem.
+**Momentum .NET** is a comprehensive template system that generates production-ready microservices solutions using .NET 10. The repository contains both the template engine (`mmt`) and supporting library ecosystem.
 
 **Key Components**:
 - **Template System** (`dotnet new mmt`): Generates complete microservices solutions
@@ -86,7 +86,7 @@ dotnet run --project src/AppDomain.AppHost
 # API: https://localhost:8101 (REST), :8102 (gRPC)
 
 # Start documentation site
-cd docs && pnpm install && pnpm dev
+cd docs && bun install && bun run dev
 # Documentation: http://localhost:8119
 ```
 
@@ -116,7 +116,7 @@ dotnet test libs/Momentum/tests/Momentum.Extensions.Tests
 dotnet pack libs/Momentum/src/Momentum.Extensions --configuration Release
 
 # Build library documentation
-cd libs/Momentum/docs && pnpm install && pnpm dev
+cd libs/Momentum/docs && bun install && bun run dev
 ```
 
 ### Source Generator Development
@@ -157,13 +157,17 @@ YourService/
 ```
 
 **Template Configuration**:
-- Components: `--api`, `--back-office`, `--orleans`, `--aspire`, `--docs`
-- Infrastructure: `--db [none|npgsql|liquibase]`, `--kafka`
+- Components: `--api`, `--backoffice`, `--orleans`, `--aspire`, `--docs`
+- Infrastructure: `--db-config [default|none|npgsql|liquibase]`, `--kafka`
 - Customization: `--org "Company"`, `--port 8100`, `--no-sample`
 - Libraries: `--libs [defaults|api|ext|kafka|generators]`
 - Development: `--local` (use local NuGet packages for testing)
 
-### Domain-Driven Design Patterns
+### Domain-Oriented Vertical Slice Patterns
+
+Generated services use Domain-Oriented Vertical Slice Architecture (CQRS + Event-Driven).
+They apply DDD-inspired boundaries (bounded contexts, domain language, contracts/events)
+with a pragmatic application-service style.
 
 Generated services follow CQRS with Wolverine:
 
@@ -184,7 +188,7 @@ YourService/
 ### Technology Stack Integration
 
 **Core Technologies**:
-- **.NET 9** with **Aspire**: Orchestration and observability
+- **.NET 10** with **Aspire**: Orchestration and observability
 - **Wolverine**: CQRS message handling with PostgreSQL persistence
 - **Orleans**: Stateful actor processing (optional)
 - **PostgreSQL** + **Liquibase**: Database with version-controlled migrations
@@ -215,30 +219,26 @@ YourService/
 The `--local` flag enables template testing with locally built Momentum libraries:
 
 **What it does**:
-- Includes `Directory.Build.Local.props` with local NuGet feed configuration
-- Copies `local-mmt-version.txt` and `local-feed-path.txt` to generated project
-- Configures MSBuild to use local packages from `libs/Momentum/.local/nuget/`
+- Copies `local-mmt-version.txt` and `local-feed-path.txt` to the generated project
+- The post-setup tool reads these files and:
+  - Hardcodes the local version into `Directory.Packages.props` (`MomentumVersion`)
+  - Creates a `nuget.config` with the local NuGet feed source
+  - Cleans up the text files
 - Automatically used by `Run-TemplateTests.ps1` for template testing
 
-**Generated Local Configuration**:
-```xml
-<!-- Directory.Build.Local.props -->
-<MomentumLocalFeedPath>libs/Momentum/.local/nuget</MomentumLocalFeedPath>
-<RestoreAdditionalProjectSources>$(MomentumLocalFeedPath)</RestoreAdditionalProjectSources>
-<LocalMomentumVersion>0.0.1-local.20250901-234411</LocalMomentumVersion>
-
-<!-- Directory.Packages.props with --local -->
-<MomentumVersion>__CI_MOMENTUM_VERSION__</MomentumVersion>
-<MomentumVersion>$(LocalMomentumVersion)</MomentumVersion> <!-- Overrides above -->
-```
+**How the lib build generates local packages**:
+- `libs/Momentum/Directory.Build.targets` generates version `1000.0.0-pre.{timestamp}`
+- Packs all libraries to `libs/Momentum/.local/nuget/`
+- Writes `local-mmt-version.txt` and `local-feed-path.txt` to the repo root
 
 **Usage**:
 ```bash
-# Generate template with local packages
-dotnet new mmt -n TestLocal --local --project-only
+# Build and pack libraries first
+dotnet build libs/Momentum/Momentum.slnx
 
-# ... pack libraries with NEW_VERSION ...
-dotnet new mmt -n TestUpdated --local
+# Install template and generate with local packages
+dotnet new install ./ --force
+dotnet new mmt -n TestLocal --allow-scripts yes --local --project-only
 ```
 
 ## Testing Strategy
@@ -330,7 +330,7 @@ await messageBus.PublishAsync(new CustomerCreated(customer.Id, customer.Name));
 ### MSBuild Properties
 
 Global configuration in `Directory.Build.props`:
-- **Target Framework**: .NET 9.0
+- **Target Framework**: .NET 10.0
 - **Nullable Reference Types**: Enabled
 - **Analyzers**: .NET analyzers + SonarAnalyzer enabled
 - **Code Style**: Enforced in build
@@ -369,8 +369,8 @@ Uses Liquibase for version-controlled schema management:
 
 **Correct Structure**:
 ```
-infra/YourService.Database/Liquibase/app_domain/
-├── app_domain.sql                    # Schema creation
+infra/YourService.Database/Liquibase/main/
+├── main.sql                    # Schema creation
 ├── invoices/
 │   ├── tables/
 │   │   └── invoices.sql             # Table + constraints + indexes + triggers
@@ -386,23 +386,23 @@ infra/YourService.Database/Liquibase/app_domain/
 **Example Table File Structure**:
 ```sql
 -- Table creation
-CREATE TABLE app_domain.invoices (...);
+CREATE TABLE main.invoices (...);
 
 -- Additional columns (if needed)
-ALTER TABLE app_domain.invoices ADD COLUMN ...;
+ALTER TABLE main.invoices ADD COLUMN ...;
 
 -- Constraints
-ALTER TABLE app_domain.invoices ADD CONSTRAINT chk_amount_positive CHECK (amount > 0);
+ALTER TABLE main.invoices ADD CONSTRAINT chk_amount_positive CHECK (amount > 0);
 
 -- Foreign keys
-ALTER TABLE app_domain.invoices ADD CONSTRAINT fk_invoice_customer ...;
+ALTER TABLE main.invoices ADD CONSTRAINT fk_invoice_customer ...;
 
 -- Indexes
-CREATE INDEX idx_invoices_status ON app_domain.invoices(tenant_id, status);
+CREATE INDEX idx_invoices_status ON main.invoices(tenant_id, status);
 
 -- Triggers and functions
 CREATE OR REPLACE FUNCTION update_invoice_version() ...;
-CREATE TRIGGER tr_invoice_version BEFORE UPDATE ON app_domain.invoices ...;
+CREATE TRIGGER tr_invoice_version BEFORE UPDATE ON main.invoices ...;
 ```
 
 ### Troubleshooting Database Issues
@@ -412,7 +412,7 @@ CREATE TRIGGER tr_invoice_version BEFORE UPDATE ON app_domain.invoices ...;
 1. **Health Checks Failing**:
    ```bash
    # Check if database is running
-   curl http://localhost:8101/health/internal
+   curl http://localhost:8101/status
 
    # Check Aspire dashboard for service status
    open https://localhost:18110
@@ -430,12 +430,12 @@ CREATE TRIGGER tr_invoice_version BEFORE UPDATE ON app_domain.invoices ...;
    -- Verify constraints exist
    SELECT constraint_name, constraint_type
    FROM information_schema.table_constraints
-   WHERE table_schema = 'app_domain';
+   WHERE table_schema = 'main';
 
    -- Verify indexes exist
    SELECT schemaname, tablename, indexname
    FROM pg_indexes
-   WHERE schemaname = 'app_domain';
+   WHERE schemaname = 'main';
    ```
 
 4. **Connection String Issues**:
@@ -452,8 +452,8 @@ Complete observability stack configured by default:
 - **Health Checks**: Built-in health endpoints
 
 **Health Check Endpoints**:
-- `/status` - Liveness probe (simple status)
-- `/health/internal` - Internal health check (localhost only, detailed)
+- `/status` - Liveness probe (cached status, no auth)
+- `/health/internal` - Readiness probe (localhost only, detailed in dev)
 - `/health` - Public health check (requires auth, detailed)
 
 **Database Health Checks**:

@@ -4,13 +4,17 @@ using System.Text;
 
 namespace Momentum.Extensions.SourceGenerators.DbCommand.Writers;
 
-internal class DbCommandHandlerSourceGenWriter : SourceGenBaseWriter
+/// <summary>
+///     Generates static handler classes with HandleAsync methods for DbCommand-attributed types.
+///     Selects the appropriate Dapper method based on return type and NonQuery setting.
+/// </summary>
+internal sealed class DbCommandHandlerSourceGenWriter : SourceGenBaseWriter
 {
     public static string Write(DbCommandTypeInfo dbCommandTypeInfo)
     {
         var returnTypeDeclaration = dbCommandTypeInfo.ResultType is null
             ? "global::System.Threading.Tasks.Task"
-            : $"global::System.Threading.Tasks.Task<{dbCommandTypeInfo.ResultType!.QualifiedTypeName}>";
+            : $"global::System.Threading.Tasks.Task<{dbCommandTypeInfo.ResultType.QualifiedTypeName}>";
 
         var dapperCall = CreateDapperCall(dbCommandTypeInfo.ResultType, dbCommandTypeInfo);
 
@@ -104,7 +108,7 @@ internal class DbCommandHandlerSourceGenWriter : SourceGenBaseWriter
                 : $"ExecuteScalarAsync<{resultTypeInfo.GenericArgumentResultFullTypeName}>";
         }
 
-        // ICommand<IEnumerable<TResul>>
+        // ICommand<IEnumerable<TResult>>
         if (resultTypeInfo.IsEnumerableResult)
         {
             return $"QueryAsync<{resultTypeInfo.GenericArgumentResultFullTypeName}>";

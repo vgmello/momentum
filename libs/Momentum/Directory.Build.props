@@ -1,27 +1,28 @@
 <Project>
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <CodeAnalysisRuleSet>../../Momentum.ruleset</CodeAnalysisRuleSet>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <NoWarn>$(NoWarn);CS1591;LOGGEN036</NoWarn>
+        <NoWarn>$(NoWarn);CS1591;LOGGEN036;NU1603</NoWarn>
+        <BaseVersion Condition="'$(BaseVersion)' == ''">1000.0.0</BaseVersion>
+        <!-- Fixed version for local debug builds. Since .local/nuget/ is cleaned before each
+             build, only one version ever exists. ClearNuGetCache in Directory.Build.targets
+             removes stale cache entries; NuGet's implicit restore repopulates from the feed. -->
+        <Version Condition="'$(Configuration)' == 'Debug'">$(BaseVersion)</Version>
+        <PackageVersion Condition="'$(Configuration)' == 'Debug'">$(BaseVersion)</PackageVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(IsTestProject)' != 'True' ">
-        <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Debug' ">true</GeneratePackageOnBuild>
+        <GeneratePackageOnBuild>$([MSBuild]::ValueOrDefault('$(Configuration)', 'Debug').Equals('Debug'))</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-
-        <!-- Set Version property from local version file if it exists -->
-        <LocalMomentumVersion Condition="Exists('$(MSBuildThisFileDirectory)../../local-mmt-version.txt')">$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)../../local-mmt-version.txt').Trim())</LocalMomentumVersion>
-        <Version Condition="'$(LocalMomentumVersion)' != '' and '$(Configuration)' == 'Debug'">$(LocalMomentumVersion)</Version>
-        <PackageVersion Condition="'$(LocalMomentumVersion)' != '' and '$(Configuration)' == 'Debug'">$(LocalMomentumVersion)</PackageVersion>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -38,7 +39,7 @@
     </PropertyGroup>
 
     <ItemGroup Condition=" '$(IsTestProject)' != 'True' ">
-        <PackageReference Include="Microsoft.SourceLink.GitHub" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
         <None Include="..\..\assets\icon.png" Pack="true" PackagePath="\" Visible="false" Condition="Exists('..\..\assets\icon.png')" />
         <None Include="README.md" Pack="true" PackagePath="\" Visible="true" Condition="Exists('README.md')" />
     </ItemGroup>

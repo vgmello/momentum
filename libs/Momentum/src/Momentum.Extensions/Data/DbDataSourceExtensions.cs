@@ -15,12 +15,16 @@ public static class DbDataSourceExtensions
     /// <param name="dataSource">The DbDataSource data source.</param>
     /// <param name="spName">The name of the stored procedure.</param>
     /// <param name="parameters">Provider for command parameters.</param>
+    /// <param name="transaction">Optional database transaction to associate with the command.</param>
+    /// <param name="commandTimeout">Optional command timeout in seconds.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The number of affected rows.</returns>
     public static Task<int> SpExecute(this DbDataSource dataSource, string spName, IDbParamsProvider parameters,
+        DbTransaction? transaction = null, int? commandTimeout = null,
         CancellationToken cancellationToken = default)
     {
-        return dataSource.SpCall<int>(spName, parameters, static conn => conn.ExecuteAsync, cancellationToken);
+        return dataSource.SpCall<int>(spName, parameters, static conn => conn.ExecuteAsync,
+            transaction, commandTimeout, cancellationToken);
     }
 
     /// <summary>
@@ -29,22 +33,44 @@ public static class DbDataSourceExtensions
     /// <param name="dataSource">The DbDataSource data source.</param>
     /// <param name="spName">The name of the stored procedure.</param>
     /// <param name="parameters">Provider for sp parameters.</param>
+    /// <param name="transaction">Optional database transaction to associate with the command.</param>
+    /// <param name="commandTimeout">Optional command timeout in seconds.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Collection of TResult</returns>
     public static Task<IEnumerable<TResult>> SpQuery<TResult>(this DbDataSource dataSource, string spName, IDbParamsProvider parameters,
+        DbTransaction? transaction = null, int? commandTimeout = null,
         CancellationToken cancellationToken = default)
     {
         return dataSource.SpCall<IEnumerable<TResult>>(
             spName: spName,
             parameters: parameters,
             dbFunction: static conn => conn.QueryAsync<TResult>,
+            transaction: transaction,
+            commandTimeout: commandTimeout,
             cancellationToken: cancellationToken);
     }
 
+    /// <summary>
+    ///     Core method that opens a connection and executes a Dapper function via stored procedure.
+    /// </summary>
+    /// <param name="dataSource">The DbDataSource data source.</param>
+    /// <param name="spName">The name of the stored procedure.</param>
+    /// <param name="parameters">Provider for command parameters.</param>
+    /// <param name="dbFunction">Factory that returns a Dapper execution function for the given connection.</param>
+    /// <param name="transaction">
+    ///     Optional database transaction to associate with the command.
+    ///     If provided, it must originate from a connection obtained from the same
+    ///     <paramref name="dataSource"/>, or the command will fail at runtime.
+    /// </param>
+    /// <param name="commandTimeout">Optional command timeout in seconds.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The result of the Dapper function execution.</returns>
     public static async Task<TResult> SpCall<TResult>(this DbDataSource dataSource,
         string spName,
         IDbParamsProvider parameters,
         Func<DbConnection, Func<CommandDefinition, Task<TResult>>> dbFunction,
+        DbTransaction? transaction = null,
+        int? commandTimeout = null,
         CancellationToken cancellationToken = default)
     {
         await using var connection = await dataSource.OpenConnectionAsync(cancellationToken);
@@ -56,6 +82,8 @@ public static class DbDataSourceExtensions
             commandText: spName,
             parameters: dbParams,
             commandType: CommandType.StoredProcedure,
+            transaction: transaction,
+            commandTimeout: commandTimeout,
             cancellationToken: cancellationToken);
 
         return await dbFunctionCall(command);

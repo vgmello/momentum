@@ -89,6 +89,20 @@ public class CashierValidationTests
         maxResult.ShouldNotHaveAnyValidationErrors();
     }
 
+    [Fact]
+    public void CreateCashierValidator_WithInvalidEmail_ShouldHaveValidationError()
+    {
+        // Arrange
+        var validator = new CreateCashierValidator();
+        var command = new CreateCashierCommand(Guid.NewGuid(), "John Doe", "not-an-email");
+
+        // Act
+        var result = validator.TestValidate(command);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor(x => x.Email);
+    }
+
     #endregion
 
     #region UpdateCashierValidator Tests
@@ -182,6 +196,20 @@ public class CashierValidationTests
 
         // Assert
         result.ShouldNotHaveValidationErrorFor(x => x.Email);
+    }
+
+    [Fact]
+    public void UpdateCashierValidator_WithInvalidEmail_ShouldHaveValidationError()
+    {
+        // Arrange
+        var validator = new UpdateCashierValidator();
+        var command = new UpdateCashierCommand(Guid.NewGuid(), Guid.NewGuid(), "John Doe", "not-an-email", Version: 1);
+
+        // Act
+        var result = validator.TestValidate(command);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor(x => x.Email);
     }
 
     #endregion

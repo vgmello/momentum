@@ -22,6 +22,6 @@ features:
       details: Generate customized solutions with selective features. Choose only what you need - API, Orleans, Kafka, or any combination that fits your architecture.
       link: /guide/template-options/
     - title: ⚡ Modern Stack, Battle-Tested Patterns
-      details: .NET 9, Orleans, Kafka, PostgreSQL with event-driven microservices architecture, comprehensive testing, and full observability built-in.
+      details: .NET 10, Orleans, Kafka, PostgreSQL with event-driven microservices architecture, comprehensive testing, and full observability built-in.
       link: /guide/template-walkthrough/
 ---

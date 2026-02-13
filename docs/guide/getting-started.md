@@ -5,7 +5,7 @@ This guide will help you set up the AppDomain Solution development environment a
 ## Prerequisites
 
 -   Docker or Docker compatible (Rancher, etc)
--   .NET 9 SDK with Aspire\* (Aspire is not required but recommended)
+-   .NET 10 SDK with Aspire\* (Aspire is not required but recommended)
 -   PostgreSQL client (optional, for database inspection)
 -   API testing tool (Postman, curl, or similar)
 -   Liquibase CLI (or use the Docker service defined in `compose.yml`)
@@ -82,7 +82,7 @@ dotnet run --project AppDomain/src/AppDomain.BackOffice.Orleans
 
 ### 3. Verify Setup
 
--   **API Health**: http://localhost:8101/health
+-   **API Health**: http://localhost:8101/status (liveness) or http://localhost:8101/health/internal (detailed, localhost only)
 -   **OpenAPI UI**: http://localhost:8101/scalar
 -   **gRPC**: Connect to localhost:8102
 
@@ -202,8 +202,8 @@ psql -h localhost -p 5432 -U postgres -d AppDomain
 
 Key tables:
 
--   `app_domain.cashiers` - Cashier records
--   `app_domain.invoices` - Invoice records
+-   `main.cashiers` - Cashier records (in app_domain database)
+-   `main.invoices` - Invoice records (in app_domain database)
 -   `AppDomain.cashier_payments` - Payment history
 
 ## Next Steps

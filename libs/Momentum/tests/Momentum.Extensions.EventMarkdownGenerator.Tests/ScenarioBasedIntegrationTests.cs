@@ -13,6 +13,8 @@ public class ScenarioBasedIntegrationTests
 {
     private const string ScenariosPath = "IntegrationTestScenarios";
 
+    private static readonly JsonSerializerOptions JsonOptions = System.Text.Json.JsonSerializerOptions.Web;
+
     public static TheoryData<string> GetTestScenarios()
     {
         var theoryData = new TheoryData<string>();
@@ -45,7 +47,7 @@ public class ScenarioBasedIntegrationTests
         if (Directory.Exists(scenariosDir))
             return scenariosDir;
 
-        // Try project directory path (go up from bin/Debug/net9.0)
+        // Try project directory path (go up from bin/Debug/net10.0)
         var projectDir = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(baseDir)));
 
         if (projectDir != null)
@@ -159,12 +161,7 @@ public class ScenarioBasedIntegrationTests
         if (File.Exists(configPath))
         {
             var configJson = await File.ReadAllTextAsync(configPath);
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-            scenario.Config = JsonSerializer.Deserialize<TestScenarioConfig>(configJson, options);
+            scenario.Config = JsonSerializer.Deserialize<TestScenarioConfig>(configJson, JsonOptions);
         }
 
         // Load expected files
@@ -195,15 +192,15 @@ public class ScenarioBasedIntegrationTests
         var possiblePaths = new[]
         {
             // Relative to current working directory (when running from Momentum root)
-            Path.Combine(Directory.GetCurrentDirectory(), "tests", "TestEvents", "bin", "Debug", "net9.0", "TestEvents.dll"),
+            Path.Combine(Directory.GetCurrentDirectory(), "tests", "TestEvents", "bin", "Debug", "net10.0", "TestEvents.dll"),
 
             // Relative to test assembly location (when running from test bin directory)
             Path.Combine(Path.GetDirectoryName(typeof(ScenarioBasedIntegrationTests).Assembly.Location)!,
-                "..", "..", "..", "..", "TestEvents", "bin", "Debug", "net9.0", "TestEvents.dll"),
+                "..", "..", "..", "..", "TestEvents", "bin", "Debug", "net10.0", "TestEvents.dll"),
 
             // Relative to solution root
             Path.Combine(Path.GetDirectoryName(typeof(ScenarioBasedIntegrationTests).Assembly.Location)!,
-                "..", "..", "..", "..", "..", "..", "tests", "TestEvents", "bin", "Debug", "net9.0", "TestEvents.dll")
+                "..", "..", "..", "..", "..", "..", "tests", "TestEvents", "bin", "Debug", "net10.0", "TestEvents.dll")
         };
 
         foreach (var path in possiblePaths)
@@ -227,7 +224,7 @@ public class ScenarioBasedIntegrationTests
         var sidebarGenerator = new JsonSidebarGenerator();
 
         // Load XML documentation
-        var xmlLoaded = await xmlParser.LoadMultipleDocumentationAsync([scenario.InputXmlPath]);
+        var xmlLoaded = await xmlParser.LoadMultipleDocumentationAsync([scenario.InputXmlPath], TestContext.Current.CancellationToken);
 
         xmlLoaded.ShouldBeTrue($"Should be able to load XML from {scenario.InputXmlPath}");
 
@@ -291,10 +288,7 @@ public class ScenarioBasedIntegrationTests
         {
             var fileName = Path.GetFileName(result.FileName);
 
-            if (!allGeneratedResults.ContainsKey(fileName))
-            {
-                allGeneratedResults[fileName] = result;
-            }
+            allGeneratedResults.TryAdd(fileName, result);
         }
 
         // Validate each expected file
@@ -428,28 +422,28 @@ public class ScenarioBasedIntegrationTests
 public class TestScenario
 {
     public string Name { get; set; } = string.Empty;
-    public string InputXmlPath { get; set; } = string.Empty;
-    public string ExpectedOutputsPath { get; set; } = string.Empty;
-    public string AssemblyPath { get; set; } = string.Empty;
+    public string InputXmlPath { get; init; } = string.Empty;
+    public string ExpectedOutputsPath { get; init; } = string.Empty;
+    public string AssemblyPath { get; init; } = string.Empty;
     public TestScenarioConfig? Config { get; set; }
     public List<ExpectedFile> ExpectedFiles { get; set; } = [];
 }
 
 public class ExpectedFile
 {
-    public string FileName { get; set; } = string.Empty;
+    public string FileName { get; init; } = string.Empty;
     public string FilePath { get; set; } = string.Empty;
-    public string Content { get; set; } = string.Empty;
-    public bool IsSchemaFile { get; set; }
+    public string Content { get; init; } = string.Empty;
+    public bool IsSchemaFile { get; init; }
 }
 
 public class TestScenarioConfig
 {
-    public bool StrictFileMatching { get; set; } = true;
-    public List<string> IgnoreFiles { get; set; } = [];
-    public Dictionary<string, string> CustomAssertions { get; set; } = new();
-    public bool GenerateSchemas { get; set; } = true;
-    public bool GenerateSidebar { get; set; } = true;
+    public bool StrictFileMatching { get; init; } = true;
+    public List<string> IgnoreFiles { get; init; } = [];
+    public Dictionary<string, string> CustomAssertions { get; init; } = [];
+    public bool GenerateSchemas { get; init; } = true;
+    public bool GenerateSidebar { get; init; } = true;
 }
 
 public class MarkdownGenerationResults

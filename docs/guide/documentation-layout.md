@@ -33,19 +33,19 @@ docs/
 -   **VitePress** (v1.6.3) - Static site generator for main documentation
 -   **DocFX** - Microsoft's documentation tool for .NET API reference
 -   **Mermaid** (v11.9.0) - Diagram and flowchart rendering
--   **Node.js/PNPM** - Package management and development server
+-   **Bun** - JavaScript runtime and package manager
 -   **TypeScript** - Configuration and custom plugins
 
 ## Running the Documentation
 
-### Option 1: Local Development with PNPM (Recommended for Template Changes)
+### Option 1: Local Development with Bun (Recommended for Template Changes)
 
-**Prerequisites**: Node.js and PNPM installed
+**Prerequisites**: Bun installed
 
 ```bash
 cd docs
-pnpm install
-pnpm run docs:dev
+bun install
+bun run docs:dev
 ```
 
 This option:
@@ -53,7 +53,7 @@ This option:
 -   ✅ Allows template and configuration changes
 -   ✅ Live reload for all changes
 -   ✅ Full development capabilities
--   ⚠️ Requires local Node.js setup
+-   ⚠️ Requires local Bun setup
 
 ### Option 2: Via Aspire (Default)
 
@@ -167,7 +167,7 @@ To add a new page to any section:
 
 1. Create the markdown file in the appropriate directory
 2. Add an entry to the relevant sidebar section in `config.mts`
-3. Test locally with `pnpm run docs:dev`
+3. Test locally with `bun run docs:dev`
 
 ### Sidebar Features
 
@@ -182,10 +182,10 @@ Available in `/docs/package.json`:
 
 ```json
 {
-    "docs:dev": "pnpm run generate:adr-table && vitepress dev",
-    "docs:build": "pnpm run generate:adr-table && vitepress build",
+    "docs:dev": "bun run docs:prep && vitepress dev",
+    "docs:build": "bun run docs:prep && vitepress build",
     "docs:preview": "vitepress preview",
-    "generate:adr-table": "tsx .vitepress/generateAdrTable.ts"
+    "docs:prep": "bun run docs:events && bun run docs:dotnet && bun run docs:adr"
 }
 ```
 
@@ -203,7 +203,7 @@ The API reference documentation is auto-generated from .NET XML documentation co
 ## Contributing to Documentation
 
 1. **Content Changes**: Use any of the three running options above
-2. **Template Changes**: Use local PNPM development only
+2. **Template Changes**: Use local Bun development only
 3. **Configuration Changes**: Edit `.vitepress/config.mts` and test locally
 4. **New Sections**: Follow the existing pattern in sidebar configuration
 

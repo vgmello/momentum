@@ -8,7 +8,7 @@ namespace Momentum.Extensions.Abstractions.Messaging;
 /// <typeparam name="TResult">The type of result returned by the query.</typeparam>
 /// <remarks>
 ///     This is a marker interface used by the messaging infrastructure to identify query messages.
-///     Queries should be read-only Momentum that retrieve data without modifying the system state.
+///     Queries should be read-only operations that retrieve data without modifying the system state.
 /// </remarks>
 public interface IQuery<out TResult>
 {

@@ -1,10 +1,10 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Momentum.Extensions.Abstractions.Extensions;
+using Momentum.Extensions.Abstractions.Messaging;
+using System.Text.RegularExpressions;
 
 namespace Momentum.ServiceDefaults.Messaging;
 
@@ -17,7 +17,7 @@ namespace Momentum.ServiceDefaults.Messaging;
 /// <example>
 ///     <!--@include: @code/examples/service-bus-options-examples.md -->
 /// </example>
-public class ServiceBusOptions
+public partial class ServiceBusOptions
 {
     /// <summary>
     ///     Gets the configuration section name used to bind these options.
@@ -37,7 +37,7 @@ public class ServiceBusOptions
     /// <remarks>
     ///     See <see cref="ServiceBusOptions" /> for detailed configuration information.
     /// </remarks>
-    public string Domain { get; set; } = GetDomainName();
+    public string Domain { get; set; } = DefaultDomainAttribute.GetDomainName(ServiceDefaultsExtensions.EntryAssembly);
 
     /// <summary>
     ///     Gets or sets the public service name used for external identification and message routing.
@@ -90,24 +90,23 @@ public class ServiceBusOptions
     /// </remarks>
     public bool ReliableMessaging { get; set; } = true;
 
-    private static string GetDomainName()
-    {
-        // TODO: maybe a dedicated assembly attribute or csproj property to override explicitly if needed
-        var simpleName = ServiceDefaultsExtensions.EntryAssembly.GetName().Name!;
-        var mainNamespaceIndex = simpleName.IndexOf('.');
-
-        return mainNamespaceIndex >= 0 ? simpleName[..mainNamespaceIndex] : simpleName;
-    }
-
     /// <summary>
     ///     Post-configuration processor that validates and completes ServiceBus configuration after binding.
     /// </summary>
     /// <remarks>
     ///     See <see cref="ServiceBusOptions" /> for detailed configuration information.
     /// </remarks>
-    public class Configurator(ILogger<Configurator> logger, IHostEnvironment env, IConfiguration config)
+    public partial class Configurator(IHostEnvironment env)
         : IPostConfigureOptions<ServiceBusOptions>
     {
+        // Valid service name: lowercase alphanumeric with hyphens (kebab-case)
+        [GeneratedRegex("^[a-z0-9]+(-[a-z0-9]+)*$")]
+        private static partial Regex ServiceNameValidationRegex();
+
+        // Valid domain name: alphanumeric starting with a letter (PascalCase or simple)
+        [GeneratedRegex("^[A-Za-z][A-Za-z0-9]*$")]
+        private static partial Regex DomainNameValidationRegex();
+
         /// <summary>
         ///     Completes the configuration of ServiceBus options after initial binding.
         /// </summary>
@@ -119,20 +118,38 @@ public class ServiceBusOptions
         /// <example>
         ///     See class-level examples in <see cref="ServiceBusOptions" />.
         /// </example>
+        /// <exception cref="InvalidOperationException">
+        ///     Thrown when domain or service name validation fails.
+        /// </exception>
         public void PostConfigure(string? name, ServiceBusOptions options)
         {
             if (options.PublicServiceName.Length == 0)
                 options.PublicServiceName = GetServiceName(env.ApplicationName);
 
-            options.ServiceUrn = new Uri($"/{options.Domain.ToSnakeCase()}/{GetServiceName(options.PublicServiceName)}", UriKind.Relative);
+            // Validate domain name format
+            if (string.IsNullOrWhiteSpace(options.Domain))
+                throw new InvalidOperationException("ServiceBus Domain cannot be empty.");
 
-            var connectionString = config.GetConnectionString(SectionName);
+            if (!DomainNameValidationRegex().IsMatch(options.Domain))
+                throw new InvalidOperationException(
+                    $"Invalid ServiceBus Domain format: '{options.Domain}'. " +
+                    "Domain must start with a letter and contain only alphanumeric characters.");
 
-            if (string.IsNullOrWhiteSpace(connectionString))
-            {
-                logger.LogWarning("ConnectionStrings:ServiceBus is not set. " +
-                                  "Transactional Inbox/Outbox and Message Persistence features disabled");
-            }
+            // Validate service name format
+            if (string.IsNullOrWhiteSpace(options.PublicServiceName))
+                throw new InvalidOperationException("ServiceBus PublicServiceName cannot be empty.");
+
+            if (!ServiceNameValidationRegex().IsMatch(options.PublicServiceName))
+                throw new InvalidOperationException(
+                    $"Invalid ServiceBus PublicServiceName format: '{options.PublicServiceName}'. " +
+                    "Service name must be lowercase alphanumeric with hyphens (kebab-case).");
+
+            var urnPath = $"/{options.Domain.ToSnakeCase()}/{GetServiceName(options.PublicServiceName)}";
+
+            if (!Uri.TryCreate(urnPath, UriKind.Relative, out var serviceUrn))
+                throw new InvalidOperationException($"Failed to create valid URN from path: {urnPath}");
+
+            options.ServiceUrn = serviceUrn;
         }
 
         private static string GetServiceName(string appName) => appName.ToLowerInvariant().Replace('.', '-');

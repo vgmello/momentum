@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "google/protobuf/timestamp.proto";
+
 option csharp_namespace = "AppDomain.Cashiers.Grpc.Models";
 
 package app_domain.cashiers;
@@ -9,4 +11,7 @@ message Cashier {
   string cashier_id = 2;
   string name = 3;
   string email = 4;
+  google.protobuf.Timestamp created_date_utc = 5;
+  google.protobuf.Timestamp updated_date_utc = 6;
+  int32 version = 7;
 }

@@ -1,40 +1,18 @@
 # syntax=docker/dockerfile:1-labs
-# Base
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine AS base
-EXPOSE 8080
-EXPOSE 8443
-
-RUN apk add --no-cache \
-    ca-certificates librdkafka-dev tzdata \
-    && rm -rf /var/cache/apk/* \
-    && adduser -D -u 1001 appuser
-
-USER appuser
-WORKDIR /app
-
-## Patch Kafka Native Lib (ARM64 only)
-RUN TARGETARCH=$(uname -m) && \
-    if [ "$TARGETARCH" = "aarch64" ]; then \
-    mkdir -p runtimes/linux-arm64/native && \
-    ln -s /usr/lib/librdkafka.so.1 runtimes/linux-arm64/native/alpine-librdkafka.so; \
-    fi
-
-# ----
-
 # Build stage
-FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
 ## Copy all project files to restore dependencies
-COPY --parents **/**/**/*.csproj .
-COPY Directory.Build.props Directory.Packages.props ./
+COPY --link --parents **/**/**/*.csproj .
+COPY --link Directory.Build.props Directory.Packages.props ./
 
 ## Restore packages - this layer is cached unless dependencies change
 RUN dotnet restore "src/AppDomain.BackOffice.Orleans/AppDomain.BackOffice.Orleans.csproj"
 
 ## Copy source code (this layer invalidates on any code change)
-COPY . .
+COPY --link . .
 WORKDIR /src/src/AppDomain.BackOffice.Orleans/
 
 ## Create Wolverine generated source files
@@ -52,8 +30,25 @@ RUN dotnet publish \
 
 # ----
 
-# Final stage
-FROM base AS final
-COPY --from=build --chown=appuser:appuser /app/publish .
+# Final stage — alpine-extra already includes ca-certificates, tzdata, ICU libs,
+# and creates a non-root 'app' user (UID 1654) so we reuse it directly.
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine-extra AS final
+EXPOSE 8080
+EXPOSE 8443
+
+RUN apk add --no-cache librdkafka-dev
+
+WORKDIR /app
+
+## Patch Kafka Native Lib — on ARM64 Alpine the NuGet-bundled glibc librdkafka crashes,
+## so we symlink the Alpine system lib. Confluent.Kafka checks for 'alpine-librdkafka.so' first.
+RUN TARGETARCH=$(uname -m) && \
+    if [ "$TARGETARCH" = "aarch64" ]; then \
+    mkdir -p runtimes/linux-arm64/native && \
+    ln -sf /usr/lib/librdkafka.so.1 runtimes/linux-arm64/native/alpine-librdkafka.so; \
+    fi
+
+USER app
+COPY --link --from=build --chown=$APP_UID:$APP_UID /app/publish .
 
 ENTRYPOINT ["dotnet", "AppDomain.BackOffice.Orleans.dll"]

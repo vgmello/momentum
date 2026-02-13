@@ -2,6 +2,7 @@
 
 using Momentum.Extensions.Abstractions.Messaging;
 using Momentum.ServiceDefaults.Messaging.Wolverine;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using Wolverine;
 
@@ -15,6 +16,7 @@ namespace Momentum.ServiceDefaults.Messaging.Middlewares;
 /// </remarks>
 public static class OpenTelemetryInstrumentationMiddleware
 {
+    private static readonly ConcurrentDictionary<Type, string?> OperationTypeCache = new();
     /// <summary>
     ///     Starts a new activity for message processing.
     /// </summary>
@@ -41,14 +43,10 @@ public static class OpenTelemetryInstrumentationMiddleware
         {
             activity.SetTag("message.name", envelope.GetMessageName(fullName: true));
 
-            if (IsCommand(envelope.Message))
-            {
-                activity.SetTag("operation.type", "command");
-            }
-            else if (IsQuery(envelope.Message))
-            {
-                activity.SetTag("operation.type", "query");
-            }
+            var operationType = GetOperationType(envelope.Message.GetType());
+
+            if (operationType is not null)
+                activity.SetTag("operation.type", operationType);
         }
 
         if (!string.IsNullOrEmpty(envelope.Source))
@@ -82,14 +80,30 @@ public static class OpenTelemetryInstrumentationMiddleware
             activity.SetTag("error.type", envelope.Failure.GetType().Name);
         }
 
-        activity.Stop();
+        activity.Dispose();
     }
 
-    private static bool IsCommand(object message) =>
-        message.GetType().GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ICommand<>));
+    private static string? GetOperationType(Type messageType)
+    {
+        return OperationTypeCache.GetOrAdd(messageType, static type =>
+        {
+            foreach (var iface in type.GetInterfaces())
+            {
+                if (!iface.IsGenericType)
+                    continue;
 
-    private static bool IsQuery(object message) =>
-        message.GetType().GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IQuery<>));
+                var genericDef = iface.GetGenericTypeDefinition();
+
+                if (genericDef == typeof(ICommand<>))
+                    return "command";
+
+                if (genericDef == typeof(IQuery<>))
+                    return "query";
+            }
+
+            return null;
+        });
+    }
 
     private static string? ExtractParentTraceIdFromIncomingMessage(Envelope envelope)
     {

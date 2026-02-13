@@ -17,7 +17,7 @@ public class CreateInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
+        await connection.ExecuteAsync("TRUNCATE TABLE main.invoices;");
 
         // Arrange
         var createRequest = _invoiceFaker
@@ -39,7 +39,7 @@ public class CreateInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
 
         // Verify in database
         var dbInvoice = await connection.QuerySingleOrDefaultAsync(
-            "SELECT invoice_id, name, amount, currency, status FROM app_domain.invoices WHERE invoice_id = @Id",
+            "SELECT invoice_id, name, amount, currency, status FROM main.invoices WHERE invoice_id = @Id",
             new { Id = Guid.Parse(createdInvoice.InvoiceId) });
 
         dbInvoice!.ShouldNotBeNull();
@@ -58,13 +58,12 @@ public class CreateInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
-        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.cashiers;");
+        await connection.ExecuteAsync("TRUNCATE TABLE main.invoices, main.cashiers CASCADE;");
 
         // Create a cashier first
         var cashierId = Guid.NewGuid();
         await connection.ExecuteAsync(
-            "INSERT INTO app_domain.cashiers (tenant_id, cashier_id, name, email) VALUES (@TenantId, @CashierId, @Name, @Email)",
+            "INSERT INTO main.cashiers (tenant_id, cashier_id, name, email) VALUES (@TenantId, @CashierId, @Name, @Email)",
             new
             {
                 TenantId = Guid.Parse("12345678-0000-0000-0000-000000000000"),
@@ -88,7 +87,7 @@ public class CreateInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
 
         // Verify in database
         var dbInvoice = await connection.QuerySingleOrDefaultAsync(
-            "SELECT cashier_id FROM app_domain.invoices WHERE invoice_id = @Id",
+            "SELECT cashier_id FROM main.invoices WHERE invoice_id = @Id",
             new { Id = Guid.Parse(createdInvoice.InvoiceId) });
 
         dbInvoice!.ShouldNotBeNull();
@@ -118,7 +117,7 @@ public class CreateInvoiceIntegrationTests(IntegrationTestFixture fixture) : Int
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
+        await connection.ExecuteAsync("TRUNCATE TABLE main.invoices;");
 
         // Arrange
         var createRequest = _invoiceFaker

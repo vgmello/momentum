@@ -17,7 +17,7 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
+        await connection.ExecuteAsync("TRUNCATE TABLE main.invoices;");
 
         // Arrange - Create an invoice first
         var createRequest = _invoiceFaker
@@ -46,7 +46,7 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
 
         // Verify in database
         var dbInvoice = await connection.QuerySingleOrDefaultAsync(
-            "SELECT status, amount_paid, payment_date FROM app_domain.invoices WHERE invoice_id = @Id",
+            "SELECT status, amount_paid, payment_date FROM main.invoices WHERE invoice_id = @Id",
             new { Id = Guid.Parse(createdInvoice.InvoiceId) });
 
         dbInvoice!.ShouldNotBeNull();
@@ -63,7 +63,7 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
+        await connection.ExecuteAsync("TRUNCATE TABLE main.invoices;");
 
         // Arrange - Create an invoice first
         var createRequest = _invoiceFaker
@@ -91,7 +91,7 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
 
         // Verify payment date is set to current time
         var dbInvoice = await connection.QuerySingleOrDefaultAsync(
-            "SELECT payment_date FROM app_domain.invoices WHERE invoice_id = @Id",
+            "SELECT payment_date FROM main.invoices WHERE invoice_id = @Id",
             new { Id = Guid.Parse(createdInvoice.InvoiceId) });
 
         dbInvoice!.ShouldNotBeNull();
@@ -121,7 +121,7 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
+        await connection.ExecuteAsync("TRUNCATE TABLE main.invoices;");
 
         // Arrange - Create an invoice first
         var createRequest = _invoiceFaker
@@ -149,7 +149,7 @@ public class MarkInvoiceAsPaidIntegrationTests(IntegrationTestFixture fixture) :
     {
         var dataSource = Fixture.Services.GetRequiredService<DbDataSource>();
         var connection = dataSource.CreateConnection();
-        await connection.ExecuteAsync("TRUNCATE TABLE app_domain.invoices;");
+        await connection.ExecuteAsync("TRUNCATE TABLE main.invoices;");
 
         // Arrange - Create and pay an invoice
         var createRequest = new CreateInvoiceRequest

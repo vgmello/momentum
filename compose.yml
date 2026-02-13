@@ -17,46 +17,65 @@ services:
       timeout: 5s
       retries: 5
     # These command-line arguments are tuned for a local performance server.
-    command: >
-      postgres
-      -c max_connections=200
-      -c shared_buffers=2GB
-      -c effective_cache_size=7GB
-      -c maintenance_work_mem=256MB
-      -c work_mem=32MB
-      -c checkpoint_completion_target=0.9
-      -c wal_buffers=16MB
-      -c min_wal_size=1GB
-      -c max_wal_size=4GB
-      -c max_worker_processes=8
-      -c max_parallel_workers=8
-      -c max_parallel_workers_per_gather=4
-      -c max_parallel_maintenance_workers=4
-      -c random_page_cost=1.1
-      -c effective_io_concurrency=200
-      -c default_statistics_target=100
+    command:
+      - postgres
+      - -c
+      - max_connections=200
+      - -c
+      - shared_buffers=2GB
+      - -c
+      - effective_cache_size=7GB
+      - -c
+      - maintenance_work_mem=256MB
+      - -c
+      - work_mem=32MB
+      - -c
+      - checkpoint_completion_target=0.9
+      - -c
+      - wal_buffers=16MB
+      - -c
+      - min_wal_size=1GB
+      - -c
+      - max_wal_size=4GB
+      - -c
+      - max_worker_processes=8
+      - -c
+      - max_parallel_workers=8
+      - -c
+      - max_parallel_workers_per_gather=4
+      - -c
+      - max_parallel_maintenance_workers=4
+      - -c
+      - random_page_cost=1.1
+      - -c
+      - effective_io_concurrency=200
+      - -c
+      - default_statistics_target=100
 
+    restart: unless-stopped
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
   # #if (USE_LIQUIBASE)
   app-domain-db-migrations:
-    image: liquibase/liquibase:4.32-alpine
+    image: liquibase/liquibase:4.33-alpine
     profiles: [ "db", "api", "backoffice" ]
     volumes:
-      - ./infra/AppDomain.Database:/app
+      - ./infra/AppDomain.Database/Liquibase:/liquibase/changelog
     depends_on:
       app-domain-db:
         condition: service_healthy
-    working_dir: /app
+    environment:
+      - LIQUIBASE_SEARCH_PATH=/liquibase/changelog
+      - LIQUIBASE_COMMAND_USERNAME=${POSTGRES_USER:-postgres}
+      - LIQUIBASE_COMMAND_PASSWORD=${POSTGRES_PASSWORD:-password@}
     entrypoint: /bin/sh
     command:
       - -c
       - |
-        echo 'Running database migrations...' && \
-        liquibase update --defaults-file liquibase.setup.properties --url=jdbc:postgresql://app-domain-db:5432/postgres && \
-        liquibase update --defaults-file liquibase.servicebus.properties --url=jdbc:postgresql://app-domain-db:5432/service_bus && \
-        liquibase update --url=jdbc:postgresql://app-domain-db:5432/app_domain && \
+        liquibase update --url=jdbc:postgresql://app-domain-db:5432/postgres --changelog-file=postgres/changelog.xml && \
+        liquibase update --url=jdbc:postgresql://app-domain-db:5432/service_bus --changelog-file=service_bus/changelog.xml && \
+        liquibase update --url=jdbc:postgresql://app-domain-db:5432/app_domain --changelog-file=app_domain/changelog.xml && \
         echo 'Database migrations completed successfully!'
 
   # #endif
@@ -90,6 +109,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
+    restart: unless-stopped
     # #endif
 
     # #if (INCLUDE_ORLEANS)
@@ -103,6 +123,7 @@ services:
     volumes:
       - azurite-data:/data
     command: "azurite --silent --location /data --debug /data/debug.log --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0"
+    restart: unless-stopped
     healthcheck:
       test: [ "CMD-SHELL", "netstat -ltn | grep :10000 || exit 1" ]
       interval: 10s
@@ -112,7 +133,7 @@ services:
   # #endif
   # Aspire Dashboard
   aspire-dashboard:
-    image: mcr.microsoft.com/dotnet/aspire-dashboard:9.4
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:13
     profiles: [ "aspire" ]
     ports:
       - "18100:18888"
@@ -175,6 +196,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    restart: unless-stopped
 
   # #endif
   # #if (INCLUDE_BACK_OFFICE)
@@ -212,6 +234,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    restart: unless-stopped
 
   # #endif
   # #if (INCLUDE_ORLEANS)
@@ -253,6 +276,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    restart: unless-stopped
 
   # #endif
   # #if (INCLUDE_DOCS)
@@ -266,15 +290,16 @@ services:
     user: "1001:1001"
     volumes:
       - ./:/app
-      - pnpm_node_modules:/app/docs/node_modules
-    command: [ "pnpm", "dev", "--host" ]
+      - bun_node_modules:/app/docs/node_modules
+    command: [ "bun", "run", "dev", "--", "--host" ]
     healthcheck:
       test: [ "CMD-SHELL", "curl -f http://localhost:5173/index.html || exit 1" ]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 10s
-  # #endif
+    restart: unless-stopped
+    # #endif
 
     # k6 Performance Testing - Run on-demand with: docker compose run --rm k6-performance run /scripts/scenarios/mixed/realistic-workflow.js
   k6-performance:
@@ -298,7 +323,7 @@ services:
     networks:
       - default
     # No default command - run tests on-demand with custom arguments
-# #if (INCLUDE_ORLEANS || INCLUDE_DOCS)
+    # #if (INCLUDE_ORLEANS || INCLUDE_DOCS)
 volumes:
   # #endif
   # #if (INCLUDE_ORLEANS)
@@ -306,7 +331,7 @@ volumes:
 
   # #endif
   # #if (INCLUDE_DOCS)
-  pnpm_node_modules:
+  bun_node_modules:
 
   # #endif
   postgres_data:

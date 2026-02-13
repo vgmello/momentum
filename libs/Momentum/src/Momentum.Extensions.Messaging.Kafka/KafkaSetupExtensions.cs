@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Momentum.Extensions.Abstractions.Extensions;
 using Momentum.ServiceDefaults.Messaging;
+using System.Reflection;
 using Wolverine;
 using static Momentum.Extensions.Messaging.Kafka.KafkaAspireExtensions;
 
@@ -32,6 +33,10 @@ public static class KafkaSetupExtensions
         Action<KafkaProducerSettings>? configureProducerSettings = null,
         Action<KafkaConsumerSettings>? configureConsumerSettings = null)
     {
+        // Skip initialization during build-time OpenAPI document generation
+        if (Assembly.GetEntryAssembly()?.GetName().Name == "GetDocument.Insider")
+            return builder;
+
         var clientId = builder.Environment.ApplicationName.ToKebabCase();
 
         SetConfigConsumerGroupId(

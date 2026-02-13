@@ -16,8 +16,6 @@ public static partial class DbMapper
     /// </summary>
     /// <param name="cashier">The Cashier database entity to convert.</param>
     /// <returns>A Cashier domain model.</returns>
-    [MapperIgnoreSource(nameof(Entities.Cashier.CreatedDateUtc))]
-    [MapperIgnoreSource(nameof(Entities.Cashier.UpdatedDateUtc))]
     [MapperIgnoreTarget(nameof(Cashier.CashierPayments))]
     public static partial Cashier ToModel(this Entities.Cashier cashier);
 

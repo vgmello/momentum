@@ -1,48 +1,48 @@
 # Architecture Overview
 
-The AppDomain Solution follows Vertical Slice Architecture principles with CQRS patterns to ensure maintainability, testability, and scalability. This architecture separates concerns into distinct layers while maintaining clear dependency flows.
+The AppDomain Solution follows Domain-Oriented Vertical Slice Architecture (CQRS + Event-Driven) to ensure maintainability, testability, and scalability. It uses DDD-inspired boundaries (bounded contexts, domain language, contracts/events) with a pragmatic application-service style.
 
 ## Architecture Layers
 
 ```mermaid
 graph TB
     subgraph "Presentation Layer"
-        API[AppDomain.Api<br/>REST & gRPC Endpoints]
-        WebUI[Web UI<br/>SvelteKit Frontend]
+        API["AppDomain.Api<br/>REST & gRPC Endpoints"]
+        WebUI["Web UI<br/>SvelteKit Frontend"]
     end
 
     subgraph "Application Layer"
-        Commands[Commands<br/>Write Operations]
-        Queries[Queries<br/>Read Operations]
-        Handlers[Command/Query Handlers]
-        Events[Integration Events]
+        Commands["Commands<br/>Write Operations"]
+        Queries["Queries<br/>Read Operations"]
+        Handlers["Command/Query Handlers"]
+        Events["Integration Events"]
     end
 
     subgraph "Domain Layer"
-        Entities[Domain Entities<br/>Cashier, Invoice, Bill]
-        ValueObjects[Value Objects<br/>Money, Currency]
-        DomainEvents[Domain Events]
-        Rules[Business Rules]
+        Entities["Domain Entities<br/>Cashier, Invoice, Bill"]
+        ValueObjects["Value Objects<br/>Money, Currency"]
+        DomainEvents["Domain Events"]
+        Rules["Business Rules"]
     end
 
     subgraph "Infrastructure Layer"
-        Database[(PostgreSQL<br/>Database)]
-        MessageBus[Message Bus<br/>Wolverine]
-        Orleans[Orleans Grains<br/>Stateful Processing]
-        External[External Services]
+        Database[("PostgreSQL<br/>Database")]
+        MessageBus["Message Bus<br/>Wolverine"]
+        Orleans["Orleans Grains<br/>Stateful Processing"]
+        External["External Services"]
     end
 
-    API -/-> Commands
-    API -/-> Queries
-    WebUI -/-> API
-    Commands -/-> Handlers
-    Queries -/-> Handlers
-    Handlers -/-> Entities
-    Handlers -/-> Database
-    Handlers -/-> MessageBus
-    Events -/-> MessageBus
-    Orleans -/-> Database
-    MessageBus -/-> Orleans
+    API ---> Commands
+    API ---> Queries
+    WebUI ---> API
+    Commands ---> Handlers
+    Queries ---> Handlers
+    Handlers ---> Entities
+    Handlers ---> Database
+    Handlers ---> MessageBus
+    Events ---> MessageBus
+    Orleans ---> Database
+    MessageBus ---> Orleans
 ```
 
 ## Core Principles
@@ -125,7 +125,7 @@ Location: [`src/AppDomain/*/Commands/`](https://github.com/org-name/app-domain/t
 ### Command Example
 
 ```csharp
-[DbCommand(sp: "app_domain.invoices_create")]
+[DbCommand(sp: "main.invoices_create")]
 public record CreateInvoiceCommand : IRequest<Result<Invoice>>
 {
     public required string Name { get; init; }

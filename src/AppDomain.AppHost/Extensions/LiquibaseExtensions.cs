@@ -25,19 +25,20 @@ public static class LiquibaseExtensions
         IResourceBuilder<ParameterResource> dbPassword)
     {
         return builder
-            .AddContainer("liquibase", "liquibase/liquibase:4.32-alpine")
+            .AddContainer("liquibase", "liquibase/liquibase:4.33-alpine")
             .WithBindMount("../../infra/AppDomain.Database/Liquibase", "/liquibase/changelog")
             .WithEnvironment("LIQUIBASE_COMMAND_USERNAME", "postgres")
             .WithEnvironment("LIQUIBASE_COMMAND_PASSWORD", dbPassword)
-            .WithEnvironment("LIQUIBASE_COMMAND_CHANGELOG_FILE", "changelog.xml")
             .WithEnvironment("LIQUIBASE_SEARCH_PATH", "/liquibase/changelog")
             .WaitFor(dbServerResource)
             .WithReference(dbServerResource)
             .WithEntrypoint("/bin/sh")
             .WithArgs("-c",
                 """
-                liquibase --url=jdbc:postgresql://app-domain-db:5432/service_bus update --changelog-file=service_bus/changelog.xml && \
-                liquibase --url=jdbc:postgresql://app-domain-db:5432/app_domain update --changelog-file=app_domain/changelog.xml
+                liquibase update --url=jdbc:postgresql://app-domain-db:5432/postgres --changelog-file=postgres/changelog.xml --contexts=aspire && \
+                liquibase update --url=jdbc:postgresql://app-domain-db:5432/service_bus --changelog-file=service_bus/changelog.xml && \
+                liquibase update --url=jdbc:postgresql://app-domain-db:5432/app_domain --changelog-file=app_domain/changelog.xml && \
+                echo 'Database migrations completed successfully!'
                 """);
     }
 }

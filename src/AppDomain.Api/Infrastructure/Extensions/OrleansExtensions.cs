@@ -1,5 +1,7 @@
 // Copyright (c) OrgName. All rights reserved.
 
+using System.Reflection;
+
 namespace AppDomain.Api.Infrastructure.Extensions;
 
 public static class OrleansExtensions
@@ -8,6 +10,10 @@ public static class OrleansExtensions
 
     public static IHostApplicationBuilder AddOrleansClient(this IHostApplicationBuilder builder, string sectionName = SectionName)
     {
+        // Skip initialization during build-time OpenAPI document generation
+        if (Assembly.GetEntryAssembly()?.GetName().Name == "GetDocument.Insider")
+            return builder;
+
         var config = builder.Configuration.GetSection(sectionName);
 
         var useLocalCluster = config.GetValue<bool>("UseLocalhostClustering");
@@ -78,33 +84,30 @@ public static class OrleansExtensions
 
     private static Func<IServiceProvider, object> LazyClusterClientFactory(ServiceDescriptor primaryClusterClientRegistration)
     {
-        var initialized = false;
-        var initializing = false;
+        var state = 0; // 0 = idle, 1 = initializing, 2 = initialized
 
         return provider =>
         {
             var primaryClusterClient = provider.GetRequiredKeyedService<IClusterClient>(primaryClusterClientRegistration);
 
-            if (initialized)
+            if (Volatile.Read(ref state) == 2)
                 return primaryClusterClient;
 
             var lazyClusterClient = provider.GetRequiredService<LazyClusterClientManager>();
 
-            if (initializing)
+            if (Interlocked.CompareExchange(ref state, 1, 0) != 0)
             {
-                // This should the main ClusterClient initialization (first call)
+                // Already initializing or initialized - this is the re-entrant call
                 lazyClusterClient.StartDelayedAsync(primaryClusterClient);
 
                 return primaryClusterClient;
             }
 
-            initializing = true;
-
             // This call should trigger this same factory again, which it will be in the `initializing` state, returning the main client
             var clients = provider.GetServices<IClusterClient>().ToList();
             clients.ForEach(lazyClusterClient.StartDelayedAsync);
 
-            initialized = true;
+            Volatile.Write(ref state, 2);
 
             return primaryClusterClient;
         };

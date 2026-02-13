@@ -175,15 +175,15 @@ Published to trigger payment processing.
 
 Invoice data is stored in PostgreSQL:
 
-**Table**: [`app_domain.invoices`](https://github.com/org-name/app-domain/blob/main/infra/AppDomain.Database/Liquibase/app_domain/tables/invoices.sql)
+**Table**: [`main.invoices`](https://github.com/org-name/app-domain/blob/main/infra/AppDomain.Database/Liquibase/app_domain/invoices/tables/invoices.sql)
 
 **Key Stored Procedures**:
 
--   `app_domain.invoices_create` - Create new invoice
--   `app_domain.invoices_cancel` - Cancel invoice
--   `app_domain.invoices_mark_as_paid` - Update to paid status
--   `app_domain.invoices_get` - Retrieve single invoice
--   `app_domain.invoices_list` - List invoices with filters
+-   `main.invoices_create` - Create new invoice
+-   `main.invoices_cancel` - Cancel invoice
+-   `main.invoices_mark_as_paid` - Update to paid status
+-   `main.invoices_get` - Retrieve single invoice
+-   `main.invoices_list` - List invoices with filters
 
 ## Testing Patterns
 

@@ -84,7 +84,7 @@ public static class CreateInvoiceCommandHandler
     /// <returns>The inserted invoice entity</returns>
     public static async Task<Data.Entities.Invoice> Handle(DbCommand command, AppDomainDb db, CancellationToken cancellationToken)
     {
-        var inserted = await db.Invoices.InsertWithOutputAsync(command.Invoice, token: cancellationToken);
+        var inserted = await db.Invoices.InsertWithOutputAsync(command.Invoice, cancellationToken);
 
         return inserted;
     }
@@ -100,7 +100,7 @@ public static class CreateInvoiceCommandHandler
             TenantId = command.TenantId,
             InvoiceId = Guid.CreateVersion7(),
             Name = command.Name,
-            Status = "Draft",
+            Status = nameof(InvoiceStatus.Draft),
             Amount = command.Amount,
             Currency = command.Currency,
             DueDate = command.DueDate,

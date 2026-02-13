@@ -28,7 +28,7 @@ builder.Services.AddControllers(opt =>
 ```csharp
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddProblemDetails();
-builder.Services.AddOpenApiWithXmlDocSupport();
+builder.Services.AddAutoProducesConvention(); // Auto-infer response types for OpenAPI
 builder.Services.AddHttpLogging();
 ```
 
@@ -99,9 +99,8 @@ if (!app.Environment.IsDevelopment())
 ```csharp
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.MapOpenApi().CacheOutput();
     app.MapScalarApiReference(options => options.WithTitle($"{app.Environment.ApplicationName} OpenAPI"));
-    app.UseMiddleware<OpenApiCachingMiddleware>();
 
     app.MapGrpcReflectionService();
 }
@@ -137,13 +136,15 @@ This transforms controller and action names:
 ### XML Documentation Support
 
 ```csharp
-builder.Services.AddOpenApiWithXmlDocSupport();
+// Call AddOpenApi() directly in your API project for XML documentation support
+// AddAutoProducesConvention() is already included in AddApiServiceDefaults()
+builder.Services.AddOpenApi(options => options.ConfigureOpenApiDefaults());
 ```
 
-This extension method configures:
-- **XML Documentation Loading**: Automatic discovery of XML files
-- **Document Transformers**: For enriching OpenAPI with XML comments
-- **Operation Transformers**: For parameter and response documentation
+The .NET 10 source generator automatically enriches OpenAPI with XML comments when:
+- `GenerateDocumentationFile` is set to `true` in your project
+- `AddOpenApi()` is called directly in your API project (not from a library)
+- The `InterceptorsNamespaces` includes `Microsoft.AspNetCore.OpenApi.Generated`
 
 ### Scalar Documentation
 

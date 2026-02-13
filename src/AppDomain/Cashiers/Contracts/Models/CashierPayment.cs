@@ -8,17 +8,17 @@ namespace AppDomain.Cashiers.Contracts.Models;
 public record CashierPayment
 {
     /// <summary>
-    ///     Gets or sets the unique identifier of the cashier who processed this payment.
+    ///     Gets the unique identifier of the cashier who processed this payment.
     /// </summary>
-    public int CashierId { get; set; }
+    public Guid CashierId { get; init; }
 
     /// <summary>
-    ///     Gets or sets the unique identifier for this payment transaction.
+    ///     Gets the unique identifier for this payment transaction.
     /// </summary>
-    public int PaymentId { get; set; }
+    public Guid PaymentId { get; init; }
 
     /// <summary>
-    ///     Gets or sets the date and time when the payment was processed.
+    ///     Gets the date and time when the payment was processed.
     /// </summary>
-    public DateTime PaymentDate { get; set; }
+    public DateTime PaymentDate { get; init; }
 }

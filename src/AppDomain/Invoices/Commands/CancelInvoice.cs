@@ -44,7 +44,7 @@ public static partial class CancelInvoiceCommandHandler
     ///         - If the function name starts with a $, the function gets executed as `select * from {dbFunction}`
     ///     </para>
     /// </remarks>
-    [DbCommand(fn: "$app_domain.invoices_cancel")]
+    [DbCommand(fn: "$main.invoices_cancel")]
     public partial record DbCommand(Guid TenantId, Guid InvoiceId, int Version) : ICommand<Data.Entities.Invoice?>;
 
     /// <summary>
@@ -62,11 +62,11 @@ public static partial class CancelInvoiceCommandHandler
 
         if (updatedInvoice is null)
         {
-            var failures = new List<ValidationFailure>
-            {
+            List<ValidationFailure> failures =
+            [
                 new("Version", "Invoice not found, cannot be cancelled, or was modified by another user. " +
                                "Please refresh and try again.")
-            };
+            ];
 
             return (failures, null);
         }

@@ -1,11 +1,12 @@
 // Copyright (c) OrgName. All rights reserved.
 
 using AppDomain.Invoices.Actors;
-using AppDomain.Invoices.Contracts.IntegrationEvents;
-using AppDomain.Invoices.Data.Entities;
-using AppDomain.Invoices.Queries;
 using AppDomain.Invoices.Commands;
+using AppDomain.Invoices.Contracts.IntegrationEvents;
+using AppDomain.Invoices.Contracts.Models;
+using AppDomain.Invoices.Queries;
 using ContractInvoice = AppDomain.Invoices.Contracts.Models.Invoice;
+using Invoice = AppDomain.Invoices.Data.Entities.Invoice;
 
 namespace AppDomain.BackOffice.Orleans.Invoices.Grains;
 
@@ -31,19 +32,8 @@ public class InvoiceActor(
 
         var result = await messageBus.InvokeQueryAsync(query);
 
-        return result.Match<Invoice?>(
-            contractInvoice =>
-            {
-                // Convert contract model to data entity
-                var invoice = MapContractToDataEntity(contractInvoice);
-
-                // Update access tracking
-                invoiceState.State.LastAccessed = DateTime.UtcNow;
-                invoiceState.State.OperationCount++;
-                _ = invoiceState.WriteStateAsync(); // Fire and forget
-
-                return invoice;
-            },
+        var invoice = result.Match<Invoice?>(
+            MapContractToDataEntity,
             errors =>
             {
                 logger.LogWarning("Invoice {InvoiceId} not found for tenant {TenantId}: {Errors}",
@@ -51,6 +41,15 @@ public class InvoiceActor(
 
                 return null;
             });
+
+        if (invoice is not null)
+        {
+            invoiceState.State.LastAccessed = DateTime.UtcNow;
+            invoiceState.State.OperationCount++;
+            await invoiceState.WriteStateAsync();
+        }
+
+        return invoice;
     }
 
     /// <inheritdoc />
@@ -64,33 +63,25 @@ public class InvoiceActor(
 
         var result = await messageBus.InvokeCommandAsync(command);
 
-        return result.Match(
-            contractInvoice =>
-            {
-                var invoice = MapContractToDataEntity(contractInvoice);
-
-                // Publish integration event
-                _ = PublishIntegrationEventAsync(new InvoicePaid(
-                    tenantId,
-                    invoiceId,
-                    contractInvoice)); // Fire and forget
-
-                // Update operation tracking
-                invoiceState.State.LastAccessed = DateTime.UtcNow;
-                invoiceState.State.OperationCount++;
-                _ = invoiceState.WriteStateAsync(); // Fire and forget
-
-                logger.LogInformation("Marked invoice {InvoiceId} as paid with amount {Amount}",
-                    invoiceId, amountPaid);
-
-                return invoice;
-            },
+        var (contractInvoice, invoice) = result.Match<(ContractInvoice?, Invoice)>(
+            success => (success, MapContractToDataEntity(success)),
             errors => throw new InvalidOperationException(
                 $"Failed to mark invoice {invoiceId} as paid: {string.Join(", ", errors.Select(e => e.ErrorMessage))}"));
+
+        await PublishIntegrationEventAsync(new InvoicePaid(tenantId, invoiceId, contractInvoice!));
+
+        invoiceState.State.LastAccessed = DateTime.UtcNow;
+        invoiceState.State.OperationCount++;
+        await invoiceState.WriteStateAsync();
+
+        logger.LogInformation("Marked invoice {InvoiceId} as paid with amount {Amount}",
+            invoiceId, amountPaid);
+
+        return invoice;
     }
 
     /// <inheritdoc />
-    public async Task<Invoice> UpdateStatusAsync(Guid tenantId, string newStatus)
+    public async Task<Invoice> UpdateStatusAsync(Guid tenantId, InvoiceStatus newStatus)
     {
         await EnsureInitialized(tenantId);
 
@@ -104,7 +95,7 @@ public class InvoiceActor(
         }
 
         // Update the status (this would typically be done via a command)
-        var updatedInvoice = currentInvoice with { Status = newStatus };
+        var updatedInvoice = currentInvoice with { Status = newStatus.ToString() };
 
         logger.LogInformation("Updated invoice {InvoiceId} status to {Status}",
             this.GetPrimaryKey(), newStatus);
@@ -136,7 +127,7 @@ public class InvoiceActor(
             return false;
         }
 
-        if (currentInvoice.Status == "Paid")
+        if (currentInvoice.Status == InvoiceStatus.Paid.ToString())
         {
             logger.LogWarning("Invoice {InvoiceId} is already paid", invoiceId);
 
@@ -157,7 +148,7 @@ public class InvoiceActor(
             amount,
             DateTime.UtcNow,
             paymentMethod,
-            Guid.NewGuid().ToString()));
+            Guid.CreateVersion7().ToString()));
 
         return true;
     }
@@ -173,7 +164,8 @@ public class InvoiceActor(
             invoiceState.State.TenantId = tenantId;
             invoiceState.State.ActivatedAt = DateTime.UtcNow;
             invoiceState.State.IsInitialized = true;
-            invoiceState.State.Metadata!["InvoiceId"] = this.GetPrimaryKey().ToString();
+            invoiceState.State.Metadata ??= new Dictionary<string, string>();
+            invoiceState.State.Metadata["InvoiceId"] = this.GetPrimaryKey().ToString();
             await invoiceState.WriteStateAsync();
         }
     }
@@ -190,7 +182,7 @@ public class InvoiceActor(
             TenantId = invoice.TenantId,
             InvoiceId = invoice.InvoiceId,
             Name = invoice.Name,
-            Status = invoice.Status,
+            Status = invoice.Status.ToString(),
             Amount = invoice.Amount,
             Currency = invoice.Currency,
             DueDate = invoice.DueDate,
@@ -206,10 +198,9 @@ public class InvoiceActor(
     /// <typeparam name="T">The type of integration event to publish</typeparam>
     /// <param name="integrationEvent">The integration event to publish</param>
     /// <returns>A task representing the asynchronous operation</returns>
-    private Task PublishIntegrationEventAsync<T>(T integrationEvent) where T : class
+    private async Task PublishIntegrationEventAsync<T>(T integrationEvent) where T : class
     {
         logger.LogDebug("Publishing integration event {EventType}: {Event}", typeof(T).Name, integrationEvent);
-
-        return Task.CompletedTask;
+        await messageBus.PublishAsync(integrationEvent);
     }
 }

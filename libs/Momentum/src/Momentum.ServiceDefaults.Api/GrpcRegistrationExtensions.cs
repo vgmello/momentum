@@ -31,7 +31,12 @@ public static class GrpcRegistrationExtensions
     /// </remarks>
     public static void MapGrpcServices(this IEndpointRouteBuilder routeBuilder)
     {
-        routeBuilder.MapGrpcServices(Assembly.GetEntryAssembly()!);
+        var assembly = Assembly.GetEntryAssembly()
+                       ?? throw new InvalidOperationException(
+                           "Unable to identify entry assembly for gRPC service discovery. " +
+                           "Use the MapGrpcServices(assembly) overload to specify the assembly explicitly.");
+
+        MapGrpcServices(routeBuilder, assembly);
     }
 
     /// <summary>
@@ -45,10 +50,18 @@ public static class GrpcRegistrationExtensions
     /// </remarks>
     public static void MapGrpcServices(this IEndpointRouteBuilder routeBuilder, Type assemblyMarker)
     {
-        routeBuilder.MapGrpcServices(assemblyMarker.Assembly);
+        MapGrpcServices(routeBuilder, assemblyMarker.Assembly);
     }
 
-    private static void MapGrpcServices(this IEndpointRouteBuilder routeBuilder, Assembly assembly)
+    /// <summary>
+    ///     Maps all gRPC services found in the specified assembly to endpoints.
+    /// </summary>
+    /// <param name="routeBuilder">The endpoint route builder to register services with.</param>
+    /// <param name="assembly">The assembly to scan for gRPC services.</param>
+    /// <remarks>
+    ///     This overload allows specifying the exact assembly to scan for gRPC services.
+    /// </remarks>
+    public static void MapGrpcServices(this IEndpointRouteBuilder routeBuilder, Assembly assembly)
     {
         var grpcServiceTypes = assembly.GetTypes()
             .Where(type => type is { IsClass: true, IsAbstract: false, IsInterface: false, IsGenericType: false } && IsGrpcService(type));

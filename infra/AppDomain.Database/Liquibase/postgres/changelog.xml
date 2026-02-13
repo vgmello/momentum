@@ -5,6 +5,6 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <includeAll path="" minDepth="2" relativeToChangelogFile="true" endsWithFilter="changelog.xml"/>
+    <include file="postgres/postgres.sql"/>
 
 </databaseChangeLog>

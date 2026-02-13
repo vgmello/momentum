@@ -1,6 +1,7 @@
 // Copyright (c) OrgName. All rights reserved.
 
 using Orleans.Configuration;
+using Orleans.Dashboard;
 
 namespace AppDomain.BackOffice.Orleans.Infrastructure.Extensions;
 
@@ -50,11 +51,7 @@ public static class OrleansExtensions
 
             siloBuilder.Configure<GrainCollectionOptions>(builder.Configuration.GetSection("Orleans:GrainCollection"));
 
-            siloBuilder.UseDashboard(opt =>
-            {
-                opt.HostSelf = false;
-                opt.Host = "*";
-            });
+            siloBuilder.AddDashboard();
         });
 
         builder.Services
@@ -89,9 +86,9 @@ public static class OrleansExtensions
     /// <param name="app">The web application.</param>
     /// <param name="path">The path to map the dashboard to. Defaults to "/dashboard".</param>
     /// <returns>The web application for method chaining.</returns>
-    public static WebApplication MapOrleansDashboard(this WebApplication app, string path = "/dashboard")
+    public static WebApplication MapDashboard(this WebApplication app, string path = "/dashboard")
     {
-        app.Map(path, opt => opt.UseOrleansDashboard());
+        app.MapOrleansDashboard(routePrefix: path);
 
         return app;
     }

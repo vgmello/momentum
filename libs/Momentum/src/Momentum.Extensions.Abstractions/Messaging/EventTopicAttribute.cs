@@ -32,6 +32,10 @@ public class EventTopicAttribute(string topic, string? domain = null, string ver
     /// </summary>
     /// <value>
     ///     The domain name for this event, or <c>null</c> to use the assembly's default domain.
+    ///     When <c>null</c> or empty, the domain is resolved via
+    ///     <see cref="DefaultDomainAttribute.GetDomainName"/>, which returns the assembly's
+    ///     <see cref="DefaultDomainAttribute.Domain"/> if set, or the first segment of the
+    ///     assembly name as a fallback (e.g., <c>AppDomain.Contracts</c> → <c>AppDomain</c>).
     /// </value>
     public string? Domain { get; } = domain;
 
@@ -43,9 +47,13 @@ public class EventTopicAttribute(string topic, string? domain = null, string ver
     /// <summary>
     ///     Indicates if the event is internal or public (Default: public)
     /// </summary>
-    public bool Internal { get; set; } = false;
+    public bool Internal { get; set; }
 
 
+    /// <summary>
+    ///     Gets a value indicating whether the topic name should be pluralized.
+    ///     Returns <c>false</c> for explicitly named topics.
+    /// </summary>
     public virtual bool ShouldPluralizeTopicName => false;
 }
 

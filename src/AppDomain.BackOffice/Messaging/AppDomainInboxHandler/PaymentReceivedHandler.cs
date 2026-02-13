@@ -2,6 +2,7 @@
 
 using AppDomain.Invoices.Commands;
 using AppDomain.Invoices.Contracts.IntegrationEvents;
+using AppDomain.Invoices.Contracts.Models;
 using AppDomain.Invoices.Queries;
 
 namespace AppDomain.BackOffice.Messaging.AppDomainInboxHandler;
@@ -16,24 +17,28 @@ public static class PaymentReceivedHandler
     /// </summary>
     /// <param name="event">The payment received integration event containing payment details.</param>
     /// <param name="messaging">Message bus for executing commands and queries.</param>
+    /// <param name="logger">Logger for tracking payment processing.</param>
     /// <param name="cancellationToken">Cancellation token for async operations.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    /// <exception cref="InvalidOperationException">Thrown when the associated invoice cannot be retrieved.</exception>
-    public static async Task Handle(PaymentReceived @event, IMessageBus messaging, CancellationToken cancellationToken)
+    public static async Task Handle(PaymentReceived @event, IMessageBus messaging, ILogger logger, CancellationToken cancellationToken)
     {
-        // TODO: Get TenantId from the invoice or event
-        // In a real scenario, this would be retrieved from the invoice context or the event itself
-        var tenantId = Guid.Parse("12345678-0000-0000-0000-000000000000"); // Using the same fake tenant ID for consistency
+        var tenantId = @event.TenantId;
 
         // Get the current invoice to obtain its version for optimistic concurrency
         var getInvoiceQuery = new GetInvoiceQuery(tenantId, @event.InvoiceId);
         var invoiceResult = await messaging.InvokeQueryAsync(getInvoiceQuery, cancellationToken);
 
-        var invoice = invoiceResult.Match(
+        var invoice = invoiceResult.Match<Invoice?>(
             success => success,
-            errors => throw new InvalidOperationException(
-                $"Failed to retrieve invoice {@event.InvoiceId} for payment processing: {string.Join(", ", errors)}")
+            errors =>
+            {
+                logger.LogWarning("Failed to retrieve invoice {InvoiceId} for payment processing: {Errors}",
+                    @event.InvoiceId, string.Join(", ", errors));
+                return null;
+            }
         );
+
+        if (invoice is null) return;
 
         var markPaidCommand = new MarkInvoiceAsPaidCommand(
             tenantId,
@@ -43,6 +48,13 @@ public static class PaymentReceivedHandler
             @event.PaymentDate
         );
 
-        await messaging.InvokeCommandAsync(markPaidCommand, cancellationToken);
+        var markPaidResult = await messaging.InvokeCommandAsync(markPaidCommand, cancellationToken);
+
+        markPaidResult.Switch(
+            _ => logger.LogInformation("Invoice {InvoiceId} marked as paid for tenant {TenantId}",
+                @event.InvoiceId, tenantId),
+            errors => logger.LogWarning("Failed to mark invoice {InvoiceId} as paid: {Errors}",
+                @event.InvoiceId, string.Join(", ", errors.Select(e => e.ErrorMessage)))
+        );
     }
 }

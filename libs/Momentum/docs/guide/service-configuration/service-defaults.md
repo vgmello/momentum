@@ -229,9 +229,9 @@ builder.Services.AddHealthChecks()
 
 The default endpoints are:
 
-- `/health` - Overall health status
-- `/health/internal` - Readiness probe
-- `/health/live` - Liveness probe
+- `/status` - Liveness probe (cached status, no auth)
+- `/health/internal` - Readiness probe (localhost only, detailed in dev)
+- `/health` - Public health check (requires auth, detailed)
 
 ## Application Lifecycle
 
