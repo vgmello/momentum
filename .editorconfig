@@ -231,7 +231,7 @@ csharp_preserve_single_line_statements = true
 
 resharper_unused_type_global_highlighting = none
 resharper_unused_member_global_highlighting = none
-dotnet_diagnostic.S1135.severity = none # Track uses of "TODO" tags
+dotnet_diagnostic.S1135.severity = suggestion # Track uses of "TODO" tags
 dotnet_diagnostic.LOGGEN036.severity = none # A value being logged doesn't have an effective way to be converted into a string
 dotnet_diagnostic.LOGGEN031.severity = none # Logging method "LogRequestReceived" has template(s) that start with "@": @Message
 dotnet_diagnostic.IDE0005.severity = error # Using directive is unnecessary
