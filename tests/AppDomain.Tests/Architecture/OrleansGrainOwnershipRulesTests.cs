@@ -1,5 +1,8 @@
 // Copyright (c) OrgName. All rights reserved.
 
+using NetArchTest.Rules;
+using Orleans.GrainDirectory;
+
 namespace AppDomain.Tests.Architecture;
 
 #pragma warning disable CS8602
@@ -177,5 +180,28 @@ public class OrleansGrainOwnershipRulesTests : ArchitectureTestBase
 
         // Log discovered domains for verification
         Console.WriteLine($"Discovered domains with grains: {string.Join(", ", domainNames)}");
+    }
+
+    [Fact]
+    public void AllGrainImplementations_ShouldHaveGrainDirectoryAttribute()
+    {
+        var grainTypes = Types
+            .InAssembly(typeof(BackOffice.Orleans.DependencyInjection).Assembly)
+            .That().Inherit(typeof(Grain))
+            .And().AreNotAbstract()
+            .GetTypes();
+
+#if INCLUDE_SAMPLE
+        grainTypes.ShouldNotBeEmpty("Should discover at least one grain implementation");
+#endif
+
+        var violations = grainTypes
+            .Where(t => !t.GetCustomAttributes(typeof(GrainDirectoryAttribute), false).Any())
+            .Select(t => t.FullName)
+            .ToList();
+
+        violations.ShouldBeEmpty(
+            $"All grain implementations must have [GrainDirectory] attribute for persistent grain directory. " +
+            $"Missing on: {string.Join(", ", violations)}");
     }
 }
