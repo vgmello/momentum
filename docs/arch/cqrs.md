@@ -6,6 +6,8 @@ title: CQRS Implementation Pattern
 
 This document outlines the Command Query Responsibility Segregation (CQRS) pattern implementation used in the AppDomain application. The design mirrors real-world department operations, making it intuitive for junior engineers and non-technical product people to understand.
 
+This CQRS implementation is part of the broader Domain-Oriented Vertical Slice Architecture. See [Architecture Overview](./index.md) for details.
+
 ## Philosophy
 
 The CQRS implementation follows these core principles:

@@ -158,12 +158,16 @@ YourService/
 
 **Template Configuration**:
 - Components: `--api`, `--backoffice`, `--orleans`, `--aspire`, `--docs`
-- Infrastructure: `--db [none|npgsql|liquibase]`, `--kafka`
+- Infrastructure: `--db-config [default|none|npgsql|liquibase]`, `--kafka`
 - Customization: `--org "Company"`, `--port 8100`, `--no-sample`
 - Libraries: `--libs [defaults|api|ext|kafka|generators]`
 - Development: `--local` (use local NuGet packages for testing)
 
-### Domain-Driven Design Patterns
+### Domain-Oriented Vertical Slice Patterns
+
+Generated services use Domain-Oriented Vertical Slice Architecture (CQRS + Event-Driven).
+They apply DDD-inspired boundaries (bounded contexts, domain language, contracts/events)
+with a pragmatic application-service style.
 
 Generated services follow CQRS with Wolverine:
 

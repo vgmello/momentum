@@ -21,7 +21,7 @@ Structure your code to directly correspond to business operations:
 
 ## Architecture and Design
 
-### Domain-Driven Design
+### Domain-Oriented Vertical Slice
 
 #### Organize by Business Domains
 

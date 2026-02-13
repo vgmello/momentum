@@ -1,6 +1,6 @@
 # AppDomain Microservices Solution
 
-A comprehensive .NET 10 microservices solution implementing Domain-Driven Design principles with event-driven architecture. The solution
+A comprehensive .NET 10 microservices solution implementing Domain-Oriented Vertical Slice Architecture (CQRS + Event-Driven). The solution
 mirrors real-world business operations with separate front office (synchronous APIs) and back office (asynchronous event processing)
 components.
 
@@ -8,9 +8,11 @@ components.
 
 The AppDomain solution demonstrates modern enterprise architecture patterns including:
 
--   **Domain-Driven Design (DDD)** with clear bounded contexts
+-   **Domain-Oriented Vertical Slice Architecture** with clear domain-centric slices
+-   **DDD-inspired boundaries** with bounded contexts, domain language, and contracts/events
 -   **Event-driven architecture** using Apache Kafka
 -   **CQRS pattern** with separate command and query handling
+-   **Pragmatic application-service style** over heavy domain object ceremony
 -   **Microservices architecture** with proper service boundaries
 <!--#if (INCLUDE_ORLEANS) -->
 -   **Orleans-based stateful processing** for complex business workflows

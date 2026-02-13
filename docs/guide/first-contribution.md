@@ -22,9 +22,11 @@ Welcome to the AppDomain Solution! This guide will walk you through making your 
 The AppDomain Solution is a microservices-based system that follows these key principles:
 
 - **Real-world mirroring**: Code structure reflects actual business operations
+- **Domain-Oriented Vertical Slice (CQRS + Event-Driven)**: Organize code by business capabilities and use-case flows
+- **DDD-inspired boundaries**: Bounded contexts, domain language, and contracts/events
+- **Pragmatic application-service style**: Keep business workflows explicit without heavy object-centric ceremony
 - **Event-driven architecture**: Services communicate through integration events
 - **CQRS patterns**: Separate commands (writes) from queries (reads)
-- **Domain-driven design**: Business logic organized around domain concepts
 
 ### Code of Conduct
 

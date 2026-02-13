@@ -1,12 +1,12 @@
 ---
 title: Adding Domains
-description: Guide for adding new business domains to your Momentum application, following Domain-Driven Design principles and CQRS patterns.
+description: Guide for adding new business domains to your Momentum application using Domain-Oriented Vertical Slice patterns.
 date: 2024-01-15
 ---
 
 # Adding Domains
 
-Guide for adding new business domains to your Momentum application, following Domain-Driven Design principles and CQRS patterns.
+This guide walks you through adding new business domains to your Momentum application, following established patterns for consistency and maintainability.
 
 ## Overview
 

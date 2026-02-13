@@ -4,7 +4,7 @@
 
 This class configures the core messaging infrastructure used for CQRS patterns, event-driven architecture, and cross-service communication. It integrates with PostgreSQL for message persistence and supports CloudEvents for standardized messaging.
 
-The configuration automatically derives service names and URNs from the application assembly name, following domain-driven design patterns where the assembly name reflects the business domain.
+The configuration automatically derives service names and URNs from the application assembly name, following domain-oriented naming patterns where the assembly name reflects the business domain and bounded context.
 
 ## Domain Property
 
@@ -51,7 +51,7 @@ The URN format ensures uniqueness across different domains and services while ma
 // Domain: "ECommerce", PublicServiceName: "order-service"
 // Generated URN: "/e_commerce/order-service"
 
-// Domain: "CustomerManagement", PublicServiceName: "customer-api"  
+// Domain: "CustomerManagement", PublicServiceName: "customer-api"
 // Generated URN: "/customer_management/customer-api"
 ```
 
@@ -132,7 +132,7 @@ The configurator follows the .NET options pattern for post-configuration process
 
 ```
 // Missing connection string warning:
-// "ConnectionStrings:ServiceBus is not set. Transactional Inbox/Outbox 
+// "ConnectionStrings:ServiceBus is not set. Transactional Inbox/Outbox
 //  and Message Persistence features disabled"
 
 // This allows the application to start without messaging persistence

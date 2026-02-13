@@ -314,7 +314,7 @@ docker compose up
 
 ## Common Patterns Demonstrated
 
-- **Domain-Driven Design**: Clear domain boundaries and ubiquitous language
+- **DDD-Inspired Boundaries**: Clear domain boundaries and ubiquitous language in a pragmatic application-service style
 - **CQRS**: Separation of read and write operations
 - **Event-Driven Architecture**: Loose coupling through events
 - **Source Generation**: Compile-time code generation for performance

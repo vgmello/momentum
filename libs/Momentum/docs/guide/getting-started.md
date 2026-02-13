@@ -172,7 +172,7 @@ OrderService/
 
 ### **Business Domain Organization**
 
-Generated code follows Domain-Driven Design principles with Wolverine CQRS patterns:
+Generated code follows a Domain-Oriented Vertical Slice approach with Wolverine CQRS patterns and event-driven contracts:
 
 ```
 src/OrderService/

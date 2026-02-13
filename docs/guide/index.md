@@ -4,7 +4,7 @@ Welcome to the AppDomain Solution documentation. This comprehensive system provi
 
 ## System Overview
 
-The AppDomain Solution is a domain-driven application that manages the complete AppDomain lifecycle for organizations. Built with Vertical Slice Architecture principles and event-driven patterns, it provides a scalable and maintainable foundation for AppDomain operations.
+The AppDomain Solution uses Domain-Oriented Vertical Slice Architecture to manage the complete AppDomain lifecycle for organizations. See [Architecture Overview](/arch/) for details.
 
 ## Design Philosophy
 
