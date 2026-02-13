@@ -56,7 +56,7 @@ public class CorsConfigurationTests
 
         var client = app.GetTestClient();
 
-        var request = new HttpRequestMessage(HttpMethod.Get, "/test");
+        using var request = new HttpRequestMessage(HttpMethod.Get, "/test");
         request.Headers.Add("Origin", "https://localhost:3000");
         var response = await client.SendAsync(request, TestContext.Current.CancellationToken);
 
