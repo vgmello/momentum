@@ -6,9 +6,9 @@ on:
   pull_request_review_comment:
     types: [created, edited]
   issues:
-    types: [opened, assigned]
+    types: [opened, assigned, edited]
   pull_request_review:
-    types: [submitted]
+    types: [submitted, edited]
 
 env:
   DOTNET_VERSION: "10.0.x"
@@ -19,6 +19,11 @@ permissions:
   issues: write
   id-token: write
   actions: read
+  
+# Ensure only one workflow runs at a time per issue/PR
+concurrency:
+  group: claude-${{ github.event_name }}-${{ github.event.issue.number || github.event.pull_request.number }}
+  cancel-in-progress: false
 
 jobs:
   claude:
@@ -27,24 +32,182 @@ jobs:
       (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
       (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
       (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
+    runs-on: self-hosted
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-        with:
-          fetch-depth: 1
+      - name: Extract Context
+        id: context
+        env:
+          DIFF_HUNK: ${{ github.event.comment.diff_hunk }}
+        run: |
+          # Initialize variables
+          NUMBER=""
+          TYPE=""
+          BODY=""
+          ACTOR=""
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+          case "${{ github.event_name }}" in
+            issues)
+              echo "NUMBER=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
+              echo "TYPE=issue" >> $GITHUB_OUTPUT
+              NUMBER="${{ github.event.issue.number }}"
+              TYPE="issue"
+              BODY="${{ github.event.issue.body }}"
+              ACTOR="${{ github.event.issue.user.login }}"
+              ;;
+            issue_comment)
+              echo "NUMBER=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
+              echo "TYPE=issue" >> $GITHUB_OUTPUT
+              NUMBER="${{ github.event.issue.number }}"
+              TYPE="issue"
+              BODY="${{ github.event.comment.body }}"
+              ACTOR="${{ github.event.comment.user.login }}"
+              ;;
+            pull_request_review_comment)
+              echo "NUMBER=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+              echo "TYPE=pr" >> $GITHUB_OUTPUT
+              NUMBER="${{ github.event.pull_request.number }}"
+              TYPE="pr"
+              echo "REF=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
+              echo "COMMENT_ID=${{ github.event.comment.id }}" >> $GITHUB_OUTPUT
+              echo "COMMENT_PATH=${{ github.event.comment.path }}" >> $GITHUB_OUTPUT
+              echo "COMMENT_LINE=${{ github.event.comment.line }}" >> $GITHUB_OUTPUT
+              {
+                echo "COMMENT_DIFF_HUNK<<EOF"
+                printf '%s\n' "$DIFF_HUNK" | head -n 5
+                echo "EOF"
+              } >> $GITHUB_OUTPUT
+              BODY="${{ github.event.comment.body }}"
+              ACTOR="${{ github.event.comment.user.login }}"
+              ;;
+            pull_request_review)
+              echo "NUMBER=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+              echo "TYPE=pr" >> $GITHUB_OUTPUT
+              NUMBER="${{ github.event.pull_request.number }}"
+              TYPE="pr"
+              echo "REF=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
+              BODY="${{ github.event.review.body }}"
+              ACTOR="${{ github.event.review.user.login }}"
+              ;;
+          esac
+
+          echo "ACTOR=$ACTOR" >> $GITHUB_OUTPUT
+
+          # Check if PR branch follows issue-{number} pattern
+          # If so, use the issue number for Claude branch but keep PR number for comments
+          CLAUDE_NUMBER="${NUMBER}"
+          CLAUDE_TYPE="${TYPE}"
+          if [ "${{ github.event_name }}" == "pull_request_review_comment" ] || [ "${{ github.event_name }}" == "pull_request_review" ]; then
+            BRANCH_NAME="${{ github.event.pull_request.head.ref }}"
+            if [[ "$BRANCH_NAME" =~ ^issue-([0-9]+)$ ]]; then
+              ISSUE_NUM="${BASH_REMATCH[1]}"
+              echo "Detected issue branch pattern: $BRANCH_NAME -> issue #$ISSUE_NUM"
+              CLAUDE_NUMBER="$ISSUE_NUM"
+              CLAUDE_TYPE="issue"
+            fi
+          fi
+
+          echo "CLAUDE_NUMBER=$CLAUDE_NUMBER" >> $GITHUB_OUTPUT
+          echo "CLAUDE_TYPE=$CLAUDE_TYPE" >> $GITHUB_OUTPUT
+
+          # Remove @claude mentions
+          BODY=$(echo "$BODY" | sed 's/@claude//g')
+
+          # Multi-line output
+          {
+            echo "BODY<<EOF"
+            echo "$BODY"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+
+      - name: Check User Permissions
+        id: permission_check
+        run: |
+          # Prefer an explicit PAT with repo + workflow scopes if provided; otherwise use the job token
+          TOKEN="${{ secrets.GH_PAT }}"
+          if [ -z "$TOKEN" ]; then
+            TOKEN="${{ github.token }}"
+          fi
+
+          # Get the user's permission level using GitHub API
+          ACTOR="${{ steps.context.outputs.ACTOR }}"
+          REPO="${{ github.repository }}"
+
+          echo "Checking permissions for user: $ACTOR"
+
+          # Query GitHub API for user's permission level
+          PERMISSION_RESPONSE=$(curl -s -H "Authorization: token $TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/$REPO/collaborators/$ACTOR/permission")
+
+          PERMISSION=$(echo "$PERMISSION_RESPONSE" | jq -r '.permission // "none"')
+
+          echo "User $ACTOR has permission level: $PERMISSION"
+
+          # Check if user has write, maintain, or admin permission
+          if [[ "$PERMISSION" == "write" || "$PERMISSION" == "maintain" || "$PERMISSION" == "admin" ]]; then
+            echo "has_permission=true" >> $GITHUB_OUTPUT
+            echo "✅ User $ACTOR has sufficient permissions ($PERMISSION)"
+          else
+            echo "has_permission=false" >> $GITHUB_OUTPUT
+            echo "❌ User $ACTOR does not have sufficient permissions (current: $PERMISSION, required: write or above)"
+
+            TYPE="${{ steps.context.outputs.TYPE }}"
+            NUMBER="${{ steps.context.outputs.NUMBER }}"
+
+            COMMENT_BODY="⚠️ **Permission Denied**
+
+            Hi @$ACTOR, you need write access or higher to use the Claude workflow."
+            
+            if [ "$TYPE" == "issue" ]; then
+              gh issue comment "$NUMBER" --body "$COMMENT_BODY"
+            else
+              gh pr comment "$NUMBER" --body "$COMMENT_BODY"
+            fi
+          fi
 
       - name: Run Claude Code
-        id: claude
-        uses: anthropics/claude-code-action@v1
-        with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          claude_args: |
-            --model claude-sonnet-4-0
+        if: steps.permission_check.outputs.has_permission == 'true'
+        run: |
+          # Prefer an explicit PAT with repo + workflow scopes if provided; otherwise use the job token
+          TOKEN="${{ secrets.GH_PAT }}"
+          if [ -z "$TOKEN" ]; then
+            TOKEN="${{ github.token }}"
+          fi
+
+          USER_PROMPT="You are working on ${{ steps.context.outputs.TYPE }} #${{ steps.context.outputs.NUMBER }} in repository ${{ github.repository }}."
+
+          # Add PR review comment context if available
+          if [ -n "${{ steps.context.outputs.COMMENT_PATH }}" ]; then
+            USER_PROMPT="$USER_PROMPT
+
+          This is a PR review comment on:
+          - File: ${{ steps.context.outputs.COMMENT_PATH }}
+          - Line: ${{ steps.context.outputs.COMMENT_LINE }}
+          - Comment ID: ${{ steps.context.outputs.COMMENT_ID }}
+          - Code context:
+          \`\`\`
+          ${{ steps.context.outputs.COMMENT_DIFF_HUNK }}
+          \`\`\`"
+          fi
+
+          USER_PROMPT="$USER_PROMPT
+
+          User request: ${{ steps.context.outputs.BODY }}"
+
+          docker run --rm \
+            -e CLAUDE_CODE_OAUTH_TOKEN="${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}" \
+            -e GITHUB_TOKEN="$TOKEN" \
+            -e GITHUB_REPOSITORY="${{ github.repository }}" \
+            -e GITHUB_REF="${{ steps.context.outputs.REF }}" \
+            -e CLAUDE_BRANCH_NAME="claude-${{ steps.context.outputs.CLAUDE_TYPE }}-${{ steps.context.outputs.CLAUDE_NUMBER }}" \
+            -e USER_PROMPT="$USER_PROMPT" \
+            -e GITHUB_ACTOR="${{ steps.context.outputs.ACTOR }}" \
+            -e ISSUE_TYPE="${{ steps.context.outputs.TYPE }}" \
+            -e ISSUE_NUMBER="${{ steps.context.outputs.NUMBER }}" \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            sdlc-claude:latest

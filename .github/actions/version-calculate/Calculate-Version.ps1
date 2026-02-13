@@ -46,7 +46,13 @@ function Get-LatestRelease {
     $versions = git tag -l $tagPattern 2>$null | Where-Object { $_ } |
     ForEach-Object {
         try {
-            [System.Management.Automation.SemanticVersion]($_.Replace($TagPrefix, ""))
+            # Use proper prefix removal instead of Replace to avoid removing characters from middle of string
+            $versionString = if ($_.StartsWith($TagPrefix)) { 
+                $_.Substring($TagPrefix.Length) 
+            } else { 
+                $_ 
+            }
+            [System.Management.Automation.SemanticVersion]($versionString)
         }
         catch { $null }
     } | Where-Object { $_ }
