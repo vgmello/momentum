@@ -31,6 +31,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.Configuration" VersionOverride="10.0.3" />
         <ProjectReference Include="..\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
     </ItemGroup>
     <!--#endif -->
