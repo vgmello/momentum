@@ -26,10 +26,6 @@ public static class OpenTelemetrySetupExtensions
     private const double DevelopmentSamplingRate = 1.0;
 
     /// <summary>
-    ///     Sampling rate for production environment (10% - balance between observability and performance).
-    /// </summary>
-    private const double ProductionSamplingRate = 0.1;
-    /// <summary>
     ///     Adds comprehensive OpenTelemetry instrumentation for production-ready observability including logging, metrics, and distributed
     ///     tracing.
     /// </summary>
@@ -43,6 +39,9 @@ public static class OpenTelemetrySetupExtensions
     /// </example>
     public static IHostApplicationBuilder AddOpenTelemetry(this IHostApplicationBuilder builder)
     {
+        var otelOptions = new OpenTelemetryOptions();
+        builder.Configuration.GetSection(OpenTelemetryOptions.SectionName).Bind(otelOptions);
+
         var activitySourceName = builder.Configuration.GetValue<string>("OpenTelemetry:ActivitySourceName")
                                  ?? builder.Environment.ApplicationName;
 
@@ -67,7 +66,9 @@ public static class OpenTelemetrySetupExtensions
             .ConfigureResource(resource => resource
                 .AddAttributes(new Dictionary<string, object>
                 {
-                    ["env"] = builder.Environment.EnvironmentName
+                    ["env"] = builder.Environment.EnvironmentName,
+                    ["service.instance.id"] = Environment.MachineName,
+                    ["host.name"] = Environment.MachineName
                 }))
             .WithMetrics(metrics => metrics
                 .AddMeter(activitySourceName)
@@ -112,7 +113,7 @@ public static class OpenTelemetrySetupExtensions
                     };
                 })
                 .SetSampler(new TraceIdRatioBasedSampler(
-                    builder.Environment.IsDevelopment() ? DevelopmentSamplingRate : ProductionSamplingRate)));
+                    builder.Environment.IsDevelopment() ? DevelopmentSamplingRate : otelOptions.ProductionSamplingRate)));
 
         return builder;
     }
