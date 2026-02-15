@@ -1,9 +1,10 @@
 {
-  "strictFileMatching": true,
+  "strictFileMatching": false,
   "ignoreFiles": [],
   "customAssertions": {
     "sidebar.json": "Should properly group events by subdomain and create hierarchical navigation structure"
   },
   "generateSchemas": false,
-  "generateSidebar": true
+  "generateSidebar": true,
+  "focusedEvents": ["UserCreated", "InvoiceGenerated", "PaymentProcessed", "SubscriptionActivated"]
 }

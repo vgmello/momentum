@@ -23,16 +23,21 @@ runs:
 
     - name: Restore dependencies
       shell: bash
+      env:
+        BUILD_TARGET: ${{ inputs.build-target }}
       run: |
         echo "📦 Restoring dependencies..."
-        dotnet restore ${{ inputs.build-target }} --verbosity minimal
+        dotnet restore "$BUILD_TARGET" --verbosity minimal
 
     - name: Build project
       shell: bash
+      env:
+        BUILD_TARGET: ${{ inputs.build-target }}
+        BUILD_CONFIGURATION: ${{ inputs.configuration }}
       run: |
-        echo "🔨 Building ${{ inputs.build-target }}..."
-        dotnet build ${{ inputs.build-target }} \
-          --configuration ${{ inputs.configuration }} \
+        echo "🔨 Building $BUILD_TARGET..."
+        dotnet build "$BUILD_TARGET" \
+          --configuration "$BUILD_CONFIGURATION" \
           --no-restore \
           --verbosity minimal
 

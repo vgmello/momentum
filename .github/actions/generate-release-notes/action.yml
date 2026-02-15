@@ -24,8 +24,13 @@ runs:
     - name: Generate release notes
       id: generate
       shell: pwsh
+      env:
+        ACTION_PATH: ${{ github.action_path }}
+        INPUT_VERSION: ${{ inputs.version }}
+        INPUT_TAG: ${{ inputs.tag }}
+        INPUT_PREVIOUS_TAG: ${{ inputs.previous-tag }}
       run: |
-        & "${{ github.action_path }}/Generate-ReleaseNotes.ps1" `
-          -Version "${{ inputs.version }}" `
-          -Tag "${{ inputs.tag }}" `
-          -PreviousTag "${{ inputs.previous-tag }}"
+        & "$env:ACTION_PATH/Generate-ReleaseNotes.ps1" `
+          -Version $env:INPUT_VERSION `
+          -Tag $env:INPUT_TAG `
+          -PreviousTag $env:INPUT_PREVIOUS_TAG

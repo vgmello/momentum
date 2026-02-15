@@ -12,7 +12,7 @@ public class CorsSettingsTests
         var settings = new CorsSettings();
 
         settings.AllowedOrigins.ShouldBeEmpty();
-        settings.AllowedMethods.ShouldBe(["GET", "POST", "PUT", "DELETE"]);
+        settings.AllowedMethods.ShouldBe(["GET", "POST", "PUT", "PATCH", "DELETE"]);
         settings.AllowedHeaders.ShouldBe(["Content-Type", "Authorization"]);
         settings.AllowCredentials.ShouldBeFalse();
     }

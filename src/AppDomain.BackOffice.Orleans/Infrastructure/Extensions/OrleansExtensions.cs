@@ -11,6 +11,7 @@ namespace AppDomain.BackOffice.Orleans.Infrastructure.Extensions;
 public static class OrleansExtensions
 {
     public const string SectionName = "Orleans";
+    public const string GrainDirectoryName = "Default";
 
     /// <summary>
     ///     Adds and configures Orleans silo with clustering, grain state persistence, and monitoring.
@@ -23,6 +24,7 @@ public static class OrleansExtensions
         var config = builder.Configuration.GetSection(sectionName);
 
         var useLocalCluster = config.GetValue<bool>("UseLocalhostClustering");
+        string? grainDirectoryConnectionString = null;
 
         if (!useLocalCluster)
         {
@@ -34,8 +36,24 @@ public static class OrleansExtensions
             if (string.IsNullOrEmpty(orleansConnectionString))
                 throw new InvalidOperationException($"Orleans connection string '{orleansConnectionString}' is not set.");
 
+            var grainDirectoryServiceName = GetServiceName(config, "GrainDirectory:Default:ServiceKey", "GrainDirectory");
+
+            // Fall back to clustering connection string when grain directory has no dedicated connection
+            // (e.g., Docker Compose where only ConnectionStrings:Orleans is set)
+            if (string.IsNullOrEmpty(builder.Configuration.GetConnectionString(grainDirectoryServiceName)))
+            {
+                grainDirectoryServiceName = clusterServiceName;
+                config["GrainDirectory:Default:ServiceKey"] = clusterServiceName;
+            }
+
+            grainDirectoryConnectionString = builder.Configuration.GetConnectionString(grainDirectoryServiceName)
+                                            ?? orleansConnectionString;
+
             builder.AddKeyedAzureTableServiceClient(clusterServiceName);
             builder.AddKeyedAzureBlobServiceClient(grainStateServiceName);
+
+            if (grainDirectoryServiceName != clusterServiceName)
+                builder.AddKeyedAzureTableServiceClient(grainDirectoryServiceName);
         }
         else
         {
@@ -50,6 +68,13 @@ public static class OrleansExtensions
             }
 
             siloBuilder.Configure<GrainCollectionOptions>(builder.Configuration.GetSection("Orleans:GrainCollection"));
+
+            if (!useLocalCluster)
+            {
+                siloBuilder.AddAzureTableGrainDirectory(
+                    GrainDirectoryName,
+                    options => options.TableServiceClient = new Azure.Data.Tables.TableServiceClient(grainDirectoryConnectionString));
+            }
 
             siloBuilder.AddDashboard();
         });

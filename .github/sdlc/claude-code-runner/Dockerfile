@@ -2,7 +2,7 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0-noble
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install system dependencies as root
+# Install system dependencies as root, create claude user with sudo access
 RUN apt-get update && \
     apt-get install -y \
     ca-certificates \
@@ -26,10 +26,10 @@ RUN apt-get update && \
     apt-get install -y gh && \
     #
     # Cleanup
-    rm -rf /var/lib/apt/lists/* /tmp/githubcli-archive-keyring.gpg
-
-# Create claude user with sudo access and workspace directory
-RUN useradd -m -s /bin/bash claude && \
+    rm -rf /var/lib/apt/lists/* /tmp/githubcli-archive-keyring.gpg && \
+    #
+    # Create claude user with sudo access and workspace directory
+    useradd -m -s /bin/bash claude && \
     mkdir -p /workspace && \
     chown -R claude:claude /workspace && \
     usermod -aG sudo claude && \
@@ -43,7 +43,7 @@ USER claude
 ENV NVM_DIR="/home/claude/.nvm" \
     PATH="/home/claude/.nvm/versions/node/default/bin:/home/claude/.local/bin:$PATH"
 
-# Install nvm and Node.js
+# Install nvm, Node.js, and Claude Code CLI
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash && \
     . "$NVM_DIR/nvm.sh" && \
     nvm install 22 && \
@@ -52,10 +52,10 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | b
     # Add node to PATH
     echo 'export NVM_DIR="$HOME/.nvm"' >> /home/claude/.bashrc && \
     echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> /home/claude/.bashrc && \
-    echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"' >> /home/claude/.bashrc
-
-# Install Claude Code CLI
-RUN curl -fsSL https://claude.ai/install.sh | bash
+    echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"' >> /home/claude/.bashrc && \
+    #
+    # Install Claude Code CLI
+    curl -fsSL https://claude.ai/install.sh | bash
 
 COPY --chmod=755 entrypoint.sh /usr/local/bin/entrypoint.sh
 

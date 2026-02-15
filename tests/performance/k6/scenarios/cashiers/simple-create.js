@@ -36,7 +36,7 @@ function generateCashierData() {
     };
 }
 
-export default function () {
+export default function main() {
     group("Create Cashier Test", () => {
         // Generate test data
         const cashierData = generateCashierData();
@@ -64,6 +64,7 @@ export default function () {
                     const body = JSON.parse(r.body);
                     return body.name === cashierData.name;
                 } catch (e) {
+                    console.warn("Failed to parse response for name check:", e);
                     return false;
                 }
             },
@@ -72,19 +73,20 @@ export default function () {
                     const body = JSON.parse(r.body);
                     return body.email === cashierData.email;
                 } catch (e) {
+                    console.warn("Failed to parse response for email check:", e);
                     return false;
                 }
             },
         });
 
-        if (!success) {
+        if (success) {
+            console.log(`✓ Cashier created successfully: ${cashierData.name}`);
+        } else {
             console.error(`Create cashier failed:`, {
                 status: createResponse.status,
                 body: createResponse.body,
                 error: createResponse.error,
             });
-        } else {
-            console.log(`✓ Cashier created successfully: ${cashierData.name}`);
         }
 
         // Small pause between iterations

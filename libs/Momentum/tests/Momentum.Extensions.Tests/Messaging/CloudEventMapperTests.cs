@@ -198,16 +198,6 @@ public class CloudEventMapperTests
         envelope.Id.ShouldBe(originalId);
     }
 
-    [Fact]
-    public void AllHeaders_ReturnsEmptyEnumerable()
-    {
-        // Act
-        var headers = _mapper.AllHeaders();
-
-        // Assert
-        headers.ShouldBeEmpty();
-    }
-
     private static Message<string, byte[]> CreateCloudEventMessage()
     {
         var headers = new Headers

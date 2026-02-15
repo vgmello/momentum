@@ -63,4 +63,7 @@ internal abstract class SourceGenBaseWriter
         sb.AppendLine("#nullable enable");
         sb.AppendLine();
     }
+
+    protected const string GeneratedCodeAttribute =
+        "[global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"Momentum.SourceGenerators\", \"1.0\")]";
 }

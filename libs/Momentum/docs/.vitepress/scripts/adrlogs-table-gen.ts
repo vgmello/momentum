@@ -52,7 +52,7 @@ function getStatusBadgeType(status: string): string {
 function formatDate(date: string | Date): string {
     try {
         const dateObj = new Date(date);
-        if (isNaN(dateObj.getTime())) return date.toString(); // Invalid date
+        if (Number.isNaN(dateObj.getTime())) return date.toString(); // Invalid date
         return dateObj.toISOString().split("T")[0]; // YYYY-MM-DD
     } catch {
         return date.toString();

@@ -11,8 +11,6 @@ using Wolverine;
 using Wolverine.Kafka;
 using static Momentum.Extensions.Messaging.Kafka.KafkaAspireExtensions;
 
-#pragma warning disable S3011
-
 namespace Momentum.Extensions.Messaging.Kafka;
 
 /// <summary>

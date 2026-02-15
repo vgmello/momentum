@@ -13,11 +13,14 @@ GITHUB_REF="${GITHUB_REF:-}"  # If empty, will use default branch
 CLAUDE_BRANCH_NAME="${CLAUDE_BRANCH_NAME:?Error: CLAUDE_BRANCH_NAME is required}"
 USER_PROMPT="${USER_PROMPT:?Error: USER_PROMPT is required}"
 
+# Constants
+readonly GIT_TOKEN_FILTER='x-access-token'
+
 # Validate CLAUDE_BRANCH_NAME is not just "claude--"
 if [[ "$CLAUDE_BRANCH_NAME" == "claude--" ]] || [[ "$CLAUDE_BRANCH_NAME" =~ ^claude--$ ]]; then
     echo ""
     echo "=========================================="
-    echo "ERROR: Invalid CLAUDE_BRANCH_NAME"
+    echo "ERROR: Invalid CLAUDE_BRANCH_NAME" >&2
     echo "=========================================="
     echo ""
     echo "CLAUDE_BRANCH_NAME is set to: '$CLAUDE_BRANCH_NAME'"
@@ -44,14 +47,15 @@ CLAUDE_OUTPUT_FILE="/tmp/claude-output.txt"
 # Function to commit and push Claude state changes
 commit_claude_state() {
     cd "$CLAUDE_STATE_DIR"
-    
+
     if [[ -n $(git status -s) ]]; then
         echo "Changes detected in Claude state"
         git add .
-        git commit -m "Claude Code state update" 2>&1 | grep -v "x-access-token" || true
-        git push -u origin "$CLAUDE_BRANCH_NAME" 2>&1 | grep -v "x-access-token" || true
+        git commit -m "Claude Code state update" 2>&1 | grep -v "$GIT_TOKEN_FILTER" || true
+        git push -u origin "$CLAUDE_BRANCH_NAME" 2>&1 | grep -v "$GIT_TOKEN_FILTER" || true
         echo "Claude state committed and pushed to branch: $CLAUDE_BRANCH_NAME"
     fi
+    return 0
 }
 
 # Background function to periodically commit Claude state
@@ -60,6 +64,7 @@ background_commit_loop() {
         sleep 30
         commit_claude_state
     done
+    return 0
 }
 
 echo "Configuration:"
@@ -71,7 +76,7 @@ echo ""
 # Setup git credentials
 echo "=== Setting up Git credentials ==="
 git config --global credential.helper store
-echo "https://x-access-token:${GITHUB_TOKEN}@github.com" > /home/claude/.git-credentials
+echo "https://${GIT_TOKEN_FILTER}:${GITHUB_TOKEN}@github.com" > /home/claude/.git-credentials
 git config --global user.name "github-actions[bot]"
 git config --global user.email "github-actions[bot]@users.noreply.github.com"
 echo "Git credentials configured"
@@ -81,12 +86,12 @@ echo ""
 echo "=== Setting up Claude state branch ==="
 mkdir -p "$(dirname "$CLAUDE_STATE_DIR")"
 
-if git ls-remote --heads "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$CLAUDE_BRANCH_NAME" 2>&1 | grep -v "x-access-token" | grep -q "$CLAUDE_BRANCH_NAME"; then
+if git ls-remote --heads "https://${GIT_TOKEN_FILTER}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$CLAUDE_BRANCH_NAME" 2>&1 | grep -v "$GIT_TOKEN_FILTER" | grep -q "$CLAUDE_BRANCH_NAME"; then
     echo "Claude branch exists, cloning: $CLAUDE_BRANCH_NAME"
-    git clone --depth 1 --branch "$CLAUDE_BRANCH_NAME" "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$CLAUDE_STATE_DIR" 2>&1 | grep -v "x-access-token" || true
+    git clone --depth 1 --branch "$CLAUDE_BRANCH_NAME" "https://${GIT_TOKEN_FILTER}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$CLAUDE_STATE_DIR" 2>&1 | grep -v "$GIT_TOKEN_FILTER" || true
 else
     echo "Claude branch does not exist, creating: $CLAUDE_BRANCH_NAME"
-    git clone --depth 1 "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$CLAUDE_STATE_DIR" 2>&1 | grep -v "x-access-token" || true
+    git clone --depth 1 "https://${GIT_TOKEN_FILTER}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$CLAUDE_STATE_DIR" 2>&1 | grep -v "$GIT_TOKEN_FILTER" || true
     cd "$CLAUDE_STATE_DIR"
     git checkout -b "$CLAUDE_BRANCH_NAME"
 fi
@@ -99,12 +104,12 @@ cd "$WORKSPACE_DIR"
 
 # Clone main repository
 echo "=== Cloning main repository ==="
-if [ -n "$GITHUB_REF" ]; then
+if [[ -n "$GITHUB_REF" ]]; then
     echo "Cloning with specific ref: $GITHUB_REF"
-    git clone --depth 1 --branch "$GITHUB_REF" "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$WORKSPACE_DIR" 2>&1 | grep -v "x-access-token" || true
+    git clone --depth 1 --branch "$GITHUB_REF" "https://${GIT_TOKEN_FILTER}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$WORKSPACE_DIR" 2>&1 | grep -v "$GIT_TOKEN_FILTER" || true
 else
     echo "Cloning default branch"
-    git clone --depth 1 "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$WORKSPACE_DIR" 2>&1 | grep -v "x-access-token" || true
+    git clone --depth 1 "https://${GIT_TOKEN_FILTER}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$WORKSPACE_DIR" 2>&1 | grep -v "$GIT_TOKEN_FILTER" || true
 fi
 
 echo "Repository cloned to: $WORKSPACE_DIR"
@@ -116,7 +121,7 @@ echo "=== Preparing prompts ==="
 # System prompt - read from repo
 SYSTEM_PROMPT_FILE="$WORKSPACE_DIR/.github/sdlc/claude-system-prompt.md"
 
-if [ -f "$SYSTEM_PROMPT_FILE" ]; then
+if [[ -f "$SYSTEM_PROMPT_FILE" ]]; then
     echo "System prompt found at: $SYSTEM_PROMPT_FILE"
     SYSTEM_PROMPT=$(cat "$SYSTEM_PROMPT_FILE")
 else
@@ -161,7 +166,7 @@ echo ""
 CLAUDE_ARGS=(claude --continue --print --dangerously-skip-permissions)
 
 # Add system prompt
-if [ -n "$SYSTEM_PROMPT" ]; then
+if [[ -n "$SYSTEM_PROMPT" ]]; then
     CLAUDE_ARGS+=(--system-prompt "$SYSTEM_PROMPT")
 fi
 

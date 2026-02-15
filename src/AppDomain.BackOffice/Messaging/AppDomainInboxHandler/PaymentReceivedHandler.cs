@@ -51,8 +51,14 @@ public static class PaymentReceivedHandler
         var markPaidResult = await messaging.InvokeCommandAsync(markPaidCommand, cancellationToken);
 
         markPaidResult.Switch(
-            _ => logger.LogInformation("Invoice {InvoiceId} marked as paid for tenant {TenantId}",
-                @event.InvoiceId, tenantId),
+            _ =>
+            {
+                if (logger.IsEnabled(LogLevel.Information))
+                {
+                    logger.LogInformation("Invoice {InvoiceId} marked as paid for tenant {TenantId}",
+                        @event.InvoiceId, tenantId);
+                }
+            },
             errors => logger.LogWarning("Failed to mark invoice {InvoiceId} as paid: {Errors}",
                 @event.InvoiceId, string.Join(", ", errors.Select(e => e.ErrorMessage)))
         );

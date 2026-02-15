@@ -19,8 +19,11 @@ public static class CashierCreatedHandler
     /// <returns>A completed task.</returns>
     public static Task Handle(CashierCreated @event, ILogger logger, IMessageBus _, CancellationToken __)
     {
-        logger.LogInformation("Cashier created event received for tenant {TenantId}, cashier {CashierId}",
-            @event.TenantId, @event.Cashier.CashierId);
+        if (logger.IsEnabled(LogLevel.Information))
+        {
+            logger.LogInformation("Cashier created event received for tenant {TenantId}, cashier {CashierId}",
+                @event.TenantId, @event.Cashier.CashierId);
+        }
 
         // TODO: Add business logic for processing cashier creation
         // Examples: Update read models, send notifications, sync with external systems

@@ -1,9 +1,8 @@
-import fs from 'node:fs';
+import fs, { createReadStream } from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { glob } from 'glob';
 import { execSync } from 'node:child_process';
-import { createReadStream } from 'node:fs';
 import { pipeline } from 'node:stream/promises';
 
 import docfxConfig from '../../docfx.json' with { type: 'json' };
@@ -123,7 +122,7 @@ async function detectChanges(files: string[], previousState: State | null)
     // Check for new or modified files
     for (const [filePath, info] of Object.entries(currentFiles)) {
         const prevInfo = previousFiles[filePath];
-        if (!prevInfo || prevInfo.checksum !== info.checksum) {
+        if (prevInfo?.checksum !== info.checksum) {
             log(`Changed: ${filePath}`);
             hasChanges = true;
         }

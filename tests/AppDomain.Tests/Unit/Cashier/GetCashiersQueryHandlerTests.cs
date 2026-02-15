@@ -55,7 +55,7 @@ public class GetCashiersQueryHandlerTests
         messagingMock.InvokeQueryAsync(
                 Arg.Any<GetCashiersQueryHandler.DbQuery>(),
                 Arg.Any<CancellationToken>())
-            .Returns(new List<AppDomain.Cashiers.Data.Entities.Cashier>());
+            .Returns(Array.Empty<AppDomain.Cashiers.Data.Entities.Cashier>());
 
         // Act
         await GetCashiersQueryHandler.Handle(query, messagingMock, CancellationToken.None);
@@ -79,7 +79,7 @@ public class GetCashiersQueryHandlerTests
         messagingMock.InvokeQueryAsync(
                 Arg.Any<GetCashiersQueryHandler.DbQuery>(),
                 Arg.Any<CancellationToken>())
-            .Returns(new List<AppDomain.Cashiers.Data.Entities.Cashier>());
+            .Returns(Array.Empty<AppDomain.Cashiers.Data.Entities.Cashier>());
 
         // Act
         var result = await GetCashiersQueryHandler.Handle(query, messagingMock, CancellationToken.None);
@@ -99,7 +99,7 @@ public class GetCashiersQueryHandlerTests
         messagingMock.InvokeQueryAsync(
                 Arg.Any<GetCashiersQueryHandler.DbQuery>(),
                 Arg.Any<CancellationToken>())
-            .Returns(new List<AppDomain.Cashiers.Data.Entities.Cashier>());
+            .Returns(Array.Empty<AppDomain.Cashiers.Data.Entities.Cashier>());
 
         // Act
         await GetCashiersQueryHandler.Handle(query, messagingMock, CancellationToken.None);

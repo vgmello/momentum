@@ -1,12 +1,18 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
+using Grpc.AspNetCore.Server;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenTelemetry.Trace;
 using Scalar.AspNetCore;
+using System.Text.Json.Serialization;
 
 namespace Momentum.ServiceDefaults.Api;
 
@@ -57,13 +63,17 @@ public static class ApiExtensions
 
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddProblemDetails();
+        builder.Services.AddExceptionHandler<ProblemDetailsExceptionHandler>();
 
         // NOTE: OpenAPI is NOT configured here.
         // Call AddOpenApi() directly in your Program.cs for XML documentation support.
         // The .NET 10 source generator intercepts AddOpenApi() calls and generates
         // XML comment transformers for the calling project's documentation.
 
-        builder.Services.AddHttpLogging();
+        if (builder.Configuration.GetValue("HttpLogging:Enabled", false))
+        {
+            builder.Services.AddHttpLogging();
+        }
 
         // Add output caching for OpenAPI document caching
         builder.Services.AddOutputCache(options =>
@@ -71,10 +81,8 @@ public static class ApiExtensions
             options.AddPolicy("OpenApi", policy => policy.Expire(TimeSpan.FromMinutes(10)));
         });
 
-        builder.Services.AddGrpc(options =>
-        {
-            options.EnableDetailedErrors = builder.Environment.IsDevelopment();
-        });
+        builder.Services.AddGrpc();
+        builder.Services.Configure<GrpcServiceOptions>(builder.Configuration.GetSection("Grpc"));
         builder.Services.AddGrpcReflection();
 
         builder.Services.AddOpenTelemetry()
@@ -89,9 +97,43 @@ public static class ApiExtensions
                     .Build());
         }
 
+        builder.WebHost.UseKestrelHttpsConfiguration();
         builder.WebHost.ConfigureKestrel(serverOptions =>
         {
             serverOptions.AddServerHeader = false;
+        });
+        builder.Services.Configure<KestrelServerOptions>(builder.Configuration.GetSection("Kestrel"));
+
+        var rateLimitingSection = builder.Configuration.GetSection("RateLimiting");
+        if (rateLimitingSection.GetValue("Enabled", false))
+        {
+            builder.Services.AddRateLimiter(options =>
+            {
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+                var fixedSection = rateLimitingSection.GetSection("Fixed");
+                if (fixedSection.Exists())
+                {
+                    options.AddFixedWindowLimiter("fixed", limiterOptions =>
+                    {
+                        fixedSection.Bind(limiterOptions);
+                    });
+                }
+            });
+        }
+
+        builder.Services.ConfigureHttpJsonOptions(options =>
+        {
+            builder.Configuration.GetSection("JsonOptions").Bind(options.SerializerOptions);
+            options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
+
+        builder.Services.AddApiVersioning(options =>
+        {
+            options.DefaultApiVersion = new Asp.Versioning.ApiVersion(1, 0);
+            options.AssumeDefaultVersionWhenUnspecified = true;
+            options.ReportApiVersions = true;
+            options.ApiVersionReader = new Asp.Versioning.UrlSegmentApiVersionReader();
         });
 
         return builder;
@@ -107,8 +149,17 @@ public static class ApiExtensions
     /// </remarks>
     public static WebApplication ConfigureApiUsingDefaults(this WebApplication app)
     {
-        app.UseHttpLogging();
+        if (app.Configuration.GetValue("HttpLogging:Enabled", false))
+        {
+            app.UseHttpLogging();
+        }
+
         app.UseRouting();
+
+        if (app.Configuration.GetValue("RateLimiting:Enabled", false))
+        {
+            app.UseRateLimiter();
+        }
 
         var requireAuth = app.Services.GetService<ApiAuthConfiguration>()?.RequireAuth == true;
 

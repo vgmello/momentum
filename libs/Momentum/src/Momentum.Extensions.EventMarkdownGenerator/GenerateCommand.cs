@@ -42,6 +42,11 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
         [Description("Base GitHub URL for source code links (e.g., https://github.com/org/repo/blob/main/src)")]
         public string? GitHubUrl { get; init; }
 
+        [CommandOption("--format")]
+        [Description("Serialization format for payload size calculation (json, binary)")]
+        [DefaultValue("json")]
+        public string Format { get; init; } = "json";
+
         [CommandOption("-v|--verbose")]
         [Description("Enable verbose output")]
         public bool Verbose { get; init; }
@@ -78,7 +83,8 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
                 OutputDirectory = settings.Output,
                 SidebarFileName = settings.SidebarFile,
                 TemplatesDirectory = settings.Templates,
-                GitHubBaseUrl = settings.GitHubUrl
+                GitHubBaseUrl = settings.GitHubUrl,
+                SerializationFormat = settings.Format
             };
 
             await GenerateDocumentationAsync(options, cancellationToken);
@@ -114,10 +120,9 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
         options.EnsureOutputDirectoryExists();
 
         var xmlParser = new XmlDocumentationParser();
-        var markdownGenerator = new FluidMarkdownGenerator(options.TemplatesDirectory);
-        var sidebarGenerator = new JsonSidebarGenerator();
-
+        var markdownGenerator = await FluidMarkdownGenerator.CreateAsync(options.TemplatesDirectory);
         var xmlDocumentationPaths = DiscoverXmlDocumentationFiles(options.AssemblyPaths, options.XmlDocumentationPaths);
+        var calculator = PayloadSizeCalculator.Create(options.SerializationFormat);
 
         if (xmlDocumentationPaths.Count > 0)
         {
@@ -132,8 +137,14 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
             IsolatedAssemblyLoadContext? loadContext = null;
             try
             {
-                var assembly = LoadAssemblyWithDependencyResolution(assemblyPath, out loadContext);
-                var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser);
+                using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                cts.CancelAfter(TimeSpan.FromSeconds(30));
+
+                var assembly = await Task.Run(
+                    () => LoadAssemblyWithDependencyResolution(assemblyPath, out loadContext),
+                    cts.Token);
+
+                var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser, calculator);
 
                 foreach (var eventMetadata in events)
                 {
@@ -148,6 +159,10 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
                 }
 
                 processedAssemblies++;
+            }
+            catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+            {
+                AnsiConsole.MarkupLine($"[yellow]Warning:[/] Timed out loading assembly {assemblyPath} (30s limit)");
             }
             catch (Exception ex)
             {
@@ -165,7 +180,7 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
             AnsiConsole.WriteLine($"Processed {processedAssemblies} assemblies but found no types with EventTopic attributes.");
 
             // Still generate empty sidebar for consistency
-            await sidebarGenerator.WriteSidebarAsync(new List<EventWithDocumentation>(), options.GetSidebarPath(), cancellationToken);
+            await JsonSidebarGenerator.WriteSidebarAsync([], options.GetSidebarPath(), cancellationToken);
             AnsiConsole.MarkupLine($"[green]✓[/] Generated empty sidebar file: {options.SidebarFileName}");
 
             return;
@@ -189,7 +204,7 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
         await WriteMarkdownFilesAsync(schemaFiles, cancellationToken);
 
         // Generate and write sidebar JSON
-        await sidebarGenerator.WriteSidebarAsync(allEvents, options.GetSidebarPath(), cancellationToken);
+        await JsonSidebarGenerator.WriteSidebarAsync(allEvents, options.GetSidebarPath(), cancellationToken);
 
         // Summary
         AnsiConsole.WriteLine();

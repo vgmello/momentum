@@ -5,6 +5,8 @@ using AppDomain.Invoices.Commands;
 using AppDomain.Invoices.Contracts.IntegrationEvents;
 using AppDomain.Invoices.Contracts.Models;
 using AppDomain.Invoices.Queries;
+using AppDomain.BackOffice.Orleans.Infrastructure.Extensions;
+using Orleans.GrainDirectory;
 using ContractInvoice = AppDomain.Invoices.Contracts.Models.Invoice;
 using Invoice = AppDomain.Invoices.Data.Entities.Invoice;
 
@@ -17,6 +19,7 @@ namespace AppDomain.BackOffice.Orleans.Invoices.Grains;
 /// <param name="invoiceState">The persistent state for grain metadata</param>
 /// <param name="messageBus">Wolverine message bus for commands/queries</param>
 /// <param name="logger">Logger instance</param>
+[GrainDirectory(GrainDirectoryName = OrleansExtensions.GrainDirectoryName)]
 public class InvoiceActor(
     ILogger<InvoiceActor> logger,
     [PersistentState("invoice")] IPersistentState<InvoiceActorState> invoiceState,
@@ -164,7 +167,7 @@ public class InvoiceActor(
             invoiceState.State.TenantId = tenantId;
             invoiceState.State.ActivatedAt = DateTime.UtcNow;
             invoiceState.State.IsInitialized = true;
-            invoiceState.State.Metadata ??= new Dictionary<string, string>();
+            invoiceState.State.Metadata ??= [];
             invoiceState.State.Metadata["InvoiceId"] = this.GetPrimaryKey().ToString();
             await invoiceState.WriteStateAsync();
         }

@@ -217,7 +217,7 @@ export function setup() {
 }
 
 // Main spike test scenario
-export default function (data) {
+export default function main(data) {
     const tenantId = `spike_tenant_${__VU}`;
 
     // VU-scoped phase tracking using function-scoped variable

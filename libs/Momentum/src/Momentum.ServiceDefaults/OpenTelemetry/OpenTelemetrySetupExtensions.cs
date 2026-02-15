@@ -20,15 +20,9 @@ namespace Momentum.ServiceDefaults.OpenTelemetry;
 /// </summary>
 public static class OpenTelemetrySetupExtensions
 {
-    /// <summary>
-    ///     Sampling rate for development environment (100% - capture all traces).
-    /// </summary>
-    private const double DevelopmentSamplingRate = 1.0;
+    private const double DefaultDevelopmentSamplingRate = 1.0;
+    private const double DefaultProductionSamplingRate = 0.1;
 
-    /// <summary>
-    ///     Sampling rate for production environment (10% - balance between observability and performance).
-    /// </summary>
-    private const double ProductionSamplingRate = 0.1;
     /// <summary>
     ///     Adds comprehensive OpenTelemetry instrumentation for production-ready observability including logging, metrics, and distributed
     ///     tracing.
@@ -43,6 +37,18 @@ public static class OpenTelemetrySetupExtensions
     /// </example>
     public static IHostApplicationBuilder AddOpenTelemetry(this IHostApplicationBuilder builder)
     {
+        var otelOptions = new OpenTelemetryOptions();
+        builder.Configuration.GetSection(OpenTelemetryOptions.SectionName).Bind(otelOptions);
+
+        if (otelOptions.SamplingRate is < 0.0 or > 1.0)
+        {
+            throw new InvalidOperationException(
+                $"OpenTelemetry:SamplingRate must be between 0.0 and 1.0, got {otelOptions.SamplingRate}");
+        }
+
+        var samplingRate = otelOptions.SamplingRate
+                           ?? (builder.Environment.IsDevelopment() ? DefaultDevelopmentSamplingRate : DefaultProductionSamplingRate);
+
         var activitySourceName = builder.Configuration.GetValue<string>("OpenTelemetry:ActivitySourceName")
                                  ?? builder.Environment.ApplicationName;
 
@@ -67,7 +73,8 @@ public static class OpenTelemetrySetupExtensions
             .ConfigureResource(resource => resource
                 .AddAttributes(new Dictionary<string, object>
                 {
-                    ["env"] = builder.Environment.EnvironmentName
+                    ["env"] = builder.Environment.EnvironmentName,
+                    ["service.instance.id"] = Environment.MachineName
                 }))
             .WithMetrics(metrics => metrics
                 .AddMeter(activitySourceName)
@@ -111,8 +118,7 @@ public static class OpenTelemetrySetupExtensions
                         activity.SetTag("grpc.request.uri", message.RequestUri?.ToString());
                     };
                 })
-                .SetSampler(new TraceIdRatioBasedSampler(
-                    builder.Environment.IsDevelopment() ? DevelopmentSamplingRate : ProductionSamplingRate)));
+                .SetSampler(new TraceIdRatioBasedSampler(samplingRate)));
 
         return builder;
     }

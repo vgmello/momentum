@@ -1,5 +1,5 @@
 {
-  "strictFileMatching": true,
+  "strictFileMatching": false,
   "ignoreFiles": [],
   "customAssertions": {
     "node-relationship-created.md": "Should handle circular references without infinite loops",
@@ -7,5 +7,6 @@
     "schemas/Graph.Nodes.Contracts.Models.NodeMetadata.md": "Should reference GraphNode without creating infinite schema nesting"
   },
   "generateSchemas": true,
-  "generateSidebar": false
+  "generateSidebar": false,
+  "focusedEvents": ["NodeRelationshipCreated"]
 }

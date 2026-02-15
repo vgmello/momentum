@@ -68,7 +68,11 @@ public class LiquibaseMigrationContainer : IAsyncDisposable
         }
     }
 
-    public async ValueTask DisposeAsync() => await _liquibaseContainer.DisposeAsync();
+    public async ValueTask DisposeAsync()
+    {
+        GC.SuppressFinalize(this);
+        await _liquibaseContainer.DisposeAsync();
+    }
 
     private static string FindSolutionRoot()
     {

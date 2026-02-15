@@ -22,17 +22,23 @@ public class FluidMarkdownGenerator
     private readonly IFluidTemplate _eventTemplate;
     private readonly IFluidTemplate _schemaTemplate;
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="FluidMarkdownGenerator"/> class.
-    /// </summary>
-    /// <param name="customTemplatesDirectory">Optional directory containing custom Liquid templates to override defaults.</param>
-    public FluidMarkdownGenerator(string? customTemplatesDirectory = null)
+    private FluidMarkdownGenerator(string eventTemplateSource, string schemaTemplateSource)
     {
-        var eventTemplateSource = GetTemplate("event.liquid", customTemplatesDirectory);
-        var schemaTemplateSource = GetTemplate("schema.liquid", customTemplatesDirectory);
-
         _eventTemplate = Parser.Parse(eventTemplateSource);
         _schemaTemplate = Parser.Parse(schemaTemplateSource);
+    }
+
+    /// <summary>
+    ///     Creates a new instance of the <see cref="FluidMarkdownGenerator"/> class asynchronously.
+    /// </summary>
+    /// <param name="customTemplatesDirectory">Optional directory containing custom Liquid templates to override defaults.</param>
+    /// <returns>A new <see cref="FluidMarkdownGenerator"/> instance.</returns>
+    public static async Task<FluidMarkdownGenerator> CreateAsync(string? customTemplatesDirectory = null)
+    {
+        var eventTemplateSource = await GetTemplateAsync("event.liquid", customTemplatesDirectory);
+        var schemaTemplateSource = await GetTemplateAsync("schema.liquid", customTemplatesDirectory);
+
+        return new FluidMarkdownGenerator(eventTemplateSource, schemaTemplateSource);
     }
 
     /// <summary>
@@ -133,26 +139,25 @@ public class FluidMarkdownGenerator
 
         foreach (var templateName in templateNames)
         {
-            var templateContent = GetEmbeddedTemplate(templateName);
+            var templateContent = await GetEmbeddedTemplateAsync(templateName);
             var targetPath = Path.Combine(targetDirectory, templateName);
             await File.WriteAllTextAsync(targetPath, templateContent, cancellationToken);
         }
     }
 
-    private static string GetTemplate(string templateName, string? customTemplatesDirectory)
+    private static async Task<string> GetTemplateAsync(string templateName, string? customTemplatesDirectory)
     {
         try
         {
-            // Check if override templates exists
             if (!string.IsNullOrEmpty(customTemplatesDirectory))
             {
                 var customTemplatePath = Path.Combine(customTemplatesDirectory, templateName);
 
                 if (File.Exists(customTemplatePath))
-                    return File.ReadAllText(customTemplatePath);
+                    return await File.ReadAllTextAsync(customTemplatePath);
             }
 
-            return GetEmbeddedTemplate(templateName);
+            return await GetEmbeddedTemplateAsync(templateName);
         }
         catch (Exception ex) when (ex is not FileNotFoundException)
         {
@@ -160,13 +165,11 @@ public class FluidMarkdownGenerator
         }
     }
 
-    private static string GetEmbeddedTemplate(string templateName)
+    private static async Task<string> GetEmbeddedTemplateAsync(string templateName)
     {
         try
         {
             var assembly = Assembly.GetExecutingAssembly();
-
-            // Try to read from filesystem first (as Content files)
             var assemblyLocation = assembly.Location;
 
             if (!string.IsNullOrEmpty(assemblyLocation))
@@ -179,12 +182,11 @@ public class FluidMarkdownGenerator
 
                     if (File.Exists(templatePath))
                     {
-                        return File.ReadAllText(templatePath);
+                        return await File.ReadAllTextAsync(templatePath);
                     }
                 }
             }
 
-            // Fallback to embedded resource for backward compatibility
             var resourceName = $"Momentum.Extensions.EventMarkdownGenerator.Templates.{templateName}";
 
             using var stream = assembly.GetManifestResourceStream(resourceName);
@@ -197,7 +199,7 @@ public class FluidMarkdownGenerator
 
             using var reader = new StreamReader(stream);
 
-            return reader.ReadToEnd();
+            return await reader.ReadToEndAsync();
         }
         catch (Exception ex) when (ex is not FileNotFoundException)
         {

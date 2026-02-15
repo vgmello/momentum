@@ -10,8 +10,10 @@ namespace Momentum.Extensions.EventMarkdownGenerator.Services;
 ///     Generates JSON sidebar navigation structure for documentation sites.
 ///     Groups events by subdomain and section, with separate schemas section.
 /// </summary>
-public class JsonSidebarGenerator
+public static class JsonSidebarGenerator
 {
+    private const string UnknownValue = "Unknown";
+
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         WriteIndented = true,
@@ -23,14 +25,14 @@ public class JsonSidebarGenerator
     /// </summary>
     /// <param name="events">The events to include in the sidebar.</param>
     /// <returns>A formatted JSON string representing the sidebar structure.</returns>
-    public string GenerateSidebar(ICollection<EventWithDocumentation> events)
+    public static string GenerateSidebar(ICollection<EventWithDocumentation> events)
     {
         var sidebarItems = GenerateSidebarItems(events);
 
         return JsonSerializer.Serialize(sidebarItems, JsonOptions);
     }
 
-    public List<SidebarItem> GenerateSidebarItems(ICollection<EventWithDocumentation> events)
+    public static List<SidebarItem> GenerateSidebarItems(ICollection<EventWithDocumentation> events)
     {
         var eventGroups = GroupEventsBySubdomainAndSection(events);
         var sidebarItems = BuildSidebarStructure(eventGroups);
@@ -214,7 +216,7 @@ public class JsonSidebarGenerator
         }
 
         // Extract subdomain (second part) and section (if exists between subdomain and Contracts)
-        var subdomain = parts.Length > 1 ? parts[1] : "Unknown";
+        var subdomain = parts.Length > 1 ? parts[1] : UnknownValue;
         var section = "";
 
         // If there are parts between subdomain and Contracts/IntegrationEvents, it's a section
@@ -278,7 +280,7 @@ public class JsonSidebarGenerator
     private static string ExtractSubdomainFromType(Type type)
     {
         if (type.Namespace == null)
-            return "Unknown";
+            return UnknownValue;
 
         var parts = type.Namespace.Split('.');
 
@@ -293,7 +295,7 @@ public class JsonSidebarGenerator
     /// <param name="events">The events to include in the sidebar.</param>
     /// <param name="filePath">The file path to write the sidebar JSON to.</param>
     /// <param name="cancellationToken">Optional cancellation token.</param>
-    public async Task WriteSidebarAsync(ICollection<EventWithDocumentation> events, string filePath, CancellationToken cancellationToken = default)
+    public static async Task WriteSidebarAsync(ICollection<EventWithDocumentation> events, string filePath, CancellationToken cancellationToken = default)
     {
         var sidebarJson = GenerateSidebar(events);
         await File.WriteAllTextAsync(filePath, sidebarJson, cancellationToken);
@@ -315,11 +317,11 @@ public class JsonSidebarGenerator
     private static string CapitalizeDomain(string domain)
     {
         if (string.IsNullOrEmpty(domain))
-            return "Unknown";
+            return UnknownValue;
 
         // Handle special cases
         if (domain.Equals("unknown", StringComparison.OrdinalIgnoreCase))
-            return "Unknown";
+            return UnknownValue;
 
         return domain.CapitalizeFirst();
     }

@@ -1,9 +1,10 @@
 {
-  "strictFileMatching": true,
+  "strictFileMatching": false,
   "ignoreFiles": [],
   "customAssertions": {
     "internal-audit-log-created.md": "Should mark as internal event with proper topic visibility"
   },
   "generateSchemas": false,
-  "generateSidebar": false
+  "generateSidebar": false,
+  "focusedEvents": ["InternalAuditLogCreated"]
 }

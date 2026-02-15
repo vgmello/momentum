@@ -68,9 +68,6 @@ curl -fsSL https://bun.sh/install | bash
 # Windows (using PowerShell)
 powershell -c "irm bun.sh/install.ps1 | iex"
 
-# Or using npm
-npm install -g bun
-
 # Verify installation
 bun --version
 ```

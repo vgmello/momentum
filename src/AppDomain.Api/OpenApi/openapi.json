@@ -913,7 +913,11 @@
         }
       },
       "InvoiceStatus": {
-        "type": "integer"
+        "enum": [
+          "Draft",
+          "Paid",
+          "Cancelled"
+        ]
       },
       "MarkInvoiceAsPaidRequest": {
         "required": [
