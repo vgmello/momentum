@@ -222,7 +222,7 @@ public class ScenarioBasedIntegrationTests
     {
         // Initialize services
         var xmlParser = new XmlDocumentationParser();
-        var fluidGenerator = new FluidMarkdownGenerator();
+        var fluidGenerator = await FluidMarkdownGenerator.CreateAsync();
         // Load XML documentation
         var xmlLoaded = await xmlParser.LoadMultipleDocumentationAsync([scenario.InputXmlPath], TestContext.Current.CancellationToken);
 
@@ -230,7 +230,7 @@ public class ScenarioBasedIntegrationTests
 
         // Load and discover events
         var assembly = Assembly.LoadFrom(scenario.AssemblyPath);
-        var discoveredEvents = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser).ToList();
+        var discoveredEvents = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser, PayloadSizeCalculator.Create("json")).ToList();
 
         // Generate event documentation
         var eventsWithDocumentation = discoveredEvents.Select(eventMetadata => new EventWithDocumentation

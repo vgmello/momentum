@@ -2,7 +2,6 @@
 
 using Momentum.Extensions.Abstractions.Messaging;
 using Momentum.Extensions.EventMarkdownGenerator.Services;
-using Momentum.Extensions.EventMarkdownGenerator.Services.Serialization;
 using Shouldly;
 using System.ComponentModel.DataAnnotations;
 using Xunit;
@@ -11,8 +10,8 @@ namespace Momentum.Extensions.EventMarkdownGenerator.Tests;
 
 public class PayloadSizeCalculatorTests
 {
-    private readonly PayloadSizeCalculator _jsonCalc = new JsonPayloadSizeCalculator();
-    private readonly PayloadSizeCalculator _binaryCalc = new BinaryPayloadSizeCalculator();
+    private readonly PayloadSizeCalculator _jsonCalc = PayloadSizeCalculator.Create("json");
+    private readonly PayloadSizeCalculator _binaryCalc = PayloadSizeCalculator.Create("binary");
 
     // --- StringEncoding attribute resolution ---
 

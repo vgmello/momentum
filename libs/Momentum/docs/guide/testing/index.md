@@ -235,7 +235,7 @@ public class IntegrationTestFixture : WebApplicationFactory<AppDomain.Api.Progra
         builder.Configure(app =>
         {
             app.UseRouting();
-            app.UseEndpoints(endpoints => endpoints.MapGrpcServices(typeof(AppDomain.Api.Program)));
+            app.UseEndpoints(endpoints => endpoints.MapGrpcServices(typeof(AppDomain.Api.Program).Assembly));
         });
     }
 }

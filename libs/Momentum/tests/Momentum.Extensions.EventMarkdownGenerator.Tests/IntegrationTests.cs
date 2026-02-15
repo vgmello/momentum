@@ -53,14 +53,14 @@ public class IntegrationTests
         {
             // Initialize services
             var xmlParser = new XmlDocumentationParser();
-            var markdownGenerator = new FluidMarkdownGenerator();
+            var markdownGenerator = await FluidMarkdownGenerator.CreateAsync();
 
             // Load XML documentation
             await xmlParser.LoadMultipleDocumentationAsync([TestXmlPath], TestContext.Current.CancellationToken);
 
             // Load and discover events
             var assembly = Assembly.LoadFrom(TestAssemblyPath);
-            var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser).ToList();
+            var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser, PayloadSizeCalculator.Create("json")).ToList();
 
             events.Count.ShouldBeGreaterThan(0);
             var cashierCreatedEvent = events.FirstOrDefault(e => e.EventName == "CashierCreated");
@@ -109,7 +109,7 @@ public class IntegrationTests
 
         // Act
         var xmlParser = new XmlDocumentationParser();
-        var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser).ToList();
+        var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser, PayloadSizeCalculator.Create("json")).ToList();
 
         // Assert
         events.Count.ShouldBeGreaterThan(0);
@@ -134,7 +134,7 @@ public class IntegrationTests
 
         // Act
         var xmlParser = new XmlDocumentationParser();
-        var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser).ToList();
+        var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser, PayloadSizeCalculator.Create("json")).ToList();
 
         // Assert
         events.Count.ShouldBeGreaterThan(0);
@@ -193,7 +193,7 @@ public class IntegrationTests
         // Arrange
         var assembly = Assembly.LoadFrom(TestAssemblyPath);
         var xmlParser = new XmlDocumentationParser();
-        var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser).ToList();
+        var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser, PayloadSizeCalculator.Create("json")).ToList();
         var eventsWithDoc = events.Select(e => new EventWithDocumentation
         {
             Metadata = e,

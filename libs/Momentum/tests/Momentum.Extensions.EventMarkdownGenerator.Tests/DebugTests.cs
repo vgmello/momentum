@@ -50,7 +50,7 @@ public class DebugTests
         Assert.True(File.Exists(testEventsPath), $"TestEvents.dll should exist at: {testEventsPath}");
 
         var assembly = System.Reflection.Assembly.LoadFrom(testEventsPath);
-        var discoveredEvents = Services.AssemblyEventDiscovery.DiscoverEvents(assembly).ToList();
+        var discoveredEvents = Services.AssemblyEventDiscovery.DiscoverEvents(assembly, null, Services.PayloadSizeCalculator.Create("json")).ToList();
 
         Assert.True(discoveredEvents.Count > 0,
             $"Should discover events. Found {discoveredEvents.Count} events. Assembly types: {string.Join(", ", assembly.GetTypes().Select(t => t.FullName))}");

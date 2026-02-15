@@ -89,7 +89,7 @@ public static class ServiceDefaultsExtensions
         {
             http.AddStandardResilienceHandler(options =>
             {
-                builder.Configuration.GetSection("HttpResilience").Bind(options);
+                builder.Configuration.GetSection("HttpClientResilience").Bind(options);
             });
 
             http.AddServiceDiscovery();

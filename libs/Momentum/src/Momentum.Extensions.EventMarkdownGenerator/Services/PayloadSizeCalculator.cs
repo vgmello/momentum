@@ -19,19 +19,19 @@ public abstract class PayloadSizeCalculator
     public abstract string FormatName { get; }
 
     /// <summary>Overhead bytes for a serialized string value (e.g., JSON quotes: 2 bytes).</summary>
-    public abstract int GetStringValueOverhead();
+    protected abstract int GetStringValueOverhead();
 
     /// <summary>Overhead bytes for a property entry including key and delimiters.</summary>
-    public abstract int GetPropertyOverhead(string propertyName);
+    protected abstract int GetPropertyOverhead(string propertyName);
 
     /// <summary>Overhead bytes for object wrappers (e.g., JSON { } adds 2 bytes).</summary>
-    public abstract int GetObjectOverhead();
+    protected abstract int GetObjectOverhead();
 
     /// <summary>Overhead bytes per element separator (e.g., JSON comma: 1 byte).</summary>
-    public abstract int GetElementSeparatorOverhead();
+    protected abstract int GetElementSeparatorOverhead();
 
     /// <summary>Overhead bytes for collection wrappers (e.g., JSON [ ] adds 2 bytes).</summary>
-    public abstract int GetCollectionOverhead();
+    protected abstract int GetCollectionOverhead();
 
     /// <summary>
     ///     Creates a PayloadSizeCalculator for the specified serialization format.

@@ -4,23 +4,12 @@ using Momentum.Extensions.Abstractions.Extensions;
 using System.Reflection;
 using Momentum.Extensions.Abstractions.Messaging;
 using Momentum.Extensions.EventMarkdownGenerator.Models;
-using Momentum.Extensions.EventMarkdownGenerator.Services.Serialization;
 
 namespace Momentum.Extensions.EventMarkdownGenerator.Services;
 
 public static class AssemblyEventDiscovery
 {
     private const string EventTopicAttributeName = nameof(EventTopicAttribute);
-
-    public static IEnumerable<EventMetadata> DiscoverEvents(Assembly assembly)
-    {
-        return DiscoverEvents(assembly, null, PayloadSizeCalculator.Create("json"));
-    }
-
-    public static IEnumerable<EventMetadata> DiscoverEvents(Assembly assembly, XmlDocumentationParser? xmlParser)
-    {
-        return DiscoverEvents(assembly, xmlParser, PayloadSizeCalculator.Create("json"));
-    }
 
     public static IEnumerable<EventMetadata> DiscoverEvents(Assembly assembly, XmlDocumentationParser? xmlParser,
         PayloadSizeCalculator calculator)
