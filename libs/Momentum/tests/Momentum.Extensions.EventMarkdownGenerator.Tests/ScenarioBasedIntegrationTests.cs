@@ -20,7 +20,9 @@ public class ScenarioBasedIntegrationTests
     public static TheoryData<string> GetTestScenarios()
     {
         var theoryData = new TheoryData<string>();
-        var scenariosDir = FindScenariosDirectory();
+
+        // Use source directory for discovery to avoid stale bin artifacts
+        var scenariosDir = FindSourceScenariosDirectory() ?? FindScenariosDirectory();
 
         if (scenariosDir == null || !Directory.Exists(scenariosDir))
         {
@@ -70,7 +72,7 @@ public class ScenarioBasedIntegrationTests
         return null;
     }
 
-    [Theory(Skip = "Scenario expected files need updating to match current generation output")]
+    [Theory]
     [MemberData(nameof(GetTestScenarios))]
     public async Task ScenarioTest_ShouldGenerateExpectedMarkdown(string scenarioName)
     {
@@ -147,6 +149,55 @@ public class ScenarioBasedIntegrationTests
         }
     }
 
+    [Fact(Skip = "Run manually to regenerate expected baselines")]
+    public async Task RegenerateAllBaselines()
+    {
+        // Write to the SOURCE directory so changes persist across rebuilds
+        var scenariosDir = FindSourceScenariosDirectory();
+        scenariosDir.ShouldNotBeNull("Could not find source scenarios directory");
+
+        foreach (var scenarioPath in Directory.GetDirectories(scenariosDir))
+        {
+            var scenario = await LoadTestScenario(scenarioPath);
+            var expectedDir = Path.Combine(scenarioPath, "expected");
+
+            // Clear existing expected files
+            if (Directory.Exists(expectedDir))
+                Directory.Delete(expectedDir, true);
+            Directory.CreateDirectory(expectedDir);
+
+            // Generate into expected directory directly
+            var results = await ExecuteMarkdownGeneration(scenario, expectedDir);
+
+            // Copy sidebar if config says to generate it
+            if (scenario.Config?.GenerateSidebar == true)
+            {
+                var sidebarContent = await File.ReadAllTextAsync(results.SidebarPath, TestContext.Current.CancellationToken);
+                var prettyJson = JsonSerializer.Serialize(
+                    JsonSerializer.Deserialize<JsonElement>(sidebarContent), IndentedJsonOptions);
+                await File.WriteAllTextAsync(
+                    Path.Combine(expectedDir, "sidebar.json"), prettyJson, TestContext.Current.CancellationToken);
+            }
+
+            // Remove sidebar from root if it was written there
+            var rootSidebar = Path.Combine(expectedDir, "sidebar.json");
+            if (!scenario.Config?.GenerateSidebar == true && File.Exists(rootSidebar))
+                File.Delete(rootSidebar);
+        }
+    }
+
+    private static string? FindSourceScenariosDirectory()
+    {
+        // Navigate from bin/Debug/net10.0/ up to the project source directory
+        var projectDir = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", ".."));
+        var scenariosDir = Path.Combine(projectDir, ScenariosPath);
+
+        if (Directory.Exists(scenariosDir))
+            return scenariosDir;
+
+        return null;
+    }
+
     private static async Task<TestScenario> LoadTestScenario(string scenarioPath)
     {
         var scenario = new TestScenario
@@ -166,8 +217,8 @@ public class ScenarioBasedIntegrationTests
             scenario.Config = JsonSerializer.Deserialize<TestScenarioConfig>(configJson, JsonOptions);
         }
 
-        // Load expected files
-        scenario.ExpectedFiles = Directory.GetFiles(scenario.ExpectedOutputsPath, "*.md")
+        // Load expected files (including schemas subdirectory)
+        scenario.ExpectedFiles = Directory.GetFiles(scenario.ExpectedOutputsPath, "*.md", SearchOption.AllDirectories)
             .Select(path => new ExpectedFile
             {
                 FileName = Path.GetFileName(path),
@@ -241,12 +292,12 @@ public class ScenarioBasedIntegrationTests
 
         var results = new MarkdownGenerationResults();
 
-        // Generate individual markdown files
+        // Generate individual markdown files and write to disk
         foreach (var eventWithDoc in eventsWithDocumentation)
         {
-            // Test FluidMarkdownGenerator
             var fluidResult = fluidGenerator.GenerateMarkdown(eventWithDoc, outputDir);
             results.FluidResults.Add(fluidResult);
+            await WriteOutputFileAsync(fluidResult);
 
             // Generate schemas for complex types (only if enabled in config)
             if (scenario.Config?.GenerateSchemas == true)
@@ -260,6 +311,7 @@ public class ScenarioBasedIntegrationTests
                 {
                     var schemaResult = fluidGenerator.GenerateSchemaMarkdown(complexType, outputDir);
                     results.SchemaResults.Add(schemaResult);
+                    await WriteOutputFileAsync(schemaResult);
                 }
             }
         }
@@ -270,6 +322,16 @@ public class ScenarioBasedIntegrationTests
         results.SidebarPath = sidebarPath;
 
         return results;
+    }
+
+    private static async Task WriteOutputFileAsync(IndividualMarkdownOutput output)
+    {
+        var directory = Path.GetDirectoryName(output.FilePath);
+
+        if (!string.IsNullOrEmpty(directory))
+            Directory.CreateDirectory(directory);
+
+        await File.WriteAllTextAsync(output.FilePath, output.Content, TestContext.Current.CancellationToken);
     }
 
     private static async Task ValidateResults(TestScenario scenario, MarkdownGenerationResults results, string scenarioName)
