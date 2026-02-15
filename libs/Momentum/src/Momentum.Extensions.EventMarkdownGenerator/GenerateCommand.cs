@@ -2,6 +2,7 @@
 
 using Momentum.Extensions.EventMarkdownGenerator.Models;
 using Momentum.Extensions.EventMarkdownGenerator.Services;
+using Momentum.Extensions.EventMarkdownGenerator.Services.Serialization;
 using Spectre.Console;
 using Spectre.Console.Cli;
 using System.ComponentModel;
@@ -42,6 +43,11 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
         [Description("Base GitHub URL for source code links (e.g., https://github.com/org/repo/blob/main/src)")]
         public string? GitHubUrl { get; init; }
 
+        [CommandOption("--format")]
+        [Description("Serialization format for payload size calculation (json, binary)")]
+        [DefaultValue("json")]
+        public string Format { get; init; } = "json";
+
         [CommandOption("-v|--verbose")]
         [Description("Enable verbose output")]
         public bool Verbose { get; init; }
@@ -78,7 +84,8 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
                 OutputDirectory = settings.Output,
                 SidebarFileName = settings.SidebarFile,
                 TemplatesDirectory = settings.Templates,
-                GitHubBaseUrl = settings.GitHubUrl
+                GitHubBaseUrl = settings.GitHubUrl,
+                SerializationFormat = settings.Format
             };
 
             await GenerateDocumentationAsync(options, cancellationToken);
@@ -116,6 +123,7 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
         var xmlParser = new XmlDocumentationParser();
         var markdownGenerator = await FluidMarkdownGenerator.CreateAsync(options.TemplatesDirectory);
         var xmlDocumentationPaths = DiscoverXmlDocumentationFiles(options.AssemblyPaths, options.XmlDocumentationPaths);
+        var overheadCalculator = OverheadCalculatorFactory.Create(options.SerializationFormat);
 
         if (xmlDocumentationPaths.Count > 0)
         {
@@ -137,7 +145,7 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
                     () => LoadAssemblyWithDependencyResolution(assemblyPath, out loadContext),
                     cts.Token);
 
-                var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser);
+                var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser, overheadCalculator);
 
                 foreach (var eventMetadata in events)
                 {

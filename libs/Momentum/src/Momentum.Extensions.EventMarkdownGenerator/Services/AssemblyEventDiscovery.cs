@@ -4,6 +4,7 @@ using Momentum.Extensions.Abstractions.Extensions;
 using System.Reflection;
 using Momentum.Extensions.Abstractions.Messaging;
 using Momentum.Extensions.EventMarkdownGenerator.Models;
+using Momentum.Extensions.EventMarkdownGenerator.Services.Serialization;
 
 namespace Momentum.Extensions.EventMarkdownGenerator.Services;
 
@@ -25,6 +26,15 @@ public static class AssemblyEventDiscovery
         var integrationEventTypes = GetEventTypes(assembly);
 
         return integrationEventTypes.Select(type => CreateEventMetadata(type, defaultDomain, xmlParser));
+    }
+
+    public static IEnumerable<EventMetadata> DiscoverEvents(Assembly assembly, XmlDocumentationParser? xmlParser,
+        ISerializationOverheadCalculator overheadCalculator)
+    {
+        var defaultDomain = GetMainDomainName(assembly);
+        var integrationEventTypes = GetEventTypes(assembly);
+
+        return integrationEventTypes.Select(type => CreateEventMetadata(type, defaultDomain, xmlParser, overheadCalculator));
     }
 
     private static IEnumerable<Type> GetEventTypes(Assembly assembly)
@@ -55,12 +65,13 @@ public static class AssemblyEventDiscovery
             .Any(attr => attr.GetType().Name.StartsWith(EventTopicAttributeName));
     }
 
-    private static EventMetadata CreateEventMetadata(Type eventType, string defaultDomain, XmlDocumentationParser? xmlParser)
+    private static EventMetadata CreateEventMetadata(Type eventType, string defaultDomain,
+        XmlDocumentationParser? xmlParser, ISerializationOverheadCalculator? overheadCalculator = null)
     {
         // Use dynamic attribute handling to work across assembly contexts
         var topicAttribute = GetEventTopicAttributeDynamic(eventType);
         var obsoleteAttribute = eventType.GetCustomAttribute<ObsoleteAttribute>();
-        var (properties, partitionKeys) = GetEventPropertiesAndPartitionKeys(eventType, xmlParser);
+        var (properties, partitionKeys) = GetEventPropertiesAndPartitionKeys(eventType, xmlParser, overheadCalculator);
 
         var topicName = GetTopicName(topicAttribute, eventType);
 
@@ -141,7 +152,7 @@ public static class AssemblyEventDiscovery
     }
 
     private static (List<EventPropertyMetadata> properties, List<PartitionKeyMetadata> partitionKeys) GetEventPropertiesAndPartitionKeys(
-        Type eventType, XmlDocumentationParser? xmlParser)
+        Type eventType, XmlDocumentationParser? xmlParser, ISerializationOverheadCalculator? overheadCalculator = null)
     {
         var properties = new List<EventPropertyMetadata>();
         var partitionKeys = new List<PartitionKeyMetadata>();
@@ -170,7 +181,9 @@ public static class AssemblyEventDiscovery
             }
 
             var description = eventDoc?.PropertyDescriptions?.GetValueOrDefault(property.Name) ?? "No description available";
-            var sizeResult = PayloadSizeCalculator.CalculatePropertySize(property, property.PropertyType);
+            var sizeResult = overheadCalculator != null
+                ? PayloadSizeCalculator.CalculatePropertySize(property, property.PropertyType, overheadCalculator)
+                : PayloadSizeCalculator.CalculatePropertySize(property, property.PropertyType);
 
             properties.Add(new EventPropertyMetadata
             {
