@@ -133,7 +133,7 @@ export default defineConfig({
     },
     lastUpdated: true,
     cleanUrls: true,
-    ignoreDeadLinks: [/^https?:\/\/.*/],
+    ignoreDeadLinks: [/^https?:\/\/.*/, /API_BASE_URL/],
     vite: {
         define: {
             __API_BASE_URL__: JSON.stringify(API_BASE_URL),
