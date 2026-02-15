@@ -15,6 +15,8 @@ public class ScenarioBasedIntegrationTests
 
     private static readonly JsonSerializerOptions JsonOptions = System.Text.Json.JsonSerializerOptions.Web;
 
+    private static readonly JsonSerializerOptions IndentedJsonOptions = new() { WriteIndented = true };
+
     public static TheoryData<string> GetTestScenarios()
     {
         var theoryData = new TheoryData<string>();
@@ -356,8 +358,8 @@ public class ScenarioBasedIntegrationTests
         var actualJson = JsonDocument.Parse(actualSidebar);
 
         // Compare JSON structure (this gives better error messages than string comparison)
-        JsonSerializer.Serialize(actualJson, new JsonSerializerOptions { WriteIndented = true })
-            .ShouldBe(JsonSerializer.Serialize(expectedJson, new JsonSerializerOptions { WriteIndented = true }),
+        JsonSerializer.Serialize(actualJson, IndentedJsonOptions)
+            .ShouldBe(JsonSerializer.Serialize(expectedJson, IndentedJsonOptions),
                 $"Scenario '{scenarioName}' sidebar.json structure mismatch");
     }
 

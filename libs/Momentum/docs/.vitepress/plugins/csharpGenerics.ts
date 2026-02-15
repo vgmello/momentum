@@ -2,7 +2,7 @@ import MarkdownIt from "markdown-it";
 
 const hasAngleBracketPair = (content: string): boolean => {
     const openIdx = content.indexOf("<");
-    return openIdx !== -1 && content.indexOf(">", openIdx + 2) !== -1;
+    return openIdx !== -1 && content.includes(">", openIdx + 2);
 };
 
 /**
