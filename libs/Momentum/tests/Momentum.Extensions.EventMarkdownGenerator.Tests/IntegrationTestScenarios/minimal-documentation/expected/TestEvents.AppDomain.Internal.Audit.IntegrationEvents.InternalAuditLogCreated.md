@@ -14,6 +14,7 @@ editLink: false
 - **Topic:** `{env}.testevents.internal.audit-logs.v1`
 - **Estimated Payload Size:** 24 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
+
 ## Description
 
 No documentation available

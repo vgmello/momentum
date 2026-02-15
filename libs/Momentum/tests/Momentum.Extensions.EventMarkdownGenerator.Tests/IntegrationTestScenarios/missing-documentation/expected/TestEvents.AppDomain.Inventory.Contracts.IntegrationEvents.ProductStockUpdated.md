@@ -14,6 +14,7 @@ editLink: false
 - **Topic:** `{env}.testevents.public.products.v1`
 - **Estimated Payload Size:** 64 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId, WarehouseId, ProductCategory
+
 ## Description
 
 No documentation available

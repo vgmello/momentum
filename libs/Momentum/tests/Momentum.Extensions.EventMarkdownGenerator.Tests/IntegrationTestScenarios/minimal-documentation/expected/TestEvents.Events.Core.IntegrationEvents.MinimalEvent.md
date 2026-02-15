@@ -14,6 +14,7 @@ editLink: false
 - **Topic:** `{env}.testevents.public.minimal-events.v1`
 - **Estimated Payload Size:** 16 bytes
 - **Partition Keys**: Id
+
 ## Description
 
 No documentation available

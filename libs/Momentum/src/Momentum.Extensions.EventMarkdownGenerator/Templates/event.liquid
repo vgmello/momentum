@@ -22,8 +22,7 @@ editLink: false
 - **Estimated Payload Size:** {{ event.TotalEstimatedSizeBytes }} bytes{% if event.HasInaccurateEstimates %} ⚠️ *Contains dynamic properties*{% endif %}
 {% if event.PartitionKeys.size > 0 -%}
 - **Partition Keys**: {{ event.PartitionKeys | map: "Name" | join: ", " }}
-{% endif -%}
-
+{% endif %}
 ## Description
 
 {{ event.Description }}

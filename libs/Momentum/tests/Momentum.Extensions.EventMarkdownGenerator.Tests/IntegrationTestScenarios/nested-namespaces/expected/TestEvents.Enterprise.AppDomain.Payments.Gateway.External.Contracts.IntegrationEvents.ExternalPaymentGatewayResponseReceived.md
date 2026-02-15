@@ -14,6 +14,7 @@ editLink: false
 - **Topic:** `{env}.testevents.public.external-payment-gateway-response-receiveds.v1`
 - **Estimated Payload Size:** 55 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
+
 ## Description
 
 No documentation available

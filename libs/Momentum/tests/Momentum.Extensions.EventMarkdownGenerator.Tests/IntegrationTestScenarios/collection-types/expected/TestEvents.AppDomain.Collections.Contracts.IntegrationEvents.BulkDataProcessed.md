@@ -14,6 +14,7 @@ editLink: false
 - **Topic:** `{env}.testevents.public.bulk-data-processeds.v1`
 - **Estimated Payload Size:** 399 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
+
 ## Description
 
 No documentation available

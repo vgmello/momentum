@@ -14,6 +14,7 @@ editLink: false
 - **Topic:** `{env}.testevents.public.payment-status-changeds.v1`
 - **Estimated Payload Size:** 56 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
+
 ## Description
 
 No documentation available

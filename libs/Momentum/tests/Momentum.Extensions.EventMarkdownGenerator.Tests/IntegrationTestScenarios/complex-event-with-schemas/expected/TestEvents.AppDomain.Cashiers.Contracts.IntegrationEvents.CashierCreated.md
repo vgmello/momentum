@@ -14,6 +14,7 @@ editLink: false
 - **Topic:** `{env}.testevents.public.cashiers.v1`
 - **Estimated Payload Size:** 73 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId, PartitionKeyTest
+
 ## Description
 
 No documentation available

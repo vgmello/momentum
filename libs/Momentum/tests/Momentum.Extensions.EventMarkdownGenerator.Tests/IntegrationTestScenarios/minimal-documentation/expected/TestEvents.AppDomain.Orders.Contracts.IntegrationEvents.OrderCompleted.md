@@ -14,6 +14,7 @@ editLink: false
 - **Topic:** `{env}.testevents.public.orders.v1`
 - **Estimated Payload Size:** 1388 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
+
 ## Description
 
 No documentation available

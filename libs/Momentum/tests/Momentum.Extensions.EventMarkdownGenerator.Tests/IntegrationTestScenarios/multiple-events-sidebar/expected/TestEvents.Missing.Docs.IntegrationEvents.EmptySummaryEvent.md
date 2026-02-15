@@ -14,6 +14,7 @@ editLink: false
 - **Topic:** `{env}.testevents.public.empty-summary-events.v1`
 - **Estimated Payload Size:** 16 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
+
 ## Description
 
 No documentation available

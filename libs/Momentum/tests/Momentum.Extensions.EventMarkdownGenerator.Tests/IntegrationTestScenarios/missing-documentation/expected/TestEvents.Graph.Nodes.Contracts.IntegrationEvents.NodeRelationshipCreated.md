@@ -14,6 +14,7 @@ editLink: false
 - **Topic:** `{env}.testevents.public.node-relationship-createds.v1`
 - **Estimated Payload Size:** 382 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
+
 ## Description
 
 No documentation available
