@@ -63,6 +63,7 @@ public static class ApiExtensions
 
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddProblemDetails();
+        builder.Services.AddExceptionHandler<ProblemDetailsExceptionHandler>();
 
         // NOTE: OpenAPI is NOT configured here.
         // Call AddOpenApi() directly in your Program.cs for XML documentation support.
@@ -173,7 +174,7 @@ public static class ApiExtensions
         if (!app.Environment.IsDevelopment())
         {
             app.UseHsts();
-            app.UseProblemDetailsExceptionHandler();
+            app.UseExceptionHandler();
         }
 
         app.UseOutputCache();

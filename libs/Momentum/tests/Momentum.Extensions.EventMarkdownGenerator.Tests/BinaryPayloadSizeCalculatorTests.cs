@@ -1,12 +1,14 @@
+// Copyright (c) Momentum .NET. All rights reserved.
+
 using Momentum.Extensions.EventMarkdownGenerator.Services.Serialization;
 using Shouldly;
 using Xunit;
 
 namespace Momentum.Extensions.EventMarkdownGenerator.Tests;
 
-public class BinaryOverheadCalculatorTests
+public class BinaryPayloadSizeCalculatorTests
 {
-    private readonly BinaryOverheadCalculator _calculator = new();
+    private readonly BinaryPayloadSizeCalculator _calculator = new();
 
     [Fact]
     public void FormatName_ShouldBeBinary()

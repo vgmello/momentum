@@ -11,8 +11,8 @@ namespace Momentum.Extensions.EventMarkdownGenerator.Tests;
 
 public class PayloadSizeCalculatorTests
 {
-    private readonly ISerializationOverheadCalculator _jsonCalc = new JsonOverheadCalculator();
-    private readonly ISerializationOverheadCalculator _binaryCalc = new BinaryOverheadCalculator();
+    private readonly PayloadSizeCalculator _jsonCalc = new JsonPayloadSizeCalculator();
+    private readonly PayloadSizeCalculator _binaryCalc = new BinaryPayloadSizeCalculator();
 
     // --- StringEncoding attribute resolution ---
 
@@ -22,7 +22,7 @@ public class PayloadSizeCalculatorTests
         // Default is 1 byte/char when using overhead calculator. Property "Name" with [MaxLength(50)]
         // JSON: (50 * 1) + 2 (string quotes) = 52
         var prop = typeof(TestEventDefault).GetProperty(nameof(TestEventDefault.Name))!;
-        var result = PayloadSizeCalculator.CalculatePropertySize(prop, prop.PropertyType, _jsonCalc);
+        var result = _jsonCalc.CalculatePropertySize(prop, prop.PropertyType);
         result.SizeBytes.ShouldBe(52); // 50 * 1 + 2
         result.IsAccurate.ShouldBeTrue();
     }
@@ -33,7 +33,7 @@ public class PayloadSizeCalculatorTests
         // Class has [StringEncoding(BytesPerChar = 2)], property "Name" with [MaxLength(50)]
         // JSON: (50 * 2) + 2 (quotes) = 102
         var prop = typeof(TestEventClassEncoding).GetProperty(nameof(TestEventClassEncoding.Name))!;
-        var result = PayloadSizeCalculator.CalculatePropertySize(prop, prop.PropertyType, _jsonCalc);
+        var result = _jsonCalc.CalculatePropertySize(prop, prop.PropertyType);
         result.SizeBytes.ShouldBe(102); // 50 * 2 + 2
     }
 
@@ -43,7 +43,7 @@ public class PayloadSizeCalculatorTests
         // Class has [StringEncoding(BytesPerChar = 2)], property has [StringEncoding(BytesPerChar = 4)]
         // JSON: (50 * 4) + 2 = 202
         var prop = typeof(TestEventClassEncoding).GetProperty(nameof(TestEventClassEncoding.Description))!;
-        var result = PayloadSizeCalculator.CalculatePropertySize(prop, prop.PropertyType, _jsonCalc);
+        var result = _jsonCalc.CalculatePropertySize(prop, prop.PropertyType);
         result.SizeBytes.ShouldBe(202); // 50 * 4 + 2
     }
 
@@ -52,19 +52,8 @@ public class PayloadSizeCalculatorTests
     {
         // Binary: (50 * 1) + 0 = 50
         var prop = typeof(TestEventDefault).GetProperty(nameof(TestEventDefault.Name))!;
-        var result = PayloadSizeCalculator.CalculatePropertySize(prop, prop.PropertyType, _binaryCalc);
+        var result = _binaryCalc.CalculatePropertySize(prop, prop.PropertyType);
         result.SizeBytes.ShouldBe(50); // 50 * 1 + 0
-    }
-
-    // --- Backward compatibility ---
-
-    [Fact]
-    public void CalculatePropertySize_WithoutOverheadCalculator_UsesLegacyBehavior()
-    {
-        // The 2-arg overload still works (backward compat), uses no overhead, 4 bytes/char
-        var prop = typeof(TestEventDefault).GetProperty(nameof(TestEventDefault.Name))!;
-        var result = PayloadSizeCalculator.CalculatePropertySize(prop, prop.PropertyType);
-        result.SizeBytes.ShouldBe(200); // 50 * 4 (legacy behavior)
     }
 
     // --- Primitive types unchanged ---
@@ -73,7 +62,7 @@ public class PayloadSizeCalculatorTests
     public void CalculatePropertySize_Int_UnchangedByFormat()
     {
         var prop = typeof(TestEventDefault).GetProperty(nameof(TestEventDefault.Count))!;
-        var result = PayloadSizeCalculator.CalculatePropertySize(prop, prop.PropertyType, _jsonCalc);
+        var result = _jsonCalc.CalculatePropertySize(prop, prop.PropertyType);
         result.SizeBytes.ShouldBe(4);
         result.IsAccurate.ShouldBeTrue();
     }
@@ -84,9 +73,28 @@ public class PayloadSizeCalculatorTests
     public void CalculatePropertySize_StringWithNoMaxLength_ReturnsInaccurate()
     {
         var prop = typeof(TestEventDefault).GetProperty(nameof(TestEventDefault.NoLength))!;
-        var result = PayloadSizeCalculator.CalculatePropertySize(prop, prop.PropertyType, _jsonCalc);
+        var result = _jsonCalc.CalculatePropertySize(prop, prop.PropertyType);
         result.SizeBytes.ShouldBe(0);
         result.IsAccurate.ShouldBeFalse();
+    }
+
+    // --- Factory method ---
+
+    [Theory]
+    [InlineData("json", "JSON")]
+    [InlineData("JSON", "JSON")]
+    [InlineData("binary", "Binary")]
+    [InlineData("Binary", "Binary")]
+    public void Create_ValidFormat_ReturnsCorrectCalculator(string format, string expectedName)
+    {
+        var calc = PayloadSizeCalculator.Create(format);
+        calc.FormatName.ShouldBe(expectedName);
+    }
+
+    [Fact]
+    public void Create_UnknownFormat_ThrowsArgumentException()
+    {
+        Should.Throw<ArgumentException>(() => PayloadSizeCalculator.Create("xml"));
     }
 
     // --- Test types (inner classes so attribute resolution works) ---

@@ -1,12 +1,14 @@
+// Copyright (c) Momentum .NET. All rights reserved.
+
 using Momentum.Extensions.EventMarkdownGenerator.Services.Serialization;
 using Shouldly;
 using Xunit;
 
 namespace Momentum.Extensions.EventMarkdownGenerator.Tests;
 
-public class JsonOverheadCalculatorTests
+public class JsonPayloadSizeCalculatorTests
 {
-    private readonly JsonOverheadCalculator _calculator = new();
+    private readonly JsonPayloadSizeCalculator _calculator = new();
 
     [Fact]
     public void FormatName_ShouldBeJson()

@@ -2,7 +2,6 @@
 
 using Momentum.Extensions.EventMarkdownGenerator.Models;
 using Momentum.Extensions.EventMarkdownGenerator.Services;
-using Momentum.Extensions.EventMarkdownGenerator.Services.Serialization;
 using Spectre.Console;
 using Spectre.Console.Cli;
 using System.ComponentModel;
@@ -123,7 +122,7 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
         var xmlParser = new XmlDocumentationParser();
         var markdownGenerator = await FluidMarkdownGenerator.CreateAsync(options.TemplatesDirectory);
         var xmlDocumentationPaths = DiscoverXmlDocumentationFiles(options.AssemblyPaths, options.XmlDocumentationPaths);
-        var overheadCalculator = OverheadCalculatorFactory.Create(options.SerializationFormat);
+        var calculator = PayloadSizeCalculator.Create(options.SerializationFormat);
 
         if (xmlDocumentationPaths.Count > 0)
         {
@@ -145,7 +144,7 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
                     () => LoadAssemblyWithDependencyResolution(assemblyPath, out loadContext),
                     cts.Token);
 
-                var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser, overheadCalculator);
+                var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser, calculator);
 
                 foreach (var eventMetadata in events)
                 {

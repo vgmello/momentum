@@ -24,6 +24,7 @@ public static class OrleansExtensions
         var config = builder.Configuration.GetSection(sectionName);
 
         var useLocalCluster = config.GetValue<bool>("UseLocalhostClustering");
+        string? grainDirectoryConnectionString = null;
 
         if (!useLocalCluster)
         {
@@ -44,6 +45,9 @@ public static class OrleansExtensions
                 grainDirectoryServiceName = clusterServiceName;
                 config["GrainDirectory:Default:ServiceKey"] = clusterServiceName;
             }
+
+            grainDirectoryConnectionString = builder.Configuration.GetConnectionString(grainDirectoryServiceName)
+                                            ?? orleansConnectionString;
 
             builder.AddKeyedAzureTableServiceClient(clusterServiceName);
             builder.AddKeyedAzureBlobServiceClient(grainStateServiceName);
@@ -69,7 +73,7 @@ public static class OrleansExtensions
             {
                 siloBuilder.AddAzureTableGrainDirectory(
                     GrainDirectoryName,
-                    (Action<AzureTableGrainDirectoryOptions>)(_ => { }));
+                    options => options.TableServiceClient = new Azure.Data.Tables.TableServiceClient(grainDirectoryConnectionString));
             }
 
             siloBuilder.AddDashboard();

@@ -14,27 +14,21 @@ public static class AssemblyEventDiscovery
 
     public static IEnumerable<EventMetadata> DiscoverEvents(Assembly assembly)
     {
-        var defaultDomain = GetMainDomainName(assembly);
-        var integrationEventTypes = GetEventTypes(assembly);
-
-        return integrationEventTypes.Select(type => CreateEventMetadata(type, defaultDomain, null));
+        return DiscoverEvents(assembly, null, PayloadSizeCalculator.Create("json"));
     }
 
     public static IEnumerable<EventMetadata> DiscoverEvents(Assembly assembly, XmlDocumentationParser? xmlParser)
     {
-        var defaultDomain = GetMainDomainName(assembly);
-        var integrationEventTypes = GetEventTypes(assembly);
-
-        return integrationEventTypes.Select(type => CreateEventMetadata(type, defaultDomain, xmlParser));
+        return DiscoverEvents(assembly, xmlParser, PayloadSizeCalculator.Create("json"));
     }
 
     public static IEnumerable<EventMetadata> DiscoverEvents(Assembly assembly, XmlDocumentationParser? xmlParser,
-        ISerializationOverheadCalculator overheadCalculator)
+        PayloadSizeCalculator calculator)
     {
         var defaultDomain = GetMainDomainName(assembly);
         var integrationEventTypes = GetEventTypes(assembly);
 
-        return integrationEventTypes.Select(type => CreateEventMetadata(type, defaultDomain, xmlParser, overheadCalculator));
+        return integrationEventTypes.Select(type => CreateEventMetadata(type, defaultDomain, xmlParser, calculator));
     }
 
     private static IEnumerable<Type> GetEventTypes(Assembly assembly)
@@ -66,12 +60,12 @@ public static class AssemblyEventDiscovery
     }
 
     private static EventMetadata CreateEventMetadata(Type eventType, string defaultDomain,
-        XmlDocumentationParser? xmlParser, ISerializationOverheadCalculator? overheadCalculator = null)
+        XmlDocumentationParser? xmlParser, PayloadSizeCalculator calculator)
     {
         // Use dynamic attribute handling to work across assembly contexts
         var topicAttribute = GetEventTopicAttributeDynamic(eventType);
         var obsoleteAttribute = eventType.GetCustomAttribute<ObsoleteAttribute>();
-        var (properties, partitionKeys) = GetEventPropertiesAndPartitionKeys(eventType, xmlParser, overheadCalculator);
+        var (properties, partitionKeys) = GetEventPropertiesAndPartitionKeys(eventType, xmlParser, calculator);
 
         var topicName = GetTopicName(topicAttribute, eventType);
 
@@ -152,7 +146,7 @@ public static class AssemblyEventDiscovery
     }
 
     private static (List<EventPropertyMetadata> properties, List<PartitionKeyMetadata> partitionKeys) GetEventPropertiesAndPartitionKeys(
-        Type eventType, XmlDocumentationParser? xmlParser, ISerializationOverheadCalculator? overheadCalculator = null)
+        Type eventType, XmlDocumentationParser? xmlParser, PayloadSizeCalculator calculator)
     {
         var properties = new List<EventPropertyMetadata>();
         var partitionKeys = new List<PartitionKeyMetadata>();
@@ -181,9 +175,7 @@ public static class AssemblyEventDiscovery
             }
 
             var description = eventDoc?.PropertyDescriptions?.GetValueOrDefault(property.Name) ?? "No description available";
-            var sizeResult = overheadCalculator != null
-                ? PayloadSizeCalculator.CalculatePropertySize(property, property.PropertyType, overheadCalculator)
-                : PayloadSizeCalculator.CalculatePropertySize(property, property.PropertyType);
+            var sizeResult = calculator.CalculatePropertySize(property, property.PropertyType);
 
             properties.Add(new EventPropertyMetadata
             {

@@ -1,6 +1,7 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
 using Microsoft.AspNetCore.OpenApi;
+using Microsoft.Extensions.Configuration;
 
 namespace Momentum.ServiceDefaults.Api.OpenApi.Extensions;
 
@@ -13,23 +14,28 @@ public static class OpenApiExtensions
     ///     Configures OpenAPI options with Momentum's default settings.
     /// </summary>
     /// <param name="options">The OpenAPI options to configure.</param>
-    /// <param name="addBearerAuth">When <c>true</c> (default), adds the Bearer authentication security scheme to the OpenAPI document.</param>
+    /// <param name="configuration">
+    ///     Optional application configuration. When provided, security schemes are read from
+    ///     <c>OpenApi:SecuritySchemes</c>. Each key becomes a scheme name, with child properties
+    ///     mapped to <c>Type</c>, <c>Scheme</c>, <c>BearerFormat</c>, and <c>Description</c>.
+    ///     When <c>null</c> or when the section is absent, no security schemes are added.
+    /// </param>
     /// <remarks>
     ///     This method applies Momentum's standard OpenAPI configuration:
     ///     <list type="bullet">
     ///         <item>Server URL normalization (removes trailing slashes)</item>
-    ///         <item>Bearer authentication security scheme</item>
+    ///         <item>Config-driven security schemes via <c>OpenApi:SecuritySchemes</c></item>
     ///     </list>
     ///     Call this from your project's <c>AddOpenApi()</c> configuration to apply defaults:
     ///     <code>
     ///     builder.Services.AddOpenApi(options =&gt;
     ///     {
-    ///         options.ConfigureOpenApiDefaults();
+    ///         options.ConfigureOpenApiDefaults(builder.Configuration);
     ///         // Add your custom configuration here
     ///     });
     ///     </code>
     /// </remarks>
-    public static OpenApiOptions ConfigureOpenApiDefaults(this OpenApiOptions options, bool addBearerAuth = true)
+    public static OpenApiOptions ConfigureOpenApiDefaults(this OpenApiOptions options, IConfiguration? configuration = null)
     {
         // Normalize server URLs by removing trailing slashes
         options.AddDocumentTransformer((document, _, _) =>
@@ -45,21 +51,30 @@ public static class OpenApiExtensions
             return Task.CompletedTask;
         });
 
-        if (addBearerAuth)
+        var schemesSection = configuration?.GetSection("OpenApi:SecuritySchemes");
+
+        if (schemesSection is not null && schemesSection.Exists())
         {
-            // Add Bearer authentication security scheme
             options.AddDocumentTransformer((document, _, _) =>
             {
                 var components = document.Components ??= new Microsoft.OpenApi.OpenApiComponents();
                 components.SecuritySchemes ??= new Dictionary<string, Microsoft.OpenApi.IOpenApiSecurityScheme>();
 
-                components.SecuritySchemes["Bearer"] = new Microsoft.OpenApi.OpenApiSecurityScheme
+                foreach (var schemeSection in schemesSection.GetChildren())
                 {
-                    Type = Microsoft.OpenApi.SecuritySchemeType.Http,
-                    Scheme = "bearer",
-                    BearerFormat = "JWT",
-                    Description = "Enter your JWT token"
-                };
+                    var typeStr = schemeSection.GetValue<string>("Type");
+
+                    if (!Enum.TryParse<Microsoft.OpenApi.SecuritySchemeType>(typeStr, true, out var schemeType))
+                        continue;
+
+                    components.SecuritySchemes[schemeSection.Key] = new Microsoft.OpenApi.OpenApiSecurityScheme
+                    {
+                        Type = schemeType,
+                        Scheme = schemeSection.GetValue<string>("Scheme") ?? string.Empty,
+                        BearerFormat = schemeSection.GetValue<string>("BearerFormat"),
+                        Description = schemeSection.GetValue<string>("Description")
+                    };
+                }
 
                 return Task.CompletedTask;
             });
