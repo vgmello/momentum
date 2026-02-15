@@ -7,7 +7,7 @@
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <CodeAnalysisRuleSet>../../Momentum.ruleset</CodeAnalysisRuleSet>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <NoWarn>$(NoWarn);CS1591;LOGGEN036;NU1603</NoWarn>
+        <NoWarn>$(NoWarn);CS1591;LOGGEN036;LOGGEN031;S3267;NU1603</NoWarn>
         <BaseVersion Condition="'$(BaseVersion)' == ''">1000.0.0</BaseVersion>
         <!-- Fixed version for local debug builds. Since .local/nuget/ is cleaned before each
              build, only one version ever exists. ClearNuGetCache in Directory.Build.targets

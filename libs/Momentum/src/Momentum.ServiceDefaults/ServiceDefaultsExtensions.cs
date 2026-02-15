@@ -171,7 +171,6 @@ public static class ServiceDefaultsExtensions
     ///     to ensure fatal errors are captured before the process terminates. The exception is
     ///     re-thrown to allow the runtime to handle it appropriately (e.g., for process exit codes).
     /// </remarks>
-#pragma warning disable S2139 // Exceptions should be either logged or rethrown but not both
     public static async Task RunAsync(this WebApplication app, string[] args)
     {
         var isWolverineCommand = args.Length > 0 && WolverineCommands.Contains(args[0]);
@@ -211,7 +210,6 @@ public static class ServiceDefaultsExtensions
             }
         }
     }
-#pragma warning restore S2139
 
     private static readonly FrozenSet<string> WolverineCommands = new[]
     {

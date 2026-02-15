@@ -4,9 +4,6 @@ using NetArchTest.Rules;
 using Orleans.GrainDirectory;
 
 namespace AppDomain.Tests.Architecture;
-
-#pragma warning disable CS8602
-
 /// <summary>
 ///     Architecture tests to enforce grain ownership boundaries in Orleans.
 ///     Only the domain that owns a grain should be able to call it directly.

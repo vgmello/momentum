@@ -167,7 +167,6 @@
         <Rule Id="S3263" Action="Warning" />
         <Rule Id="S3264" Action="Warning" />
         <Rule Id="S3265" Action="Error" />
-        <Rule Id="S3267" Action="None" />
         <Rule Id="S3329" Action="Error" />
         <Rule Id="S3330" Action="Info" />
         <Rule Id="S3343" Action="Warning" />

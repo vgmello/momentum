@@ -3,9 +3,6 @@
 using NetArchTest.Rules;
 
 namespace AppDomain.Tests.Architecture;
-
-#pragma warning disable CS8602
-
 /// <summary>
 ///     Base class for all architecture tests providing common functionality.
 /// </summary>

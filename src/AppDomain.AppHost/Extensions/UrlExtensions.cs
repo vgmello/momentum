@@ -2,8 +2,6 @@
 
 using Microsoft.Extensions.Logging;
 
-#pragma warning disable CA1873
-
 namespace AppDomain.AppHost.Extensions;
 
 /// <summary>

@@ -10,8 +10,6 @@ using Orleans.GrainDirectory;
 using ContractInvoice = AppDomain.Invoices.Contracts.Models.Invoice;
 using Invoice = AppDomain.Invoices.Data.Entities.Invoice;
 
-#pragma warning disable CA1873
-
 namespace AppDomain.BackOffice.Orleans.Invoices.Grains;
 
 /// <summary>

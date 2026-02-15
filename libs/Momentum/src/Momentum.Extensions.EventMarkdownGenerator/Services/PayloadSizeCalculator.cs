@@ -213,9 +213,7 @@ public static class PayloadSizeCalculator
         return overhead;
     }
 
-#pragma warning disable S3776 // Cognitive Complexity acceptable for complex type analysis with error handling
     private static PayloadSizeResult CalculateComplexTypeSize(Type type, HashSet<Type> visitedTypes, ISerializationOverheadCalculator? overheadCalculator)
-#pragma warning restore S3776
     {
         // Prevent infinite recursion
         if (!visitedTypes.Add(type))

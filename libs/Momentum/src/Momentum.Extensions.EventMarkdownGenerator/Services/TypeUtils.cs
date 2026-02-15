@@ -160,9 +160,7 @@ public static class TypeUtils
     ///     Gets a friendly display name for a type (e.g., "string" instead of "String").
     ///     Handles nullable types and generics appropriately.
     /// </summary>
-#pragma warning disable S3776 // Cognitive Complexity acceptable for type name formatting
     public static string GetFriendlyTypeName(Type type)
-#pragma warning restore S3776
     {
         if (type == typeof(string)) return "string";
         if (type == typeof(int)) return "int";
