@@ -239,7 +239,7 @@ dotnet_diagnostic.CA1806.severity = warning # Don't ignore TryParse return value
 dotnet_diagnostic.CA1816.severity = warning # Call SuppressFinalize in DisposeAsync
 dotnet_diagnostic.CA1822.severity = warning # Mark members as static when not accessing instance data
 dotnet_diagnostic.CA1859.severity = warning # Use concrete types for better performance
-dotnet_diagnostic.CA1873.severity = warning # Avoid expensive logging argument evaluation
+dotnet_diagnostic.CA1873.severity = none # Avoid expensive logging argument evaluation
 
 #### Naming styles ####
 
