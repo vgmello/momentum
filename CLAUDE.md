@@ -157,7 +157,7 @@ YourService/
 ```
 
 **Template Configuration**:
-- Components: `--api`, `--backoffice`, `--orleans`, `--aspire`, `--docs`
+- Components: `--api`, `--backoffice`, `--orleans`, `--aspire`, `--docs`, `--bff`
 - Infrastructure: `--db-config [default|none|npgsql|liquibase]`, `--kafka`
 - Customization: `--org "Company"`, `--port 8100`, `--no-sample`
 - Libraries: `--libs [defaults|api|ext|kafka|generators]`

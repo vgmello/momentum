@@ -48,7 +48,7 @@ function checkGrpcResponse(response, operation) {
 }
 
 // Main test scenario
-export default function () {
+export default function main() {
     const tenantId = `tenant_${__VU}_${__ITER}`;
 
     // Connect to gRPC service
@@ -59,7 +59,6 @@ export default function () {
 
     group("Cashiers gRPC CRUD Operations", () => {
         let cashierId;
-        let cashierVersion;
 
         // Create cashier
         group("Create Cashier (gRPC)", () => {

@@ -64,8 +64,9 @@ public static class PayloadSizeCalculator
     }
 
     /// <summary>
-    ///     Calculates string payload size using worst-case UTF-32 encoding (4 bytes per character).
-    ///     This provides a conservative upper bound for JSON serialization which typically uses UTF-8.
+    ///     Calculates string payload size using worst-case encoding (4 bytes per character).
+    ///     This is the maximum for both UTF-8 (4 bytes for supplementary characters) and UTF-32,
+    ///     providing a conservative upper bound for JSON serialization.
     ///     Uses MaxLength or StringLength attributes when available for accurate estimation.
     /// </summary>
     private static PayloadSizeResult CalculateStringSize(PropertyInfo property)
@@ -74,7 +75,7 @@ public static class PayloadSizeCalculator
 
         if (constraints.MaxLength.HasValue)
         {
-            // Use 4 bytes per character (UTF-32) as worst-case estimate
+            // 4 bytes per character is the worst case for both UTF-8 and UTF-32
             return new PayloadSizeResult
             {
                 SizeBytes = constraints.MaxLength.Value * 4,

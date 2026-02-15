@@ -26,6 +26,11 @@ const markdownOptions: MarkdownOptions = {
 };
 
 export default defineConfig({
+    vite: {
+        ssr: {
+            noExternal: ['mermaid'],
+        },
+    },
     title: "Momentum .NET",
     description: "Momentum .NET, It's not a framework, it's a highly opinionated .NET template with pre-configured .NET libraries and tools, for scalable, distributed .NET services.",
     ignoreDeadLinks: [

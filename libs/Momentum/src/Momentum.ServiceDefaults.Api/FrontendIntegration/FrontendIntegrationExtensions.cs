@@ -27,6 +27,18 @@ public static class FrontendIntegrationExtensions
         builder.Services.Configure<SecurityHeaderSettings>(
             builder.Configuration.GetSection("SecurityHeaders"));
 
+        builder.Services.AddResponseCompression(options =>
+        {
+            options.EnableForHttps = true;
+            options.Providers.Add<Microsoft.AspNetCore.ResponseCompression.BrotliCompressionProvider>();
+            options.Providers.Add<Microsoft.AspNetCore.ResponseCompression.GzipCompressionProvider>();
+        });
+
+        builder.Services.Configure<Microsoft.AspNetCore.ResponseCompression.BrotliCompressionProviderOptions>(options =>
+        {
+            options.Level = System.IO.Compression.CompressionLevel.Fastest;
+        });
+
         return builder;
     }
 
@@ -37,6 +49,12 @@ public static class FrontendIntegrationExtensions
     /// <returns>The configured web application for method chaining.</returns>
     public static WebApplication UseFrontendIntegration(this WebApplication app)
     {
+        if (!app.Environment.IsDevelopment())
+        {
+            app.UseHttpsRedirection();
+        }
+
+        app.UseResponseCompression();
         app.UseCors(CorsPolicyName);
         app.UseSecurityHeaders();
 
@@ -53,6 +71,12 @@ public static class FrontendIntegrationExtensions
         var corsSettings = builder.Configuration
             .GetSection("Cors")
             .Get<CorsSettings>() ?? new CorsSettings();
+
+        if (corsSettings.AllowCredentials && corsSettings.AllowedOrigins.Length == 0)
+        {
+            throw new InvalidOperationException(
+                "CORS: AllowCredentials requires explicit AllowedOrigins. Wildcard origins are not permitted with credentials.");
+        }
 
         builder.Services.AddCors(options =>
         {

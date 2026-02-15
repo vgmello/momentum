@@ -44,7 +44,7 @@ export function setup() {
 }
 
 // Main test scenario
-export default function (data) {
+export default function main(data) {
     const tenantId = `tenant_${__VU}_${__ITER}`;
     const { testCashierId } = data;
 

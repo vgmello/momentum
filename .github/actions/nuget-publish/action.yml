@@ -48,6 +48,14 @@ runs:
       shell: pwsh
       env:
         NUGET_API_KEY: ${{ inputs.nuget-api-key }}
+        INPUT_PATH: ${{ inputs.path }}
+        INPUT_CONFIG: ${{ inputs.config }}
+        INPUT_PACKAGE_VERSION: ${{ inputs.package-version }}
+        INPUT_NUGET_SOURCE: ${{ inputs.nuget-source }}
+        INPUT_PACK_ARGS: ${{ inputs.pack-args }}
+        INPUT_SKIP_DUPLICATE: ${{ inputs.skip-duplicate }}
+        INPUT_DRY_RUN: ${{ inputs.dry-run }}
+        ACTION_PATH: ${{ github.action_path }}
       run: |
         # Mask the API key in logs
         if ($env:NUGET_API_KEY -ne "") {
@@ -55,27 +63,27 @@ runs:
         }
 
         $params = @{
-          Path = "${{ inputs.path }}"
-          Config = "${{ inputs.config }}"
-          PackageVersion = "${{ inputs.package-version }}"
+          Path = $env:INPUT_PATH
+          Config = $env:INPUT_CONFIG
+          PackageVersion = $env:INPUT_PACKAGE_VERSION
           NugetApiKey = $env:NUGET_API_KEY
-          NugetSource = "${{ inputs.nuget-source }}"
+          NugetSource = $env:INPUT_NUGET_SOURCE
         }
 
         # Parse pack-args as an array if provided
-        $packArgsInput = "${{ inputs.pack-args }}"
+        $packArgsInput = $env:INPUT_PACK_ARGS
         if (-not [string]::IsNullOrWhiteSpace($packArgsInput)) {
           # Split on spaces but preserve quoted strings
           $packArgsArray = $packArgsInput -split '\s+(?=(?:[^"]*"[^"]*")*[^"]*$)' | Where-Object { $_ -ne '' }
           $params['PackArgs'] = $packArgsArray
         }
 
-        if ("${{ inputs.skip-duplicate }}" -eq "true") {
+        if ($env:INPUT_SKIP_DUPLICATE -eq "true") {
           $params['SkipDuplicate'] = $true
         }
 
-        if ("${{ inputs.dry-run }}" -eq "true") {
+        if ($env:INPUT_DRY_RUN -eq "true") {
           $params['DryRun'] = $true
         }
 
-        & "${{ github.action_path }}/Publish-NuGetPackages.ps1" @params
+        & "$env:ACTION_PATH/Publish-NuGetPackages.ps1" @params

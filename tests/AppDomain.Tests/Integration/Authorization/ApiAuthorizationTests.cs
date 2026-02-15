@@ -202,6 +202,8 @@ public class ApiAuthorizationTests : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
+        GC.SuppressFinalize(this);
+
         if (_app is not null)
         {
             await _app.StopAsync();

@@ -1,5 +1,7 @@
 // Copyright (c) OrgName. All rights reserved.
 
+using AppDomain.Cashiers.Contracts.Models;
+
 namespace AppDomain.Cashiers.Contracts.IntegrationEvents;
 
 /// <summary>
@@ -25,7 +27,7 @@ namespace AppDomain.Cashiers.Contracts.IntegrationEvents;
 ///     - Clean up related authentication records
 ///     - Notify dependent services of cashier removal
 /// </remarks>
-[EventTopic<Guid>]
+[EventTopic<Cashier>]
 public record CashierDeleted(
     [PartitionKey] Guid TenantId,
     Guid CashierId,

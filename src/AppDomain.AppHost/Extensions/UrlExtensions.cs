@@ -30,8 +30,7 @@ public static class UrlExtensions
     public static IResourceBuilder<T> WithEndpointUrl<T>(this IResourceBuilder<T> builder,
         string endpoints, string displayText, string url = "/", ILogger? logger = null) where T : IResource
     {
-        if (builder == null)
-            throw new ArgumentNullException(nameof(builder));
+        ArgumentNullException.ThrowIfNull(builder);
 
         if (string.IsNullOrWhiteSpace(endpoints))
         {
@@ -41,9 +40,64 @@ public static class UrlExtensions
         }
 
         var endpointsList = endpoints.Split("|");
-        logger?.LogDebug("Processing {EndpointCount} endpoint specifications: {Endpoints}", endpointsList.Length, endpoints);
+        if (logger?.IsEnabled(LogLevel.Debug) == true)
+        {
+            logger.LogDebug("Processing {EndpointCount} endpoint specifications: {Endpoints}", endpointsList.Length, endpoints);
+        }
 
-        // Parse endpoint specifications to support port-specific matching
+        var (endpointSpecs, invalidEndpoints) = ParseEndpointSpecs(endpointsList, endpoints, logger);
+
+        if (endpointSpecs.Count == 0)
+        {
+            logger?.LogWarning("No valid endpoint specifications found in '{Endpoints}', no endpoint URLs will be configured", endpoints);
+
+            return builder;
+        }
+
+        if (invalidEndpoints.Count > 0 && logger?.IsEnabled(LogLevel.Information) == true)
+        {
+            logger.LogInformation(
+                "Successfully parsed {ValidCount} out of {TotalCount} endpoint specifications. Invalid: [{InvalidEndpoints}]",
+                endpointSpecs.Count, endpointsList.Length, string.Join(", ", invalidEndpoints));
+        }
+
+        builder.WithUrls(context =>
+        {
+            try
+            {
+                var urlForEndpoint = context.Urls.FirstOrDefault(u =>
+                    endpointSpecs.Any(spec => MatchesEndpointSpec(spec, u)));
+
+                if (urlForEndpoint is not null)
+                {
+                    urlForEndpoint.Url = url;
+                    urlForEndpoint.DisplayText = displayText;
+                    if (logger?.IsEnabled(LogLevel.Debug) == true)
+                    {
+                        logger.LogDebug(
+                            "Applied endpoint URL configuration: DisplayText='{DisplayText}', Url='{Url}' to endpoint '{EndpointName}'",
+                            displayText, url, GetEndpointName(urlForEndpoint));
+                    }
+                }
+                else
+                {
+                    logger?.LogWarning(
+                        "No matching endpoints found for specifications '{Endpoints}'. Available endpoints: [{AvailableEndpoints}]",
+                        endpoints, string.Join(", ", context.Urls.Select(u => GetEndpointName(u) ?? "unknown")));
+                }
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, "Error occurred while applying endpoint URL configuration for '{Endpoints}'", endpoints);
+            }
+        });
+
+        return builder;
+    }
+
+    private static (List<EndpointSpec> Specs, List<string> Invalid) ParseEndpointSpecs(
+        string[] endpointsList, string endpoints, ILogger? logger)
+    {
         var endpointSpecs = new List<EndpointSpec>();
         var invalidEndpoints = new List<string>();
 
@@ -62,7 +116,10 @@ public static class UrlExtensions
             {
                 var spec = ParseEndpointSpec(trimmedEndpoint, logger);
                 endpointSpecs.Add(spec);
-                logger?.LogDebug("Parsed endpoint specification: {Scheme}:{Port}", spec.Scheme, spec.Port?.ToString() ?? "any");
+                if (logger?.IsEnabled(LogLevel.Debug) == true)
+                {
+                    logger.LogDebug("Parsed endpoint specification: {Scheme}:{Port}", spec.Scheme, spec.Port?.ToString() ?? "any");
+                }
             }
             catch (ArgumentException ex)
             {
@@ -71,51 +128,7 @@ public static class UrlExtensions
             }
         }
 
-        if (endpointSpecs.Count == 0)
-        {
-            logger?.LogWarning("No valid endpoint specifications found in '{Endpoints}', no endpoint URLs will be configured", endpoints);
-
-            return builder;
-        }
-
-        if (invalidEndpoints.Count > 0)
-        {
-            logger?.LogInformation(
-                "Successfully parsed {ValidCount} out of {TotalCount} endpoint specifications. Invalid: [{InvalidEndpoints}]",
-                endpointSpecs.Count, endpointsList.Length, string.Join(", ", invalidEndpoints));
-        }
-
-        builder.WithUrls(context =>
-        {
-            try
-            {
-                // Find the first URL that matches any of our endpoint specifications
-                var urlForEndpoint = context.Urls.FirstOrDefault(u =>
-                    endpointSpecs.Any(spec => MatchesEndpointSpec(spec, u)));
-
-                if (urlForEndpoint is not null)
-                {
-                    urlForEndpoint.Url = url;
-                    urlForEndpoint.DisplayText = displayText;
-                    logger?.LogDebug(
-                        "Applied endpoint URL configuration: DisplayText='{DisplayText}', Url='{Url}' to endpoint '{EndpointName}'",
-                        displayText, url, GetEndpointName(urlForEndpoint));
-                }
-                else
-                {
-                    logger?.LogWarning(
-                        "No matching endpoints found for specifications '{Endpoints}'. Available endpoints: [{AvailableEndpoints}]",
-                        endpoints, string.Join(", ", context.Urls.Select(u => GetEndpointName(u) ?? "unknown")));
-                }
-            }
-            catch (Exception ex)
-            {
-                logger?.LogError(ex, "Error occurred while applying endpoint URL configuration for '{Endpoints}'", endpoints);
-                // Don't rethrow - allow the application to continue with other endpoints
-            }
-        });
-
-        return builder;
+        return (endpointSpecs, invalidEndpoints);
     }
 
     /// <summary>

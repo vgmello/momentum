@@ -304,29 +304,3 @@ cd LibTest
 dotnet build  # Should use packaged versions of libraries
 ```
 
-## CRITICAL DOCUMENTATION BUILD ISSUE
-
-**TASK: Fix ALL VitePress build failures - every single file must render perfectly**
-
-The documentation build is failing with Vue parsing errors across multiple files. The CSharpGenericsPlugin must be enhanced to handle ALL Vue parsing issues, not just move errors between files.
-
-**Current Status:**
-- Plugin successfully processes 40+ files with C# generics
-- rdbms-migrations.md was fixed but error moved to adding-domains/index.md
-- Multiple files still have "Invalid end tag" Vue parsing errors
-- GOAL: Complete build success with zero errors
-
-**Required Solution:**
-- The plugin must identify and fix ALL files with Vue parsing issues
-- Every markdown file with XML/HTML content must render without errors
-- The build command `bun run docs:build` must succeed completely
-- No partial solutions - ALL files must work
-
-**Plugin Enhancement Needed:**
-The CSharpGenericsPlugin in `.vitepress/plugins/csharpGenerics.ts` needs to:
-1. Detect ALL files with Vue parsing issues (not just specific ones)
-2. Apply comprehensive fixes to every problematic file
-3. Ensure zero build failures
-4. Maintain proper documentation rendering quality
-
-This is a blocking issue for documentation deployment and must be resolved completely.

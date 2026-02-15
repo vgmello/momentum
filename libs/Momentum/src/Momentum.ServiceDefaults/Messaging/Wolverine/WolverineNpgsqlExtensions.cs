@@ -38,6 +38,16 @@ public class WolverineNpgsqlExtensions(IConfiguration configuration, IOptions<Se
         if (string.IsNullOrWhiteSpace(connectionString))
             throw new InvalidOperationException($"The DB string '{ServiceBusOptions.SectionName}' is not set.");
 
+        try
+        {
+            _ = new Npgsql.NpgsqlConnectionStringBuilder(connectionString);
+        }
+        catch (ArgumentException ex)
+        {
+            throw new InvalidOperationException(
+                $"The DB connection string '{ServiceBusOptions.SectionName}' has an invalid format: {ex.Message}", ex);
+        }
+
         var persistenceSchema = options.ServiceName
             .Replace(".", "_")
             .Replace("-", "_")

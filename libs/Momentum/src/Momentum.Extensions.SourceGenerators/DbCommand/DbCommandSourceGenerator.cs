@@ -40,19 +40,31 @@ public class DbCommandSourceGenerator : IIncrementalGenerator
 
         context.RegisterSourceOutput(commandTypes, static (spc, dbCommandTypeInfo) =>
         {
-            foreach (var diagnostic in dbCommandTypeInfo.DiagnosticsToReport)
+            try
             {
+                foreach (var diagnostic in dbCommandTypeInfo.DiagnosticsToReport)
+                {
+                    spc.ReportDiagnostic(diagnostic);
+                }
+
+                // Only proceed with generation if there are no errors
+                if (dbCommandTypeInfo.HasErrors)
+                {
+                    return;
+                }
+
+                GenerateDbExtensionsPart(spc, dbCommandTypeInfo);
+                GenerateHandlerPart(spc, dbCommandTypeInfo);
+            }
+            catch (Exception ex)
+            {
+                var diagnostic = Diagnostic.Create(
+                    DbCommandAnalyzers.UnexpectedGeneratorError,
+                    Location.None,
+                    dbCommandTypeInfo.TypeName,
+                    ex.Message);
                 spc.ReportDiagnostic(diagnostic);
             }
-
-            // Only proceed with generation if there are no errors
-            if (dbCommandTypeInfo.HasErrors)
-            {
-                return;
-            }
-
-            GenerateDbExtensionsPart(spc, dbCommandTypeInfo);
-            GenerateHandlerPart(spc, dbCommandTypeInfo);
         });
     }
 
@@ -83,7 +95,7 @@ public class DbCommandSourceGenerator : IIncrementalGenerator
 
         var paramsCase = DbParamsCase.None;
         if (options.TryGetValue($"build_property.{nameof(DbCommandSourceGenSettings.DbCommandDefaultParamCase)}", out var stringValue))
-            Enum.TryParse(stringValue, out paramsCase);
+            _ = Enum.TryParse(stringValue, out paramsCase);
 
         options.TryGetValue($"build_property.{nameof(DbCommandSourceGenSettings.DbCommandParamPrefix)}", out var dbColumnPrefix);
 

@@ -86,10 +86,11 @@ public class KafkaWolverineExtensions(
             var setupKafkaRouteMethodInfo = SetupKafkaPublisherRouteMethodInfo.MakeGenericMethod(messageType);
             setupKafkaRouteMethodInfo.Invoke(null, [options, topicName]);
 
-            logger.LogDebug("Configured publisher for {EventType} to topic {TopicName}", messageType.Name, topicName);
+            if (logger.IsEnabled(LogLevel.Debug))
+                logger.LogDebug("Configured publisher for {EventType} to topic {TopicName}", messageType.Name, topicName);
         }
 
-        if (publisherTopics.Count > 0)
+        if (publisherTopics.Count > 0 && logger.IsEnabled(LogLevel.Information))
         {
             logger.LogInformation("Configured Kafka publishers for {TopicCount} topics: {Topics}",
                 publisherTopics.Count, string.Join(", ", publisherTopics));
@@ -119,7 +120,8 @@ public class KafkaWolverineExtensions(
             var topicName = topicNameGenerator.GetTopicName(messageType, topicAttribute);
             topicsToSubscribe.Add(topicName);
 
-            logger.LogDebug("Discovered handler for {EventType} on topic {TopicName}", messageType.Name, topicName);
+            if (logger.IsEnabled(LogLevel.Debug))
+                logger.LogDebug("Discovered handler for {EventType} on topic {TopicName}", messageType.Name, topicName);
         }
 
         foreach (var topicName in topicsToSubscribe)
@@ -127,7 +129,7 @@ public class KafkaWolverineExtensions(
             options.ListenToKafkaTopic(topicName);
         }
 
-        if (topicsToSubscribe.Count > 0)
+        if (topicsToSubscribe.Count > 0 && logger.IsEnabled(LogLevel.Information))
         {
             logger.LogInformation("Configured Kafka subscriptions for {TopicCount} topics with consumer group {ConsumerGroup}: {Topics}",
                 topicsToSubscribe.Count, options.ServiceName, string.Join(", ", topicsToSubscribe));

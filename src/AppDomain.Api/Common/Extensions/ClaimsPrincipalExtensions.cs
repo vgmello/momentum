@@ -20,10 +20,7 @@ public static class ClaimsPrincipalExtensions
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="principal" /> is null.</exception>
     public static Guid GetTenantId(this ClaimsPrincipal principal)
     {
-        if (principal == null)
-        {
-            throw new ArgumentNullException(nameof(principal));
-        }
+        ArgumentNullException.ThrowIfNull(principal);
 
         // TODO: Replace with actual tenant claim when authentication is implemented
         // For now, return the fake tenant ID

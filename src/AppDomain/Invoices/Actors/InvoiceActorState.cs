@@ -31,7 +31,7 @@ public sealed class InvoiceActorState
     ///     Gets or sets metadata about the grain state for debugging and monitoring.
     /// </summary>
     [Id(3)]
-    public Dictionary<string, string>? Metadata { get; set; } = new();
+    public Dictionary<string, string>? Metadata { get; set; } = [];
 
     /// <summary>
     ///     Gets or sets cached tenant ID for this grain.

@@ -1,3 +1,8 @@
+# WARNING: This Docker Compose file is intended for LOCAL DEVELOPMENT and TESTING only.
+# It is NOT suitable for production workloads. Production deployments should use
+# proper orchestration (e.g., Kubernetes, cloud-managed services) with appropriate
+# security, scaling, and high-availability configurations.
+
 services:
   # #if (USE_PGSQL)
   # Database services

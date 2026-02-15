@@ -1,16 +1,31 @@
 import type { MarkdownRenderer } from "vitepress";
-import mermaid, { type MermaidConfig } from "mermaid";
 
-mermaid.registerIconPacks([
-    {
-        name: "logos",
-        loader: () => fetch("https://unpkg.com/@iconify-json/logos/icons.json").then((res) => res.json()),
-    },
-]);
+type MermaidAPI = typeof import("mermaid").default;
+type MermaidConfig = Parameters<MermaidAPI["initialize"]>[0];
+
+let mermaidInstance: MermaidAPI | null = null;
+
+async function getMermaid(): Promise<MermaidAPI> {
+    if (!mermaidInstance) {
+        const mod = await import("mermaid");
+        mermaidInstance = mod.default;
+        mermaidInstance.registerIconPacks([
+            {
+                name: "logos",
+                loader: () =>
+                    fetch("https://unpkg.com/@iconify-json/logos/icons.json").then((res) =>
+                        res.json()
+                    ),
+            },
+        ]);
+    }
+    return mermaidInstance;
+}
 
 export const render = async (id: string, code: string, config: MermaidConfig): Promise<string> => {
-    mermaid.initialize(config);
-    const { svg } = await mermaid.render(id, code);
+    const m = await getMermaid();
+    m.initialize(config);
+    const { svg } = await m.render(id, code);
     return svg;
 };
 

@@ -20,8 +20,11 @@ public class BusinessDayEndedHandler(ILogger<BusinessDayEndedHandler> logger, IM
     /// <returns>A task representing the asynchronous operation.</returns>
     public async Task Handle(BusinessDayEnded businessDayEnded)
     {
-        logger.LogInformation("Processing business day ended for {BusinessDate} in {Market}/{Region}",
-            businessDayEnded.BusinessDate, businessDayEnded.Market, businessDayEnded.Region);
+        if (logger.IsEnabled(LogLevel.Information))
+        {
+            logger.LogInformation("Processing business day ended for {BusinessDate} in {Market}/{Region}",
+                businessDayEnded.BusinessDate, businessDayEnded.Market, businessDayEnded.Region);
+        }
 
         var tenantId = Guid.CreateVersion7();
         var invoiceId = Guid.CreateVersion7();

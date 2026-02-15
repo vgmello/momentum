@@ -33,7 +33,7 @@ function generateCashierData() {
     };
 }
 
-export default function () {
+export default function main() {
     client.connect(GRPC_ENDPOINT, {
         plaintext: true,
         timeout: "30s",
@@ -56,7 +56,7 @@ export default function () {
         });
 
         // Check response (remove timing check as it's tracked separately by k6)
-        const success = check(response, {
+        check(response, {
             "Create cashier gRPC - status is OK": (r) => r && r.status === grpc.StatusOK,
             "Create cashier gRPC - has cashierId": (r) => r.message && r.message.cashierId !== undefined && r.message.cashierId !== "",
             "Create cashier gRPC - name matches": (r) => r.message && r.message.name === cashierData.name,
@@ -64,19 +64,19 @@ export default function () {
             "Create cashier gRPC - has tenantId": (r) => r.message && r.message.tenantId !== undefined && r.message.tenantId !== "",
         });
 
-        // Only log as error if gRPC status is not OK
-        if (response.status !== grpc.StatusOK) {
-            console.error(`Create cashier gRPC failed:`, {
-                status: response.status,
-                message: response.message,
-                error: response.error,
-            });
-        } else {
+        // Log result based on gRPC status
+        if (response.status === grpc.StatusOK) {
             console.log(`✓ Cashier created successfully via gRPC: ${cashierData.name}`);
             // Log performance warning if response time is slow
             if (response.timings && response.timings.duration >= 500) {
                 console.warn(`⚠ Slow response time: ${response.timings.duration}ms`);
             }
+        } else {
+            console.error(`Create cashier gRPC failed:`, {
+                status: response.status,
+                message: response.message,
+                error: response.error,
+            });
         }
 
         // Small pause between iterations

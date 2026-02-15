@@ -109,7 +109,8 @@ try {
         // Check if events-docsgen tool is available
         try {
             execSync('events-docsgen --version', { stdio: 'pipe' });
-        } catch (checkError) {
+        } catch {
+            // Tool is not installed - provide installation instructions
             log('❌ The events-docsgen tool is not installed.');
             log('');
             log('Please install it using:');

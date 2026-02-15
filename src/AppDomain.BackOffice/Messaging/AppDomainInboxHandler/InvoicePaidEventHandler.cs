@@ -17,9 +17,12 @@ public static class InvoicePaidEventHandler
     /// <returns>A task representing the asynchronous operation.</returns>
     public static Task Handle(InvoicePaid message, ILogger logger)
     {
-        logger.LogInformation(
-            "Processing InvoicePaid event for Invoice {InvoiceId}, Amount: {AmountPaid}, PaymentDate: {PaymentDate}",
-            message.Invoice.InvoiceId, message.Invoice.AmountPaid, message.Invoice.PaymentDate);
+        if (logger.IsEnabled(LogLevel.Information))
+        {
+            logger.LogInformation(
+                "Processing InvoicePaid event for Invoice {InvoiceId}, Amount: {AmountPaid}, PaymentDate: {PaymentDate}",
+                message.Invoice.InvoiceId, message.Invoice.AmountPaid, message.Invoice.PaymentDate);
+        }
 
         // TODO: Add business logic for handling paid invoices
         // For example:
@@ -28,7 +31,10 @@ public static class InvoicePaidEventHandler
         // - Update analytics
         // - Trigger fulfillment process
 
-        logger.LogInformation("Successfully processed InvoicePaid event for Invoice {InvoiceId}", message.Invoice.InvoiceId);
+        if (logger.IsEnabled(LogLevel.Information))
+        {
+            logger.LogInformation("Successfully processed InvoicePaid event for Invoice {InvoiceId}", message.Invoice.InvoiceId);
+        }
 
         return Task.CompletedTask;
     }

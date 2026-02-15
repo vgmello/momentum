@@ -66,7 +66,7 @@ public static class DomainDiscovery
     /// <summary>
     ///     Discovers all domains that have Orleans grains by looking for *.Actors namespaces.
     /// </summary>
-    private static IEnumerable<string> GetDomainsWithGrains()
+    private static List<string> GetDomainsWithGrains()
     {
         return GetAppDomainTypes()
             .GetTypes()

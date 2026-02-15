@@ -15,6 +15,8 @@ public class ScenarioBasedIntegrationTests
 
     private static readonly JsonSerializerOptions JsonOptions = System.Text.Json.JsonSerializerOptions.Web;
 
+    private static readonly JsonSerializerOptions IndentedJsonOptions = new() { WriteIndented = true };
+
     public static TheoryData<string> GetTestScenarios()
     {
         var theoryData = new TheoryData<string>();
@@ -221,8 +223,6 @@ public class ScenarioBasedIntegrationTests
         // Initialize services
         var xmlParser = new XmlDocumentationParser();
         var fluidGenerator = new FluidMarkdownGenerator();
-        var sidebarGenerator = new JsonSidebarGenerator();
-
         // Load XML documentation
         var xmlLoaded = await xmlParser.LoadMultipleDocumentationAsync([scenario.InputXmlPath], TestContext.Current.CancellationToken);
 
@@ -266,7 +266,7 @@ public class ScenarioBasedIntegrationTests
 
         // Generate sidebar
         var sidebarPath = Path.Combine(outputDir, "sidebar.json");
-        await sidebarGenerator.WriteSidebarAsync(eventsWithDocumentation, sidebarPath);
+        await JsonSidebarGenerator.WriteSidebarAsync(eventsWithDocumentation, sidebarPath);
         results.SidebarPath = sidebarPath;
 
         return results;
@@ -358,8 +358,8 @@ public class ScenarioBasedIntegrationTests
         var actualJson = JsonDocument.Parse(actualSidebar);
 
         // Compare JSON structure (this gives better error messages than string comparison)
-        JsonSerializer.Serialize(actualJson, new JsonSerializerOptions { WriteIndented = true })
-            .ShouldBe(JsonSerializer.Serialize(expectedJson, new JsonSerializerOptions { WriteIndented = true }),
+        JsonSerializer.Serialize(actualJson, IndentedJsonOptions)
+            .ShouldBe(JsonSerializer.Serialize(expectedJson, IndentedJsonOptions),
                 $"Scenario '{scenarioName}' sidebar.json structure mismatch");
     }
 

@@ -183,6 +183,7 @@ public class IntegrationTestFixture : IAsyncLifetime
 
     public async ValueTask DisposeAsync()
     {
+        GC.SuppressFinalize(this);
         //#if (HAS_BACKEND)
         if (_app is not null)
         {

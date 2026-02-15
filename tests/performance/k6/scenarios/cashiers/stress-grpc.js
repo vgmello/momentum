@@ -49,7 +49,7 @@ export function setup() {
 }
 
 // Main stress test scenario
-export default function () {
+export default function main() {
     const tenantId = `stress_tenant_${__VU}`;
     
     // Connect to gRPC service with aggressive timeout
@@ -65,7 +65,7 @@ export default function () {
 
         // Create cashier with minimal validation
         const cashierData = generateCashierData();
-        const createStartTime = new Date().getTime();
+        const createStartTime = Date.now();
 
         const createRequest = {
             name: cashierData.name,
@@ -79,7 +79,7 @@ export default function () {
             tags: { operation: "create_cashier_grpc_stress" },
         });
 
-        const createDuration = new Date().getTime() - createStartTime;
+        const createDuration = Date.now() - createStartTime;
 
         // Track performance degradation
         const createSuccess = check(createResponse, {
@@ -140,7 +140,7 @@ export default function () {
                 tags: { operation: "update_cashier_grpc_stress" },
             });
 
-            const updateSuccess = check(updateResponse, {
+            check(updateResponse, {
                 "Update cashier - gRPC status OK": (r) => r.status === grpc.StatusOK,
             });
 
