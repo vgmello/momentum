@@ -2,7 +2,6 @@
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -52,6 +51,7 @@ public class CorsConfigurationTests
         var app = builder.Build();
         app.UseCors(FrontendIntegrationExtensions.CorsPolicyName);
         app.MapGet("/test", () => "ok");
+
         await app.StartAsync(TestContext.Current.CancellationToken);
 
         var client = app.GetTestClient();

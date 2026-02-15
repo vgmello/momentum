@@ -9,17 +9,16 @@ $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 $ErrorActionPreference = "Stop"
 
-# Set defaults
-$deployPrerelease = $false
+# Set defaults - default to prerelease so unhandled event types (e.g. workflow_run) never accidentally publish a stable release
+$deployPrerelease = $true
 $deployDocs = $false
 
-# Set prerelease flag (only when explicitly needed)
+# Only produce a stable release for explicit release actions
 $githubEventName = $env:GITHUB_EVENT_NAME
 $githubRef = $env:GITHUB_REF
-if (($githubEventName -eq "push" -and $githubRef -eq "refs/heads/main") -or
-    ($githubEventName -eq "workflow_dispatch" -and $DeployType -like "*prerelease")) {
-    # We want all commits to main that are not a explicit 'release' tag to be a pre-release
-    $deployPrerelease = $true
+if (($githubEventName -eq "push" -and $githubRef -eq "refs/tags/release") -or
+    ($githubEventName -eq "workflow_dispatch" -and $DeployType -eq "release")) {
+    $deployPrerelease = $false
 }
 
 # Set docs flag for library releases

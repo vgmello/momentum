@@ -19,7 +19,7 @@ public class PortConfigurationAction
         public Dictionary<string, int> PortMappings { get; set; } = [];
     }
 
-    public PortConfigurationResult ConfigurePorts(string projectDir, JsonElement config)
+    public static PortConfigurationResult ConfigurePorts(string projectDir, JsonElement config)
     {
         var basePort = GetBasePortFromConfig(config);
         var portMappings = BuildPortMappings(basePort);
@@ -78,7 +78,7 @@ public class PortConfigurationAction
             { "18110", basePort + 10010 } // Aspire Dashboard HTTPS
         };
 
-    private List<string> FindFilesToUpdate(string projectDir)
+    private static List<string> FindFilesToUpdate(string projectDir)
     {
         var files = new List<string>();
         var extensions = new[] { ".cs", ".json", ".yml", ".yaml", ".xml", ".config" };
