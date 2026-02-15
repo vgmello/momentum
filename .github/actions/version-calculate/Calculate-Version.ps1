@@ -47,10 +47,11 @@ function Get-LatestRelease {
     ForEach-Object {
         try {
             # Use proper prefix removal instead of Replace to avoid removing characters from middle of string
-            $versionString = if ($_.StartsWith($TagPrefix)) { 
-                $_.Substring($TagPrefix.Length) 
-            } else { 
-                $_ 
+            $versionString = if ($_.StartsWith($TagPrefix)) {
+                $_.Substring($TagPrefix.Length)
+            }
+            else {
+                $_
             }
             [System.Management.Automation.SemanticVersion]($versionString)
         }
@@ -115,9 +116,13 @@ $latestRelease = Get-LatestRelease -MajorVersion $fileVersion.Major -TagPrefix $
 $latestStable = Get-LatestRelease -MajorVersion $fileVersion.Major -TagPrefix $TagPrefix -IncludePreRelease $false
 
 # Output previous version info
+# previous-tag is context-aware: in stable mode it points to the previous stable tag
+# so release notes compare stable-to-stable, not stable-to-preview
+$previousTagVersion = if ($Prerelease) { $latestRelease } else { $latestStable }
+
 if ($latestRelease) {
     Write-GitHubOutput -Name "previous-version" -Value $latestRelease.ToString()
-    Write-GitHubOutput -Name "previous-tag" -Value "${TagPrefix}$latestRelease"
+    Write-GitHubOutput -Name "previous-tag" -Value $(if ($previousTagVersion) { "${TagPrefix}$previousTagVersion" } else { "" })
     Write-GitHubOutput -Name "previous-stable-version" -Value $(if ($latestStable) { $latestStable.ToString() } else { "" })
 }
 else {

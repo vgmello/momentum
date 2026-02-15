@@ -24,8 +24,7 @@ try
     Console.WriteLine("🔧 Action 1: Port Configuration");
     Console.WriteLine("═══════════════════════════════");
 
-    var portAction = new PortConfigurationAction();
-    var portResult = portAction.ConfigurePorts(projectDir, config);
+    var portResult = PortConfigurationAction.ConfigurePorts(projectDir, config);
 
     Console.WriteLine(portResult.ChangedFiles > 0
         ? $"✅ Port configuration completed: {portResult.ChangedFiles}/{portResult.ProcessedFiles} files updated"
