@@ -23,7 +23,7 @@ export function setup() {
 }
 
 // Main test scenario
-export default function () {
+export default function main() {
     const tenantId = `tenant_${__VU}_${__ITER}`;
 
     group("Cashiers CRUD Operations", () => {

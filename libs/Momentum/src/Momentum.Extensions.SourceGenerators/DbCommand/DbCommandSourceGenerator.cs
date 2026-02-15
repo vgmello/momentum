@@ -95,7 +95,7 @@ public class DbCommandSourceGenerator : IIncrementalGenerator
 
         var paramsCase = DbParamsCase.None;
         if (options.TryGetValue($"build_property.{nameof(DbCommandSourceGenSettings.DbCommandDefaultParamCase)}", out var stringValue))
-            Enum.TryParse(stringValue, out paramsCase);
+            _ = Enum.TryParse(stringValue, out paramsCase);
 
         options.TryGetValue($"build_property.{nameof(DbCommandSourceGenSettings.DbCommandParamPrefix)}", out var dbColumnPrefix);
 

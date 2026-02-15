@@ -202,7 +202,7 @@ public class CloudEventMapperTests
     public void AllHeaders_ReturnsEmptyEnumerable()
     {
         // Act
-        var headers = _mapper.AllHeaders();
+        var headers = CloudEventMapper.AllHeaders();
 
         // Assert
         headers.ShouldBeEmpty();

@@ -83,7 +83,7 @@ public class CloudEventMapper(IOptions<ServiceBusOptions> serviceBusOptions) : I
         }
     }
 
-    public IEnumerable<string> AllHeaders()
+    public static IEnumerable<string> AllHeaders()
     {
         yield break;
     }

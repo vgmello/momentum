@@ -192,8 +192,6 @@ public class IntegrationTests
     {
         // Arrange
         var assembly = Assembly.LoadFrom(TestAssemblyPath);
-        var sidebarGenerator = new JsonSidebarGenerator();
-
         var xmlParser = new XmlDocumentationParser();
         var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser).ToList();
         var eventsWithDoc = events.Select(e => new EventWithDocumentation
@@ -203,7 +201,7 @@ public class IntegrationTests
         }).ToList();
 
         // Act
-        var sidebarItems = sidebarGenerator.GenerateSidebarItems(eventsWithDoc);
+        var sidebarItems = JsonSidebarGenerator.GenerateSidebarItems(eventsWithDoc);
 
         // Assert
         var cashierCreatedEvent = events.FirstOrDefault(e => e.EventName == "CashierCreated");

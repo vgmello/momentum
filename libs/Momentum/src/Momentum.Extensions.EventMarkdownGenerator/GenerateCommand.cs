@@ -115,8 +115,6 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
 
         var xmlParser = new XmlDocumentationParser();
         var markdownGenerator = await FluidMarkdownGenerator.CreateAsync(options.TemplatesDirectory);
-        var sidebarGenerator = new JsonSidebarGenerator();
-
         var xmlDocumentationPaths = DiscoverXmlDocumentationFiles(options.AssemblyPaths, options.XmlDocumentationPaths);
 
         if (xmlDocumentationPaths.Count > 0)
@@ -175,7 +173,7 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
             AnsiConsole.WriteLine($"Processed {processedAssemblies} assemblies but found no types with EventTopic attributes.");
 
             // Still generate empty sidebar for consistency
-            await sidebarGenerator.WriteSidebarAsync([], options.GetSidebarPath(), cancellationToken);
+            await JsonSidebarGenerator.WriteSidebarAsync([], options.GetSidebarPath(), cancellationToken);
             AnsiConsole.MarkupLine($"[green]✓[/] Generated empty sidebar file: {options.SidebarFileName}");
 
             return;
@@ -199,7 +197,7 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
         await WriteMarkdownFilesAsync(schemaFiles, cancellationToken);
 
         // Generate and write sidebar JSON
-        await sidebarGenerator.WriteSidebarAsync(allEvents, options.GetSidebarPath(), cancellationToken);
+        await JsonSidebarGenerator.WriteSidebarAsync(allEvents, options.GetSidebarPath(), cancellationToken);
 
         // Summary
         AnsiConsole.WriteLine();

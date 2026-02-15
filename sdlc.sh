@@ -33,42 +33,47 @@ show_usage() {
     echo "  $0            # Start runners"
     echo "  $0 --stop     # Stop runners"
     exit 0
+    return 0
 }
 
 # Function to check if Docker is installed
 check_docker() {
     if ! command -v docker &> /dev/null; then
-        echo -e "${RED}Error: Docker is not installed.${NC}"
+        echo -e "${RED}Error: Docker is not installed.${NC}" >&2
         echo "Please install Docker first: https://docs.docker.com/get-docker/"
         exit 1
     fi
+    return 0
 }
 
 # Function to check if docker-compose is installed
 check_docker_compose() {
     if ! command -v docker-compose &> /dev/null; then
-        echo -e "${RED}Error: docker-compose is not installed.${NC}"
+        echo -e "${RED}Error: docker-compose is not installed.${NC}" >&2
         echo "Install it from: https://docs.docker.com/compose/install/"
         exit 1
     fi
+    return 0
 }
 
 # Function to check if .env file exists
 check_env_file() {
-    if [ ! -f "$GITHUB_RUNNER_DIR/.env" ]; then
-        echo -e "${RED}Error: Configuration file not found!${NC}"
+    if [[ ! -f "$GITHUB_RUNNER_DIR/.env" ]]; then
+        echo -e "${RED}Error: Configuration file not found!${NC}" >&2
         echo ""
         echo "Please run setup first:"
         echo -e "  ${BLUE}./sdlc.sh --setup${NC}"
         echo ""
         exit 1
     fi
+    return 0
 }
 
 # Function to validate environment (checks .env file and docker-compose)
 env_validation() {
     check_env_file
     check_docker_compose
+    return 0
 }
 
 # Function to build Claude Code container
@@ -78,15 +83,16 @@ print_section_header() {
     echo "  $title"
     echo "================================================"
     echo ""
+    return 0
 }
 
 # Function to validate non-empty input
 validate_non_empty() {
     local value="$1"
     local field_name="$2"
-    
-    if [ -z "$value" ]; then
-        echo -e "${YELLOW}   Error: $field_name cannot be empty${NC}"
+
+    if [[ -z "$value" ]]; then
+        echo -e "${YELLOW}   Error: $field_name cannot be empty${NC}" >&2
         return 1
     fi
     return 0
@@ -98,7 +104,7 @@ build_claude_container() {
     echo -e "${BLUE}Building sdlc-claude:latest...${NC}"
     docker build -t sdlc-claude:latest "$CLAUDE_CODE_RUNNER_DIR"
 
-    if [ $? -eq 0 ]; then
+    if [[ $? -eq 0 ]]; then
         echo ""
         echo -e "${GREEN}✓ Claude Code container built successfully!${NC}"
     else
@@ -106,6 +112,7 @@ build_claude_container() {
         exit 1
     fi
     echo ""
+    return 0
 }
 
 # Function to run setup
@@ -128,7 +135,7 @@ run_setup() {
     print_section_header "Creating Runner Configuration"
 
     # Create .env file in github-runner directory
-    if [ ! -f "$GITHUB_RUNNER_DIR/.env" ]; then
+    if [[ ! -f "$GITHUB_RUNNER_DIR/.env" ]]; then
         echo -e "${BLUE}Let's configure your GitHub Actions runners...${NC}"
         echo ""
 
@@ -183,7 +190,7 @@ run_setup() {
                 RUNNER_SCOPE="org"
                 break
             else
-                echo -e "${YELLOW}   Error: Invalid format. Use 'owner/repo-name' for repository or 'org-name' for organization${NC}"
+                echo -e "${YELLOW}   Error: Invalid format. Use 'owner/repo-name' for repository or 'org-name' for organization${NC}" >&2
                 continue
             fi
         done
@@ -198,7 +205,7 @@ run_setup() {
         read -p "   Enter prefix (or press Enter for default '$DEFAULT_RUNNER_PREFIX'): " RUNNER_PREFIX
 
         # Use hostname as default if empty
-        if [ -z "$RUNNER_PREFIX" ]; then
+        if [[ -z "$RUNNER_PREFIX" ]]; then
             RUNNER_PREFIX="$DEFAULT_RUNNER_PREFIX"
             echo -e "${GREEN}   ✓ Using default prefix: $RUNNER_PREFIX${NC}"
         fi
@@ -215,7 +222,7 @@ run_setup() {
             read -p "   Enter number of runners (1-20, or press Enter for default '5'): " RUNNER_REPLICATIONS
             
             # Use default if empty
-            if [ -z "$RUNNER_REPLICATIONS" ]; then
+            if [[ -z "$RUNNER_REPLICATIONS" ]]; then
                 RUNNER_REPLICATIONS=5
                 echo -e "${GREEN}   ✓ Using default: $RUNNER_REPLICATIONS runners${NC}"
                 break
@@ -223,13 +230,13 @@ run_setup() {
             
             # Validate it's a number
             if ! [[ "$RUNNER_REPLICATIONS" =~ ^[0-9]+$ ]]; then
-                echo -e "${YELLOW}   Error: Please enter a valid number${NC}"
+                echo -e "${YELLOW}   Error: Please enter a valid number${NC}" >&2
                 continue
             fi
             
             # Validate range
-            if [ "$RUNNER_REPLICATIONS" -lt 1 ] || [ "$RUNNER_REPLICATIONS" -gt 20 ]; then
-                echo -e "${YELLOW}   Error: Number must be between 1 and 20${NC}"
+            if [[ "$RUNNER_REPLICATIONS" -lt 1 ]] || [[ "$RUNNER_REPLICATIONS" -gt 20 ]]; then
+                echo -e "${YELLOW}   Error: Number must be between 1 and 20${NC}" >&2
                 continue
             fi
             
@@ -293,6 +300,7 @@ EOF
     echo ""
     echo "================================================"
     echo ""
+    return 0
 }
 
 # Function to start runners
@@ -316,7 +324,7 @@ start_runners() {
     cd "$GITHUB_RUNNER_DIR"
     docker-compose -p "$PROJECT_NAME" up --build -d --scale github-runner=$RUNNER_COUNT
 
-    if [ $? -eq 0 ]; then
+    if [[ $? -eq 0 ]]; then
         echo ""
         echo -e "${GREEN}✓ Runners started successfully!${NC}"
         echo ""
@@ -333,6 +341,7 @@ start_runners() {
         echo -e "${RED}✗ Failed to start runners${NC}"
         exit 1
     fi
+    return 0
 }
 
 # Function to stop runners
@@ -348,7 +357,7 @@ stop_runners() {
     cd "$GITHUB_RUNNER_DIR"
     docker-compose -p "$PROJECT_NAME" down
 
-    if [ $? -eq 0 ]; then
+    if [[ $? -eq 0 ]]; then
         echo ""
         echo -e "${GREEN}✓ Runners stopped successfully!${NC}"
         echo ""
@@ -359,6 +368,7 @@ stop_runners() {
         echo -e "${RED}✗ Failed to stop runners${NC}"
         exit 1
     fi
+    return 0
 }
 
 # Main script logic
@@ -376,7 +386,7 @@ case "${1:-}" in
         start_runners
         ;;
     *)
-        echo -e "${RED}Error: Unknown option '$1'${NC}"
+        echo -e "${RED}Error: Unknown option '$1'${NC}" >&2
         echo ""
         show_usage
         ;;

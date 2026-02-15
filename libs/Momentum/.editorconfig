@@ -237,6 +237,12 @@ dotnet_diagnostic.CA1866.severity = warning # Use 'StartsWith(char)' instead of 
 dotnet_diagnostic.S1192.severity = warning # String literals should not be duplicated
 dotnet_diagnostic.S3267.severity = none # Loops should be simplified with LINQ "Where" (intentionally disabled)
 dotnet_diagnostic.S6610.severity = warning # "StartsWith/EndsWith" char overloads should be used
+dotnet_diagnostic.CA1510.severity = warning # Use ArgumentNullException.ThrowIfNull
+dotnet_diagnostic.CA1806.severity = warning # Don't ignore TryParse return value
+dotnet_diagnostic.CA1816.severity = warning # Call SuppressFinalize in DisposeAsync
+dotnet_diagnostic.CA1822.severity = warning # Mark members as static when not accessing instance data
+dotnet_diagnostic.CA1859.severity = warning # Use concrete types for better performance
+dotnet_diagnostic.CA1873.severity = warning # Avoid expensive logging argument evaluation
 
 #### Naming styles ####
 

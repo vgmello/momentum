@@ -47,7 +47,8 @@ public class XmlDocumentationService(ILogger<XmlDocumentationService> logger) : 
 
             await ParseXmlDocumentationAsync(xmlReader, cancellationToken).ConfigureAwait(false);
 
-            logger.LogInformation("Loaded XML documentation from {FilePath} with {Count} entries", xmlFilePath, _documentationCache.Count);
+            if (logger.IsEnabled(LogLevel.Information))
+                logger.LogInformation("Loaded XML documentation from {FilePath} with {Count} entries", xmlFilePath, _documentationCache.Count);
 
             return true;
         }

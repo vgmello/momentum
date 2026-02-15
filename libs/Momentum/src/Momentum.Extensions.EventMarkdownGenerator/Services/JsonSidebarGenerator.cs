@@ -10,7 +10,7 @@ namespace Momentum.Extensions.EventMarkdownGenerator.Services;
 ///     Generates JSON sidebar navigation structure for documentation sites.
 ///     Groups events by subdomain and section, with separate schemas section.
 /// </summary>
-public class JsonSidebarGenerator
+public static class JsonSidebarGenerator
 {
     private const string UnknownValue = "Unknown";
 
@@ -25,14 +25,14 @@ public class JsonSidebarGenerator
     /// </summary>
     /// <param name="events">The events to include in the sidebar.</param>
     /// <returns>A formatted JSON string representing the sidebar structure.</returns>
-    public string GenerateSidebar(ICollection<EventWithDocumentation> events)
+    public static string GenerateSidebar(ICollection<EventWithDocumentation> events)
     {
         var sidebarItems = GenerateSidebarItems(events);
 
         return JsonSerializer.Serialize(sidebarItems, JsonOptions);
     }
 
-    public List<SidebarItem> GenerateSidebarItems(ICollection<EventWithDocumentation> events)
+    public static List<SidebarItem> GenerateSidebarItems(ICollection<EventWithDocumentation> events)
     {
         var eventGroups = GroupEventsBySubdomainAndSection(events);
         var sidebarItems = BuildSidebarStructure(eventGroups);
@@ -295,7 +295,7 @@ public class JsonSidebarGenerator
     /// <param name="events">The events to include in the sidebar.</param>
     /// <param name="filePath">The file path to write the sidebar JSON to.</param>
     /// <param name="cancellationToken">Optional cancellation token.</param>
-    public async Task WriteSidebarAsync(ICollection<EventWithDocumentation> events, string filePath, CancellationToken cancellationToken = default)
+    public static async Task WriteSidebarAsync(ICollection<EventWithDocumentation> events, string filePath, CancellationToken cancellationToken = default)
     {
         var sidebarJson = GenerateSidebar(events);
         await File.WriteAllTextAsync(filePath, sidebarJson, cancellationToken);
