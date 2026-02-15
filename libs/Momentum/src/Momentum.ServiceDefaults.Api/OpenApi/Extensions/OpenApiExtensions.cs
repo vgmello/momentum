@@ -10,14 +10,16 @@ namespace Momentum.ServiceDefaults.Api.OpenApi.Extensions;
 /// </summary>
 public static class OpenApiExtensions
 {
+    private const string SecuritySchemesSectionName = "OpenApi:SecuritySchemes";
+
     /// <summary>
     ///     Configures OpenAPI options with Momentum's default settings.
     /// </summary>
     /// <param name="options">The OpenAPI options to configure.</param>
     /// <param name="configuration">
-    ///     Optional application configuration. When provided, security schemes are read from
-    ///     <c>OpenApi:SecuritySchemes</c>. Each key becomes a scheme name, with child properties
-    ///     mapped to <c>Type</c>, <c>Scheme</c>, <c>BearerFormat</c>, and <c>Description</c>.
+    ///     Optional application configuration. When provided, security schemes are bound from
+    ///     <c>OpenApi:SecuritySchemes</c>. Each key becomes a scheme name with properties
+    ///     <c>Type</c>, <c>Scheme</c>, <c>BearerFormat</c>, and <c>Description</c>.
     ///     When <c>null</c> or when the section is absent, no security schemes are added.
     /// </param>
     /// <remarks>
@@ -51,29 +53,18 @@ public static class OpenApiExtensions
             return Task.CompletedTask;
         });
 
-        var schemesSection = configuration?.GetSection("OpenApi:SecuritySchemes");
+        var schemes = BindSecuritySchemes(configuration);
 
-        if (schemesSection is not null && schemesSection.Exists())
+        if (schemes.Count > 0)
         {
             options.AddDocumentTransformer((document, _, _) =>
             {
                 var components = document.Components ??= new Microsoft.OpenApi.OpenApiComponents();
                 components.SecuritySchemes ??= new Dictionary<string, Microsoft.OpenApi.IOpenApiSecurityScheme>();
 
-                foreach (var schemeSection in schemesSection.GetChildren())
+                foreach (var (name, scheme) in schemes)
                 {
-                    var typeStr = schemeSection.GetValue<string>("Type");
-
-                    if (!Enum.TryParse<Microsoft.OpenApi.SecuritySchemeType>(typeStr, true, out var schemeType))
-                        continue;
-
-                    components.SecuritySchemes[schemeSection.Key] = new Microsoft.OpenApi.OpenApiSecurityScheme
-                    {
-                        Type = schemeType,
-                        Scheme = schemeSection.GetValue<string>("Scheme") ?? string.Empty,
-                        BearerFormat = schemeSection.GetValue<string>("BearerFormat"),
-                        Description = schemeSection.GetValue<string>("Description")
-                    };
+                    components.SecuritySchemes[name] = scheme;
                 }
 
                 return Task.CompletedTask;
@@ -81,5 +72,34 @@ public static class OpenApiExtensions
         }
 
         return options;
+    }
+
+    private static Dictionary<string, Microsoft.OpenApi.OpenApiSecurityScheme> BindSecuritySchemes(
+        IConfiguration? configuration)
+    {
+        var result = new Dictionary<string, Microsoft.OpenApi.OpenApiSecurityScheme>();
+        var schemesSection = configuration?.GetSection(SecuritySchemesSectionName);
+
+        if (schemesSection is null || !schemesSection.Exists())
+            return result;
+
+        foreach (var child in schemesSection.GetChildren())
+        {
+            var schemeOptions = new OpenApiSecuritySchemeOptions();
+            child.Bind(schemeOptions);
+
+            if (!Enum.TryParse<Microsoft.OpenApi.SecuritySchemeType>(schemeOptions.Type, true, out var schemeType))
+                continue;
+
+            result[child.Key] = new Microsoft.OpenApi.OpenApiSecurityScheme
+            {
+                Type = schemeType,
+                Scheme = schemeOptions.Scheme,
+                BearerFormat = schemeOptions.BearerFormat,
+                Description = schemeOptions.Description
+            };
+        }
+
+        return result;
     }
 }
