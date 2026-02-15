@@ -69,7 +69,7 @@ public static class OrleansExtensions
             {
                 siloBuilder.AddAzureTableGrainDirectory(
                     GrainDirectoryName,
-                    (Action<global::Orleans.Configuration.AzureTableGrainDirectoryOptions>)(_ => { }));
+                    (Action<AzureTableGrainDirectoryOptions>)(_ => { }));
             }
 
             siloBuilder.AddDashboard();

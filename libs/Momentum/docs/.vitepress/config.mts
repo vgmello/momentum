@@ -27,6 +27,7 @@ const markdownOptions: MarkdownOptions = {
 
 export default defineConfig({
     vite: {
+        // Prevent Vite from externalizing mermaid during SSR since it uses browser APIs
         ssr: {
             noExternal: ['mermaid'],
         },

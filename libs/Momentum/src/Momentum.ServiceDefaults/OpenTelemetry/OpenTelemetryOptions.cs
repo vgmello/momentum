@@ -13,7 +13,7 @@ public class OpenTelemetryOptions
     public const string SectionName = "OpenTelemetry";
 
     /// <summary>
-    ///     Sampling rate for production traces (0.0 to 1.0). Default: 0.1 (10%).
+    ///     Sampling rate for traces (0.0 to 1.0). When not set, defaults to 1.0 in development and 0.1 in production.
     /// </summary>
-    public double ProductionSamplingRate { get; set; } = 0.1;
+    public double? SamplingRate { get; set; }
 }

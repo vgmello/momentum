@@ -2,6 +2,8 @@
 
 using Microsoft.Extensions.Logging;
 
+#pragma warning disable CA1873
+
 namespace AppDomain.AppHost.Extensions;
 
 /// <summary>
@@ -40,10 +42,7 @@ public static class UrlExtensions
         }
 
         var endpointsList = endpoints.Split("|");
-        if (logger?.IsEnabled(LogLevel.Debug) == true)
-        {
-            logger.LogDebug("Processing {EndpointCount} endpoint specifications: {Endpoints}", endpointsList.Length, endpoints);
-        }
+        logger?.LogDebug("Processing {EndpointCount} endpoint specifications: {Endpoints}", endpointsList.Length, endpoints);
 
         var (endpointSpecs, invalidEndpoints) = ParseEndpointSpecs(endpointsList, endpoints, logger);
 
@@ -54,9 +53,9 @@ public static class UrlExtensions
             return builder;
         }
 
-        if (invalidEndpoints.Count > 0 && logger?.IsEnabled(LogLevel.Information) == true)
+        if (invalidEndpoints.Count > 0)
         {
-            logger.LogInformation(
+            logger?.LogInformation(
                 "Successfully parsed {ValidCount} out of {TotalCount} endpoint specifications. Invalid: [{InvalidEndpoints}]",
                 endpointSpecs.Count, endpointsList.Length, string.Join(", ", invalidEndpoints));
         }
@@ -72,12 +71,9 @@ public static class UrlExtensions
                 {
                     urlForEndpoint.Url = url;
                     urlForEndpoint.DisplayText = displayText;
-                    if (logger?.IsEnabled(LogLevel.Debug) == true)
-                    {
-                        logger.LogDebug(
-                            "Applied endpoint URL configuration: DisplayText='{DisplayText}', Url='{Url}' to endpoint '{EndpointName}'",
-                            displayText, url, GetEndpointName(urlForEndpoint));
-                    }
+                    logger?.LogDebug(
+                        "Applied endpoint URL configuration: DisplayText='{DisplayText}', Url='{Url}' to endpoint '{EndpointName}'",
+                        displayText, url, GetEndpointName(urlForEndpoint));
                 }
                 else
                 {
@@ -116,10 +112,7 @@ public static class UrlExtensions
             {
                 var spec = ParseEndpointSpec(trimmedEndpoint, logger);
                 endpointSpecs.Add(spec);
-                if (logger?.IsEnabled(LogLevel.Debug) == true)
-                {
-                    logger.LogDebug("Parsed endpoint specification: {Scheme}:{Port}", spec.Scheme, spec.Port?.ToString() ?? "any");
-                }
+                logger?.LogDebug("Parsed endpoint specification: {Scheme}:{Port}", spec.Scheme, spec.Port?.ToString() ?? "any");
             }
             catch (ArgumentException ex)
             {

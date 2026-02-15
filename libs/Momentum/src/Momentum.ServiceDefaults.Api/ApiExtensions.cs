@@ -1,20 +1,18 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
+using Grpc.AspNetCore.Server;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenTelemetry.Trace;
 using Scalar.AspNetCore;
-using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.RateLimiting;
 
 namespace Momentum.ServiceDefaults.Api;
 
@@ -71,7 +69,7 @@ public static class ApiExtensions
         // The .NET 10 source generator intercepts AddOpenApi() calls and generates
         // XML comment transformers for the calling project's documentation.
 
-        if (builder.Environment.IsDevelopment())
+        if (builder.Configuration.GetValue("HttpLogging:Enabled", false))
         {
             builder.Services.AddHttpLogging();
         }
@@ -85,15 +83,8 @@ public static class ApiExtensions
         builder.Services.AddGrpc(options =>
         {
             options.EnableDetailedErrors = builder.Environment.IsDevelopment();
-
-            var maxReceiveSize = builder.Configuration.GetValue<int?>("Grpc:Limits:MaxReceiveMessageSize");
-            var maxSendSize = builder.Configuration.GetValue<int?>("Grpc:Limits:MaxSendMessageSize");
-
-            if (maxReceiveSize.HasValue)
-                options.MaxReceiveMessageSize = maxReceiveSize.Value;
-            if (maxSendSize.HasValue)
-                options.MaxSendMessageSize = maxSendSize.Value;
         });
+        builder.Services.Configure<GrpcServiceOptions>(builder.Configuration.GetSection("Grpc"));
         builder.Services.AddGrpcReflection();
 
         builder.Services.AddOpenTelemetry()
@@ -108,29 +99,35 @@ public static class ApiExtensions
                     .Build());
         }
 
+        builder.WebHost.UseKestrelHttpsConfiguration();
         builder.WebHost.ConfigureKestrel(serverOptions =>
         {
             serverOptions.AddServerHeader = false;
         });
+        builder.Services.Configure<KestrelServerOptions>(builder.Configuration.GetSection("Kestrel"));
 
-        builder.Services.AddRateLimiter(options =>
+        var rateLimitingSection = builder.Configuration.GetSection("RateLimiting");
+        if (rateLimitingSection.GetValue("Enabled", false))
         {
-            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-            options.AddFixedWindowLimiter("fixed", limiterOptions =>
+            builder.Services.AddRateLimiter(options =>
             {
-                var rateLimitConfig = builder.Configuration.GetSection("RateLimiting");
-                limiterOptions.Window = TimeSpan.FromSeconds(rateLimitConfig.GetValue<int?>("WindowSeconds") ?? 60);
-                limiterOptions.PermitLimit = rateLimitConfig.GetValue<int?>("PermitLimit") ?? 100;
-                limiterOptions.QueueLimit = rateLimitConfig.GetValue<int?>("QueueLimit") ?? 10;
-                limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+                var fixedSection = rateLimitingSection.GetSection("Fixed");
+                if (fixedSection.Exists())
+                {
+                    options.AddFixedWindowLimiter("fixed", limiterOptions =>
+                    {
+                        fixedSection.Bind(limiterOptions);
+                    });
+                }
             });
-        });
+        }
 
         builder.Services.ConfigureHttpJsonOptions(options =>
         {
-            options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            builder.Configuration.GetSection("JsonOptions").Bind(options.SerializerOptions);
             options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
-            options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
         });
 
         builder.Services.AddApiVersioning(options =>
@@ -154,13 +151,17 @@ public static class ApiExtensions
     /// </remarks>
     public static WebApplication ConfigureApiUsingDefaults(this WebApplication app)
     {
-        if (app.Environment.IsDevelopment())
+        if (app.Configuration.GetValue("HttpLogging:Enabled", false))
         {
             app.UseHttpLogging();
         }
 
         app.UseRouting();
-        app.UseRateLimiter();
+
+        if (app.Configuration.GetValue("RateLimiting:Enabled", false))
+        {
+            app.UseRateLimiter();
+        }
 
         var requireAuth = app.Services.GetService<ApiAuthConfiguration>()?.RequireAuth == true;
 
@@ -175,42 +176,7 @@ public static class ApiExtensions
         if (!app.Environment.IsDevelopment())
         {
             app.UseHsts();
-            app.UseExceptionHandler(exceptionApp =>
-            {
-                exceptionApp.Run(async context =>
-                {
-                    context.Response.ContentType = "application/problem+json";
-
-                    var exceptionFeature = context.Features.Get<IExceptionHandlerFeature>();
-                    var exception = exceptionFeature?.Error;
-
-                    var (statusCode, title) = exception switch
-                    {
-                        FluentValidation.ValidationException => (StatusCodes.Status400BadRequest, "Validation Error"),
-                        UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Unauthorized"),
-                        KeyNotFoundException => (StatusCodes.Status404NotFound, "Not Found"),
-                        _ => (StatusCodes.Status500InternalServerError, "Internal Server Error")
-                    };
-
-                    context.Response.StatusCode = statusCode;
-
-                    var problemDetails = new ProblemDetails
-                    {
-                        Status = statusCode,
-                        Title = title,
-                        Instance = context.Request.Path
-                    };
-
-                    if (exception is FluentValidation.ValidationException validationException)
-                    {
-                        problemDetails.Extensions["errors"] = validationException.Errors
-                            .GroupBy(e => e.PropertyName)
-                            .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
-                    }
-
-                    await context.Response.WriteAsJsonAsync(problemDetails);
-                });
-            });
+            app.UseProblemDetailsExceptionHandler();
         }
 
         app.UseOutputCache();

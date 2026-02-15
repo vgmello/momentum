@@ -10,6 +10,8 @@ using Orleans.GrainDirectory;
 using ContractInvoice = AppDomain.Invoices.Contracts.Models.Invoice;
 using Invoice = AppDomain.Invoices.Data.Entities.Invoice;
 
+#pragma warning disable CA1873
+
 namespace AppDomain.BackOffice.Orleans.Invoices.Grains;
 
 /// <summary>
@@ -39,11 +41,8 @@ public class InvoiceActor(
             MapContractToDataEntity,
             errors =>
             {
-                if (logger.IsEnabled(LogLevel.Warning))
-                {
-                    logger.LogWarning("Invoice {InvoiceId} not found for tenant {TenantId}: {Errors}",
-                        invoiceId, tenantId, string.Join(", ", errors.Select(e => e.ErrorMessage)));
-                }
+                logger.LogWarning("Invoice {InvoiceId} not found for tenant {TenantId}: {Errors}",
+                    invoiceId, tenantId, string.Join(", ", errors.Select(e => e.ErrorMessage)));
 
                 return null;
             });
@@ -80,11 +79,8 @@ public class InvoiceActor(
         invoiceState.State.OperationCount++;
         await invoiceState.WriteStateAsync();
 
-        if (logger.IsEnabled(LogLevel.Information))
-        {
-            logger.LogInformation("Marked invoice {InvoiceId} as paid with amount {Amount}",
-                invoiceId, amountPaid);
-        }
+        logger.LogInformation("Marked invoice {InvoiceId} as paid with amount {Amount}",
+            invoiceId, amountPaid);
 
         return invoice;
     }
@@ -106,11 +102,8 @@ public class InvoiceActor(
         // Update the status (this would typically be done via a command)
         var updatedInvoice = currentInvoice with { Status = newStatus.ToString() };
 
-        if (logger.IsEnabled(LogLevel.Information))
-        {
-            logger.LogInformation("Updated invoice {InvoiceId} status to {Status}",
-                this.GetPrimaryKey(), newStatus);
-        }
+        logger.LogInformation("Updated invoice {InvoiceId} status to {Status}",
+            this.GetPrimaryKey(), newStatus);
 
         return updatedInvoice;
     }
@@ -149,11 +142,8 @@ public class InvoiceActor(
         // Process payment
         await MarkAsPaidAsync(tenantId, amount, DateTime.UtcNow);
 
-        if (logger.IsEnabled(LogLevel.Information))
-        {
-            logger.LogInformation("Processed payment of {Amount} via {PaymentMethod} for invoice {InvoiceId}",
-                amount, paymentMethod, invoiceId);
-        }
+        logger.LogInformation("Processed payment of {Amount} via {PaymentMethod} for invoice {InvoiceId}",
+            amount, paymentMethod, invoiceId);
 
         // Publish payment event
         await PublishIntegrationEventAsync(new PaymentReceived(
@@ -215,10 +205,7 @@ public class InvoiceActor(
     /// <returns>A task representing the asynchronous operation</returns>
     private async Task PublishIntegrationEventAsync<T>(T integrationEvent) where T : class
     {
-        if (logger.IsEnabled(LogLevel.Debug))
-        {
-            logger.LogDebug("Publishing integration event {EventType}: {Event}", typeof(T).Name, integrationEvent);
-        }
+        logger.LogDebug("Publishing integration event {EventType}: {Event}", typeof(T).Name, integrationEvent);
         await messageBus.PublishAsync(integrationEvent);
     }
 }

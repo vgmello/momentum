@@ -3,7 +3,6 @@
 using FluentValidation;
 using JasperFx;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -12,7 +11,6 @@ using Momentum.ServiceDefaults.HealthChecks;
 using Momentum.ServiceDefaults.Logging;
 using Momentum.ServiceDefaults.Messaging;
 using Momentum.ServiceDefaults.OpenTelemetry;
-using Polly;
 using Serilog;
 using System.Collections.Frozen;
 using System.Reflection;
@@ -78,18 +76,6 @@ public static class ServiceDefaultsExtensions
     {
         builder.UseInitializationLogger();
 
-        builder.WebHost.UseKestrelHttpsConfiguration();
-
-        // Configure request size limits from configuration
-        var maxRequestBodySize = builder.Configuration.GetValue<long?>("Kestrel:Limits:MaxRequestBodySize");
-        if (maxRequestBodySize.HasValue)
-        {
-            builder.WebHost.ConfigureKestrel(serverOptions =>
-            {
-                serverOptions.Limits.MaxRequestBodySize = maxRequestBodySize.Value;
-            });
-        }
-
         builder.AddLogging();
         builder.AddOpenTelemetry();
         builder.AddServiceBus();
@@ -103,17 +89,7 @@ public static class ServiceDefaultsExtensions
         {
             http.AddStandardResilienceHandler(options =>
             {
-                options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(30);
-                options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(90);
-
-                options.Retry.MaxRetryAttempts = 3;
-                options.Retry.Delay = TimeSpan.FromSeconds(2);
-                options.Retry.BackoffType = DelayBackoffType.Exponential;
-
-                options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(60);
-                options.CircuitBreaker.FailureRatio = 0.5;
-                options.CircuitBreaker.MinimumThroughput = 5;
-                options.CircuitBreaker.BreakDuration = TimeSpan.FromSeconds(30);
+                builder.Configuration.GetSection("HttpResilience").Bind(options);
             });
 
             http.AddServiceDiscovery();

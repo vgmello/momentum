@@ -13,6 +13,7 @@ public static class OpenApiExtensions
     ///     Configures OpenAPI options with Momentum's default settings.
     /// </summary>
     /// <param name="options">The OpenAPI options to configure.</param>
+    /// <param name="addBearerAuth">When <c>true</c> (default), adds the Bearer authentication security scheme to the OpenAPI document.</param>
     /// <remarks>
     ///     This method applies Momentum's standard OpenAPI configuration:
     ///     <list type="bullet">
@@ -28,7 +29,7 @@ public static class OpenApiExtensions
     ///     });
     ///     </code>
     /// </remarks>
-    public static OpenApiOptions ConfigureOpenApiDefaults(this OpenApiOptions options)
+    public static OpenApiOptions ConfigureOpenApiDefaults(this OpenApiOptions options, bool addBearerAuth = true)
     {
         // Normalize server URLs by removing trailing slashes
         options.AddDocumentTransformer((document, _, _) =>
@@ -44,22 +45,25 @@ public static class OpenApiExtensions
             return Task.CompletedTask;
         });
 
-        // Add Bearer authentication security scheme
-        options.AddDocumentTransformer((document, _, _) =>
+        if (addBearerAuth)
         {
-            var components = document.Components ??= new Microsoft.OpenApi.OpenApiComponents();
-            components.SecuritySchemes ??= new Dictionary<string, Microsoft.OpenApi.IOpenApiSecurityScheme>();
-
-            components.SecuritySchemes["Bearer"] = new Microsoft.OpenApi.OpenApiSecurityScheme
+            // Add Bearer authentication security scheme
+            options.AddDocumentTransformer((document, _, _) =>
             {
-                Type = Microsoft.OpenApi.SecuritySchemeType.Http,
-                Scheme = "bearer",
-                BearerFormat = "JWT",
-                Description = "Enter your JWT token"
-            };
+                var components = document.Components ??= new Microsoft.OpenApi.OpenApiComponents();
+                components.SecuritySchemes ??= new Dictionary<string, Microsoft.OpenApi.IOpenApiSecurityScheme>();
 
-            return Task.CompletedTask;
-        });
+                components.SecuritySchemes["Bearer"] = new Microsoft.OpenApi.OpenApiSecurityScheme
+                {
+                    Type = Microsoft.OpenApi.SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    Description = "Enter your JWT token"
+                };
+
+                return Task.CompletedTask;
+            });
+        }
 
         return options;
     }

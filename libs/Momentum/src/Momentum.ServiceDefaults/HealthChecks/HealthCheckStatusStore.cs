@@ -32,7 +32,7 @@ public class HealthCheckStatusStore
     ///     This property is thread-safe and uses Interlocked operations
     ///     to ensure atomicity and visibility across threads.
     /// </remarks>
-    public HealthStatus LastHealthStatus
+    public virtual HealthStatus LastHealthStatus
     {
         get => (HealthStatus)Volatile.Read(ref _lastHealthStatus);
         set => Interlocked.Exchange(ref _lastHealthStatus, (int)value);

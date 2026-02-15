@@ -12,6 +12,7 @@ using Wolverine.Kafka;
 using static Momentum.Extensions.Messaging.Kafka.KafkaAspireExtensions;
 
 #pragma warning disable S3011
+#pragma warning disable CA1873
 
 namespace Momentum.Extensions.Messaging.Kafka;
 
@@ -86,11 +87,10 @@ public class KafkaWolverineExtensions(
             var setupKafkaRouteMethodInfo = SetupKafkaPublisherRouteMethodInfo.MakeGenericMethod(messageType);
             setupKafkaRouteMethodInfo.Invoke(null, [options, topicName]);
 
-            if (logger.IsEnabled(LogLevel.Debug))
-                logger.LogDebug("Configured publisher for {EventType} to topic {TopicName}", messageType.Name, topicName);
+            logger.LogDebug("Configured publisher for {EventType} to topic {TopicName}", messageType.Name, topicName);
         }
 
-        if (publisherTopics.Count > 0 && logger.IsEnabled(LogLevel.Information))
+        if (publisherTopics.Count > 0)
         {
             logger.LogInformation("Configured Kafka publishers for {TopicCount} topics: {Topics}",
                 publisherTopics.Count, string.Join(", ", publisherTopics));
@@ -120,8 +120,7 @@ public class KafkaWolverineExtensions(
             var topicName = topicNameGenerator.GetTopicName(messageType, topicAttribute);
             topicsToSubscribe.Add(topicName);
 
-            if (logger.IsEnabled(LogLevel.Debug))
-                logger.LogDebug("Discovered handler for {EventType} on topic {TopicName}", messageType.Name, topicName);
+            logger.LogDebug("Discovered handler for {EventType} on topic {TopicName}", messageType.Name, topicName);
         }
 
         foreach (var topicName in topicsToSubscribe)
@@ -129,7 +128,7 @@ public class KafkaWolverineExtensions(
             options.ListenToKafkaTopic(topicName);
         }
 
-        if (topicsToSubscribe.Count > 0 && logger.IsEnabled(LogLevel.Information))
+        if (topicsToSubscribe.Count > 0)
         {
             logger.LogInformation("Configured Kafka subscriptions for {TopicCount} topics with consumer group {ConsumerGroup}: {Topics}",
                 topicsToSubscribe.Count, options.ServiceName, string.Join(", ", topicsToSubscribe));
