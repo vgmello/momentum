@@ -2,7 +2,9 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using Momentum.Extensions.Abstractions.Messaging;
 using Momentum.Extensions.EventMarkdownGenerator.Models;
+using Momentum.Extensions.EventMarkdownGenerator.Services.Serialization;
 
 namespace Momentum.Extensions.EventMarkdownGenerator.Services;
 
@@ -13,21 +15,76 @@ namespace Momentum.Extensions.EventMarkdownGenerator.Services;
 public static class PayloadSizeCalculator
 {
     /// <summary>
+    ///     Legacy default bytes per character for backward compatibility (worst-case UTF-8/UTF-32).
+    /// </summary>
+    private const int DefaultBytesPerChar = 4;
+
+    /// <summary>
     ///     Calculates the estimated size in bytes for a property's serialized payload.
+    ///     Uses legacy behavior with 4 bytes per character and no serialization overhead.
     /// </summary>
     /// <param name="property">The property to analyze for size constraints.</param>
     /// <param name="propertyType">The type of the property.</param>
     /// <returns>A result containing the estimated size, accuracy flag, and any warnings.</returns>
     public static PayloadSizeResult CalculatePropertySize(PropertyInfo property, Type propertyType)
     {
-        return CalculatePropertySize(property, propertyType, []);
+        return CalculatePropertySize(property, propertyType, [], null);
     }
 
-    private static PayloadSizeResult CalculatePropertySize(PropertyInfo property, Type propertyType, HashSet<Type> visitedTypes)
+    /// <summary>
+    ///     Calculates the estimated size in bytes for a property's serialized payload,
+    ///     including serialization format overhead and StringEncoding attribute resolution.
+    /// </summary>
+    /// <param name="property">The property to analyze for size constraints.</param>
+    /// <param name="propertyType">The type of the property.</param>
+    /// <param name="overheadCalculator">The serialization overhead calculator to use.</param>
+    /// <returns>A result containing the estimated size, accuracy flag, and any warnings.</returns>
+    public static PayloadSizeResult CalculatePropertySize(PropertyInfo property, Type propertyType, ISerializationOverheadCalculator overheadCalculator)
+    {
+        return CalculatePropertySize(property, propertyType, [], overheadCalculator);
+    }
+
+    /// <summary>
+    ///     Resolves the BytesPerChar value from StringEncoding attributes in the hierarchy:
+    ///     Property > Class > Assembly > default (1).
+    /// </summary>
+    internal static int ResolveStringEncoding(PropertyInfo property)
+    {
+        // Property-level attribute takes highest priority
+        var propertyAttr = property.GetCustomAttribute<StringEncodingAttribute>();
+        if (propertyAttr != null)
+        {
+            return propertyAttr.BytesPerChar;
+        }
+
+        // Class-level attribute is next
+        var classAttr = property.DeclaringType?.GetCustomAttribute<StringEncodingAttribute>();
+        if (classAttr != null)
+        {
+            return classAttr.BytesPerChar;
+        }
+
+        // Assembly-level attribute is last
+        var assemblyAttr = property.DeclaringType?.Assembly.GetCustomAttribute<StringEncodingAttribute>();
+        if (assemblyAttr != null)
+        {
+            return assemblyAttr.BytesPerChar;
+        }
+
+        // Default: 1 byte per character
+        return 1;
+    }
+
+    private static PayloadSizeResult CalculatePropertySize(PropertyInfo property, Type propertyType, HashSet<Type> visitedTypes, ISerializationOverheadCalculator? overheadCalculator)
     {
         try
         {
             var underlyingType = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
+
+            if (underlyingType == typeof(string))
+            {
+                return CalculateStringSize(property, overheadCalculator);
+            }
 
             if (TypeUtils.IsPrimitiveType(underlyingType))
             {
@@ -39,18 +96,13 @@ public static class PayloadSizeCalculator
                 };
             }
 
-            if (underlyingType == typeof(string))
-            {
-                return CalculateStringSize(property);
-            }
-
             if (TypeUtils.IsCollectionType(underlyingType))
             {
-                return CalculateCollectionSize(property, underlyingType, visitedTypes);
+                return CalculateCollectionSize(property, underlyingType, visitedTypes, overheadCalculator);
             }
 
             // Handle complex types
-            return CalculateComplexTypeSize(underlyingType, visitedTypes);
+            return CalculateComplexTypeSize(underlyingType, visitedTypes, overheadCalculator);
         }
         catch (Exception ex) when (ex is FileNotFoundException or FileLoadException or TypeLoadException)
         {
@@ -64,21 +116,34 @@ public static class PayloadSizeCalculator
     }
 
     /// <summary>
-    ///     Calculates string payload size using worst-case encoding (4 bytes per character).
-    ///     This is the maximum for both UTF-8 (4 bytes for supplementary characters) and UTF-32,
-    ///     providing a conservative upper bound for JSON serialization.
-    ///     Uses MaxLength or StringLength attributes when available for accurate estimation.
+    ///     Calculates string payload size.
+    ///     When an overhead calculator is provided, uses StringEncoding attribute resolution for bytes-per-char
+    ///     and adds string value overhead (e.g., JSON quotes).
+    ///     When null (legacy), uses worst-case encoding (4 bytes per character) with no overhead.
     /// </summary>
-    private static PayloadSizeResult CalculateStringSize(PropertyInfo property)
+    private static PayloadSizeResult CalculateStringSize(PropertyInfo property, ISerializationOverheadCalculator? overheadCalculator)
     {
         var constraints = GetDataAnnotationConstraints(property);
 
         if (constraints.MaxLength.HasValue)
         {
-            // 4 bytes per character is the worst case for both UTF-8 and UTF-32
+            int bytesPerChar;
+            int overhead;
+
+            if (overheadCalculator != null)
+            {
+                bytesPerChar = ResolveStringEncoding(property);
+                overhead = overheadCalculator.GetStringValueOverhead();
+            }
+            else
+            {
+                bytesPerChar = DefaultBytesPerChar;
+                overhead = 0;
+            }
+
             return new PayloadSizeResult
             {
-                SizeBytes = constraints.MaxLength.Value * 4,
+                SizeBytes = (constraints.MaxLength.Value * bytesPerChar) + overhead,
                 IsAccurate = true,
                 Warning = null
             };
@@ -92,7 +157,7 @@ public static class PayloadSizeCalculator
         };
     }
 
-    private static PayloadSizeResult CalculateCollectionSize(PropertyInfo property, Type collectionType, HashSet<Type> visitedTypes)
+    private static PayloadSizeResult CalculateCollectionSize(PropertyInfo property, Type collectionType, HashSet<Type> visitedTypes, ISerializationOverheadCalculator? overheadCalculator)
     {
         var elementType = TypeUtils.GetElementType(collectionType);
 
@@ -109,17 +174,48 @@ public static class PayloadSizeCalculator
         var constraints = GetDataAnnotationConstraints(property);
         var estimatedCount = constraints.MaxRange ?? 10;
 
-        var elementSizeResult = CalculateTypeSize(elementType, visitedTypes);
+        var elementSizeResult = CalculateTypeSize(elementType, visitedTypes, overheadCalculator);
+
+        var totalSize = elementSizeResult.SizeBytes * estimatedCount;
+
+        if (overheadCalculator != null)
+        {
+            totalSize += overheadCalculator.GetCollectionOverhead();
+
+            if (estimatedCount > 1)
+            {
+                totalSize += overheadCalculator.GetElementSeparatorOverhead() * (estimatedCount - 1);
+            }
+        }
 
         return new PayloadSizeResult
         {
-            SizeBytes = elementSizeResult.SizeBytes * estimatedCount,
+            SizeBytes = totalSize,
             IsAccurate = elementSizeResult.IsAccurate && constraints.MaxRange.HasValue,
             Warning = constraints.MaxRange.HasValue ? elementSizeResult.Warning : "Collection size estimated (no Range constraint)"
         };
     }
 
-    private static PayloadSizeResult CalculateComplexTypeSize(Type type, HashSet<Type> visitedTypes)
+    private static int CalculateSerializationOverhead(ISerializationOverheadCalculator? overheadCalculator, int propertyCount)
+    {
+        if (overheadCalculator == null)
+        {
+            return 0;
+        }
+
+        var overhead = overheadCalculator.GetObjectOverhead();
+
+        if (propertyCount > 1)
+        {
+            overhead += overheadCalculator.GetElementSeparatorOverhead() * (propertyCount - 1);
+        }
+
+        return overhead;
+    }
+
+#pragma warning disable S3776 // Cognitive Complexity acceptable for complex type analysis with error handling
+    private static PayloadSizeResult CalculateComplexTypeSize(Type type, HashSet<Type> visitedTypes, ISerializationOverheadCalculator? overheadCalculator)
+#pragma warning restore S3776
     {
         // Prevent infinite recursion
         if (!visitedTypes.Add(type))
@@ -141,13 +237,20 @@ public static class PayloadSizeCalculator
             try
             {
                 var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                var propertyCount = 0;
 
                 foreach (var property in properties)
                 {
                     try
                     {
-                        var propertyResult = CalculatePropertySize(property, property.PropertyType, visitedTypes);
+                        var propertyResult = CalculatePropertySize(property, property.PropertyType, visitedTypes, overheadCalculator);
                         totalSize += propertyResult.SizeBytes;
+                        propertyCount++;
+
+                        if (overheadCalculator != null)
+                        {
+                            totalSize += overheadCalculator.GetPropertyOverhead(property.Name);
+                        }
 
                         if (!propertyResult.IsAccurate)
                         {
@@ -166,6 +269,8 @@ public static class PayloadSizeCalculator
                         isAccurate = false;
                     }
                 }
+
+                totalSize += CalculateSerializationOverhead(overheadCalculator, propertyCount);
             }
             catch (Exception ex) when (ex is FileNotFoundException or FileLoadException or TypeLoadException)
             {
@@ -191,7 +296,7 @@ public static class PayloadSizeCalculator
         }
     }
 
-    private static PayloadSizeResult CalculateTypeSize(Type type, HashSet<Type> visitedTypes)
+    private static PayloadSizeResult CalculateTypeSize(Type type, HashSet<Type> visitedTypes, ISerializationOverheadCalculator? overheadCalculator)
     {
         try
         {
@@ -215,7 +320,7 @@ public static class PayloadSizeCalculator
                 };
             }
 
-            return CalculateComplexTypeSize(type, visitedTypes);
+            return CalculateComplexTypeSize(type, visitedTypes, overheadCalculator);
         }
         catch (Exception ex) when (ex is FileNotFoundException or FileLoadException or TypeLoadException)
         {
