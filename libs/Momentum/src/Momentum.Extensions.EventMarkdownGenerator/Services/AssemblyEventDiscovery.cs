@@ -188,7 +188,7 @@ public static class AssemblyEventDiscovery
                     Name = property.Name,
                     TypeName = TypeUtils.GetFriendlyTypeName(property.PropertyType),
                     Description = description,
-                    Order = partitionKeyAttr?.Order ?? 0,
+                    Order = partitionKeyAttr!.Order,
                     IsFromParameter = parameterToPropertyMap.ContainsKey(property.Name)
                 });
             }

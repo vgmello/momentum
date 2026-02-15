@@ -70,7 +70,7 @@ public class ScenarioBasedIntegrationTests
         return null;
     }
 
-    [Theory(Skip = "Debug test - only run when debugging path issues")]
+    [Theory(Skip = "Scenario expected files need updating to match current generation output")]
     [MemberData(nameof(GetTestScenarios))]
     public async Task ScenarioTest_ShouldGenerateExpectedMarkdown(string scenarioName)
     {

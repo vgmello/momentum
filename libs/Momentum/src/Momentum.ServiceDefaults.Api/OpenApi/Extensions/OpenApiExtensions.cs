@@ -85,19 +85,13 @@ public static class OpenApiExtensions
 
         foreach (var child in schemesSection.GetChildren())
         {
-            var schemeOptions = new OpenApiSecuritySchemeOptions();
-            child.Bind(schemeOptions);
+            var scheme = new Microsoft.OpenApi.OpenApiSecurityScheme();
+            child.Bind(scheme);
 
-            if (!Enum.TryParse<Microsoft.OpenApi.SecuritySchemeType>(schemeOptions.Type, true, out var schemeType))
+            if (scheme.Type is null)
                 continue;
 
-            result[child.Key] = new Microsoft.OpenApi.OpenApiSecurityScheme
-            {
-                Type = schemeType,
-                Scheme = schemeOptions.Scheme,
-                BearerFormat = schemeOptions.BearerFormat,
-                Description = schemeOptions.Description
-            };
+            result[child.Key] = scheme;
         }
 
         return result;
