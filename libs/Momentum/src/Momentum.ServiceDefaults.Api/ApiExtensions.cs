@@ -80,10 +80,7 @@ public static class ApiExtensions
             options.AddPolicy("OpenApi", policy => policy.Expire(TimeSpan.FromMinutes(10)));
         });
 
-        builder.Services.AddGrpc(options =>
-        {
-            options.EnableDetailedErrors = builder.Environment.IsDevelopment();
-        });
+        builder.Services.AddGrpc();
         builder.Services.Configure<GrpcServiceOptions>(builder.Configuration.GetSection("Grpc"));
         builder.Services.AddGrpcReflection();
 
