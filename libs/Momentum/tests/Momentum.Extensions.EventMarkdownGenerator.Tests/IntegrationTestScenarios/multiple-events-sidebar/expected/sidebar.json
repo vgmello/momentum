@@ -130,6 +130,12 @@
             "link": "/TestEvents.Events.Core.IntegrationEvents.MinimalEvent",
             "items": [],
             "collapsed": false
+          },
+          {
+            "text": "Simple Notification",
+            "link": "/TestEvents.Events.Core.IntegrationEvents.SimpleNotification",
+            "items": [],
+            "collapsed": false
           }
         ],
         "collapsed": false
