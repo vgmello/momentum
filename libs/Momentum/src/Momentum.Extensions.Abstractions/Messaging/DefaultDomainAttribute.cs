@@ -48,7 +48,7 @@ public class DefaultDomainAttribute : Attribute
     ///     The domain name used as a fallback when <see cref="EventTopicAttribute.Domain"/>
     ///     is not set on an individual event.
     /// </value>
-    public string Domain { get; set; } = string.Empty;
+    public string Domain { get; set; }
 
     /// <summary>
     ///     Resolves the effective domain name for the given assembly.
