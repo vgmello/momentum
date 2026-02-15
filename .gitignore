@@ -422,7 +422,6 @@ FodyWeavers.xsd
 **/docs/.vitepress/cache
 **/docs/.vitepress/dist
 **/docs/.vitepress/.temp
-**/docs/.vitepress/.originals
 
 # Idea / Rider files
 .idea/
