@@ -167,7 +167,7 @@ public class IntegrationTestFixture : IAsyncLifetime
 
         //#if (INCLUDE_API)
         _app.ConfigureApiUsingDefaults();
-        _app.MapGrpcServices(typeof(Api.DependencyInjection));
+        _app.MapGrpcServices(typeof(Api.DependencyInjection).Assembly);
         //#endif
 
         await _app.StartAsync();
@@ -183,6 +183,7 @@ public class IntegrationTestFixture : IAsyncLifetime
 
     public async ValueTask DisposeAsync()
     {
+        GC.SuppressFinalize(this);
         //#if (HAS_BACKEND)
         if (_app is not null)
         {

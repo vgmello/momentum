@@ -16,6 +16,9 @@ public record GeneratorOptions
 
     public string? GitHubBaseUrl { get; init; }
 
+    /// <summary>Serialization format for overhead calculation. Default: "json". Options: "json", "binary".</summary>
+    public string SerializationFormat { get; init; } = "json";
+
     public string GetSidebarPath() => Path.Combine(OutputDirectory, Path.GetFileName(SidebarFileName));
 
     public void EnsureOutputDirectoryExists()

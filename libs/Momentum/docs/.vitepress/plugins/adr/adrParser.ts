@@ -13,7 +13,7 @@ export interface AdrMetadata {
     fileName: string;
 }
 
-const adrFileRegex = RegExp(/adr-(\d+)-(.*?)\.md/);
+const adrFileRegex = new RegExp(/adr-(\d+)-(.*?)\.md/);
 
 export class AdrParser {
     /**

@@ -66,7 +66,7 @@ public static class DomainDiscovery
     /// <summary>
     ///     Discovers all domains that have Orleans grains by looking for *.Actors namespaces.
     /// </summary>
-    private static IEnumerable<string> GetDomainsWithGrains()
+    private static HashSet<string> GetDomainsWithGrains()
     {
         return GetAppDomainTypes()
             .GetTypes()
@@ -75,8 +75,7 @@ public static class DomainDiscovery
                         !t.Namespace.StartsWith("AppDomain.BackOffice.Orleans") &&
                         t.GetInterfaces().Any(i => typeof(IGrain).IsAssignableFrom(i)))
             .Select(t => t.Namespace!)
-            .Distinct()
-            .ToList();
+            .ToHashSet();
     }
 
     /// <summary>

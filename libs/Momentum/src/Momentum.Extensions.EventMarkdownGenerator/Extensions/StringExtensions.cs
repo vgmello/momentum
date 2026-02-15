@@ -7,7 +7,7 @@ namespace Momentum.Extensions.EventMarkdownGenerator.Extensions;
 /// </summary>
 public static class StringExtensions
 {
-    private static readonly HashSet<char> InvalidFileNameChars = new(Path.GetInvalidFileNameChars());
+    private static readonly HashSet<char> InvalidFileNameChars = [..Path.GetInvalidFileNameChars()];
 
     /// <summary>
     ///     Converts a string to a safe filename by replacing invalid characters.

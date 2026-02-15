@@ -1,4 +1,4 @@
-import { check, fail, sleep } from "k6";
+import { check, sleep } from "k6";
 import { Rate, Trend } from "k6/metrics";
 
 // Custom metrics
@@ -66,7 +66,7 @@ export function parseResponse(response) {
     try {
         return JSON.parse(response.body);
     } catch (e) {
-        console.error("Failed to parse response:", response.body);
+        console.error(`Failed to parse response: ${response.body}`, e);
         return null;
     }
 }
@@ -147,10 +147,10 @@ export function formatBytes(bytes, decimals = 2) {
     if (bytes === 0) return "0 Bytes";
 
     const k = 1024;
-    const dm = decimals < 0 ? 0 : decimals;
+    const dm = Math.max(0, decimals);
     const sizes = ["Bytes", "KB", "MB", "GB"];
 
     const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+    return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
 }

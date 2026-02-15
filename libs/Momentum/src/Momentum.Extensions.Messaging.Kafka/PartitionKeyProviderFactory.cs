@@ -7,8 +7,6 @@ using System.Reflection;
 
 namespace Momentum.Extensions.Messaging.Kafka;
 
-#pragma warning disable S3011
-
 public static class PartitionKeyProviderFactory
 {
     /// <summary>

@@ -1,54 +1,340 @@
 [
   {
-    "text": "Users",
+    "text": "AppDomain",
     "link": null,
-    "collapsed": false,
     "items": [
       {
-        "text": "User Created",
-        "link": "/user-created"
+        "text": "Cashiers",
+        "link": null,
+        "items": [
+          {
+            "text": "Cashier Created",
+            "link": "/TestEvents.AppDomain.Cashiers.Contracts.IntegrationEvents.CashierCreated",
+            "items": [],
+            "collapsed": false
+          }
+        ],
+        "collapsed": false
       },
       {
-        "text": "User Deleted",
-        "link": "/user-deleted"
-      }
-    ]
-  },
-  {
-    "text": "Subscriptions",
-    "link": null,
-    "collapsed": false,
-    "items": [
-      {
-        "text": "Subscription Activated",
-        "link": "/subscription-activated"
+        "text": "Collections",
+        "link": null,
+        "items": [
+          {
+            "text": "Bulk Data Processed",
+            "link": "/TestEvents.AppDomain.Collections.Contracts.IntegrationEvents.BulkDataProcessed",
+            "items": [],
+            "collapsed": false
+          }
+        ],
+        "collapsed": false
       },
       {
-        "text": "Subscription Cancelled",
-        "link": "/subscription-cancelled"
+        "text": "Domain Events",
+        "link": null,
+        "items": [
+          {
+            "text": "Internal Audit Log Created",
+            "link": "/TestEvents.AppDomain.Internal.Audit.IntegrationEvents.InternalAuditLogCreated",
+            "items": [],
+            "collapsed": false
+          }
+        ],
+        "collapsed": false
+      },
+      {
+        "text": "Inventory",
+        "link": null,
+        "items": [
+          {
+            "text": "Product Stock Updated",
+            "link": "/TestEvents.AppDomain.Inventory.Contracts.IntegrationEvents.ProductStockUpdated",
+            "items": [],
+            "collapsed": false
+          }
+        ],
+        "collapsed": false
+      },
+      {
+        "text": "Legacy",
+        "link": null,
+        "items": [
+          {
+            "text": "Payment Processed",
+            "link": "/TestEvents.AppDomain.Legacy.Contracts.IntegrationEvents.PaymentProcessed",
+            "items": [],
+            "collapsed": false
+          }
+        ],
+        "collapsed": false
+      },
+      {
+        "text": "Orders",
+        "link": null,
+        "items": [
+          {
+            "text": "Order Completed",
+            "link": "/TestEvents.AppDomain.Orders.Contracts.IntegrationEvents.OrderCompleted",
+            "items": [],
+            "collapsed": false
+          }
+        ],
+        "collapsed": false
+      },
+      {
+        "text": "Types",
+        "link": null,
+        "items": [
+          {
+            "text": "Payment Status Changed",
+            "link": "/TestEvents.AppDomain.Types.Contracts.IntegrationEvents.PaymentStatusChanged",
+            "items": [],
+            "collapsed": false
+          }
+        ],
+        "collapsed": false
       }
-    ]
+    ],
+    "collapsed": false
   },
   {
-    "text": "Invoices",
+    "text": "Enterprise",
     "link": null,
-    "collapsed": false,
     "items": [
       {
-        "text": "Invoice Generated",
-        "link": "/invoice-generated"
+        "text": "AppDomain.Payments.Gateway.External",
+        "link": null,
+        "items": [
+          {
+            "text": "External Payment Gateway Response Received",
+            "link": "/TestEvents.Enterprise.AppDomain.Payments.Gateway.External.Contracts.IntegrationEvents.ExternalPaymentGatewayResponseReceived",
+            "items": [],
+            "collapsed": false
+          }
+        ],
+        "collapsed": false
       }
-    ]
+    ],
+    "collapsed": false
   },
   {
-    "text": "Payments",
+    "text": "Events",
     "link": null,
-    "collapsed": false,
     "items": [
       {
-        "text": "Payment Processed",
-        "link": "/payment-processed"
+        "text": "Core",
+        "link": null,
+        "items": [
+          {
+            "text": "Minimal Event",
+            "link": "/TestEvents.Events.Core.IntegrationEvents.MinimalEvent",
+            "items": [],
+            "collapsed": false
+          },
+          {
+            "text": "Simple Notification",
+            "link": "/TestEvents.Events.Core.IntegrationEvents.SimpleNotification",
+            "items": [],
+            "collapsed": false
+          }
+        ],
+        "collapsed": false
       }
-    ]
+    ],
+    "collapsed": false
+  },
+  {
+    "text": "Graph",
+    "link": null,
+    "items": [
+      {
+        "text": "Nodes",
+        "link": null,
+        "items": [
+          {
+            "text": "Node Relationship Created",
+            "link": "/TestEvents.Graph.Nodes.Contracts.IntegrationEvents.NodeRelationshipCreated",
+            "items": [],
+            "collapsed": false
+          }
+        ],
+        "collapsed": false
+      }
+    ],
+    "collapsed": false
+  },
+  {
+    "text": "Missing",
+    "link": null,
+    "items": [
+      {
+        "text": "Docs",
+        "link": null,
+        "items": [
+          {
+            "text": "Empty Summary Event",
+            "link": "/TestEvents.Missing.Docs.IntegrationEvents.EmptySummaryEvent",
+            "items": [],
+            "collapsed": false
+          },
+          {
+            "text": "Malformed Xml Event",
+            "link": "/TestEvents.Missing.Docs.IntegrationEvents.MalformedXmlEvent",
+            "items": [],
+            "collapsed": false
+          },
+          {
+            "text": "Missing Param Docs Event",
+            "link": "/TestEvents.Missing.Docs.IntegrationEvents.MissingParamDocsEvent",
+            "items": [],
+            "collapsed": false
+          }
+        ],
+        "collapsed": false
+      },
+      {
+        "text": "Domain Events",
+        "link": null,
+        "items": [
+          {
+            "text": "Undocumented Event",
+            "link": "/TestEvents.Missing.Docs.IntegrationEvents.UndocumentedEvent",
+            "items": [],
+            "collapsed": false
+          }
+        ],
+        "collapsed": false
+      }
+    ],
+    "collapsed": false
+  },
+  {
+    "text": "Platform",
+    "link": null,
+    "items": [
+      {
+        "text": "AppDomain.Invoices",
+        "link": null,
+        "items": [
+          {
+            "text": "Invoice Generated",
+            "link": "/TestEvents.Platform.AppDomain.Invoices.Contracts.IntegrationEvents.InvoiceGenerated",
+            "items": [],
+            "collapsed": false
+          }
+        ],
+        "collapsed": false
+      },
+      {
+        "text": "AppDomain.Payments",
+        "link": null,
+        "items": [
+          {
+            "text": "Payment Processed",
+            "link": "/TestEvents.Platform.AppDomain.Payments.Contracts.IntegrationEvents.PaymentProcessed",
+            "items": [],
+            "collapsed": false
+          }
+        ],
+        "collapsed": false
+      },
+      {
+        "text": "Subscriptions",
+        "link": null,
+        "items": [
+          {
+            "text": "Subscription Activated",
+            "link": "/TestEvents.Platform.Subscriptions.Contracts.IntegrationEvents.SubscriptionActivated",
+            "items": [],
+            "collapsed": false
+          },
+          {
+            "text": "Subscription Cancelled",
+            "link": "/TestEvents.Platform.Subscriptions.Contracts.IntegrationEvents.SubscriptionCancelled",
+            "items": [],
+            "collapsed": false
+          }
+        ],
+        "collapsed": false
+      },
+      {
+        "text": "Users",
+        "link": null,
+        "items": [
+          {
+            "text": "User Created",
+            "link": "/TestEvents.Platform.Users.Contracts.IntegrationEvents.UserCreated",
+            "items": [],
+            "collapsed": false
+          },
+          {
+            "text": "User Deleted",
+            "link": "/TestEvents.Platform.Users.Contracts.IntegrationEvents.UserDeleted",
+            "items": [],
+            "collapsed": false
+          }
+        ],
+        "collapsed": false
+      }
+    ],
+    "collapsed": false
+  },
+  {
+    "text": "Schemas",
+    "link": null,
+    "items": [
+      {
+        "text": "AppDomain",
+        "link": null,
+        "items": [
+          {
+            "text": "Cashier",
+            "link": "/schemas/TestEvents.AppDomain.Cashiers.Contracts.IntegrationEvents.Cashier",
+            "items": [],
+            "collapsed": false
+          },
+          {
+            "text": "Customer",
+            "link": "/schemas/TestEvents.AppDomain.Orders.Contracts.Models.Customer",
+            "items": [],
+            "collapsed": false
+          },
+          {
+            "text": "OrderItem",
+            "link": "/schemas/TestEvents.AppDomain.Orders.Contracts.Models.OrderItem",
+            "items": [],
+            "collapsed": false
+          }
+        ],
+        "collapsed": false
+      },
+      {
+        "text": "Graph",
+        "link": null,
+        "items": [
+          {
+            "text": "GraphNode",
+            "link": "/schemas/TestEvents.Graph.Nodes.Contracts.Models.GraphNode",
+            "items": [],
+            "collapsed": false
+          }
+        ],
+        "collapsed": false
+      },
+      {
+        "text": "System",
+        "link": null,
+        "items": [
+          {
+            "text": "Object",
+            "link": "/schemas/System.Object",
+            "items": [],
+            "collapsed": false
+          }
+        ],
+        "collapsed": false
+      }
+    ],
+    "collapsed": false
   }
 ]

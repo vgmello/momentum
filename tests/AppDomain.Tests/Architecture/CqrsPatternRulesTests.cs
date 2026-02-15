@@ -1,9 +1,6 @@
 // Copyright (c) OrgName. All rights reserved.
 
 namespace AppDomain.Tests.Architecture;
-
-#pragma warning disable CS8602
-
 public class CqrsPatternRulesTests : ArchitectureTestBase
 {
     [Fact]

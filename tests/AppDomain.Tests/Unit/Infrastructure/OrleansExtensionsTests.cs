@@ -1,6 +1,5 @@
 // Copyright (c) OrgName. All rights reserved.
 
-#pragma warning disable S1944 // Inappropriate casts - NSubstitute mocks implement multiple interfaces
 using AppDomain.Api.Infrastructure.Extensions;
 
 namespace AppDomain.Tests.Unit.Infrastructure;

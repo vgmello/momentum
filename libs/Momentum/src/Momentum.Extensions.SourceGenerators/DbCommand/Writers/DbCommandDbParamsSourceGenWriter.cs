@@ -14,7 +14,7 @@ internal sealed class DbCommandDbParamsSourceGenWriter : SourceGenBaseWriter
 
     public static string Write(DbCommandTypeInfo dbCommandTypeInfo)
     {
-        var sourceBuilder = new StringBuilder();
+        var sourceBuilder = new StringBuilder(256);
 
         AppendFileHeader(sourceBuilder);
         AppendNamespace(sourceBuilder, dbCommandTypeInfo.Namespace);

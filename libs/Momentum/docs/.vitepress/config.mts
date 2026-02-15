@@ -26,6 +26,12 @@ const markdownOptions: MarkdownOptions = {
 };
 
 export default defineConfig({
+    vite: {
+        // Prevent Vite from externalizing mermaid during SSR since it uses browser APIs
+        ssr: {
+            noExternal: ['mermaid'],
+        },
+    },
     title: "Momentum .NET",
     description: "Momentum .NET, It's not a framework, it's a highly opinionated .NET template with pre-configured .NET libraries and tools, for scalable, distributed .NET services.",
     ignoreDeadLinks: [

@@ -45,84 +45,98 @@ export function setup() {
     return { startTime: new Date().toISOString() };
 }
 
+// Helper: Create cashier and track metrics
+function createCashierWithMetrics(tenantId) {
+    const cashierData = generateCashierData();
+    const createStartTime = Date.now();
+
+    const createResponse = http.post(endpoints.cashiers.create, JSON.stringify(cashierData), {
+        headers: headers.withTenant(tenantId),
+        tags: { operation: "create_cashier_stress" },
+        timeout: "10s", // Longer timeout for stress conditions
+    });
+
+    const createDuration = Date.now() - createStartTime;
+
+    return handleCreateResponse(createResponse, createDuration);
+}
+
+// Helper: Process create response and record metrics
+function handleCreateResponse(createResponse, createDuration) {
+    let cashierId;
+    let cashierVersion;
+
+    if (createResponse.status === 201) {
+        customMetrics.cashierCreationRate.add(1);
+        const cashier = parseResponse(createResponse);
+        cashierId = cashier.cashierId;
+        cashierVersion = cashier.version;
+
+        if (createDuration > 500) {
+            console.log(`⚠️ SLOW: ${createDuration}ms for VU ${__VU}`);
+        }
+    } else if (createResponse.status === 503) {
+        console.error(`🔴 SERVICE UNAVAILABLE at VU ${__VU}`);
+        customMetrics.cashierCreationRate.add(0);
+    } else if (createResponse.status === 429) {
+        console.error(`🔴 RATE LIMITED at VU ${__VU}`);
+        customMetrics.cashierCreationRate.add(0);
+    } else {
+        customMetrics.cashierCreationRate.add(0);
+    }
+
+    return { cashierId, cashierVersion };
+}
+
+// Helper: Perform read, update, and delete operations on a cashier
+function performCashierOperations(tenantId, cashierId, cashierVersion) {
+    // Burst read operations
+    for (let i = 0; i < 3; i++) {
+        http.get(endpoints.cashiers.get(cashierId), {
+            headers: headers.withTenant(tenantId),
+            tags: { operation: "get_cashier_burst" },
+            timeout: "5s",
+        });
+    }
+
+    // Update with version control
+    if (cashierVersion) {
+        const updateData = {
+            name: `Stressed ${generateCashierData().name}`,
+            email: generateCashierData().email,
+            version: cashierVersion,
+        };
+
+        const updateResponse = http.put(endpoints.cashiers.update(cashierId), JSON.stringify(updateData), {
+            headers: headers.withTenant(tenantId),
+            tags: { operation: "update_cashier_stress" },
+            timeout: "10s",
+        });
+
+        if (updateResponse.status === 409) {
+            customMetrics.concurrentVersionErrors.add(1);
+        }
+    }
+
+    // Aggressive delete
+    http.del(endpoints.cashiers.delete(cashierId), null, {
+        headers: headers.withTenant(tenantId),
+        tags: { operation: "delete_cashier_stress" },
+        timeout: "5s",
+    });
+}
+
 // Main stress test scenario
-export default function () {
+export default function main() {
     const tenantId = `stress_tenant_${__VU}`;
 
     // Aggressive testing - minimal sleep between operations
     group("Cashier Stress Operations", () => {
-        let cashierId;
-        let cashierVersion;
+        const { cashierId, cashierVersion } = createCashierWithMetrics(tenantId);
 
-        // Create cashier with minimal validation
-        const cashierData = generateCashierData();
-        const createStartTime = new Date().getTime();
-
-        const createResponse = http.post(endpoints.cashiers.create, JSON.stringify(cashierData), {
-            headers: headers.withTenant(tenantId),
-            tags: { operation: "create_cashier_stress" },
-            timeout: "10s", // Longer timeout for stress conditions
-        });
-
-        const createDuration = new Date().getTime() - createStartTime;
-
-        // Track performance degradation
-        if (createResponse.status === 201) {
-            customMetrics.cashierCreationRate.add(1);
-            const cashier = parseResponse(createResponse);
-            cashierId = cashier.cashierId;
-            cashierVersion = cashier.version;
-
-            // Log slow responses
-            if (createDuration > 500) {
-                console.log(`⚠️ SLOW: ${createDuration}ms for VU ${__VU}`);
-            }
-        } else if (createResponse.status === 503) {
-            console.error(`🔴 SERVICE UNAVAILABLE at VU ${__VU}`);
-            customMetrics.cashierCreationRate.add(0);
-        } else if (createResponse.status === 429) {
-            console.error(`🔴 RATE LIMITED at VU ${__VU}`);
-            customMetrics.cashierCreationRate.add(0);
-        } else {
-            customMetrics.cashierCreationRate.add(0);
-        }
-
-        // Rapid-fire read operations if creation succeeded
+        // Rapid-fire read/update/delete operations if creation succeeded
         if (cashierId) {
-            // Burst read operations
-            for (let i = 0; i < 3; i++) {
-                http.get(endpoints.cashiers.get(cashierId), {
-                    headers: headers.withTenant(tenantId),
-                    tags: { operation: "get_cashier_burst" },
-                    timeout: "5s",
-                });
-            }
-
-            // Update with version control
-            if (cashierVersion) {
-                const updateData = {
-                    name: `Stressed ${generateCashierData().name}`,
-                    email: generateCashierData().email,
-                    version: cashierVersion,
-                };
-
-                const updateResponse = http.put(endpoints.cashiers.update(cashierId), JSON.stringify(updateData), {
-                    headers: headers.withTenant(tenantId),
-                    tags: { operation: "update_cashier_stress" },
-                    timeout: "10s",
-                });
-
-                if (updateResponse.status === 409) {
-                    customMetrics.concurrentVersionErrors.add(1);
-                }
-            }
-
-            // Aggressive delete
-            http.del(endpoints.cashiers.delete(cashierId), null, {
-                headers: headers.withTenant(tenantId),
-                tags: { operation: "delete_cashier_stress" },
-                timeout: "5s",
-            });
+            performCashierOperations(tenantId, cashierId, cashierVersion);
         }
 
         // List operations to stress query performance

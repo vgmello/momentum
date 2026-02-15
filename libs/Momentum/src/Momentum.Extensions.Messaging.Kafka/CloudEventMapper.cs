@@ -83,11 +83,6 @@ public class CloudEventMapper(IOptions<ServiceBusOptions> serviceBusOptions) : I
         }
     }
 
-    public IEnumerable<string> AllHeaders()
-    {
-        yield break;
-    }
-
     private static string? GetHeaderValue(Message<string, byte[]> message, string headerName)
     {
         const string kafkaHeaderPrefix = "ce_";

@@ -5,7 +5,7 @@
         <IsTestProject>true</IsTestProject>
         <IsPackable>false</IsPackable>
         <EnableDefaultContentItems>false</EnableDefaultContentItems>
-        <NoWarn>$(NoWarn);CS0436;</NoWarn>
+        <NoWarn>$(NoWarn);CS0436;CS8602</NoWarn>
     </PropertyGroup>
 
 <!--#if (INCLUDE_API) -->

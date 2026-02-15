@@ -3,9 +3,11 @@
 using FluentValidation;
 using JasperFx;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Momentum.ServiceDefaults.HealthChecks;
 using Momentum.ServiceDefaults.Logging;
 using Momentum.ServiceDefaults.Messaging;
 using Momentum.ServiceDefaults.OpenTelemetry;
@@ -74,22 +76,22 @@ public static class ServiceDefaultsExtensions
     {
         builder.UseInitializationLogger();
 
-        builder.WebHost.UseKestrelHttpsConfiguration();
-
         builder.AddLogging();
         builder.AddOpenTelemetry();
         builder.AddServiceBus();
         builder.AddValidators();
 
+        builder.Services.TryAddSingleton<HealthCheckStatusStore>();
         builder.Services.AddHealthChecks();
         builder.Services.AddServiceDiscovery();
 
         builder.Services.ConfigureHttpClientDefaults(http =>
         {
-            // Resilience by default
-            http.AddStandardResilienceHandler();
+            http.AddStandardResilienceHandler(options =>
+            {
+                builder.Configuration.GetSection("HttpClientResilience").Bind(options);
+            });
 
-            // Service discovery by default
             http.AddServiceDiscovery();
         });
 
@@ -169,7 +171,6 @@ public static class ServiceDefaultsExtensions
     ///     to ensure fatal errors are captured before the process terminates. The exception is
     ///     re-thrown to allow the runtime to handle it appropriately (e.g., for process exit codes).
     /// </remarks>
-#pragma warning disable S2139 // Exceptions should be either logged or rethrown but not both
     public static async Task RunAsync(this WebApplication app, string[] args)
     {
         var isWolverineCommand = args.Length > 0 && WolverineCommands.Contains(args[0]);
@@ -209,7 +210,6 @@ public static class ServiceDefaultsExtensions
             }
         }
     }
-#pragma warning restore S2139
 
     private static readonly FrozenSet<string> WolverineCommands = new[]
     {

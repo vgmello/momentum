@@ -10,6 +10,8 @@ namespace Momentum.Extensions.EventMarkdownGenerator.Tests;
 /// </summary>
 public class TestScenarioBuilder
 {
+    private static readonly JsonSerializerOptions IndentedJsonOptions = new() { WriteIndented = true };
+
     private readonly string _scenarioName;
     private readonly string _basePath;
     private readonly StringBuilder _xmlBuilder;
@@ -48,7 +50,7 @@ public class TestScenarioBuilder
         _xmlBuilder.AppendLine("        </member>");
 
         // Add constructor documentation if parameters provided
-        if (parameters != null && parameters.Any())
+        if (parameters is { Count: > 0 })
         {
             var parameterTypes = string.Join(",", parameters.Keys.Select(GetSystemType));
             _xmlBuilder.AppendLine($"        <member name=\"M:{eventType}.#ctor({parameterTypes})\">");
@@ -130,7 +132,7 @@ public class TestScenarioBuilder
             GenerateSchemas = generateSchemas,
             GenerateSidebar = generateSidebar,
             IgnoreFiles = ignoreFiles ?? [],
-            CustomAssertions = customAssertions ?? new Dictionary<string, string>()
+            CustomAssertions = customAssertions ?? []
         };
 
         return this;
@@ -164,7 +166,7 @@ public class TestScenarioBuilder
 
         // Write config
         var configPath = Path.Combine(scenarioPath, "config.json");
-        var configJson = JsonSerializer.Serialize(_config, new JsonSerializerOptions { WriteIndented = true });
+        var configJson = JsonSerializer.Serialize(_config, IndentedJsonOptions);
         await File.WriteAllTextAsync(configPath, configJson);
 
         return scenarioPath;

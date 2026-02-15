@@ -32,16 +32,11 @@ namespace Momentum.Extensions.Abstractions.Messaging;
 public class DefaultDomainAttribute : Attribute
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="DefaultDomainAttribute"/> class.
-    /// </summary>
-    public DefaultDomainAttribute() { }
-
-    /// <summary>
     ///     Initializes a new instance of the <see cref="DefaultDomainAttribute"/> class
     ///     with the specified domain name.
     /// </summary>
     /// <param name="domain">The default domain name for distributed events.</param>
-    public DefaultDomainAttribute(string domain)
+    public DefaultDomainAttribute(string domain = "")
     {
         Domain = domain;
     }
@@ -53,7 +48,7 @@ public class DefaultDomainAttribute : Attribute
     ///     The domain name used as a fallback when <see cref="EventTopicAttribute.Domain"/>
     ///     is not set on an individual event.
     /// </value>
-    public string Domain { get; set; } = string.Empty;
+    public string Domain { get; set; }
 
     /// <summary>
     ///     Resolves the effective domain name for the given assembly.

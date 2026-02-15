@@ -26,7 +26,7 @@ const markdownOptions: MarkdownOptions = {
     },
 };
 
-const API_BASE_URL = process.env.API_BASE_URL || "https://app-domain.api.OrgName.com"
+const API_BASE_URL = process.env.API_BASE_URL || "https://app-domain.api.org-name.com"
 
 export default defineConfig({
     title: "AppDomain Solution",
@@ -43,7 +43,7 @@ export default defineConfig({
         ],
 
         editLink: {
-            pattern: 'https://github.com/OrgName/AppDomain/edit/main/docs/:path'
+            pattern: 'https://github.com/org-name/AppDomain/edit/main/docs/:path'
         },
 
         search: {
@@ -133,7 +133,7 @@ export default defineConfig({
     },
     lastUpdated: true,
     cleanUrls: true,
-    ignoreDeadLinks: [/^https?:\/\/.*/],
+    ignoreDeadLinks: [/^https?:\/\/.*/, /API_BASE_URL/],
     vite: {
         define: {
             __API_BASE_URL__: JSON.stringify(API_BASE_URL),

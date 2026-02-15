@@ -33,7 +33,7 @@ builder.AddFrontendIntegration();
 // NOTE: AddOpenApi must be called directly in the API project (not in a library)
 // for the .NET 10 source generator to intercept it and generate XML documentation
 // comment transformers. This enables automatic inclusion of XML docs in the OpenAPI document.
-builder.Services.AddOpenApi(options => options.ConfigureOpenApiDefaults());
+builder.Services.AddOpenApi(options => options.ConfigureOpenApiDefaults(builder.Configuration));
 
 //#if (USE_KAFKA)
 builder.AddKafkaMessagingExtensions();

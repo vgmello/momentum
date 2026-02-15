@@ -60,7 +60,7 @@ onMounted(async () => {
     await renderChart();
 
     //refresh images on first render
-    const hasImages = /<img([\w\W]+?)>/.exec(code.value)?.length > 0;
+    const hasImages = /<img(.+?)>/s.exec(code.value)?.length > 0;
     if (hasImages)
         setTimeout(() => {
             let imgElements = document.getElementsByTagName("img");

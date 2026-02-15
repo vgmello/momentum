@@ -2,32 +2,101 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using Momentum.Extensions.Abstractions.Messaging;
 using Momentum.Extensions.EventMarkdownGenerator.Models;
+using Momentum.Extensions.EventMarkdownGenerator.Services.Serialization;
 
 namespace Momentum.Extensions.EventMarkdownGenerator.Services;
 
 /// <summary>
 ///     Calculates estimated payload sizes for event properties based on type analysis
 ///     and data annotation constraints (MaxLength, Range, StringLength).
+///     Subclass to define serialization-format-specific overhead (JSON, Binary, etc.).
 /// </summary>
-public static class PayloadSizeCalculator
+public abstract class PayloadSizeCalculator
 {
+    /// <summary>Display name of the serialization format (e.g., "JSON", "Binary").</summary>
+    public abstract string FormatName { get; }
+
+    /// <summary>Overhead bytes for a serialized string value (e.g., JSON quotes: 2 bytes).</summary>
+    protected abstract int GetStringValueOverhead();
+
+    /// <summary>Overhead bytes for a property entry including key and delimiters.</summary>
+    protected abstract int GetPropertyOverhead(string propertyName);
+
+    /// <summary>Overhead bytes for object wrappers (e.g., JSON { } adds 2 bytes).</summary>
+    protected abstract int GetObjectOverhead();
+
+    /// <summary>Overhead bytes per element separator (e.g., JSON comma: 1 byte).</summary>
+    protected abstract int GetElementSeparatorOverhead();
+
+    /// <summary>Overhead bytes for collection wrappers (e.g., JSON [ ] adds 2 bytes).</summary>
+    protected abstract int GetCollectionOverhead();
+
+    /// <summary>
+    ///     Creates a PayloadSizeCalculator for the specified serialization format.
+    /// </summary>
+    public static PayloadSizeCalculator Create(string format) => format.ToLowerInvariant() switch
+    {
+        "json" => new JsonPayloadSizeCalculator(),
+        "binary" => new BinaryPayloadSizeCalculator(),
+        _ => throw new ArgumentException(
+            $"Unknown serialization format: '{format}'. Supported: json, binary.",
+            nameof(format))
+    };
+
     /// <summary>
     ///     Calculates the estimated size in bytes for a property's serialized payload.
     /// </summary>
     /// <param name="property">The property to analyze for size constraints.</param>
     /// <param name="propertyType">The type of the property.</param>
     /// <returns>A result containing the estimated size, accuracy flag, and any warnings.</returns>
-    public static PayloadSizeResult CalculatePropertySize(PropertyInfo property, Type propertyType)
+    public PayloadSizeResult CalculatePropertySize(PropertyInfo property, Type propertyType)
     {
         return CalculatePropertySize(property, propertyType, []);
     }
 
-    private static PayloadSizeResult CalculatePropertySize(PropertyInfo property, Type propertyType, HashSet<Type> visitedTypes)
+    /// <summary>
+    ///     Resolves the BytesPerChar value from StringEncoding attributes in the hierarchy:
+    ///     Property > Class > Assembly > default (1).
+    /// </summary>
+    internal static int ResolveStringEncoding(PropertyInfo property)
+    {
+        // Property-level attribute takes highest priority
+        var propertyAttr = property.GetCustomAttribute<StringEncodingAttribute>();
+        if (propertyAttr != null)
+        {
+            return propertyAttr.BytesPerChar;
+        }
+
+        // Class-level attribute is next
+        var classAttr = property.DeclaringType?.GetCustomAttribute<StringEncodingAttribute>();
+        if (classAttr != null)
+        {
+            return classAttr.BytesPerChar;
+        }
+
+        // Assembly-level attribute is last
+        var assemblyAttr = property.DeclaringType?.Assembly.GetCustomAttribute<StringEncodingAttribute>();
+        if (assemblyAttr != null)
+        {
+            return assemblyAttr.BytesPerChar;
+        }
+
+        // Default: 1 byte per character
+        return 1;
+    }
+
+    private PayloadSizeResult CalculatePropertySize(PropertyInfo property, Type propertyType, HashSet<Type> visitedTypes)
     {
         try
         {
             var underlyingType = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
+
+            if (underlyingType == typeof(string))
+            {
+                return CalculateStringSize(property);
+            }
 
             if (TypeUtils.IsPrimitiveType(underlyingType))
             {
@@ -37,11 +106,6 @@ public static class PayloadSizeCalculator
                     IsAccurate = true,
                     Warning = null
                 };
-            }
-
-            if (underlyingType == typeof(string))
-            {
-                return CalculateStringSize(property);
             }
 
             if (TypeUtils.IsCollectionType(underlyingType))
@@ -63,21 +127,18 @@ public static class PayloadSizeCalculator
         }
     }
 
-    /// <summary>
-    ///     Calculates string payload size using worst-case UTF-32 encoding (4 bytes per character).
-    ///     This provides a conservative upper bound for JSON serialization which typically uses UTF-8.
-    ///     Uses MaxLength or StringLength attributes when available for accurate estimation.
-    /// </summary>
-    private static PayloadSizeResult CalculateStringSize(PropertyInfo property)
+    private PayloadSizeResult CalculateStringSize(PropertyInfo property)
     {
         var constraints = GetDataAnnotationConstraints(property);
 
         if (constraints.MaxLength.HasValue)
         {
-            // Use 4 bytes per character (UTF-32) as worst-case estimate
+            var bytesPerChar = ResolveStringEncoding(property);
+            var overhead = GetStringValueOverhead();
+
             return new PayloadSizeResult
             {
-                SizeBytes = constraints.MaxLength.Value * 4,
+                SizeBytes = (constraints.MaxLength.Value * bytesPerChar) + overhead,
                 IsAccurate = true,
                 Warning = null
             };
@@ -91,7 +152,7 @@ public static class PayloadSizeCalculator
         };
     }
 
-    private static PayloadSizeResult CalculateCollectionSize(PropertyInfo property, Type collectionType, HashSet<Type> visitedTypes)
+    private PayloadSizeResult CalculateCollectionSize(PropertyInfo property, Type collectionType, HashSet<Type> visitedTypes)
     {
         var elementType = TypeUtils.GetElementType(collectionType);
 
@@ -110,15 +171,36 @@ public static class PayloadSizeCalculator
 
         var elementSizeResult = CalculateTypeSize(elementType, visitedTypes);
 
+        var totalSize = elementSizeResult.SizeBytes * estimatedCount;
+
+        totalSize += GetCollectionOverhead();
+
+        if (estimatedCount > 1)
+        {
+            totalSize += GetElementSeparatorOverhead() * (estimatedCount - 1);
+        }
+
         return new PayloadSizeResult
         {
-            SizeBytes = elementSizeResult.SizeBytes * estimatedCount,
+            SizeBytes = totalSize,
             IsAccurate = elementSizeResult.IsAccurate && constraints.MaxRange.HasValue,
             Warning = constraints.MaxRange.HasValue ? elementSizeResult.Warning : "Collection size estimated (no Range constraint)"
         };
     }
 
-    private static PayloadSizeResult CalculateComplexTypeSize(Type type, HashSet<Type> visitedTypes)
+    private int CalculateSerializationOverhead(int propertyCount)
+    {
+        var overhead = GetObjectOverhead();
+
+        if (propertyCount > 1)
+        {
+            overhead += GetElementSeparatorOverhead() * (propertyCount - 1);
+        }
+
+        return overhead;
+    }
+
+    private PayloadSizeResult CalculateComplexTypeSize(Type type, HashSet<Type> visitedTypes)
     {
         // Prevent infinite recursion
         if (!visitedTypes.Add(type))
@@ -140,6 +222,7 @@ public static class PayloadSizeCalculator
             try
             {
                 var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                var propertyCount = 0;
 
                 foreach (var property in properties)
                 {
@@ -147,6 +230,9 @@ public static class PayloadSizeCalculator
                     {
                         var propertyResult = CalculatePropertySize(property, property.PropertyType, visitedTypes);
                         totalSize += propertyResult.SizeBytes;
+                        propertyCount++;
+
+                        totalSize += GetPropertyOverhead(property.Name);
 
                         if (!propertyResult.IsAccurate)
                         {
@@ -165,6 +251,8 @@ public static class PayloadSizeCalculator
                         isAccurate = false;
                     }
                 }
+
+                totalSize += CalculateSerializationOverhead(propertyCount);
             }
             catch (Exception ex) when (ex is FileNotFoundException or FileLoadException or TypeLoadException)
             {
@@ -190,7 +278,7 @@ public static class PayloadSizeCalculator
         }
     }
 
-    private static PayloadSizeResult CalculateTypeSize(Type type, HashSet<Type> visitedTypes)
+    private PayloadSizeResult CalculateTypeSize(Type type, HashSet<Type> visitedTypes)
     {
         try
         {

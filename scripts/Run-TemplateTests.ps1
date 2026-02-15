@@ -329,6 +329,9 @@ function Test-Template {
                             $contentFailed = $true
                         }
                     }
+                    else {
+                        Write-ColoredMessage -Level 'WARN' -Message "[$TestCategory] $Name`: Content check skipped - file not found: $($check.File)"
+                    }
                 }
                 if ($contentFailed) {
                     $script:FailedTests++

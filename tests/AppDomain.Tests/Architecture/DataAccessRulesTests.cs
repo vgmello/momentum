@@ -4,9 +4,6 @@ using AppDomain.Common.Data;
 using NetArchTest.Rules;
 
 namespace AppDomain.Tests.Architecture;
-
-#pragma warning disable CS8602
-
 public class DataAccessRulesTests : ArchitectureTestBase
 {
     [Fact]
