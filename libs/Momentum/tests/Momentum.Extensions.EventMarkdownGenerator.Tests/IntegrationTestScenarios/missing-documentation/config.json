@@ -1,5 +1,5 @@
 {
-  "strictFileMatching": true,
+  "strictFileMatching": false,
   "ignoreFiles": [],
   "customAssertions": {
     "undocumented-event.md": "Should gracefully handle completely missing documentation",
@@ -8,5 +8,6 @@
     "malformed-xml-event.md": "Should handle malformed XML gracefully without breaking generation"
   },
   "generateSchemas": false,
-  "generateSidebar": false
+  "generateSidebar": false,
+  "focusedEvents": ["UndocumentedEvent", "EmptySummaryEvent", "MissingParamDocsEvent", "MalformedXmlEvent"]
 }

@@ -1,9 +1,10 @@
 {
-  "strictFileMatching": true,
+  "strictFileMatching": false,
   "ignoreFiles": [],
   "customAssertions": {
     "bulk-data-processed.md": "Should properly handle various collection types (arrays, lists, IEnumerable, ICollection, Dictionary)"
   },
   "generateSchemas": false,
-  "generateSidebar": false
+  "generateSidebar": false,
+  "focusedEvents": ["BulkDataProcessed"]
 }

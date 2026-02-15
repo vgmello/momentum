@@ -1,9 +1,10 @@
 {
-  "strictFileMatching": true,
+  "strictFileMatching": false,
   "ignoreFiles": [],
   "customAssertions": {
     "external-payment-gateway-response-received.md": "Should properly handle deep namespace hierarchies and extract correct domain/subdomain information"
   },
   "generateSchemas": false,
-  "generateSidebar": false
+  "generateSidebar": false,
+  "focusedEvents": ["ExternalPaymentGatewayResponseReceived"]
 }

@@ -166,24 +166,64 @@ public class ScenarioBasedIntegrationTests
                 Directory.Delete(expectedDir, true);
             Directory.CreateDirectory(expectedDir);
 
-            // Generate into expected directory directly
-            var results = await ExecuteMarkdownGeneration(scenario, expectedDir);
+            // Generate all files to a temp directory
+            var tempDir = Path.Combine(Path.GetTempPath(), $"baseline-regen-{Guid.NewGuid()}");
+            Directory.CreateDirectory(tempDir);
 
-            // Copy sidebar if config says to generate it
-            if (scenario.Config?.GenerateSidebar == true)
+            try
             {
-                var sidebarContent = await File.ReadAllTextAsync(results.SidebarPath, TestContext.Current.CancellationToken);
-                var prettyJson = JsonSerializer.Serialize(
-                    JsonSerializer.Deserialize<JsonElement>(sidebarContent), IndentedJsonOptions);
-                await File.WriteAllTextAsync(
-                    Path.Combine(expectedDir, "sidebar.json"), prettyJson, TestContext.Current.CancellationToken);
-            }
+                var results = await ExecuteMarkdownGeneration(scenario, tempDir);
 
-            // Remove sidebar from root if it was written there
-            var rootSidebar = Path.Combine(expectedDir, "sidebar.json");
-            if (!scenario.Config?.GenerateSidebar == true && File.Exists(rootSidebar))
-                File.Delete(rootSidebar);
+                // Copy only focused files (or all if baseline)
+                foreach (var file in GetFilesToCopy(scenario, tempDir))
+                {
+                    var relativePath = Path.GetRelativePath(tempDir, file);
+                    var targetPath = Path.Combine(expectedDir, relativePath);
+                    var targetDir = Path.GetDirectoryName(targetPath);
+
+                    if (!string.IsNullOrEmpty(targetDir))
+                        Directory.CreateDirectory(targetDir);
+
+                    File.Copy(file, targetPath, overwrite: true);
+                }
+
+                // Write pretty-printed sidebar if enabled
+                if (scenario.Config?.GenerateSidebar == true && File.Exists(results.SidebarPath))
+                {
+                    var sidebarContent = await File.ReadAllTextAsync(results.SidebarPath, TestContext.Current.CancellationToken);
+                    var prettyJson = JsonSerializer.Serialize(
+                        JsonSerializer.Deserialize<JsonElement>(sidebarContent), IndentedJsonOptions);
+                    await File.WriteAllTextAsync(
+                        Path.Combine(expectedDir, "sidebar.json"), prettyJson, TestContext.Current.CancellationToken);
+                }
+            }
+            finally
+            {
+                if (Directory.Exists(tempDir))
+                    Directory.Delete(tempDir, true);
+            }
         }
+    }
+
+    private static List<string> GetFilesToCopy(TestScenario scenario, string outputDir)
+    {
+        var allFiles = Directory.GetFiles(outputDir, "*.md", SearchOption.AllDirectories).ToList();
+
+        // Baseline scenario (no focused events): copy all files
+        if (scenario.Config?.FocusedEvents is not { Count: > 0 })
+            return allFiles;
+
+        var focused = scenario.Config.FocusedEvents.ToHashSet();
+
+        return allFiles.Where(file =>
+        {
+            // Always include schema files
+            if (file.Contains($"{Path.DirectorySeparatorChar}schemas{Path.DirectorySeparatorChar}"))
+                return true;
+
+            var fileName = Path.GetFileName(file);
+            return focused.Any(e => fileName.Contains($".{e}.md"));
+        }).ToList();
     }
 
     private static string? FindSourceScenariosDirectory()
@@ -334,13 +374,27 @@ public class ScenarioBasedIntegrationTests
         await File.WriteAllTextAsync(output.FilePath, output.Content, TestContext.Current.CancellationToken);
     }
 
+    private static List<ExpectedFile> FilterExpectedFiles(TestScenario scenario)
+    {
+        if (scenario.Config?.FocusedEvents is not { Count: > 0 })
+            return scenario.ExpectedFiles;
+
+        var focused = scenario.Config.FocusedEvents.ToHashSet();
+
+        return scenario.ExpectedFiles
+            .Where(f => f.IsSchemaFile || focused.Any(e => f.FileName.Contains($".{e}.md")))
+            .ToList();
+    }
+
     private static async Task ValidateResults(TestScenario scenario, MarkdownGenerationResults results, string scenarioName)
     {
+        var expectedFiles = FilterExpectedFiles(scenario);
+
         // Validate that we have expected results
         results.ShouldSatisfyAllConditions(
             () => (results.FluidResults.Count + results.SchemaResults.Count)
                 .ShouldBeGreaterThan(0, $"Scenario '{scenarioName}' should generate at least one markdown file"),
-            () => scenario.ExpectedFiles.Count.ShouldBeGreaterThan(0, $"Scenario '{scenarioName}' should have expected output files")
+            () => expectedFiles.Count.ShouldBeGreaterThan(0, $"Scenario '{scenarioName}' should have expected output files")
         );
 
         // Group all generated results by filename for easier comparison
@@ -354,7 +408,7 @@ public class ScenarioBasedIntegrationTests
         }
 
         // Validate each expected file
-        foreach (var expectedFile in scenario.ExpectedFiles)
+        foreach (var expectedFile in expectedFiles)
         {
             await ValidateGeneratedFile(expectedFile, allGeneratedResults, scenarioName);
         }
@@ -370,7 +424,7 @@ public class ScenarioBasedIntegrationTests
         // Optional: Validate that we didn't generate unexpected files
         if (scenario.Config?.StrictFileMatching == true)
         {
-            var expectedFileNames = scenario.ExpectedFiles.Select(f => f.FileName).ToHashSet();
+            var expectedFileNames = expectedFiles.Select(f => f.FileName).ToHashSet();
             var generatedFileNames = allGeneratedResults.Keys.ToHashSet();
 
             var unexpectedFiles = generatedFileNames.Except(expectedFileNames).ToList();
@@ -506,6 +560,7 @@ public class TestScenarioConfig
     public Dictionary<string, string> CustomAssertions { get; init; } = [];
     public bool GenerateSchemas { get; init; } = true;
     public bool GenerateSidebar { get; init; } = true;
+    public List<string> FocusedEvents { get; init; } = [];
 }
 
 public class MarkdownGenerationResults

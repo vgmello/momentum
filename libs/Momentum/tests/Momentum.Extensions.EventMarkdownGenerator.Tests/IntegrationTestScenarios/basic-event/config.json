@@ -3,5 +3,6 @@
   "ignoreFiles": [],
   "customAssertions": {},
   "generateSchemas": false,
-  "generateSidebar": true
+  "generateSidebar": true,
+  "focusedEvents": []
 }
