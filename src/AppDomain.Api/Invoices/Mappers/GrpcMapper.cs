@@ -6,6 +6,8 @@ using AppDomain.Invoices.Grpc.Models;
 using AppDomain.Invoices.Queries;
 using Google.Protobuf.WellKnownTypes;
 
+#pragma warning disable RMG089 // Mapping nullable source to non-nullable target handled by helper methods
+
 namespace AppDomain.Api.Invoices.Mappers;
 
 /// <summary>

@@ -79,9 +79,7 @@ public class XmlDocumentationParser(ILogger<XmlDocumentationService>? logger = n
 
             // Build constructor member name - format: M:TypeName.#ctor(ParameterTypes)
             var parameterTypes = parameters.Select(p => GetXmlTypeName(p.ParameterType));
-            var memberName = parameters.Length > 0
-                ? $"M:{eventType.FullName}.#ctor({string.Join(",", parameterTypes)})"
-                : $"M:{eventType.FullName}.#ctor";
+            var memberName = $"M:{eventType.FullName}.#ctor({string.Join(",", parameterTypes)})";
 
             var documentation = _xmlService.GetDocumentation(memberName);
 

@@ -15,13 +15,14 @@ USER_PROMPT="${USER_PROMPT:?Error: USER_PROMPT is required}"
 
 # Constants
 readonly GIT_TOKEN_FILTER='x-access-token'
+readonly SEPARATOR='=========================================='
 
 # Validate CLAUDE_BRANCH_NAME is not just "claude--"
 if [[ "$CLAUDE_BRANCH_NAME" == "claude--" ]] || [[ "$CLAUDE_BRANCH_NAME" =~ ^claude--$ ]]; then
     echo ""
-    echo "=========================================="
+    echo "$SEPARATOR"
     echo "ERROR: Invalid CLAUDE_BRANCH_NAME" >&2
-    echo "=========================================="
+    echo "$SEPARATOR"
     echo ""
     echo "CLAUDE_BRANCH_NAME is set to: '$CLAUDE_BRANCH_NAME'"
     echo ""
@@ -34,7 +35,7 @@ if [[ "$CLAUDE_BRANCH_NAME" == "claude--" ]] || [[ "$CLAUDE_BRANCH_NAME" =~ ^cla
     echo "  2. Issue/PR number is missing from the event"
     echo "  3. Environment variable not properly passed to Docker"
     echo ""
-    echo "=========================================="
+    echo "$SEPARATOR"
     echo ""
     exit 1
 fi
@@ -126,9 +127,9 @@ if [[ -f "$SYSTEM_PROMPT_FILE" ]]; then
     SYSTEM_PROMPT=$(cat "$SYSTEM_PROMPT_FILE")
 else
     echo ""
-    echo "=========================================="
+    echo "$SEPARATOR"
     echo "WARNING: No system prompt file found!"
-    echo "=========================================="
+    echo "$SEPARATOR"
     echo ""
     echo "Expected location: $SYSTEM_PROMPT_FILE"
     echo ""
@@ -138,7 +139,7 @@ else
     echo "  - Coding standards and conventions"
     echo "  - Repository structure information"
     echo ""
-    echo "=========================================="
+    echo "$SEPARATOR"
     echo ""
     SYSTEM_PROMPT="You are Claude Code, an AI assistant helping with software development tasks."
 fi

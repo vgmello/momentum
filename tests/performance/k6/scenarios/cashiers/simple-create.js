@@ -55,7 +55,7 @@ export default function main() {
                     const body = JSON.parse(r.body);
                     return body.cashierId !== undefined;
                 } catch (e) {
-                    console.error("Failed to parse response:", r.body);
+                    console.error(`Failed to parse response: ${e}`, r.body);
                     return false;
                 }
             },

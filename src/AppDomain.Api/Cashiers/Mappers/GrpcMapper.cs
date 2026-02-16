@@ -7,6 +7,8 @@ using AppDomain.Cashiers.Queries;
 using Google.Protobuf.WellKnownTypes;
 using GrpcCashier = AppDomain.Cashiers.Grpc.Models.Cashier;
 
+#pragma warning disable RMG089 // Mapping nullable source to non-nullable target handled by helper methods
+
 namespace AppDomain.Api.Cashiers.Mappers;
 
 /// <summary>
