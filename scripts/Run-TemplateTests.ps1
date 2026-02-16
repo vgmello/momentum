@@ -333,7 +333,8 @@ function Test-Template {
                         }
                     }
                     else {
-                        Write-ColoredMessage -Level 'WARN' -Message "[$TestCategory] $Name`: Content check skipped - file not found: $($check.File)"
+                        Write-ColoredMessage -Level 'ERROR' -Message "[$TestCategory] $Name`: Content check failed - file not found: $($check.File)"
+                        $contentFailed = $true
                     }
                 }
                 if ($contentFailed) {
