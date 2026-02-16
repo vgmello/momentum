@@ -3,7 +3,6 @@
 using JasperFx.CodeGeneration;
 using JasperFx.CodeGeneration.Frames;
 using JasperFx.CodeGeneration.Model;
-using Wolverine;
 
 namespace Momentum.ServiceDefaults.Messaging.Middlewares;
 

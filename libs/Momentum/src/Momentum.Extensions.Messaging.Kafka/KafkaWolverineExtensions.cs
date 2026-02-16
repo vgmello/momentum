@@ -4,10 +4,8 @@ using JasperFx.Core.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Momentum.Extensions.Abstractions.Messaging;
 using Momentum.ServiceDefaults.Messaging;
 using System.Reflection;
-using Wolverine;
 using Wolverine.Kafka;
 using static Momentum.Extensions.Messaging.Kafka.KafkaAspireExtensions;
 

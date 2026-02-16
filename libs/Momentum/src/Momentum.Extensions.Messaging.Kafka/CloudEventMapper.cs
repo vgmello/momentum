@@ -7,7 +7,6 @@ using Confluent.Kafka;
 using Microsoft.Extensions.Options;
 using Momentum.ServiceDefaults.Messaging;
 using System.Text;
-using Wolverine;
 using Wolverine.Kafka;
 
 namespace Momentum.Extensions.Messaging.Kafka;

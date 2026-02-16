@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Momentum.ServiceDefaults.Messaging.Telemetry;
 using Momentum.ServiceDefaults.Messaging.Wolverine;
 using System.Diagnostics;
-using Wolverine;
 
 namespace Momentum.ServiceDefaults.Messaging.Middlewares;
 

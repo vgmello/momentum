@@ -7,10 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Momentum.Extensions.Abstractions.Extensions;
 using Momentum.ServiceDefaults.Messaging;
 using System.Reflection;
-using Wolverine;
 using static Momentum.Extensions.Messaging.Kafka.KafkaAspireExtensions;
 
 namespace Momentum.Extensions.Messaging.Kafka;

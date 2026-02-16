@@ -5,6 +5,11 @@
              (Endpoint, MemberInfo) that the source generator cannot handle (SYSLIB1100/1101) -->
         <EnableConfigurationBindingGenerator>false</EnableConfigurationBindingGenerator>
     </PropertyGroup>
+
+    <!-- Import global usings for standalone development (NuGet consumers get these via build/ props) -->
+    <Import Project="Momentum.ServiceDefaults.props"/>
+    <Import Project="../Momentum.Extensions/Momentum.Extensions.props"
+            Condition="Exists('../Momentum.Extensions/Momentum.Extensions.props')"/>
     
     <!--#if (!LIBS_INCLUDES_DEFAULTS) -->
     <PropertyGroup>

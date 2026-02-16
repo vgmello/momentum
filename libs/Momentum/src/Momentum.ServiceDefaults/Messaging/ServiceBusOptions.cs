@@ -2,8 +2,6 @@
 
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using Momentum.Extensions.Abstractions.Extensions;
-using Momentum.Extensions.Abstractions.Messaging;
 using System.Text.RegularExpressions;
 
 namespace Momentum.ServiceDefaults.Messaging;

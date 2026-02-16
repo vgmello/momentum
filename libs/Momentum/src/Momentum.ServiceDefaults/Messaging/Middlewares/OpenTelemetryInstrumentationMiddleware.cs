@@ -1,10 +1,8 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-using Momentum.Extensions.Abstractions.Messaging;
 using Momentum.ServiceDefaults.Messaging.Wolverine;
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using Wolverine;
 
 namespace Momentum.ServiceDefaults.Messaging.Middlewares;
 

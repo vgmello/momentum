@@ -1,8 +1,6 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
 using Microsoft.Extensions.Hosting;
-using Momentum.Extensions.Abstractions.Extensions;
-using Momentum.Extensions.Abstractions.Messaging;
 
 namespace Momentum.Extensions.Messaging.Kafka;
 
