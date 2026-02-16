@@ -1,4 +1,4 @@
-import { execSync } from 'node:child_process';
+import { execFileSync, execSync } from 'node:child_process';
 import path from 'node:path';
 import fs from 'node:fs';
 import { glob } from 'glob';
@@ -7,7 +7,7 @@ const log = (message: string) => console.log(`[${new Date().toISOString()}] ${me
 
 function getGitHubUrl(): string | null {
     try {
-        const remoteUrl = execSync('git remote get-url origin', {
+        const remoteUrl = execFileSync('git', ['remote', 'get-url', 'origin'], {
             encoding: 'utf8',
             cwd: path.resolve('..')
         }).trim();
@@ -108,7 +108,7 @@ try {
     try {
         // Check if events-docsgen tool is available
         try {
-            execSync('events-docsgen --version', { stdio: 'pipe' });
+            execFileSync('events-docsgen', ['--version'], { stdio: 'pipe' });
         } catch {
             // Tool is not installed - provide installation instructions
             log('❌ The events-docsgen tool is not installed.');
@@ -123,16 +123,16 @@ try {
         const env = { ...process.env, 'SkipLocalFeedPush': 'true' };
         const githubUrl = getGitHubUrl();
 
-        let command = `events-docsgen generate --assemblies "${assembliesArg}" --output "${outputDir}"`;
+        const args = ['generate', '--assemblies', assembliesArg, '--output', outputDir];
         if (githubUrl) {
             log(`Using GitHub URL: ${githubUrl}`);
-            command += ` --github-url "${githubUrl}"`;
+            args.push('--github-url', githubUrl);
         } else {
             log('No GitHub URL found - links will use anchor references');
         }
-        command += ' --verbose';
+        args.push('--verbose');
 
-        execSync(command, { stdio: 'inherit', env });
+        execFileSync('events-docsgen', args, { stdio: 'inherit', env });
     } catch (toolError) {
         log(`Tool execution failed: ${toolError}`);
         throw toolError;

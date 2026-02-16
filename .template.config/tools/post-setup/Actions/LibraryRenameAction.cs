@@ -278,7 +278,7 @@ public static partial class LibraryRenameAction
         var alternation = string.Join("|", escapedTokens);
         var pattern = $@"\bMomentum\.(?<token>{alternation})(?!\w)";
 
-        return new Regex(pattern, RegexOptions.Compiled);
+        return new Regex(pattern, RegexOptions.Compiled, TimeSpan.FromSeconds(5));
     }
 
     private static List<string> FindFilesToProcess(string rootPath, string[] extensions, string[] excludeDirs, int maxBytes)

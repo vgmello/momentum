@@ -2,7 +2,7 @@ import fs, { createReadStream } from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { glob } from 'glob';
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import { pipeline } from 'node:stream/promises';
 
 import docfxConfig from '../../docfx.json' with { type: 'json' };
@@ -194,10 +194,10 @@ function runDocfx(): void {
     try {
         // Try global docfx first, then dotnet tool if installed locally
         try {
-            execSync('docfx metadata', { stdio: 'inherit' });
+            execFileSync('docfx', ['metadata'], { stdio: 'inherit' });
         } catch {
             log('Global docfx not found, trying dotnet tool...');
-            execSync('dotnet tool run docfx metadata', { stdio: 'inherit' });
+            execFileSync('dotnet', ['tool', 'run', 'docfx', 'metadata'], { stdio: 'inherit' });
         }
         log('Documentation generated successfully');
     } catch (error) {

@@ -2,7 +2,7 @@ import fs, { createReadStream } from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { glob } from 'glob';
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import { pipeline } from 'node:stream/promises';
 
 import docfxConfig from '../../docfx.json' with { type: 'json' };
@@ -192,7 +192,7 @@ async function getFileInfo(filePath: string): Promise<FileInfo | null> {
 function runDocfx(): void {
     log('Running docfx metadata...');
     try {
-        execSync('docfx metadata', { stdio: 'inherit' });
+        execFileSync('docfx', ['metadata'], { stdio: 'inherit' });
         log('Documentation generated successfully');
     } catch (error) {
         log(`Error running docfx: ${error}`);

@@ -131,7 +131,8 @@ public class PortConfigurationAction
                 foreach (var pattern in patterns)
                 {
                     content = Regex.Replace(content, pattern,
-                        match => match.Value.Replace(mapping.Key, mappingValueStr));
+                        match => match.Value.Replace(mapping.Key, mappingValueStr),
+                        RegexOptions.None, TimeSpan.FromSeconds(5));
                 }
             }
 
