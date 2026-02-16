@@ -8,44 +8,55 @@ param(
     [string]$DocsPath = ""
 )
 
-Write-Host "# 📊 Deployment Summary"
-Write-Host ""
+$summary = [System.Text.StringBuilder]::new()
+[void]$summary.AppendLine("# 📊 Deployment Summary")
+[void]$summary.AppendLine("")
 
 if ($DeployPrerelease) {
     if (-not [string]::IsNullOrWhiteSpace($ReleaseVersion)) {
-        Write-Host "✅ **Pre-release deployed**"
-        Write-Host "   - Version: $ReleaseVersion"
-        Write-Host "   - Tag: $ReleaseTag"
-        Write-Host "   - NuGet: $NugetSource"
-        Write-Host "   - GitHub Release: Created"
+        [void]$summary.AppendLine("✅ **Pre-release deployed**")
+        [void]$summary.AppendLine("   - Version: ``$ReleaseVersion``")
+        [void]$summary.AppendLine("   - Tag: ``$ReleaseTag``")
+        [void]$summary.AppendLine("   - NuGet: $NugetSource")
+        [void]$summary.AppendLine("   - GitHub Release: Created")
     }
     else {
-        Write-Host "❌ **Pre-release failed**"
+        [void]$summary.AppendLine("❌ **Pre-release failed**")
     }
 }
 
 if (-not $DeployPrerelease) {
     if (-not [string]::IsNullOrWhiteSpace($ReleaseVersion)) {
-        Write-Host "✅ **Release deployed**"
-        Write-Host "   - Version: $ReleaseVersion"
-        Write-Host "   - Tag: $ReleaseTag"
-        Write-Host "   - NuGet: $NugetSource"
-        Write-Host "   - GitHub Release: Created"
+        [void]$summary.AppendLine("✅ **Release deployed**")
+        [void]$summary.AppendLine("   - Version: ``$ReleaseVersion``")
+        [void]$summary.AppendLine("   - Tag: ``$ReleaseTag``")
+        [void]$summary.AppendLine("   - NuGet: $NugetSource")
+        [void]$summary.AppendLine("   - GitHub Release: Created")
     }
     else {
-        Write-Host "❌ **Release failed**"
+        [void]$summary.AppendLine("❌ **Release failed**")
     }
 }
 
 if ($DeployDocs) {
     if (-not [string]::IsNullOrWhiteSpace($DocsUrl)) {
-        Write-Host "✅ **Documentation deployed**"
-        Write-Host "   - URL: $DocsUrl"
+        [void]$summary.AppendLine("✅ **Documentation deployed**")
+        [void]$summary.AppendLine("   - URL: $DocsUrl")
         if (-not [string]::IsNullOrWhiteSpace($DocsPath)) {
-            Write-Host "   - Source: $DocsPath"
+            [void]$summary.AppendLine("   - Source: ``$DocsPath``")
         }
     }
     else {
-        Write-Host "❌ **Documentation failed**"
+        [void]$summary.AppendLine("❌ **Documentation failed**")
     }
+}
+
+$content = $summary.ToString()
+
+# Write to console for log visibility
+Write-Host $content
+
+# Write to GitHub Actions Job Summary
+if ($env:GITHUB_STEP_SUMMARY) {
+    $content | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
 }

@@ -131,19 +131,19 @@ jobs:
       - name: Deployment Summary
         shell: pwsh
         run: |
-          $args = @(
-            "-ReleaseVersion", "${{ steps.release-version.outputs.next-version }}",
-            "-ReleaseTag", "${{ steps.release-version.outputs.next-tag }}",
-            "-NugetSource", "${{ env.NUGET_SOURCE }}"
-          )
+          $summaryArgs = @{
+            ReleaseVersion = "${{ steps.release-version.outputs.next-version }}"
+            ReleaseTag = "${{ steps.release-version.outputs.next-tag }}"
+            NugetSource = "${{ env.NUGET_SOURCE }}"
+          }
 
           if ("${{ steps.config.outputs.prerelease }}" -eq "true") {
-            $args += "-DeployPrerelease"
+            $summaryArgs["DeployPrerelease"] = $true
           }
 
           if ("${{ steps.config.outputs.deploy-docs }}" -eq "true") {
-            $args += "-DocsUrl", "${{ steps.docs-deployment.outputs.page_url }}"
-            $args += "-DeployDocs"
+            $summaryArgs["DocsUrl"] = "${{ steps.docs-deployment.outputs.page_url }}"
+            $summaryArgs["DeployDocs"] = $true
           }
 
-          & ./.github/scripts/Write-DeploymentSummary.ps1 @args
+          & ./.github/scripts/Write-DeploymentSummary.ps1 @summaryArgs
