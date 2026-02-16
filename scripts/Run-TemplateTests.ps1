@@ -226,6 +226,9 @@ function Test-Template {
         [string]$TestCategory,
 
         [Parameter()]
+        [hashtable[]]$ContentMustContain = @(),
+
+        [Parameter()]
         [hashtable[]]$ContentMustNotContain = @()
     )
 
@@ -309,6 +312,31 @@ function Test-Template {
                     $testErrorSummary = Get-ErrorSummary -ErrorOutput $testOutput -MaxLines 2 -Filter '(Failed|Error|Exception|Assert)'
 
                     Write-ColoredMessage -Level 'ERROR' -Message "[$TestCategory] $Name`: Tests failed$testErrorSummary"
+                    $script:FailedTests++
+                    $script:TestResults[$Name] = 'FAILED'
+
+                    Test-MaxFailuresReached -TestName $Name
+                    return
+                }
+            }
+
+            # Validate required content if specified
+            if ($ContentMustContain.Count -gt 0) {
+                $contentFailed = $false
+                foreach ($check in $ContentMustContain) {
+                    $filePath = Join-Path -Path '.' -ChildPath $check.File
+                    if (Test-Path -Path $filePath) {
+                        $fileContent = Get-Content -Path $filePath -Raw
+                        if (-not ($fileContent -match $check.Pattern)) {
+                            Write-ColoredMessage -Level 'ERROR' -Message "[$TestCategory] $Name`: Content check failed - '$($check.Pattern)' not found in $($check.File)"
+                            $contentFailed = $true
+                        }
+                    }
+                    else {
+                        Write-ColoredMessage -Level 'WARN' -Message "[$TestCategory] $Name`: Content check skipped - file not found: $($check.File)"
+                    }
+                }
+                if ($contentFailed) {
                     $script:FailedTests++
                     $script:TestResults[$Name] = 'FAILED'
 
@@ -464,16 +492,30 @@ function Invoke-TestCategory {
         'library-config' {
             Write-ColoredMessage -Level 'INFO' -Message "Running Category 4: Library Configuration Tests"
 
-            $libraries = @(
-                @{ Name = 'defaults'; TestName = 'TestLibDefaults' },
-                @{ Name = 'api'; TestName = 'TestLibApi' },
-                @{ Name = 'ext'; TestName = 'TestLibExt' },
-                @{ Name = 'kafka'; TestName = 'TestLibKafka' },
-                @{ Name = 'generators'; TestName = 'TestLibGenerators' }
+            $defaultsContainsChecks = @(
+                @{ File = 'src/TestLibDefaults.Api/TestLibDefaults.Api.csproj'; Pattern = 'Momentum\.ServiceDefaults\.props' }
             )
-            foreach ($lib in $libraries) {
-                Test-Template -Name $lib.TestName -Parameters "--libs $($lib.Name)" -TestCategory 'Library Config'
-            }
+            Test-Template -Name 'TestLibDefaults' -Parameters '--libs defaults' -TestCategory 'Library Config' -ContentMustContain $defaultsContainsChecks
+
+            $apiExclusionChecks = @(
+                @{ File = 'src/TestLibApi.Api/TestLibApi.Api.csproj'; Pattern = 'Momentum\.ServiceDefaults\.props' }
+            )
+            Test-Template -Name 'TestLibApi' -Parameters '--libs api' -TestCategory 'Library Config' -ContentMustNotContain $apiExclusionChecks
+
+            $extContainsChecks = @(
+                @{ File = 'src/TestLibExt/TestLibExt.csproj'; Pattern = 'Momentum\.Extensions\.props' }
+            )
+            Test-Template -Name 'TestLibExt' -Parameters '--libs ext' -TestCategory 'Library Config' -ContentMustContain $extContainsChecks
+
+            $kafkaExclusionChecks = @(
+                @{ File = 'src/TestLibKafka.Api/TestLibKafka.Api.csproj'; Pattern = 'Momentum\.ServiceDefaults\.props' }
+            )
+            Test-Template -Name 'TestLibKafka' -Parameters '--libs kafka' -TestCategory 'Library Config' -ContentMustNotContain $kafkaExclusionChecks
+
+            $generatorsContainsChecks = @(
+                @{ File = 'src/TestLibGenerators/TestLibGenerators.csproj'; Pattern = 'Momentum\.Extensions\.SourceGenerators\.props' }
+            )
+            Test-Template -Name 'TestLibGenerators' -Parameters '--libs generators' -TestCategory 'Library Config' -ContentMustContain $generatorsContainsChecks
 
             # Test library combinations
             Test-Template -Name 'TestLibMulti' -Parameters '--libs defaults --libs api --libs kafka' -TestCategory 'Library Config'
