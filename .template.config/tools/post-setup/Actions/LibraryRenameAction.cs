@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 
 namespace PostSetup.Actions;
 
-public static class LibraryRenameAction
+public static partial class LibraryRenameAction
 {
     public class LibraryRenameResult
     {
@@ -22,7 +22,7 @@ public static class LibraryRenameAction
         public string SkipReason { get; set; } = string.Empty;
     }
 
-    private class ProcessingConfig
+    private sealed class ProcessingConfig
     {
         public string[] ScanRoots { get; set; } = [];
         public string[] FileExtensions { get; set; } = [];
@@ -30,7 +30,7 @@ public static class LibraryRenameAction
         public int MaxBytes { get; set; }
     }
 
-    private class PathReplacement
+    private sealed class PathReplacement
     {
         public string OldPath { get; set; } = "";
         public string NewPath { get; set; } = "";
@@ -367,16 +367,10 @@ public static class LibraryRenameAction
 
         // Replace any remaining Momentum.*.csproj references with libPrefix.*.csproj
         // This handles cases like: Momentum.ServiceDefaults.csproj -> MyLib.ServiceDefaults.csproj
-        content = Regex.Replace(
-            content,
-            @"Momentum\.([A-Za-z.]+)\.csproj",
-            $"{libPrefix}.$1.csproj");
+        content = CsprojReferenceRegex().Replace(content, $"{libPrefix}.$1.csproj");
 
         // Replace Momentum.*.props references
-        content = Regex.Replace(
-            content,
-            @"Momentum\.([A-Za-z.]+)\.props",
-            $"{libPrefix}.$1.props");
+        content = PropsReferenceRegex().Replace(content, $"{libPrefix}.$1.props");
 
         return content;
     }
@@ -409,7 +403,7 @@ public static class LibraryRenameAction
 
         var content = File.ReadAllText(packagesPropsPath);
         var nonEmbedded = new List<string>();
-        var packageVersionRegex = new Regex(@"<PackageVersion\s+Include=""(Momentum\.[^""]+)""");
+        var packageVersionRegex = PackageVersionRegex();
 
         foreach (Match match in packageVersionRegex.Matches(content))
         {
@@ -571,4 +565,13 @@ public static class LibraryRenameAction
 
         return defaultValue;
     }
+
+    [GeneratedRegex(@"Momentum\.([A-Za-z.]+)\.csproj")]
+    private static partial Regex CsprojReferenceRegex();
+
+    [GeneratedRegex(@"Momentum\.([A-Za-z.]+)\.props")]
+    private static partial Regex PropsReferenceRegex();
+
+    [GeneratedRegex(@"<PackageVersion\s+Include=""(Momentum\.[^""]+)""")]
+    private static partial Regex PackageVersionRegex();
 }

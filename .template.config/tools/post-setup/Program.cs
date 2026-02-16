@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text.Json;
 using PostSetup.Actions;
 
+const string sectionSeparator = "═══════════════════════════════";
+
 try
 {
     Console.WriteLine("🚀 Running Momentum .NET post-setup tasks...");
@@ -22,7 +24,7 @@ try
     // Action 1: Port Configuration
     Console.WriteLine();
     Console.WriteLine("🔧 Action 1: Port Configuration");
-    Console.WriteLine("═══════════════════════════════");
+    Console.WriteLine(sectionSeparator);
 
     var portResult = PortConfigurationAction.ConfigurePorts(projectDir, config);
 
@@ -33,7 +35,7 @@ try
     // Action 2: Library Rename
     Console.WriteLine();
     Console.WriteLine("📚 Action 2: Library Rename");
-    Console.WriteLine("═══════════════════════════════");
+    Console.WriteLine(sectionSeparator);
 
     var libraryResult = LibraryRenameAction.ProcessMomentumLibImport(projectDir, config);
 
@@ -55,7 +57,7 @@ try
     // Action 3: Local Package Configuration
     Console.WriteLine();
     Console.WriteLine("📦 Action 3: Local Package Configuration");
-    Console.WriteLine("═══════════════════════════════");
+    Console.WriteLine(sectionSeparator);
 
     var localPackageResult = LocalPackageConfigurationAction.ConfigureLocalPackages(projectDir, config);
 
@@ -71,7 +73,7 @@ try
     // Final summary
     Console.WriteLine();
     Console.WriteLine("🎉 Post-setup Actions Summary");
-    Console.WriteLine("═══════════════════════════════");
+    Console.WriteLine(sectionSeparator);
 
     var totalFilesChanged = portResult.ChangedFiles + libraryResult.ChangedFiles;
     var totalFilesProcessed = portResult.ProcessedFiles + libraryResult.ProcessedFiles;

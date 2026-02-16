@@ -95,7 +95,7 @@ export default function main(data) {
             if (success) {
                 const invoices = parseResponse(listResponse);
                 check(invoices, {
-                    "List contains invoices": (list) => Array.isArray(list) && list.length >= 0,
+                    "List contains invoices": (list) => Array.isArray(list) && list.length > 0,
                 });
             }
         });
@@ -111,12 +111,12 @@ export default function main(data) {
                     paymentReference: `PAY_${Date.now()}`,
                 };
 
-                const startTime = new Date().getTime();
+                const startTime = Date.now();
                 const paymentResponse = http.post(endpoints.invoices.simulatePayment(invoiceId), JSON.stringify(paymentData), {
                     headers: headers.withTenant(tenantId),
                     tags: { operation: "simulate_payment" },
                 });
-                const endTime = new Date().getTime();
+                const endTime = Date.now();
 
                 const success = checkResponse(paymentResponse, 200, "Simulate payment");
                 if (success) {

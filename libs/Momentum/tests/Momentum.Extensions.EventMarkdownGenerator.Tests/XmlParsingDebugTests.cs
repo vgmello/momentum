@@ -60,9 +60,8 @@ public class XmlParsingDebugTests
         // The main issue we're investigating
         foreach (var expectedProp in new[] { "TenantId", "PartitionKeyTest", "Cashier" })
         {
-            if (documentation.PropertyDescriptions.ContainsKey(expectedProp))
+            if (documentation.PropertyDescriptions.TryGetValue(expectedProp, out var desc))
             {
-                var desc = documentation.PropertyDescriptions[expectedProp];
                 Console.WriteLine($"Property {expectedProp}: '{desc}'");
 
                 // This should NOT be "No description available" if XML parsing works
@@ -87,7 +86,7 @@ public class XmlParsingDebugTests
 
         var xmlContent = File.ReadAllText(xmlPath);
         Console.WriteLine("XML Content preview:");
-        Console.WriteLine(xmlContent.Substring(0, Math.Min(1000, xmlContent.Length)));
+        Console.WriteLine(xmlContent.AsSpan(0, Math.Min(1000, xmlContent.Length)));
 
         // Verify expected property documentation exists
         xmlContent.ShouldContain("P:AppDomain.Cashiers.Contracts.IntegrationEvents.CashierCreated.TenantId");

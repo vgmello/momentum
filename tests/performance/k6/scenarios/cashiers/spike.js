@@ -70,7 +70,7 @@ function executeCashierOperations(tenantId, currentPhase) {
 
     // Create cashier - measure spike impact
     const cashierData = generateCashierData();
-    const createStartTime = new Date().getTime();
+    const createStartTime = Date.now();
 
     const createResponse = http.post(endpoints.cashiers.create, JSON.stringify(cashierData), {
         headers: headers.withTenant(tenantId),
@@ -81,7 +81,7 @@ function executeCashierOperations(tenantId, currentPhase) {
         timeout: "15s", // Longer timeout for spike conditions
     });
 
-    const createDuration = new Date().getTime() - createStartTime;
+    const createDuration = Date.now() - createStartTime;
     spikeResponseTime.add(createDuration);
 
     // Track spike-specific metrics
