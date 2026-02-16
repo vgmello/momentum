@@ -27,7 +27,7 @@
     <PackageVersion Include="Bogus" Version="35.6.5" />
     <PackageVersion Include="CloudNative.CloudEvents.Kafka" Version="2.8.0" />
     <PackageVersion Include="CloudNative.CloudEvents.SystemTextJson" Version="2.8.0" />
-    <PackageVersion Include="coverlet.collector" Version="6.0.4" />
+    <PackageVersion Include="coverlet.collector" Version="8.0.0" />
     <PackageVersion Include="Dapper" Version="2.1.66" />
     <PackageVersion Include="Fluid.Core" Version="2.31.0" />
     <PackageVersion Include="FluentValidation" Version="12.1.1" />
