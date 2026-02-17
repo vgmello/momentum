@@ -509,7 +509,8 @@ function Invoke-TestCategory {
             Test-Template -Name 'TestLibExt' -Parameters '--libs ext' -TestCategory 'Library Config' -ContentMustContain $extContainsChecks
 
             $kafkaExclusionChecks = @(
-                @{ File = 'src/TestLibKafka.Api/TestLibKafka.Api.csproj'; Pattern = 'Momentum\.ServiceDefaults\.props' }
+                @{ File = 'src/TestLibKafka.Api/TestLibKafka.Api.csproj'; Pattern = 'Momentum\.ServiceDefaults\.props' },
+                @{ File = 'libs/Momentum/src/Momentum.Extensions.Messaging.Kafka/Momentum.Extensions.Messaging.Kafka.csproj'; Pattern = 'Momentum\.ServiceDefaults\.props' }
             )
             Test-Template -Name 'TestLibKafka' -Parameters '--libs kafka' -TestCategory 'Library Config' -ContentMustNotContain $kafkaExclusionChecks
 

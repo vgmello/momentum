@@ -1,7 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <!-- Import global usings for standalone development (NuGet consumers get these via build/ props) -->
+    <!--#if (LIBS_INCLUDES_DEFAULTS) -->
     <Import Project="../Momentum.ServiceDefaults/Momentum.ServiceDefaults.props"
             Condition="Exists('../Momentum.ServiceDefaults/Momentum.ServiceDefaults.props')"/>
+    <!--#endif -->
     <Import Project="../Momentum.Extensions/Momentum.Extensions.props"
             Condition="Exists('../Momentum.Extensions/Momentum.Extensions.props')"/>
 
