@@ -1,5 +1,6 @@
 import http from "k6/http";
 import { check, group, sleep } from "k6";
+import crypto from "k6/crypto";
 
 // Simple test configuration for cashier creation
 export const options = {
@@ -28,7 +29,8 @@ const headers = {
 // Helper function to generate random cashier data
 function generateCashierData() {
     const timestamp = Date.now();
-    const rand = Math.floor(crypto.getRandomValues(new Uint32Array(1))[0] % 1000);
+    const bytes = crypto.randomBytes(4);
+    const rand = new DataView(bytes).getUint32(0) % 1000;
 
     return {
         name: `Test Cashier ${timestamp}_${rand}`,

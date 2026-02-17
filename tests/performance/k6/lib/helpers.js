@@ -1,5 +1,6 @@
 import { check, sleep } from "k6";
 import { Rate, Trend } from "k6/metrics";
+import crypto from "k6/crypto";
 
 // Custom metrics
 export const customMetrics = {
@@ -9,11 +10,11 @@ export const customMetrics = {
     concurrentVersionErrors: new Rate("concurrent_version_errors"),
 };
 
-// Cryptographically secure random number [0, 1) using Web Crypto API
+// Cryptographically secure random number [0, 1) using k6/crypto
 export function random() {
-    const buf = new Uint32Array(1);
-    crypto.getRandomValues(buf);
-    return buf[0] / (0xffffffff + 1);
+    const bytes = crypto.randomBytes(4);
+    const view = new DataView(bytes);
+    return view.getUint32(0) / (0xffffffff + 1);
 }
 
 // Cryptographically secure random integer [0, max)
