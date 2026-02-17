@@ -1,6 +1,6 @@
 FROM ubuntu:24.04
 
-# Args 
+# Args
 ARG RUNNER_VERSION="2.329.0"
 
 # Environment variables
@@ -12,11 +12,10 @@ ENV RUNNER_LABELS=self-hosted,linux,docker
 
 RUN useradd -m -s /bin/bash runner && \
     mkdir -p /home/runner && \
-    chown -R runner:runner /home/runner && \
     #
     # Install basic dependencies
-    apt update && \
-    apt install -y \
+    apt-get update && \
+    apt-get install -y \
     ca-certificates \
     curl \
     git \
@@ -36,31 +35,28 @@ RUN useradd -m -s /bin/bash runner && \
     tee /etc/apt/sources.list.d/docker.list > /dev/null && \
     #
     # Update package index with new repositories
-    apt update && \
-    #
-    # Install extract packages
-    apt install -y \
+    apt-get update && \
     #
     # Install Docker CE CLI
-    docker-ce-cli && \
-    rm -rf /var/lib/apt/lists/*
-
-# Switch to runner user
-USER runner    
-WORKDIR /home/runner
-
-# Download and install GitHub Actions Runner
-RUN ARCH=$(dpkg --print-architecture) && \
+    apt-get install -y docker-ce-cli && \
+    rm -rf /var/lib/apt/lists/* && \
+    #
+    # Download and install GitHub Actions Runner
+    ARCH="$(dpkg --print-architecture)" && \
     if [ "$ARCH" = "amd64" ]; then RUNNER_ARCH="x64"; \
     elif [ "$ARCH" = "arm64" ]; then RUNNER_ARCH="arm64"; \
     else echo "Unsupported architecture: $ARCH" && exit 1; fi && \
-    # Install Runner
+    cd /home/runner && \
     curl -o "actions-runner-linux-${RUNNER_ARCH}-${RUNNER_VERSION}.tar.gz" -L \
     "https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-${RUNNER_ARCH}-${RUNNER_VERSION}.tar.gz" && \
     tar xzf "./actions-runner-linux-${RUNNER_ARCH}-${RUNNER_VERSION}.tar.gz" && \
     rm "actions-runner-linux-${RUNNER_ARCH}-${RUNNER_VERSION}.tar.gz" && \
-    # Install dependencies for the runner
-    ./bin/installdependencies.sh || true
+    (./bin/installdependencies.sh || true) && \
+    chown -R runner:runner /home/runner
+
+# Switch to runner user
+USER runner
+WORKDIR /home/runner
 
 COPY --chown=runner:runner --chmod=755 entrypoint.sh /home/runner/entrypoint.sh
 
