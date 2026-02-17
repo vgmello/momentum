@@ -62,7 +62,6 @@ RUN ARCH=$(dpkg --print-architecture) && \
     # Install dependencies for the runner
     ./bin/installdependencies.sh || true
 
-COPY --chown=runner:runner entrypoint.sh /home/runner/entrypoint.sh
-RUN chmod +x /home/runner/entrypoint.sh
+COPY --chown=runner:runner --chmod=755 entrypoint.sh /home/runner/entrypoint.sh
 
 ENTRYPOINT ["/home/runner/entrypoint.sh"]

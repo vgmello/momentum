@@ -9,6 +9,8 @@ import {
     generateInvoiceData,
     customMetrics,
     logTestSummary,
+    random,
+    randomInt,
 } from "../../lib/helpers.js";
 
 // Configuration constants
@@ -89,7 +91,7 @@ function powerUserWorkflow(tenantId, data) {
         // Create multiple invoices
         if (cashierId) {
             group("Create Multiple Invoices", () => {
-                const numInvoices = 3 + Math.floor(Math.random() * 3); // 3-5 invoices
+                const numInvoices = 3 + Math.floor(random() * 3); // 3-5 invoices
 
                 for (let i = 0; i < numInvoices; i++) {
                     const invoiceData = generateInvoiceData(cashierId);
@@ -103,7 +105,7 @@ function powerUserWorkflow(tenantId, data) {
                         customMetrics.invoiceCreationRate.add(1);
 
                         // 30% chance to immediately pay the invoice
-                        if (Math.random() < INVOICE_PAY_PROBABILITY) {
+                        if (random() < INVOICE_PAY_PROBABILITY) {
                             const paymentData = {
                                 version: invoice.version,
                                 amountPaid: invoice.amount,
@@ -153,7 +155,7 @@ function regularUserWorkflow(tenantId, data) {
         if (cashiersResponse.status === 200) {
             const cashiers = parseResponse(cashiersResponse);
             if (cashiers && cashiers.length > 0) {
-                selectedCashierId = cashiers[Math.floor(Math.random() * cashiers.length)].cashierId;
+                selectedCashierId = cashiers[Math.floor(random() * cashiers.length)].cashierId;
             }
         }
 
@@ -281,7 +283,7 @@ function readOnlyUserWorkflow(tenantId, data) {
                 const cashiers = parseResponse(listResponse);
                 if (cashiers && cashiers.length > 0) {
                     // View details of a random cashier
-                    const randomCashier = cashiers[Math.floor(Math.random() * cashiers.length)];
+                    const randomCashier = cashiers[Math.floor(random() * cashiers.length)];
                     http.get(endpoints.cashiers.get(randomCashier.cashierId), {
                         headers: headers.withTenant(tenantId),
                         tags: { operation: "get_cashier", workflow: "read_only" },
@@ -302,7 +304,7 @@ function readOnlyUserWorkflow(tenantId, data) {
                 const invoices = parseResponse(listResponse);
                 if (invoices && invoices.length > 0) {
                     // View details of a random invoice
-                    const randomInvoice = invoices[Math.floor(Math.random() * invoices.length)];
+                    const randomInvoice = invoices[Math.floor(random() * invoices.length)];
                     http.get(endpoints.invoices.get(randomInvoice.invoiceId), {
                         headers: headers.withTenant(tenantId),
                         tags: { operation: "get_invoice", workflow: "read_only" },
@@ -312,7 +314,7 @@ function readOnlyUserWorkflow(tenantId, data) {
 
             // Check different invoice statuses
             const statuses = ["Pending", "Paid", "Cancelled"];
-            const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+            const randomStatus = statuses[Math.floor(random() * statuses.length)];
 
             http.get(`${endpoints.invoices.list}?status=${randomStatus}`, {
                 headers: headers.withTenant(tenantId),

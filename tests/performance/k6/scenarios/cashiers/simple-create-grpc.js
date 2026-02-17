@@ -25,11 +25,11 @@ client.load(["../../protos"], "cashiers.proto");
 // Helper function to generate random cashier data
 function generateCashierData() {
     const timestamp = Date.now();
-    const random = Math.floor(Math.random() * 1000);
+    const rand = Math.floor(crypto.getRandomValues(new Uint32Array(1))[0] % 1000);
 
     return {
-        name: `Test Cashier ${timestamp}_${random}`,
-        email: `cashier_${timestamp}_${random}@test.example.com`,
+        name: `Test Cashier ${timestamp}_${rand}`,
+        email: `cashier_${timestamp}_${rand}@test.example.com`,
     };
 }
 
