@@ -68,7 +68,7 @@ jobs:
           distribution: "zulu"
 
       - name: Cache NuGet packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/*.props', '**/Directory.*.props') }}
@@ -76,7 +76,7 @@ jobs:
             ${{ runner.os }}-nuget-
 
       - name: Cache SonarQube Cloud packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar-${{ hashFiles('**/*.csproj') }}
@@ -84,7 +84,7 @@ jobs:
 
       - name: Cache SonarQube Cloud scanner
         id: cache-sonar-scanner
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ./.sonar/scanner
           key: ${{ runner.os }}-sonar-scanner-${{ hashFiles('**/.config/dotnet-tools.json') }}
