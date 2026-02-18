@@ -4,6 +4,8 @@
         <OutputType>Exe</OutputType>
         <IsTestProject>true</IsTestProject>
         <IsPackable>false</IsPackable>
+        <RefitterNoLogging>true</RefitterNoLogging>
+        <RefitterSkipValidation>true</RefitterSkipValidation>
     </PropertyGroup>
 
     <ItemGroup>
@@ -19,7 +21,8 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Shouldly"/>
-        <PackageReference Include="NSwag.MSBuild">
+        <PackageReference Include="Refit.HttpClientFactory"/>
+        <PackageReference Include="Refitter.MSBuild">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -28,18 +31,6 @@
     <ItemGroup>
         <None Include="appsettings.json" CopyToOutputDirectory="PreserveNewest"/>
         <None Include="appsettings.*.json" CopyToOutputDirectory="PreserveNewest"/>
-        <Compile Remove="OpenApi/Generated/**/*.cs"/>
     </ItemGroup>
-
-    <!--/-:msbuild-conditional:noEmit -->
-    <Target Name="GenerateOpenApiClient" BeforeTargets="CoreCompile">
-        <Message Text="Generating OpenApiClient from API project OpenApi spec" Importance="high"/>
-        <MakeDir Directories="OpenApi/Generated" Condition="!Exists('OpenApi/Generated')"/>
-        <Exec Command="$(NSwagExe_Net100) openapi2csclient /input:../../src/AppDomain.Api/OpenApi/openapi.json /classname:AppDomainApiClient /namespace:AppDomain.Tests.E2E.OpenApi.Generated /output:OpenApi/Generated/AppDomainApiClient.cs /generateResponseClasses:true /generateJsonMethods:true /useHttpClientCreationMethod:true"/>
-        <ItemGroup>
-            <Compile Include="OpenApi/Generated/AppDomainApiClient.cs"/>
-        </ItemGroup>
-    </Target>
-    <!--/+:msbuild-conditional:noEmit -->
 
 </Project>
