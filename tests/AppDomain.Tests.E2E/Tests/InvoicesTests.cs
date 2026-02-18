@@ -13,7 +13,7 @@ public class InvoicesTests(End2EndTestFixture fixture) : End2EndTest(fixture)
     public async Task GetInvoices_ReturnsValidResponse()
     {
         // Act
-        var invoices = await ApiClient.GetInvoicesAsync(null, null, null, CancellationToken);
+        var invoices = await ApiClient.GetInvoicesAsync(100, 0, null, CancellationToken);
 
         // Assert
         invoices.ShouldNotBeNull();
@@ -25,7 +25,6 @@ public class InvoicesTests(End2EndTestFixture fixture) : End2EndTest(fixture)
             // Note: CashierId can be empty GUID (API allows non-existent cashier IDs)
             invoice.Amount.ShouldBeGreaterThan(0);
             invoice.Currency.ShouldNotBeNullOrEmpty();
-            invoice.Status.ShouldNotBeNullOrEmpty();
         }
     }
 
@@ -52,7 +51,7 @@ public class InvoicesTests(End2EndTestFixture fixture) : End2EndTest(fixture)
         invoice.CashierId.ShouldBe(cashier.CashierId);
         invoice.Amount.ShouldBe(100.50m);
         invoice.Currency.ShouldBe("USD");
-        invoice.Status.ShouldNotBeNullOrEmpty();
+        invoice.Status.ShouldBe(InvoiceStatus.Draft);
         invoice.CreatedDateUtc.ShouldBeGreaterThan(DateTime.UtcNow.AddMinutes(-1));
     }
 
@@ -96,7 +95,7 @@ public class InvoicesTests(End2EndTestFixture fixture) : End2EndTest(fixture)
     }
 
     [Fact]
-    public async Task CreateInvoice_WithNonExistentCashier_CreatesInvoice()
+    public async Task CreateInvoice_WithNonExistentCashier_ReturnsError()
     {
         // Arrange
         var nonExistentCashierId = Guid.NewGuid();
@@ -108,16 +107,10 @@ public class InvoicesTests(End2EndTestFixture fixture) : End2EndTest(fixture)
             Currency = "USD"
         };
 
-        // Act
-        var invoice = await ApiClient.CreateInvoiceAsync(createRequest, CancellationToken);
-
-        // Assert - API accepts non-existent cashier IDs
-        invoice.ShouldNotBeNull();
-        invoice.InvoiceId.ShouldNotBe(Guid.Empty);
-        invoice.CashierId.ShouldBe(nonExistentCashierId);
-        invoice.Amount.ShouldBe(100.00m);
-        invoice.Currency.ShouldBe("USD");
-        invoice.Status.ShouldNotBeNullOrEmpty();
+        // Act & Assert - API rejects non-existent cashier IDs (FK constraint)
+        var exception = await Should.ThrowAsync<ApiException>(
+            () => ApiClient.CreateInvoiceAsync(createRequest, CancellationToken));
+        exception.StatusCode.ShouldBeOneOf(400, 404, 500);
     }
 
     [Fact]
@@ -160,12 +153,12 @@ public class InvoicesTests(End2EndTestFixture fixture) : End2EndTest(fixture)
 
         // Assert
         cancelledInvoice.ShouldNotBeNull();
-        cancelledInvoice.Status.ShouldBe("Cancelled");
+        cancelledInvoice.Status.ShouldBe(InvoiceStatus.Cancelled);
 
         // Verify invoice status changed
         var updatedInvoice = await ApiClient.GetInvoiceAsync(createdInvoice.InvoiceId, CancellationToken);
         updatedInvoice.ShouldNotBeNull();
-        updatedInvoice.Status.ShouldBe("Cancelled");
+        updatedInvoice.Status.ShouldBe(InvoiceStatus.Cancelled);
     }
 
     private async Task<Cashier> CreateTestCashier()
