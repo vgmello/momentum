@@ -13,9 +13,7 @@ public abstract class End2EndTest(End2EndTestFixture fixture)
 {
     protected TestSettings TestSettings => fixture.TestSettings;
 
-    protected HttpClient HttpClient => fixture.HttpClient;
-
-    protected AppDomainApiClient ApiClient => fixture.ApiClient;
+    protected IAppDomainApiClient ApiClient => fixture.ApiClient;
 
     protected static CancellationToken CancellationToken => TestContext.Current.CancellationToken;
 }

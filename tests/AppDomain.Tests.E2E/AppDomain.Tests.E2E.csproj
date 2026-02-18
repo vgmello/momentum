@@ -6,6 +6,8 @@
         <IsPackable>false</IsPackable>
         <RefitterNoLogging>true</RefitterNoLogging>
         <RefitterSkipValidation>true</RefitterSkipValidation>
+        <!-- Suppress CS1573 from Refitter-generated code (missing XML param tags for CancellationToken) -->
+        <NoWarn>$(NoWarn);1573</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -31,6 +33,12 @@
     <ItemGroup>
         <None Include="appsettings.json" CopyToOutputDirectory="PreserveNewest"/>
         <None Include="appsettings.*.json" CopyToOutputDirectory="PreserveNewest"/>
+        <Compile Remove="OpenApi/Generated/**/*.cs"/>
     </ItemGroup>
+
+    <!--/-:msbuild-conditional:noEmit -->
+    <!-- Refitter.MSBuild generates client code before CoreCompile and adds files to Compile.
+         We exclude OpenApi/Generated from default globbing above to avoid CS2002 (duplicate source). -->
+    <!--/+:msbuild-conditional:noEmit -->
 
 </Project>
