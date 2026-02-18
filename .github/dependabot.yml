@@ -55,7 +55,10 @@ updates:
         patterns:
           - "Scalar.AspNetCore"
           - "OrleansDashboard"
-          - "NSwag.*"
+      api-client:
+        patterns:
+          - "Refit*"
+          - "Refitter*"
       code-quality:
         patterns:
           - "SonarAnalyzer.*"
