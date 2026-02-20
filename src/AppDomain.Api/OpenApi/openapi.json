@@ -745,7 +745,7 @@
               "string"
             ],
             "description": "The invoice amount (required).",
-            "format": "double"
+            "format": "decimal"
           },
           "currency": {
             "type": "string",
@@ -825,11 +825,6 @@
           "name",
           "status",
           "amount",
-          "currency",
-          "dueDate",
-          "cashierId",
-          "amountPaid",
-          "paymentDate",
           "createdDateUtc",
           "updatedDateUtc",
           "version"
@@ -856,7 +851,7 @@
               "number",
               "string"
             ],
-            "format": "double"
+            "format": "decimal"
           },
           "currency": {
             "type": [
@@ -885,7 +880,7 @@
               "number",
               "string"
             ],
-            "format": "double"
+            "format": "decimal"
           },
           "paymentDate": {
             "type": [
@@ -942,7 +937,7 @@
               "string"
             ],
             "description": "The amount that was paid (required).",
-            "format": "double"
+            "format": "decimal"
           },
           "paymentDate": {
             "type": [
@@ -1060,7 +1055,7 @@
               "string"
             ],
             "description": "The payment amount to simulate (required).",
-            "format": "double"
+            "format": "decimal"
           },
           "currency": {
             "type": "string",

@@ -28,10 +28,7 @@ public sealed class End2EndTestFixture : IDisposable
             Timeout = TimeSpan.FromSeconds(TestSettings.TimeoutSeconds)
         };
 
-        ApiClient = new AppDomainApiClient(HttpClient)
-        {
-            BaseUrl = TestSettings.ApiUrl
-        };
+        ApiClient = new AppDomainApiClient(TestSettings.ApiUrl, HttpClient);
 
         LogTestConfiguration();
     }

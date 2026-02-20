@@ -13,7 +13,7 @@ public class CashiersTests(End2EndTestFixture fixture) : End2EndTest(fixture)
     public async Task GetCashiers_ReturnsValidResponse()
     {
         // Act
-        var cashiers = await ApiClient.GetCashiersAsync(null, null, CancellationToken);
+        var cashiers = await ApiClient.GetCashiersAsync(100, 0, CancellationToken);
 
         // Assert
         cashiers.ShouldNotBeNull();
@@ -31,10 +31,11 @@ public class CashiersTests(End2EndTestFixture fixture) : End2EndTest(fixture)
     public async Task CreateCashier_WithValidData_ReturnsCreatedCashier()
     {
         // Arrange
+        var uniqueId = Guid.NewGuid();
         var createRequest = new CreateCashierRequest
         {
-            Name = "Test Cashier",
-            Email = "test@example.com"
+            Name = $"Test Cashier {uniqueId}",
+            Email = $"test{uniqueId}@example.com"
         };
 
         // Act
@@ -43,18 +44,19 @@ public class CashiersTests(End2EndTestFixture fixture) : End2EndTest(fixture)
         // Assert
         cashier.ShouldNotBeNull();
         cashier.CashierId.ShouldNotBe(Guid.Empty);
-        cashier.Name.ShouldBe("Test Cashier");
-        cashier.Email.ShouldBe("test@example.com");
+        cashier.Name.ShouldBe(createRequest.Name);
+        cashier.Email.ShouldBe(createRequest.Email);
     }
 
     [Fact]
     public async Task CreateAndGetCashier_ReturnsCreatedCashier()
     {
         // Arrange
+        var uniqueId = Guid.NewGuid();
         var createRequest = new CreateCashierRequest
         {
-            Name = "Integration Test Cashier",
-            Email = "integration@example.com"
+            Name = $"Integration Test Cashier {uniqueId}",
+            Email = $"integration{uniqueId}@example.com"
         };
 
         // Act - Create
@@ -67,8 +69,8 @@ public class CashiersTests(End2EndTestFixture fixture) : End2EndTest(fixture)
         // Assert
         getCashier.ShouldNotBeNull();
         getCashier.CashierId.ShouldBe(createdCashier.CashierId);
-        getCashier.Name.ShouldBe("Integration Test Cashier");
-        getCashier.Email.ShouldBe("integration@example.com");
+        getCashier.Name.ShouldBe(createRequest.Name);
+        getCashier.Email.ShouldBe(createRequest.Email);
     }
 
     [Fact]
@@ -89,7 +91,7 @@ public class CashiersTests(End2EndTestFixture fixture) : End2EndTest(fixture)
         var invalidRequest = new CreateCashierRequest
         {
             Name = "",
-            Email = "test@example.com"
+            Email = $"test{Guid.NewGuid()}@example.com"
         };
 
         // Act & Assert
@@ -101,19 +103,21 @@ public class CashiersTests(End2EndTestFixture fixture) : End2EndTest(fixture)
     public async Task UpdateCashier_WithValidData_ReturnsUpdatedCashier()
     {
         // Arrange - Create a cashier first
+        var uniqueId = Guid.NewGuid();
         var createRequest = new CreateCashierRequest
         {
-            Name = "Original Name",
-            Email = "original@example.com"
+            Name = $"Original Name {uniqueId}",
+            Email = $"original{uniqueId}@example.com"
         };
 
         var createdCashier = await ApiClient.CreateCashierAsync(createRequest, CancellationToken);
         createdCashier.ShouldNotBeNull();
 
+        var updatedUniqueId = Guid.NewGuid();
         var updateRequest = new UpdateCashierRequest
         {
-            Name = "Updated Name",
-            Email = "updated@example.com",
+            Name = $"Updated Name {updatedUniqueId}",
+            Email = $"updated{updatedUniqueId}@example.com",
             Version = createdCashier.Version
         };
 
@@ -123,18 +127,19 @@ public class CashiersTests(End2EndTestFixture fixture) : End2EndTest(fixture)
         // Assert
         updatedCashier.ShouldNotBeNull();
         updatedCashier.CashierId.ShouldBe(createdCashier.CashierId);
-        updatedCashier.Name.ShouldBe("Updated Name");
-        updatedCashier.Email.ShouldBe("updated@example.com");
+        updatedCashier.Name.ShouldBe(updateRequest.Name);
+        updatedCashier.Email.ShouldBe(updateRequest.Email);
     }
 
     [Fact]
     public async Task DeleteCashier_ExistingCashier_ReturnsSuccess()
     {
         // Arrange - Create a cashier first
+        var uniqueId = Guid.NewGuid();
         var createRequest = new CreateCashierRequest
         {
-            Name = "To Be Deleted",
-            Email = "delete@example.com"
+            Name = $"To Be Deleted {uniqueId}",
+            Email = $"delete{uniqueId}@example.com"
         };
 
         var createdCashier = await ApiClient.CreateCashierAsync(createRequest, CancellationToken);
