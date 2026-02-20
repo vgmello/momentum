@@ -1,7 +1,7 @@
 import http from "k6/http";
 import { group, sleep } from "k6";
 import { endpoints, headers } from "../../config/endpoints.js";
-import { parseResponse, generateCashierData, customMetrics, logTestSummary } from "../../lib/helpers.js";
+import { parseResponse, generateCashierData, customMetrics, logTestSummary, random } from "../../lib/helpers.js";
 
 // Stress test configuration - aggressive performance testing
 export const options = {
@@ -152,7 +152,7 @@ export default function main() {
     });
 
     // Minimal sleep - high throughput
-    sleep(0.1 + Math.random() * 0.2);
+    sleep(0.1 + random() * 0.2);
 }
 
 // Test teardown

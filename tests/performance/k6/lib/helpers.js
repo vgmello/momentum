@@ -1,5 +1,6 @@
 import { check, sleep } from "k6";
 import { Rate, Trend } from "k6/metrics";
+import crypto from "k6/crypto";
 
 // Custom metrics
 export const customMetrics = {
@@ -9,12 +10,24 @@ export const customMetrics = {
     concurrentVersionErrors: new Rate("concurrent_version_errors"),
 };
 
+// Cryptographically secure random number [0, 1) using k6/crypto
+export function random() {
+    const bytes = crypto.randomBytes(4);
+    const view = new DataView(bytes);
+    return view.getUint32(0) / (0xffffffff + 1);
+}
+
+// Cryptographically secure random integer [0, max)
+export function randomInt(max) {
+    return Math.floor(random() * max);
+}
+
 // Helper function to generate random data
 export function generateRandomString(length = 10) {
     const characters = "abcdefghijklmnopqrstuvwxyz0123456789";
     let result = "";
     for (let i = 0; i < length; i++) {
-        result += characters.charAt(Math.floor(Math.random() * characters.length));
+        result += characters.charAt(randomInt(characters.length));
     }
     return result;
 }
@@ -28,18 +41,18 @@ export function generateEmail() {
 export function generateName() {
     const firstNames = ["John", "Jane", "Bob", "Alice", "Charlie", "Diana", "Eve", "Frank"];
     const lastNames = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller"];
-    return `${firstNames[Math.floor(Math.random() * firstNames.length)]} ${lastNames[Math.floor(Math.random() * lastNames.length)]}`;
+    return `${firstNames[randomInt(firstNames.length)]} ${lastNames[randomInt(lastNames.length)]}`;
 }
 
 // Generate random amount
 export function generateAmount(min = 10, max = 1000) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+    return Math.floor(random() * (max - min + 1)) + min;
 }
 
 // Generate future date
 export function generateFutureDate(daysAhead = 30) {
     const date = new Date();
-    date.setDate(date.getDate() + Math.floor(Math.random() * daysAhead) + 1);
+    date.setDate(date.getDate() + randomInt(daysAhead) + 1);
     return date.toISOString();
 }
 

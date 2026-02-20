@@ -1,7 +1,7 @@
 import http from "k6/http";
 import { group, sleep } from "k6";
 import { endpoints, headers } from "../../config/endpoints.js";
-import { checkResponse, parseResponse, generateCashierData, customMetrics, logTestSummary } from "../../lib/helpers.js";
+import { checkResponse, parseResponse, generateCashierData, customMetrics, logTestSummary, random } from "../../lib/helpers.js";
 import { Trend, Rate } from "k6/metrics";
 
 // Custom metrics for spike testing
@@ -150,7 +150,7 @@ function performAdditionalOperations(testResult, tenantId, currentPhase) {
     }
 
     // Update operation during spike
-    if (cashierVersion && Math.random() < 0.5) {
+    if (cashierVersion && random() < 0.5) {
         const updateData = {
             name: `Spike Test ${generateCashierData().name}`,
             email: generateCashierData().email,
@@ -168,7 +168,7 @@ function performAdditionalOperations(testResult, tenantId, currentPhase) {
     }
 
     // Clean up
-    if (Math.random() < 0.3) {
+    if (random() < 0.3) {
         http.del(endpoints.cashiers.delete(cashierId), null, {
             headers: headers.withTenant(tenantId),
             tags: {
@@ -181,7 +181,7 @@ function performAdditionalOperations(testResult, tenantId, currentPhase) {
 }
 
 function performListOperations(tenantId, currentPhase) {
-    if (Math.random() < 0.2) {
+    if (random() < 0.2) {
         http.get(`${endpoints.cashiers.list}?pageSize=50`, {
             headers: headers.withTenant(tenantId),
             tags: {
@@ -254,7 +254,7 @@ export default function main(data) {
 
     // Variable sleep based on phase
     const sleepTime = currentPhase.includes("spike") ? 0.05 : 0.5;
-    sleep(sleepTime + Math.random() * sleepTime);
+    sleep(sleepTime + random() * sleepTime);
 }
 
 // Test teardown

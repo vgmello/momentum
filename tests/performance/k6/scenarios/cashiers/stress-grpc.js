@@ -1,7 +1,7 @@
 import grpc from "k6/net/grpc";
 import { check, group, sleep } from "k6";
 import { endpoints } from "../../config/endpoints.js";
-import { generateCashierData, customMetrics, logTestSummary } from "../../lib/helpers.js";
+import { generateCashierData, customMetrics, logTestSummary, random } from "../../lib/helpers.js";
 import http from "k6/http";
 
 // Stress test configuration - aggressive gRPC performance testing
@@ -191,7 +191,7 @@ export default function main() {
     client.close();
 
     // Minimal sleep - high throughput
-    sleep(0.1 + Math.random() * 0.2);
+    sleep(0.1 + random() * 0.2);
 }
 
 // Test teardown
