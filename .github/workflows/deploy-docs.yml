@@ -75,10 +75,10 @@ jobs:
       - name: Deployment Summary
         shell: pwsh
         run: |
-          $args = @(
-            "-DocsUrl", "${{ steps.docs-deployment.outputs.page_url }}",
-            "-DocsPath", "${{ github.event.inputs.docs-path || 'libs/Momentum/docs' }}",
-            "-DeployDocs"
-          )
+          $summaryArgs = @{
+            DocsUrl = "${{ steps.docs-deployment.outputs.page_url }}"
+            DocsPath = "${{ github.event.inputs.docs-path || 'libs/Momentum/docs' }}"
+            DeployDocs = $true
+          }
 
-          & ./.github/scripts/Write-DeploymentSummary.ps1 @args
+          & ./.github/scripts/Write-DeploymentSummary.ps1 @summaryArgs

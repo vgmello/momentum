@@ -160,14 +160,14 @@ jobs:
       - name: Deployment Summary
         shell: pwsh
         run: |
-          $args = @(
-            "-ReleaseVersion", "${{ steps.release-version.outputs.next-version }}",
-            "-ReleaseTag", "${{ steps.release-version.outputs.next-tag }}",
-            "-NugetSource", "${{ env.NUGET_SOURCE }}"
-          )
-
-          if ("${{ steps.config.outputs.prerelease }}" -eq "true") {
-            $args += "-DeployPrerelease"
+          $summaryArgs = @{
+            ReleaseVersion = "${{ steps.release-version.outputs.next-version }}"
+            ReleaseTag = "${{ steps.release-version.outputs.next-tag }}"
+            NugetSource = "${{ env.NUGET_SOURCE }}"
           }
 
-          & ./.github/scripts/Write-DeploymentSummary.ps1 @args
+          if ("${{ steps.config.outputs.prerelease }}" -eq "true") {
+            $summaryArgs["DeployPrerelease"] = $true
+          }
+
+          & ./.github/scripts/Write-DeploymentSummary.ps1 @summaryArgs
