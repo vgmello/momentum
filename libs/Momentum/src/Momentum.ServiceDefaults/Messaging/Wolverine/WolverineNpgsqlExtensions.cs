@@ -2,7 +2,6 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
-using Wolverine;
 using Wolverine.Postgresql;
 
 namespace Momentum.ServiceDefaults.Messaging.Wolverine;

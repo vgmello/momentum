@@ -3,7 +3,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Momentum.ServiceDefaults.Messaging.Wolverine;
-using Wolverine;
 
 namespace Momentum.ServiceDefaults.Messaging;
 

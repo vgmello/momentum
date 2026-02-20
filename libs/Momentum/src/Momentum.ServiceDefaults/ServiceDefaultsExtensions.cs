@@ -1,6 +1,5 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-using FluentValidation;
 using JasperFx;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;

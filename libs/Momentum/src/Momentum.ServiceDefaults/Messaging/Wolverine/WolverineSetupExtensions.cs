@@ -8,7 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Momentum.ServiceDefaults.Messaging.Middlewares;
 using System.Reflection;
-using Wolverine;
 using Wolverine.Runtime;
 
 namespace Momentum.ServiceDefaults.Messaging.Wolverine;

@@ -3,8 +3,6 @@
 using JasperFx.CodeGeneration;
 using JasperFx.CodeGeneration.Frames;
 using JasperFx.CodeGeneration.Model;
-using Momentum.Extensions;
-using Momentum.Extensions.Abstractions.Messaging;
 using Wolverine.Runtime;
 using Wolverine.Runtime.Handlers;
 

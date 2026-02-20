@@ -1,8 +1,5 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-using FluentValidation;
-using FluentValidation.Results;
-
 namespace Momentum.ServiceDefaults.Messaging.Middlewares;
 
 /// <summary>

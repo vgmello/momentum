@@ -1,7 +1,6 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
 using Microsoft.Extensions.DependencyInjection;
-using Momentum.Extensions.Abstractions.Extensions;
 using System.Collections.Concurrent;
 using System.Diagnostics.Metrics;
 
