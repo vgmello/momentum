@@ -7,6 +7,21 @@ on:
     paths:
       - "libs/Momentum/src/**"
       - "libs/Momentum/docs/**"
+      - ".template.config/**"
+      - ".vscode/**"
+      - "src/**"
+      - "docs/**"
+      - "infra/**"
+      - "tests/**"
+      - "libs/Momentum/Momentum.Template.csproj"
+      - "compose.yml"
+      - "README.md"
+      - "ProjectREADME.md"
+      - "Directory.Build.props"
+      - "Directory.Packages.props"
+      - "AppDomain.slnx"
+      - "AppDomain.ruleset"
+      - ".gitignore"
     tags:
       - "release"
 

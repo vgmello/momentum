@@ -2,36 +2,13 @@ name: Publish Momentum Template
 
 on:
   # Run after publish-libs workflow completes successfully
+  # This is the only automatic trigger - ensures template always publishes with latest lib version
   workflow_run:
     workflows: ["Publish Momentum Libraries"]
     types:
       - completed
     branches:
       - main
-
-  # Run independently when template-specific paths change (excluding libs paths)
-  push:
-    branches:
-      - main
-    paths:
-      - ".template.config/**"
-      - ".vscode/**"
-      - "src/**"
-      - "docs/**"
-      - "infra/**"
-      - "tests/**"
-      - "libs/Momentum/Momentum.Template.csproj"
-      - "compose.yml"
-      - "README.md"
-      - "ProjectREADME.md"
-      - "Directory.Build.props"
-      - "Directory.Packages.props"
-      - "AppDomain.slnx"
-      - "AppDomain.ruleset"
-      - ".gitignore"
-
-    tags:
-      - "release"
 
   workflow_dispatch:
     inputs:
