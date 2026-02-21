@@ -82,7 +82,7 @@
     <PackageVersion Include="OneOf.SourceGenerator" Version="3.0.271" />
     <PackageVersion Include="Refit" Version="10.0.1" />
     <PackageVersion Include="Refit.HttpClientFactory" Version="10.0.1" />
-    <PackageVersion Include="Refitter.MSBuild" Version="1.6.5" />
+    <PackageVersion Include="Refitter.MSBuild" Version="1.7.3" />
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemetryVersion)" />
     <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryVersion)" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="$(OpenTelemetryVersion)" />
