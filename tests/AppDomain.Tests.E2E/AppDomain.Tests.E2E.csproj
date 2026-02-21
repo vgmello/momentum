@@ -5,6 +5,9 @@
         <IsTestProject>true</IsTestProject>
         <IsPackable>false</IsPackable>
         <RefitterNoLogging>true</RefitterNoLogging>
+        <!-- Refitter 1.7.3 bundles Microsoft.OpenApi v1.6 for validation, which doesn't support OpenAPI 3.1.
+             NSwag (used for actual generation) handles 3.1 fine. Skip validation until Refitter upgrades. -->
+        <RefitterSkipValidation>true</RefitterSkipValidation>
     </PropertyGroup>
 
     <ItemGroup>
