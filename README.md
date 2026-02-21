@@ -60,6 +60,7 @@ Momentum is built on modern, production-proven technologies:
 -   **🗄️ PostgreSQL**: Robust relational database with JSON support
 -   **🔄 Liquibase**: Version-controlled database migrations
 -   **📊 OpenTelemetry**: Distributed tracing and observability
+-   **🔌 Refit + Refitter**: Type-safe REST API clients with OpenAPI code generation
 -   **🧪 Testcontainers**: Real infrastructure for integration testing
 
 ## Template System Overview
@@ -892,6 +893,7 @@ Momentum makes use of several outstanding open-source libraries and frameworks. 
 -   **[Mapperly](https://github.com/riok/mapperly)**: A .NET source generator for generating object mappings at compile-time, offering zero-overhead and type-safe mapping.
 -   **[Microsoft Orleans](https://dotnet.github.io/orleans/)**: A cross-platform framework for building robust, scalable distributed applications with virtual actors.
 -   **[.NET Aspire](https://github.com/dotnet/aspire)**: An opinionated, cloud-ready stack for building observable, production-ready distributed applications.
+-   **[Asp.Versioning](https://github.com/dotnet/aspnet-api-versioning)**: API versioning for ASP.NET Core with support for URL, query string, and header-based versioning.
 
 ### Data & Messaging
 
@@ -902,6 +904,11 @@ Momentum makes use of several outstanding open-source libraries and frameworks. 
 -   **[Npgsql](https://www.npgsql.org/)**: The .NET data provider for PostgreSQL.
 -   **[Liquibase](https://www.liquibase.com/)**: Database schema change management and version control.
 
+### API Client Generation
+
+-   **[Refit](https://github.com/reactiveui/refit)**: Automatic type-safe REST library for .NET that turns REST APIs into live interfaces.
+-   **[Refitter](https://github.com/christianhelle/refitter)**: OpenAPI client code generation via MSBuild, producing Refit interfaces and contracts from OpenAPI specifications at build time.
+
 ### Testing & Quality
 
 -   **[xUnit v3](https://xunit.net/)**: Modern, extensible testing framework for .NET applications.
@@ -909,6 +916,9 @@ Momentum makes use of several outstanding open-source libraries and frameworks. 
 -   **[Testcontainers](https://dotnet.testcontainers.org/)**: A library to support tests with throwaway instances of Docker containers.
 -   **[NSubstitute](https://nsubstitute.github.io/)**: A friendly substitute for .NET mocking libraries.
 -   **[NetArchTest](https://github.com/BenMorris/NetArchTest)**: A fluent API for .NET that can enforce architectural rules in unit tests.
+-   **[Bogus](https://github.com/bchavez/Bogus)**: A simple fake data generator for .NET, useful for creating realistic test data.
+-   **[coverlet](https://github.com/coverlet-coverage/coverlet)**: Cross-platform code coverage library for .NET with support for line, branch, and method coverage.
+-   **[SonarAnalyzer](https://github.com/SonarSource/sonar-dotnet)**: Static code analysis for C# to detect bugs, vulnerabilities, and code smells.
 
 ### Observability & Infrastructure
 
