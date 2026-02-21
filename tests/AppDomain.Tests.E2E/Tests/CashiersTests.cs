@@ -15,7 +15,7 @@ public class CashiersTests(End2EndTestFixture fixture) : End2EndTest(fixture)
     public async Task GetCashiers_ReturnsValidResponse()
     {
         // Act
-        var cashiers = await ApiClient.GetCashiers(100, 0, CancellationToken);
+        var cashiers = await ApiClient.GetCashiersAsync(100, 0, CancellationToken);
 
         // Assert
         cashiers.ShouldNotBeNull();
@@ -41,7 +41,7 @@ public class CashiersTests(End2EndTestFixture fixture) : End2EndTest(fixture)
         };
 
         // Act
-        var cashier = await ApiClient.CreateCashier(createRequest, CancellationToken);
+        var cashier = await ApiClient.CreateCashierAsync(createRequest, CancellationToken);
 
         // Assert
         cashier.ShouldNotBeNull();
@@ -62,11 +62,11 @@ public class CashiersTests(End2EndTestFixture fixture) : End2EndTest(fixture)
         };
 
         // Act - Create
-        var createdCashier = await ApiClient.CreateCashier(createRequest, CancellationToken);
+        var createdCashier = await ApiClient.CreateCashierAsync(createRequest, CancellationToken);
         createdCashier.ShouldNotBeNull();
 
         // Act - Get by ID
-        var getCashier = await ApiClient.GetCashier(createdCashier.CashierId, CancellationToken);
+        var getCashier = await ApiClient.GetCashierAsync(createdCashier.CashierId, CancellationToken);
 
         // Assert
         getCashier.ShouldNotBeNull();
@@ -82,7 +82,7 @@ public class CashiersTests(End2EndTestFixture fixture) : End2EndTest(fixture)
         var nonExistentId = Guid.NewGuid();
 
         // Act & Assert
-        var exception = await Should.ThrowAsync<ApiException>(() => ApiClient.GetCashier(nonExistentId, CancellationToken));
+        var exception = await Should.ThrowAsync<ApiException>(() => ApiClient.GetCashierAsync(nonExistentId, CancellationToken));
         exception.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 
@@ -97,7 +97,7 @@ public class CashiersTests(End2EndTestFixture fixture) : End2EndTest(fixture)
         };
 
         // Act & Assert
-        var exception = await Should.ThrowAsync<ApiException>(() => ApiClient.CreateCashier(invalidRequest, CancellationToken));
+        var exception = await Should.ThrowAsync<ApiException>(() => ApiClient.CreateCashierAsync(invalidRequest, CancellationToken));
         exception.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
     }
 
@@ -112,7 +112,7 @@ public class CashiersTests(End2EndTestFixture fixture) : End2EndTest(fixture)
             Email = $"original{uniqueId}@example.com"
         };
 
-        var createdCashier = await ApiClient.CreateCashier(createRequest, CancellationToken);
+        var createdCashier = await ApiClient.CreateCashierAsync(createRequest, CancellationToken);
         createdCashier.ShouldNotBeNull();
 
         var updatedUniqueId = Guid.NewGuid();
@@ -124,7 +124,7 @@ public class CashiersTests(End2EndTestFixture fixture) : End2EndTest(fixture)
         };
 
         // Act
-        var updatedCashier = await ApiClient.UpdateCashier(createdCashier.CashierId, updateRequest, CancellationToken);
+        var updatedCashier = await ApiClient.UpdateCashierAsync(createdCashier.CashierId, updateRequest, CancellationToken);
 
         // Assert
         updatedCashier.ShouldNotBeNull();
@@ -144,14 +144,14 @@ public class CashiersTests(End2EndTestFixture fixture) : End2EndTest(fixture)
             Email = $"delete{uniqueId}@example.com"
         };
 
-        var createdCashier = await ApiClient.CreateCashier(createRequest, CancellationToken);
+        var createdCashier = await ApiClient.CreateCashierAsync(createRequest, CancellationToken);
         createdCashier.ShouldNotBeNull();
 
         // Act
-        await ApiClient.DeleteCashier(createdCashier.CashierId, CancellationToken);
+        await ApiClient.DeleteCashierAsync(createdCashier.CashierId, CancellationToken);
 
         // Assert - Verify cashier was deleted
-        var exception = await Should.ThrowAsync<ApiException>(() => ApiClient.GetCashier(createdCashier.CashierId, CancellationToken));
+        var exception = await Should.ThrowAsync<ApiException>(() => ApiClient.GetCashierAsync(createdCashier.CashierId, CancellationToken));
         exception.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 }
