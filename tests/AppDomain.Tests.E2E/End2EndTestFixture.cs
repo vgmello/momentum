@@ -3,7 +3,7 @@
 using AppDomain.Tests.E2E.OpenApi.Generated;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.CommandLine;
-using Microsoft.Extensions.DependencyInjection;
+using Refit;
 
 namespace AppDomain.Tests.E2E;
 
@@ -12,9 +12,9 @@ namespace AppDomain.Tests.E2E;
 /// </summary>
 public sealed class End2EndTestFixture : IDisposable
 {
-    private readonly ServiceProvider _serviceProvider;
-
     public TestSettings TestSettings { get; }
+
+    public HttpClient HttpClient { get; }
 
     public IAppDomainApiClient ApiClient { get; }
 
@@ -24,14 +24,13 @@ public sealed class End2EndTestFixture : IDisposable
 
         TestSettings = configuration.GetSection(nameof(TestSettings)).Get<TestSettings>() ?? new TestSettings();
 
-        var services = new ServiceCollection();
-        services.ConfigureRefitClients(
-            new Uri(TestSettings.ApiUrl),
-            builder => builder.ConfigureHttpClient(c =>
-                c.Timeout = TimeSpan.FromSeconds(TestSettings.TimeoutSeconds)));
+        HttpClient = new HttpClient
+        {
+            BaseAddress = new Uri(TestSettings.ApiUrl),
+            Timeout = TimeSpan.FromSeconds(TestSettings.TimeoutSeconds)
+        };
 
-        _serviceProvider = services.BuildServiceProvider();
-        ApiClient = _serviceProvider.GetRequiredService<IAppDomainApiClient>();
+        ApiClient = RestService.For<IAppDomainApiClient>(HttpClient);
 
         LogTestConfiguration();
     }
@@ -68,6 +67,6 @@ public sealed class End2EndTestFixture : IDisposable
 
     public void Dispose()
     {
-        _serviceProvider.Dispose();
+        HttpClient.Dispose();
     }
 }

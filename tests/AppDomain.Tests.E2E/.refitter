@@ -11,7 +11,7 @@
   "returnIApiResponse": false,
   "useCancellationTokens": true,
   "typeAccessibility": "Public",
-  "dependencyInjectionSettings": {},
+  "operationNameTemplate": "{operationName}Async",
   "outputFolder": "./OpenApi/Generated",
   "outputFilename": "AppDomainApiClient.cs"
 }
