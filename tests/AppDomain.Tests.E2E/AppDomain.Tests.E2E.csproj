@@ -4,6 +4,10 @@
         <OutputType>Exe</OutputType>
         <IsTestProject>true</IsTestProject>
         <IsPackable>false</IsPackable>
+        <RefitterNoLogging>true</RefitterNoLogging>
+        <!-- Refitter 1.7.3 bundles Microsoft.OpenApi v1.6 for validation, which doesn't support OpenAPI 3.1.
+             NSwag (used for actual generation) handles 3.1 fine. Skip validation until Refitter upgrades. -->
+        <RefitterSkipValidation>true</RefitterSkipValidation>
     </PropertyGroup>
 
     <ItemGroup>
@@ -19,7 +23,8 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Shouldly"/>
-        <PackageReference Include="NSwag.MSBuild">
+        <PackageReference Include="Refit.HttpClientFactory"/>
+        <PackageReference Include="Refitter.MSBuild">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -32,14 +37,8 @@
     </ItemGroup>
 
     <!--/-:msbuild-conditional:noEmit -->
-    <Target Name="GenerateOpenApiClient" BeforeTargets="CoreCompile">
-        <Message Text="Generating OpenApiClient from API project OpenApi spec" Importance="high"/>
-        <MakeDir Directories="OpenApi/Generated" Condition="!Exists('OpenApi/Generated')"/>
-        <Exec Command="$(NSwagExe_Net100) openapi2csclient /input:../../src/AppDomain.Api/OpenApi/openapi.json /classname:AppDomainApiClient /namespace:AppDomain.Tests.E2E.OpenApi.Generated /output:OpenApi/Generated/AppDomainApiClient.cs /generateResponseClasses:true /generateJsonMethods:true /useHttpClientCreationMethod:true"/>
-        <ItemGroup>
-            <Compile Include="OpenApi/Generated/AppDomainApiClient.cs"/>
-        </ItemGroup>
-    </Target>
+    <!-- Refitter.MSBuild generates client code before CoreCompile and adds files to Compile.
+         We exclude OpenApi/Generated from default globbing above to avoid CS2002 (duplicate source). -->
     <!--/+:msbuild-conditional:noEmit -->
 
 </Project>

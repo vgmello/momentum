@@ -79,7 +79,7 @@ public static class OpenApiExtensions
 
     /// <summary>
     ///     Sets the format of <c>decimal</c> types to <c>"decimal"</c> instead of the default <c>"double"</c>,
-    ///     ensuring NSwag generates <c>decimal</c> in C# client code.
+    ///     ensuring OpenAPI client generators produce <c>decimal</c> in C# client code.
     /// </summary>
     private static void AddDecimalFormatFix(OpenApiOptions options)
     {

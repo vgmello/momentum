@@ -1,6 +1,8 @@
 // Copyright (c) OrgName. All rights reserved.
 
+using System.Net;
 using AppDomain.Tests.E2E.OpenApi.Generated;
+using Refit;
 
 namespace AppDomain.Tests.E2E.Tests;
 
@@ -81,7 +83,7 @@ public class CashiersTests(End2EndTestFixture fixture) : End2EndTest(fixture)
 
         // Act & Assert
         var exception = await Should.ThrowAsync<ApiException>(() => ApiClient.GetCashierAsync(nonExistentId, CancellationToken));
-        exception.StatusCode.ShouldBe(404);
+        exception.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 
     [Fact]
@@ -96,7 +98,7 @@ public class CashiersTests(End2EndTestFixture fixture) : End2EndTest(fixture)
 
         // Act & Assert
         var exception = await Should.ThrowAsync<ApiException>(() => ApiClient.CreateCashierAsync(invalidRequest, CancellationToken));
-        exception.StatusCode.ShouldBe(400);
+        exception.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
     }
 
     [Fact]
@@ -150,6 +152,6 @@ public class CashiersTests(End2EndTestFixture fixture) : End2EndTest(fixture)
 
         // Assert - Verify cashier was deleted
         var exception = await Should.ThrowAsync<ApiException>(() => ApiClient.GetCashierAsync(createdCashier.CashierId, CancellationToken));
-        exception.StatusCode.ShouldBe(404);
+        exception.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 }

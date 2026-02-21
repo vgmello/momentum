@@ -1,6 +1,8 @@
 // Copyright (c) OrgName. All rights reserved.
 
+using System.Net;
 using AppDomain.Tests.E2E.OpenApi.Generated;
+using Refit;
 
 namespace AppDomain.Tests.E2E.Tests;
 
@@ -52,7 +54,7 @@ public class InvoicesTests(End2EndTestFixture fixture) : End2EndTest(fixture)
         invoice.Amount.ShouldBe(100.50m);
         invoice.Currency.ShouldBe("USD");
         invoice.Status.ShouldBe(InvoiceStatus.Draft);
-        invoice.CreatedDateUtc.ShouldBeGreaterThan(DateTime.UtcNow.AddMinutes(-1));
+        invoice.CreatedDateUtc.ShouldBeGreaterThan(DateTimeOffset.UtcNow.AddMinutes(-1));
     }
 
     [Fact]
@@ -91,7 +93,7 @@ public class InvoicesTests(End2EndTestFixture fixture) : End2EndTest(fixture)
 
         // Act & Assert
         var exception = await Should.ThrowAsync<ApiException>(() => ApiClient.GetInvoiceAsync(nonExistentId, CancellationToken));
-        exception.StatusCode.ShouldBe(404);
+        exception.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 
     [Fact]
@@ -110,7 +112,7 @@ public class InvoicesTests(End2EndTestFixture fixture) : End2EndTest(fixture)
         // Act & Assert - API rejects non-existent cashier IDs (FK constraint)
         var exception = await Should.ThrowAsync<ApiException>(
             () => ApiClient.CreateInvoiceAsync(createRequest, CancellationToken));
-        exception.StatusCode.ShouldBeOneOf(400, 404, 500);
+        ((int)exception.StatusCode).ShouldBeOneOf(400, 404, 500);
     }
 
     [Fact]
@@ -128,7 +130,7 @@ public class InvoicesTests(End2EndTestFixture fixture) : End2EndTest(fixture)
 
         // Act & Assert
         var exception = await Should.ThrowAsync<ApiException>(() => ApiClient.CreateInvoiceAsync(invalidRequest, CancellationToken));
-        exception.StatusCode.ShouldBe(400);
+        exception.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
     }
 
     [Fact]

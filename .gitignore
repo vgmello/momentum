@@ -429,9 +429,6 @@ FodyWeavers.xsd
 # Internal Generated Code
 **/Internal/Generated/
 
-# Generated OpenAPI clients
-**/OpenApi/Generated/
-
 # macOS metadata files
 .DS_Store
 ._*
