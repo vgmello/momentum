@@ -58,6 +58,11 @@
     Note: all existing Momentum templates are always uninstalled before testing regardless
     of this flag to avoid false positives.
 
+.PARAMETER Parallel
+    Run tests in parallel using PowerShell 7 ForEach-Object -Parallel.
+    Tests run 4-at-a-time. Console output is batched per test (not interleaved).
+    Default: false (sequential execution).
+
 .EXAMPLE
     ./Run-TemplateTests.ps1
     Run all test categories
@@ -73,6 +78,10 @@
 .EXAMPLE
     ./Run-TemplateTests.ps1 -SkipRestoreTemplate
     Run tests without reinstalling the repo root template afterwards
+
+.EXAMPLE
+    ./Run-TemplateTests.ps1 -Parallel
+    Run all tests with up to 4 tests executing concurrently
 #>
 
 [CmdletBinding(DefaultParameterSetName = 'Run')]
@@ -101,7 +110,10 @@ param(
     [switch]$IncludeE2E,
 
     [Parameter(ParameterSetName = 'Run')]
-    [switch]$SkipRestoreTemplate
+    [switch]$SkipRestoreTemplate,
+
+    [Parameter(ParameterSetName = 'Run')]
+    [switch]$Parallel
 )
 
 $ErrorActionPreference = 'Stop'
