@@ -172,6 +172,34 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: dotnet sonarscanner end /d:sonar.token="$SONAR_TOKEN"
 
+      - name: Rename test results
+        if: always()
+        shell: bash
+        run: |
+          shopt -s nullglob
+          declare -A fallback=( [appdomain]="AppDomain.Tests" [momentum]="Momentum.Tests" )
+          for f in TestResults/*.trx; do
+            name=$(grep -oPm1 'codeBase="[^"]*[/\\]\K[^/\\"]+(?=\.dll")' "$f" || true)
+            if [ -n "$name" ] && [ ! -f "TestResults/${name}.trx" ]; then
+              mv "$f" "TestResults/${name}.trx"
+              continue
+            fi
+            # Fallback: map known prefixes to clean names
+            base=$(basename "$f")
+            for prefix in "${!fallback[@]}"; do
+              if [[ "$base" == ${prefix}_* ]]; then
+                target="${fallback[$prefix]}.trx"
+                i=1
+                while [ -f "TestResults/${target}" ]; do
+                  target="${fallback[$prefix]}.${i}.trx"
+                  i=$((i + 1))
+                done
+                mv "$f" "TestResults/${target}"
+                break
+              fi
+            done
+          done
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
@@ -179,21 +207,6 @@ jobs:
           name: test-results
           path: TestResults/
           retention-days: 7
-
-      - name: Rename test results for reporting
-        if: always()
-        shell: bash
-        run: |
-          shopt -s nullglob
-          for f in TestResults/*.trx; do
-            name=$(grep -oPm1 'codeBase="[^"]*[/\\]\K[^/\\"]+(?=\.dll")' "$f" || true)
-            if [ -z "$name" ]; then
-              name=$(grep -oPm1 'Discover\w+:\s+\K\S+' "$f" || true)
-            fi
-            if [ -n "$name" ] && [ ! -f "TestResults/${name}.trx" ]; then
-              mv "$f" "TestResults/${name}.trx"
-            fi
-          done
 
       - name: Test report
         if: always()
@@ -241,7 +254,7 @@ jobs:
         shell: pwsh
         run: |
           Write-Host "🧪 Running real-world pattern template tests..."
-          & ./scripts/Run-TemplateTests.ps1 -Category real-world-patterns -MaxFailures 3 -KeepResultsWithErrors:$false -SkipRestoreTemplate -Parallel
+          & ./scripts/Run-TemplateTests.ps1 -Category real-world-patterns -MaxFailures 3 -KeepResultsWithErrors:$false -SkipRestoreTemplate
 
   docs-build:
     name: Verify Documentation Build
