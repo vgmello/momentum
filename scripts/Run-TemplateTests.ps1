@@ -7,14 +7,18 @@
 .DESCRIPTION
     Comprehensive test suite for the Momentum .NET template (mmt) covering all critical scenarios:
 
-    • Component isolation testing
-    • Infrastructure variation testing
-    • Configuration edge case testing
-    • Real-world pattern testing
-    • Automated validation
+    Categories:
+    • component-isolation    - Test each component in isolation
+    • port-config           - Test port boundaries and common conflicts
+    • org-names             - Validate special characters handling
+    • library-config        - Test library reference combinations
+    • real-world-patterns   - Validate common deployment scenarios
+    • orleans-combinations  - Test stateful processing configurations
+    • edge-cases           - Test boundary conditions and special modes
 
     Features:
     • 7 test categories with ~20 parametrized tests
+    • Parallel execution by default (4 concurrent tests)
     • Immediate cleanup after each test to conserve disk space
     • Selective preservation of failed tests for debugging
     • Early exit on maximum failures
@@ -61,7 +65,7 @@
 .PARAMETER Parallel
     Run tests in parallel using PowerShell 7 ForEach-Object -Parallel.
     Tests run 4-at-a-time. Console output is batched per test (not interleaved).
-    Default: false (sequential execution).
+    Default: true (parallel execution). Pass -Parallel $false for sequential.
     Note: In parallel mode, all tests run to completion. MaxFailures only controls
     whether remaining results are processed after failures are detected.
 
@@ -82,8 +86,8 @@
     Run tests without reinstalling the repo root template afterwards
 
 .EXAMPLE
-    ./Run-TemplateTests.ps1 -Parallel
-    Run all tests with up to 4 tests executing concurrently
+    ./Run-TemplateTests.ps1 -Parallel $false
+    Run all tests sequentially (one at a time)
 #>
 
 [CmdletBinding(DefaultParameterSetName = 'Run')]
@@ -115,7 +119,7 @@ param(
     [switch]$SkipRestoreTemplate,
 
     [Parameter(ParameterSetName = 'Run')]
-    [switch]$Parallel
+    [bool]$Parallel = $true
 )
 
 $ErrorActionPreference = 'Stop'

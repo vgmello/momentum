@@ -1,9 +1,10 @@
 # Momentum .NET
 
-[![NuGet](https://img.shields.io/nuget/v/Momentum.Extensions.Abstractions?style=flat-square&color=green)](https://www.nuget.org/packages/Momentum.Extensions.Abstractions)
-[![NuGet Preview](https://img.shields.io/nuget/vpre/Momentum.Extensions.Abstractions?style=flat-square&label=nuget-preview)](https://www.nuget.org/packages/Momentum.Extensions.Abstractions)
+[![NuGet](https://img.shields.io/nuget/v/Momentum.Extensions.Abstractions?style=flat-square&color=blue)](https://www.nuget.org/packages/Momentum.Extensions.Abstractions)
 [![Downloads](https://img.shields.io/nuget/dt/Momentum.Extensions.Abstractions?style=flat-square)](https://www.nuget.org/packages/Momentum.Extensions.Abstractions)
-[![License](https://img.shields.io/github/license/vgmello/momentum?style=flat-square)](https://github.com/vgmello/momentum/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/vgmello/momentum?style=flat-square&color=brightgreen)](https://github.com/vgmello/momentum/blob/main/LICENSE)
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/vgmello/momentum/ci.yml?style=flat-square&logo=github&label=CI)
+](https://github.com/vgmello/momentum/actions/workflows/ci.yml)
 
 Welcome to **Momentum** - a comprehensive .NET 10 template system that generates complete, production-ready microservices solutions. Whether you're building APIs, event-driven backends, or stateful processing systems, Momentum provides the architecture, patterns, and infrastructure you need to get productive immediately.
 
