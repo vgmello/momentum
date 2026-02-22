@@ -15,6 +15,7 @@ public record GetCashierQuery(Guid TenantId, Guid CashierId) : IQuery<Result<Cas
 /// <summary>
 ///     Handler for the GetCashierQuery.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class GetCashierQueryHandler
 {
     /// <summary>

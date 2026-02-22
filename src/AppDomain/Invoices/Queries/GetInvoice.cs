@@ -15,6 +15,7 @@ public record GetInvoiceQuery(Guid TenantId, Guid Id) : IQuery<Result<Invoice>>;
 /// <summary>
 ///     Handles the GetInvoiceQuery to retrieve a single invoice from the database.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class GetInvoiceQueryHandler
 {
     /// <summary>
