@@ -8,6 +8,7 @@ using Wolverine.Runtime.Handlers;
 
 namespace Momentum.ServiceDefaults.Messaging.Middlewares;
 
+[ExcludeFromCodeCoverage]
 public class FluentValidationPolicy : IHandlerPolicy
 {
     public void Apply(IReadOnlyList<HandlerChain> chains, GenerationRules rules, IServiceContainer container)

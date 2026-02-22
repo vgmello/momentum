@@ -6,6 +6,7 @@ using Momentum.ServiceDefaults.Messaging.Wolverine;
 
 namespace Momentum.ServiceDefaults.Messaging;
 
+[ExcludeFromCodeCoverage]
 public static class MessagingSetupExtensions
 {
     /// <summary>

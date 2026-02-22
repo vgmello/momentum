@@ -6,6 +6,7 @@ using Wolverine.Postgresql;
 
 namespace Momentum.ServiceDefaults.Messaging.Wolverine;
 
+[ExcludeFromCodeCoverage]
 public class WolverineNpgsqlExtensions(IConfiguration configuration, IOptions<ServiceBusOptions> serviceBusOptions)
     : IConfigureOptions<WolverineOptions>
 {

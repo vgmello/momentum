@@ -15,6 +15,7 @@ namespace Momentum.ServiceDefaults.Messaging.Middlewares;
 ///     already have it, ensuring consistent exception handling across the messaging system.
 ///     The policy is registered during Wolverine configuration and applies to all discovered handlers.
 /// </remarks>
+[ExcludeFromCodeCoverage]
 public class ExceptionHandlingPolicy : IHandlerPolicy
 {
     /// <summary>

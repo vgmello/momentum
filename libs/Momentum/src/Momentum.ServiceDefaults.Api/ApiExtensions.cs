@@ -1,5 +1,7 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 using Grpc.AspNetCore.Server;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -12,7 +14,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenTelemetry.Trace;
 using Scalar.AspNetCore;
-using System.Text.Json.Serialization;
 
 namespace Momentum.ServiceDefaults.Api;
 
@@ -21,11 +22,13 @@ namespace Momentum.ServiceDefaults.Api;
 ///     from <see cref="ApiExtensions.AddApiServiceDefaults" /> to
 ///     <see cref="ApiExtensions.ConfigureApiUsingDefaults" />.
 /// </summary>
+[ExcludeFromCodeCoverage]
 internal sealed record ApiAuthConfiguration(bool RequireAuth);
 
 /// <summary>
 ///     Provides extension methods for configuring API services with sensible defaults.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class ApiExtensions
 {
     /// <summary>

@@ -422,6 +422,7 @@ FodyWeavers.xsd
 **/docs/.vitepress/cache
 **/docs/.vitepress/dist
 **/docs/.vitepress/.temp
+**/docs/plans/
 
 # Idea / Rider files
 .idea/
@@ -439,6 +440,7 @@ requirements/
 
 _temp
 _template_tests/
+.local/tools/
 .pnpm-store/
 docs/obj**
 

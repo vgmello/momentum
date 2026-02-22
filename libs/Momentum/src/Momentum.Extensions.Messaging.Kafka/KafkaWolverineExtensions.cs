@@ -1,5 +1,6 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
+using System.Diagnostics.CodeAnalysis;
 using JasperFx.Core.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -14,6 +15,7 @@ namespace Momentum.Extensions.Messaging.Kafka;
 /// <summary>
 ///     Wolverine extension for configuring distributed events with Kafka.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class KafkaWolverineExtensions(
     ILogger<KafkaWolverineExtensions> logger,
     IConfiguration configuration,

@@ -19,6 +19,7 @@ namespace Momentum.ServiceDefaults.Messaging.Middlewares;
 ///     This ensures that exceptions are properly tracked in the message envelope for
 ///     logging and metrics purposes while still allowing Wolverine to handle retries and DLQ.
 /// </remarks>
+[ExcludeFromCodeCoverage]
 public class ExceptionHandlingFrame : SyncFrame
 {
     private Variable? _envelope;

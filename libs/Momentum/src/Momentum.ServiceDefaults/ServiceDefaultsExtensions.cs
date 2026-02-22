@@ -71,6 +71,7 @@ public static class ServiceDefaultsExtensions
     /// <example>
     ///     <!--@include: @code/examples/service-defaults-examples.md -->
     /// </example>
+    [ExcludeFromCodeCoverage]
     public static IHostApplicationBuilder AddServiceDefaults(this WebApplicationBuilder builder)
     {
         builder.UseInitializationLogger();
@@ -116,6 +117,7 @@ public static class ServiceDefaultsExtensions
     /// <example>
     ///     See <see cref="AddServiceDefaults" /> for examples.
     /// </example>
+    [ExcludeFromCodeCoverage]
     public static void AddValidators(this WebApplicationBuilder builder)
     {
         builder.Services.AddValidatorsFromAssembly(EntryAssembly);
@@ -170,6 +172,7 @@ public static class ServiceDefaultsExtensions
     ///     to ensure fatal errors are captured before the process terminates. The exception is
     ///     re-thrown to allow the runtime to handle it appropriately (e.g., for process exit codes).
     /// </remarks>
+    [ExcludeFromCodeCoverage]
     public static async Task RunAsync(this WebApplication app, string[] args)
     {
         var isWolverineCommand = args.Length > 0 && WolverineCommands.Contains(args[0]);

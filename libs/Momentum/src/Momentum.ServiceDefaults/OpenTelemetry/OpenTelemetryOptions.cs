@@ -5,6 +5,7 @@ namespace Momentum.ServiceDefaults.OpenTelemetry;
 /// <summary>
 ///     Configuration options for OpenTelemetry instrumentation.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class OpenTelemetryOptions
 {
     /// <summary>

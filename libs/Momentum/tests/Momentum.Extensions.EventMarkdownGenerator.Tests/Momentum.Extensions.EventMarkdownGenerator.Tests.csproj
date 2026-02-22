@@ -22,6 +22,7 @@
     <ItemGroup>
         <ProjectReference Include="../../src/Momentum.Extensions.EventMarkdownGenerator/Momentum.Extensions.EventMarkdownGenerator.csproj"/>
         <ProjectReference Include="../../src/Momentum.Extensions.Abstractions/Momentum.Extensions.Abstractions.csproj"/>
+        <ProjectReference Include="../../src/Momentum.Extensions.XmlDocs/Momentum.Extensions.XmlDocs.csproj"/>
         <ProjectReference Include="../TestEvents/TestEvents.csproj"/>
     </ItemGroup>
 

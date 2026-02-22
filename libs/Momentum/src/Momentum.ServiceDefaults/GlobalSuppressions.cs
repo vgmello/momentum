@@ -1,6 +1,6 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-using System.Diagnostics.CodeAnalysis;
+global using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Major Code Smell", "S2139",
     Scope = "member",
