@@ -106,13 +106,12 @@ jobs:
           tag-prefix: "template-v"
 
       - name: Create GitHub release
-        uses: softprops/action-gh-release@v2.5.0
+        uses: ./.github/actions/github-release
         with:
-          tag_name: ${{ steps.release-version.outputs.next-tag }}
-          name: Momentum Template ${{ steps.release-version.outputs.next-tag }}
-          generate_release_notes: true
+          tag-name: ${{ steps.release-version.outputs.next-tag }}
+          release-name: Momentum Template ${{ steps.release-version.outputs.next-tag }}
           prerelease: ${{ steps.config.outputs.prerelease }}
-          target_commitish: main
+          previous-stable-tag: ${{ steps.release-version.outputs.previous-stable-tag }}
 
       - name: Publish packages
         uses: ./.github/actions/nuget-publish

@@ -49,6 +49,15 @@
 .PARAMETER IncludeE2E
     Include E2E tests in the test run. By default, E2E tests are excluded.
 
+.PARAMETER RestoreTemplate
+    Controls post-test cleanup behavior (default: true).
+    When true: uninstalls the clean export template, deletes its directory, and reinstalls
+    the template from the repo root so the developer's environment is ready.
+    When false: leaves the clean export directory and its template installation in place.
+    Use false in CI where no developer environment needs restoring.
+    Note: all existing Momentum templates are always uninstalled before testing regardless
+    of this flag to avoid false positives.
+
 .EXAMPLE
     ./Run-TemplateTests.ps1
     Run all test categories
@@ -60,6 +69,10 @@
 .EXAMPLE
     ./Run-TemplateTests.ps1 -MaxFailures 3 -KeepResultsWithErrors
     Stop after 3 failures and preserve failed test directories
+
+.EXAMPLE
+    ./Run-TemplateTests.ps1 -RestoreTemplate:$false
+    Run tests without reinstalling the repo root template afterwards
 #>
 
 [CmdletBinding(DefaultParameterSetName = 'Run')]
@@ -85,7 +98,10 @@ param(
     [int]$MaxFailures = 0,
 
     [Parameter(ParameterSetName = 'Run')]
-    [switch]$IncludeE2E
+    [switch]$IncludeE2E,
+
+    [Parameter(ParameterSetName = 'Run')]
+    [switch]$RestoreTemplate = $true
 )
 
 $ErrorActionPreference = 'Stop'
@@ -95,6 +111,9 @@ Set-StrictMode -Version Latest
 $env:MSBUILDDISABLENODEREUSE = '1'
 $env:DOTNET_CLI_DO_NOT_USE_MSBUILD_SERVER = '1'
 
+# Copy parameter to script scope so it's reliably accessible during Ctrl+C cleanup
+$script:RestoreTemplateEnabled = [bool]$RestoreTemplate
+
 # Script-level variables
 $script:TotalTests = 0
 $script:PassedTests = 0
@@ -102,16 +121,15 @@ $script:FailedTests = 0
 $script:TestResults = @{}
 $script:TestCompleted = $false
 
-# Initialize test environment
-$script:ExecutionTimestamp = Get-Date -Format 'yyyy-MM-dd_HH-mm-ss'
+# Initialize test environment with shared run ID
 $scriptDir = Split-Path -Parent $PSCommandPath
-$script:ExecutionTestDir = Join-Path -Path $scriptDir -ChildPath '..' |
-Join-Path -ChildPath '_template_tests' |
-Join-Path -ChildPath $script:ExecutionTimestamp
+$script:RepoRoot = (Resolve-Path (Join-Path -Path $scriptDir -ChildPath '..')).Path
+$script:TemplateTestsRoot = Join-Path -Path $script:RepoRoot -ChildPath '_template_tests'
+$script:RunId = [System.Guid]::NewGuid().ToString('N').Substring(0, 8)
+$script:CleanExportDir = Join-Path -Path $script:TemplateTestsRoot -ChildPath "mmt-$($script:RunId)"
+$script:ExecutionTestDir = Join-Path -Path $script:TemplateTestsRoot -ChildPath "mmt-$($script:RunId)-results"
 
-if (-not (Test-Path -Path $script:ExecutionTestDir)) {
-    New-Item -ItemType Directory -Path $script:ExecutionTestDir -Force | Out-Null
-}
+New-Item -ItemType Directory -Path $script:ExecutionTestDir -Force | Out-Null
 
 $LogFile = Join-Path -Path $script:ExecutionTestDir -ChildPath 'template-test-results.log'
 "Momentum Template Test Suite - $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" |
@@ -590,8 +608,9 @@ function Show-Results {
     }
 
     Write-Host ''
-    Write-ColoredMessage -Level 'INFO' -Message "Test execution directory: $script:ExecutionTestDir"
-    Write-ColoredMessage -Level 'INFO' -Message "Full test results saved to: $LogFile"
+    Write-ColoredMessage -Level 'INFO' -Message "Run ID: mmt-$($script:RunId)"
+    Write-ColoredMessage -Level 'INFO' -Message "Results: $script:ExecutionTestDir"
+    Write-ColoredMessage -Level 'INFO' -Message "Log: $LogFile"
 
     # Mark test as completed for cleanup handler
     $script:TestCompleted = $true
@@ -609,6 +628,9 @@ function Show-Results {
 function Invoke-Cleanup {
     [CmdletBinding()]
     param()
+
+    # Always clean up the temporary clean export
+    Remove-CleanExport
 
     if ($KeepResults) {
         Write-ColoredMessage -Level 'INFO' -Message "Keeping all test results: $script:ExecutionTestDir"
@@ -637,9 +659,158 @@ function Invoke-Cleanup {
                 Remove-Item -Path $script:ExecutionTestDir -Recurse -Force -ErrorAction Stop
             }
             catch {
-                Write-Host "$($Colors.Yellow)[WARN]$($Colors.Reset) Failed to clean up execution directory: $script:ExecutionTimestamp - $($_.Exception.Message)"
+                Write-Host "$($Colors.Yellow)[WARN]$($Colors.Reset) Failed to clean up execution directory: mmt-$($script:RunId)-results - $($_.Exception.Message)"
             }
         }
+    }
+}
+
+function Uninstall-AllMomentumTemplates {
+    <#
+    .SYNOPSIS
+        Uninstalls all installed Momentum template packages.
+    #>
+    [CmdletBinding()]
+    param()
+
+    Write-ColoredMessage -Level 'INFO' -Message 'Uninstalling all Momentum template installations...'
+
+    # dotnet new uninstall with no args lists all installed template packages
+    # Output format:
+    #    /path/to/template
+    #       Templates:
+    #          Template Name (shortname) Language
+    #       Uninstall Command:
+    #          dotnet new uninstall /path/to/template
+    $uninstallOutput = & dotnet new uninstall 2>&1 | Out-String
+
+    # Extract package paths from "dotnet new uninstall <path>" lines that mention momentum
+    $momentumPackages = @()
+    $currentBlock = @()
+    foreach ($line in ($uninstallOutput -split '[\r\n]+')) {
+        $currentBlock += $line
+        if ($line -match '^\s+dotnet new uninstall\s+(.+)$') {
+            $package = $Matches[1].Trim()
+            $blockText = $currentBlock -join "`n"
+            if ($blockText -match '(?i)momentum') {
+                $momentumPackages += $package
+            }
+            $currentBlock = @()
+        }
+    }
+
+    foreach ($package in $momentumPackages) {
+        Write-ColoredMessage -Level 'INFO' -Message "Uninstalling: $package"
+        & dotnet new uninstall $package 2>&1 | Out-Null
+    }
+
+    if ($momentumPackages.Count -eq 0) {
+        Write-ColoredMessage -Level 'INFO' -Message 'No existing Momentum templates found'
+    }
+    else {
+        Write-ColoredMessage -Level 'SUCCESS' -Message "Uninstalled $($momentumPackages.Count) Momentum template package(s)"
+    }
+}
+
+function Install-TemplateFromCleanExport {
+    <#
+    .SYNOPSIS
+        Creates a clean git export and installs the template from it.
+    .DESCRIPTION
+        The dotnet template engine walks ALL files in the source directory during generation,
+        even those matching exclude patterns. A dirty working tree with bin/, obj/, node_modules/
+        etc. causes the engine to enumerate tens of thousands of unnecessary files, making each
+        template generation 8-13x slower than necessary.
+
+        This function creates a clean git archive export (tracked files only) under
+        _template_tests/mmt-{runId}, copies local NuGet configuration files, and installs
+        the template from the clean directory.
+
+        When RestoreTemplate is enabled, all existing Momentum templates are uninstalled first
+        to ensure a clean slate.
+    #>
+    [CmdletBinding()]
+    param()
+
+    # Always uninstall all existing Momentum templates to avoid false positives
+    Uninstall-AllMomentumTemplates
+
+    Write-ColoredMessage -Level 'INFO' -Message 'Creating clean git export for fast template generation...'
+
+    New-Item -ItemType Directory -Path $script:CleanExportDir -Force | Out-Null
+
+    # Export only git-tracked files (excludes bin, obj, node_modules, etc.)
+    # Use a temp tar file because PowerShell pipelines mangle binary data
+    $archiveTar = Join-Path $script:CleanExportDir '.archive.tar'
+    try {
+        & git -C $script:RepoRoot archive HEAD -o $archiveTar 2>&1
+        if ($LASTEXITCODE -ne 0) { throw "git archive failed" }
+        & tar -x -C $script:CleanExportDir -f $archiveTar 2>&1
+        if ($LASTEXITCODE -ne 0) { throw "tar extract failed" }
+    }
+    catch {
+        Write-ColoredMessage -Level 'WARN' -Message "Git archive failed, falling back to direct install: $_"
+        Remove-Item -Path $script:CleanExportDir -Recurse -Force -ErrorAction SilentlyContinue
+        $script:CleanExportDir = $null
+        return $script:RepoRoot
+    }
+    finally {
+        Remove-Item -Path $archiveTar -Force -ErrorAction SilentlyContinue
+    }
+
+    # Copy local NuGet configuration files (gitignored but needed for --local flag)
+    foreach ($localFile in @('local-mmt-version.txt', 'local-feed-path.txt')) {
+        $sourcePath = Join-Path $script:RepoRoot $localFile
+        if (Test-Path $sourcePath) {
+            Copy-Item -Path $sourcePath -Destination $script:CleanExportDir
+        }
+    }
+
+    $cleanFileCount = @(Get-ChildItem -Path $script:CleanExportDir -Recurse -File).Count
+    Write-ColoredMessage -Level 'INFO' -Message "Clean export: $cleanFileCount files in mmt-$($script:RunId)/"
+
+    # Install template from clean export
+    $installOutput = & dotnet new install $script:CleanExportDir --force 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        Write-ColoredMessage -Level 'WARN' -Message "Template install from clean export failed, falling back to direct install"
+        Remove-Item -Path $script:CleanExportDir -Recurse -Force -ErrorAction SilentlyContinue
+        $script:CleanExportDir = $null
+        return $script:RepoRoot
+    }
+
+    Write-ColoredMessage -Level 'SUCCESS' -Message 'Template installed from clean export'
+    return $script:CleanExportDir
+}
+
+function Remove-CleanExport {
+    <#
+    .SYNOPSIS
+        Removes the clean export and restores the repo root template when RestoreTemplate is true.
+        When RestoreTemplate is false, the clean export directory and its template installation
+        are left in place (useful in CI where no developer environment needs restoring).
+    #>
+    [CmdletBinding()]
+    param()
+
+    if (-not $script:RestoreTemplateEnabled) {
+        return
+    }
+
+    # Uninstall the clean export template and delete its directory
+    if ($script:CleanExportDir -and (Test-Path $script:CleanExportDir)) {
+        & dotnet new uninstall $script:CleanExportDir 2>$null | Out-Null
+        Remove-Item -Path $script:CleanExportDir -Recurse -Force -ErrorAction SilentlyContinue
+        $script:CleanExportDir = $null
+    }
+
+    # Restore the template from the repo root so the developer's environment is ready
+    Write-ColoredMessage -Level 'INFO' -Message 'Restoring template from repo root...'
+    $restoreOutput = & dotnet new install $script:RepoRoot --force 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        Write-ColoredMessage -Level 'SUCCESS' -Message "Template restored from: $($script:RepoRoot)"
+    }
+    else {
+        Write-ColoredMessage -Level 'WARN' -Message "Failed to restore template from repo root. Run manually: dotnet new install $($script:RepoRoot) --force"
     }
 }
 
@@ -653,10 +824,13 @@ function Invoke-Main {
             return
         }
 
+        # Install template from clean git export for faster generation
+        $templateSource = Install-TemplateFromCleanExport
+
         # Verify template is installed
         $templateList = & dotnet new list 2>$null
         if (-not ($templateList -match 'mmt')) {
-            Write-ColoredMessage -Level 'ERROR' -Message 'Momentum template (mmt) not installed. Run: dotnet new install .'
+            Write-ColoredMessage -Level 'ERROR' -Message 'Momentum template (mmt) not installed.'
             exit 1
         }
 

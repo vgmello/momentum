@@ -158,17 +158,11 @@ jobs:
           echo "📦 Building Momentum libraries for local template testing..."
           dotnet build libs/Momentum/Momentum.slnx --verbosity minimal
 
-      - name: Install template
-        shell: bash
-        run: |
-          echo "📐 Installing Momentum template..."
-          dotnet new install ./ --force
-
       - name: Run real-world pattern template tests
         shell: pwsh
         run: |
           Write-Host "🧪 Running real-world pattern template tests..."
-          & ./scripts/Run-TemplateTests.ps1 -Category real-world-patterns -MaxFailures 3 -KeepResultsWithErrors:$false
+          & ./scripts/Run-TemplateTests.ps1 -Category real-world-patterns -MaxFailures 3 -KeepResultsWithErrors:$false -RestoreTemplate:$false
 
   docs-build:
     name: Verify Documentation Build
