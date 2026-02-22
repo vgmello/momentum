@@ -13,9 +13,9 @@ public static class DomainDiscovery
     /// <summary>
     ///     Gets all types from the AppDomain assemblies for architecture testing.
     /// </summary>
-    private static Types GetAppDomainTypes() => Types
+    private static PredicateList GetAppDomainTypes() => Types
 #if INCLUDE_API
-    .InAssemblies([typeof(IAppDomainAssembly).Assembly, typeof(Api.DependencyInjection).Assembly])
+        .InAssemblies([typeof(IAppDomainAssembly).Assembly, typeof(Api.DependencyInjection).Assembly])
 #else
         .InAssemblies([typeof(IAppDomainAssembly).Assembly])
 #endif
@@ -121,7 +121,7 @@ public static class DomainDiscovery
     public static IEnumerable<Type> GetAllCommandTypes()
     {
         return GetAppDomainTypes()
-            .That().ResideInNamespaceEndingWith(".Commands")
+            .And().ResideInNamespaceEndingWith(".Commands")
             .And().AreClasses()
             .And().HaveNameEndingWith("Command")
             .GetTypes();
@@ -133,7 +133,7 @@ public static class DomainDiscovery
     public static IEnumerable<Type> GetAllQueryTypes()
     {
         return GetAppDomainTypes()
-            .That().ResideInNamespaceEndingWith(".Queries")
+            .And().ResideInNamespaceEndingWith(".Queries")
             .And().AreClasses()
             .And().HaveNameEndingWith("Query")
             .GetTypes();
@@ -145,7 +145,7 @@ public static class DomainDiscovery
     public static IEnumerable<Type> GetAllIntegrationEventTypes()
     {
         return GetAppDomainTypes()
-            .That().ResideInNamespaceEndingWith(".IntegrationEvents")
+            .And().ResideInNamespaceEndingWith(".IntegrationEvents")
             .And().AreClasses()
             .GetTypes();
     }
@@ -156,7 +156,7 @@ public static class DomainDiscovery
     public static IEnumerable<Type> GetAllDomainEventTypes()
     {
         return GetAppDomainTypes()
-            .That().ResideInNamespaceEndingWith(".DomainEvents")
+            .And().ResideInNamespaceEndingWith(".DomainEvents")
             .And().AreClasses()
             .GetTypes();
     }
