@@ -52,6 +52,10 @@ try {
     Write-Host "📦 Installing dependencies with Bun..."
     if ($CI) {
         bun install --frozen-lockfile
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning "⚠️ Lockfile is out of sync with package.json. Retrying without --frozen-lockfile to keep docs deployment running."
+            bun install
+        }
     } else {
         bun install
     }

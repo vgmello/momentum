@@ -116,6 +116,9 @@ jobs:
         run: |
           Write-Host "🔍 Starting SonarQube analysis..."
           & "./.sonar/scanner/dotnet-sonarscanner" begin `
+            /k:"vgmello_momentum" `
+            /o:"vgmello" `
+            /d:sonar.host.url="https://sonarcloud.io" `
             /d:sonar.token="$env:SONAR_TOKEN"
 
       - name: Restore NuGet packages
