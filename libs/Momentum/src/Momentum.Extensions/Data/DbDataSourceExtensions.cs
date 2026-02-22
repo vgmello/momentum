@@ -4,6 +4,7 @@ using Dapper;
 using Momentum.Extensions.Abstractions.Dapper;
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Momentum.Extensions.Data;
 
@@ -19,6 +20,7 @@ public static class DbDataSourceExtensions
     /// <param name="commandTimeout">Optional command timeout in seconds.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The number of affected rows.</returns>
+    [ExcludeFromCodeCoverage]
     public static Task<int> SpExecute(this DbDataSource dataSource, string spName, IDbParamsProvider parameters,
         DbTransaction? transaction = null, int? commandTimeout = null,
         CancellationToken cancellationToken = default)
@@ -37,6 +39,7 @@ public static class DbDataSourceExtensions
     /// <param name="commandTimeout">Optional command timeout in seconds.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Collection of TResult</returns>
+    [ExcludeFromCodeCoverage]
     public static Task<IEnumerable<TResult>> SpQuery<TResult>(this DbDataSource dataSource, string spName, IDbParamsProvider parameters,
         DbTransaction? transaction = null, int? commandTimeout = null,
         CancellationToken cancellationToken = default)

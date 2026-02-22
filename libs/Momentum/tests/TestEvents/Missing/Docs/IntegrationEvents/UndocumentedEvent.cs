@@ -13,4 +13,5 @@ public sealed record UndocumentedEvent(
 /// <summary>
 /// Represents missing documentation scenarios
 /// </summary>
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Sonar", "S2094", Justification = "Intentionally empty record used as domain marker for test scenarios")]
 public record Missing;

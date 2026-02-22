@@ -1,7 +1,5 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-using System.Diagnostics.CodeAnalysis;
-
 namespace Momentum.ServiceDefaults.Messaging.Wolverine;
 
 /// <summary>

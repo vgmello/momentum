@@ -15,6 +15,7 @@ namespace Momentum.ServiceDefaults.Messaging.Wolverine;
 /// <summary>
 ///     Provides extension methods for configuring Wolverine messaging framework.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class WolverineSetupExtensions
 {
     public const string SectionName = "Wolverine";

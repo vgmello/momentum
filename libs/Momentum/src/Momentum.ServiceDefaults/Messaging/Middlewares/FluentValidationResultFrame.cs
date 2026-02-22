@@ -8,6 +8,7 @@ using Wolverine.Runtime.Handlers;
 
 namespace Momentum.ServiceDefaults.Messaging.Middlewares;
 
+[ExcludeFromCodeCoverage]
 internal class FluentValidationResultFrame(Type messageType, MethodCall validationMethodCall) : SyncFrame
 {
     private Variable? _context;

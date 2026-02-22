@@ -8,6 +8,7 @@ using Serilog;
 
 namespace Momentum.ServiceDefaults.Logging;
 
+[ExcludeFromCodeCoverage]
 public static class LoggingSetupExtensions
 {
     /// <summary>

@@ -13,6 +13,7 @@ using System.Text.Json.Serialization;
 
 namespace Momentum.ServiceDefaults.HealthChecks;
 
+[ExcludeFromCodeCoverage]
 public static partial class HealthCheckSetupExtensions
 {
     private const string HealthCheckLogName = "HealthChecks";

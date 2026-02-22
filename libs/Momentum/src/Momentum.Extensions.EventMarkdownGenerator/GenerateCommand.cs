@@ -1,17 +1,19 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
+using System.Runtime.Loader;
 using Momentum.Extensions.EventMarkdownGenerator.Models;
 using Momentum.Extensions.EventMarkdownGenerator.Services;
 using Spectre.Console;
 using Spectre.Console.Cli;
-using System.ComponentModel;
-using System.Reflection;
-using System.Runtime.Loader;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace Momentum.Extensions.EventMarkdownGenerator;
 
+[ExcludeFromCodeCoverage]
 public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
 {
     public sealed class Settings : CommandSettings

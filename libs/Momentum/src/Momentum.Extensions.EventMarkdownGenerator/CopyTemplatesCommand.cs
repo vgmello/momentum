@@ -1,12 +1,14 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using Momentum.Extensions.EventMarkdownGenerator.Services;
 using Spectre.Console;
 using Spectre.Console.Cli;
-using System.ComponentModel;
 
 namespace Momentum.Extensions.EventMarkdownGenerator;
 
+[ExcludeFromCodeCoverage]
 public sealed class CopyTemplatesCommand : AsyncCommand<CopyTemplatesCommand.Settings>
 {
     public sealed class Settings : CommandSettings

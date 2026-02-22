@@ -1,5 +1,8 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
+using System.Collections.Frozen;
+using System.Diagnostics;
+using System.Diagnostics.Metrics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -9,15 +12,13 @@ using OpenTelemetry.Context.Propagation;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using System.Collections.Frozen;
-using System.Diagnostics;
-using System.Diagnostics.Metrics;
 
 namespace Momentum.ServiceDefaults.OpenTelemetry;
 
 /// <summary>
 ///     Provides extension methods for configuring OpenTelemetry instrumentation.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class OpenTelemetrySetupExtensions
 {
     private const double DefaultDevelopmentSamplingRate = 1.0;

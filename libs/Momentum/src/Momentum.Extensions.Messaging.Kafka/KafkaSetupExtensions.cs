@@ -1,5 +1,7 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using Aspire.Confluent.Kafka;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -8,11 +10,11 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Momentum.ServiceDefaults.Messaging;
-using System.Reflection;
 using static Momentum.Extensions.Messaging.Kafka.KafkaAspireExtensions;
 
 namespace Momentum.Extensions.Messaging.Kafka;
 
+[ExcludeFromCodeCoverage]
 public static class KafkaSetupExtensions
 {
     public const string SectionName = "Messaging";
