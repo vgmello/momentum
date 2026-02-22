@@ -236,6 +236,7 @@ This entire flow is contained within the Invoices slice, making it easy to under
 -   **PostgreSQL**: Robust data persistence with Liquibase migrations
 -   **Docker & Aspire**: Container orchestration and local development
 -   **Orleans**: Actor-based distributed processing
+-   **Refit + Refitter**: Type-safe REST API clients with OpenAPI code generation for E2E testing
 
 ## Getting Started
 

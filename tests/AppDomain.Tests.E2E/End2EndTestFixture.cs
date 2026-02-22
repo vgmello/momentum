@@ -3,6 +3,7 @@
 using AppDomain.Tests.E2E.OpenApi.Generated;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.CommandLine;
+using Refit;
 
 namespace AppDomain.Tests.E2E;
 
@@ -15,7 +16,7 @@ public sealed class End2EndTestFixture : IDisposable
 
     public HttpClient HttpClient { get; }
 
-    public AppDomainApiClient ApiClient { get; }
+    public IAppDomainApiClient ApiClient { get; }
 
     public End2EndTestFixture()
     {
@@ -25,10 +26,11 @@ public sealed class End2EndTestFixture : IDisposable
 
         HttpClient = new HttpClient
         {
+            BaseAddress = new Uri(TestSettings.ApiUrl),
             Timeout = TimeSpan.FromSeconds(TestSettings.TimeoutSeconds)
         };
 
-        ApiClient = new AppDomainApiClient(TestSettings.ApiUrl, HttpClient);
+        ApiClient = RestService.For<IAppDomainApiClient>(HttpClient);
 
         LogTestConfiguration();
     }
