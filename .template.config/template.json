@@ -574,6 +574,24 @@
       ]
     },
     {
+      "source": "./.claude_project",
+      "target": "./.claude",
+      "condition": "(!project-only)",
+      "include": [
+        "settings.json",
+        "agents/**/*",
+        "skills/**/*"
+      ]
+    },
+    {
+      "source": "./.claude_project",
+      "target": "./",
+      "condition": "(!project-only)",
+      "include": [
+        "CLAUDE.md"
+      ]
+    },
+    {
       "source": "./",
       "target": "./",
       "condition": "(!project-only)",

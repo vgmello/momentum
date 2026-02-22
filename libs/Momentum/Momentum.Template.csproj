@@ -24,6 +24,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Content Include="..\..\.claude_project\**" PackagePath="/content/.claude_project"
+                 Link=".claude_project\%(RecursiveDir)%(Filename)%(Extension)" Exclude="**\bin\**;**\obj\**;"/>
         <Content Include="..\..\.template.config\**" PackagePath="/content/.template.config"
                  Link=".template.config\%(RecursiveDir)%(Filename)%(Extension)" Exclude="**\bin\**;**\obj\**;"/>
         <Content Include="..\..\.vscode\**" PackagePath="/content/.vscode"

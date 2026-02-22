@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "file=\"$TOOL_INPUT_file_path\"; if [[ \"$file\" == *.cs ]]; then proj=$(find \"$(dirname \"$file\")\" -maxdepth 5 -name '*.csproj' -print -quit 2>/dev/null); if [ -n \"$proj\" ]; then dotnet format \"$proj\" --include \"$file\" --no-restore --verbosity quiet 2>/dev/null; fi; fi"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "file=\"$TOOL_INPUT_file_path\"; if echo \"$file\" | grep -qE '\\.(env|pfx|key)$|/appsettings\\.json$|compose\\.yml$|\\.slnx\\.DotSettings$'; then echo 'BLOCK: This is a sensitive file. Please confirm with the user before editing.' >&2; exit 2; fi"
+          }
+        ]
+      }
+    ]
+  }
+}
