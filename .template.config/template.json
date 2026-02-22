@@ -441,7 +441,8 @@
         {
           "condition": "(!INCLUDE_BACK_OFFICE)",
           "exclude": [
-            "src/AppDomain.BackOffice/**/*"
+            "src/AppDomain.BackOffice/**/*",
+            "tests/AppDomain.Tests/Unit/BackOffice/**/*"
           ]
         },
         {
@@ -514,6 +515,7 @@
             "src/AppDomain.BackOffice/Messaging/AppDomainInboxHandler/**/*",
             "src/AppDomain/Cashiers/**/*",
             "src/AppDomain/Invoices/**/*",
+            "tests/AppDomain.Tests/Unit/BackOffice/**/*",
             "tests/AppDomain.Tests/Unit/Cashier/**/*",
             "tests/AppDomain.Tests/Unit/Invoices/**/*",
             "tests/AppDomain.Tests/Integration/Cashiers/**/*",
