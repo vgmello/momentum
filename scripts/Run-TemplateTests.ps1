@@ -670,7 +670,7 @@ function Invoke-IndividualTestCleanup {
     }
 }
 
-function Invoke-TestCategory {
+function Get-TestDefinitions {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
@@ -681,10 +681,10 @@ function Invoke-TestCategory {
         [string]$TestCategory
     )
 
+    $tests = @()
+
     switch ($TestCategory) {
         'component-isolation' {
-            Write-ColoredMessage -Level 'INFO' -Message "Running Category 1: Component Isolation Tests"
-
             $components = @(
                 @{ Name = 'api'; TestName = 'TestApiOnly' },
                 @{ Name = 'backoffice'; TestName = 'TestBackOfficeOnly' },
@@ -694,34 +694,27 @@ function Invoke-TestCategory {
             )
             foreach ($component in $components) {
                 $otherComponents = $components |
-                Where-Object { $_.Name -ne $component.Name } |
-                ForEach-Object { "--$($_.Name) false" }
+                    Where-Object { $_.Name -ne $component.Name } |
+                    ForEach-Object { "--$($_.Name) false" }
                 $params = "--$($component.Name) true " + ($otherComponents -join ' ')
-                Test-Template -Name $component.TestName -Parameters $params -TestCategory 'Component Isolation'
+                $tests += @{ Name = $component.TestName; Parameters = $params; TestCategory = 'Component Isolation'; ContentMustNotContain = @() }
             }
-
         }
 
         'port-config' {
-            Write-ColoredMessage -Level 'INFO' -Message "Running Category 2: Port Configuration Tests"
-
             $ports = @(1024, 5000, 9000, 65000)
             foreach ($port in $ports) {
-                Test-Template -Name "TestPort$port" -Parameters "--port $port" -TestCategory 'Port Config'
+                $tests += @{ Name = "TestPort$port"; Parameters = "--port $port"; TestCategory = 'Port Config'; ContentMustNotContain = @() }
             }
         }
 
         'org-names' {
-            Write-ColoredMessage -Level 'INFO' -Message "Running Category 3: Organization Name Tests"
-
-            Test-Template -Name 'TestOrgSpecial' -Parameters '--org "Company-Name.Inc"' -TestCategory 'Organization Names'
-            Test-Template -Name 'TestOrgNumbers' -Parameters '--org "123 Corp"' -TestCategory 'Organization Names'
-            Test-Template -Name 'TestOrgAmpersand' -Parameters '--org "My Company & Partners"' -TestCategory 'Organization Names'
+            $tests += @{ Name = 'TestOrgSpecial'; Parameters = '--org "Company-Name.Inc"'; TestCategory = 'Organization Names'; ContentMustNotContain = @() }
+            $tests += @{ Name = 'TestOrgNumbers'; Parameters = '--org "123 Corp"'; TestCategory = 'Organization Names'; ContentMustNotContain = @() }
+            $tests += @{ Name = 'TestOrgAmpersand'; Parameters = '--org "My Company & Partners"'; TestCategory = 'Organization Names'; ContentMustNotContain = @() }
         }
 
         'library-config' {
-            Write-ColoredMessage -Level 'INFO' -Message "Running Category 4: Library Configuration Tests"
-
             $libraries = @(
                 @{ Name = 'defaults'; TestName = 'TestLibDefaults' },
                 @{ Name = 'api'; TestName = 'TestLibApi' },
@@ -730,59 +723,47 @@ function Invoke-TestCategory {
                 @{ Name = 'generators'; TestName = 'TestLibGenerators' }
             )
             foreach ($lib in $libraries) {
-                Test-Template -Name $lib.TestName -Parameters "--libs $($lib.Name)" -TestCategory 'Library Config'
+                $tests += @{ Name = $lib.TestName; Parameters = "--libs $($lib.Name)"; TestCategory = 'Library Config'; ContentMustNotContain = @() }
             }
-
-            # Test library combinations
-            Test-Template -Name 'TestLibMulti' -Parameters '--libs defaults --libs api --libs kafka' -TestCategory 'Library Config'
-            Test-Template -Name 'TestLibCustomName' -Parameters '--libs defaults --libs ext --lib-name CustomPlatform' -TestCategory 'Library Config'
+            $tests += @{ Name = 'TestLibMulti'; Parameters = '--libs defaults --libs api --libs kafka'; TestCategory = 'Library Config'; ContentMustNotContain = @() }
+            $tests += @{ Name = 'TestLibCustomName'; Parameters = '--libs defaults --libs ext --lib-name CustomPlatform'; TestCategory = 'Library Config'; ContentMustNotContain = @() }
         }
 
         'real-world-patterns' {
-            Write-ColoredMessage -Level 'INFO' -Message "Running Category 5: Real-World Architecture Patterns"
-
-            Test-Template -Name 'TestDefault' -Parameters '' -TestCategory 'Real-World Patterns'
-            Test-Template -Name 'TestDefaultNoSample' -Parameters '--no-sample' -TestCategory 'Real-World Patterns'
-            Test-Template -Name 'TestDefaultWithLibs' -Parameters '--libs defaults api kafka ext --lib-name Platform' -TestCategory 'Real-World Patterns'
-            Test-Template -Name 'TestApiNoBackOffice' -Parameters '--backoffice false' -TestCategory 'Real-World Patterns'
-            Test-Template -Name 'TestBackOfficeNoApi' -Parameters '--api false' -TestCategory 'Real-World Patterns'
-            Test-Template -Name 'TestAPISimple' -Parameters '--no-sample --backoffice false --docs false --kafka false' -TestCategory 'Real-World Patterns'
-            Test-Template -Name 'TestFullStack' -Parameters '--orleans true' -TestCategory 'Real-World Patterns'
-            Test-Template -Name 'TestBffEnabled' -Parameters '--bff' -TestCategory 'Real-World Patterns'
+            $tests += @{ Name = 'TestDefault'; Parameters = ''; TestCategory = 'Real-World Patterns'; ContentMustNotContain = @() }
+            $tests += @{ Name = 'TestDefaultNoSample'; Parameters = '--no-sample'; TestCategory = 'Real-World Patterns'; ContentMustNotContain = @() }
+            $tests += @{ Name = 'TestDefaultWithLibs'; Parameters = '--libs defaults api kafka ext --lib-name Platform'; TestCategory = 'Real-World Patterns'; ContentMustNotContain = @() }
+            $tests += @{ Name = 'TestApiNoBackOffice'; Parameters = '--backoffice false'; TestCategory = 'Real-World Patterns'; ContentMustNotContain = @() }
+            $tests += @{ Name = 'TestBackOfficeNoApi'; Parameters = '--api false'; TestCategory = 'Real-World Patterns'; ContentMustNotContain = @() }
+            $tests += @{ Name = 'TestAPISimple'; Parameters = '--no-sample --backoffice false --docs false --kafka false'; TestCategory = 'Real-World Patterns'; ContentMustNotContain = @() }
+            $tests += @{ Name = 'TestFullStack'; Parameters = '--orleans true'; TestCategory = 'Real-World Patterns'; ContentMustNotContain = @() }
+            $tests += @{ Name = 'TestBffEnabled'; Parameters = '--bff'; TestCategory = 'Real-World Patterns'; ContentMustNotContain = @() }
 
             $bffExclusionChecks = @(
                 @{ File = 'src/TestBffDisabled.Api/Program.cs'; Pattern = 'FrontendIntegration' },
                 @{ File = 'src/TestBffDisabled.Api/appsettings.json'; Pattern = '"Cors"|"SecurityHeaders"' }
             )
-            Test-Template -Name 'TestBffDisabled' -Parameters '--bff false' -TestCategory 'Real-World Patterns' -ContentMustNotContain $bffExclusionChecks
+            $tests += @{ Name = 'TestBffDisabled'; Parameters = '--bff false'; TestCategory = 'Real-World Patterns'; ContentMustNotContain = $bffExclusionChecks }
         }
 
         'orleans-combinations' {
-            Write-ColoredMessage -Level 'INFO' -Message "Running Category 6: Orleans Combinations"
-
-            Test-Template -Name 'TestOrleansAPI' -Parameters '--orleans true --api true --aspire true' -TestCategory 'Orleans Combinations'
-            Test-Template -Name 'TestOrleansFullStack' -Parameters '--orleans true --api true --backoffice true --aspire true' -TestCategory 'Orleans Combinations'
-            Test-Template -Name 'TestOrleansNoKafka' -Parameters '--orleans true --kafka false' -TestCategory 'Orleans Combinations'
-            Test-Template -Name 'TestOrleansNoSample' -Parameters '--orleans true --no-sample' -TestCategory 'Orleans Combinations'
+            $tests += @{ Name = 'TestOrleansAPI'; Parameters = '--orleans true --api true --aspire true'; TestCategory = 'Orleans Combinations'; ContentMustNotContain = @() }
+            $tests += @{ Name = 'TestOrleansFullStack'; Parameters = '--orleans true --api true --backoffice true --aspire true'; TestCategory = 'Orleans Combinations'; ContentMustNotContain = @() }
+            $tests += @{ Name = 'TestOrleansNoKafka'; Parameters = '--orleans true --kafka false'; TestCategory = 'Orleans Combinations'; ContentMustNotContain = @() }
+            $tests += @{ Name = 'TestOrleansNoSample'; Parameters = '--orleans true --no-sample'; TestCategory = 'Orleans Combinations'; ContentMustNotContain = @() }
         }
 
         'edge-cases' {
-            Write-ColoredMessage -Level 'INFO' -Message "Running Category 7: Edge Cases and Special Configurations"
-
-            Test-Template -Name 'TestMinimal' -Parameters '--project-only --no-sample' -TestCategory 'Edge Cases'
-            Test-Template -Name 'TestBareMin' -Parameters '--api false --backoffice false --aspire false --docs false' -TestCategory 'Edge Cases'
+            $tests += @{ Name = 'TestMinimal'; Parameters = '--project-only --no-sample'; TestCategory = 'Edge Cases'; ContentMustNotContain = @() }
+            $tests += @{ Name = 'TestBareMin'; Parameters = '--api false --backoffice false --aspire false --docs false'; TestCategory = 'Edge Cases'; ContentMustNotContain = @() }
             $allFalseParams = '--api false --backoffice false --orleans false --docs false --aspire false --kafka false'
-            Test-Template -Name 'TestAllFalse' -Parameters $allFalseParams -TestCategory 'Edge Cases'
-
+            $tests += @{ Name = 'TestAllFalse'; Parameters = $allFalseParams; TestCategory = 'Edge Cases'; ContentMustNotContain = @() }
             $allTrueParams = '--api true --backoffice true --orleans true --docs true --aspire true --kafka true'
-            Test-Template -Name 'TestAllTrue' -Parameters $allTrueParams -TestCategory 'Edge Cases'
-        }
-
-        default {
-            Write-ColoredMessage -Level 'ERROR' -Message "Unknown category: $TestCategory"
-            exit 1
+            $tests += @{ Name = 'TestAllTrue'; Parameters = $allTrueParams; TestCategory = 'Edge Cases'; ContentMustNotContain = @() }
         }
     }
+
+    return $tests
 }
 
 function Show-Categories {
@@ -1080,12 +1061,12 @@ function Invoke-Main {
 
         Write-Host ''
 
-        # Run specific category or all categories
-        if ($Category) {
-            Invoke-TestCategory -TestCategory $Category
+        # Collect test definitions for selected or all categories
+        $categoriesToRun = if ($Category) {
+            @($Category)
         }
         else {
-            $allCategories = @(
+            @(
                 'component-isolation',
                 'port-config',
                 'org-names',
@@ -1094,10 +1075,17 @@ function Invoke-Main {
                 'orleans-combinations',
                 'edge-cases'
             )
+        }
 
-            foreach ($cat in $allCategories) {
-                Invoke-TestCategory -TestCategory $cat
-            }
+        $allTests = @()
+        foreach ($cat in $categoriesToRun) {
+            $allTests += Get-TestDefinitions -TestCategory $cat
+        }
+
+        # Execute tests sequentially
+        foreach ($testDef in $allTests) {
+            Test-Template -Name $testDef.Name -Parameters $testDef.Parameters `
+                -TestCategory $testDef.TestCategory -ContentMustNotContain $testDef.ContentMustNotContain
         }
 
         Show-Results
