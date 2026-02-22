@@ -119,6 +119,21 @@ jobs:
           path: TestResults/
           retention-days: 7
 
+      - name: Rename test results for reporting
+        if: always()
+        shell: bash
+        run: |
+          for f in TestResults/*.trx; do
+            # Extract assembly name from codeBase or discovery output
+            name=$(grep -oP 'codeBase="[^"]*[/\\]\K[^/\\"]+(?=\.dll")' "$f" | head -1)
+            if [ -z "$name" ]; then
+              name=$(grep -oP 'Discover\w+:\s+\K\S+' "$f" | head -1)
+            fi
+            if [ -n "$name" ] && [ ! -f "TestResults/${name}.trx" ]; then
+              mv "$f" "TestResults/${name}.trx"
+            fi
+          done
+
       - name: Test report
         if: always()
         uses: dorny/test-reporter@v2.5.0
@@ -126,6 +141,7 @@ jobs:
           name: Test Results
           path: TestResults/*.trx
           reporter: dotnet-trx
+          fail-on-error: false
 
   template-tests:
     name: Template Tests (Real-World Patterns)

@@ -120,6 +120,7 @@ $script:PassedTests = 0
 $script:FailedTests = 0
 $script:TestResults = @{}
 $script:TestCompleted = $false
+$script:SuiteStopwatch = $null
 
 # Initialize test environment with shared run ID
 $scriptDir = Split-Path -Parent $PSCommandPath
@@ -173,6 +174,25 @@ function Get-ErrorSummary {
     return ''
 }
 
+function Format-Duration {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [System.Diagnostics.Stopwatch]$Stopwatch
+    )
+
+    $elapsed = $Stopwatch.Elapsed
+    if ($elapsed.TotalSeconds -lt 1) {
+        return "$([int]$elapsed.TotalMilliseconds)ms"
+    }
+    elseif ($elapsed.TotalMinutes -lt 1) {
+        return "$([math]::Round($elapsed.TotalSeconds, 1))s"
+    }
+    else {
+        return "$([int][math]::Floor($elapsed.TotalMinutes))m $($elapsed.Seconds)s"
+    }
+}
+
 function Test-MaxFailuresReached {
     [CmdletBinding()]
     param(
@@ -224,6 +244,7 @@ function Write-ColoredMessage {
             'ERROR' { 'Red' }
             'WARN' { 'Yellow' }
         }
+        Write-Host "[$timeStamp] " -ForegroundColor DarkGray -NoNewline
         Write-Host "[$Level]" -ForegroundColor $color -NoNewline
         Write-Host " $Message"
     }
@@ -234,7 +255,7 @@ function Write-ColoredMessage {
             'ERROR' { $Colors.Red }
             'WARN' { $Colors.Yellow }
         }
-        Write-Host "$colorCode[$Level]$($Colors.Reset) $Message"
+        Write-Host "`e[90m[$timeStamp]`e[0m $colorCode[$Level]$($Colors.Reset) $Message"
     }
 }
 
@@ -259,6 +280,7 @@ function Test-Template {
 
     $script:TotalTests++
 
+    $testSw = [System.Diagnostics.Stopwatch]::StartNew()
     $paramDisplay = if ($Parameters.Trim()) { "with params: $Parameters" } else { "(no parameters)" }
     Write-ColoredMessage -Level 'INFO' -Message "[$TestCategory] Testing: $Name $paramDisplay"
 
@@ -278,20 +300,24 @@ function Test-Template {
         $generationOut = Join-Path -Path $tempDir -ChildPath "01-generation-stdout.log"
         $generationErr = Join-Path -Path $tempDir -ChildPath "01-generation-stderr.log"
 
+        $genSw = [System.Diagnostics.Stopwatch]::StartNew()
         $process = Start-Process -FilePath 'dotnet' -ArgumentList $templateArgs `
             -NoNewWindow -Wait -PassThru `
             -RedirectStandardOutput $generationOut -RedirectStandardError $generationErr
+        $genSw.Stop()
 
         if ($process.ExitCode -ne 0) {
             $errorOutput = Get-Content $generationErr -Raw -ErrorAction SilentlyContinue
             $errorSummary = Get-ErrorSummary -ErrorOutput $errorOutput -MaxLines 3
 
-            Write-ColoredMessage -Level 'ERROR' -Message "[$TestCategory] $Name`: Generation failed$errorSummary"
+            Write-ColoredMessage -Level 'ERROR' -Message "[$TestCategory] $Name`: Generation failed ($(Format-Duration $genSw))$errorSummary"
             $script:FailedTests++
             $script:TestResults[$Name] = 'FAILED'
 
             return
         }
+
+        Write-ColoredMessage -Level 'SUCCESS' -Message "[$TestCategory] $Name`: Generation succeeded ($(Format-Duration $genSw))"
 
         if (-not (Test-Path -Path $Name -PathType Container)) {
             Write-ColoredMessage -Level 'ERROR' -Message "[$TestCategory] $Name`: Generation succeeded but directory not found"
@@ -310,12 +336,14 @@ function Test-Template {
         $buildErr = Join-Path -Path $tempDir -ChildPath "02-build-stderr.log"
 
         # Attempt to build the generated project
+        $buildSw = [System.Diagnostics.Stopwatch]::StartNew()
         $buildProcess = Start-Process -FilePath 'dotnet' -ArgumentList @('build', '--verbosity', 'normal', '-nodeReuse:false') `
             -NoNewWindow -Wait -PassThru `
             -RedirectStandardOutput $buildOut -RedirectStandardError $buildErr
+        $buildSw.Stop()
 
         if ($buildProcess.ExitCode -eq 0) {
-            Write-ColoredMessage -Level 'SUCCESS' -Message "[$TestCategory] $Name`: Build succeeded ($projectCount projects)"
+            Write-ColoredMessage -Level 'SUCCESS' -Message "[$TestCategory] $Name`: Build succeeded ($projectCount projects, $(Format-Duration $buildSw))"
 
             # Run tests if they exist (excluding E2E tests)
             if (Test-Path -Path 'tests' -PathType Container) {
@@ -327,19 +355,21 @@ function Test-Template {
                 $testFilter = if ($IncludeE2E) { 'Type!=Integration' } else { 'Type!=E2E&Type!=Integration' }
                 $testArgs = @('test', '--verbosity', 'normal', '--filter', $testFilter)
 
+                $testRunSw = [System.Diagnostics.Stopwatch]::StartNew()
                 $testProcess = Start-Process -FilePath 'dotnet' -ArgumentList $testArgs `
                     -NoNewWindow -Wait -PassThru `
                     -RedirectStandardOutput $testOut -RedirectStandardError $testErr
+                $testRunSw.Stop()
 
                 if ($testProcess.ExitCode -eq 0) {
                     $excludedMsg = if ($IncludeE2E) { 'Integration tests excluded' } else { 'E2E and Integration tests excluded' }
-                    Write-ColoredMessage -Level 'SUCCESS' -Message "[$TestCategory] $Name`: Tests passed ($excludedMsg)"
+                    Write-ColoredMessage -Level 'SUCCESS' -Message "[$TestCategory] $Name`: Tests passed ($excludedMsg, $(Format-Duration $testRunSw))"
                 }
                 else {
                     $testOutput = Get-Content $testErr -Raw -ErrorAction SilentlyContinue
                     $testErrorSummary = Get-ErrorSummary -ErrorOutput $testOutput -MaxLines 2 -Filter '(Failed|Error|Exception|Assert)'
 
-                    Write-ColoredMessage -Level 'ERROR' -Message "[$TestCategory] $Name`: Tests failed$testErrorSummary"
+                    Write-ColoredMessage -Level 'ERROR' -Message "[$TestCategory] $Name`: Tests failed ($(Format-Duration $testRunSw))$testErrorSummary"
                     $script:FailedTests++
                     $script:TestResults[$Name] = 'FAILED'
 
@@ -373,14 +403,16 @@ function Test-Template {
                 }
             }
 
+            $testSw.Stop()
             $script:PassedTests++
             $script:TestResults[$Name] = 'PASSED'
+            Write-ColoredMessage -Level 'INFO' -Message "[$TestCategory] $Name`: Total time: $(Format-Duration $testSw) (gen: $(Format-Duration $genSw), build: $(Format-Duration $buildSw))"
         }
         else {
             $buildOutput = Get-Content $buildErr -Raw -ErrorAction SilentlyContinue
             $buildErrorSummary = Get-ErrorSummary -ErrorOutput $buildOutput -MaxLines 3 -Filter '(error|Error|CS[0-9]+|MSB[0-9]+)'
 
-            Write-ColoredMessage -Level 'ERROR' -Message "[$TestCategory] $Name`: Build failed$buildErrorSummary"
+            Write-ColoredMessage -Level 'ERROR' -Message "[$TestCategory] $Name`: Build failed ($(Format-Duration $buildSw))$buildErrorSummary"
             $script:FailedTests++
             $script:TestResults[$Name] = 'FAILED'
 
@@ -608,6 +640,10 @@ function Show-Results {
     }
 
     Write-Host ''
+    if ($script:SuiteStopwatch) {
+        $script:SuiteStopwatch.Stop()
+        Write-ColoredMessage -Level 'INFO' -Message "Total time: $(Format-Duration $script:SuiteStopwatch)"
+    }
     Write-ColoredMessage -Level 'INFO' -Message "Run ID: mmt-$($script:RunId)"
     Write-ColoredMessage -Level 'INFO' -Message "Results: $script:ExecutionTestDir"
     Write-ColoredMessage -Level 'INFO' -Message "Log: $LogFile"
@@ -673,6 +709,7 @@ function Uninstall-AllMomentumTemplates {
     [CmdletBinding()]
     param()
 
+    $sw = [System.Diagnostics.Stopwatch]::StartNew()
     Write-ColoredMessage -Level 'INFO' -Message 'Uninstalling all Momentum template installations...'
 
     # dotnet new uninstall with no args lists all installed template packages
@@ -704,11 +741,12 @@ function Uninstall-AllMomentumTemplates {
         & dotnet new uninstall $package 2>&1 | Out-Null
     }
 
+    $sw.Stop()
     if ($momentumPackages.Count -eq 0) {
-        Write-ColoredMessage -Level 'INFO' -Message 'No existing Momentum templates found'
+        Write-ColoredMessage -Level 'INFO' -Message "No existing Momentum templates found ($(Format-Duration $sw))"
     }
     else {
-        Write-ColoredMessage -Level 'SUCCESS' -Message "Uninstalled $($momentumPackages.Count) Momentum template package(s)"
+        Write-ColoredMessage -Level 'SUCCESS' -Message "Uninstalled $($momentumPackages.Count) Momentum template package(s) ($(Format-Duration $sw))"
     }
 }
 
@@ -731,6 +769,8 @@ function Install-TemplateFromCleanExport {
     #>
     [CmdletBinding()]
     param()
+
+    $setupSw = [System.Diagnostics.Stopwatch]::StartNew()
 
     # Always uninstall all existing Momentum templates to avoid false positives
     Uninstall-AllMomentumTemplates
@@ -778,7 +818,8 @@ function Install-TemplateFromCleanExport {
         return $script:RepoRoot
     }
 
-    Write-ColoredMessage -Level 'SUCCESS' -Message 'Template installed from clean export'
+    $setupSw.Stop()
+    Write-ColoredMessage -Level 'SUCCESS' -Message "Template installed from clean export (setup: $(Format-Duration $setupSw))"
     return $script:CleanExportDir
 }
 
@@ -825,6 +866,7 @@ function Invoke-Main {
         }
 
         # Install template from clean git export for faster generation
+        $script:SuiteStopwatch = [System.Diagnostics.Stopwatch]::StartNew()
         $templateSource = Install-TemplateFromCleanExport
 
         # Verify template is installed
