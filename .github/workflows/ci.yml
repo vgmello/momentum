@@ -186,9 +186,9 @@ jobs:
         run: |
           shopt -s nullglob
           for f in TestResults/*.trx; do
-            name=$(grep -oP 'codeBase="[^"]*[/\\]\K[^/\\"]+(?=\.dll")' "$f" | head -1 || true)
+            name=$(grep -oPm1 'codeBase="[^"]*[/\\]\K[^/\\"]+(?=\.dll")' "$f" || true)
             if [ -z "$name" ]; then
-              name=$(grep -oP 'Discover\w+:\s+\K\S+' "$f" | head -1 || true)
+              name=$(grep -oPm1 'Discover\w+:\s+\K\S+' "$f" || true)
             fi
             if [ -n "$name" ] && [ ! -f "TestResults/${name}.trx" ]; then
               mv "$f" "TestResults/${name}.trx"
