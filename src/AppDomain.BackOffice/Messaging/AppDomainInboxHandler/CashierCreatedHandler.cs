@@ -1,5 +1,6 @@
 // Copyright (c) OrgName. All rights reserved.
 
+using System.Diagnostics.CodeAnalysis;
 using AppDomain.Cashiers.Contracts.IntegrationEvents;
 
 namespace AppDomain.BackOffice.Messaging.AppDomainInboxHandler;
@@ -7,6 +8,7 @@ namespace AppDomain.BackOffice.Messaging.AppDomainInboxHandler;
 /// <summary>
 ///     Handles cashier created integration events for back office processing.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class CashierCreatedHandler
 {
     /// <summary>

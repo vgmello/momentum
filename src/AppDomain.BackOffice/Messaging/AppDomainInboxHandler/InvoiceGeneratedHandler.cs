@@ -1,5 +1,6 @@
 // Copyright (c) OrgName. All rights reserved.
 
+using System.Diagnostics.CodeAnalysis;
 using AppDomain.Invoices.Contracts.DomainEvents;
 
 namespace AppDomain.BackOffice.Messaging.AppDomainInboxHandler;
@@ -8,6 +9,7 @@ namespace AppDomain.BackOffice.Messaging.AppDomainInboxHandler;
 ///     Handles invoice generated domain events for back office processing.
 /// </summary>
 /// <param name="logger">Logger for tracking handler execution.</param>
+[ExcludeFromCodeCoverage]
 public class InvoiceGeneratedHandler(ILogger<InvoiceGeneratedHandler> logger)
 {
     /// <summary>

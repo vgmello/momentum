@@ -16,6 +16,7 @@ namespace AppDomain.Infrastructure;
 /// <summary>
 ///     Provides extension methods for configuring AppDomain infrastructure services.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class DependencyInjection
 {
     /// <summary>

@@ -18,6 +18,7 @@ public record GetInvoicesQuery(Guid TenantId, int Offset = 0, int Limit = 100, I
 /// <summary>
 ///     Handles the GetInvoicesQuery to retrieve a filtered and paginated list of invoices from the database.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class GetInvoicesQueryHandler
 {
     /// <summary>

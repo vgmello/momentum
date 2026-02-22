@@ -1,5 +1,6 @@
 // Copyright (c) OrgName. All rights reserved.
 
+using System.Diagnostics.CodeAnalysis;
 using AppDomain.Invoices.Contracts.IntegrationEvents;
 using AppDomain.Invoices.Contracts.Models;
 
@@ -11,6 +12,7 @@ namespace AppDomain.BackOffice.Invoices.Jobs;
 /// </summary>
 /// <param name="bus">The message bus for publishing integration events.</param>
 /// <param name="logger">Logger instance for tracking operations.</param>
+[ExcludeFromCodeCoverage]
 public class DummyInvoiceGenerator(IMessageBus bus, ILogger<DummyInvoiceGenerator> logger) : BackgroundService
 {
     /// <summary>

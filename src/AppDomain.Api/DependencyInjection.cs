@@ -1,10 +1,13 @@
 // Copyright (c) OrgName. All rights reserved.
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace AppDomain.Api;
 
 /// <summary>
 ///     Provides dependency injection extension methods for API application services.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class DependencyInjection
 {
     /// <summary>

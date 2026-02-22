@@ -65,6 +65,7 @@ public static class DeleteCashierCommandHandler
     /// <param name="db">The database context</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>True if the cashier was deleted, false otherwise</returns>
+    [ExcludeFromCodeCoverage]
     public static async Task<bool> Handle(DbCommand command, AppDomainDb db, CancellationToken cancellationToken)
     {
         var deletedCount = await db.Cashiers

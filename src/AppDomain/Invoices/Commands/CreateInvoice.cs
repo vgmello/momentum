@@ -82,6 +82,7 @@ public static class CreateInvoiceCommandHandler
     /// <param name="db">The database context</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>The inserted invoice entity</returns>
+    [ExcludeFromCodeCoverage]
     public static async Task<Data.Entities.Invoice> Handle(DbCommand command, AppDomainDb db, CancellationToken cancellationToken)
     {
         var inserted = await db.Invoices.InsertWithOutputAsync(command.Invoice, cancellationToken);

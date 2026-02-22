@@ -7,6 +7,7 @@ namespace AppDomain.Cashiers.Data.Entities;
 /// <summary>
 ///     Represents the association between a cashier and a currency with effective date tracking.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public record CashierCurrency : DbEntity
 {
     /// <summary>

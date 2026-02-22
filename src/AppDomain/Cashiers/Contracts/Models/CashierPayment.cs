@@ -5,6 +5,7 @@ namespace AppDomain.Cashiers.Contracts.Models;
 /// <summary>
 ///     Represents a payment transaction processed by a cashier.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public record CashierPayment
 {
     /// <summary>

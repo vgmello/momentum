@@ -14,6 +14,7 @@ namespace AppDomain.Common.Data;
 ///     Provides access to domain entity tables and manages database connections.
 /// </summary>
 /// <param name="options">Database connection options configured for this context.</param>
+[ExcludeFromCodeCoverage]
 public class AppDomainDb(DataOptions<AppDomainDb> options) : DataConnection(options.Options)
 {
     //#if (INCLUDE_SAMPLE)

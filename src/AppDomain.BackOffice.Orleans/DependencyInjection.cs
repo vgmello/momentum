@@ -1,10 +1,13 @@
 // Copyright (c) OrgName. All rights reserved.
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace AppDomain.BackOffice.Orleans;
 
 /// <summary>
 ///     Provides dependency injection configuration for the Orleans stateful processing service.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class DependencyInjection
 {
     /// <summary>

@@ -78,4 +78,39 @@ public class SimulatePaymentCommandHandlerTests
         integrationEvent.PaymentMethod.ShouldBe("Credit Card");
         integrationEvent.PaymentReference.ShouldBe("SIM-REF");
     }
+
+    [Fact]
+    public async Task Handle_WithNonExistentInvoice_ShouldReturnValidationFailure()
+    {
+        // Arrange
+        var messagingMock = Substitute.For<IMessageBus>();
+        var tenantId = Guid.NewGuid();
+        var invoiceId = Guid.NewGuid();
+        var command = new SimulatePaymentCommand(tenantId, invoiceId, 1, 100.00m);
+
+        Result<Invoice> errorResult = new List<FluentValidation.Results.ValidationFailure>
+        {
+            new("InvoiceId", "Invoice not found")
+        };
+
+        messagingMock
+            .InvokeQueryAsync(Arg.Any<IQuery<Result<Invoice>>>(), Arg.Any<CancellationToken>())
+            .Returns(errorResult);
+
+        var logger = Substitute.For<ILogger>();
+        logger.IsEnabled(Arg.Any<LogLevel>()).Returns(true);
+
+        // Act
+        var (result, integrationEvent) = await SimulatePaymentCommandHandler.Handle(command, messagingMock, logger, CancellationToken.None);
+
+        // Assert
+        var failures = result.Match(_ => null!, validationFailures => validationFailures);
+
+        failures.ShouldNotBeNull();
+        failures.Count.ShouldBe(1);
+        failures[0].PropertyName.ShouldBe("InvoiceId");
+        failures[0].ErrorMessage.ShouldBe("Invoice not found.");
+
+        integrationEvent.ShouldBeNull();
+    }
 }

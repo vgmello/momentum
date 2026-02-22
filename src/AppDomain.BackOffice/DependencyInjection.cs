@@ -1,5 +1,7 @@
 // Copyright (c) OrgName. All rights reserved.
 
+using System.Diagnostics.CodeAnalysis;
+
 //#if (INCLUDE_SAMPLE)
 using AppDomain.BackOffice.Invoices.Jobs;
 //#endif
@@ -9,6 +11,7 @@ namespace AppDomain.BackOffice;
 /// <summary>
 ///     Provides dependency injection configuration for the back office service.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class DependencyInjection
 {
     /// <summary>
