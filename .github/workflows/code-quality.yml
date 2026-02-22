@@ -123,14 +123,23 @@ jobs:
           $sonarProperties = @{}
           Get-Content $sonarPropertiesPath | ForEach-Object {
             $line = $_.Trim()
-            if (-not $line -or $line.StartsWith("#")) { return }
+            if (-not $line -or $line.StartsWith("#")) { continue }
             $parts = $line -split "=", 2
             if ($parts.Count -eq 2) {
-              $sonarProperties[$parts[0].Trim()] = $parts[1].Trim()
+              $propertyKey = $parts[0].Trim()
+              $propertyValue = $parts[1].Trim()
+              if (-not $propertyKey.StartsWith("sonar.")) {
+                throw "Invalid Sonar property key: $propertyKey"
+              }
+              if ($propertyValue -match '[\r\n"`]') {
+                throw "Invalid Sonar property value for $propertyKey: newline, quote, and backtick characters are not allowed"
+              }
+              $sonarProperties[$propertyKey] = $propertyValue
             }
           }
 
           $requiredProperties = @("sonar.projectKey", "sonar.organization", "sonar.host.url")
+          $reservedProperties = $requiredProperties + @("sonar.token")
           foreach ($required in $requiredProperties) {
             if (-not $sonarProperties.ContainsKey($required)) {
               throw "Required Sonar property missing: $required"
@@ -145,8 +154,8 @@ jobs:
             "/d:sonar.token=$env:SONAR_TOKEN"
           )
 
-          foreach ($entry in ($sonarProperties.GetEnumerator() | Sort-Object Name)) {
-            if ($requiredProperties -contains $entry.Key) { continue }
+          foreach ($entry in $sonarProperties.GetEnumerator()) {
+            if ($reservedProperties -contains $entry.Key) { continue }
             $sonarArgs += "/d:$($entry.Key)=$($entry.Value)"
           }
 
