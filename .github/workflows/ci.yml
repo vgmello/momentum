@@ -57,15 +57,16 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
-permissions:
-  contents: read
-  checks: write
+permissions: {}
 
 jobs:
   build-and-test:
     name: Build & Test
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions:
+      contents: read
+      checks: write
 
     steps:
       - name: Checkout repository
@@ -148,6 +149,8 @@ jobs:
     needs: build-and-test
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout repository
@@ -185,6 +188,8 @@ jobs:
     needs: build-and-test
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout repository
