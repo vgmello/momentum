@@ -271,6 +271,186 @@ function Write-ColoredMessage {
     }
 }
 
+function Invoke-SingleTest {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)] [string]$Name,
+        [Parameter(Mandatory)] [AllowEmptyString()] [string]$Parameters,
+        [Parameter(Mandatory)] [string]$TestCategory,
+        [Parameter(Mandatory)] [string]$ExecutionTestDir,
+        [Parameter()] [hashtable[]]$ContentMustNotContain = @(),
+        [Parameter()] [bool]$IncludeE2ETests = $false
+    )
+
+    $messages = [System.Collections.Generic.List[hashtable]]::new()
+    $testSw = [System.Diagnostics.Stopwatch]::StartNew()
+
+    $result = @{
+        Name          = $Name
+        Category      = $TestCategory
+        Result        = 'FAILED'
+        Messages      = $null
+        GenDuration   = $null
+        BuildDuration = $null
+        TestDuration  = $null
+        TotalDuration = $null
+        ProjectCount  = 0
+        ErrorSummary  = ''
+    }
+
+    $paramDisplay = if ($Parameters.Trim()) { "with params: $Parameters" } else { "(no parameters)" }
+    $messages.Add(@{ Level = 'INFO'; Message = "[$TestCategory] Testing: $Name $paramDisplay" })
+
+    $tempDir = Join-Path -Path $ExecutionTestDir -ChildPath $Name
+    New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
+
+    try {
+        # Build template arguments
+        $templateArgs = @('new', 'mmt', '-n', $Name, '--allow-scripts', 'yes', '--local')
+        if ($Parameters.Trim()) {
+            $templateArgs += ($Parameters -split '\s+' | Where-Object { $_ })
+        }
+
+        $generationOut = Join-Path -Path $tempDir -ChildPath "01-generation-stdout.log"
+        $generationErr = Join-Path -Path $tempDir -ChildPath "01-generation-stderr.log"
+
+        # Generation
+        $genSw = [System.Diagnostics.Stopwatch]::StartNew()
+        $process = Start-Process -FilePath 'dotnet' -ArgumentList $templateArgs `
+            -WorkingDirectory $tempDir -NoNewWindow -Wait -PassThru `
+            -RedirectStandardOutput $generationOut -RedirectStandardError $generationErr
+        $genSw.Stop()
+        $result.GenDuration = $genSw.Elapsed
+
+        if ($process.ExitCode -ne 0) {
+            $errorOutput = Get-Content $generationErr -Raw -ErrorAction SilentlyContinue
+            $errorSummary = Get-ErrorSummary -ErrorOutput $errorOutput -MaxLines 3
+            $genDur = $genSw.Elapsed.TotalSeconds.ToString('F1')
+            $messages.Add(@{ Level = 'ERROR'; Message = "[$TestCategory] $Name`: Generation failed ($($genDur)s)$errorSummary" })
+            $result.ErrorSummary = "Generation failed$errorSummary"
+            $result.Messages = $messages.ToArray()
+            $result.TotalDuration = $testSw.Elapsed
+            return $result
+        }
+
+        $genDur = $genSw.Elapsed.TotalSeconds.ToString('F1')
+        $messages.Add(@{ Level = 'SUCCESS'; Message = "[$TestCategory] $Name`: Generation succeeded ($($genDur)s)" })
+
+        $projectDir = Join-Path -Path $tempDir -ChildPath $Name
+        if (-not (Test-Path -Path $projectDir -PathType Container)) {
+            $messages.Add(@{ Level = 'ERROR'; Message = "[$TestCategory] $Name`: Generation succeeded but directory not found" })
+            $result.ErrorSummary = 'Directory not found after generation'
+            $result.Messages = $messages.ToArray()
+            $result.TotalDuration = $testSw.Elapsed
+            return $result
+        }
+
+        $projects = @(Get-ChildItem -Path $projectDir -Filter "*.csproj" -Recurse -ErrorAction SilentlyContinue)
+        $result.ProjectCount = @($projects).Count
+
+        $buildOut = Join-Path -Path $tempDir -ChildPath "02-build-stdout.log"
+        $buildErr = Join-Path -Path $tempDir -ChildPath "02-build-stderr.log"
+
+        # Build
+        $buildSw = [System.Diagnostics.Stopwatch]::StartNew()
+        $buildProcess = Start-Process -FilePath 'dotnet' `
+            -ArgumentList @('build', '--verbosity', 'normal', '-nodeReuse:false') `
+            -WorkingDirectory $projectDir -NoNewWindow -Wait -PassThru `
+            -RedirectStandardOutput $buildOut -RedirectStandardError $buildErr
+        $buildSw.Stop()
+        $result.BuildDuration = $buildSw.Elapsed
+
+        if ($buildProcess.ExitCode -ne 0) {
+            $buildOutput = Get-Content $buildErr -Raw -ErrorAction SilentlyContinue
+            $buildErrorSummary = Get-ErrorSummary -ErrorOutput $buildOutput -MaxLines 3 -Filter '(error|Error|CS[0-9]+|MSB[0-9]+)'
+            $buildDur = $buildSw.Elapsed.TotalSeconds.ToString('F1')
+            $messages.Add(@{ Level = 'ERROR'; Message = "[$TestCategory] $Name`: Build failed ($($buildDur)s)$buildErrorSummary" })
+            $result.ErrorSummary = "Build failed$buildErrorSummary"
+            $result.Messages = $messages.ToArray()
+            $result.TotalDuration = $testSw.Elapsed
+            return $result
+        }
+
+        $buildDur = $buildSw.Elapsed.TotalSeconds.ToString('F1')
+        $messages.Add(@{ Level = 'SUCCESS'; Message = "[$TestCategory] $Name`: Build succeeded ($($result.ProjectCount) projects, $($buildDur)s)" })
+
+        # Tests
+        $testsDir = Join-Path -Path $projectDir -ChildPath 'tests'
+        if (Test-Path -Path $testsDir -PathType Container) {
+            $testOut = Join-Path -Path $tempDir -ChildPath "03-test-stdout.log"
+            $testErr = Join-Path -Path $tempDir -ChildPath "03-test-stderr.log"
+
+            $testFilter = if ($IncludeE2ETests) { 'Type!=Integration' } else { 'Type!=E2E&Type!=Integration' }
+            $testArgs = @('test', '--verbosity', 'normal', '--filter', $testFilter)
+
+            $testRunSw = [System.Diagnostics.Stopwatch]::StartNew()
+            $testProcess = Start-Process -FilePath 'dotnet' -ArgumentList $testArgs `
+                -WorkingDirectory $projectDir -NoNewWindow -Wait -PassThru `
+                -RedirectStandardOutput $testOut -RedirectStandardError $testErr
+            $testRunSw.Stop()
+            $result.TestDuration = $testRunSw.Elapsed
+
+            if ($testProcess.ExitCode -eq 0) {
+                $excludedMsg = if ($IncludeE2ETests) { 'Integration tests excluded' } else { 'E2E and Integration tests excluded' }
+                $testDur = $testRunSw.Elapsed.TotalSeconds.ToString('F1')
+                $messages.Add(@{ Level = 'SUCCESS'; Message = "[$TestCategory] $Name`: Tests passed ($excludedMsg, $($testDur)s)" })
+            }
+            else {
+                $testOutput = Get-Content $testErr -Raw -ErrorAction SilentlyContinue
+                $testErrorSummary = Get-ErrorSummary -ErrorOutput $testOutput -MaxLines 2 -Filter '(Failed|Error|Exception|Assert)'
+                $testDur = $testRunSw.Elapsed.TotalSeconds.ToString('F1')
+                $messages.Add(@{ Level = 'ERROR'; Message = "[$TestCategory] $Name`: Tests failed ($($testDur)s)$testErrorSummary" })
+                $result.ErrorSummary = "Tests failed$testErrorSummary"
+                $result.Messages = $messages.ToArray()
+                $result.TotalDuration = $testSw.Elapsed
+                return $result
+            }
+        }
+
+        # Content exclusion checks
+        if ($ContentMustNotContain.Count -gt 0) {
+            $contentFailed = $false
+            foreach ($check in $ContentMustNotContain) {
+                $filePath = Join-Path -Path $projectDir -ChildPath $check.File
+                if (Test-Path -Path $filePath) {
+                    $fileContent = Get-Content -Path $filePath -Raw
+                    if ($fileContent -match $check.Pattern) {
+                        $messages.Add(@{ Level = 'ERROR'; Message = "[$TestCategory] $Name`: Content check failed - '$($check.Pattern)' found in $($check.File)" })
+                        $contentFailed = $true
+                    }
+                }
+                else {
+                    $messages.Add(@{ Level = 'WARN'; Message = "[$TestCategory] $Name`: Content check skipped - file not found: $($check.File)" })
+                }
+            }
+            if ($contentFailed) {
+                $result.ErrorSummary = 'Content check failed'
+                $result.Messages = $messages.ToArray()
+                $result.TotalDuration = $testSw.Elapsed
+                return $result
+            }
+        }
+
+        # All passed
+        $testSw.Stop()
+        $result.Result = 'PASSED'
+        $result.TotalDuration = $testSw.Elapsed
+
+        $genFmt = $genSw.Elapsed.TotalSeconds.ToString('F1')
+        $buildFmt = $buildSw.Elapsed.TotalSeconds.ToString('F1')
+        $totalFmt = $testSw.Elapsed.TotalSeconds.ToString('F1')
+        $messages.Add(@{ Level = 'INFO'; Message = "[$TestCategory] $Name`: Total time: $($totalFmt)s (gen: $($genFmt)s, build: $($buildFmt)s)" })
+    }
+    catch {
+        $messages.Add(@{ Level = 'ERROR'; Message = "[$TestCategory] $Name`: Exception occurred - $($_.Exception.Message)" })
+        $result.ErrorSummary = $_.Exception.Message
+    }
+
+    $result.Messages = $messages.ToArray()
+    $result.TotalDuration = $testSw.Elapsed
+    return $result
+}
+
 function Test-Template {
     [CmdletBinding()]
     param(
