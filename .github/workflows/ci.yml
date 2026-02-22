@@ -99,6 +99,7 @@ jobs:
             --verbosity minimal \
             --filter "Type!=E2E" \
             --logger "trx;LogFilePrefix=appdomain" \
+            --collect:"XPlat Code Coverage;Format=opencover" \
             --results-directory ./TestResults/
 
       - name: Run Momentum library tests
@@ -110,6 +111,7 @@ jobs:
             --no-build \
             --verbosity minimal \
             --logger "trx;LogFilePrefix=momentum" \
+            --collect:"XPlat Code Coverage;Format=opencover" \
             --results-directory ./TestResults/
 
       - name: Upload test results
