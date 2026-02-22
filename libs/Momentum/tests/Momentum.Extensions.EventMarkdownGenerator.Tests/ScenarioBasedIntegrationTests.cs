@@ -282,19 +282,19 @@ public class ScenarioBasedIntegrationTests
         }
 
         // Fallback to default test assembly - search multiple possible paths
-        var possiblePaths = new[]
+        var testAssemblyLocation = Path.GetDirectoryName(typeof(ScenarioBasedIntegrationTests).Assembly.Location)!;
+        var configurations = new[] { "Release", "Debug" };
+        var possiblePaths = configurations.SelectMany(config => new[]
         {
             // Relative to current working directory (when running from Momentum root)
-            Path.Combine(Directory.GetCurrentDirectory(), "tests", "TestEvents", "bin", "Debug", "net10.0", "TestEvents.dll"),
+            Path.Combine(Directory.GetCurrentDirectory(), "tests", "TestEvents", "bin", config, "net10.0", "TestEvents.dll"),
 
             // Relative to test assembly location (when running from test bin directory)
-            Path.Combine(Path.GetDirectoryName(typeof(ScenarioBasedIntegrationTests).Assembly.Location)!,
-                "..", "..", "..", "..", "TestEvents", "bin", "Debug", "net10.0", "TestEvents.dll"),
+            Path.Combine(testAssemblyLocation, "..", "..", "..", "..", "TestEvents", "bin", config, "net10.0", "TestEvents.dll"),
 
             // Relative to solution root
-            Path.Combine(Path.GetDirectoryName(typeof(ScenarioBasedIntegrationTests).Assembly.Location)!,
-                "..", "..", "..", "..", "..", "..", "tests", "TestEvents", "bin", "Debug", "net10.0", "TestEvents.dll")
-        };
+            Path.Combine(testAssemblyLocation, "..", "..", "..", "..", "..", "..", "tests", "TestEvents", "bin", config, "net10.0", "TestEvents.dll")
+        });
 
         foreach (var path in possiblePaths)
         {
