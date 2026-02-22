@@ -205,32 +205,6 @@ function Format-Duration {
     }
 }
 
-function Test-MaxFailuresReached {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory)]
-        [ValidateNotNullOrEmpty()]
-        [string]$TestName,
-
-        [Parameter()]
-        [string[]]$TempFiles = @()
-    )
-
-    if ($MaxFailures -gt 0 -and $script:FailedTests -ge $MaxFailures) {
-        Write-ColoredMessage -Level 'ERROR' -Message "Reached maximum failures ($MaxFailures). Exiting early."
-
-        # Clean up any temp files passed in
-        if ($TempFiles.Count -gt 0) {
-            Remove-Item $TempFiles -Force -ErrorAction SilentlyContinue
-        }
-
-        Pop-Location
-        Invoke-IndividualTestCleanup -TestName $TestName -TestResult 'FAILED'
-        Show-Results
-        exit 1
-    }
-}
-
 function Write-ColoredMessage {
     [CmdletBinding()]
     param(
@@ -451,185 +425,6 @@ function Invoke-SingleTest {
     return $result
 }
 
-function Test-Template {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory)]
-        [ValidateNotNullOrEmpty()]
-        [string]$Name,
-
-        [Parameter(Mandatory)]
-        [AllowEmptyString()]
-        [string]$Parameters,
-
-        [Parameter(Mandatory)]
-        [ValidateNotNullOrEmpty()]
-        [string]$TestCategory,
-
-        [Parameter()]
-        [hashtable[]]$ContentMustNotContain = @()
-    )
-
-    $script:TotalTests++
-
-    $testSw = [System.Diagnostics.Stopwatch]::StartNew()
-    $paramDisplay = if ($Parameters.Trim()) { "with params: $Parameters" } else { "(no parameters)" }
-    Write-ColoredMessage -Level 'INFO' -Message "[$TestCategory] Testing: $Name $paramDisplay"
-
-    $tempDir = Join-Path -Path $script:ExecutionTestDir -ChildPath $Name
-    New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
-
-    Push-Location -Path $tempDir
-
-    try {
-        # Build template arguments
-        $templateArgs = @('new', 'mmt', '-n', $Name, '--allow-scripts', 'yes', '--local')
-
-        if ($Parameters.Trim()) {
-            $templateArgs += ($Parameters -split '\s+' | Where-Object { $_ })
-        }
-
-        $generationOut = Join-Path -Path $tempDir -ChildPath "01-generation-stdout.log"
-        $generationErr = Join-Path -Path $tempDir -ChildPath "01-generation-stderr.log"
-
-        $genSw = [System.Diagnostics.Stopwatch]::StartNew()
-        $process = Start-Process -FilePath 'dotnet' -ArgumentList $templateArgs `
-            -NoNewWindow -Wait -PassThru `
-            -RedirectStandardOutput $generationOut -RedirectStandardError $generationErr
-        $genSw.Stop()
-
-        if ($process.ExitCode -ne 0) {
-            $errorOutput = Get-Content $generationErr -Raw -ErrorAction SilentlyContinue
-            $errorSummary = Get-ErrorSummary -ErrorOutput $errorOutput -MaxLines 3
-
-            Write-ColoredMessage -Level 'ERROR' -Message "[$TestCategory] $Name`: Generation failed ($(Format-Duration $genSw))$errorSummary"
-            $script:FailedTests++
-            $script:TestResults[$Name] = 'FAILED'
-
-            return
-        }
-
-        Write-ColoredMessage -Level 'SUCCESS' -Message "[$TestCategory] $Name`: Generation succeeded ($(Format-Duration $genSw))"
-
-        if (-not (Test-Path -Path $Name -PathType Container)) {
-            Write-ColoredMessage -Level 'ERROR' -Message "[$TestCategory] $Name`: Generation succeeded but directory not found"
-            $script:FailedTests++
-            $script:TestResults[$Name] = 'FAILED'
-
-            return
-        }
-
-        Set-Location -Path $Name
-
-        $projects = @(Get-ChildItem -Path . -Filter "*.csproj" -Recurse -ErrorAction SilentlyContinue)
-        $projectCount = @($projects).Count
-
-        $buildOut = Join-Path -Path $tempDir -ChildPath "02-build-stdout.log"
-        $buildErr = Join-Path -Path $tempDir -ChildPath "02-build-stderr.log"
-
-        # Attempt to build the generated project
-        $buildSw = [System.Diagnostics.Stopwatch]::StartNew()
-        $buildProcess = Start-Process -FilePath 'dotnet' -ArgumentList @('build', '--verbosity', 'normal', '-nodeReuse:false') `
-            -NoNewWindow -Wait -PassThru `
-            -RedirectStandardOutput $buildOut -RedirectStandardError $buildErr
-        $buildSw.Stop()
-
-        if ($buildProcess.ExitCode -eq 0) {
-            Write-ColoredMessage -Level 'SUCCESS' -Message "[$TestCategory] $Name`: Build succeeded ($projectCount projects, $(Format-Duration $buildSw))"
-
-            # Run tests if they exist (excluding E2E tests)
-            if (Test-Path -Path 'tests' -PathType Container) {
-                $testOut = Join-Path -Path $tempDir -ChildPath "03-test-stdout.log"
-                $testErr = Join-Path -Path $tempDir -ChildPath "03-test-stderr.log"
-
-                # Exclude Integration tests (require Docker/Testcontainers infrastructure)
-                # E2E tests are also excluded by default unless -IncludeE2E is specified
-                $testFilter = if ($IncludeE2E) { 'Type!=Integration' } else { 'Type!=E2E&Type!=Integration' }
-                $testArgs = @('test', '--verbosity', 'normal', '--filter', $testFilter)
-
-                $testRunSw = [System.Diagnostics.Stopwatch]::StartNew()
-                $testProcess = Start-Process -FilePath 'dotnet' -ArgumentList $testArgs `
-                    -NoNewWindow -Wait -PassThru `
-                    -RedirectStandardOutput $testOut -RedirectStandardError $testErr
-                $testRunSw.Stop()
-
-                if ($testProcess.ExitCode -eq 0) {
-                    $excludedMsg = if ($IncludeE2E) { 'Integration tests excluded' } else { 'E2E and Integration tests excluded' }
-                    Write-ColoredMessage -Level 'SUCCESS' -Message "[$TestCategory] $Name`: Tests passed ($excludedMsg, $(Format-Duration $testRunSw))"
-                }
-                else {
-                    $testOutput = Get-Content $testErr -Raw -ErrorAction SilentlyContinue
-                    $testErrorSummary = Get-ErrorSummary -ErrorOutput $testOutput -MaxLines 2 -Filter '(Failed|Error|Exception|Assert)'
-
-                    Write-ColoredMessage -Level 'ERROR' -Message "[$TestCategory] $Name`: Tests failed ($(Format-Duration $testRunSw))$testErrorSummary"
-                    $script:FailedTests++
-                    $script:TestResults[$Name] = 'FAILED'
-
-                    Test-MaxFailuresReached -TestName $Name
-                    return
-                }
-            }
-
-            # Validate content exclusions if specified
-            if ($ContentMustNotContain.Count -gt 0) {
-                $contentFailed = $false
-                foreach ($check in $ContentMustNotContain) {
-                    $filePath = Join-Path -Path '.' -ChildPath $check.File
-                    if (Test-Path -Path $filePath) {
-                        $fileContent = Get-Content -Path $filePath -Raw
-                        if ($fileContent -match $check.Pattern) {
-                            Write-ColoredMessage -Level 'ERROR' -Message "[$TestCategory] $Name`: Content check failed - '$($check.Pattern)' found in $($check.File)"
-                            $contentFailed = $true
-                        }
-                    }
-                    else {
-                        Write-ColoredMessage -Level 'WARN' -Message "[$TestCategory] $Name`: Content check skipped - file not found: $($check.File)"
-                    }
-                }
-                if ($contentFailed) {
-                    $script:FailedTests++
-                    $script:TestResults[$Name] = 'FAILED'
-
-                    Test-MaxFailuresReached -TestName $Name
-                    return
-                }
-            }
-
-            $testSw.Stop()
-            $script:PassedTests++
-            $script:TestResults[$Name] = 'PASSED'
-            Write-ColoredMessage -Level 'INFO' -Message "[$TestCategory] $Name`: Total time: $(Format-Duration $testSw) (gen: $(Format-Duration $genSw), build: $(Format-Duration $buildSw))"
-        }
-        else {
-            $buildOutput = Get-Content $buildErr -Raw -ErrorAction SilentlyContinue
-            $buildErrorSummary = Get-ErrorSummary -ErrorOutput $buildOutput -MaxLines 3 -Filter '(error|Error|CS[0-9]+|MSB[0-9]+)'
-
-            Write-ColoredMessage -Level 'ERROR' -Message "[$TestCategory] $Name`: Build failed ($(Format-Duration $buildSw))$buildErrorSummary"
-            $script:FailedTests++
-            $script:TestResults[$Name] = 'FAILED'
-
-            Test-MaxFailuresReached -TestName $Name
-        }
-
-    }
-    catch {
-        Write-ColoredMessage -Level 'ERROR' -Message "[$TestCategory] $Name`: Exception occurred - $($_.Exception.Message)"
-        $script:FailedTests++
-        $script:TestResults[$Name] = 'FAILED'
-
-        Test-MaxFailuresReached -TestName $Name
-    }
-    finally {
-        Pop-Location
-        Invoke-IndividualTestCleanup -TestName $Name -TestResult $script:TestResults[$Name]
-
-        # Shut down any lingering MSBuild/dotnet server processes to reclaim memory
-        & dotnet build-server shutdown 2>$null | Out-Null
-    }
-
-    Write-Host '---'
-}
-
 function Invoke-IndividualTestCleanup {
     [CmdletBinding()]
     param(
@@ -764,6 +559,117 @@ function Get-TestDefinitions {
     }
 
     return $tests
+}
+
+function Invoke-TestExecution {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [hashtable[]]$TestDefinitions
+    )
+
+    $script:TotalTests += $TestDefinitions.Count
+
+    if ($Parallel) {
+        Write-ColoredMessage -Level 'INFO' -Message "Running $($TestDefinitions.Count) tests in parallel (4 concurrent)..."
+
+        # Variables to pass into the parallel scope
+        $executionTestDir = $script:ExecutionTestDir
+        $includeE2ETests = [bool]$IncludeE2E
+
+        # ForEach-Object -Parallel runs each iteration in a separate runspace.
+        # Functions defined in the script are NOT available — we must pass the
+        # function definitions as strings and dot-source them inside the block.
+        $funcGetErrorSummary = ${function:Get-ErrorSummary}.ToString()
+        $funcInvokeSingleTest = ${function:Invoke-SingleTest}.ToString()
+
+        $results = $TestDefinitions | ForEach-Object -Parallel {
+            # Re-create functions in this runspace
+            ${function:Get-ErrorSummary} = $using:funcGetErrorSummary
+            ${function:Invoke-SingleTest} = $using:funcInvokeSingleTest
+
+            $testDef = $_
+            Invoke-SingleTest `
+                -Name $testDef.Name `
+                -Parameters $testDef.Parameters `
+                -TestCategory $testDef.TestCategory `
+                -ExecutionTestDir $using:executionTestDir `
+                -ContentMustNotContain $testDef.ContentMustNotContain `
+                -IncludeE2ETests $using:includeE2ETests
+        } -ThrottleLimit 4
+
+        # Process results on the main thread
+        foreach ($testResult in $results) {
+            # Replay messages
+            foreach ($msg in $testResult.Messages) {
+                Write-ColoredMessage -Level $msg.Level -Message $msg.Message
+            }
+
+            # Update counters
+            if ($testResult.Result -eq 'PASSED') {
+                $script:PassedTests++
+            }
+            else {
+                $script:FailedTests++
+            }
+            $script:TestResults[$testResult.Name] = $testResult.Result
+
+            # Cleanup individual test
+            Invoke-IndividualTestCleanup -TestName $testResult.Name -TestResult $testResult.Result
+
+            Write-Host '---'
+
+            # Check max failures
+            if ($MaxFailures -gt 0 -and $script:FailedTests -ge $MaxFailures) {
+                Write-ColoredMessage -Level 'ERROR' -Message "Reached maximum failures ($MaxFailures). Stopping."
+                break
+            }
+        }
+
+        # Shut down build servers once after all parallel tests
+        & dotnet build-server shutdown 2>$null | Out-Null
+    }
+    else {
+        # Sequential mode — existing behavior via Invoke-SingleTest
+        foreach ($testDef in $TestDefinitions) {
+            $testResult = Invoke-SingleTest `
+                -Name $testDef.Name `
+                -Parameters $testDef.Parameters `
+                -TestCategory $testDef.TestCategory `
+                -ExecutionTestDir $script:ExecutionTestDir `
+                -ContentMustNotContain $testDef.ContentMustNotContain `
+                -IncludeE2ETests ([bool]$IncludeE2E)
+
+            # Replay messages
+            foreach ($msg in $testResult.Messages) {
+                Write-ColoredMessage -Level $msg.Level -Message $msg.Message
+            }
+
+            # Update counters
+            if ($testResult.Result -eq 'PASSED') {
+                $script:PassedTests++
+            }
+            else {
+                $script:FailedTests++
+            }
+            $script:TestResults[$testResult.Name] = $testResult.Result
+
+            # Cleanup individual test
+            Invoke-IndividualTestCleanup -TestName $testResult.Name -TestResult $testResult.Result
+
+            # Shut down build servers per test in sequential mode
+            & dotnet build-server shutdown 2>$null | Out-Null
+
+            Write-Host '---'
+
+            # Check max failures
+            if ($MaxFailures -gt 0 -and $script:FailedTests -ge $MaxFailures) {
+                Write-ColoredMessage -Level 'ERROR' -Message "Reached maximum failures ($MaxFailures). Exiting early."
+                Show-Results
+                exit 1
+            }
+        }
+    }
 }
 
 function Show-Categories {
@@ -1061,12 +967,14 @@ function Invoke-Main {
 
         Write-Host ''
 
-        # Collect test definitions for selected or all categories
-        $categoriesToRun = if ($Category) {
-            @($Category)
+        # Collect test definitions
+        $allTests = @()
+        if ($Category) {
+            Write-ColoredMessage -Level 'INFO' -Message "Collecting tests for category: $Category"
+            $allTests = @(Get-TestDefinitions -TestCategory $Category)
         }
         else {
-            @(
+            $allCategories = @(
                 'component-isolation',
                 'port-config',
                 'org-names',
@@ -1075,18 +983,21 @@ function Invoke-Main {
                 'orleans-combinations',
                 'edge-cases'
             )
+
+            foreach ($cat in $allCategories) {
+                $allTests += @(Get-TestDefinitions -TestCategory $cat)
+            }
         }
 
-        $allTests = @()
-        foreach ($cat in $categoriesToRun) {
-            $allTests += Get-TestDefinitions -TestCategory $cat
+        Write-ColoredMessage -Level 'INFO' -Message "Collected $($allTests.Count) test(s)"
+        if ($Parallel) {
+            Write-ColoredMessage -Level 'INFO' -Message 'Execution mode: parallel (4 concurrent)'
         }
 
-        # Execute tests sequentially
-        foreach ($testDef in $allTests) {
-            Test-Template -Name $testDef.Name -Parameters $testDef.Parameters `
-                -TestCategory $testDef.TestCategory -ContentMustNotContain $testDef.ContentMustNotContain
-        }
+        Write-Host ''
+
+        # Execute tests
+        Invoke-TestExecution -TestDefinitions $allTests
 
         Show-Results
     }
