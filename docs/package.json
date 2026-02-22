@@ -15,7 +15,7 @@
     "docs:events": "bun .vitepress/scripts/generate-events-docs.ts \"../src/AppDomain.Contracts/bin/**/AppDomain.Contracts.dll\""
   },
   "dependencies": {
-    "glob": "^11.0.3",
+    "glob": "^13.0.6",
     "gray-matter": "^4.0.3",
     "yaml": "^2.8.1"
   },
