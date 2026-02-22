@@ -105,25 +105,14 @@ jobs:
           prerelease: ${{ steps.config.outputs.prerelease }}
           tag-prefix: "template-v"
 
-      - name: Generate release notes
-        id: release-notes
-        uses: ./.github/actions/generate-release-notes
-        with:
-          version: ${{ steps.release-version.outputs.next-version }}
-          tag: ${{ steps.release-version.outputs.next-tag }}
-          previous-tag: ${{ steps.release-version.outputs.previous-tag }}
-
       - name: Create GitHub release
-        shell: pwsh
-        run: |
-          & ./.github/scripts/Create-GitHubRelease.ps1 `
-            -Tag "${{ steps.release-version.outputs.next-tag }}" `
-            -Title "Momentum Template ${{ steps.release-version.outputs.next-tag }}" `
-            -NotesFile "${{ steps.release-notes.outputs.notes-file }}" `
-            ${{ steps.config.outputs.prerelease == 'true' && '-Prerelease' || '' }} `
-            -Target "main"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v2.5.0
+        with:
+          tag_name: ${{ steps.release-version.outputs.next-tag }}
+          name: Momentum Template ${{ steps.release-version.outputs.next-tag }}
+          generate_release_notes: true
+          prerelease: ${{ steps.config.outputs.prerelease }}
+          target_commitish: main
 
       - name: Publish packages
         uses: ./.github/actions/nuget-publish

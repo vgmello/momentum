@@ -1,0 +1,194 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+    paths-ignore:
+      - "_template_tests/**"
+      - ".claude/**"
+      - ".claude_project/**"
+      - ".mcp.json"
+      - "CLAUDE.md"
+      - "libs/Momentum/CLAUDE.md"
+      - "LICENSE"
+      - "sonar-project.properties"
+      - "debug.symbols.txt"
+      - "local-feed-path.txt"
+      - "local-mmt-version.txt"
+      - ".github/workflows/**"
+      - ".github/actions/**"
+      - ".github/scripts/**"
+      - ".github/dependabot.yml"
+      - ".github/release.yml"
+      - ".github/CODE_OF_CONDUCT.md"
+      - ".github/SECURITY.md"
+
+  pull_request:
+    branches: ["main"]
+    paths-ignore:
+      - "_template_tests/**"
+      - ".claude/**"
+      - ".claude_project/**"
+      - ".mcp.json"
+      - "CLAUDE.md"
+      - "libs/Momentum/CLAUDE.md"
+      - "LICENSE"
+      - "sonar-project.properties"
+      - "debug.symbols.txt"
+      - "local-feed-path.txt"
+      - "local-mmt-version.txt"
+      - ".github/workflows/**"
+      - ".github/actions/**"
+      - ".github/scripts/**"
+      - ".github/dependabot.yml"
+      - ".github/release.yml"
+      - ".github/CODE_OF_CONDUCT.md"
+      - ".github/SECURITY.md"
+
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: "10.0.x"
+  DOTNET_NOLOGO: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  checks: write
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Build AppDomain solution
+        uses: ./.github/actions/build
+        with:
+          build-target: AppDomain.slnx
+
+      - name: Build Momentum libraries
+        uses: ./.github/actions/build
+        with:
+          build-target: libs/Momentum/Momentum.slnx
+
+      - name: Run AppDomain tests
+        shell: bash
+        run: |
+          echo "🧪 Running AppDomain tests (excluding E2E)..."
+          dotnet test AppDomain.slnx \
+            --configuration Release \
+            --no-build \
+            --verbosity minimal \
+            --filter "Type!=E2E" \
+            --logger "trx;LogFilePrefix=appdomain" \
+            --results-directory ./TestResults/
+
+      - name: Run Momentum library tests
+        shell: bash
+        run: |
+          echo "🧪 Running Momentum library tests..."
+          dotnet test libs/Momentum/Momentum.slnx \
+            --configuration Release \
+            --no-build \
+            --verbosity minimal \
+            --logger "trx;LogFilePrefix=momentum" \
+            --results-directory ./TestResults/
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults/
+          retention-days: 7
+
+      - name: Test report
+        if: always()
+        uses: dorny/test-reporter@v2.5.0
+        with:
+          name: Test Results
+          path: TestResults/*.trx
+          reporter: dotnet-trx
+
+  template-tests:
+    name: Template Tests (Real-World Patterns)
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/*.props') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Build and pack local Momentum libraries
+        shell: bash
+        run: |
+          echo "📦 Building Momentum libraries for local template testing..."
+          dotnet build libs/Momentum/Momentum.slnx --verbosity minimal
+
+      - name: Install template
+        shell: bash
+        run: |
+          echo "📐 Installing Momentum template..."
+          dotnet new install ./ --force
+
+      - name: Run real-world pattern template tests
+        shell: pwsh
+        run: |
+          Write-Host "🧪 Running real-world pattern template tests..."
+          & ./scripts/Run-TemplateTests.ps1 -Category real-world-patterns -MaxFailures 3 -KeepResultsWithErrors:$false
+
+  docs-build:
+    name: Verify Documentation Build
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Build documentation
+        uses: ./.github/actions/docs-build
+        with:
+          docs-path: libs/Momentum/docs
+          build-dotnet: true

@@ -91,6 +91,10 @@ param(
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
+# Prevent MSBuild from keeping long-lived server nodes that accumulate memory across tests
+$env:MSBUILDDISABLENODEREUSE = '1'
+$env:DOTNET_CLI_DO_NOT_USE_MSBUILD_SERVER = '1'
+
 # Script-level variables
 $script:TotalTests = 0
 $script:PassedTests = 0
@@ -288,7 +292,7 @@ function Test-Template {
         $buildErr = Join-Path -Path $tempDir -ChildPath "02-build-stderr.log"
 
         # Attempt to build the generated project
-        $buildProcess = Start-Process -FilePath 'dotnet' -ArgumentList @('build', '--verbosity', 'normal') `
+        $buildProcess = Start-Process -FilePath 'dotnet' -ArgumentList @('build', '--verbosity', 'normal', '-nodeReuse:false') `
             -NoNewWindow -Wait -PassThru `
             -RedirectStandardOutput $buildOut -RedirectStandardError $buildErr
 
@@ -376,6 +380,9 @@ function Test-Template {
     finally {
         Pop-Location
         Invoke-IndividualTestCleanup -TestName $Name -TestResult $script:TestResults[$Name]
+
+        # Shut down any lingering MSBuild/dotnet server processes to reclaim memory
+        & dotnet build-server shutdown 2>$null | Out-Null
     }
 
     Write-Host '---'
