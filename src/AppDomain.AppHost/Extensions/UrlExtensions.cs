@@ -7,6 +7,7 @@ namespace AppDomain.AppHost.Extensions;
 /// <summary>
 /// Represents a parsed endpoint specification with scheme and optional port.
 /// </summary>
+[ExcludeFromCodeCoverage]
 internal record EndpointSpec(string Scheme, int? Port)
 {
     /// <summary>
@@ -15,6 +16,7 @@ internal record EndpointSpec(string Scheme, int? Port)
     public bool IsSchemeOnly => Port == null;
 }
 
+[ExcludeFromCodeCoverage]
 public static class UrlExtensions
 {
     /// <summary>

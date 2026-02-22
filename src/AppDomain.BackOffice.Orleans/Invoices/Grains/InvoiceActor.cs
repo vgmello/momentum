@@ -19,6 +19,7 @@ namespace AppDomain.BackOffice.Orleans.Invoices.Grains;
 /// <param name="invoiceState">The persistent state for grain metadata</param>
 /// <param name="messageBus">Wolverine message bus for commands/queries</param>
 /// <param name="logger">Logger instance</param>
+[ExcludeFromCodeCoverage]
 [GrainDirectory(GrainDirectoryName = OrleansExtensions.GrainDirectoryName)]
 public class InvoiceActor(
     ILogger<InvoiceActor> logger,
