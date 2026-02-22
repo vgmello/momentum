@@ -71,7 +71,7 @@
     Stop after 3 failures and preserve failed test directories
 
 .EXAMPLE
-    ./Run-TemplateTests.ps1 -RestoreTemplate:$false
+    ./Run-TemplateTests.ps1 -RestoreTemplate $false
     Run tests without reinstalling the repo root template afterwards
 #>
 
@@ -101,7 +101,7 @@ param(
     [switch]$IncludeE2E,
 
     [Parameter(ParameterSetName = 'Run')]
-    [switch]$RestoreTemplate = $true
+    [bool]$RestoreTemplate = $true
 )
 
 $ErrorActionPreference = 'Stop'
