@@ -46,6 +46,9 @@
     • 0 = run all tests regardless of failures
     • N = exit after N failures
 
+.PARAMETER IncludeE2E
+    Include E2E tests in the test run. By default, E2E tests are excluded.
+
 .EXAMPLE
     ./Run-TemplateTests.ps1
     Run all test categories
@@ -79,7 +82,10 @@ param(
 
     [Parameter(ParameterSetName = 'Run')]
     [ValidateRange(0, [int]::MaxValue)]
-    [int]$MaxFailures = 0
+    [int]$MaxFailures = 0,
+
+    [Parameter(ParameterSetName = 'Run')]
+    [switch]$IncludeE2E
 )
 
 $ErrorActionPreference = 'Stop'
@@ -294,15 +300,18 @@ function Test-Template {
                 $testOut = Join-Path -Path $tempDir -ChildPath "03-test-stdout.log"
                 $testErr = Join-Path -Path $tempDir -ChildPath "03-test-stderr.log"
 
-                # Exclude E2E and Integration tests (require Docker/Testcontainers infrastructure)
-                $testArgs = @('test', '--verbosity', 'normal', '--filter', 'Type!=E2E&Type!=Integration')
+                # Exclude Integration tests (require Docker/Testcontainers infrastructure)
+                # E2E tests are also excluded by default unless -IncludeE2E is specified
+                $testFilter = if ($IncludeE2E) { 'Type!=Integration' } else { 'Type!=E2E&Type!=Integration' }
+                $testArgs = @('test', '--verbosity', 'normal', '--filter', $testFilter)
 
                 $testProcess = Start-Process -FilePath 'dotnet' -ArgumentList $testArgs `
                     -NoNewWindow -Wait -PassThru `
                     -RedirectStandardOutput $testOut -RedirectStandardError $testErr
 
                 if ($testProcess.ExitCode -eq 0) {
-                    Write-ColoredMessage -Level 'SUCCESS' -Message "[$TestCategory] $Name`: Tests passed (E2E and Integration tests excluded)"
+                    $excludedMsg = if ($IncludeE2E) { 'Integration tests excluded' } else { 'E2E and Integration tests excluded' }
+                    Write-ColoredMessage -Level 'SUCCESS' -Message "[$TestCategory] $Name`: Tests passed ($excludedMsg)"
                 }
                 else {
                     $testOutput = Get-Content $testErr -Raw -ErrorAction SilentlyContinue
