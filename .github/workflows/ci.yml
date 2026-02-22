@@ -162,7 +162,7 @@ jobs:
         shell: pwsh
         run: |
           Write-Host "🧪 Running real-world pattern template tests..."
-          & ./scripts/Run-TemplateTests.ps1 -Category real-world-patterns -MaxFailures 3 -KeepResultsWithErrors:$false -RestoreTemplate:$false
+          & ./scripts/Run-TemplateTests.ps1 -Category real-world-patterns -MaxFailures 3 -KeepResultsWithErrors:$false -SkipRestoreTemplate
 
   docs-build:
     name: Verify Documentation Build

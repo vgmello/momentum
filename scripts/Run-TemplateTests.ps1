@@ -49,12 +49,12 @@
 .PARAMETER IncludeE2E
     Include E2E tests in the test run. By default, E2E tests are excluded.
 
-.PARAMETER RestoreTemplate
-    Controls post-test cleanup behavior (default: true).
-    When true: uninstalls the clean export template, deletes its directory, and reinstalls
-    the template from the repo root so the developer's environment is ready.
-    When false: leaves the clean export directory and its template installation in place.
-    Use false in CI where no developer environment needs restoring.
+.PARAMETER SkipRestoreTemplate
+    Skip post-test template restoration (default: false).
+    When absent (default): uninstalls the clean export template, deletes its directory, and
+    reinstalls the template from the repo root so the developer's environment is ready.
+    When present: leaves the clean export directory and its template installation in place.
+    Use in CI where no developer environment needs restoring.
     Note: all existing Momentum templates are always uninstalled before testing regardless
     of this flag to avoid false positives.
 
@@ -71,7 +71,7 @@
     Stop after 3 failures and preserve failed test directories
 
 .EXAMPLE
-    ./Run-TemplateTests.ps1 -RestoreTemplate $false
+    ./Run-TemplateTests.ps1 -SkipRestoreTemplate
     Run tests without reinstalling the repo root template afterwards
 #>
 
@@ -101,7 +101,7 @@ param(
     [switch]$IncludeE2E,
 
     [Parameter(ParameterSetName = 'Run')]
-    [bool]$RestoreTemplate = $true
+    [switch]$SkipRestoreTemplate
 )
 
 $ErrorActionPreference = 'Stop'
@@ -112,7 +112,7 @@ $env:MSBUILDDISABLENODEREUSE = '1'
 $env:DOTNET_CLI_DO_NOT_USE_MSBUILD_SERVER = '1'
 
 # Copy parameter to script scope so it's reliably accessible during Ctrl+C cleanup
-$script:RestoreTemplateEnabled = [bool]$RestoreTemplate
+$script:RestoreTemplateEnabled = -not $SkipRestoreTemplate
 
 # Script-level variables
 $script:TotalTests = 0
