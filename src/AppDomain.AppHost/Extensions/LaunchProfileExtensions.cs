@@ -8,6 +8,7 @@ namespace AppDomain.AppHost.Extensions;
 /// <summary>
 ///     Provides extension methods for integrating launch profile endpoint configurations with .NET Aspire orchestration.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class LaunchProfileExtensions
 {
     private const string KestrelEndpointsPrefix = "KESTREL__ENDPOINTS__";

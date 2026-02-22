@@ -8,6 +8,7 @@ namespace AppDomain.BackOffice.Orleans.Infrastructure.Extensions;
 /// <summary>
 ///     Provides extension methods for configuring Microsoft Orleans in the application.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class OrleansExtensions
 {
     public const string SectionName = "Orleans";

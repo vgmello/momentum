@@ -5,6 +5,7 @@ namespace AppDomain.AppHost.Extensions;
 /// <summary>
 ///     Provides extension methods for gRPC endpoint configuration in .NET Aspire orchestration.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class GrpcExtensions
 {
     /// <summary>

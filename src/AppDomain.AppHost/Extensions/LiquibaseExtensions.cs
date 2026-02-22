@@ -5,6 +5,7 @@ namespace AppDomain.AppHost.Extensions;
 /// <summary>
 ///     Provides extension methods for configuring Liquibase database migrations in .NET Aspire orchestration.
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class LiquibaseExtensions
 {
     /// <summary>
