@@ -1,12 +1,13 @@
 // Copyright (c) OrgName. All rights reserved.
 
 namespace AppDomain.Tests.Architecture;
+
 public class DomainIsolationRulesTests : ArchitectureTestBase
 {
     [Fact]
     public void Domains_ShouldNotDirectlyReferencEachOthersInternals()
     {
-        var domainPrefixes = DomainDiscovery.GetAllDomains().ToList();
+        var domainPrefixes = DomainDiscovery.GetAllDomainNamespaces().ToList();
 
         // Ensure we discovered some domains
         domainPrefixes.ShouldNotBeEmpty("Should discover at least one domain with Commands, Queries, or Data");
@@ -42,7 +43,7 @@ public class DomainIsolationRulesTests : ArchitectureTestBase
     [Fact]
     public void DiscoveredDomains_ShouldHaveExpectedStructure()
     {
-        var domains = DomainDiscovery.GetAllDomains().ToList();
+        var domains = DomainDiscovery.GetAllDomainNamespaces().ToList();
 
         Console.WriteLine($"Discovered domains: {string.Join(", ", domains)}");
 

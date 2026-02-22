@@ -87,22 +87,20 @@ jobs:
         shell: bash
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          SONAR_ARGS=(
-            /k:"vgmello_momentum"
-            /o:"vgmello"
-            /d:sonar.host.url="https://sonarcloud.io"
-            /d:sonar.token="$SONAR_TOKEN"
-            /d:sonar.cs.opencover.reportsPaths="**/TestResults/*/coverage.opencover.xml"
-            /d:sonar.exclusions=".github/sdlc/**,.claude/**,scripts/**,**/node_modules/**,**/bin/**,**/obj/**"
-            /d:sonar.coverage.exclusions="**/*Tests*/**,**/Program.cs,**/*.Generated.cs,infra/**,docs/**,.template.config/**,.github/**"
-            /d:sonar.issue.ignore.multicriteria="e1,e2"
-            /d:sonar.issue.ignore.multicriteria.e1.ruleKey="csharpsquid:S2068"
-            /d:sonar.issue.ignore.multicriteria.e1.resourceKey="**/appsettings.Performance.json"
-            /d:sonar.issue.ignore.multicriteria.e2.ruleKey="csharpsquid:S1135"
-            /d:sonar.issue.ignore.multicriteria.e2.resourceKey="**/*"
-          )
+          # Read properties from .sonarcloud.properties as single source of truth
+          SONAR_ARGS=()
+          while IFS='=' read -r key value; do
+            [[ -z "$key" || "$key" =~ ^# ]] && continue
+            case "$key" in
+              sonar.projectKey)  SONAR_ARGS+=(/k:"$value") ;;
+              sonar.organization) SONAR_ARGS+=(/o:"$value") ;;
+              *)                 SONAR_ARGS+=(/d:"$key=$value") ;;
+            esac
+          done < .sonarcloud.properties
+
+          # Add runtime-only parameters
+          SONAR_ARGS+=(/d:sonar.token="$SONAR_TOKEN")
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             SONAR_ARGS+=(
               /d:sonar.pullrequest.key="${{ github.event.pull_request.number }}"

@@ -15,21 +15,21 @@ public static class DomainDiscovery
     /// </summary>
     private static Types GetAppDomainTypes() => Types
 #if INCLUDE_API
-        .InAssemblies([typeof(IAppDomainAssembly).Assembly, typeof(Api.DependencyInjection).Assembly]);
+    .InAssemblies([typeof(IAppDomainAssembly).Assembly, typeof(Api.DependencyInjection).Assembly])
 #else
-        .InAssemblies([typeof(IAppDomainAssembly).Assembly]);
+        .InAssemblies([typeof(IAppDomainAssembly).Assembly])
 #endif
+    .That().ResideInNamespaceStartingWith("AppDomain.");
 
     /// <summary>
     ///     Discovers all domain namespaces by looking for Commands, Queries, or Data folders.
     /// </summary>
-    public static IEnumerable<string> GetAllDomains()
+    public static IEnumerable<string> GetAllDomainNamespaces()
     {
         var allTypes = GetAppDomainTypes().GetTypes();
 
         return allTypes
             .Where(t => t.Namespace != null &&
-                        t.Namespace.StartsWith("AppDomain.") &&
                         !t.Namespace.StartsWith("AppDomain.Common") &&
                         !t.Namespace.StartsWith("AppDomain.BackOffice") &&
                         !t.Namespace.StartsWith("AppDomain.Api") &&
@@ -57,7 +57,7 @@ public static class DomainDiscovery
     /// </summary>
     public static IEnumerable<string> GetDomainNames()
     {
-        return GetAllDomains()
+        return GetAllDomainNamespaces()
             .Select(d => d.Replace("AppDomain.", ""))
             .Distinct();
     }
@@ -71,8 +71,7 @@ public static class DomainDiscovery
         return GetAppDomainTypes()
             .GetTypes()
             .Where(t => t.Namespace?.Contains(".Actors") == true &&
-                        t.Namespace.StartsWith("AppDomain.") &&
-                        !t.Namespace.StartsWith("AppDomain.BackOffice.Orleans") &&
+                        !t.Namespace!.StartsWith("AppDomain.BackOffice.Orleans") &&
                         t.GetInterfaces().Any(i => typeof(IGrain).IsAssignableFrom(i)))
             .Select(t => t.Namespace!)
             .ToHashSet();
