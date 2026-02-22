@@ -79,6 +79,41 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
+      - name: Install SonarScanner
+        shell: bash
+        run: dotnet tool install --global dotnet-sonarscanner
+
+      - name: SonarScanner begin
+        shell: bash
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          SONAR_ARGS=(
+            /k:"vgmello_momentum"
+            /o:"vgmello"
+            /d:sonar.host.url="https://sonarcloud.io"
+            /d:sonar.token="$SONAR_TOKEN"
+            /d:sonar.cs.opencover.reportsPaths="**/TestResults/*/coverage.opencover.xml"
+            /d:sonar.exclusions=".github/sdlc/**,.claude/**,scripts/**,**/node_modules/**,**/bin/**,**/obj/**"
+            /d:sonar.coverage.exclusions="**/*Tests*/**,**/Program.cs,**/*.Generated.cs,infra/**,docs/**,.template.config/**,.github/**"
+            /d:sonar.issue.ignore.multicriteria="e1,e2"
+            /d:sonar.issue.ignore.multicriteria.e1.ruleKey="csharpsquid:S2068"
+            /d:sonar.issue.ignore.multicriteria.e1.resourceKey="**/appsettings.Performance.json"
+            /d:sonar.issue.ignore.multicriteria.e2.ruleKey="csharpsquid:S1135"
+            /d:sonar.issue.ignore.multicriteria.e2.resourceKey="**/*"
+          )
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            SONAR_ARGS+=(
+              /d:sonar.pullrequest.key="${{ github.event.pull_request.number }}"
+              /d:sonar.pullrequest.branch="${{ github.head_ref }}"
+              /d:sonar.pullrequest.base="${{ github.base_ref }}"
+            )
+          else
+            SONAR_ARGS+=(/d:sonar.branch.name="${{ github.ref_name }}")
+          fi
+          dotnet sonarscanner begin "${SONAR_ARGS[@]}"
+
       - name: Build AppDomain solution
         uses: ./.github/actions/build
         with:
@@ -113,6 +148,13 @@ jobs:
             --logger "trx;LogFilePrefix=momentum" \
             --collect:"XPlat Code Coverage;Format=opencover" \
             --results-directory ./TestResults/
+
+      - name: SonarScanner end
+        if: always()
+        shell: bash
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: dotnet sonarscanner end /d:sonar.token="$SONAR_TOKEN"
 
       - name: Upload test results
         if: always()
@@ -183,7 +225,7 @@ jobs:
         shell: pwsh
         run: |
           Write-Host "🧪 Running real-world pattern template tests..."
-          & ./scripts/Run-TemplateTests.ps1 -Category real-world-patterns -MaxFailures 3 -KeepResultsWithErrors:$false -SkipRestoreTemplate
+          & ./scripts/Run-TemplateTests.ps1 -Category real-world-patterns -MaxFailures 3 -KeepResultsWithErrors:$false -SkipRestoreTemplate -Parallel
 
   docs-build:
     name: Verify Documentation Build

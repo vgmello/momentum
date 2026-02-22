@@ -62,6 +62,8 @@
     Run tests in parallel using PowerShell 7 ForEach-Object -Parallel.
     Tests run 4-at-a-time. Console output is batched per test (not interleaved).
     Default: false (sequential execution).
+    Note: In parallel mode, all tests run to completion. MaxFailures only controls
+    whether remaining results are processed after failures are detected.
 
 .EXAMPLE
     ./Run-TemplateTests.ps1
@@ -622,6 +624,9 @@ function Invoke-TestExecution {
             # Check max failures
             if ($MaxFailures -gt 0 -and $script:FailedTests -ge $MaxFailures) {
                 Write-ColoredMessage -Level 'ERROR' -Message "Reached maximum failures ($MaxFailures). Stopping."
+                # Adjust TotalTests to reflect only processed results
+                $processed = $script:PassedTests + $script:FailedTests
+                $script:TotalTests -= ($TestDefinitions.Count - $processed)
                 break
             }
         }
