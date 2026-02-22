@@ -100,6 +100,11 @@ jobs:
         shell: bash
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GH_EVENT_NAME: ${{ github.event_name }}
+          GH_PR_NUMBER: ${{ github.event.pull_request.number }}
+          GH_HEAD_REF: ${{ github.head_ref }}
+          GH_BASE_REF: ${{ github.base_ref }}
+          GH_REF_NAME: ${{ github.ref_name }}
         run: |
           # Read properties from .sonarcloud.properties as single source of truth
           SONAR_ARGS=()
@@ -114,14 +119,14 @@ jobs:
 
           # Add runtime-only parameters
           SONAR_ARGS+=(/d:sonar.token="$SONAR_TOKEN")
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
+          if [ "$GH_EVENT_NAME" = "pull_request" ]; then
             SONAR_ARGS+=(
-              /d:sonar.pullrequest.key="${{ github.event.pull_request.number }}"
-              /d:sonar.pullrequest.branch="${{ github.head_ref }}"
-              /d:sonar.pullrequest.base="${{ github.base_ref }}"
+              /d:sonar.pullrequest.key="$GH_PR_NUMBER"
+              /d:sonar.pullrequest.branch="$GH_HEAD_REF"
+              /d:sonar.pullrequest.base="$GH_BASE_REF"
             )
           else
-            SONAR_ARGS+=(/d:sonar.branch.name="${{ github.ref_name }}")
+            SONAR_ARGS+=(/d:sonar.branch.name="$GH_REF_NAME")
           fi
           dotnet sonarscanner begin "${SONAR_ARGS[@]}"
 
