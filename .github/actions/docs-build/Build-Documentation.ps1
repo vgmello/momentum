@@ -51,10 +51,20 @@ Push-Location $DocsPath
 try {
     Write-Host "📦 Installing dependencies with Bun..."
     if ($CI) {
-        bun install --frozen-lockfile
+        bun install --frozen-lockfile 2>&1 | Tee-Object -Variable installOutput
         if ($LASTEXITCODE -ne 0) {
-            Write-Warning "⚠️ Lockfile is out of sync with package.json. Retrying without --frozen-lockfile to keep docs deployment running."
-            bun install
+            if (($installOutput -join "`n") -match "lockfile had changes, but lockfile is frozen") {
+                Write-Warning "⚠️ Lockfile is out of sync with package.json. Retrying without --frozen-lockfile. Please run 'bun install' locally and commit the updated lockfile."
+                bun install
+                if ($LASTEXITCODE -ne 0) {
+                    Write-Error "❌ Dependency installation failed after retrying without frozen lockfile"
+                    exit 1
+                }
+            }
+            else {
+                Write-Error "❌ Dependency installation failed"
+                exit 1
+            }
         }
     } else {
         bun install
