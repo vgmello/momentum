@@ -115,11 +115,42 @@ jobs:
         shell: pwsh
         run: |
           Write-Host "🔍 Starting SonarQube analysis..."
-          & "./.sonar/scanner/dotnet-sonarscanner" begin `
-            /k:"vgmello_momentum" `
-            /o:"vgmello" `
-            /d:sonar.host.url="https://sonarcloud.io" `
-            /d:sonar.token="$env:SONAR_TOKEN"
+          $sonarPropertiesPath = "sonar-project.properties"
+          if (-not (Test-Path $sonarPropertiesPath)) {
+            throw "Missing Sonar properties file: $sonarPropertiesPath"
+          }
+
+          $sonarProperties = @{}
+          Get-Content $sonarPropertiesPath | ForEach-Object {
+            $line = $_.Trim()
+            if (-not $line -or $line.StartsWith("#")) { return }
+            $parts = $line -split "=", 2
+            if ($parts.Count -eq 2) {
+              $sonarProperties[$parts[0].Trim()] = $parts[1].Trim()
+            }
+          }
+
+          $requiredProperties = @("sonar.projectKey", "sonar.organization", "sonar.host.url")
+          foreach ($required in $requiredProperties) {
+            if (-not $sonarProperties.ContainsKey($required)) {
+              throw "Required Sonar property missing: $required"
+            }
+          }
+
+          $sonarArgs = @(
+            "begin",
+            "/k:$($sonarProperties['sonar.projectKey'])",
+            "/o:$($sonarProperties['sonar.organization'])",
+            "/d:sonar.host.url=$($sonarProperties['sonar.host.url'])",
+            "/d:sonar.token=$env:SONAR_TOKEN"
+          )
+
+          foreach ($entry in ($sonarProperties.GetEnumerator() | Sort-Object Name)) {
+            if ($requiredProperties -contains $entry.Key) { continue }
+            $sonarArgs += "/d:$($entry.Key)=$($entry.Value)"
+          }
+
+          & "./.sonar/scanner/dotnet-sonarscanner" @sonarArgs
 
       - name: Restore NuGet packages
         run: |
