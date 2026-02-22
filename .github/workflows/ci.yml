@@ -1,0 +1,282 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+    paths-ignore:
+      - "_template_tests/**"
+      - ".claude/**"
+      - ".claude_project/**"
+      - ".mcp.json"
+      - "CLAUDE.md"
+      - "libs/Momentum/CLAUDE.md"
+      - "LICENSE"
+      - "sonar-project.properties"
+      - "debug.symbols.txt"
+      - "local-feed-path.txt"
+      - "local-mmt-version.txt"
+      - ".github/workflows/**"
+      - ".github/actions/**"
+      - ".github/scripts/**"
+      - ".github/dependabot.yml"
+      - ".github/release.yml"
+      - ".github/CODE_OF_CONDUCT.md"
+      - ".github/SECURITY.md"
+
+  pull_request:
+    branches: ["main"]
+    paths-ignore:
+      - "_template_tests/**"
+      - ".claude/**"
+      - ".claude_project/**"
+      - ".mcp.json"
+      - "CLAUDE.md"
+      - "libs/Momentum/CLAUDE.md"
+      - "LICENSE"
+      - "sonar-project.properties"
+      - "debug.symbols.txt"
+      - "local-feed-path.txt"
+      - "local-mmt-version.txt"
+      - ".github/workflows/**"
+      - ".github/actions/**"
+      - ".github/scripts/**"
+      - ".github/dependabot.yml"
+      - ".github/release.yml"
+      - ".github/CODE_OF_CONDUCT.md"
+      - ".github/SECURITY.md"
+
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: "10.0.x"
+  DOTNET_NOLOGO: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      checks: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: "zulu"
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache SonarQube Cloud packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Install SonarScanner
+        shell: bash
+        run: dotnet tool install --global dotnet-sonarscanner
+
+      - name: SonarScanner begin
+        shell: bash
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GH_EVENT_NAME: ${{ github.event_name }}
+          GH_PR_NUMBER: ${{ github.event.pull_request.number }}
+          GH_HEAD_REF: ${{ github.head_ref }}
+          GH_BASE_REF: ${{ github.base_ref }}
+          GH_REF_NAME: ${{ github.ref_name }}
+        run: |
+          # Read properties from .sonarcloud.properties as single source of truth
+          SONAR_ARGS=()
+          while IFS='=' read -r key value; do
+            [[ -z "$key" || "$key" =~ ^# ]] && continue
+            case "$key" in
+              sonar.projectKey)  SONAR_ARGS+=(/k:"$value") ;;
+              sonar.organization) SONAR_ARGS+=(/o:"$value") ;;
+              *)                 SONAR_ARGS+=(/d:"$key=$value") ;;
+            esac
+          done < .sonarcloud.properties
+
+          # Add runtime-only parameters
+          SONAR_ARGS+=(/d:sonar.token="$SONAR_TOKEN")
+          if [ "$GH_EVENT_NAME" = "pull_request" ]; then
+            SONAR_ARGS+=(
+              /d:sonar.pullrequest.key="$GH_PR_NUMBER"
+              /d:sonar.pullrequest.branch="$GH_HEAD_REF"
+              /d:sonar.pullrequest.base="$GH_BASE_REF"
+            )
+          else
+            SONAR_ARGS+=(/d:sonar.branch.name="$GH_REF_NAME")
+          fi
+          dotnet sonarscanner begin "${SONAR_ARGS[@]}"
+
+      - name: Build AppDomain solution
+        uses: ./.github/actions/build
+        with:
+          build-target: AppDomain.slnx
+
+      - name: Build Momentum libraries
+        uses: ./.github/actions/build
+        with:
+          build-target: libs/Momentum/Momentum.slnx
+
+      - name: Run AppDomain tests
+        shell: bash
+        run: |
+          echo "🧪 Running AppDomain tests (excluding E2E)..."
+          dotnet test AppDomain.slnx \
+            --configuration Release \
+            --no-build \
+            --verbosity minimal \
+            --filter "Type!=E2E" \
+            --logger "trx;LogFilePrefix=appdomain" \
+            --collect:"XPlat Code Coverage;Format=opencover" \
+            --results-directory ./TestResults/
+
+      - name: Run Momentum library tests
+        shell: bash
+        run: |
+          echo "🧪 Running Momentum library tests..."
+          dotnet test libs/Momentum/Momentum.slnx \
+            --configuration Release \
+            --no-build \
+            --verbosity minimal \
+            --logger "trx;LogFilePrefix=momentum" \
+            --collect:"XPlat Code Coverage;Format=opencover" \
+            --results-directory ./TestResults/
+
+      - name: SonarScanner end
+        if: always()
+        shell: bash
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: dotnet sonarscanner end /d:sonar.token="$SONAR_TOKEN"
+
+      - name: Rename test results
+        if: always()
+        shell: bash
+        run: |
+          shopt -s nullglob
+          declare -A fallback=( [appdomain]="AppDomain.Tests" [momentum]="Momentum.Tests" )
+          for f in TestResults/*.trx; do
+            name=$(grep -oPm1 'codeBase="[^"]*[/\\]\K[^/\\"]+(?=\.dll")' "$f" || true)
+            if [ -n "$name" ] && [ ! -f "TestResults/${name}.trx" ]; then
+              mv "$f" "TestResults/${name}.trx"
+              continue
+            fi
+            # Fallback: map known prefixes to clean names
+            base=$(basename "$f")
+            for prefix in "${!fallback[@]}"; do
+              if [[ "$base" == ${prefix}_* ]]; then
+                target="${fallback[$prefix]}.trx"
+                i=1
+                while [ -f "TestResults/${target}" ]; do
+                  target="${fallback[$prefix]}.${i}.trx"
+                  i=$((i + 1))
+                done
+                mv "$f" "TestResults/${target}"
+                break
+              fi
+            done
+          done
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults/
+          retention-days: 7
+
+      - name: Test report
+        if: always()
+        uses: dorny/test-reporter@v2.5.0
+        with:
+          name: Test Results
+          path: TestResults/*.trx
+          reporter: dotnet-trx
+          fail-on-error: false
+
+  template-tests:
+    name: Template Tests (Real-World Patterns)
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/*.props') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Build and pack local Momentum libraries
+        shell: bash
+        run: |
+          echo "📦 Building Momentum libraries for local template testing..."
+          dotnet build libs/Momentum/Momentum.slnx --verbosity minimal
+
+      - name: Run real-world pattern template tests
+        shell: pwsh
+        run: |
+          Write-Host "🧪 Running real-world pattern template tests..."
+          & ./scripts/Run-TemplateTests.ps1 -Category real-world-patterns -MaxFailures 3 -KeepResultsWithErrors:$false -SkipRestoreTemplate
+
+  docs-build:
+    name: Verify Documentation Build
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Build documentation
+        uses: ./.github/actions/docs-build
+        with:
+          docs-path: libs/Momentum/docs
+          build-dotnet: true

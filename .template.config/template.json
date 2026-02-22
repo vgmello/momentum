@@ -367,6 +367,7 @@
       "exclude": [
         "**/[Bb]in/**",
         "**/[Oo]bj/**",
+        "**/node_modules/**",
         ".template.config/**/*",
         "**/*.filelist",
         "**/*.user",
@@ -376,9 +377,10 @@
         "**/.local/**/*",
         "**/.vitepress/cache/**/*",
         "**/.vitepress/dist/**/*",
+        "**/.vitepress/.temp/**/*",
         "**/Internal/Generated/**/*",
         "**/docs/reference/*",
-        "**/docs/node_modules/**/*",
+        "tests/performance/**/*",
         "libs/Momentum/Directory.Build.props",
         "libs/Momentum/Directory.Build.targets",
         "libs/Momentum/src/Momentum.Extensions.Abstractions/**/*",
@@ -571,6 +573,24 @@
       "include": [
         "post-setup-config.json",
         "post-setup/**/*"
+      ]
+    },
+    {
+      "source": "./.claude_project",
+      "target": "./.claude",
+      "condition": "(!project-only)",
+      "include": [
+        "settings.json",
+        "agents/**/*",
+        "skills/**/*"
+      ]
+    },
+    {
+      "source": "./.claude_project",
+      "target": "./",
+      "condition": "(!project-only)",
+      "include": [
+        "CLAUDE.md"
       ]
     },
     {

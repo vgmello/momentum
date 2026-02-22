@@ -1,0 +1,56 @@
+name: "Create GitHub Release"
+description: |
+  Creates a GitHub release with auto-generated release notes.
+  When a previous stable tag is provided, release notes compare against that tag
+  instead of the immediately previous tag (useful for prereleases).
+
+inputs:
+  tag-name:
+    description: "Tag name for the release"
+    required: true
+  release-name:
+    description: "Display name for the release"
+    required: true
+  prerelease:
+    description: "Whether this is a prerelease"
+    required: false
+    default: "false"
+  previous-stable-tag:
+    description: "Previous stable tag to compare against for release notes. If empty, GitHub generates notes from the previous tag."
+    required: false
+    default: ""
+  target-commitish:
+    description: "Commitish value for the release"
+    required: false
+    default: "main"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Generate release notes from stable tag
+      id: release-notes
+      if: inputs.previous-stable-tag != ''
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        BODY=$(gh api repos/${{ github.repository }}/releases/generate-notes \
+          -f tag_name="${{ inputs.tag-name }}" \
+          -f target_commitish="${{ inputs.target-commitish }}" \
+          -f previous_tag_name="${{ inputs.previous-stable-tag }}" \
+          --jq '.body')
+        # Use a delimiter to safely pass multiline content
+        EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+        echo "body<<$EOF" >> "$GITHUB_OUTPUT"
+        echo "$BODY" >> "$GITHUB_OUTPUT"
+        echo "$EOF" >> "$GITHUB_OUTPUT"
+
+    - name: Create GitHub release
+      uses: softprops/action-gh-release@v2.5.0
+      with:
+        tag_name: ${{ inputs.tag-name }}
+        name: ${{ inputs.release-name }}
+        body: ${{ steps.release-notes.outputs.body || '' }}
+        generate_release_notes: ${{ steps.release-notes.outputs.body == '' }}
+        prerelease: ${{ inputs.prerelease }}
+        target_commitish: ${{ inputs.target-commitish }}

@@ -1,9 +1,10 @@
 # Momentum .NET
 
-[![NuGet](https://img.shields.io/nuget/v/Momentum.Extensions.Abstractions?style=flat-square)](https://www.nuget.org/packages/Momentum.Extensions.Abstractions)
-[![NuGet Preview](https://img.shields.io/nuget/vpre/Momentum.Extensions.Abstractions?style=flat-square&label=nuget-preview)](https://www.nuget.org/packages/Momentum.Extensions.Abstractions)
+[![NuGet](https://img.shields.io/nuget/v/Momentum.Extensions.Abstractions?style=flat-square&color=blue)](https://www.nuget.org/packages/Momentum.Extensions.Abstractions)
 [![Downloads](https://img.shields.io/nuget/dt/Momentum.Extensions.Abstractions?style=flat-square)](https://www.nuget.org/packages/Momentum.Extensions.Abstractions)
-[![License](https://img.shields.io/github/license/vgmello/momentum?style=flat-square)](https://github.com/vgmello/momentum/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/vgmello/momentum?style=flat-square&color=brightgreen)](https://github.com/vgmello/momentum/blob/main/LICENSE)
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/vgmello/momentum/ci.yml?style=flat-square&logo=github&label=CI)
+](https://github.com/vgmello/momentum/actions/workflows/ci.yml)
 
 Welcome to **Momentum** - a comprehensive .NET 10 template system that generates complete, production-ready microservices solutions. Whether you're building APIs, event-driven backends, or stateful processing systems, Momentum provides the architecture, patterns, and infrastructure you need to get productive immediately.
 
@@ -39,29 +40,29 @@ dotnet run --project src/OrderService.AppHost
 
 **That's it!** You now have a running microservices solution with:
 
--   ✅ REST and gRPC APIs with sample endpoints
--   ✅ Background event processing with Wolverine
--   ✅ PostgreSQL database with migrations
--   ✅ Apache Kafka messaging
--   ✅ Comprehensive observability
--   ✅ Live documentation
--   ✅ Sample business domain (Cashiers/Invoices)
+- ✅ REST and gRPC APIs with sample endpoints
+- ✅ Background event processing with Wolverine
+- ✅ PostgreSQL database with migrations
+- ✅ Apache Kafka messaging
+- ✅ Comprehensive observability
+- ✅ Live documentation
+- ✅ Sample business domain (Cashiers/Invoices)
 
 ## Technology Stack
 
 Momentum is built on modern, production-proven technologies:
 
--   **🎯 .NET 10**: Latest framework with performance optimizations
--   **🏗️ .NET Aspire**: Local development orchestration and observability
--   **🎭 Orleans**: Stateful actor-based processing for complex workflows
--   **⚡ Wolverine**: CQRS/MediatR pattern with message handling
--   **🚀 gRPC + REST**: Dual API protocols for performance and compatibility
--   **📡 Apache Kafka**: Event streaming and reliable messaging
--   **🗄️ PostgreSQL**: Robust relational database with JSON support
--   **🔄 Liquibase**: Version-controlled database migrations
--   **📊 OpenTelemetry**: Distributed tracing and observability
--   **🔌 Refit + Refitter**: Type-safe REST API clients with OpenAPI code generation
--   **🧪 Testcontainers**: Real infrastructure for integration testing
+- **🎯 .NET 10**: Latest framework with performance optimizations
+- **🏗️ .NET Aspire**: Local development orchestration and observability
+- **🎭 Orleans**: Stateful actor-based processing for complex workflows
+- **⚡ Wolverine**: CQRS/MediatR pattern with message handling
+- **🚀 gRPC + REST**: Dual API protocols for performance and compatibility
+- **📡 Apache Kafka**: Event streaming and reliable messaging
+- **🗄️ PostgreSQL**: Robust relational database with JSON support
+- **🔄 Liquibase**: Version-controlled database migrations
+- **📊 OpenTelemetry**: Distributed tracing and observability
+- **🔌 Refit + Refitter**: Type-safe REST API clients with OpenAPI code generation
+- **🧪 Testcontainers**: Real infrastructure for integration testing
 
 ## Template System Overview
 
@@ -71,20 +72,20 @@ Momentum is built on modern, production-proven technologies:
 
 ### **Core Architecture Principles**
 
--   **🎯 Real-World Mirroring**: Code structure corresponds to business operations and processes
--   **🚫 No Smart Objects**: Entities are data records, not self-modifying objects
--   **🏢 Front/Back Office**: Synchronous APIs vs Asynchronous processing
--   **📡 Event-Driven**: Integration events via Kafka with Wolverine message handling
--   **🧭 Pragmatic Domain Boundaries**: Bounded contexts, domain language, and contracts/events without heavy domain object ceremony
--   **🧪 Testing First**: Comprehensive testing with real infrastructure
+- **🎯 Real-World Mirroring**: Code structure corresponds to business operations and processes
+- **🚫 No Smart Objects**: Entities are data records, not self-modifying objects
+- **🏢 Front/Back Office**: Synchronous APIs vs Asynchronous processing
+- **📡 Event-Driven**: Integration events via Kafka with Wolverine message handling
+- **🧭 Pragmatic Domain Boundaries**: Bounded contexts, domain language, and contracts/events without heavy domain object ceremony
+- **🧪 Testing First**: Comprehensive testing with real infrastructure
 
 ## Prerequisites
 
 Before getting started, ensure you have:
 
--   **.NET 10 SDK** - [Download here](https://dotnet.microsoft.com/download/dotnet/10.0)
--   **IDE**: Visual Studio, VS Code with C# Dev Kit, or JetBrains Rider
--   **Local Container Solution (Docker, Rancher, Podman, etc)** - Required for databases, Kafka, and local development
+- **.NET 10 SDK** - [Download here](https://dotnet.microsoft.com/download/dotnet/10.0)
+- **IDE**: Visual Studio, VS Code with C# Dev Kit, or JetBrains Rider
+- **Local Container Solution (Docker, Rancher, Podman, etc)** - Required for databases, Kafka, and local development
 
 ## Template Configuration Options
 
@@ -124,26 +125,26 @@ The template offers comprehensive configuration options:
 
 **Core Components:**
 
--   `--api`: REST/gRPC API project (default: true)
--   `--backoffice`: Background processing project (default: true)
--   `--aspire`: .NET Aspire orchestration project (default: true)
--   `--docs`: VitePress documentation project (default: true)
--   `--orleans`: Orleans stateful processing project (default: false)
+- `--api`: REST/gRPC API project (default: true)
+- `--backoffice`: Background processing project (default: true)
+- `--aspire`: .NET Aspire orchestration project (default: true)
+- `--docs`: VitePress documentation project (default: true)
+- `--orleans`: Orleans stateful processing project (default: false)
 
 **Infrastructure:**
 
--   `--kafka`: Apache Kafka messaging (default: true)
--   `--db-config`: Database setup (`default`, `npgsql`, `liquibase`, `none`)
--   `--port`: Base port number (default: 8100)
+- `--kafka`: Apache Kafka messaging (default: true)
+- `--db-config`: Database setup (`default`, `npgsql`, `liquibase`, `none`)
+- `--port`: Base port number (default: 8100)
 
 **Customization:**
 
--   `--org`: Organization name for copyright headers, github, etc
--   `--no-sample`: Exclude sample code (default: false, use `--no-sample` to skip)
--   `--project-only`: Generate only projects without solution files
--   `--libs`: Include Momentum libraries as project references
--   `--lib-name`: Custom prefix to replace "Momentum" in library names
--   `--local`: Use local Momentum packages from `libs/Momentum/.local/nuget` (template development)
+- `--org`: Organization name for copyright headers, github, etc
+- `--no-sample`: Exclude sample code (default: false, use `--no-sample` to skip)
+- `--project-only`: Generate only projects without solution files
+- `--libs`: Include Momentum libraries as project references
+- `--lib-name`: Custom prefix to replace "Momentum" in library names
+- `--local`: Use local Momentum packages from `libs/Momentum/.local/nuget` (template development)
 
 > [!NOTE]
 > For complete parameter documentation and all available combinations, see the [`template.json`](.template.config/template.json) file and the [Template Options Guide](https://momentumlib.net/guide/template-options/) for detailed use cases and examples.
@@ -230,11 +231,11 @@ dotnet add package Momentum.Extensions
 
 Congratulations! You've added powerful capabilities to your application:
 
--   ✅ Structured error handling with Result types
--   ✅ Built-in health checks and metrics
--   ✅ OpenTelemetry observability
--   ✅ Structured logging with Serilog
--   ✅ Production-ready service defaults
+- ✅ Structured error handling with Result types
+- ✅ Built-in health checks and metrics
+- ✅ OpenTelemetry observability
+- ✅ Structured logging with Serilog
+- ✅ Production-ready service defaults
 
 ## Individual Libraries Overview
 
@@ -250,10 +251,10 @@ dotnet add package Momentum.Extensions
 
 **Key Features:**
 
--   **ResultOfT Types**: Elegant error handling without exceptions
--   **Validation Integration**: FluentValidation helpers and extensions
--   **Data Access**: Enhanced Dapper extensions and LINQ2DB support
--   **Messaging Abstractions**: Base interfaces for CQRS and event-driven design with Wolverine integration
+- **ResultOfT Types**: Elegant error handling without exceptions
+- **Validation Integration**: FluentValidation helpers and extensions
+- **Data Access**: Enhanced Dapper extensions and LINQ2DB support
+- **Messaging Abstractions**: Base interfaces for CQRS and event-driven design with Wolverine integration
 
 **Use When:** You want robust error handling and core utilities in any .NET project.
 
@@ -267,11 +268,11 @@ dotnet add package Momentum.ServiceDefaults
 
 **Key Features:**
 
--   **Aspire Integration**: Full .NET Aspire service defaults implementation
--   **Observability Stack**: OpenTelemetry + Serilog for monitoring
--   **Health Checks**: Built-in application health monitoring
--   **Resilience**: HTTP client resilience patterns
--   **Service Discovery**: Automatic service resolution
+- **Aspire Integration**: Full .NET Aspire service defaults implementation
+- **Observability Stack**: OpenTelemetry + Serilog for monitoring
+- **Health Checks**: Built-in application health monitoring
+- **Resilience**: HTTP client resilience patterns
+- **Service Discovery**: Automatic service resolution
 
 **Use When:** Building microservices, APIs, or any distributed application that needs production-ready configuration.
 
@@ -285,10 +286,10 @@ dotnet add package Momentum.ServiceDefaults.Api
 
 **Key Features:**
 
--   **OpenAPI**: Enhanced Swagger documentation with XML docs
--   **gRPC Support**: Service registration and health checks
--   **Route Conventions**: Kebab-case URL transformations
--   **Response Types**: Automatic response type generation
+- **OpenAPI**: Enhanced Swagger documentation with XML docs
+- **gRPC Support**: Service registration and health checks
+- **Route Conventions**: Kebab-case URL transformations
+- **Response Types**: Automatic response type generation
 
 **Use When:** Building REST APIs or gRPC services that need enhanced documentation and conventions.
 
@@ -302,10 +303,10 @@ dotnet add package Momentum.Extensions.SourceGenerators
 
 **Key Features:**
 
--   **DbCommand Generation**: Type-safe database command handlers
--   **Zero Runtime Overhead**: All generation happens at compile time
--   **IDE Integration**: Generated code appears in IntelliSense
--   **Customizable**: Configure generation through attributes and MSBuild properties
+- **DbCommand Generation**: Type-safe database command handlers
+- **Zero Runtime Overhead**: All generation happens at compile time
+- **IDE Integration**: Generated code appears in IntelliSense
+- **Customizable**: Configure generation through attributes and MSBuild properties
 
 **Use When:** You want to eliminate boilerplate code and ensure type safety for database operations.
 
@@ -319,10 +320,10 @@ dotnet add package Momentum.Extensions.Messaging.Kafka
 
 **Key Features:**
 
--   **CloudEvents**: Standards-compliant event serialization
--   **Kafka Integration**: Producer and consumer patterns
--   **Partition Key Support**: Automatic partitioning strategies
--   **Observability**: Built-in metrics and tracing
+- **CloudEvents**: Standards-compliant event serialization
+- **Kafka Integration**: Producer and consumer patterns
+- **Partition Key Support**: Automatic partitioning strategies
+- **Observability**: Built-in metrics and tracing
 
 **Use When:** Building event-driven microservices that need reliable messaging.
 
@@ -864,10 +865,10 @@ Choose your path based on how you're using Momentum:
 
 We're continuously expanding Momentum to include even more production-ready technologies and patterns:
 
--   **SQL Server** - Additional database provider support alongside PostgreSQL
--   **k6 for Performance Testing** - Automated load testing and performance validation
--   **LGTM stack for improved observability** - Enhanced monitoring with Loki, Grafana, Tempo, and Mimir
--   **Maybe REDIS** - Caching and session management capabilities
+- **SQL Server** - Additional database provider support alongside PostgreSQL
+- **k6 for Performance Testing** - Automated load testing and performance validation
+- **LGTM stack for improved observability** - Enhanced monitoring with Loki, Grafana, Tempo, and Mimir
+- **Maybe REDIS** - Caching and session management capabilities
 
 ## Support
 
@@ -889,50 +890,50 @@ Momentum makes use of several outstanding open-source libraries and frameworks. 
 
 ### Core Framework Libraries
 
--   **[Wolverine](https://wolverinefx.io/)**: Next-generation message bus and CQRS framework for .NET, providing elegant command/query handling and message processing capabilities.
--   **[Mapperly](https://github.com/riok/mapperly)**: A .NET source generator for generating object mappings at compile-time, offering zero-overhead and type-safe mapping.
--   **[Microsoft Orleans](https://dotnet.github.io/orleans/)**: A cross-platform framework for building robust, scalable distributed applications with virtual actors.
--   **[.NET Aspire](https://github.com/dotnet/aspire)**: An opinionated, cloud-ready stack for building observable, production-ready distributed applications.
--   **[Asp.Versioning](https://github.com/dotnet/aspnet-api-versioning)**: API versioning for ASP.NET Core with support for URL, query string, and header-based versioning.
+- **[Wolverine](https://wolverinefx.io/)**: Next-generation message bus and CQRS framework for .NET, providing elegant command/query handling and message processing capabilities.
+- **[Mapperly](https://github.com/riok/mapperly)**: A .NET source generator for generating object mappings at compile-time, offering zero-overhead and type-safe mapping.
+- **[Microsoft Orleans](https://dotnet.github.io/orleans/)**: A cross-platform framework for building robust, scalable distributed applications with virtual actors.
+- **[.NET Aspire](https://github.com/dotnet/aspire)**: An opinionated, cloud-ready stack for building observable, production-ready distributed applications.
+- **[Asp.Versioning](https://github.com/dotnet/aspnet-api-versioning)**: API versioning for ASP.NET Core with support for URL, query string, and header-based versioning.
 
 ### Data & Messaging
 
--   **[Dapper](https://github.com/DapperLib/Dapper)**: A simple object mapper for .NET with high performance and minimal overhead.
--   **[linq2db](https://linq2db.github.io/)**: Fast, lightweight, and type-safe LINQ to SQL implementation for .NET.
--   **[FluentValidation](https://fluentvalidation.net/)**: A popular .NET library for building strongly-typed validation rules.
--   **[CloudNative CloudEvents](https://cloudevents.io/)**: A specification for describing event data in a common way with Kafka integration.
--   **[Npgsql](https://www.npgsql.org/)**: The .NET data provider for PostgreSQL.
--   **[Liquibase](https://www.liquibase.com/)**: Database schema change management and version control.
+- **[Dapper](https://github.com/DapperLib/Dapper)**: A simple object mapper for .NET with high performance and minimal overhead.
+- **[linq2db](https://linq2db.github.io/)**: Fast, lightweight, and type-safe LINQ to SQL implementation for .NET.
+- **[FluentValidation](https://fluentvalidation.net/)**: A popular .NET library for building strongly-typed validation rules.
+- **[CloudNative CloudEvents](https://cloudevents.io/)**: A specification for describing event data in a common way with Kafka integration.
+- **[Npgsql](https://www.npgsql.org/)**: The .NET data provider for PostgreSQL.
+- **[Liquibase](https://www.liquibase.com/)**: Database schema change management and version control.
 
 ### API Client Generation
 
--   **[Refit](https://github.com/reactiveui/refit)**: Automatic type-safe REST library for .NET that turns REST APIs into live interfaces.
--   **[Refitter](https://github.com/christianhelle/refitter)**: OpenAPI client code generation via MSBuild, producing Refit interfaces and contracts from OpenAPI specifications at build time.
+- **[Refit](https://github.com/reactiveui/refit)**: Automatic type-safe REST library for .NET that turns REST APIs into live interfaces.
+- **[Refitter](https://github.com/christianhelle/refitter)**: OpenAPI client code generation via MSBuild, producing Refit interfaces and contracts from OpenAPI specifications at build time.
 
 ### Testing & Quality
 
--   **[xUnit v3](https://xunit.net/)**: Modern, extensible testing framework for .NET applications.
--   **[Shouldly](https://docs.shouldly.org/)**: Testing framework that focuses on giving great error messages when assertions fail.
--   **[Testcontainers](https://dotnet.testcontainers.org/)**: A library to support tests with throwaway instances of Docker containers.
--   **[NSubstitute](https://nsubstitute.github.io/)**: A friendly substitute for .NET mocking libraries.
--   **[NetArchTest](https://github.com/BenMorris/NetArchTest)**: A fluent API for .NET that can enforce architectural rules in unit tests.
--   **[Bogus](https://github.com/bchavez/Bogus)**: A simple fake data generator for .NET, useful for creating realistic test data.
--   **[coverlet](https://github.com/coverlet-coverage/coverlet)**: Cross-platform code coverage library for .NET with support for line, branch, and method coverage.
--   **[SonarAnalyzer](https://github.com/SonarSource/sonar-dotnet)**: Static code analysis for C# to detect bugs, vulnerabilities, and code smells.
+- **[xUnit v3](https://xunit.net/)**: Modern, extensible testing framework for .NET applications.
+- **[Shouldly](https://docs.shouldly.org/)**: Testing framework that focuses on giving great error messages when assertions fail.
+- **[Testcontainers](https://dotnet.testcontainers.org/)**: A library to support tests with throwaway instances of Docker containers.
+- **[NSubstitute](https://nsubstitute.github.io/)**: A friendly substitute for .NET mocking libraries.
+- **[NetArchTest](https://github.com/BenMorris/NetArchTest)**: A fluent API for .NET that can enforce architectural rules in unit tests.
+- **[Bogus](https://github.com/bchavez/Bogus)**: A simple fake data generator for .NET, useful for creating realistic test data.
+- **[coverlet](https://github.com/coverlet-coverage/coverlet)**: Cross-platform code coverage library for .NET with support for line, branch, and method coverage.
+- **[SonarAnalyzer](https://github.com/SonarSource/sonar-dotnet)**: Static code analysis for C# to detect bugs, vulnerabilities, and code smells.
 
 ### Observability & Infrastructure
 
--   **[OpenTelemetry](https://opentelemetry.io/)**: A collection of tools, APIs, and SDKs for instrumenting, generating, collecting, and exporting telemetry data.
--   **[Serilog](https://serilog.net/)**: Diagnostic logging library for .NET applications with rich structured event data.
--   **[Scalar](https://github.com/scalar/scalar)**: Modern API documentation with interactive OpenAPI/Swagger support.
--   **[gRPC](https://grpc.io/)**: A high-performance, open source universal RPC framework.
--   **[Orleans Dashboard](https://github.com/OrleansContrib/OrleansDashboard)**: Web-based monitoring dashboard for Microsoft Orleans applications.
+- **[OpenTelemetry](https://opentelemetry.io/)**: A collection of tools, APIs, and SDKs for instrumenting, generating, collecting, and exporting telemetry data.
+- **[Serilog](https://serilog.net/)**: Diagnostic logging library for .NET applications with rich structured event data.
+- **[Scalar](https://github.com/scalar/scalar)**: Modern API documentation with interactive OpenAPI/Swagger support.
+- **[gRPC](https://grpc.io/)**: A high-performance, open source universal RPC framework.
+- **[Orleans Dashboard](https://github.com/OrleansContrib/OrleansDashboard)**: Web-based monitoring dashboard for Microsoft Orleans applications.
 
 ### Code Generation & Utilities
 
--   **[OneOf](https://github.com/mcintyre321/OneOf)**: Discriminated unions for C# with exhaustive matching.
--   **[Spectre.Console](https://spectreconsole.net/)**: A .NET library that makes it easier to create beautiful console applications.
--   **[Fluid](https://github.com/sebastienros/fluid)**: High-performance, secure Liquid templating language for .NET.
+- **[OneOf](https://github.com/mcintyre321/OneOf)**: Discriminated unions for C# with exhaustive matching.
+- **[Spectre.Console](https://spectreconsole.net/)**: A .NET library that makes it easier to create beautiful console applications.
+- **[Fluid](https://github.com/sebastienros/fluid)**: High-performance, secure Liquid templating language for .NET.
 
 Each of these libraries may be licensed differently, so we recommend you review their licenses if you plan to use Momentum in your own projects.
 

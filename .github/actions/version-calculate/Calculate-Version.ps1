@@ -124,11 +124,13 @@ if ($latestRelease) {
     Write-GitHubOutput -Name "previous-version" -Value $latestRelease.ToString()
     Write-GitHubOutput -Name "previous-tag" -Value $(if ($previousTagVersion) { "${TagPrefix}$previousTagVersion" } else { "" })
     Write-GitHubOutput -Name "previous-stable-version" -Value $(if ($latestStable) { $latestStable.ToString() } else { "" })
+    Write-GitHubOutput -Name "previous-stable-tag" -Value $(if ($latestStable) { "${TagPrefix}$latestStable" } else { "" })
 }
 else {
     Write-GitHubOutput -Name "previous-version" -Value ""
     Write-GitHubOutput -Name "previous-tag" -Value ""
     Write-GitHubOutput -Name "previous-stable-version" -Value ""
+    Write-GitHubOutput -Name "previous-stable-tag" -Value ""
 }
 
 # Calculate new version

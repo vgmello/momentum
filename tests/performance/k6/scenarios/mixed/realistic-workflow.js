@@ -10,7 +10,6 @@ import {
     customMetrics,
     logTestSummary,
     random,
-    randomInt,
 } from "../../lib/helpers.js";
 
 // Configuration constants
