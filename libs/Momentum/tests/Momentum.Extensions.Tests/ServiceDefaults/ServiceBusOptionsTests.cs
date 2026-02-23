@@ -125,4 +125,45 @@ public class ServiceBusOptionsTests
 
         options.ServiceUrn.ToString().ShouldStartWith("/my_domain/");
     }
+
+    [Fact]
+    public void PostConfigure_ReliableMessaging_ShouldDefaultToTrue()
+    {
+        var options = new ServiceBusOptions();
+
+        options.ReliableMessaging.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void PostConfigure_WithEmptyServiceName_AfterDerivation_ShouldThrow()
+    {
+        var hostEnvironment = Substitute.For<IHostEnvironment>();
+        hostEnvironment.ApplicationName.Returns("   ");
+        var configurator = new ServiceBusOptions.Configurator(hostEnvironment);
+
+        var options = new ServiceBusOptions
+        {
+            Domain = "MyDomain",
+            PublicServiceName = string.Empty
+        };
+
+        var exception = Should.Throw<InvalidOperationException>(() =>
+            configurator.PostConfigure(name: null, options));
+
+        exception.Message.ShouldContain("PublicServiceName");
+    }
+
+    [Fact]
+    public void PostConfigure_ShouldHandleMultiSegmentDomain()
+    {
+        var options = new ServiceBusOptions
+        {
+            Domain = "ECommerce",
+            PublicServiceName = "catalog-service"
+        };
+
+        _configurator.PostConfigure(name: null, options);
+
+        options.ServiceUrn.ToString().ShouldBe("/e_commerce/catalog-service");
+    }
 }

@@ -14,6 +14,27 @@ internal static class TestHelpers
         string source, Dictionary<string, string?>? options = null)
         where T : IIncrementalGenerator, new()
     {
+        var driver = CreateAndRunGenerator<T>(source, options);
+        var generationResults = driver.GetRunResult();
+
+        var output = generationResults.GeneratedTrees
+            .Select(tree => tree.ToString())
+            .ToArray();
+
+        return (output, generationResults.Diagnostics.ToArray());
+    }
+
+    public static GeneratorDriver CreateAndRunGenerator<T>(string source, Dictionary<string, string?>? options = null)
+        where T : IIncrementalGenerator, new()
+    {
+        var compilation = CreateCompilation<T>(source);
+
+        return RunGenerator<T>(compilation, options);
+    }
+
+    private static CSharpCompilation CreateCompilation<T>(string source)
+        where T : IIncrementalGenerator, new()
+    {
         var syntaxTree = CSharpSyntaxTree.ParseText(source);
 
         var references = AppDomain.CurrentDomain.GetAssemblies()
@@ -26,22 +47,14 @@ internal static class TestHelpers
                 MetadataReference.CreateFromFile(typeof(ColumnAttribute).Assembly.Location)
             ]);
 
-        var compilation = CSharpCompilation.Create(
+        return CSharpCompilation.Create(
             "Platform.TestAssembly",
             [syntaxTree],
             references,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-
-        var generationResults = RunGenerator<T>(compilation, options);
-
-        var output = generationResults.GeneratedTrees
-            .Select(tree => tree.ToString())
-            .ToArray();
-
-        return (output, generationResults.Diagnostics.ToArray());
     }
 
-    private static GeneratorDriverRunResult RunGenerator<T>(CSharpCompilation compilation, Dictionary<string, string?>? options)
+    private static GeneratorDriver RunGenerator<T>(CSharpCompilation compilation, Dictionary<string, string?>? options)
         where T : IIncrementalGenerator, new()
     {
         var generator = new T().AsSourceGenerator();
@@ -60,7 +73,7 @@ internal static class TestHelpers
             .WithUpdatedAnalyzerConfigOptions(optProvider)
             .RunGenerators(compilation);
 
-        return driver.GetRunResult();
+        return driver;
     }
 }
 
