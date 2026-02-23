@@ -433,6 +433,9 @@
             "src/AppDomain.Api/**/*",
             "tests/AppDomain.Tests.E2E/**/*",
             "tests/AppDomain.Tests/Unit/Infrastructure/OrleansExtensionsTests.cs",
+            "tests/AppDomain.Tests/Unit/Invoices/InvoiceEndpointsTests.cs",
+            "tests/AppDomain.Tests/Unit/Cashier/CashierEndpointsTests.cs",
+            "tests/AppDomain.Tests/Unit/Common/ValidationExtensionsTests.cs",
             "tests/AppDomain.Tests/Integration/Cashiers/**/*",
             "tests/AppDomain.Tests/Integration/Invoices/**/*",
             "tests/AppDomain.Tests/Integration/_Internal/TestDataGenerators/**/*"
