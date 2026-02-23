@@ -1,7 +1,6 @@
 // Copyright (c) OrgName. All rights reserved.
 
 #pragma warning disable xUnit1051
-#pragma warning disable CA2012
 
 using AppDomain.BackOffice.Messaging.AccountingInboxHandler;
 using AppDomain.Invoices.Contracts.DomainEvents;
