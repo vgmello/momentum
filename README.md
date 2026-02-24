@@ -204,7 +204,7 @@ Services use a base port system (default: 8100):
 | PostgreSQL       | 54320 | -     | -    | Database              |
 | Kafka            | 59092 | -     | -    | Message broker        |
 
-Customize the base port with `--port 9000` to use 9100, 9101, etc.
+Customize the base port with `--port 9000` to use 9001, 9002, etc.
 
 ## Individual Libraries Approach
 
@@ -927,7 +927,7 @@ Momentum makes use of several outstanding open-source libraries and frameworks. 
 - **[Serilog](https://serilog.net/)**: Diagnostic logging library for .NET applications with rich structured event data.
 - **[Scalar](https://github.com/scalar/scalar)**: Modern API documentation with interactive OpenAPI/Swagger support.
 - **[gRPC](https://grpc.io/)**: A high-performance, open source universal RPC framework.
-- **[Orleans Dashboard](https://github.com/OrleansContrib/OrleansDashboard)**: Web-based monitoring dashboard for Microsoft Orleans applications.
+- **[Orleans Dashboard](https://github.com/OrleansContrib/OrleansDashboard)**: Community-built web-based monitoring dashboard for Orleans applications.
 
 ### Code Generation & Utilities
 
