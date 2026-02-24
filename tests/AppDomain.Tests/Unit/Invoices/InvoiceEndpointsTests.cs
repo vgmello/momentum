@@ -8,42 +8,16 @@ using AppDomain.Api.Invoices.Models;
 using AppDomain.Invoices.Commands;
 using AppDomain.Invoices.Contracts.Models;
 using AppDomain.Invoices.Queries;
+using AppDomain.Tests.Unit.Common;
 using FluentValidation.Results;
-using Microsoft.AspNetCore.TestHost;
 using Momentum.Extensions;
-using Wolverine;
-
 namespace AppDomain.Tests.Unit.Invoices;
 
-public class InvoiceEndpointsTests : IAsyncDisposable
+public class InvoiceEndpointsTests : EndpointTest
 {
-    private static readonly Guid FakeTenantId = Guid.Parse("12345678-0000-0000-0000-000000000000");
-
-    private readonly IMessageBus _mockBus;
-    private readonly WebApplication _app;
-    private readonly HttpClient _client;
-
     public InvoiceEndpointsTests()
     {
-        _mockBus = Substitute.For<IMessageBus>();
-
-        var builder = WebApplication.CreateEmptyBuilder(new WebApplicationOptions { EnvironmentName = "Test" });
-        builder.WebHost.UseTestServer();
-        builder.Services.AddRoutingCore();
-        builder.Services.AddSingleton(_mockBus);
-
-        _app = builder.Build();
-        _app.MapInvoiceEndpoints();
-        _app.StartAsync().GetAwaiter().GetResult();
-
-        _client = _app.GetTestClient();
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        GC.SuppressFinalize(this);
-        _client.Dispose();
-        await _app.DisposeAsync();
+        ConfigureApp(app => app.MapInvoiceEndpoints());
     }
 
     // -- Helpers --
@@ -78,11 +52,11 @@ public class InvoiceEndpointsTests : IAsyncDisposable
         // Arrange
         var invoices = new List<Invoice> { CreateSampleInvoice(), CreateSampleInvoice() };
 
-        _mockBus.InvokeAsync<IEnumerable<Invoice>>(Arg.Any<GetInvoicesQuery>(), Arg.Any<CancellationToken>())
+        MockBus.InvokeAsync<IEnumerable<Invoice>>(Arg.Any<GetInvoicesQuery>(), Arg.Any<CancellationToken>())
             .Returns(invoices);
 
         // Act
-        var response = await _client.GetAsync("/invoices?limit=50&offset=0");
+        var response = await Client.GetAsync("/invoices?limit=50&offset=0");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -96,16 +70,16 @@ public class InvoiceEndpointsTests : IAsyncDisposable
     public async Task GetInvoices_WithPagination_PassesParametersToQuery()
     {
         // Arrange
-        _mockBus.InvokeAsync<IEnumerable<Invoice>>(Arg.Any<GetInvoicesQuery>(), Arg.Any<CancellationToken>())
+        MockBus.InvokeAsync<IEnumerable<Invoice>>(Arg.Any<GetInvoicesQuery>(), Arg.Any<CancellationToken>())
             .Returns(Enumerable.Empty<Invoice>());
 
         // Act
-        var response = await _client.GetAsync("/invoices?limit=25&offset=10");
+        var response = await Client.GetAsync("/invoices?limit=25&offset=10");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
-        await _mockBus.Received(1).InvokeAsync<IEnumerable<Invoice>>(
+        await MockBus.Received(1).InvokeAsync<IEnumerable<Invoice>>(
             Arg.Is<GetInvoicesQuery>(q => q.TenantId == FakeTenantId && q.Limit == 25 && q.Offset == 10),
             Arg.Any<CancellationToken>());
     }
@@ -120,13 +94,13 @@ public class InvoiceEndpointsTests : IAsyncDisposable
         var invoice = CreateSampleInvoice(invoiceId: invoiceId);
         Result<Invoice> successResult = invoice;
 
-        _mockBus.InvokeAsync<Result<Invoice>>(
+        MockBus.InvokeAsync<Result<Invoice>>(
                 Arg.Is<GetInvoiceQuery>(q => q.Id == invoiceId && q.TenantId == FakeTenantId),
                 Arg.Any<CancellationToken>())
             .Returns(successResult);
 
         // Act
-        var response = await _client.GetAsync($"/invoices/{invoiceId}");
+        var response = await Client.GetAsync($"/invoices/{invoiceId}");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -146,11 +120,11 @@ public class InvoiceEndpointsTests : IAsyncDisposable
             new("InvoiceId", "Invoice not found.")
         };
 
-        _mockBus.InvokeAsync<Result<Invoice>>(Arg.Any<GetInvoiceQuery>(), Arg.Any<CancellationToken>())
+        MockBus.InvokeAsync<Result<Invoice>>(Arg.Any<GetInvoiceQuery>(), Arg.Any<CancellationToken>())
             .Returns(errorResult);
 
         // Act
-        var response = await _client.GetAsync($"/invoices/{invoiceId}");
+        var response = await Client.GetAsync($"/invoices/{invoiceId}");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
@@ -165,14 +139,14 @@ public class InvoiceEndpointsTests : IAsyncDisposable
         var invoice = CreateSampleInvoice();
         Result<Invoice> successResult = invoice;
 
-        _mockBus.InvokeAsync<Result<Invoice>>(Arg.Any<CreateInvoiceCommand>(), Arg.Any<CancellationToken>())
+        MockBus.InvokeAsync<Result<Invoice>>(Arg.Any<CreateInvoiceCommand>(), Arg.Any<CancellationToken>())
             .Returns(successResult);
 
         var request = new CreateInvoiceRequest("Office Supplies Q1", 250.00m, "USD",
             new DateTime(2026, 6, 15, 0, 0, 0, DateTimeKind.Utc), null);
 
         // Act
-        var response = await _client.PostAsJsonAsync("/invoices", request);
+        var response = await Client.PostAsJsonAsync("/invoices", request);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Created);
@@ -194,13 +168,13 @@ public class InvoiceEndpointsTests : IAsyncDisposable
             new("Amount", "Amount must be greater than zero.")
         };
 
-        _mockBus.InvokeAsync<Result<Invoice>>(Arg.Any<CreateInvoiceCommand>(), Arg.Any<CancellationToken>())
+        MockBus.InvokeAsync<Result<Invoice>>(Arg.Any<CreateInvoiceCommand>(), Arg.Any<CancellationToken>())
             .Returns(errorResult);
 
         var request = new CreateInvoiceRequest("", 0m);
 
         // Act
-        var response = await _client.PostAsJsonAsync("/invoices", request);
+        var response = await Client.PostAsJsonAsync("/invoices", request);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
@@ -216,7 +190,7 @@ public class InvoiceEndpointsTests : IAsyncDisposable
         var cancelledInvoice = CreateSampleInvoice(invoiceId: invoiceId, status: InvoiceStatus.Cancelled, version: 2);
         Result<Invoice> successResult = cancelledInvoice;
 
-        _mockBus.InvokeAsync<Result<Invoice>>(
+        MockBus.InvokeAsync<Result<Invoice>>(
                 Arg.Is<CancelInvoiceCommand>(c => c.InvoiceId == invoiceId && c.Version == 1),
                 Arg.Any<CancellationToken>())
             .Returns(successResult);
@@ -224,7 +198,7 @@ public class InvoiceEndpointsTests : IAsyncDisposable
         var request = new CancelInvoiceRequest(Version: 1);
 
         // Act
-        var response = await _client.PutAsJsonAsync($"/invoices/{invoiceId}/cancel", request);
+        var response = await Client.PutAsJsonAsync($"/invoices/{invoiceId}/cancel", request);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -244,13 +218,13 @@ public class InvoiceEndpointsTests : IAsyncDisposable
             new("Version", "The invoice has been modified by another user. Please refresh and try again.")
         };
 
-        _mockBus.InvokeAsync<Result<Invoice>>(Arg.Any<CancelInvoiceCommand>(), Arg.Any<CancellationToken>())
+        MockBus.InvokeAsync<Result<Invoice>>(Arg.Any<CancelInvoiceCommand>(), Arg.Any<CancellationToken>())
             .Returns(errorResult);
 
         var request = new CancelInvoiceRequest(Version: 1);
 
         // Act
-        var response = await _client.PutAsJsonAsync($"/invoices/{invoiceId}/cancel", request);
+        var response = await Client.PutAsJsonAsync($"/invoices/{invoiceId}/cancel", request);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Conflict);
@@ -266,13 +240,13 @@ public class InvoiceEndpointsTests : IAsyncDisposable
             new("InvoiceId", "Invoice not found.")
         };
 
-        _mockBus.InvokeAsync<Result<Invoice>>(Arg.Any<CancelInvoiceCommand>(), Arg.Any<CancellationToken>())
+        MockBus.InvokeAsync<Result<Invoice>>(Arg.Any<CancelInvoiceCommand>(), Arg.Any<CancellationToken>())
             .Returns(errorResult);
 
         var request = new CancelInvoiceRequest(Version: 1);
 
         // Act
-        var response = await _client.PutAsJsonAsync($"/invoices/{invoiceId}/cancel", request);
+        var response = await Client.PutAsJsonAsync($"/invoices/{invoiceId}/cancel", request);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
@@ -289,7 +263,7 @@ public class InvoiceEndpointsTests : IAsyncDisposable
         var paidInvoice = CreateSampleInvoice(invoiceId: invoiceId, status: InvoiceStatus.Paid, version: 2);
         Result<Invoice> successResult = paidInvoice;
 
-        _mockBus.InvokeAsync<Result<Invoice>>(
+        MockBus.InvokeAsync<Result<Invoice>>(
                 Arg.Is<MarkInvoiceAsPaidCommand>(c =>
                     c.InvoiceId == invoiceId && c.AmountPaid == 250.00m && c.PaymentDate == paymentDate),
                 Arg.Any<CancellationToken>())
@@ -298,7 +272,7 @@ public class InvoiceEndpointsTests : IAsyncDisposable
         var request = new MarkInvoiceAsPaidRequest(Version: 1, AmountPaid: 250.00m, PaymentDate: paymentDate);
 
         // Act
-        var response = await _client.PutAsJsonAsync($"/invoices/{invoiceId}/mark-paid", request);
+        var response = await Client.PutAsJsonAsync($"/invoices/{invoiceId}/mark-paid", request);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -318,13 +292,13 @@ public class InvoiceEndpointsTests : IAsyncDisposable
             new("Version", "The invoice has been modified by another user. Please refresh and try again.")
         };
 
-        _mockBus.InvokeAsync<Result<Invoice>>(Arg.Any<MarkInvoiceAsPaidCommand>(), Arg.Any<CancellationToken>())
+        MockBus.InvokeAsync<Result<Invoice>>(Arg.Any<MarkInvoiceAsPaidCommand>(), Arg.Any<CancellationToken>())
             .Returns(errorResult);
 
         var request = new MarkInvoiceAsPaidRequest(Version: 1, AmountPaid: 250.00m);
 
         // Act
-        var response = await _client.PutAsJsonAsync($"/invoices/{invoiceId}/mark-paid", request);
+        var response = await Client.PutAsJsonAsync($"/invoices/{invoiceId}/mark-paid", request);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Conflict);
@@ -339,7 +313,7 @@ public class InvoiceEndpointsTests : IAsyncDisposable
         var invoiceId = Guid.NewGuid();
         Result<bool> successResult = true;
 
-        _mockBus.InvokeAsync<Result<bool>>(
+        MockBus.InvokeAsync<Result<bool>>(
                 Arg.Is<SimulatePaymentCommand>(c =>
                     c.InvoiceId == invoiceId && c.Amount == 100.00m && c.Currency == "EUR"),
                 Arg.Any<CancellationToken>())
@@ -349,7 +323,7 @@ public class InvoiceEndpointsTests : IAsyncDisposable
             PaymentMethod: "Wire Transfer", PaymentReference: "SIM-TEST-001");
 
         // Act
-        var response = await _client.PostAsJsonAsync($"/invoices/{invoiceId}/simulate-payment", request);
+        var response = await Client.PostAsJsonAsync($"/invoices/{invoiceId}/simulate-payment", request);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -368,13 +342,13 @@ public class InvoiceEndpointsTests : IAsyncDisposable
             new("Version", "The invoice has been modified by another user. Please refresh and try again.")
         };
 
-        _mockBus.InvokeAsync<Result<bool>>(Arg.Any<SimulatePaymentCommand>(), Arg.Any<CancellationToken>())
+        MockBus.InvokeAsync<Result<bool>>(Arg.Any<SimulatePaymentCommand>(), Arg.Any<CancellationToken>())
             .Returns(errorResult);
 
         var request = new SimulatePaymentRequest(Version: 1, Amount: 100.00m);
 
         // Act
-        var response = await _client.PostAsJsonAsync($"/invoices/{invoiceId}/simulate-payment", request);
+        var response = await Client.PostAsJsonAsync($"/invoices/{invoiceId}/simulate-payment", request);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Conflict);
@@ -390,13 +364,13 @@ public class InvoiceEndpointsTests : IAsyncDisposable
             new("InvoiceId", "Invoice not found.")
         };
 
-        _mockBus.InvokeAsync<Result<bool>>(Arg.Any<SimulatePaymentCommand>(), Arg.Any<CancellationToken>())
+        MockBus.InvokeAsync<Result<bool>>(Arg.Any<SimulatePaymentCommand>(), Arg.Any<CancellationToken>())
             .Returns(errorResult);
 
         var request = new SimulatePaymentRequest(Version: 1, Amount: 100.00m);
 
         // Act
-        var response = await _client.PostAsJsonAsync($"/invoices/{invoiceId}/simulate-payment", request);
+        var response = await Client.PostAsJsonAsync($"/invoices/{invoiceId}/simulate-payment", request);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
