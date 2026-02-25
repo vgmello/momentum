@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
-
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <IsTestProject>true</IsTestProject>
@@ -20,11 +19,13 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-<!--#if (INCLUDE_API) -->
+<!--#if (INCLUDE_GRPC) -->
         <PackageReference Include="Grpc.Tools">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+<!--#endif -->
+<!--#if (INCLUDE_API) -->
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing"/>
 <!--#endif -->
 <!--#if (HAS_BACKEND) -->
@@ -72,7 +73,7 @@
 <!--#endif -->
     </ItemGroup>
 
-<!--#if (INCLUDE_API) -->
+<!--#if (INCLUDE_GRPC) -->
     <ItemGroup>
         <Protobuf Include="..\..\src\AppDomain.Api\**\Protos\**\*.proto"
                   ProtoRoot="..\..\src\AppDomain.Api\"
@@ -86,10 +87,4 @@
     <ItemGroup>
         <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest"/>
     </ItemGroup>
-
-    <ItemGroup>
-        <Using Include="Xunit"/>
-        <Using Include="Shouldly"/>
-    </ItemGroup>
-
 </Project>

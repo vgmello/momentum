@@ -18,8 +18,10 @@ using Testcontainers.PostgreSql;
 //#if (USE_KAFKA)
 using Testcontainers.Kafka;
 //#endif
-//#if (INCLUDE_API)
+//#if (INCLUDE_GRPC)
 using Grpc.Net.Client;
+//#endif
+//#if (INCLUDE_API)
 using Momentum.ServiceDefaults.Api;
 //#endif
 //#if (HAS_BACKEND)
@@ -64,7 +66,7 @@ public class IntegrationTestFixture : IAsyncLifetime
     public string KafkaBootstrapAddress => _kafka.GetBootstrapAddress();
 
     //#endif
-    //#if (INCLUDE_API)
+    //#if (INCLUDE_GRPC)
     public GrpcChannel GrpcChannel { get; private set; } = null!;
 
     //#endif
@@ -167,12 +169,14 @@ public class IntegrationTestFixture : IAsyncLifetime
 
         //#if (INCLUDE_API)
         _app.ConfigureApiUsingDefaults();
+        //#endif
+        //#if (INCLUDE_GRPC)
         _app.MapGrpcServices(typeof(Api.DependencyInjection).Assembly);
         //#endif
 
         await _app.StartAsync();
 
-        //#if (INCLUDE_API)
+        //#if (INCLUDE_GRPC)
         GrpcChannel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions
         {
             HttpClient = _app.GetTestClient()
@@ -192,7 +196,7 @@ public class IntegrationTestFixture : IAsyncLifetime
         }
         //#endif
 
-        //#if (INCLUDE_API)
+        //#if (INCLUDE_GRPC)
         GrpcChannel.Dispose();
         //#endif
 

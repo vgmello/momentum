@@ -3,10 +3,14 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <AspireVersion>13.1.1</AspireVersion>
     <MicrosoftExtensionsVersion>10.0.3</MicrosoftExtensionsVersion>
+    <!--#if (INCLUDE_ORLEANS) -->
     <MicrosoftOrleansVersion>10.0.1</MicrosoftOrleansVersion>
+    <!--#endif -->
     <OpenTelemetryVersion>1.15.0</OpenTelemetryVersion>
     <AspireAppHostSdkVersion>$(AspireVersion)</AspireAppHostSdkVersion>
+    <!--#if (INCLUDE_GRPC) -->
     <GrpcVersion>2.67.0</GrpcVersion>
+    <!--#endif -->
     <!--#if (!USE_LOCAL) -->
     <MomentumVersion>$(TemplateMomentumVersion)</MomentumVersion>
     <!--#else -->
@@ -15,14 +19,18 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Asp.Versioning.Http" Version="8.1.1" />
+    <PackageVersion Include="Aspire.Hosting.AppHost" Version="$(AspireVersion)" />
+    <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="$(AspireVersion)" />
+    <!--#if (INCLUDE_ORLEANS) -->
     <PackageVersion Include="Aspire.Azure.Data.Tables" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Azure.Storage.Blobs" Version="$(AspireVersion)" />
-    <PackageVersion Include="Aspire.Confluent.Kafka" Version="$(AspireVersion)" />
-    <PackageVersion Include="Aspire.Hosting.AppHost" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Hosting.Azure.Storage" Version="$(AspireVersion)" />
-    <PackageVersion Include="Aspire.Hosting.Kafka" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Hosting.Orleans" Version="$(AspireVersion)" />
-    <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="$(AspireVersion)" />
+    <!--#endif -->
+    <!--#if (USE_KAFKA) -->
+    <PackageVersion Include="Aspire.Confluent.Kafka" Version="$(AspireVersion)" />
+    <PackageVersion Include="Aspire.Hosting.Kafka" Version="$(AspireVersion)" />
+    <!--#endif -->
     <PackageVersion Include="Aspire.Npgsql" Version="$(AspireVersion)" />
     <PackageVersion Include="Bogus" Version="35.6.5" />
     <PackageVersion Include="CloudNative.CloudEvents.Kafka" Version="2.8.0" />
@@ -32,12 +40,14 @@
     <PackageVersion Include="Fluid.Core" Version="2.31.0" />
     <PackageVersion Include="FluentValidation" Version="12.1.1" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+    <!--#if (INCLUDE_GRPC) -->
     <PackageVersion Include="Google.Protobuf" Version="3.33.5" />
     <PackageVersion Include="Grpc.AspNetCore" Version="$(GrpcVersion)" />
     <PackageVersion Include="Grpc.AspNetCore.Server.Reflection" Version="$(GrpcVersion)" />
     <PackageVersion Include="Grpc.AspNetCore.Web" Version="$(GrpcVersion)" />
     <PackageVersion Include="Grpc.Net.Client" Version="$(GrpcVersion)" />
     <PackageVersion Include="Grpc.Tools" Version="2.68.1" />
+    <!--#endif -->
     <PackageVersion Include="linq2db" Version="6.1.0" />
     <PackageVersion Include="linq2db.Extensions" Version="6.1.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="$(MicrosoftExtensionsVersion)" />
@@ -59,6 +69,7 @@
     <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.3.0" />
     <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.3.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+    <!--#if (INCLUDE_ORLEANS) -->
     <PackageVersion Include="Microsoft.Orleans.Analyzers" Version="$(MicrosoftOrleansVersion)" />
     <PackageVersion Include="Microsoft.Orleans.Client" Version="$(MicrosoftOrleansVersion)" />
     <PackageVersion Include="Microsoft.Orleans.Clustering.AzureStorage" Version="$(MicrosoftOrleansVersion)" />
@@ -67,6 +78,9 @@
     <PackageVersion Include="Microsoft.Orleans.Reminders.AzureStorage" Version="$(MicrosoftOrleansVersion)" />
     <PackageVersion Include="Microsoft.Orleans.Server" Version="$(MicrosoftOrleansVersion)" />
     <PackageVersion Include="Microsoft.Orleans.TestingHost" Version="$(MicrosoftOrleansVersion)" />
+    <PackageVersion Include="Microsoft.Orleans.Dashboard" Version="$(MicrosoftOrleansVersion)" />
+    <PackageVersion Include="Microsoft.Orleans.GrainDirectory.AzureStorage" Version="$(MicrosoftOrleansVersion)" />
+    <!--#endif -->
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.103" />
     <PackageVersion Include="Momentum.Extensions" Version="$(MomentumVersion)" />
     <PackageVersion Include="Momentum.Extensions.Abstractions" Version="$(MomentumVersion)" />
@@ -86,12 +100,12 @@
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemetryVersion)" />
     <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryVersion)" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="$(OpenTelemetryVersion)" />
+    <!--#if (INCLUDE_GRPC) -->
     <PackageVersion Include="OpenTelemetry.Instrumentation.GrpcCore" Version="1.0.0-beta.10" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.GrpcNetClient" Version="1.15.0-beta.1" />
+    <!--#endif -->
     <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="$(OpenTelemetryVersion)" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="$(OpenTelemetryVersion)" />
-    <PackageVersion Include="Microsoft.Orleans.Dashboard" Version="$(MicrosoftOrleansVersion)" />
-    <PackageVersion Include="Microsoft.Orleans.GrainDirectory.AzureStorage" Version="$(MicrosoftOrleansVersion)" />
     <PackageVersion Include="Riok.Mapperly" Version="4.3.1" />
     <PackageVersion Include="Scalar.AspNetCore" Version="2.12.46" />
     <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
@@ -105,7 +119,9 @@
     <PackageVersion Include="Testcontainers.Kafka" Version="4.10.0" />
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.10.0" />
     <PackageVersion Include="WolverineFx" Version="5.16.2" />
+    <!--#if (USE_KAFKA) -->
     <PackageVersion Include="WolverineFx.Kafka" Version="5.16.2" />
+    <!--#endif -->
     <PackageVersion Include="WolverineFx.Postgresql" Version="5.16.2" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
     <PackageVersion Include="xunit.v3" Version="3.2.2" />

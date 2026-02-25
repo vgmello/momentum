@@ -4,7 +4,6 @@
         <DbCommandDefaultParamCase>SnakeCase</DbCommandDefaultParamCase>
         <DbCommandParamPrefix>p_</DbCommandParamPrefix>
         <!--#endif -->
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
