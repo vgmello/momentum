@@ -2,12 +2,12 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <AspireVersion>13.1.1</AspireVersion>
+    <AspireAppHostSdkVersion>$(AspireVersion)</AspireAppHostSdkVersion>
     <MicrosoftExtensionsVersion>10.0.3</MicrosoftExtensionsVersion>
     <!--#if (INCLUDE_ORLEANS) -->
     <MicrosoftOrleansVersion>10.0.1</MicrosoftOrleansVersion>
     <!--#endif -->
     <OpenTelemetryVersion>1.15.0</OpenTelemetryVersion>
-    <AspireAppHostSdkVersion>$(AspireVersion)</AspireAppHostSdkVersion>
     <!--#if (INCLUDE_GRPC) -->
     <GrpcVersion>2.67.0</GrpcVersion>
     <!--#endif -->
