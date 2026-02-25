@@ -65,5 +65,4 @@
     <ItemGroup>
         <InternalsVisibleTo Include="AppDomain.Tests"/>
     </ItemGroup>
-
 </Project>

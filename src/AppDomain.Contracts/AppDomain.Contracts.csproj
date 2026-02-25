@@ -70,5 +70,4 @@
         <Message Text="Packaging version: $(ProjectName)-$(PackageVersion)" Importance="high"/>
     </Target>
     <!--/+:msbuild-conditional:noEmit -->
-
 </Project>

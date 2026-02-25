@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <IsTestProject>true</IsTestProject>
@@ -40,5 +39,4 @@
     <!-- Refitter.MSBuild generates client code before CoreCompile and adds files to Compile.
          We exclude OpenApi/Generated from default globbing above to avoid CS2002 (duplicate source). -->
     <!--/+:msbuild-conditional:noEmit -->
-
 </Project>
