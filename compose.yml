@@ -159,7 +159,9 @@ services:
     profiles: [ "api" ]
     ports:
       - "8101:8080"
+      # #if (INCLUDE_GRPC)
       - "8102:8102" # GRPC HttpPort
+      # #endif
     depends_on:
       app-domain-db:
         condition: service_healthy
@@ -184,8 +186,10 @@ services:
       # #endif
       - Kestrel__Endpoints__Http__Protocols=Http1
       - Kestrel__Endpoints__Http__Url=http://+:8080
+      # #if (INCLUDE_GRPC)
       - Kestrel__Endpoints__Grpc__Protocols=Http2
       - Kestrel__Endpoints__Grpc__Url=http://+:8102
+      # #endif
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://aspire-dashboard:18890
       - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
       - OTEL_SERVICE_NAME=app-domain-api
@@ -317,7 +321,9 @@ services:
       - ./tests/performance/results:/results
     environment:
       - API_BASE_URL=http://app-domain-api:8080
+      # #if (INCLUDE_GRPC)
       - GRPC_ENDPOINT=app-domain-api:8102
+      # #endif
       - ENVIRONMENT=${ENVIRONMENT:-local}
       # k6 Web Dashboard configuration
       - K6_WEB_DASHBOARD=true

@@ -28,7 +28,7 @@
         <None Include="README.md" Pack="true" PackagePath="\"/>
         <Compile Include="..\AppDomain\**\Contracts\IntegrationEvents\*.cs" Link="%(RecursiveDir)%(Filename)%(Extension)"/>
         <Compile Include="..\AppDomain\**\Contracts\Models\*.cs" Link="%(RecursiveDir)%(Filename)%(Extension)"/>
-        <!--#if (INCLUDE_API) -->
+        <!--#if (INCLUDE_GRPC) -->
         <Protobuf Include="..\AppDomain.Api\**\Protos\**\*.proto" Link="%(RecursiveDir)%(Filename)%(Extension)"
                   Pack="true"
                   PackagePath="Protos"
@@ -38,7 +38,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <!--#if (INCLUDE_API) -->
+        <!--#if (INCLUDE_GRPC) -->
         <PackageReference Include="Google.Protobuf"/>
         <PackageReference Include="Grpc.Net.Client"/>
         <PackageReference Include="Grpc.Tools">

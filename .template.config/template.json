@@ -33,7 +33,13 @@
     },
     "api": {
       "type": "parameter",
-      "description": "Generate API project (REST/gRPC endpoints)",
+      "description": "Generate API project (REST endpoints)",
+      "datatype": "bool",
+      "defaultValue": "true"
+    },
+    "grpc": {
+      "type": "parameter",
+      "description": "Include gRPC endpoints and services",
       "datatype": "bool",
       "defaultValue": "true"
     },
@@ -190,6 +196,10 @@
     "INCLUDE_API": {
       "type": "computed",
       "value": "api && !project-only"
+    },
+    "INCLUDE_GRPC": {
+      "type": "computed",
+      "value": "grpc && INCLUDE_API"
     },
     "INCLUDE_BACK_OFFICE": {
       "type": "computed",
@@ -434,6 +444,20 @@
             "tests/AppDomain.Tests/Unit/Invoices/InvoiceEndpointsTests.cs",
             "tests/AppDomain.Tests/Unit/Cashier/CashierEndpointsTests.cs",
             "tests/AppDomain.Tests/Unit/Common/ValidationExtensionsTests.cs",
+            "tests/AppDomain.Tests/Integration/Cashiers/**/*",
+            "tests/AppDomain.Tests/Integration/Invoices/**/*",
+            "tests/AppDomain.Tests/Integration/_Internal/TestDataGenerators/**/*"
+          ]
+        },
+        {
+          "condition": "(!INCLUDE_GRPC)",
+          "exclude": [
+            "src/AppDomain.Api/**/Protos/**/*",
+            "src/AppDomain.Api/**/*Service.cs",
+            "src/AppDomain.Api/**/Mappers/GrpcMapper.cs",
+            "src/AppDomain.Api/Common/Extensions/GrpcExtensions.cs",
+            "src/AppDomain.Api/Common/Extensions/ServerCallContextExtensions.cs",
+            "src/AppDomain.AppHost/Extensions/GrpcExtensions.cs",
             "tests/AppDomain.Tests/Integration/Cashiers/**/*",
             "tests/AppDomain.Tests/Integration/Invoices/**/*",
             "tests/AppDomain.Tests/Integration/_Internal/TestDataGenerators/**/*"

@@ -10,11 +10,13 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <!--#if (INCLUDE_GRPC) -->
         <PackageReference Include="Grpc.AspNetCore"/>
         <PackageReference Include="Grpc.Tools">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <!--#endif -->
         <PackageReference Include="Microsoft.Extensions.ApiDescription.Server">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -54,9 +56,11 @@
     <Import Project="..\..\libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.props"/>
 
     <!--#endif -->
+    <!--#if (INCLUDE_GRPC) -->
     <ItemGroup>
         <Protobuf Include="**/Protos/**/*.proto" ProtoRoot="." GrpcServices="Server"/>
     </ItemGroup>
+    <!--#endif -->
 
     <ItemGroup>
         <InternalsVisibleTo Include="AppDomain.Tests"/>

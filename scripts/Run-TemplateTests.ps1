@@ -545,6 +545,12 @@ function Get-TestDefinitions {
                 @{ File = 'src/TestBffDisabled.Api/appsettings.json'; Pattern = '"Cors"|"SecurityHeaders"' }
             )
             $tests += @{ Name = 'TestBffDisabled'; Parameters = '--bff false'; TestCategory = 'Real-World Patterns'; ContentMustNotContain = $bffExclusionChecks }
+
+            $grpcExclusionChecks = @(
+                @{ File = 'src/TestNoGrpc.Api/TestNoGrpc.Api.csproj'; Pattern = 'Grpc\.AspNetCore' },
+                @{ File = 'src/TestNoGrpc.Api/TestNoGrpc.Api.csproj'; Pattern = 'Protobuf' }
+            )
+            $tests += @{ Name = 'TestNoGrpc'; Parameters = '--grpc false'; TestCategory = 'Real-World Patterns'; ContentMustNotContain = $grpcExclusionChecks }
         }
 
         'orleans-combinations' {
