@@ -3,7 +3,6 @@
     <PropertyGroup>
         <IsPackable>True</IsPackable>
         <GeneratePackageOnBuild Condition="'$(Configuration)' == 'Debug'">True</GeneratePackageOnBuild>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <VersionPrefix>0.0.1</VersionPrefix>
         <VersionSuffix Condition="'$(Configuration)' == 'Debug'">pre</VersionSuffix>
     </PropertyGroup>

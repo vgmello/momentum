@@ -2,7 +2,6 @@
     <PropertyGroup>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <UserSecretsId>4d1e9d4f-ee8a-4d91-8c2b-11e09987ac0b</UserSecretsId>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <!-- Enable OpenAPI source generator interceptors for XML documentation support -->
         <InterceptorsNamespaces>$(InterceptorsNamespaces);Microsoft.AspNetCore.OpenApi.Generated</InterceptorsNamespaces>
         <!-- OpenAPI build-time document generation settings -->
