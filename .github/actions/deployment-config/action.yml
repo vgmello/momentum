@@ -21,5 +21,8 @@ runs:
     - name: Configure deployment
       id: config
       shell: pwsh
+      env:
+        ACTION_PATH: ${{ github.action_path }}
+        INPUT_DEPLOY_TYPE: ${{ inputs.deploy-type }}
       run: |
-        & "${{ github.action_path }}/Configure-Deployment.ps1" -DeployType "${{ inputs.deploy-type }}"
+        & "$env:ACTION_PATH/Configure-Deployment.ps1" -DeployType "$env:INPUT_DEPLOY_TYPE"

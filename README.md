@@ -3,8 +3,9 @@
 [![NuGet](https://img.shields.io/nuget/v/Momentum.Extensions.Abstractions?style=flat-square&color=blue)](https://www.nuget.org/packages/Momentum.Extensions.Abstractions)
 [![Downloads](https://img.shields.io/nuget/dt/Momentum.Extensions.Abstractions?style=flat-square)](https://www.nuget.org/packages/Momentum.Extensions.Abstractions)
 [![License](https://img.shields.io/github/license/vgmello/momentum?style=flat-square&color=brightgreen)](https://github.com/vgmello/momentum/blob/main/LICENSE)
-[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/vgmello/momentum/ci.yml?style=flat-square&logo=github&label=CI)
-](https://github.com/vgmello/momentum/actions/workflows/ci.yml)
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/vgmello/momentum/ci.yml?style=flat-square&logo=github&label=CI)](https://github.com/vgmello/momentum/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/sonar/coverage/vgmello_momentum?server=https%3A%2F%2Fsonarcloud.io&style=flat-square&logo=sonarqubecloud)](https://sonarcloud.io/summary/overall?id=vgmello_momentum)
+[![Quality Gate](https://img.shields.io/sonar/quality_gate/vgmello_momentum?server=https%3A%2F%2Fsonarcloud.io&style=flat-square&logo=sonarqubecloud)](https://sonarcloud.io/summary/overall?id=vgmello_momentum)
 
 Welcome to **Momentum** - a comprehensive .NET 10 template system that generates complete, production-ready microservices solutions. Whether you're building APIs, event-driven backends, or stateful processing systems, Momentum provides the architecture, patterns, and infrastructure you need to get productive immediately.
 

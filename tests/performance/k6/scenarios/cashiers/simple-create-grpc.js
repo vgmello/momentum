@@ -60,17 +60,17 @@ export default function main() {
         // Check response (remove timing check as it's tracked separately by k6)
         check(response, {
             "Create cashier gRPC - status is OK": (r) => r && r.status === grpc.StatusOK,
-            "Create cashier gRPC - has cashierId": (r) => r.message && r.message.cashierId !== undefined && r.message.cashierId !== "",
-            "Create cashier gRPC - name matches": (r) => r.message && r.message.name === cashierData.name,
-            "Create cashier gRPC - email matches": (r) => r.message && r.message.email === cashierData.email,
-            "Create cashier gRPC - has tenantId": (r) => r.message && r.message.tenantId !== undefined && r.message.tenantId !== "",
+            "Create cashier gRPC - has cashierId": (r) => r.message?.cashierId !== undefined && r.message?.cashierId !== "",
+            "Create cashier gRPC - name matches": (r) => r.message?.name === cashierData.name,
+            "Create cashier gRPC - email matches": (r) => r.message?.email === cashierData.email,
+            "Create cashier gRPC - has tenantId": (r) => r.message?.tenantId !== undefined && r.message?.tenantId !== "",
         });
 
         // Log result based on gRPC status
         if (response.status === grpc.StatusOK) {
             console.log(`✓ Cashier created successfully via gRPC: ${cashierData.name}`);
             // Log performance warning if response time is slow
-            if (response.timings && response.timings.duration >= 500) {
+            if (response.timings?.duration >= 500) {
                 console.warn(`⚠ Slow response time: ${response.timings.duration}ms`);
             }
         } else {
