@@ -64,8 +64,17 @@ runs:
     - name: Calculate version
       id: calculate
       shell: pwsh
+      env:
+        ACTION_PATH: ${{ github.action_path }}
+        INPUT_VERSION_FILE: ${{ inputs.version-file }}
+        INPUT_TAG_PREFIX: ${{ inputs.tag-prefix }}
+        INPUT_PRERELEASE: ${{ inputs.prerelease }}
       run: |
-        & "${{ github.action_path }}/Calculate-Version.ps1" `
-          -VersionFile "${{ inputs.version-file }}" `
-          -TagPrefix "${{ inputs.tag-prefix }}" `
-          ${{ inputs.prerelease == 'true' && '-Prerelease' || '' }}
+        $params = @(
+          "-VersionFile", $env:INPUT_VERSION_FILE,
+          "-TagPrefix", $env:INPUT_TAG_PREFIX
+        )
+        if ($env:INPUT_PRERELEASE -eq "true") {
+          $params += "-Prerelease"
+        }
+        & "$env:ACTION_PATH/Calculate-Version.ps1" @params

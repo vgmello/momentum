@@ -76,11 +76,15 @@ jobs:
       - name: Set Momentum lib for template
         id: set-lib-version
         shell: pwsh
+        env:
+          CONFIG_PRERELEASE: ${{ steps.config.outputs.prerelease }}
+          MMT_PREVIOUS_VERSION: ${{ steps.latest-mmt-version.outputs.previous-version }}
+          MMT_PREVIOUS_STABLE_VERSION: ${{ steps.latest-mmt-version.outputs.previous-stable-version }}
         run: |
-          $version = if ("${{ steps.config.outputs.prerelease }}" -eq "true") {
-              "${{ steps.latest-mmt-version.outputs.previous-version }}"
+          $version = if ($env:CONFIG_PRERELEASE -eq "true") {
+              $env:MMT_PREVIOUS_VERSION
           } else {
-              "${{ steps.latest-mmt-version.outputs.previous-stable-version }}"
+              $env:MMT_PREVIOUS_STABLE_VERSION
           }
           $filePath = ".template.config/template.json"
 
@@ -124,14 +128,19 @@ jobs:
 
       - name: Deployment Summary
         shell: pwsh
+        env:
+          RELEASE_VERSION: ${{ steps.release-version.outputs.next-version }}
+          RELEASE_TAG: ${{ steps.release-version.outputs.next-tag }}
+          NUGET_SOURCE_URL: ${{ env.NUGET_SOURCE }}
+          CONFIG_PRERELEASE: ${{ steps.config.outputs.prerelease }}
         run: |
           $summaryArgs = @{
-            ReleaseVersion = "${{ steps.release-version.outputs.next-version }}"
-            ReleaseTag = "${{ steps.release-version.outputs.next-tag }}"
-            NugetSource = "${{ env.NUGET_SOURCE }}"
+            ReleaseVersion = $env:RELEASE_VERSION
+            ReleaseTag = $env:RELEASE_TAG
+            NugetSource = $env:NUGET_SOURCE_URL
           }
 
-          if ("${{ steps.config.outputs.prerelease }}" -eq "true") {
+          if ($env:CONFIG_PRERELEASE -eq "true") {
             $summaryArgs["DeployPrerelease"] = $true
           }
 

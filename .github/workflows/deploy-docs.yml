@@ -74,10 +74,13 @@ jobs:
 
       - name: Deployment Summary
         shell: pwsh
+        env:
+          DOCS_PAGE_URL: ${{ steps.docs-deployment.outputs.page_url }}
+          INPUT_DOCS_PATH: ${{ github.event.inputs.docs-path || 'libs/Momentum/docs' }}
         run: |
           $summaryArgs = @{
-            DocsUrl = "${{ steps.docs-deployment.outputs.page_url }}"
-            DocsPath = "${{ github.event.inputs.docs-path || 'libs/Momentum/docs' }}"
+            DocsUrl = $env:DOCS_PAGE_URL
+            DocsPath = $env:INPUT_DOCS_PATH
             DeployDocs = $true
           }
 

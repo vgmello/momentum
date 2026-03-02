@@ -126,19 +126,26 @@ jobs:
 
       - name: Deployment Summary
         shell: pwsh
+        env:
+          RELEASE_VERSION: ${{ steps.release-version.outputs.next-version }}
+          RELEASE_TAG: ${{ steps.release-version.outputs.next-tag }}
+          NUGET_SOURCE_URL: ${{ env.NUGET_SOURCE }}
+          CONFIG_PRERELEASE: ${{ steps.config.outputs.prerelease }}
+          CONFIG_DEPLOY_DOCS: ${{ steps.config.outputs.deploy-docs }}
+          DOCS_PAGE_URL: ${{ steps.docs-deployment.outputs.page_url }}
         run: |
           $summaryArgs = @{
-            ReleaseVersion = "${{ steps.release-version.outputs.next-version }}"
-            ReleaseTag = "${{ steps.release-version.outputs.next-tag }}"
-            NugetSource = "${{ env.NUGET_SOURCE }}"
+            ReleaseVersion = $env:RELEASE_VERSION
+            ReleaseTag = $env:RELEASE_TAG
+            NugetSource = $env:NUGET_SOURCE_URL
           }
 
-          if ("${{ steps.config.outputs.prerelease }}" -eq "true") {
+          if ($env:CONFIG_PRERELEASE -eq "true") {
             $summaryArgs["DeployPrerelease"] = $true
           }
 
-          if ("${{ steps.config.outputs.deploy-docs }}" -eq "true") {
-            $summaryArgs["DocsUrl"] = "${{ steps.docs-deployment.outputs.page_url }}"
+          if ($env:CONFIG_DEPLOY_DOCS -eq "true") {
+            $summaryArgs["DocsUrl"] = $env:DOCS_PAGE_URL
             $summaryArgs["DeployDocs"] = $true
           }
 
