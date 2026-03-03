@@ -70,11 +70,11 @@ runs:
         INPUT_TAG_PREFIX: ${{ inputs.tag-prefix }}
         INPUT_PRERELEASE: ${{ inputs.prerelease }}
       run: |
-        $params = @(
-          "-VersionFile", $env:INPUT_VERSION_FILE,
-          "-TagPrefix", $env:INPUT_TAG_PREFIX
-        )
+        $params = @{
+          VersionFile = $env:INPUT_VERSION_FILE
+          TagPrefix = $env:INPUT_TAG_PREFIX
+        }
         if ($env:INPUT_PRERELEASE -eq "true") {
-          $params += "-Prerelease"
+          $params['Prerelease'] = $true
         }
         & "$env:ACTION_PATH/Calculate-Version.ps1" @params
