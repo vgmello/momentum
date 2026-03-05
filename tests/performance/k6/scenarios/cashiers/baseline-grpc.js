@@ -104,9 +104,9 @@ export default function main() {
                 if (success && response.message) {
                     check(response.message, {
                         "Get cashier - cashier_id matches": (cashier) => cashier.cashier_id === cashierId,
-                        "Get cashier - has name": (cashier) => cashier.name && cashier.name.length > 0,
-                        "Get cashier - has email": (cashier) => cashier.email && cashier.email.includes("@"),
-                        "Get cashier - has tenant_id": (cashier) => cashier.tenant_id && cashier.tenant_id.length > 0,
+                        "Get cashier - has name": (cashier) => cashier.name?.length > 0,
+                        "Get cashier - has email": (cashier) => cashier.email?.includes("@"),
+                        "Get cashier - has tenant_id": (cashier) => cashier.tenant_id?.length > 0,
                     });
                 }
             });
@@ -131,7 +131,7 @@ export default function main() {
             if (success && response.message) {
                 check(response.message, {
                     "List cashiers - has cashiers array": (resp) => resp.cashiers && Array.isArray(resp.cashiers),
-                    "List cashiers - contains cashiers": (resp) => resp.cashiers && resp.cashiers.length > 0,
+                    "List cashiers - contains cashiers": (resp) => resp.cashiers?.length > 0,
                 });
             }
         });

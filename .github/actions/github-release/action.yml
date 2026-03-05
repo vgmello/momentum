@@ -33,11 +33,15 @@ runs:
       shell: bash
       env:
         GH_TOKEN: ${{ github.token }}
+        GH_REPOSITORY: ${{ github.repository }}
+        INPUT_TAG_NAME: ${{ inputs.tag-name }}
+        INPUT_TARGET_COMMITISH: ${{ inputs.target-commitish }}
+        INPUT_PREVIOUS_STABLE_TAG: ${{ inputs.previous-stable-tag }}
       run: |
-        BODY=$(gh api repos/${{ github.repository }}/releases/generate-notes \
-          -f tag_name="${{ inputs.tag-name }}" \
-          -f target_commitish="${{ inputs.target-commitish }}" \
-          -f previous_tag_name="${{ inputs.previous-stable-tag }}" \
+        BODY=$(gh api "repos/$GH_REPOSITORY/releases/generate-notes" \
+          -f tag_name="$INPUT_TAG_NAME" \
+          -f target_commitish="$INPUT_TARGET_COMMITISH" \
+          -f previous_tag_name="$INPUT_PREVIOUS_STABLE_TAG" \
           --jq '.body')
         # Use a delimiter to safely pass multiline content
         EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
