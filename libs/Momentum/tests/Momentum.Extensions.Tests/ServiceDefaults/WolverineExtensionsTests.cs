@@ -1,6 +1,6 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-using Momentum.ServiceDefaults.Messaging.Wolverine;
+using Momentum.Extensions.Messaging.Wolverine;
 using Wolverine;
 
 namespace Momentum.Extensions.Tests.ServiceDefaults;

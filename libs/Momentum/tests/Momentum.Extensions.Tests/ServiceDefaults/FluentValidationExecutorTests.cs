@@ -1,7 +1,7 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
 using FluentValidation;
-using Momentum.ServiceDefaults.Messaging.Middlewares;
+using Momentum.Extensions.Messaging.Wolverine.Middlewares;
 
 namespace Momentum.Extensions.Tests.ServiceDefaults;
 

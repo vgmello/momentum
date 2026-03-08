@@ -2,8 +2,8 @@
 
 using System.Diagnostics;
 using Momentum.Extensions.Abstractions.Messaging;
-using Momentum.ServiceDefaults.Messaging;
-using Momentum.ServiceDefaults.Messaging.Middlewares;
+using Momentum.Extensions.Messaging.Wolverine;
+using Momentum.Extensions.Messaging.Wolverine.Middlewares;
 using Wolverine;
 
 namespace Momentum.Extensions.Tests.ServiceDefaults;

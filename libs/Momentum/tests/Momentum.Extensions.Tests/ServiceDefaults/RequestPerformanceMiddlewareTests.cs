@@ -3,8 +3,8 @@
 using System.Diagnostics.Metrics;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Testing;
-using Momentum.ServiceDefaults.Messaging.Middlewares;
-using Momentum.ServiceDefaults.Messaging.Telemetry;
+using Momentum.Extensions.Messaging.Wolverine.Middlewares;
+using Momentum.Extensions.Messaging.Wolverine.Telemetry;
 using Wolverine;
 
 namespace Momentum.Extensions.Tests.ServiceDefaults;

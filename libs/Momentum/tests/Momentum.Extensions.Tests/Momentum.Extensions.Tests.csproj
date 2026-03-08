@@ -27,5 +27,6 @@
         <ProjectReference Include="..\..\src\Momentum.Extensions\Momentum.Extensions.csproj"/>
         <ProjectReference Include="..\..\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
         <ProjectReference Include="..\..\src\Momentum.Extensions.Messaging.Kafka\Momentum.Extensions.Messaging.Kafka.csproj"/>
+        <ProjectReference Include="..\..\src\Momentum.Extensions.Messaging.Wolverine\Momentum.Extensions.Messaging.Wolverine.csproj"/>
     </ItemGroup>
 </Project>

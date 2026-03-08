@@ -1,7 +1,7 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
 using CloudNative.CloudEvents;
-using Momentum.ServiceDefaults.Messaging;
+using Momentum.Extensions.Messaging.Wolverine;
 
 namespace Momentum.Extensions.Tests.ServiceDefaults;
 

@@ -39,6 +39,7 @@
     <!--#if (!LIBS_INCLUDES_KAFKA) -->
     <ItemGroup>
         <ProjectReference Include="..\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
+        <ProjectReference Include="..\Momentum.Extensions.Messaging.Wolverine\Momentum.Extensions.Messaging.Wolverine.csproj"/>
         <ProjectReference Include="..\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
     </ItemGroup>
     <!--#endif -->

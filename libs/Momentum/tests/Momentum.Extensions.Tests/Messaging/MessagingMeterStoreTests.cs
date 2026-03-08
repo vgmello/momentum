@@ -1,6 +1,6 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-using Momentum.ServiceDefaults.Messaging.Telemetry;
+using Momentum.Extensions.Messaging.Wolverine.Telemetry;
 using System.Diagnostics.Metrics;
 
 namespace Momentum.Extensions.Tests.Messaging;
