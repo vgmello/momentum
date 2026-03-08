@@ -3,7 +3,7 @@
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
 using Momentum.Extensions.Messaging.Kafka;
-using Momentum.ServiceDefaults.Messaging;
+using Momentum.Extensions.Messaging;
 using System.Text;
 using Wolverine;
 

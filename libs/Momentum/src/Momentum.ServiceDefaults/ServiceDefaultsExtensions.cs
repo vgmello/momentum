@@ -21,9 +21,6 @@ namespace Momentum.ServiceDefaults;
 /// </summary>
 public static class ServiceDefaultsExtensions
 {
-    private static readonly Lock EntryAssemblyLock = new();
-    private static Assembly? _entryAssembly;
-
     /// <summary>
     ///     Gets or sets the entry assembly for the application.
     /// </summary>
@@ -37,27 +34,12 @@ public static class ServiceDefaultsExtensions
     /// <remarks>
     ///     This property is thread-safe. Setting the entry assembly should only be done
     ///     during application startup, typically for testing scenarios.
+    ///     Delegates to <see cref="MomentumApp.EntryAssembly"/>.
     /// </remarks>
     public static Assembly EntryAssembly
     {
-        get
-        {
-            var assembly = Volatile.Read(ref _entryAssembly);
-            if (assembly is not null)
-                return assembly;
-
-            lock (EntryAssemblyLock)
-            {
-                assembly = _entryAssembly;
-                if (assembly is not null)
-                    return assembly;
-
-                assembly = GetEntryAssembly();
-                Volatile.Write(ref _entryAssembly, assembly);
-                return assembly;
-            }
-        }
-        set => Volatile.Write(ref _entryAssembly, value);
+        get => MomentumApp.EntryAssembly;
+        set => MomentumApp.EntryAssembly = value;
     }
 
     /// <summary>
@@ -227,10 +209,4 @@ public static class ServiceDefaultsExtensions
         "storage"
     }.ToFrozenSet();
 
-    private static Assembly GetEntryAssembly()
-    {
-        return Assembly.GetEntryAssembly() ??
-               throw new InvalidOperationException(
-                   "Unable to identify entry assembly. Please provide an assembly via the ServiceDefaultsExtensions.EntryAssembly property.");
-    }
 }

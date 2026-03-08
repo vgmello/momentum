@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Momentum.Extensions.Abstractions.Messaging;
 using Momentum.Extensions.Messaging.Kafka;
-using Momentum.ServiceDefaults.Messaging;
+using Momentum.Extensions.Messaging;
 using NSubstitute;
 using Wolverine;
 

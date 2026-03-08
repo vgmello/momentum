@@ -1,7 +1,7 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
 using Microsoft.Extensions.Hosting;
-using Momentum.ServiceDefaults.Messaging;
+using Momentum.Extensions.Messaging;
 using NSubstitute;
 
 namespace Momentum.Extensions.Tests.ServiceDefaults;

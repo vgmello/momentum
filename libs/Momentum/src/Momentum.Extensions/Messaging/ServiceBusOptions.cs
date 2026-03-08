@@ -2,12 +2,14 @@
 
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Momentum.Extensions.Abstractions.Extensions;
+using Momentum.Extensions.Abstractions.Messaging;
 using System.Text.RegularExpressions;
 
-namespace Momentum.ServiceDefaults.Messaging;
+namespace Momentum.Extensions.Messaging;
 
 /// <summary>
-///     Configuration options for the Wolverine service bus and messaging infrastructure.
+///     Configuration options for the service bus and messaging infrastructure.
 /// </summary>
 /// <remarks>
 ///     <!--@include: @code/service-configuration/service-bus-options-detailed.md -->
@@ -35,7 +37,7 @@ public partial class ServiceBusOptions
     /// <remarks>
     ///     See <see cref="ServiceBusOptions" /> for detailed configuration information.
     /// </remarks>
-    public string Domain { get; set; } = DefaultDomainAttribute.GetDomainName(ServiceDefaultsExtensions.EntryAssembly);
+    public string Domain { get; set; } = DefaultDomainAttribute.GetDomainName(MomentumApp.EntryAssembly);
 
     /// <summary>
     ///     Gets or sets the public service name used for external identification and message routing.
