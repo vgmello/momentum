@@ -11,7 +11,9 @@ using AppDomain.Infrastructure;
 //#if (USE_KAFKA)
 using Momentum.Extensions.Messaging.Kafka;
 //#endif
+using Momentum.Extensions.Messaging.Wolverine;
 using Momentum.ServiceDefaults;
+using Momentum.ServiceDefaults.Messaging;
 using Momentum.ServiceDefaults.Api;
 using Momentum.ServiceDefaults.Api.OpenApi.Extensions;
 //#if (INCLUDE_BFF)
@@ -24,6 +26,7 @@ using Momentum.ServiceDefaults.HealthChecks;
 var builder = WebApplication.CreateSlimBuilder(args);
 
 builder.AddServiceDefaults();
+builder.AddServiceBus(bus => bus.UseWolverine());
 builder.AddApiServiceDefaults(requireAuth: false);
 //#if (INCLUDE_BFF)
 builder.AddFrontendIntegration();

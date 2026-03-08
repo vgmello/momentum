@@ -21,6 +21,9 @@
         <!--#if (LIBS_INCLUDES_KAFKA) -->
         <Project Path="libs\Momentum\src\Momentum.Extensions.Messaging.Kafka\Momentum.Extensions.Messaging.Kafka.csproj"/>
         <!--#endif -->
+        <!--#if (LIBS_INCLUDES_WOLVERINE) -->
+        <Project Path="libs\Momentum\src\Momentum.Extensions.Messaging.Wolverine\Momentum.Extensions.Messaging.Wolverine.csproj"/>
+        <!--#endif -->
         <!--#if (LIBS_INCLUDES_GENERATORS) -->
         <Project Path="libs\Momentum\src\Momentum.Extensions.SourceGenerators\Momentum.Extensions.SourceGenerators.csproj"/>
         <!--#endif -->

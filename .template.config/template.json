@@ -157,6 +157,10 @@
         {
           "choice": "generators",
           "description": "Include Momentum.Extensions.SourceGenerators as project reference"
+        },
+        {
+          "choice": "wolverine",
+          "description": "Include Momentum.Extensions.Messaging.Wolverine as project reference"
         }
       ],
       "replaces": "__LIBS__"
@@ -276,6 +280,10 @@
     "LIBS_INCLUDES_GENERATORS": {
       "type": "computed",
       "value": "libs == 'generators'"
+    },
+    "LIBS_INCLUDES_WOLVERINE": {
+      "type": "computed",
+      "value": "libs == 'wolverine'"
     },
     // Generated Symbols
     "DiagramArrow": {
@@ -582,6 +590,12 @@
           "condition": "(!LIBS_INCLUDES_KAFKA)",
           "exclude": [
             "libs/Momentum/src/Momentum.Extensions.Messaging.Kafka/**/*"
+          ]
+        },
+        {
+          "condition": "(!LIBS_INCLUDES_WOLVERINE)",
+          "exclude": [
+            "libs/Momentum/src/Momentum.Extensions.Messaging.Wolverine/**/*"
           ]
         },
         {

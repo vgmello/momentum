@@ -85,6 +85,7 @@
     <PackageVersion Include="Momentum.Extensions" Version="$(MomentumVersion)" />
     <PackageVersion Include="Momentum.Extensions.Abstractions" Version="$(MomentumVersion)" />
     <PackageVersion Include="Momentum.Extensions.Messaging.Kafka" Version="$(MomentumVersion)" />
+    <PackageVersion Include="Momentum.Extensions.Messaging.Wolverine" Version="$(MomentumVersion)" />
     <PackageVersion Include="Momentum.Extensions.SourceGenerators" Version="$(MomentumVersion)" />
     <PackageVersion Include="Momentum.Extensions.XmlDocs" Version="$(MomentumVersion)" />
     <PackageVersion Include="Momentum.ServiceDefaults" Version="$(MomentumVersion)" />

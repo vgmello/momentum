@@ -30,6 +30,8 @@ using AppDomain.Infrastructure;
 //#if (USE_KAFKA)
 using Momentum.Extensions.Messaging.Kafka;
 //#endif
+using Momentum.Extensions.Messaging.Wolverine;
+using Momentum.ServiceDefaults.Messaging;
 //#if (INCLUDE_ORLEANS)
 using AppDomain.BackOffice.Orleans.Infrastructure.Extensions;
 //#endif
@@ -143,6 +145,7 @@ public class IntegrationTestFixture : IAsyncLifetime
         builder.WebHost.UseTestServer();
 
         builder.AddServiceDefaults();
+        builder.AddServiceBus(bus => bus.UseWolverine());
         //#if (INCLUDE_API)
         builder.AddApiServiceDefaults(requireAuth: false);
         //#endif

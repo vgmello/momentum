@@ -1,0 +1,7 @@
+<Project>
+
+    <ItemGroup Condition="'$(ImplicitUsings)' == 'enable'">
+        <Using Include="Wolverine"/>
+    </ItemGroup>
+
+</Project>

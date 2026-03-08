@@ -11,6 +11,9 @@
         <!--#if (!LIBS_INCLUDES_KAFKA) -->
         <PackageReference Include="Momentum.Extensions.Messaging.Kafka"/>
         <!--#endif -->
+        <!--#if (!LIBS_INCLUDES_WOLVERINE) -->
+        <PackageReference Include="Momentum.Extensions.Messaging.Wolverine"/>
+        <!--#endif -->
         <!--#if (USE_KAFKA) -->
         <PackageReference Include="WolverineFx.Kafka"/>
         <!--#endif -->
@@ -24,6 +27,9 @@
         <!--#if (LIBS_INCLUDES_KAFKA) -->
         <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.Messaging.Kafka\Momentum.Extensions.Messaging.Kafka.csproj"/>
         <!--#endif -->
+        <!--#if (LIBS_INCLUDES_WOLVERINE) -->
+        <ProjectReference Include="..\..\libs\Momentum\src\Momentum.Extensions.Messaging.Wolverine\Momentum.Extensions.Messaging.Wolverine.csproj"/>
+        <!--#endif -->
     </ItemGroup>
 
     <ItemGroup>
@@ -32,5 +38,8 @@
 
     <!--#if (LIBS_INCLUDES_DEFAULTS) -->
     <Import Project="..\..\libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.props"/>
+    <!--#endif -->
+    <!--#if (LIBS_INCLUDES_WOLVERINE) -->
+    <Import Project="..\..\libs\Momentum\src\Momentum.Extensions.Messaging.Wolverine\Momentum.Extensions.Messaging.Wolverine.props"/>
     <!--#endif -->
 </Project>
