@@ -114,32 +114,10 @@ public static class ServiceDefaultsExtensions
     ///     This method provides robust application lifecycle management including:
     ///     <list type="bullet">
     ///         <item>Bootstrap logger initialization for early-stage logging</item>
-    ///         <item>Wolverine CLI command detection and execution for DevOps tasks</item>
+    ///         <item>CLI command detection via registered <see cref="ICliCommandHandler"/> (e.g., messaging framework commands)</item>
     ///         <item>Graceful exception handling with structured logging</item>
     ///         <item>Proper log flushing on application shutdown</item>
     ///         <item>Support for containerized environments and orchestrators</item>
-    ///     </list>
-    ///
-    ///     <para>
-    ///         <strong>Supported Wolverine Commands:</strong>
-    ///     </para>
-    ///     <list type="table">
-    ///         <item>
-    ///             <term>check-env</term>
-    ///             <description>Validates messaging infrastructure connectivity</description>
-    ///         </item>
-    ///         <item>
-    ///             <term>codegen</term>
-    ///             <description>Generates Wolverine handler code for optimization</description>
-    ///         </item>
-    ///         <item>
-    ///             <term>db-apply, db-assert</term>
-    ///             <description>Database schema migration and validation</description>
-    ///         </item>
-    ///         <item>
-    ///             <term>storage</term>
-    ///             <description>Message persistence storage management</description>
-    ///         </item>
     ///     </list>
     /// </remarks>
     /// <example>

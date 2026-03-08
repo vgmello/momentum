@@ -5,7 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Momentum.Extensions.Messaging.Wolverine.Telemetry;
-using Momentum.ServiceDefaults.Messaging;
 using OpenTelemetry.Metrics;
 
 namespace Momentum.Extensions.Messaging.Wolverine;

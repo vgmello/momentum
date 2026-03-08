@@ -2,6 +2,7 @@
 
     <ItemGroup Condition="'$(ImplicitUsings)' == 'enable'">
         <Using Include="Wolverine"/>
+        <Using Include="Momentum.Extensions.Messaging.Wolverine"/>
     </ItemGroup>
 
 </Project>
