@@ -4,7 +4,7 @@ using System.Collections.Frozen;
 using System.Reflection;
 using Wolverine.Runtime.Handlers;
 
-namespace Momentum.ServiceDefaults.Messaging;
+namespace Momentum.Extensions.Messaging.Wolverine;
 
 public static class DistributedEventsDiscovery
 {
@@ -33,7 +33,7 @@ public static class DistributedEventsDiscovery
     /// </remarks>
     public static IEnumerable<Type> GetIntegrationEventTypes()
     {
-        Assembly[] appAssemblies = [.. DomainAssemblyAttribute.GetDomainAssemblies(), ServiceDefaultsExtensions.EntryAssembly];
+        Assembly[] appAssemblies = [.. DomainAssemblyAttribute.GetDomainAssemblies(), MomentumApp.EntryAssembly];
 
         var domainPrefixes = appAssemblies
             .Select(a => a.GetName().Name)
@@ -80,7 +80,7 @@ public static class DistributedEventsDiscovery
     // TODO: Use source generation in the future for this
     private static IEnumerable<MethodInfo> GetHandlerMethods()
     {
-        Assembly[] handlerAssemblies = [.. DomainAssemblyAttribute.GetDomainAssemblies(), ServiceDefaultsExtensions.EntryAssembly];
+        Assembly[] handlerAssemblies = [.. DomainAssemblyAttribute.GetDomainAssemblies(), MomentumApp.EntryAssembly];
 
         var candidateHandlers = handlerAssemblies
             .SelectMany(assembly => assembly.GetTypes())

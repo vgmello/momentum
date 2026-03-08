@@ -1,6 +1,5 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-using JasperFx;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +9,6 @@ using Momentum.ServiceDefaults.HealthChecks;
 using Momentum.ServiceDefaults.Logging;
 using Momentum.ServiceDefaults.OpenTelemetry;
 using Serilog;
-using System.Collections.Frozen;
 using System.Reflection;
 
 namespace Momentum.ServiceDefaults;
@@ -155,14 +153,14 @@ public static class ServiceDefaultsExtensions
     [ExcludeFromCodeCoverage]
     public static async Task RunAsync(this WebApplication app, string[] args)
     {
-        var isWolverineCommand = args.Length > 0 && WolverineCommands.Contains(args[0]);
+        var cliHandler = app.Services.GetService<ICliCommandHandler>();
+        var isCliCommand = cliHandler is not null && args.Length > 0 && cliHandler.IsCommand(args[0]);
 
         try
         {
-            if (isWolverineCommand)
+            if (isCliCommand)
             {
-                await app.RunJasperFxCommands(args);
-
+                await cliHandler!.ExecuteAsync(app, args);
                 return;
             }
 
@@ -177,9 +175,7 @@ public static class ServiceDefaultsExtensions
         {
             try
             {
-                // Only dispose explicitly for Wolverine commands — the framework's
-                // RunAsync already disposes the application on the normal path.
-                if (isWolverineCommand)
+                if (isCliCommand)
                     await app.DisposeAsync();
             }
             catch (Exception disposeEx)
@@ -192,19 +188,5 @@ public static class ServiceDefaultsExtensions
             }
         }
     }
-
-    private static readonly FrozenSet<string> WolverineCommands = new[]
-    {
-        "check-env",
-        "codegen",
-        "db-apply",
-        "db-assert",
-        "db-dump",
-        "db-patch",
-        "describe",
-        "help",
-        "resources",
-        "storage"
-    }.ToFrozenSet();
 
 }

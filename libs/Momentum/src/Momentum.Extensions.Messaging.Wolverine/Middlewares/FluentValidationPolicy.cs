@@ -6,7 +6,7 @@ using JasperFx.CodeGeneration.Frames;
 using Wolverine.Configuration;
 using Wolverine.Runtime.Handlers;
 
-namespace Momentum.ServiceDefaults.Messaging.Middlewares;
+namespace Momentum.Extensions.Messaging.Wolverine.Middlewares;
 
 [ExcludeFromCodeCoverage]
 public class FluentValidationPolicy : IHandlerPolicy

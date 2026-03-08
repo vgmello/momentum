@@ -1,6 +1,6 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-namespace Momentum.ServiceDefaults.Messaging.Wolverine;
+namespace Momentum.Extensions.Messaging.Wolverine;
 
 /// <summary>
 ///     Provides extension methods for Wolverine messaging components.

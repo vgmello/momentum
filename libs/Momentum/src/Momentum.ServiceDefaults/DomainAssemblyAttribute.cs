@@ -41,7 +41,7 @@ public class DomainAssemblyAttribute(params Type[] typeMarkers) : Attribute
     /// <returns>
     ///     A read-only list of assemblies marked as domain assemblies.
     /// </returns>
-    internal static IReadOnlyList<Assembly> GetDomainAssemblies(Assembly? applicationAssembly = null)
+    public static IReadOnlyList<Assembly> GetDomainAssemblies(Assembly? applicationAssembly = null)
     {
         var targetAssembly = applicationAssembly ?? ServiceDefaultsExtensions.EntryAssembly;
 

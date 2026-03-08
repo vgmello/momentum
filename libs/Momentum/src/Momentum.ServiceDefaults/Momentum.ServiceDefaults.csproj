@@ -1,9 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <IsAspireSharedProject>true</IsAspireSharedProject>
-        <!-- Disable configuration binding source generator - WolverineOptions has complex types
-             (Endpoint, MemberInfo) that the source generator cannot handle (SYSLIB1100/1101) -->
-        <EnableConfigurationBindingGenerator>false</EnableConfigurationBindingGenerator>
     </PropertyGroup>
 
     <Import Project="Momentum.ServiceDefaults.props"/>
@@ -43,7 +40,6 @@
 
     <ItemGroup>
         <PackageReference Include="Aspire.Npgsql"/>
-        <PackageReference Include="CloudNative.CloudEvents.SystemTextJson"/>
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions"/>
         <PackageReference Include="Microsoft.Extensions.Http.Resilience"/>
         <PackageReference Include="Microsoft.Extensions.ServiceDiscovery"/>
@@ -59,8 +55,6 @@
         <PackageReference Include="Serilog.AspNetCore"/>
         <PackageReference Include="Serilog.Exceptions"/>
         <PackageReference Include="Serilog.Sinks.OpenTelemetry"/>
-        <PackageReference Include="WolverineFx"/>
-        <PackageReference Include="WolverineFx.Postgresql"/>
         <!--#if (!LIBS_INCLUDES_EXT)
         <PackageReference Include="Momentum.Extensions"/>
         #endif -->

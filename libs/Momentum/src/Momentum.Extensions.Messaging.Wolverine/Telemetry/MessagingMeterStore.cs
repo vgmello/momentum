@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Concurrent;
 using System.Diagnostics.Metrics;
 
-namespace Momentum.ServiceDefaults.Messaging.Telemetry;
+namespace Momentum.Extensions.Messaging.Wolverine.Telemetry;
 
 /// <summary>
 ///     Provides a store for messaging metrics, creating and caching metrics instances per message type.

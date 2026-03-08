@@ -6,7 +6,7 @@ using JasperFx.CodeGeneration.Model;
 using Wolverine.Runtime;
 using Wolverine.Runtime.Handlers;
 
-namespace Momentum.ServiceDefaults.Messaging.Middlewares;
+namespace Momentum.Extensions.Messaging.Wolverine.Middlewares;
 
 [ExcludeFromCodeCoverage]
 internal class FluentValidationResultFrame(Type messageType, MethodCall validationMethodCall) : SyncFrame

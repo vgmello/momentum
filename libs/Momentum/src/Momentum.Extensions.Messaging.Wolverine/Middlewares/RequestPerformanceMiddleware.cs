@@ -1,11 +1,10 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
 using Microsoft.Extensions.Logging;
-using Momentum.ServiceDefaults.Messaging.Telemetry;
-using Momentum.ServiceDefaults.Messaging.Wolverine;
+using Momentum.Extensions.Messaging.Wolverine.Telemetry;
 using System.Diagnostics;
 
-namespace Momentum.ServiceDefaults.Messaging.Middlewares;
+namespace Momentum.Extensions.Messaging.Wolverine.Middlewares;
 
 /// <summary>
 ///     Wolverine middleware that tracks message processing performance and logs execution metrics.

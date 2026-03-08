@@ -1,6 +1,8 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-namespace Momentum.ServiceDefaults.Messaging.Middlewares;
+using FluentValidation.Results;
+
+namespace Momentum.Extensions.Messaging.Wolverine.Middlewares;
 
 /// <summary>
 ///     Provides methods for executing FluentValidation validators against messages.

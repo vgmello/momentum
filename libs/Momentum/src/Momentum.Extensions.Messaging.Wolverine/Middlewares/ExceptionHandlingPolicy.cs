@@ -5,7 +5,7 @@ using JasperFx.CodeGeneration;
 using Wolverine.Configuration;
 using Wolverine.Runtime.Handlers;
 
-namespace Momentum.ServiceDefaults.Messaging.Middlewares;
+namespace Momentum.Extensions.Messaging.Wolverine.Middlewares;
 
 /// <summary>
 ///     Wolverine policy that ensures exception handling middleware is applied to all message handlers.

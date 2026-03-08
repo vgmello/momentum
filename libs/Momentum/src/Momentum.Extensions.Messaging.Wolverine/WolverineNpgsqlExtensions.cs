@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Wolverine.Postgresql;
 
-namespace Momentum.ServiceDefaults.Messaging.Wolverine;
+namespace Momentum.Extensions.Messaging.Wolverine;
 
 [ExcludeFromCodeCoverage]
 public class WolverineNpgsqlExtensions(IConfiguration configuration, IOptions<ServiceBusOptions> serviceBusOptions)

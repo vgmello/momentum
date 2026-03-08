@@ -2,7 +2,7 @@
 
 using System.Diagnostics.Metrics;
 
-namespace Momentum.ServiceDefaults.Messaging.Telemetry;
+namespace Momentum.Extensions.Messaging.Wolverine.Telemetry;
 
 public class MessagingMetrics(string metricName, Meter meter)
 {

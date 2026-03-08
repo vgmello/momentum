@@ -1,0 +1,55 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <!-- Disable configuration binding source generator - WolverineOptions has complex types
+             (Endpoint, MemberInfo) that the source generator cannot handle (SYSLIB1100/1101) -->
+        <EnableConfigurationBindingGenerator>false</EnableConfigurationBindingGenerator>
+    </PropertyGroup>
+
+    <Import Project="../Momentum.ServiceDefaults/Momentum.ServiceDefaults.props"
+            Condition="Exists('../Momentum.ServiceDefaults/Momentum.ServiceDefaults.props')"/>
+
+    <!--#if (!LIBS_INCLUDES_WOLVERINE) -->
+    <PropertyGroup>
+        <IsPackable>true</IsPackable>
+        <PackageId>Momentum.Extensions.Messaging.Wolverine</PackageId>
+        <PackageDescription>Wolverine messaging integration for Momentum platform providing production-ready
+            CQRS message handling with PostgreSQL persistence, FluentValidation, and OpenTelemetry support.
+        </PackageDescription>
+        <PackageProjectUrl>
+            https://github.com/vgmello/momentum/blob/main/libs/Momentum/src/Momentum.Extensions.Messaging.Wolverine/README.md
+        </PackageProjectUrl>
+    </PropertyGroup>
+    <!--#endif -->
+
+    <ItemGroup Condition="'$(ImplicitUsings)' == 'enable'">
+        <Using Include="Wolverine"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Aspire.Npgsql"/>
+        <PackageReference Include="CloudNative.CloudEvents.SystemTextJson"/>
+        <PackageReference Include="FluentValidation.DependencyInjectionExtensions"/>
+        <PackageReference Include="OpenTelemetry.Extensions.Hosting"/>
+        <PackageReference Include="WolverineFx"/>
+        <PackageReference Include="WolverineFx.Postgresql"/>
+        <!--#if (!LIBS_INCLUDES_DEFAULTS)
+        <PackageReference Include="Momentum.ServiceDefaults"/>
+        #endif -->
+    </ItemGroup>
+    <!--#if (LIBS_INCLUDES_DEFAULTS) -->
+    <ItemGroup>
+        <!--#if (LIBS_INCLUDES_DEFAULTS)
+        <ProjectReference Include="..\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
+        #endif -->
+    </ItemGroup>
+    <!--#endif -->
+    <!--#if (!LIBS_INCLUDES_WOLVERINE) -->
+    <ItemGroup>
+        <ProjectReference Include="..\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
+    </ItemGroup>
+    <!--#endif -->
+</Project>

@@ -2,11 +2,9 @@
 
 using System.Collections.Frozen;
 using System.Diagnostics;
-using System.Diagnostics.Metrics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Momentum.ServiceDefaults.Messaging.Telemetry;
 using OpenTelemetry;
 using OpenTelemetry.Context.Propagation;
 using OpenTelemetry.Metrics;
@@ -53,15 +51,7 @@ public static class OpenTelemetrySetupExtensions
         var activitySourceName = builder.Configuration.GetValue<string>("OpenTelemetry:ActivitySourceName")
                                  ?? builder.Environment.ApplicationName;
 
-        var messagingMeterName = builder.Configuration.GetValue<string>("OpenTelemetry:MessagingMeterName")
-                                 ?? $"{builder.Environment.ApplicationName}.Messaging";
-
         builder.Services.AddSingleton(new ActivitySource(activitySourceName));
-
-        builder.Services
-            .AddSingleton<MessagingMeterStore>()
-            .AddKeyedSingleton<Meter>(MessagingMeterStore.MessagingMeterKey,
-                (provider, _) => provider.GetRequiredService<IMeterFactory>().Create(messagingMeterName));
 
         // Configure W3C Trace Context and Baggage propagation
         Sdk.SetDefaultTextMapPropagator(new CompositeTextMapPropagator([
@@ -79,11 +69,9 @@ public static class OpenTelemetrySetupExtensions
                 }))
             .WithMetrics(metrics => metrics
                 .AddMeter(activitySourceName)
-                .AddMeter(messagingMeterName)
                 .AddAspNetCoreInstrumentation()
                 .AddHttpClientInstrumentation()
-                .AddRuntimeInstrumentation()
-                .AddMeter(nameof(Wolverine)))
+                .AddRuntimeInstrumentation())
             .WithTracing(tracing => tracing
                 .AddSource(activitySourceName)
                 .AddAspNetCoreInstrumentation(options =>

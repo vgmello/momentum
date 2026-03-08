@@ -6,11 +6,11 @@ using JasperFx.Resources;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Momentum.ServiceDefaults.Messaging.Middlewares;
+using Momentum.Extensions.Messaging.Wolverine.Middlewares;
 using System.Reflection;
 using Wolverine.Runtime;
 
-namespace Momentum.ServiceDefaults.Messaging.Wolverine;
+namespace Momentum.Extensions.Messaging.Wolverine;
 
 /// <summary>
 ///     Provides extension methods for configuring Wolverine messaging framework.
@@ -82,7 +82,7 @@ public static class WolverineSetupExtensions
 
         services.AddWolverine(ExtensionDiscovery.ManualOnly, opts =>
         {
-            opts.ApplicationAssembly = ServiceDefaultsExtensions.EntryAssembly;
+            opts.ApplicationAssembly = MomentumApp.EntryAssembly;
 
             opts.UseSystemTextJsonForSerialization();
 

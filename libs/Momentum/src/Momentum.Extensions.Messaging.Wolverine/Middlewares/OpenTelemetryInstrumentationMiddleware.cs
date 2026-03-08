@@ -1,10 +1,9 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-using Momentum.ServiceDefaults.Messaging.Wolverine;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 
-namespace Momentum.ServiceDefaults.Messaging.Middlewares;
+namespace Momentum.Extensions.Messaging.Wolverine.Middlewares;
 
 /// <summary>
 ///     Wolverine middleware that provides OpenTelemetry distributed tracing for message processing.
