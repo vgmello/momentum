@@ -8,7 +8,6 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Momentum.ServiceDefaults.HealthChecks;
 using Momentum.ServiceDefaults.Logging;
-using Momentum.ServiceDefaults.Messaging;
 using Momentum.ServiceDefaults.OpenTelemetry;
 using Serilog;
 using System.Collections.Frozen;
@@ -60,7 +59,6 @@ public static class ServiceDefaultsExtensions
 
         builder.AddLogging();
         builder.AddOpenTelemetry();
-        builder.AddServiceBus();
         builder.AddValidators();
 
         builder.Services.TryAddSingleton<HealthCheckStatusStore>();
