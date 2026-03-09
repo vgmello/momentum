@@ -7,6 +7,9 @@ using DotNet.Testcontainers.Networks;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
+//#if (!LIBS_INCLUDES_KAFKA)
+using Momentum.Extensions.Messaging;
+//#endif
 using Momentum.Extensions.Messaging.Wolverine;
 using Momentum.ServiceDefaults;
 using AppDomain;
