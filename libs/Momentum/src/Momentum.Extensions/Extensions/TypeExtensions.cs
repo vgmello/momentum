@@ -3,7 +3,7 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-namespace Momentum.ServiceDefaults.Extensions;
+namespace Momentum.Extensions;
 
 /// <summary>
 ///     Provides extension methods for reflection operations on types, with special support for C# records and init-only properties.

@@ -1,6 +1,5 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-using Momentum.ServiceDefaults;
 using System.Reflection;
 
 namespace Momentum.Extensions.Tests.ServiceDefaults;

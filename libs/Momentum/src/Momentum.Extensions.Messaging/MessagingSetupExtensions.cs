@@ -1,9 +1,10 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Momentum.ServiceDefaults.Messaging;
+namespace Momentum.Extensions.Messaging;
 
 [ExcludeFromCodeCoverage]
 public static class MessagingSetupExtensions

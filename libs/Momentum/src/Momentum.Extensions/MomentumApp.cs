@@ -10,7 +10,6 @@ namespace Momentum.Extensions;
 public static class MomentumApp
 {
     private static readonly Lock EntryAssemblyLock = new();
-    private static Assembly? _entryAssembly;
 
     /// <summary>
     ///     Gets or sets the entry assembly for the application.
@@ -19,23 +18,27 @@ public static class MomentumApp
     {
         get
         {
-            var assembly = Volatile.Read(ref _entryAssembly);
+            var assembly = Volatile.Read(ref field);
+
             if (assembly is not null)
                 return assembly;
 
             lock (EntryAssemblyLock)
             {
-                assembly = _entryAssembly;
+                assembly = field;
+
                 if (assembly is not null)
                     return assembly;
 
                 assembly = Assembly.GetEntryAssembly() ??
                     throw new InvalidOperationException(
                         "Unable to identify entry assembly. Please provide an assembly via the MomentumApp.EntryAssembly property.");
-                Volatile.Write(ref _entryAssembly, assembly);
+
+                Volatile.Write(ref field, assembly);
+
                 return assembly;
             }
         }
-        set => Volatile.Write(ref _entryAssembly, value);
+        set => Volatile.Write(ref field, value);
     }
 }

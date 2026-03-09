@@ -7,9 +7,10 @@ using DotNet.Testcontainers.Networks;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
+using Momentum.Extensions;
 using Momentum.Extensions.Messaging.Wolverine;
 using Momentum.ServiceDefaults;
-using Momentum.ServiceDefaults.Messaging;
+using Momentum.Extensions.Messaging;
 using AppDomain;
 //#if (USE_LIQUIBASE)
 using AppDomain.Tests.Integration._Internal.Containers;

@@ -4,11 +4,7 @@
     </PropertyGroup>
 
     <Import Project="Momentum.ServiceDefaults.props"/>
-    <!--#if (LIBS_INCLUDES_EXT) -->
-    <Import Project="../Momentum.Extensions/Momentum.Extensions.props"
-            Condition="Exists('../Momentum.Extensions/Momentum.Extensions.props')"/>
-    <!--#endif -->
-    
+
     <!--#if (!LIBS_INCLUDES_DEFAULTS) -->
     <PropertyGroup>
         <IsPackable>true</IsPackable>
@@ -21,9 +17,7 @@
             https://github.com/vgmello/momentum/blob/main/libs/Momentum/src/Momentum.ServiceDefaults/README.md
         </PackageProjectUrl>
     </PropertyGroup>
-    <!--#endif -->
 
-    <!--#if (libs == 'none') -->
     <ItemGroup>
         <None Include="Momentum.ServiceDefaults.props" Pack="true" PackagePath="build/"/>
     </ItemGroup>
@@ -55,20 +49,13 @@
         <PackageReference Include="Serilog.AspNetCore"/>
         <PackageReference Include="Serilog.Exceptions"/>
         <PackageReference Include="Serilog.Sinks.OpenTelemetry"/>
-        <!--#if (!LIBS_INCLUDES_EXT)
-        <PackageReference Include="Momentum.Extensions"/>
+        <!--#if (LIBS_INCLUDES_DEFAULTS)
+        <PackageReference Include="Momentum.Extensions.Messaging"/>
         #endif -->
     </ItemGroup>
-    <!--#if (LIBS_INCLUDES_EXT) -->
-    <ItemGroup>
-        <!--#if (LIBS_INCLUDES_EXT)
-        <ProjectReference Include="..\Momentum.Extensions\Momentum.Extensions.csproj"/>
-        #endif -->
-    </ItemGroup>
-    <!--#endif -->
     <!--#if (!LIBS_INCLUDES_DEFAULTS) -->
     <ItemGroup>
-        <ProjectReference Include="..\Momentum.Extensions\Momentum.Extensions.csproj"/>
+        <ProjectReference Include="..\Momentum.Extensions.Messaging\Momentum.Extensions.Messaging.csproj"/>
     </ItemGroup>
     <!--#endif -->
 </Project>

@@ -1,6 +1,5 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-using Momentum.ServiceDefaults.Extensions;
 using System.Linq.Expressions;
 using System.Reflection;
 

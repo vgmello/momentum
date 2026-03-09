@@ -2,7 +2,7 @@
 
 using Microsoft.Extensions.Hosting;
 
-namespace Momentum.ServiceDefaults.Messaging;
+namespace Momentum.Extensions.Messaging;
 
 /// <summary>
 ///     Builder for configuring the service bus messaging infrastructure.

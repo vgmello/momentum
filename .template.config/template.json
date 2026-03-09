@@ -402,6 +402,7 @@
         "libs/Momentum/Directory.Build.props",
         "libs/Momentum/Directory.Build.targets",
         "libs/Momentum/src/Momentum.Extensions.Abstractions/**/*",
+        "libs/Momentum/src/Momentum.Extensions.Messaging/**/*",
         "libs/Momentum/src/Momentum.Extensions.XmlDocs/**/*",
         "libs/Momentum/src/Momentum.Extensions.EventMarkdownGenerator/**/*",
         "debug.symbols.txt"

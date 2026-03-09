@@ -3,7 +3,7 @@
 using System.Collections.Frozen;
 using System.Reflection;
 
-namespace Momentum.ServiceDefaults.Messaging;
+namespace Momentum.Extensions.Messaging;
 
 public static class DistributedEventsDiscovery
 {

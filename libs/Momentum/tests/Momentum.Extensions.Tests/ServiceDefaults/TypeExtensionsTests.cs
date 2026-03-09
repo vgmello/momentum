@@ -1,8 +1,6 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
 using System.Diagnostics.CodeAnalysis;
-using Momentum.ServiceDefaults.Extensions;
-
 namespace Momentum.Extensions.Tests.ServiceDefaults;
 
 public class TypeExtensionsTests

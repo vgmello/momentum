@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <IsPackable>true</IsPackable>
+        <PackageId>Momentum.Extensions.Messaging</PackageId>
+        <PackageDescription>Messaging abstractions and setup infrastructure for Momentum platform providing
+            service bus configuration, event discovery, distributed tracing, and CLI command handling.
+        </PackageDescription>
+        <PackageProjectUrl>
+            https://github.com/vgmello/momentum/blob/main/libs/Momentum/src/Momentum.Extensions.Messaging/README.md
+        </PackageProjectUrl>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="Momentum.Extensions.Messaging.props" Pack="true" PackagePath="build/"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Momentum.Extensions\Momentum.Extensions.csproj"/>
+    </ItemGroup>
+</Project>

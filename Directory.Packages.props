@@ -85,6 +85,7 @@
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.103" />
     <PackageVersion Include="Momentum.Extensions" Version="$(MomentumVersion)" />
     <PackageVersion Include="Momentum.Extensions.Abstractions" Version="$(MomentumVersion)" />
+    <PackageVersion Include="Momentum.Extensions.Messaging" Version="$(MomentumVersion)" />
     <PackageVersion Include="Momentum.Extensions.Messaging.Kafka" Version="$(MomentumVersion)" />
     <PackageVersion Include="Momentum.Extensions.Messaging.Wolverine" Version="$(MomentumVersion)" />
     <PackageVersion Include="Momentum.Extensions.SourceGenerators" Version="$(MomentumVersion)" />

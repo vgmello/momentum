@@ -1,8 +1,8 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Hosting;
 
-namespace Momentum.ServiceDefaults;
+namespace Momentum.Extensions;
 
 /// <summary>
 ///     Handles CLI commands for messaging frameworks (e.g., Wolverine's codegen, db-apply).
@@ -17,5 +17,5 @@ public interface ICliCommandHandler
     /// <summary>
     ///     Executes the CLI command.
     /// </summary>
-    Task ExecuteAsync(WebApplication app, string[] args);
+    Task ExecuteAsync(IHost host, string[] args);
 }

@@ -3,7 +3,7 @@
 using System.Collections.Immutable;
 using System.Reflection;
 
-namespace Momentum.ServiceDefaults;
+namespace Momentum.Extensions;
 
 /// <summary>
 ///     Marks an assembly to identify domain assemblies that should be scanned for various components.
@@ -43,7 +43,7 @@ public class DomainAssemblyAttribute(params Type[] typeMarkers) : Attribute
     /// </returns>
     public static IReadOnlyList<Assembly> GetDomainAssemblies(Assembly? applicationAssembly = null)
     {
-        var targetAssembly = applicationAssembly ?? ServiceDefaultsExtensions.EntryAssembly;
+        var targetAssembly = applicationAssembly ?? MomentumApp.EntryAssembly;
 
         var attributes = targetAssembly.GetCustomAttributes<DomainAssemblyAttribute>();
 

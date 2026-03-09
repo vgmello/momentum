@@ -1,7 +1,5 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-using FluentValidation.Results;
-
 namespace Momentum.Extensions.Messaging.Wolverine.Middlewares;
 
 /// <summary>

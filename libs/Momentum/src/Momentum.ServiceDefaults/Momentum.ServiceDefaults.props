@@ -6,7 +6,6 @@
         <Using Include="Momentum.Extensions.Abstractions.Extensions"/>
         <Using Include="Momentum.Extensions.Abstractions.Messaging"/>
         <Using Include="Momentum.Extensions.Messaging"/>
-        <Using Include="Momentum.ServiceDefaults.Messaging"/>
     </ItemGroup>
 
 </Project>
