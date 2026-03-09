@@ -75,8 +75,10 @@ public static class EndpointMappingExtensions
         // the entry assembly is the doc generator tool, not the API project.
         var definingAssembly = EndpointMapperType.Assembly;
 
-        return System.AppDomain.CurrentDomain.GetAssemblies()
+        return System.Runtime.Loader.AssemblyLoadContext.All
+            .SelectMany(ctx => ctx.Assemblies)
             .Where(a => !a.IsDynamic && a.GetReferencedAssemblies().Any(r => r.FullName == definingAssembly.FullName))
+            .Distinct()
             .ToArray();
     }
 }

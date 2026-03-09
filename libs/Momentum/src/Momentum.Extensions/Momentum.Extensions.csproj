@@ -4,6 +4,9 @@
         <Version>$(MomentumVersion)</Version>
         <IsPackable>false</IsPackable>
     </PropertyGroup>
+    <ItemGroup>
+        <Compile Remove="Messaging\**\*" />
+    </ItemGroup>
     #endif -->
     <!--#if (!LIBS_INCLUDES_EXT) -->
     <PropertyGroup>

@@ -36,13 +36,18 @@
         #endif -->
     </ItemGroup>
     <!--#if (LIBS_INCLUDES_KAFKA && LIBS_INCLUDES_EXT) -->
+    <Import Project="../Momentum.Extensions/Momentum.Extensions.props"
+            Condition="Exists('../Momentum.Extensions/Momentum.Extensions.props') and '$(MomentumExtPropsImported)' != 'true'"/>
+    <PropertyGroup>
+        <MomentumExtPropsImported>true</MomentumExtPropsImported>
+    </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="..\Momentum.Extensions\Momentum.Extensions.csproj"/>
     </ItemGroup>
     <!--#endif -->
     <!--#if (!LIBS_INCLUDES_KAFKA) -->
     <Import Project="../Momentum.Extensions/Momentum.Extensions.props"
-            Condition="Exists('../Momentum.Extensions/Momentum.Extensions.props')"/>
+            Condition="Exists('../Momentum.Extensions/Momentum.Extensions.props') and '$(MomentumExtPropsImported)' != 'true'"/>
 
     <ItemGroup>
         <ProjectReference Include="..\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
