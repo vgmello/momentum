@@ -1,7 +1,6 @@
 // Copyright (c) OrgName. All rights reserved.
 
 using Microsoft.AspNetCore.TestHost;
-using Wolverine;
 
 namespace AppDomain.Tests.Unit.Common;
 

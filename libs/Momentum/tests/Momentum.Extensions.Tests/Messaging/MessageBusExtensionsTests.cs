@@ -1,7 +1,6 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
 using Momentum.Extensions.Abstractions.Messaging;
-using Momentum.Extensions.Messaging;
 using NSubstitute;
 using Wolverine;
 

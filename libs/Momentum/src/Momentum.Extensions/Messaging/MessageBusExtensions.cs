@@ -3,7 +3,7 @@
 using Momentum.Extensions.Abstractions.Messaging;
 using Wolverine;
 
-namespace Momentum.Extensions.Messaging;
+namespace Momentum.Extensions;
 
 /// <summary>
 ///     Provides extension methods for the Wolverine message bus to simplify command and query invocation.

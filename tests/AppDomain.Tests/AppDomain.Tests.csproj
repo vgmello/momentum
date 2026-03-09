@@ -87,4 +87,29 @@
     <ItemGroup>
         <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest"/>
     </ItemGroup>
+
+<!--#if (false) -->
+    <ItemGroup Condition="false">
+<!--#else
+    <ItemGroup>
+#endif -->
+<!--#if (!LIBS_INCLUDES_EXT) -->
+        <PackageReference Include="Momentum.Extensions"/>
+<!--#endif -->
+    </ItemGroup>
+
+    <!--#if (LIBS_INCLUDES_EXT) -->
+    <Import Project="..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.props"
+            Condition="Exists('..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.props') and '$(MomentumExtPropsImported)' != 'true'"/>
+    <PropertyGroup>
+        <MomentumExtPropsImported>true</MomentumExtPropsImported>
+    </PropertyGroup>
+    <!--#endif -->
+    <!--#if (false) -->
+    <Import Project="..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.props"
+            Condition="Exists('..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.props') and '$(MomentumExtPropsImported)' != 'true'"/>
+    <PropertyGroup>
+        <MomentumExtPropsImported>true</MomentumExtPropsImported>
+    </PropertyGroup>
+    <!--#endif -->
 </Project>

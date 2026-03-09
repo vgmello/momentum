@@ -7,7 +7,6 @@
         <Using Include="Momentum.Extensions.Abstractions.Dapper"/>
         <Using Include="Momentum.Extensions.Abstractions.Extensions"/>
         <Using Include="Momentum.Extensions.Abstractions.Messaging"/>
-        <Using Include="Momentum.Extensions.Messaging"/>
         <Using Include="Wolverine"/>
     </ItemGroup>
 

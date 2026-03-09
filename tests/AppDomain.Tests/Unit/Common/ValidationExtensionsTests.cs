@@ -1,7 +1,6 @@
 // Copyright (c) OrgName. All rights reserved.
 
 using AppDomain.Api.Common.Extensions;
-using FluentValidation.Results;
 
 namespace AppDomain.Tests.Unit.Common;
 

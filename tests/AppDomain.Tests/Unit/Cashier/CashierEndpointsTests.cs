@@ -6,8 +6,6 @@ using AppDomain.Api.Cashiers.Models;
 using AppDomain.Cashiers.Commands;
 using AppDomain.Cashiers.Queries;
 using AppDomain.Tests.Unit.Common;
-using FluentValidation.Results;
-using Momentum.Extensions;
 namespace AppDomain.Tests.Unit.Cashier;
 
 public class CashierEndpointsTests : EndpointTest

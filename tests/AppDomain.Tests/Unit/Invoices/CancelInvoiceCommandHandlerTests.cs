@@ -4,8 +4,6 @@ using AppDomain.Invoices.Commands;
 using AppDomain.Invoices.Contracts.IntegrationEvents;
 using AppDomain.Invoices.Contracts.Models;
 using Invoice = AppDomain.Invoices.Data.Entities.Invoice;
-using Momentum.Extensions.Messaging;
-using Wolverine;
 
 namespace AppDomain.Tests.Unit.Invoices;
 

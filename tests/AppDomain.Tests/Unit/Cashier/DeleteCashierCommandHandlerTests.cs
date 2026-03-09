@@ -2,8 +2,6 @@
 
 using AppDomain.Cashiers.Commands;
 using AppDomain.Cashiers.Contracts.IntegrationEvents;
-using Momentum.Extensions.Messaging;
-using Wolverine;
 
 namespace AppDomain.Tests.Unit.Cashier;
 

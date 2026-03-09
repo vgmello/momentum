@@ -6,7 +6,6 @@ using AppDomain.BackOffice.Messaging.AccountingInboxHandler;
 using AppDomain.Invoices.Contracts.DomainEvents;
 using AppDomain.Invoices.Contracts.IntegrationEvents;
 using AppDomain.Invoices.Contracts.Models;
-using Wolverine;
 
 namespace AppDomain.Tests.Unit.BackOffice;
 
