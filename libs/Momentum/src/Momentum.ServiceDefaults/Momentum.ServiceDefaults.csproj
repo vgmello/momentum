@@ -6,6 +6,7 @@
     <Import Project="Momentum.ServiceDefaults.props"/>
 
     <!--#if (!LIBS_INCLUDES_DEFAULTS) -->
+    <Import Project="..\Momentum.Extensions\Momentum.Extensions.props"/>
     <PropertyGroup>
         <IsPackable>true</IsPackable>
         <PackageId>Momentum.ServiceDefaults</PackageId>
@@ -50,12 +51,12 @@
         <PackageReference Include="Serilog.Exceptions"/>
         <PackageReference Include="Serilog.Sinks.OpenTelemetry"/>
         <!--#if (LIBS_INCLUDES_DEFAULTS)
-        <PackageReference Include="Momentum.Extensions.Messaging"/>
+        <PackageReference Include="Momentum.Extensions"/>
         #endif -->
     </ItemGroup>
     <!--#if (!LIBS_INCLUDES_DEFAULTS) -->
     <ItemGroup>
-        <ProjectReference Include="..\Momentum.Extensions.Messaging\Momentum.Extensions.Messaging.csproj"/>
+        <ProjectReference Include="..\Momentum.Extensions\Momentum.Extensions.csproj"/>
     </ItemGroup>
     <!--#endif -->
 </Project>

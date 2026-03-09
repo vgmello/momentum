@@ -26,4 +26,11 @@ namespace Momentum.Extensions;
 /// </code>
 /// </example>
 [GenerateOneOf]
-public partial class Result<T> : OneOfBase<T, List<ValidationFailure>>;
+public partial class Result<T> : OneOfBase<T, List<ValidationFailure>>
+{
+    public static implicit operator Result<T>(ValidationFailure failure) =>
+        new Result<T>(new List<ValidationFailure> { failure });
+
+    public static explicit operator Result<T>(ValidationResult validationResult) =>
+        new Result<T>(validationResult.Errors);
+}

@@ -14,7 +14,7 @@ public class CashierEndpointsTests : EndpointTest
 {
     public CashierEndpointsTests()
     {
-        ConfigureApp(app => app.MapCashierEndpoints());
+        ConfigureApp(CashierEndpoints.MapEndpoints);
     }
 
     [Fact]

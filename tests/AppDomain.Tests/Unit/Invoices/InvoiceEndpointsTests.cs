@@ -17,7 +17,7 @@ public class InvoiceEndpointsTests : EndpointTest
 {
     public InvoiceEndpointsTests()
     {
-        ConfigureApp(app => app.MapInvoiceEndpoints());
+        ConfigureApp(InvoiceEndpoints.MapEndpoints);
     }
 
     // -- Helpers --

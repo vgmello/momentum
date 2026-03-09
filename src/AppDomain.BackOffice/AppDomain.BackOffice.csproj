@@ -39,6 +39,9 @@
     <!--#if (LIBS_INCLUDES_DEFAULTS) -->
     <Import Project="..\..\libs\Momentum\src\Momentum.ServiceDefaults\Momentum.ServiceDefaults.props"/>
     <!--#endif -->
+    <!--#if (LIBS_INCLUDES_EXT) -->
+    <Import Project="..\..\libs\Momentum\src\Momentum.Extensions\Momentum.Extensions.props"/>
+    <!--#endif -->
     <!--#if (LIBS_INCLUDES_WOLVERINE) -->
     <Import Project="..\..\libs\Momentum\src\Momentum.Extensions.Messaging.Wolverine\Momentum.Extensions.Messaging.Wolverine.props"/>
     <!--#endif -->
