@@ -88,6 +88,17 @@
         <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest"/>
     </ItemGroup>
 
+    <!--#if (true)
+    <ItemGroup>
+        <Using Include="Momentum.Extensions.Messaging"/>
+    </ItemGroup>
+    #endif -->
+    <!--#if (false) -->
+    <ItemGroup>
+        <Using Include="Momentum.Extensions.Messaging"/>
+    </ItemGroup>
+    <!--#endif -->
+
 <!--#if (false) -->
     <ItemGroup Condition="false">
 <!--#else
