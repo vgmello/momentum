@@ -5,18 +5,19 @@ using AppDomain.Api.Invoices.Models;
 using AppDomain.Invoices.Commands;
 using AppDomain.Invoices.Contracts.Models;
 using AppDomain.Invoices.Queries;
+using Momentum.ServiceDefaults.Api;
 
 namespace AppDomain.Api.Invoices;
 
 /// <summary>
 ///     Defines minimal API endpoints for invoice operations.
 /// </summary>
-public static class InvoiceEndpoints
+public class InvoiceEndpoints : IEndpointDefinition
 {
     /// <summary>
     ///     Maps all invoice REST endpoints under the /invoices route group.
     /// </summary>
-    public static RouteGroupBuilder MapInvoiceEndpoints(this IEndpointRouteBuilder routes)
+    public static void MapEndpoints(IEndpointRouteBuilder routes)
     {
         var group = routes.MapGroup("invoices")
             .WithTags("Invoices");
@@ -62,7 +63,6 @@ public static class InvoiceEndpoints
             .ProducesProblem(StatusCodes.Status409Conflict)
             .ProducesValidationProblem();
 
-        return group;
     }
 
     private static async Task<IResult> GetInvoices([AsParameters] GetInvoicesRequest request, IMessageBus bus,

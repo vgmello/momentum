@@ -2,34 +2,29 @@
 
 ## Service Configuration
 
-This method configures the following services:
+This method configures core service defaults (via `AddServiceDefaults()`) plus the following API-specific services:
 
-- **MVC Controllers**: With endpoint API explorer
+- **Core Service Defaults**: Logging, OpenTelemetry, validators, health checks, service discovery, HTTP resilience
+- **Endpoints API Explorer**: For OpenAPI endpoint discovery
 - **Problem Details**: For standardized error responses
-- **OpenAPI**: With XML documentation support
-- **HTTP Request/Response Logging**: For debugging and monitoring
+- **HTTP Request/Response Logging**: For debugging and monitoring (when enabled)
+- **Output Caching**: For OpenAPI document caching
 - **gRPC Services**: With reflection support
-- **Authentication and Authorization**: Services setup
-- **Kestrel Server Configuration**: Removes server header for security
+- **OpenTelemetry**: gRPC instrumentation
+- **Authentication and Authorization**: Conditional on `requireAuth` flag
+- **Rate Limiting**: Via `AddRateLimiting()` (when enabled in configuration)
+- **JSON Serialization**: With enum string conversion
+- **API Versioning**: URL segment versioning (v1.0 default)
+- **Kestrel Server Configuration**: HTTPS and server header removal
 
 ### Service Registration Details
-
-#### MVC Controllers with Custom Routing
-
-```csharp
-builder.Services.AddControllers(opt =>
-{
-    opt.Conventions.Add(new RouteTokenTransformerConvention(new KebabCaseRoutesTransformer()));
-});
-```
 
 #### API Documentation Services
 
 ```csharp
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddProblemDetails();
-builder.Services.AddAutoProducesConvention(); // Auto-infer response types for OpenAPI
-builder.Services.AddHttpLogging();
+builder.Services.AddExceptionHandler<ProblemDetailsExceptionHandler>();
 ```
 
 #### gRPC Services
@@ -42,13 +37,29 @@ builder.Services.AddGrpcReflection();
 #### Security Services
 
 ```csharp
+// Only when requireAuth is true:
 builder.Services.AddAuthentication();
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorizationBuilder()
+    .SetFallbackPolicy(new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build());
 ```
+
+#### Rate Limiting
+
+```csharp
+// Called automatically, but also available standalone:
+builder.AddRateLimiting();
+```
+
+Rate limiting is configured via the `RateLimiting` configuration section:
+- `RateLimiting:Enabled` - enables rate limiting
+- `RateLimiting:Fixed` - configures a fixed window limiter
 
 #### Server Configuration
 
 ```csharp
+builder.WebHost.UseKestrelHttpsConfiguration();
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
     serverOptions.AddServerHeader = false;
@@ -57,25 +68,28 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 
 ## Application Configuration
 
-This method configures the following middleware and endpoints:
+This method configures the full API middleware pipeline and maps all endpoints:
 
-- **HTTP Logging Middleware**: For request/response logging
-- **Routing, Authentication, and Authorization**: Core ASP.NET Core middleware
+- **HTTP Logging Middleware**: For request/response logging (when enabled)
+- **Routing, Rate Limiting, Authentication, and Authorization**: Core middleware
 - **gRPC-Web Support**: With default enablement for browser clients
 - **HSTS and Exception Handling**: In production environments
-- **OpenAPI, Scalar Documentation, and gRPC Reflection**: In development
-- **Controller Endpoints**: With optional authorization requirement
-- **gRPC Service Endpoints**: For gRPC communication
+- **Output Caching**: For OpenAPI document performance
+- **OpenAPI, Scalar Documentation, and gRPC Reflection**: In development (anonymous)
+- **gRPC Service Endpoints**: Auto-discovered via `MapGrpcServices()`
+- **REST Endpoints**: Auto-discovered via `MapEndpoints()` from `IEndpointDefinition` implementations
+- **Health Check Endpoints**: Via `MapDefaultHealthCheckEndpoints()`
 
 ### Middleware Pipeline Configuration
 
 #### Core Middleware
 
 ```csharp
-app.UseHttpLogging();
+app.UseHttpLogging();    // when enabled
 app.UseRouting();
-app.UseAuthentication();
-app.UseAuthorization();
+app.UseRateLimiter();    // when enabled
+app.UseAuthentication(); // when requireAuth
+app.UseAuthorization();  // when requireAuth
 ```
 
 #### gRPC-Web Support
@@ -99,37 +113,47 @@ if (!app.Environment.IsDevelopment())
 ```csharp
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi().CacheOutput();
-    app.MapScalarApiReference(options => options.WithTitle($"{app.Environment.ApplicationName} OpenAPI"));
-
-    app.MapGrpcReflectionService();
+    app.MapOpenApi().CacheOutput("OpenApi").AllowAnonymous();
+    app.MapScalarApiReference(options => options.WithTitle($"{app.Environment.ApplicationName} OpenAPI"))
+        .AllowAnonymous();
+    app.MapGrpcReflectionService().AllowAnonymous();
 }
 ```
 
 #### Endpoint Configuration
 
 ```csharp
-var controllersEndpointBuilder = app.MapControllers();
-
-if (requireAuth)
-    controllersEndpointBuilder.RequireAuthorization();
-
-app.MapGrpcServices();
+app.MapGrpcServices();                  // Auto-discovers gRPC services
+app.MapEndpoints();                     // Auto-discovers IEndpointDefinition implementations
+app.MapDefaultHealthCheckEndpoints();   // Maps /status, /health/internal, /health
 ```
 
-## Route Transformation
+## Endpoint Auto-Discovery
 
-### Kebab Case Routing
+### IEndpointDefinition Interface
 
-The extensions configure kebab-case routing transformation:
+Implement `IEndpointDefinition` on endpoint classes for automatic registration:
 
 ```csharp
-opt.Conventions.Add(new RouteTokenTransformerConvention(new KebabCaseRoutesTransformer()));
+public class CustomerEndpoints : IEndpointDefinition
+{
+    public static void MapEndpoints(IEndpointRouteBuilder routes)
+    {
+        var group = routes.MapGroup("customers").WithTags("Customers");
+        group.MapGet("/", GetCustomers);
+        group.MapPost("/", CreateCustomer);
+    }
+
+    private static async Task<IResult> GetCustomers(...) { ... }
+    private static async Task<IResult> CreateCustomer(...) { ... }
+}
 ```
 
-This transforms controller and action names:
-- `UserController.GetUser` → `/user/get-user`
-- `OrderController.CreateOrder` → `/order/create-order`
+Endpoints are discovered from the entry assembly by default. To scan a specific assembly:
+
+```csharp
+app.MapEndpoints(typeof(MyEndpoints).Assembly);
+```
 
 ## OpenAPI Integration
 
@@ -137,7 +161,6 @@ This transforms controller and action names:
 
 ```csharp
 // Call AddOpenApi() directly in your API project for XML documentation support
-// AddAutoProducesConvention() is already included in AddApiServiceDefaults()
 builder.Services.AddOpenApi(options => options.ConfigureOpenApiDefaults());
 ```
 
@@ -219,7 +242,7 @@ Enforces HTTPS in production:
 Only enabled in development:
 - **OpenAPI Documentation**: Interactive API docs
 - **gRPC Reflection**: Service discovery
-- **Caching Middleware**: Performance optimization for docs
+- **Output Caching**: Performance optimization for docs
 
 ### Production Optimizations
 
@@ -232,10 +255,30 @@ Only enabled in production:
 ### Optional Authorization
 
 ```csharp
-public static WebApplication ConfigureApiUsingDefaults(this WebApplication app, bool requireAuth = true)
+builder.AddApiServiceDefaults(requireAuth: false);
 ```
 
 The `requireAuth` parameter allows:
 - **Public APIs**: Set to `false` for open endpoints
 - **Secure APIs**: Default `true` for protected resources
-- **Mixed Scenarios**: Selective authorization per endpoint
+- **Mixed Scenarios**: Individual endpoints can use `.AllowAnonymous()` or `[AllowAnonymous]`
+
+## Minimal API Program.cs Example
+
+```csharp
+var builder = WebApplication.CreateSlimBuilder(args);
+
+// Includes AddServiceDefaults() internally - no need to call it separately
+builder.AddApiServiceDefaults(requireAuth: false);
+builder.AddServiceBus(bus => bus.UseWolverine());
+
+// OpenAPI must be called directly for XML doc source generation
+builder.Services.AddOpenApi(options => options.ConfigureOpenApiDefaults(builder.Configuration));
+
+var app = builder.Build();
+
+// Configures middleware, maps endpoints (IEndpointDefinition), gRPC services, and health checks
+app.ConfigureApiUsingDefaults();
+
+await app.RunAsync(args);
+```

@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Momentum.ServiceDefaults.HealthChecks;
 using OpenTelemetry.Trace;
 using Scalar.AspNetCore;
 
@@ -32,7 +33,7 @@ internal sealed record ApiAuthConfiguration(bool RequireAuth);
 public static class ApiExtensions
 {
     /// <summary>
-    ///     Adds default API services to the application builder (excluding OpenAPI).
+    ///     Adds default API services to the application builder, including core service defaults (excluding OpenAPI).
     /// </summary>
     /// <param name="builder">The web application builder to configure.</param>
     /// <param name="requireAuth">
@@ -45,6 +46,10 @@ public static class ApiExtensions
     /// </param>
     /// <returns>The configured host application builder for method chaining.</returns>
     /// <remarks>
+    ///     <para>
+    ///         This method calls <see cref="ServiceDefaultsExtensions.AddServiceDefaults" /> internally,
+    ///         so there is no need to call it separately for API projects.
+    ///     </para>
     ///     <para>
     ///         <strong>Important:</strong> This method does not configure OpenAPI.
     ///         For XML documentation support with OpenAPI, call <c>AddOpenApi()</c> directly
@@ -62,6 +67,8 @@ public static class ApiExtensions
     /// </remarks>
     public static IHostApplicationBuilder AddApiServiceDefaults(this WebApplicationBuilder builder, bool requireAuth = true)
     {
+        builder.AddServiceDefaults();
+
         builder.Services.AddSingleton(new ApiAuthConfiguration(requireAuth));
 
         builder.Services.AddEndpointsApiExplorer();
@@ -107,23 +114,7 @@ public static class ApiExtensions
         });
         builder.Services.Configure<KestrelServerOptions>(builder.Configuration.GetSection("Kestrel"));
 
-        var rateLimitingSection = builder.Configuration.GetSection("RateLimiting");
-        if (rateLimitingSection.GetValue("Enabled", false))
-        {
-            builder.Services.AddRateLimiter(options =>
-            {
-                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-
-                var fixedSection = rateLimitingSection.GetSection("Fixed");
-                if (fixedSection.Exists())
-                {
-                    options.AddFixedWindowLimiter("fixed", limiterOptions =>
-                    {
-                        fixedSection.Bind(limiterOptions);
-                    });
-                }
-            });
-        }
+        builder.AddRateLimiting();
 
         builder.Services.ConfigureHttpJsonOptions(options =>
         {
@@ -143,11 +134,62 @@ public static class ApiExtensions
     }
 
     /// <summary>
-    ///     Configures the web application with default API middleware and endpoints.
+    ///     Adds rate limiting services based on the <c>RateLimiting</c> configuration section.
+    /// </summary>
+    /// <param name="builder">The web application builder to configure.</param>
+    /// <returns>The configured host application builder for method chaining.</returns>
+    /// <remarks>
+    ///     <para>
+    ///         Rate limiting is enabled when <c>RateLimiting:Enabled</c> is <c>true</c> in configuration.
+    ///         Supports a fixed window limiter configured via the <c>RateLimiting:Fixed</c> section.
+    ///     </para>
+    ///     <para>
+    ///         This method is called automatically by <see cref="AddApiServiceDefaults" /> but can also
+    ///         be called independently for non-API hosts that need rate limiting.
+    ///     </para>
+    /// </remarks>
+    public static IHostApplicationBuilder AddRateLimiting(this WebApplicationBuilder builder)
+    {
+        var rateLimitingSection = builder.Configuration.GetSection("RateLimiting");
+        if (rateLimitingSection.GetValue("Enabled", false))
+        {
+            builder.Services.AddRateLimiter(options =>
+            {
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+                var fixedSection = rateLimitingSection.GetSection("Fixed");
+                if (fixedSection.Exists())
+                {
+                    options.AddFixedWindowLimiter("fixed", limiterOptions =>
+                    {
+                        fixedSection.Bind(limiterOptions);
+                    });
+                }
+            });
+        }
+
+        return builder;
+    }
+
+    /// <summary>
+    ///     Configures the web application with default API middleware, endpoints, and health checks.
     /// </summary>
     /// <param name="app">The web application to configure.</param>
     /// <returns>The configured web application for method chaining.</returns>
     /// <remarks>
+    ///     <para>
+    ///         This method configures the full API middleware pipeline and maps all endpoints:
+    ///     </para>
+    ///     <list type="bullet">
+    ///         <item>HTTP logging, routing, rate limiting, auth middleware</item>
+    ///         <item>gRPC-Web, HSTS, exception handling, output caching</item>
+    ///         <item>OpenAPI and Scalar documentation (development only)</item>
+    ///         <item>Auto-discovered gRPC services via <see cref="GrpcRegistrationExtensions.MapGrpcServices" /></item>
+    ///         <item>Auto-discovered REST endpoints via <see cref="EndpointMappingExtensions.MapEndpoints" />
+    ///             from classes implementing <see cref="IEndpointDefinition" /></item>
+    ///         <item>Default health check endpoints via
+    ///             <see cref="HealthCheckSetupExtensions.MapDefaultHealthCheckEndpoints" /></item>
+    ///     </list>
     ///     <!--@include: @code/api/api-extensions-detailed.md#application-configuration -->
     /// </remarks>
     public static WebApplication ConfigureApiUsingDefaults(this WebApplication app)
@@ -193,6 +235,8 @@ public static class ApiExtensions
         }
 
         app.MapGrpcServices();
+        app.MapEndpoints();
+        app.MapDefaultHealthCheckEndpoints();
 
         return app;
     }

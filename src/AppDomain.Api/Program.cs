@@ -3,10 +3,6 @@
 //#if (INCLUDE_ORLEANS)
 using AppDomain.Api.Infrastructure.Extensions;
 //#endif
-//#if (INCLUDE_SAMPLE)
-using AppDomain.Api.Cashiers;
-using AppDomain.Api.Invoices;
-//#endif
 using AppDomain.Infrastructure;
 //#if (USE_KAFKA)
 using Momentum.Extensions.Messaging.Kafka;
@@ -17,15 +13,13 @@ using Momentum.ServiceDefaults.Api.OpenApi.Extensions;
 //#if (INCLUDE_BFF)
 using Momentum.ServiceDefaults.Api.FrontendIntegration;
 //#endif
-using Momentum.ServiceDefaults.HealthChecks;
 
 [assembly: DomainAssembly(typeof(IAppDomainAssembly))]
 
 var builder = WebApplication.CreateSlimBuilder(args);
 
-builder.AddServiceDefaults();
-builder.AddServiceBus(bus => bus.UseWolverine());
 builder.AddApiServiceDefaults(requireAuth: false);
+builder.AddServiceBus(bus => bus.UseWolverine());
 //#if (INCLUDE_BFF)
 builder.AddFrontendIntegration();
 //#endif
@@ -52,10 +46,5 @@ app.ConfigureApiUsingDefaults();
 //#if (INCLUDE_BFF)
 app.UseFrontendIntegration();
 //#endif
-//#if (INCLUDE_SAMPLE)
-app.MapCashierEndpoints();
-app.MapInvoiceEndpoints();
-//#endif
-app.MapDefaultHealthCheckEndpoints();
 
 await app.RunAsync(args);

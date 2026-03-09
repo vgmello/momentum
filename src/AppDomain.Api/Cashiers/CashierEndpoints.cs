@@ -4,18 +4,19 @@ using AppDomain.Api.Cashiers.Models;
 using AppDomain.Cashiers.Commands;
 using AppDomain.Cashiers.Contracts.Models;
 using AppDomain.Cashiers.Queries;
+using Momentum.ServiceDefaults.Api;
 
 namespace AppDomain.Api.Cashiers;
 
 /// <summary>
 ///     Defines minimal API endpoints for cashier operations.
 /// </summary>
-public static class CashierEndpoints
+public class CashierEndpoints : IEndpointDefinition
 {
     /// <summary>
     ///     Maps all cashier REST endpoints under the /cashiers route group.
     /// </summary>
-    public static RouteGroupBuilder MapCashierEndpoints(this IEndpointRouteBuilder routes)
+    public static void MapEndpoints(IEndpointRouteBuilder routes)
     {
         var group = routes.MapGroup("cashiers")
             .WithTags("Cashiers");
@@ -54,7 +55,6 @@ public static class CashierEndpoints
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesValidationProblem();
 
-        return group;
     }
 
     private static async Task<IResult> GetCashier(Guid id, IMessageBus bus, HttpContext context,
