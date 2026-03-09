@@ -12,6 +12,7 @@
     <!--#endif -->
 
     <ItemGroup>
+        <PackageReference Include="CloudNative.CloudEvents"/>
         <PackageReference Include="FluentValidation"/>
         <PackageReference Include="linq2db"/>
         <PackageReference Include="OneOf"/>

@@ -24,6 +24,7 @@
     <ItemGroup>
         <PackageReference Include="Aspire.Confluent.Kafka"/>
         <PackageReference Include="CloudNative.CloudEvents.Kafka"/>
+        <PackageReference Include="CloudNative.CloudEvents.SystemTextJson"/>
         <PackageReference Include="WolverineFx.Kafka"/>
         <!--#if (!LIBS_INCLUDES_DEFAULTS)
         <PackageReference Include="Momentum.ServiceDefaults"/>
@@ -39,7 +40,6 @@
     <!--#if (!LIBS_INCLUDES_KAFKA) -->
     <ItemGroup>
         <ProjectReference Include="..\Momentum.Extensions.Abstractions\Momentum.Extensions.Abstractions.csproj"/>
-        <ProjectReference Include="..\Momentum.Extensions.Messaging.Wolverine\Momentum.Extensions.Messaging.Wolverine.csproj"/>
         <ProjectReference Include="..\Momentum.ServiceDefaults\Momentum.ServiceDefaults.csproj"/>
     </ItemGroup>
     <!--#endif -->

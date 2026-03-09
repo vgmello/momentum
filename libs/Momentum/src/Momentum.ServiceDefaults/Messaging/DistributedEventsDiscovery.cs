@@ -2,9 +2,8 @@
 
 using System.Collections.Frozen;
 using System.Reflection;
-using Wolverine.Runtime.Handlers;
 
-namespace Momentum.Extensions.Messaging.Wolverine;
+namespace Momentum.ServiceDefaults.Messaging;
 
 public static class DistributedEventsDiscovery
 {
@@ -12,16 +11,21 @@ public static class DistributedEventsDiscovery
 
     private const string Async = "Async";
 
+    private const string Handle = "Handle";
+    private const string Handles = "Handles";
+    private const string Consume = "Consume";
+    private const string Consumes = "Consumes";
+
     private static readonly FrozenSet<string> HandlerMethodNames = new[]
     {
-        HandlerChain.Handle,
-        HandlerChain.Handle + Async,
-        HandlerChain.Handles,
-        HandlerChain.Handles + Async,
-        HandlerChain.Consume,
-        HandlerChain.Consume + Async,
-        HandlerChain.Consumes,
-        HandlerChain.Consumes + Async
+        Handle,
+        Handle + Async,
+        Handles,
+        Handles + Async,
+        Consume,
+        Consume + Async,
+        Consumes,
+        Consumes + Async
     }.ToFrozenSet(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>

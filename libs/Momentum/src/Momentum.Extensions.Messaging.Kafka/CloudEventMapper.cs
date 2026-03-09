@@ -5,7 +5,6 @@ using CloudNative.CloudEvents.Kafka;
 using CloudNative.CloudEvents.SystemTextJson;
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
-using Momentum.Extensions.Messaging.Wolverine;
 using System.Text;
 using Wolverine.Kafka;
 

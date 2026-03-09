@@ -2,7 +2,7 @@
 
 using System.Diagnostics;
 using Momentum.Extensions.Abstractions.Messaging;
-using Momentum.Extensions.Messaging.Wolverine;
+using Momentum.Extensions.Messaging;
 using Momentum.Extensions.Messaging.Wolverine.Middlewares;
 using Wolverine;
 

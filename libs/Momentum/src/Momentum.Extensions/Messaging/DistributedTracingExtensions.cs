@@ -3,7 +3,7 @@
 using CloudNative.CloudEvents;
 using static CloudNative.CloudEvents.CloudEventAttribute;
 
-namespace Momentum.Extensions.Messaging.Wolverine;
+namespace Momentum.Extensions.Messaging;
 
 public static class DistributedTracingExtensions
 {
