@@ -3,9 +3,6 @@
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-//#if (!LIBS_INCLUDES_API)
-using Momentum.Extensions;
-//#endif
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
@@ -21,12 +18,12 @@ public static class EndpointMappingExtensions
 
     /// <summary>
     ///     Discovers and maps all endpoints from classes implementing <see cref="IEndpointDefinition" />
-    ///     in assemblies registered via <see cref="DomainAssemblyAttribute" />.
+    ///     in assemblies registered via <see cref="Momentum.Extensions.DomainAssemblyAttribute" />.
     /// </summary>
     /// <param name="routeBuilder">The endpoint route builder to register endpoints with.</param>
     /// <param name="assemblies">
     ///     The assemblies to scan for endpoint mappers. When not specified, scans the entry assembly
-    ///     and all assemblies registered via <see cref="DomainAssemblyAttribute" />.
+    ///     and all assemblies registered via <see cref="Momentum.Extensions.DomainAssemblyAttribute" />.
     ///     Falls back to scanning all loaded assemblies that reference <see cref="IEndpointDefinition" />
     ///     when the entry assembly is not available (e.g. during build-time OpenAPI generation).
     /// </param>
@@ -67,9 +64,9 @@ public static class EndpointMappingExtensions
         // confirms it's the real API project (not a build-time tool like dotnet-getdocument).
         var entryAssembly = Assembly.GetEntryAssembly();
 
-        if (entryAssembly?.GetCustomAttributes<DomainAssemblyAttribute>().Any() == true)
+        if (entryAssembly?.GetCustomAttributes<Momentum.Extensions.DomainAssemblyAttribute>().Any() == true)
         {
-            var domainAssemblies = DomainAssemblyAttribute.GetDomainAssemblies(entryAssembly);
+            var domainAssemblies = Momentum.Extensions.DomainAssemblyAttribute.GetDomainAssemblies(entryAssembly);
             return [entryAssembly, .. domainAssemblies];
         }
 
@@ -78,7 +75,7 @@ public static class EndpointMappingExtensions
         // the entry assembly is the doc generator tool, not the API project.
         var definingAssembly = EndpointMapperType.Assembly;
 
-        return AppDomain.CurrentDomain.GetAssemblies()
+        return System.AppDomain.CurrentDomain.GetAssemblies()
             .Where(a => !a.IsDynamic && a.GetReferencedAssemblies().Any(r => r.FullName == definingAssembly.FullName))
             .ToArray();
     }
