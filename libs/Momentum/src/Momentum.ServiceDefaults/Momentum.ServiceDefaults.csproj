@@ -5,6 +5,12 @@
 
     <Import Project="Momentum.ServiceDefaults.props"/>
 
+    <!--#if (LIBS_INCLUDES_DEFAULTS)
+    <PropertyGroup>
+        <Version>$(MomentumVersion)</Version>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+    #endif -->
     <!--#if (!LIBS_INCLUDES_DEFAULTS) -->
     <Import Project="..\Momentum.Extensions\Momentum.Extensions.props"/>
     <PropertyGroup>

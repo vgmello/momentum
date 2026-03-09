@@ -1,4 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
+    <!--#if (LIBS_INCLUDES_EXT)
+    <PropertyGroup>
+        <Version>$(MomentumVersion)</Version>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+    #endif -->
     <!--#if (!LIBS_INCLUDES_EXT) -->
     <PropertyGroup>
         <IsPackable>true</IsPackable>

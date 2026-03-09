@@ -399,7 +399,6 @@
         "**/Internal/Generated/**/*",
         "**/docs/reference/*",
         "tests/performance/**/*",
-        "libs/Momentum/Directory.Build.props",
         "libs/Momentum/Directory.Build.targets",
         "libs/Momentum/src/Momentum.Extensions.Abstractions/**/*",
         "libs/Momentum/src/Momentum.Extensions.Messaging/**/*",

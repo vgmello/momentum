@@ -6,6 +6,12 @@
         <EnableConfigurationBindingGenerator>false</EnableConfigurationBindingGenerator>
     </PropertyGroup>
 
+    <!--#if (LIBS_INCLUDES_API)
+    <PropertyGroup>
+        <Version>$(MomentumVersion)</Version>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+    #endif -->
     <!--#if (!LIBS_INCLUDES_API) -->
     <PropertyGroup>
         <IsPackable>true</IsPackable>
