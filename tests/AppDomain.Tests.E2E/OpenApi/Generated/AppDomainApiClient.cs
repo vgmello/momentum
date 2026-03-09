@@ -17,129 +17,6 @@ namespace AppDomain.Tests.E2E.OpenApi.Generated
     [System.CodeDom.Compiler.GeneratedCode("Refitter", "1.7.3.0")]
     public partial interface IAppDomainApiClient
     {
-        /// <summary>Retrieves a specific cashier by their unique identifier</summary>
-        /// <param name="id">id parameter</param>
-        /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
-        /// <returns>OK</returns>
-        /// <exception cref="ApiException">
-        /// Thrown when the request returns a non-success status code:
-        /// <list type="table">
-        /// <listheader>
-        /// <term>Status</term>
-        /// <description>Description</description>
-        /// </listheader>
-        /// <item>
-        /// <term>400</term>
-        /// <description>Bad Request</description>
-        /// </item>
-        /// <item>
-        /// <term>404</term>
-        /// <description>Not Found</description>
-        /// </item>
-        /// </list>
-        /// </exception>
-        [Headers("Accept: application/json, application/problem+json")]
-        [Get("/cashiers/{id}")]
-        Task<Cashier> GetCashierAsync(System.Guid id, CancellationToken cancellationToken = default);
-
-        /// <summary>Updates an existing cashier's information</summary>
-        /// <param name="id">id parameter</param>
-        /// <param name="body">body parameter</param>
-        /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
-        /// <returns>OK</returns>
-        /// <exception cref="ApiException">
-        /// Thrown when the request returns a non-success status code:
-        /// <list type="table">
-        /// <listheader>
-        /// <term>Status</term>
-        /// <description>Description</description>
-        /// </listheader>
-        /// <item>
-        /// <term>400</term>
-        /// <description>Bad Request</description>
-        /// </item>
-        /// <item>
-        /// <term>404</term>
-        /// <description>Not Found</description>
-        /// </item>
-        /// <item>
-        /// <term>409</term>
-        /// <description>Conflict</description>
-        /// </item>
-        /// </list>
-        /// </exception>
-        [Headers("Accept: application/json, application/problem+json", "Content-Type: application/json")]
-        [Put("/cashiers/{id}")]
-        Task<Cashier> UpdateCashierAsync(System.Guid id, [Body] UpdateCashierRequest body, CancellationToken cancellationToken = default);
-
-        /// <summary>Deletes a cashier from the system</summary>
-        /// <param name="id">id parameter</param>
-        /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
-        /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
-        /// <exception cref="ApiException">
-        /// Thrown when the request returns a non-success status code:
-        /// <list type="table">
-        /// <listheader>
-        /// <term>Status</term>
-        /// <description>Description</description>
-        /// </listheader>
-        /// <item>
-        /// <term>400</term>
-        /// <description>Bad Request</description>
-        /// </item>
-        /// <item>
-        /// <term>404</term>
-        /// <description>Not Found</description>
-        /// </item>
-        /// </list>
-        /// </exception>
-        [Headers("Accept: application/problem+json")]
-        [Delete("/cashiers/{id}")]
-        Task DeleteCashierAsync(System.Guid id, CancellationToken cancellationToken = default);
-
-        /// <summary>Retrieves a list of cashiers with optional filtering</summary>
-        /// <param name="limit">Maximum number of cashiers to return (1-100).</param>
-        /// <param name="offset">Number of cashiers to skip for pagination.</param>
-        /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
-        /// <returns>OK</returns>
-        /// <exception cref="ApiException">
-        /// Thrown when the request returns a non-success status code:
-        /// <list type="table">
-        /// <listheader>
-        /// <term>Status</term>
-        /// <description>Description</description>
-        /// </listheader>
-        /// <item>
-        /// <term>400</term>
-        /// <description>Bad Request</description>
-        /// </item>
-        /// </list>
-        /// </exception>
-        [Headers("Accept: application/json, application/problem+json")]
-        [Get("/cashiers")]
-        Task<ICollection<Result>> GetCashiersAsync([Query, AliasAs("Limit")] int limit, [Query, AliasAs("Offset")] int offset, CancellationToken cancellationToken = default);
-
-        /// <summary>Creates a new cashier in the system</summary>
-        /// <param name="body">body parameter</param>
-        /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
-        /// <returns>Created</returns>
-        /// <exception cref="ApiException">
-        /// Thrown when the request returns a non-success status code:
-        /// <list type="table">
-        /// <listheader>
-        /// <term>Status</term>
-        /// <description>Description</description>
-        /// </listheader>
-        /// <item>
-        /// <term>400</term>
-        /// <description>Bad Request</description>
-        /// </item>
-        /// </list>
-        /// </exception>
-        [Headers("Accept: application/json, application/problem+json", "Content-Type: application/json")]
-        [Post("/cashiers")]
-        Task<Cashier> CreateCashierAsync([Body] CreateCashierRequest body, CancellationToken cancellationToken = default);
-
         /// <summary>Retrieves a list of invoices with optional filtering and pagination</summary>
         /// <param name="limit">Maximum number of invoices to return (1-1000)</param>
         /// <param name="offset">Number of invoices to skip for pagination</param>
@@ -286,6 +163,129 @@ namespace AppDomain.Tests.E2E.OpenApi.Generated
         [Headers("Accept: application/json, application/problem+json", "Content-Type: application/json")]
         [Post("/invoices/{id}/simulate-payment")]
         Task<object> SimulatePaymentAsync(System.Guid id, [Body] SimulatePaymentRequest body, CancellationToken cancellationToken = default);
+
+        /// <summary>Retrieves a specific cashier by their unique identifier</summary>
+        /// <param name="id">id parameter</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">
+        /// Thrown when the request returns a non-success status code:
+        /// <list type="table">
+        /// <listheader>
+        /// <term>Status</term>
+        /// <description>Description</description>
+        /// </listheader>
+        /// <item>
+        /// <term>400</term>
+        /// <description>Bad Request</description>
+        /// </item>
+        /// <item>
+        /// <term>404</term>
+        /// <description>Not Found</description>
+        /// </item>
+        /// </list>
+        /// </exception>
+        [Headers("Accept: application/json, application/problem+json")]
+        [Get("/cashiers/{id}")]
+        Task<Cashier> GetCashierAsync(System.Guid id, CancellationToken cancellationToken = default);
+
+        /// <summary>Updates an existing cashier's information</summary>
+        /// <param name="id">id parameter</param>
+        /// <param name="body">body parameter</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">
+        /// Thrown when the request returns a non-success status code:
+        /// <list type="table">
+        /// <listheader>
+        /// <term>Status</term>
+        /// <description>Description</description>
+        /// </listheader>
+        /// <item>
+        /// <term>400</term>
+        /// <description>Bad Request</description>
+        /// </item>
+        /// <item>
+        /// <term>404</term>
+        /// <description>Not Found</description>
+        /// </item>
+        /// <item>
+        /// <term>409</term>
+        /// <description>Conflict</description>
+        /// </item>
+        /// </list>
+        /// </exception>
+        [Headers("Accept: application/json, application/problem+json", "Content-Type: application/json")]
+        [Put("/cashiers/{id}")]
+        Task<Cashier> UpdateCashierAsync(System.Guid id, [Body] UpdateCashierRequest body, CancellationToken cancellationToken = default);
+
+        /// <summary>Deletes a cashier from the system</summary>
+        /// <param name="id">id parameter</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
+        /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
+        /// <exception cref="ApiException">
+        /// Thrown when the request returns a non-success status code:
+        /// <list type="table">
+        /// <listheader>
+        /// <term>Status</term>
+        /// <description>Description</description>
+        /// </listheader>
+        /// <item>
+        /// <term>400</term>
+        /// <description>Bad Request</description>
+        /// </item>
+        /// <item>
+        /// <term>404</term>
+        /// <description>Not Found</description>
+        /// </item>
+        /// </list>
+        /// </exception>
+        [Headers("Accept: application/problem+json")]
+        [Delete("/cashiers/{id}")]
+        Task DeleteCashierAsync(System.Guid id, CancellationToken cancellationToken = default);
+
+        /// <summary>Retrieves a list of cashiers with optional filtering</summary>
+        /// <param name="limit">Maximum number of cashiers to return (1-100).</param>
+        /// <param name="offset">Number of cashiers to skip for pagination.</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">
+        /// Thrown when the request returns a non-success status code:
+        /// <list type="table">
+        /// <listheader>
+        /// <term>Status</term>
+        /// <description>Description</description>
+        /// </listheader>
+        /// <item>
+        /// <term>400</term>
+        /// <description>Bad Request</description>
+        /// </item>
+        /// </list>
+        /// </exception>
+        [Headers("Accept: application/json, application/problem+json")]
+        [Get("/cashiers")]
+        Task<ICollection<Result>> GetCashiersAsync([Query, AliasAs("Limit")] int limit, [Query, AliasAs("Offset")] int offset, CancellationToken cancellationToken = default);
+
+        /// <summary>Creates a new cashier in the system</summary>
+        /// <param name="body">body parameter</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the request.</param>
+        /// <returns>Created</returns>
+        /// <exception cref="ApiException">
+        /// Thrown when the request returns a non-success status code:
+        /// <list type="table">
+        /// <listheader>
+        /// <term>Status</term>
+        /// <description>Description</description>
+        /// </listheader>
+        /// <item>
+        /// <term>400</term>
+        /// <description>Bad Request</description>
+        /// </item>
+        /// </list>
+        /// </exception>
+        [Headers("Accept: application/json, application/problem+json", "Content-Type: application/json")]
+        [Post("/cashiers")]
+        Task<Cashier> CreateCashierAsync([Body] CreateCashierRequest body, CancellationToken cancellationToken = default);
 
 
     }
