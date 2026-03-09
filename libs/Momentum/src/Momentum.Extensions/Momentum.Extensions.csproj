@@ -3,10 +3,8 @@
     <PropertyGroup>
         <Version>$(MomentumVersion)</Version>
         <IsPackable>false</IsPackable>
+        <AssemblyName>Momentum.Extensions</AssemblyName>
     </PropertyGroup>
-    <ItemGroup>
-        <Compile Remove="Messaging\**\*" />
-    </ItemGroup>
     #endif -->
     <!--#if (!LIBS_INCLUDES_EXT) -->
     <PropertyGroup>
