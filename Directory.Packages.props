@@ -9,7 +9,7 @@
     <!--#endif -->
     <OpenTelemetryVersion>1.15.0</OpenTelemetryVersion>
     <!--#if (INCLUDE_GRPC) -->
-    <GrpcVersion>2.67.0</GrpcVersion>
+    <GrpcVersion>2.76.0</GrpcVersion>
     <!--#endif -->
     <!--#if (!USE_LOCAL) -->
     <MomentumVersion>$(TemplateMomentumVersion)</MomentumVersion>
@@ -46,7 +46,7 @@
     <PackageVersion Include="Grpc.AspNetCore.Server.Reflection" Version="$(GrpcVersion)" />
     <PackageVersion Include="Grpc.AspNetCore.Web" Version="$(GrpcVersion)" />
     <PackageVersion Include="Grpc.Net.Client" Version="$(GrpcVersion)" />
-    <PackageVersion Include="Grpc.Tools" Version="2.68.1" />
+    <PackageVersion Include="Grpc.Tools" Version="2.78.0" />
     <!--#endif -->
     <PackageVersion Include="linq2db" Version="6.1.0" />
     <PackageVersion Include="linq2db.Extensions" Version="6.1.0" />

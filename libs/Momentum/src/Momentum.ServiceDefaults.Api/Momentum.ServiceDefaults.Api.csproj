@@ -56,6 +56,7 @@
     <!--#endif -->
 
     <ItemGroup>
+      <PackageReference Include="Grpc.Tools" VersionOverride="2.78.0" />
         <InternalsVisibleTo Include="Momentum.ServiceDefaults.Api.Tests"/>
     </ItemGroup>
 </Project>
