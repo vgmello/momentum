@@ -1,7 +1,5 @@
 // Copyright (c) OrgName. All rights reserved.
 
-using FluentValidation.Results;
-
 namespace AppDomain.Api.Common.Extensions;
 
 /// <summary>
