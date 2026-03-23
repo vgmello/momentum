@@ -74,6 +74,7 @@
     <!--#endif -->
     <!--#if (!LIBS_INCLUDES_DEFAULTS) -->
     <ItemGroup>
+      <PackageReference Include="Google.Protobuf" VersionOverride="3.34.1" />
         <ProjectReference Include="..\Momentum.Extensions\Momentum.Extensions.csproj"/>
     </ItemGroup>
     <!--#endif -->

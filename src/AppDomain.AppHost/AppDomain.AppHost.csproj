@@ -35,6 +35,9 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Google.Protobuf" VersionOverride="3.34.1" />
+      <PackageReference Include="Grpc.AspNetCore" VersionOverride="2.76.0" />
+    <PackageReference Include="Grpc.Tools" />
         <Using Include="AppDomain.AppHost.Extensions"/>
     </ItemGroup>
 </Project>
