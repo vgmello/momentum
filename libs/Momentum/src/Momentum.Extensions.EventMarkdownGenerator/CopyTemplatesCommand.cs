@@ -23,7 +23,7 @@ public sealed class CopyTemplatesCommand : AsyncCommand<CopyTemplatesCommand.Set
         public bool Force { get; init; }
     }
 
-    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellationToken)
+    protected override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellationToken)
     {
         try
         {
