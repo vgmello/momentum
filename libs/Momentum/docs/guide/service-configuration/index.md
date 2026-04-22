@@ -472,7 +472,7 @@ dotnet run --project src/MyBusinessApp.AppHost
 
 Create configuration files for each environment:
 
-- `appsettings.Local.json` — all local development overrides (logging, connection strings, feature flags), gitignored and excluded from Docker
+- `appsettings.Local.json` — all local development overrides (logging, connection strings, feature flags), excluded from Docker via `.dockerignore`
 - `appsettings.Staging.json`
 - `appsettings.Production.json`
 

@@ -176,7 +176,7 @@ bun run docs:build
 
 **Local Settings**:
 
-Create `src/AppDomain.Api/appsettings.Local.json` (gitignored — not committed, machine-specific):
+Create `src/AppDomain.Api/appsettings.Local.json` (excluded from Docker images, committed to source control):
 
 ```json
 {
@@ -197,7 +197,7 @@ Create `src/AppDomain.Api/appsettings.Local.json` (gitignored — not committed,
 }
 ```
 
-`appsettings.Local.json` is loaded after `appsettings.json` only when `ASPNETCORE_ENVIRONMENT=Development`. It is excluded from Docker images and git (except the template source files under `src/`). Use it to override any setting for your local machine without affecting other developers.
+`appsettings.Local.json` is loaded after `appsettings.json` only when `ASPNETCORE_ENVIRONMENT=Development`. It is excluded from Docker images via `.dockerignore`. Use it to override any setting for your local machine.
 
 **User Secrets** (for sensitive data):
 

@@ -421,7 +421,7 @@ After generation, you'll need to configure environment-specific settings:
 
 ```bash
 # 1. Update connection strings for your local machine
-# Edit appsettings.Local.json in each service (gitignored, not committed):
+# Edit appsettings.Local.json in each service (excluded from Docker images):
 {
   "ConnectionStrings": {
     "AppDomainDb": "Host=localhost;Database=myapp;Username=dev;Password=dev"

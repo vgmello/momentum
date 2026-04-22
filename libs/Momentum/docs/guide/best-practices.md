@@ -1014,7 +1014,7 @@ Momentum applications use a specific configuration strategy designed for cloud-n
 **Environment-Specific Configuration Files:**
 - `appsettings.json` contains **baseline configuration** and local development defaults
 - `appsettings.{Environment}.json` files contain **environment-specific configuration** for each target environment (Production, QA, Staging)
-- `appsettings.Local.json` contains **all local development overrides** (logging, connection strings, feature flags) and is excluded from Docker images and source control
+- `appsettings.Local.json` contains **all local development overrides** (logging, connection strings, feature flags) and is excluded from Docker images via `.dockerignore`
 - Environment variables are used for **deployment-specific overrides** and values that vary by deployment instance
 - **Cloud secret management** (Azure Key Vault, AWS Secrets Manager, etc.) for sensitive data
 

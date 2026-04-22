@@ -816,7 +816,7 @@ CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at);
 
 ### 8. Configuration
 
-Create `appsettings.Local.json` (gitignored — machine-specific, not committed):
+Create `appsettings.Local.json` (excluded from Docker images via `.dockerignore`):
 
 ```json
 {
@@ -826,7 +826,7 @@ Create `appsettings.Local.json` (gitignored — machine-specific, not committed)
 }
 ```
 
-`appsettings.Local.json` is loaded after `appsettings.json` only when `ASPNETCORE_ENVIRONMENT=Development`. It is gitignored — put any local machine overrides here without affecting other developers.
+`appsettings.Local.json` is loaded after `appsettings.json` only when `ASPNETCORE_ENVIRONMENT=Development`. It is excluded from Docker images — put any local machine overrides here.
 
 ### 9. Run and Test
 

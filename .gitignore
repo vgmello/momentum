@@ -448,10 +448,5 @@ docs/obj**
 local-mmt-version.txt
 local-feed-path.txt
 
-# Local machine-specific settings (not for commit)
-**/appsettings.Local.json
-# Allow template source files to be tracked
-!src/**/appsettings.Local.json
-
 # Perf Tests Results
 **/tests/**/results

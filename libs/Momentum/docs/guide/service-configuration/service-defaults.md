@@ -376,7 +376,7 @@ The `appsettings.json` file serves as the **baseline configuration** containing 
 ```
 
 #### appsettings.Local.json - Local Machine Overrides
-The `appsettings.Local.json` file contains all **local development overrides** — logging, connection strings, feature flags, etc. It is loaded when `ASPNETCORE_ENVIRONMENT=Development` and is **excluded from Docker images and source control** via `.dockerignore` and `.gitignore`:
+The `appsettings.Local.json` file contains all **local development overrides** — logging, connection strings, feature flags, etc. It is loaded when `ASPNETCORE_ENVIRONMENT=Development` and is **excluded from Docker images** via `.dockerignore`:
 
 ```json
 {
@@ -625,7 +625,7 @@ builder.Services.Configure<ServiceDiscoveryOptions>(options =>
 
 ### Configuration Management
 1. **Environment-specific configuration**: Use appsettings.{Environment}.json files for each target environment (Production, QA, Staging)
-2. **Local development**: Use `appsettings.Local.json` for all local overrides (connection strings, logging, feature flags); it is gitignored and excluded from containers
+2. **Local development**: Use `appsettings.Local.json` for all local overrides (connection strings, logging, feature flags); it is excluded from Docker images via `.dockerignore`
 3. **Deployment overrides**: Use environment variables for deployment-specific values and temporary overrides
 4. **Secret management**: Use cloud-native secret management for sensitive data
 
