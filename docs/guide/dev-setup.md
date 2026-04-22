@@ -176,28 +176,7 @@ bun run docs:build
 
 **Local Settings**:
 
-`appsettings.Local.json` is committed to source control and excluded from Docker images via `.dockerignore`. It is loaded after `appsettings.json` only when `ASPNETCORE_ENVIRONMENT=Development`. Connection strings in it intentionally omit credentials — add those via user secrets (see below).
-
-**Database credentials (user secrets)**:
-
-The local Docker postgres password is `password@` (set by `Parameters:DbPassword` in `AppHost/appsettings.json`). Store credentials using `dotnet user-secrets` so they never end up in any file:
-
-```bash
-# Run once per service — sets credentials for the local docker-compose postgres
-cd src/AppDomain.Api
-dotnet user-secrets set "ConnectionStrings:AppDomainDb" "Host=localhost;Port=54320;Database=app_domain;Username=postgres;Password=password@;Maximum Pool Size=100;Minimum Pool Size=5;Connection Idle Lifetime=60;"
-dotnet user-secrets set "ConnectionStrings:ServiceBus"  "Host=localhost;Port=54320;Database=service_bus;Username=postgres;Password=password@;Maximum Pool Size=100;Minimum Pool Size=5;Connection Idle Lifetime=60;"
-
-cd ../AppDomain.BackOffice
-dotnet user-secrets set "ConnectionStrings:AppDomainDb" "Host=localhost;Port=54320;Database=app_domain;Username=postgres;Password=password@;"
-dotnet user-secrets set "ConnectionStrings:ServiceBus"  "Host=localhost;Port=54320;Database=service_bus;Username=postgres;Password=password@;"
-
-cd ../AppDomain.BackOffice.Orleans
-dotnet user-secrets set "ConnectionStrings:AppDomainDb" "Host=localhost;Port=54320;Database=app_domain;Username=postgres;Password=password@;"
-dotnet user-secrets set "ConnectionStrings:ServiceBus"  "Host=localhost;Port=54320;Database=service_bus;Username=postgres;Password=password@;"
-```
-
-When running via Aspire (`dotnet run --project src/AppDomain.AppHost`), credentials are injected automatically — user secrets are only needed when running services directly.
+`appsettings.Local.json` is committed to source control and excluded from Docker images via `.dockerignore`. It is loaded after `appsettings.json` only when `ASPNETCORE_ENVIRONMENT=Development`. The file is also excluded from Sonar/quality analysis so local dev credentials (e.g. the docker-compose postgres password `password@`) can live here safely.
 
 ## Infrastructure Setup
 
