@@ -76,6 +76,9 @@ public static class ServiceDefaultsExtensions
     {
         builder.UseInitializationLogger();
 
+        if (builder.Environment.IsDevelopment())
+            builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
+
         builder.AddLogging();
         builder.AddOpenTelemetry();
         builder.AddServiceBus();
