@@ -176,40 +176,28 @@ bun run docs:build
 
 **Local Settings**:
 
-Create `src/AppDomain.Api/appsettings.Local.json` (excluded from Docker images, committed to source control):
+`appsettings.Local.json` is committed to source control and excluded from Docker images via `.dockerignore`. It is loaded after `appsettings.json` only when `ASPNETCORE_ENVIRONMENT=Development`. Connection strings in it intentionally omit credentials — add those via user secrets (see below).
 
-```json
-{
-  "Serilog": {
-    "MinimumLevel": {
-      "Default": "Information",
-      "Override": {
-        "AppDomain": "Debug",
-        "Microsoft": "Warning",
-        "Microsoft.AspNetCore": "Warning"
-      }
-    }
-  },
-  "ConnectionStrings": {
-    "AppDomainDb": "Host=localhost;Port=54320;Database=app_domain;password=password@;username=postgres;",
-    "ServiceBus": "Host=localhost;Port=54320;Database=service_bus;password=password@;username=postgres;"
-  }
-}
-```
+**Database credentials (user secrets)**:
 
-`appsettings.Local.json` is loaded after `appsettings.json` only when `ASPNETCORE_ENVIRONMENT=Development`. It is excluded from Docker images via `.dockerignore`. Use it to override any setting for your local machine.
-
-**User Secrets** (for sensitive data):
+The local Docker postgres password is `password@` (set by `Parameters:DbPassword` in `AppHost/appsettings.json`). Store credentials using `dotnet user-secrets` so they never end up in any file:
 
 ```bash
-# Initialize user secrets for API project
+# Run once per service — sets credentials for the local docker-compose postgres
 cd src/AppDomain.Api
-dotnet user-secrets init
+dotnet user-secrets set "ConnectionStrings:AppDomainDb" "Host=localhost;Port=54320;Database=app_domain;Username=postgres;Password=password@;Maximum Pool Size=100;Minimum Pool Size=5;Connection Idle Lifetime=60;"
+dotnet user-secrets set "ConnectionStrings:ServiceBus"  "Host=localhost;Port=54320;Database=service_bus;Username=postgres;Password=password@;Maximum Pool Size=100;Minimum Pool Size=5;Connection Idle Lifetime=60;"
 
-# Add development secrets (example)
-dotnet user-secrets set "ExternalApi:ApiKey" "development-api-key"
-dotnet user-secrets set "JWT:SecretKey" "super-secret-development-key-that-is-very-long"
+cd ../AppDomain.BackOffice
+dotnet user-secrets set "ConnectionStrings:AppDomainDb" "Host=localhost;Port=54320;Database=app_domain;Username=postgres;Password=password@;"
+dotnet user-secrets set "ConnectionStrings:ServiceBus"  "Host=localhost;Port=54320;Database=service_bus;Username=postgres;Password=password@;"
+
+cd ../AppDomain.BackOffice.Orleans
+dotnet user-secrets set "ConnectionStrings:AppDomainDb" "Host=localhost;Port=54320;Database=app_domain;Username=postgres;Password=password@;"
+dotnet user-secrets set "ConnectionStrings:ServiceBus"  "Host=localhost;Port=54320;Database=service_bus;Username=postgres;Password=password@;"
 ```
+
+When running via Aspire (`dotnet run --project src/AppDomain.AppHost`), credentials are injected automatically — user secrets are only needed when running services directly.
 
 ## Infrastructure Setup
 
