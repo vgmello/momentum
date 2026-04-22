@@ -174,29 +174,30 @@ bun run docs:build
 
 ### Environment Configuration
 
-**Development Settings**:
+**Local Settings**:
 
-Create `src/AppDomain.Api/appsettings.Development.json`:
+Create `src/AppDomain.Api/appsettings.Local.json` (gitignored — not committed, machine-specific):
 
 ```json
 {
-  "Logging": {
-    "LogLevel": {
+  "Serilog": {
+    "MinimumLevel": {
       "Default": "Information",
-      "Microsoft.AspNetCore": "Warning",
-      "AppDomain": "Debug"
+      "Override": {
+        "AppDomain": "Debug",
+        "Microsoft": "Warning",
+        "Microsoft.AspNetCore": "Warning"
+      }
     }
   },
   "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Port=54320;Database=AppDomain;Username=postgres;Password=password;"
-  },
-  "Aspire": {
-    "Dashboard": {
-      "Url": "http://localhost:15888"
-    }
+    "AppDomainDb": "Host=localhost;Port=54320;Database=app_domain;password=password@;username=postgres;",
+    "ServiceBus": "Host=localhost;Port=54320;Database=service_bus;password=password@;username=postgres;"
   }
 }
 ```
+
+`appsettings.Local.json` is loaded on top of `appsettings.Development.json` only when `ASPNETCORE_ENVIRONMENT=Development`. It is excluded from Docker images and git (except the template source files under `src/`). Use it to override any setting for your local machine without affecting other developers.
 
 **User Secrets** (for sensitive data):
 

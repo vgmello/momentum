@@ -420,8 +420,8 @@ The template includes automated post-setup actions that run immediately after ge
 After generation, you'll need to configure environment-specific settings:
 
 ```bash
-# 1. Update connection strings for your environment
-# Edit appsettings.Development.json in each service:
+# 1. Update connection strings for your local machine
+# Edit appsettings.Local.json in each service (gitignored, not committed):
 {
   "ConnectionStrings": {
     "AppDomainDb": "Host=localhost;Database=myapp;Username=dev;Password=dev"

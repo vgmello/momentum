@@ -375,8 +375,8 @@ The `appsettings.json` file serves as the **baseline configuration** containing 
 }
 ```
 
-#### appsettings.Development.json - Local Development Overrides
-The `appsettings.Development.json` file contains **local development-specific overrides** and will be excluded from cloud environments via `.dockerignore`:
+#### appsettings.Development.json - Development Environment Settings
+The `appsettings.Development.json` file contains settings for any development environment (local, CI, dev servers). It is **included in Docker images** and committed to source control:
 
 ```json
 {
@@ -392,8 +392,20 @@ The `appsettings.Development.json` file contains **local development-specific ov
 }
 ```
 
+#### appsettings.Local.json - Local Machine Overrides
+The `appsettings.Local.json` file contains **machine-specific overrides** such as localhost connection strings. It is loaded on top of `appsettings.Development.json` only when `ASPNETCORE_ENVIRONMENT=Development`, and is **excluded from Docker images and source control** via `.dockerignore` and `.gitignore`:
+
+```json
+{
+  "ConnectionStrings": {
+    "AppDomainDb": "Host=localhost;Port=54320;Database=app_domain;password=password@;username=postgres;",
+    "ServiceBus": "Host=localhost;Port=54320;Database=service_bus;password=password@;username=postgres;"
+  }
+}
+```
+
 > [!WARNING]
-> Do not rely on `appsettings.Development.json` for cloud deployments. This file is excluded via `.dockerignore` and will not be available in containerized environments.
+> Do not rely on `appsettings.Local.json` for cloud deployments. This file is excluded via `.dockerignore` and will not be available in containerized environments.
 
 ### Cloud Environment Configuration
 
@@ -486,7 +498,7 @@ Service defaults adapt to different environments:
 
 ### Development Environment
 ```json
-// appsettings.json (baseline) + appsettings.Development.json (local overrides)
+// appsettings.json (baseline) + appsettings.Development.json + appsettings.Local.json (local overrides)
 {
   "ConnectionStrings": {
     "AppDomainDb": "Host=localhost;Port=54320;Database=app_domain;",
@@ -630,7 +642,7 @@ builder.Services.Configure<ServiceDiscoveryOptions>(options =>
 
 ### Configuration Management
 1. **Environment-specific configuration**: Use appsettings.{Environment}.json files for each target environment (Production, QA, Staging)
-2. **Local development**: Use appsettings.Development.json only for local development overrides, excluded from containers
+2. **Local development**: Use `appsettings.Development.json` for dev environment settings and `appsettings.Local.json` for machine-specific overrides (localhost connection strings); Local.json is excluded from containers
 3. **Deployment overrides**: Use environment variables for deployment-specific values and temporary overrides
 4. **Secret management**: Use cloud-native secret management for sensitive data
 

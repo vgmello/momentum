@@ -816,21 +816,17 @@ CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at);
 
 ### 8. Configuration
 
-Create `appsettings.Development.json`:
+Create `appsettings.Local.json` (gitignored — machine-specific, not committed):
 
 ```json
 {
     "ConnectionStrings": {
         "DefaultConnection": "Host=localhost;Database=ecommerce;Username=postgres;Password=password"
-    },
-    "Logging": {
-        "LogLevel": {
-            "Default": "Information",
-            "Microsoft.AspNetCore": "Warning"
-        }
     }
 }
 ```
+
+`appsettings.Local.json` is loaded on top of `appsettings.Development.json` only when `ASPNETCORE_ENVIRONMENT=Development`. Non-machine-specific dev settings (log levels, feature flags) belong in `appsettings.Development.json` instead.
 
 ### 9. Run and Test
 

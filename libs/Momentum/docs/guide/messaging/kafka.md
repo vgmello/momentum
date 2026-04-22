@@ -61,7 +61,7 @@ Configure Kafka in your application settings:
 ### Environment-Specific Configuration
 
 ```json
-// appsettings.Development.json
+// appsettings.Local.json (machine-specific, gitignored)
 {
   "ConnectionStrings": {
     "Messaging": "localhost:9092"
