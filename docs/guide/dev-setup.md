@@ -174,41 +174,9 @@ bun run docs:build
 
 ### Environment Configuration
 
-**Development Settings**:
+**Local Settings**:
 
-Create `src/AppDomain.Api/appsettings.Development.json`:
-
-```json
-{
-  "Logging": {
-    "LogLevel": {
-      "Default": "Information",
-      "Microsoft.AspNetCore": "Warning",
-      "AppDomain": "Debug"
-    }
-  },
-  "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Port=54320;Database=AppDomain;Username=postgres;Password=password;"
-  },
-  "Aspire": {
-    "Dashboard": {
-      "Url": "http://localhost:15888"
-    }
-  }
-}
-```
-
-**User Secrets** (for sensitive data):
-
-```bash
-# Initialize user secrets for API project
-cd src/AppDomain.Api
-dotnet user-secrets init
-
-# Add development secrets (example)
-dotnet user-secrets set "ExternalApi:ApiKey" "development-api-key"
-dotnet user-secrets set "JWT:SecretKey" "super-secret-development-key-that-is-very-long"
-```
+`appsettings.Local.json` is committed to source control and excluded from Docker images via `.dockerignore`. It is loaded after `appsettings.json` only when `ASPNETCORE_ENVIRONMENT=Development`. The file is also excluded from Sonar/quality analysis so local dev credentials (e.g. the docker-compose postgres password `password@`) can live here safely.
 
 ## Infrastructure Setup
 

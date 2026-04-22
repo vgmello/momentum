@@ -47,7 +47,6 @@ CLAUDE.md
 
 # Development configuration
 **/.env.*
-**/appsettings.Development.json
 **/appsettings.Local.json
 
 # IDE and editor files

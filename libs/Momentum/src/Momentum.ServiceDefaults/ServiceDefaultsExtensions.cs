@@ -74,8 +74,10 @@ public static class ServiceDefaultsExtensions
     [ExcludeFromCodeCoverage]
     public static IHostApplicationBuilder AddServiceDefaults(this WebApplicationBuilder builder)
     {
-        builder.UseInitializationLogger();
+        if (builder.Environment.IsDevelopment())
+            builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
 
+        builder.UseInitializationLogger();
         builder.AddLogging();
         builder.AddOpenTelemetry();
         builder.AddServiceBus();

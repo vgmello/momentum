@@ -816,21 +816,17 @@ CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at);
 
 ### 8. Configuration
 
-Create `appsettings.Development.json`:
+Create `appsettings.Local.json` (excluded from Docker images via `.dockerignore`):
 
 ```json
 {
     "ConnectionStrings": {
         "DefaultConnection": "Host=localhost;Database=ecommerce;Username=postgres;Password=password"
-    },
-    "Logging": {
-        "LogLevel": {
-            "Default": "Information",
-            "Microsoft.AspNetCore": "Warning"
-        }
     }
 }
 ```
+
+`appsettings.Local.json` is loaded after `appsettings.json` only when `ASPNETCORE_ENVIRONMENT=Development`. It is excluded from Docker images — put any local machine overrides here.
 
 ### 9. Run and Test
 

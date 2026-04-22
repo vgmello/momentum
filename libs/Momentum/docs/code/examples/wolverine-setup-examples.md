@@ -145,7 +145,7 @@ public class OrderServiceIntegrationTests : IClassFixture<TestFixture>
 ## Environment-Specific Configuration
 
 ```json
-// appsettings.Development.json
+// appsettings.Local.json (excluded from Docker — all local overrides)
 {
   "ConnectionStrings": {
     "ServiceBus": "Host=localhost;Database=dev_messaging;Username=dev;Password=dev"
