@@ -197,7 +197,7 @@ Create `src/AppDomain.Api/appsettings.Local.json` (gitignored — not committed,
 }
 ```
 
-`appsettings.Local.json` is loaded on top of `appsettings.Development.json` only when `ASPNETCORE_ENVIRONMENT=Development`. It is excluded from Docker images and git (except the template source files under `src/`). Use it to override any setting for your local machine without affecting other developers.
+`appsettings.Local.json` is loaded after `appsettings.json` only when `ASPNETCORE_ENVIRONMENT=Development`. It is excluded from Docker images and git (except the template source files under `src/`). Use it to override any setting for your local machine without affecting other developers.
 
 **User Secrets** (for sensitive data):
 

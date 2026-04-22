@@ -375,25 +375,8 @@ The `appsettings.json` file serves as the **baseline configuration** containing 
 }
 ```
 
-#### appsettings.Development.json - Development Environment Settings
-The `appsettings.Development.json` file contains settings for any development environment (local, CI, dev servers). It is **included in Docker images** and committed to source control:
-
-```json
-{
-  "Logging": {
-    "LogLevel": {
-      "Default": "Debug",
-      "Microsoft.AspNetCore": "Warning"
-    }
-  },
-  "Wolverine": {
-    "CodegenEnabled": true
-  }
-}
-```
-
 #### appsettings.Local.json - Local Machine Overrides
-The `appsettings.Local.json` file contains **machine-specific overrides** such as localhost connection strings. It is loaded on top of `appsettings.Development.json` only when `ASPNETCORE_ENVIRONMENT=Development`, and is **excluded from Docker images and source control** via `.dockerignore` and `.gitignore`:
+The `appsettings.Local.json` file contains all **local development overrides** — logging, connection strings, feature flags, etc. It is loaded when `ASPNETCORE_ENVIRONMENT=Development` and is **excluded from Docker images and source control** via `.dockerignore` and `.gitignore`:
 
 ```json
 {
@@ -498,7 +481,7 @@ Service defaults adapt to different environments:
 
 ### Development Environment
 ```json
-// appsettings.json (baseline) + appsettings.Development.json + appsettings.Local.json (local overrides)
+// appsettings.json (baseline) + appsettings.Local.json (local overrides, when Development)
 {
   "ConnectionStrings": {
     "AppDomainDb": "Host=localhost;Port=54320;Database=app_domain;",
@@ -642,7 +625,7 @@ builder.Services.Configure<ServiceDiscoveryOptions>(options =>
 
 ### Configuration Management
 1. **Environment-specific configuration**: Use appsettings.{Environment}.json files for each target environment (Production, QA, Staging)
-2. **Local development**: Use `appsettings.Development.json` for dev environment settings and `appsettings.Local.json` for machine-specific overrides (localhost connection strings); Local.json is excluded from containers
+2. **Local development**: Use `appsettings.Local.json` for all local overrides (connection strings, logging, feature flags); it is gitignored and excluded from containers
 3. **Deployment overrides**: Use environment variables for deployment-specific values and temporary overrides
 4. **Secret management**: Use cloud-native secret management for sensitive data
 

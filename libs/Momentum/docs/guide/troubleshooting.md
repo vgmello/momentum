@@ -284,7 +284,7 @@ public void Validator_InvalidEmail_ReturnsError()
 3. **Enable validation debugging:**
 
 ```csharp
-// In appsettings.Development.json
+// In appsettings.Local.json
 {
   "Logging": {
     "LogLevel": {

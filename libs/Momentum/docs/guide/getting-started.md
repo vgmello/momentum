@@ -826,7 +826,7 @@ Create `appsettings.Local.json` (gitignored — machine-specific, not committed)
 }
 ```
 
-`appsettings.Local.json` is loaded on top of `appsettings.Development.json` only when `ASPNETCORE_ENVIRONMENT=Development`. Non-machine-specific dev settings (log levels, feature flags) belong in `appsettings.Development.json` instead.
+`appsettings.Local.json` is loaded after `appsettings.json` only when `ASPNETCORE_ENVIRONMENT=Development`. It is gitignored — put any local machine overrides here without affecting other developers.
 
 ### 9. Run and Test
 

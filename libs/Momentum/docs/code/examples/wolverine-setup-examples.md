@@ -145,20 +145,16 @@ public class OrderServiceIntegrationTests : IClassFixture<TestFixture>
 ## Environment-Specific Configuration
 
 ```json
-// appsettings.Local.json (machine-specific, gitignored)
+// appsettings.Local.json (gitignored — all local overrides)
 {
   "ConnectionStrings": {
     "ServiceBus": "Host=localhost;Database=dev_messaging;Username=dev;Password=dev"
   },
-  "Kafka": {
-    "BootstrapServers": "localhost:9092"
-  }
-}
-
-// appsettings.Development.json (dev environment settings, committed)
-{
   "ServiceBus": {
     "PublicServiceName": "order-service-dev"
+  },
+  "Kafka": {
+    "BootstrapServers": "localhost:9092"
   }
 }
 

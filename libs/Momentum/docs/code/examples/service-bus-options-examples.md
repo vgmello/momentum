@@ -19,7 +19,7 @@
 ## Multi-Environment Configuration
 
 ```json
-// appsettings.Development.json
+// appsettings.Local.json (gitignored — local overrides)
 {
   "ServiceBus": {
     "Domain": "ECommerce",
