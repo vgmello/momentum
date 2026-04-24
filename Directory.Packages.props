@@ -9,7 +9,7 @@
     <!--#endif -->
     <OpenTelemetryVersion>1.15.1</OpenTelemetryVersion>
     <!--#if (INCLUDE_GRPC) -->
-    <GrpcVersion>2.76.0</GrpcVersion>
+    <GrpcVersion>2.67.0</GrpcVersion>
     <!--#endif -->
     <!--#if (!USE_LOCAL) -->
     <MomentumVersion>$(TemplateMomentumVersion)</MomentumVersion>
@@ -41,7 +41,7 @@
     <PackageVersion Include="FluentValidation" Version="12.1.1" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <!--#if (INCLUDE_GRPC) -->
-    <PackageVersion Include="Google.Protobuf" Version="3.34.1" />
+    <PackageVersion Include="Google.Protobuf" Version="3.34.0" />
     <PackageVersion Include="Grpc.AspNetCore" Version="$(GrpcVersion)" />
     <PackageVersion Include="Grpc.AspNetCore.Server.Reflection" Version="$(GrpcVersion)" />
     <PackageVersion Include="Grpc.AspNetCore.Web" Version="$(GrpcVersion)" />
