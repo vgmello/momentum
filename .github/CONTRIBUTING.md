@@ -80,10 +80,10 @@ cd libs/Momentum
 dotnet build Momentum.slnx
 
 # Run library tests
-dotnet test libs/Momentum/
+dotnet test Momentum.slnx
 
 # Pack libraries to the local NuGet feed (enables --local template testing)
-dotnet pack libs/Momentum/src/<LibraryName> --configuration Release
+dotnet pack src/<LibraryName> --configuration Release
 ```
 
 ### Running the Sample Application
