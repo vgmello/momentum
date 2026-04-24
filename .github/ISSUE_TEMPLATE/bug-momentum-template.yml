@@ -1,0 +1,93 @@
+name: "Bug Report: Momentum Template (mmt)"
+description: Report a bug with the `dotnet new mmt` template — generation failures, incorrect output, missing files, or post-setup issues.
+labels: ["bug", "momentum-template"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a template bug. Please include the exact `dotnet new mmt` command you ran and the template version so we can reproduce the issue.
+
+  - type: input
+    id: template-version
+    attributes:
+      label: Template Version
+      description: Output of `dotnet new mmt --version` or the NuGet package version.
+      placeholder: "e.g. 1.2.3"
+    validations:
+      required: true
+
+  - type: input
+    id: dotnet-version
+    attributes:
+      label: .NET SDK Version
+      description: Output of `dotnet --version`
+      placeholder: "e.g. 10.0.100"
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating System
+      placeholder: "e.g. macOS 15.2, Windows 11, Ubuntu 24.04"
+    validations:
+      required: true
+
+  - type: textarea
+    id: command
+    attributes:
+      label: Template Command Used
+      description: The exact `dotnet new mmt` command that triggered the issue.
+      placeholder: "dotnet new mmt -n MyService --api --kafka --allow-scripts yes"
+      render: bash
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: What went wrong? Describe the problem clearly.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect the template to generate or do?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened? Include error messages and relevant file contents.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected Area
+      description: Which part of the template is affected?
+      options:
+        - Template generation (dotnet new)
+        - Post-setup script
+        - Generated project structure
+        - Generated code / compilation errors
+        - Conditional component (API, BackOffice, Orleans, Aspire, Kafka)
+        - Database / Liquibase migrations
+        - NuGet package references
+        - Documentation site generation
+        - Local (--local) development mode
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Any other relevant details (CI environment, related issues, workarounds tried, etc.)

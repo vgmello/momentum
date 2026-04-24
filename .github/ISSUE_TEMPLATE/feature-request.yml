@@ -1,0 +1,55 @@
+name: Feature Request
+description: Suggest a new feature or improvement for the Momentum template or libraries.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a new feature! Please describe what you'd like and why it would be valuable.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which part of the project does this feature request apply to?
+      options:
+        - Momentum Template (mmt)
+        - Momentum.Extensions library
+        - Momentum.ServiceDefaults library
+        - Momentum.ServiceDefaults.Api library
+        - Momentum.Extensions.SourceGenerators library
+        - Momentum.Extensions.Messaging.Kafka library
+        - Documentation
+        - CI/CD / tooling
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / Motivation
+      description: What problem are you trying to solve? Why is this needed?
+      placeholder: "When I do X, I have to manually Y every time, which is error-prone..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the feature you'd like. Be as specific as possible.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Have you considered any alternative solutions or workarounds?
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Any other context, mockups, code examples, or related issues.

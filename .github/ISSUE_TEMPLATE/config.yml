@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security Vulnerability
+    url: https://github.com/vgmello/momentum/blob/main/.github/SECURITY.md
+    about: Please report security vulnerabilities privately — see SECURITY.md for instructions.
+  - name: Documentation
+    url: https://github.com/vgmello/momentum/blob/main/docs
+    about: Check the documentation before opening an issue — your question may already be answered.

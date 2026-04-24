@@ -1,0 +1,90 @@
+name: "Bug Report: Momentum Library"
+description: Report a bug in one of the Momentum NuGet libraries (Extensions, ServiceDefaults, Kafka, SourceGenerators, etc.)
+labels: ["bug", "momentum-library"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug in the Momentum libraries. Please fill out the sections below so we can reproduce and fix the issue quickly.
+
+  - type: dropdown
+    id: library
+    attributes:
+      label: Affected Library
+      description: Which Momentum library is affected?
+      options:
+        - Momentum.Extensions
+        - Momentum.ServiceDefaults
+        - Momentum.ServiceDefaults.Api
+        - Momentum.Extensions.SourceGenerators
+        - Momentum.Extensions.Messaging.Kafka
+        - Not sure / multiple libraries
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Library Version
+      description: Which version of the library are you using? (check your `Directory.Packages.props` or `.csproj`)
+      placeholder: "e.g. 1.2.3"
+    validations:
+      required: true
+
+  - type: input
+    id: dotnet-version
+    attributes:
+      label: .NET Version
+      description: Output of `dotnet --version`
+      placeholder: "e.g. 10.0.100"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear description of what the bug is.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Minimal steps to reproduce the behavior.
+      placeholder: |
+        1. Register `...` in DI
+        2. Call `...`
+        3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened? Include exception messages and stack traces if applicable.
+    validations:
+      required: true
+
+  - type: textarea
+    id: code
+    attributes:
+      label: Minimal Reproduction Code
+      description: A minimal code snippet or link to a repository that reproduces the issue.
+      render: csharp
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Any other relevant information (runtime environment, OS, related issues, etc.)
