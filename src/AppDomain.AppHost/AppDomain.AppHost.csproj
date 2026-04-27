@@ -20,6 +20,8 @@
         <PackageReference Include="Aspire.Hosting.Azure.Storage"/>
         <PackageReference Include="Aspire.Hosting.Orleans"/>
         <!--#endif -->
+    <PackageReference Include="Google.Protobuf" VersionOverride="3.34.1" />
+    <PackageReference Include="Grpc.Tools" />
     </ItemGroup>
 
     <ItemGroup>

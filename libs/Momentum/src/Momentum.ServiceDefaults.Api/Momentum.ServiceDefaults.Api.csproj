@@ -27,6 +27,7 @@
         <PackageReference Include="Grpc.AspNetCore"/>
         <PackageReference Include="Grpc.AspNetCore.Server.Reflection"/>
         <PackageReference Include="Grpc.AspNetCore.Web"/>
+    <PackageReference Include="Grpc.Tools" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi"/>
         <PackageReference Include="OpenTelemetry.Extensions.Hosting"/>
         <!-- Suppress prerelease warning - no stable version available for gRPC core instrumentation -->
