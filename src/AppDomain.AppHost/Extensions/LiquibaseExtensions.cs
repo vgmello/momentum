@@ -19,6 +19,9 @@ public static class LiquibaseExtensions
     ///     This method configures a Liquibase container that will run migrations for both the
     ///     service_bus and app_domain databases using changelog files from the mounted volume.
     ///     The container waits for the database server to be ready before executing migrations.
+    ///     Callers should also chain <c>.WaitFor()</c> on the returned builder for any database
+    ///     resources (e.g., the app_domain and service_bus database resources) to ensure those
+    ///     databases are created by Aspire before migrations run.
     /// </remarks>
     public static IResourceBuilder<ContainerResource> AddLiquibaseMigrations(
         this IDistributedApplicationBuilder builder,
