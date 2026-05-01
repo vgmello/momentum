@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <AspireVersion>13.2.3</AspireVersion>
+    <AspireVersion>13.2.4</AspireVersion>
     <AspireAppHostSdkVersion>$(AspireVersion)</AspireAppHostSdkVersion>
     <MicrosoftExtensionsVersion>10.0.7</MicrosoftExtensionsVersion>
     <!--#if (INCLUDE_ORLEANS) -->
