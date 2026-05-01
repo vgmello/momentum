@@ -1,5 +1,5 @@
 {
-  "name": "momentum-k6-performance-tests",
+  "name": "app-domain-k6-performance-tests",
   "version": "1.0.0",
   "description": "k6 performance tests for .NET microservices",
   "private": true,
