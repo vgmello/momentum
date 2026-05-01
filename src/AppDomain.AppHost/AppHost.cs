@@ -22,7 +22,9 @@ var database = pgsql.AddDatabase(name: "AppDomainDb", databaseName: "app_domain"
 var serviceBusDb = pgsql.AddDatabase(name: "ServiceBus", databaseName: "service_bus");
 
 #if (USE_LIQUIBASE)
-var liquibaseMigrations = builder.AddLiquibaseMigrations(pgsql, dbPassword);
+var liquibaseMigrations = builder.AddLiquibaseMigrations(pgsql, dbPassword)
+    .WaitFor(database)
+    .WaitFor(serviceBusDb);
 #endif
 
 #endif
