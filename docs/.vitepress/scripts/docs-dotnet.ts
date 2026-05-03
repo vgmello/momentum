@@ -223,7 +223,13 @@ function runDocfx(dllPaths: string[]): void {
         log(`Error running docfx: ${error}`);
         process.exit(1);
     } finally {
-        fs.unlinkSync(configPath);
+        if (fs.existsSync(configPath)) {
+            try {
+                fs.unlinkSync(configPath);
+            } catch (error) {
+                log(`Error cleaning up generated docfx config ${configPath}: ${error}`);
+            }
+        }
     }
 }
 
