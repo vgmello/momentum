@@ -5,7 +5,7 @@ import { glob } from 'glob';
 import { execFileSync } from 'node:child_process';
 import { pipeline } from 'node:stream/promises';
 
-import docfxConfig from '../../docfx.json' with { type: 'json' };
+import docfxBaseConfig from '../../docfx.json' with { type: 'json' };
 
 interface FileInfo {
     checksum: string;
@@ -19,16 +19,8 @@ interface State {
     files: Record<string, FileInfo>;
 }
 
-interface DocfxConfig {
-    metadata: Array<{
-        src: Array<{
-            src: string;
-            files: string[];
-        }>;
-    }>;
-}
-
 const STATE_FILE_NAME = 'reference/.state';
+const GENERATED_CONFIG_NAME = '.docfx.generated.json';
 const STATE_VERSION = '1.0';
 
 const stateFilePath = path.join(process.cwd(), STATE_FILE_NAME);
@@ -37,22 +29,22 @@ const log = (message: string) => console.log(`[${new Date().toISOString()}] ${me
 try {
     const startTime = Date.now();
 
-    log('Scanning for files...');
+    log('Scanning for first-party assembly files under ../src...');
 
-    const files = await getDocFxSrcFiles(docfxConfig);
+    const dllPaths = await getFirstPartyDlls();
 
-    log(`Found ${files.length} files`);
+    log(`Found ${dllPaths.length} assemblies`);
 
-    if (files.length === 0) {
-        log('No files found. Build the project first.');
+    if (dllPaths.length === 0) {
+        log('No assemblies found. Build the project first.');
         process.exit(0);
     }
 
     const previousState = loadState();
-    const { hasChanges, currentFiles } = await detectChanges(files, previousState);
+    const { hasChanges, currentFiles } = await detectChanges(dllPaths, previousState);
 
     if (hasChanges) {
-        runDocfx();
+        runDocfx(dllPaths);
 
         const newState: State = {
             version: STATE_VERSION,
@@ -74,24 +66,37 @@ try {
     process.exit(1);
 }
 
-async function getDocFxSrcFiles(config: DocfxConfig): Promise<string[]> {
-    const allFiles: string[] = [];
+async function getFirstPartyDlls(): Promise<string[]> {
+    // Discover all csproj files under ../src to get first-party project names.
+    // The script runs from the docs/ directory, so ../src always points to the repo src/.
+    const csprojFiles = await glob('../src/**/*.csproj', { absolute: false });
+    const projectNames = csprojFiles.map(f => path.basename(f, '.csproj'));
 
-    for (const metadata of config.metadata) {
-        for (const srcConfig of metadata.src) {
-            const basePath = path.resolve(srcConfig.src);
-
-            for (const pattern of srcConfig.files) {
-                const matches = await glob(pattern, {
-                    cwd: basePath,
-                    absolute: true
-                });
-                allFiles.push(...matches);
-            }
-        }
+    if (projectNames.length === 0) {
+        log('No .csproj files found under ../src');
+        return [];
     }
 
-    return [...new Set(allFiles)];
+    log(`Discovered ${projectNames.length} projects: ${projectNames.join(', ')}`);
+
+    // For each project, find the matching DLL under its bin directory.
+    // Matching by exact project name ensures only first-party assemblies are picked up.
+    const allFiles: string[] = [];
+    for (const name of projectNames) {
+        const matches = await glob(`../src/**/bin/**/${name}.dll`, { absolute: true });
+        allFiles.push(...matches);
+    }
+
+    // Deduplicate by assembly name - keeps one DLL per project.
+    // Multiple matches arise from Debug/Release configs or different framework versions;
+    // any copy is equally valid for API doc extraction, so first match wins.
+    const seen = new Map<string, string>();
+    for (const p of allFiles) {
+        const name = path.basename(p);
+        if (!seen.has(name)) seen.set(name, p);
+    }
+
+    return Array.from(seen.values());
 }
 
 async function detectChanges(files: string[], previousState: State | null)
@@ -189,14 +194,36 @@ async function getFileInfo(filePath: string): Promise<FileInfo | null> {
     }
 }
 
-function runDocfx(): void {
+function runDocfx(dllPaths: string[]): void {
     log('Running docfx metadata...');
+
+    // Build a dynamic docfx config that merges the base settings with the discovered assemblies.
+    // Paths are made relative to the docs/ directory (cwd when the script runs).
+    const configDir = process.cwd();
+    const relativePaths = dllPaths.map(p => path.relative(configDir, p));
+
+    const generatedConfig = {
+        ...docfxBaseConfig,
+        metadata: [{
+            src: [{ files: relativePaths }],
+            output: 'reference/',
+            outputFormat: 'markdown',
+            namespaceLayout: 'nested',
+            categoryLayout: 'nested'
+        }]
+    };
+
+    const configPath = path.join(configDir, GENERATED_CONFIG_NAME);
+    fs.writeFileSync(configPath, JSON.stringify(generatedConfig, null, 2));
+
     try {
-        execFileSync('docfx', ['metadata'], { stdio: 'inherit' });
+        execFileSync('docfx', ['metadata', configPath], { stdio: 'inherit' });
         log('Documentation generated successfully');
     } catch (error) {
         log(`Error running docfx: ${error}`);
         process.exit(1);
+    } finally {
+        fs.unlinkSync(configPath);
     }
 }
 

@@ -14,4 +14,4 @@ RUN apk add --no-cache git && \
 
 WORKDIR /app/docs
 
-CMD ["sh", "-c", "bun install --frozen-lockfile && bun run dev -- --host"]
+CMD ["sh", "-c", "bun install --frozen-lockfile && bun run docs:serve"]
