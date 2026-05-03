@@ -1,9 +1,8 @@
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import fs from 'node:fs';
-import { glob } from 'glob';
 
-const log = (message: string) => console.log(`[${new Date().toISOString()}] ${message}`);
+import { log, getFirstPartyDlls } from './docs-utils.js';
 
 function getGitHubUrl(): string | null {
     try {
@@ -33,41 +32,6 @@ function getGitHubUrl(): string | null {
 
         return null;
     }
-}
-
-async function getFirstPartyDlls(): Promise<string[]> {
-    // Discover all csproj files under ../src to get first-party project names.
-    // The script runs from the docs/ directory, so ../src always points to the repo src/.
-    const csprojFiles = await glob('../src/**/*.csproj', { absolute: false });
-    const projectNames = csprojFiles.map(f => path.basename(f, '.csproj'));
-
-    if (projectNames.length === 0) {
-        log('No .csproj files found under ../src');
-        return [];
-    }
-
-    log(`Discovered ${projectNames.length} projects: ${projectNames.join(', ')}`);
-
-    // For each project, find the matching DLL under its bin directory.
-    // Matching by exact project name ensures only first-party assemblies are picked up.
-    const allFiles: string[] = [];
-    for (const name of projectNames) {
-        const matches = await glob(`../src/**/bin/**/${name}.dll`, { absolute: true });
-        allFiles.push(...matches);
-    }
-
-    // Deduplicate by assembly name - keeps one DLL per project.
-    // Multiple matches arise from Debug/Release configs or different framework versions;
-    // any copy is equally valid for event type extraction, so first match wins.
-    const seenAssemblyNames = new Map<string, string>();
-    for (const assemblyPath of allFiles) {
-        const assemblyName = path.basename(assemblyPath);
-        if (!seenAssemblyNames.has(assemblyName)) {
-            seenAssemblyNames.set(assemblyName, assemblyPath);
-        }
-    }
-
-    return Array.from(seenAssemblyNames.values());
 }
 
 try {

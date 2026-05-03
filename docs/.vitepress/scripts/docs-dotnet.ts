@@ -1,11 +1,11 @@
 import fs, { createReadStream } from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { glob } from 'glob';
 import { execFileSync } from 'node:child_process';
 import { pipeline } from 'node:stream/promises';
 
 import docfxBaseConfig from '../../docfx.json' with { type: 'json' };
+import { log, getFirstPartyDlls } from './docs-utils.js';
 
 interface FileInfo {
     checksum: string;
@@ -24,7 +24,6 @@ const GENERATED_CONFIG_NAME = '.docfx.generated.json';
 const STATE_VERSION = '1.0';
 
 const stateFilePath = path.join(process.cwd(), STATE_FILE_NAME);
-const log = (message: string) => console.log(`[${new Date().toISOString()}] ${message}`);
 
 try {
     const startTime = Date.now();
@@ -64,39 +63,6 @@ try {
 } catch (error) {
     log(`Error: ${error}`);
     process.exit(1);
-}
-
-async function getFirstPartyDlls(): Promise<string[]> {
-    // Discover all csproj files under ../src to get first-party project names.
-    // The script runs from the docs/ directory, so ../src always points to the repo src/.
-    const csprojFiles = await glob('../src/**/*.csproj', { absolute: false });
-    const projectNames = csprojFiles.map(f => path.basename(f, '.csproj'));
-
-    if (projectNames.length === 0) {
-        log('No .csproj files found under ../src');
-        return [];
-    }
-
-    log(`Discovered ${projectNames.length} projects: ${projectNames.join(', ')}`);
-
-    // For each project, find the matching DLL under its bin directory.
-    // Matching by exact project name ensures only first-party assemblies are picked up.
-    const allFiles: string[] = [];
-    for (const name of projectNames) {
-        const matches = await glob(`../src/**/bin/**/${name}.dll`, { absolute: true });
-        allFiles.push(...matches);
-    }
-
-    // Deduplicate by assembly name - keeps one DLL per project.
-    // Multiple matches arise from Debug/Release configs or different framework versions;
-    // any copy is equally valid for API doc extraction, so first match wins.
-    const seen = new Map<string, string>();
-    for (const assemblyPath of allFiles) {
-        const name = path.basename(assemblyPath);
-        if (!seen.has(name)) seen.set(name, assemblyPath);
-    }
-
-    return Array.from(seen.values());
 }
 
 async function detectChanges(files: string[], previousState: State | null)
