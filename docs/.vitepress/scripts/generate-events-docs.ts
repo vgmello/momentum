@@ -35,23 +35,28 @@ function getGitHubUrl(): string | null {
     }
 }
 
-async function getAssemblyFiles(patterns: string[]): Promise<string[]> {
-    const allFiles: string[] = [];
+async function getFirstPartyDlls(): Promise<string[]> {
+    // Discover all csproj files under ../src to get first-party project names
+    const csprojFiles = await glob('../src/**/*.csproj', { absolute: false });
+    const projectNames = csprojFiles.map(f => path.basename(f, '.csproj'));
 
-    for (const pattern of patterns) {
-        const matches = await glob(pattern, {
-            absolute: true
-        });
+    if (projectNames.length === 0) {
+        log('No .csproj files found under ../src');
+        return [];
+    }
+
+    log(`Discovered ${projectNames.length} projects: ${projectNames.join(', ')}`);
+
+    // For each project, find the matching DLL under its bin directory
+    const allFiles: string[] = [];
+    for (const name of projectNames) {
+        const matches = await glob(`../src/**/bin/**/${name}.dll`, { absolute: true });
         allFiles.push(...matches);
     }
 
-    // Remove duplicates by full path
-    const uniquePaths = [...new Set(allFiles)];
-
-    // Deduplicate by assembly name - keep only the first match for each assembly
-    // This prevents duplicate events when multiple builds exist (Debug/Release, different .NET versions)
+    // Deduplicate by assembly name - keeps one DLL per project (handles Debug/Release configs)
     const seenAssemblyNames = new Map<string, string>();
-    for (const assemblyPath of uniquePaths) {
+    for (const assemblyPath of allFiles) {
         const assemblyName = path.basename(assemblyPath);
         if (!seenAssemblyNames.has(assemblyName)) {
             seenAssemblyNames.set(assemblyName, assemblyPath);
@@ -63,26 +68,11 @@ async function getAssemblyFiles(patterns: string[]): Promise<string[]> {
 
 try {
     const startTime = Date.now();
-    const args = process.argv.slice(2);
-    const patternsArg = args[0];
-
-    if (!patternsArg) {
-        log('Usage: tsx generate-events-docs.ts <glob-patterns>');
-        log('Example: tsx generate-events-docs.ts "../src/**/bin/**/AppDomain*.dll"');
-        log('Multiple: tsx generate-events-docs.ts "pattern1.dll,pattern2.dll"');
-        process.exit(1);
-    }
 
     log('Generating events documentation...');
+    log('Scanning for first-party assembly files under ../src...');
 
-    // Parse comma-delimited glob patterns
-    const patterns = patternsArg
-        .split(',')
-        .map(p => p.trim())
-        .filter(p => p.length > 0);
-
-    log('Scanning for assembly files...');
-    const assemblyPaths = await getAssemblyFiles(patterns);
+    const assemblyPaths = await getFirstPartyDlls();
 
     log(`Found ${assemblyPaths.length} assemblies:`);
 
@@ -145,3 +135,4 @@ try {
     log(`Error: ${error}`);
     process.exit(1);
 }
+
