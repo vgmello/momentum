@@ -3,12 +3,15 @@
 # The image contains baked-in tools (dotnet, bun, docfx, events-docsgen).
 # Source files are mounted at runtime; bun install runs on startup using the
 # docs_node_modules named volume as cache across container restarts.
+# Uses vitepress dev server for hot-reload. Aspire uses docs:serve (full build
+# + preview) which ensures the service is only healthy after docs are ready.
 
 services:
   docs:
     build:
       context: .
       dockerfile: docs/Dockerfile
+    command: sh -c "bun install --frozen-lockfile && bun run dev -- --host"
     ports:
       - "8119:5173"
     volumes:
