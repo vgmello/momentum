@@ -91,9 +91,9 @@ async function getFirstPartyDlls(): Promise<string[]> {
     // Multiple matches arise from Debug/Release configs or different framework versions;
     // any copy is equally valid for API doc extraction, so first match wins.
     const seen = new Map<string, string>();
-    for (const p of allFiles) {
-        const name = path.basename(p);
-        if (!seen.has(name)) seen.set(name, p);
+    for (const assemblyPath of allFiles) {
+        const name = path.basename(assemblyPath);
+        if (!seen.has(name)) seen.set(name, assemblyPath);
     }
 
     return Array.from(seen.values());
