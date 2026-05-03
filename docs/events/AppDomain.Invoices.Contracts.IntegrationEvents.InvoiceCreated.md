@@ -4,6 +4,7 @@ editLink: false
 
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
+
 # InvoiceCreated
 
 - **Status:** Active
@@ -11,7 +12,8 @@ editLink: false
 - **Entity:** `invoice`
 - **Type:** Integration Event
 - **Topic:** `{env}.appdomain.public.invoices.v1`
-- **Estimated Payload Size:** 160 bytes
+- **Estimated Payload Size:** 318 bytes ⚠️ *Contains dynamic properties*
+
 ## Description
 
 Published when a new invoice is successfully created in the AppDomain system.
@@ -37,7 +39,7 @@ This event can be used by other services to:
 | ----------------------------------------------------------------- | --------- | -------- | -------- | --------------------------------------------------------------------- |
 | TenantId| `Guid` | ✓| 16 bytes | Unique identifier for the tenant |
 | InvoiceId| `Guid` | ✓| 16 bytes | Unique identifier for the invoice |
-| [Invoice](/events/schemas/AppDomain.Invoices.Contracts.Models.Invoice.md)| `Invoice` | ✓| 128 bytes | Complete invoice object containing all invoice data and configuration |
+| [Invoice](/events/schemas/AppDomain.Invoices.Contracts.Models.Invoice.md)| `Invoice` | ✓| 286 bytes (Name: Dynamic size - no MaxLength constraint, Currency: Dynamic size - no MaxLength constraint) | Complete invoice object containing all invoice data and configuration |
 
 
 

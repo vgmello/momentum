@@ -198,14 +198,16 @@ function runDocfx(dllPaths: string[]): void {
     log('Running docfx metadata...');
 
     // Build a dynamic docfx config that merges the base settings with the discovered assemblies.
-    // Paths are made relative to the docs/ directory (cwd when the script runs).
+    // docfx does not support '../' in glob patterns, so we set `src: ".."` (the repo root, one
+    // level up from docs/) and express all paths relative to that directory instead.
     const configDir = process.cwd();
-    const relativePaths = dllPaths.map(p => path.relative(configDir, p));
+    const repoRoot = path.resolve(configDir, '..');
+    const repoRelativePaths = dllPaths.map(p => path.relative(repoRoot, p));
 
     const generatedConfig = {
         ...docfxBaseConfig,
         metadata: [{
-            src: [{ files: relativePaths }],
+            src: [{ files: repoRelativePaths, src: '..' }],
             output: 'reference/',
             outputFormat: 'markdown',
             namespaceLayout: 'nested',

@@ -1,5 +1,25 @@
 [
   {
+    "text": "BackOffice",
+    "link": null,
+    "items": [
+      {
+        "text": "Messaging.AccountingInboxHandler",
+        "link": null,
+        "items": [
+          {
+            "text": "Business Day Ended",
+            "link": "/AppDomain.BackOffice.Messaging.AccountingInboxHandler.BusinessDayEnded",
+            "items": [],
+            "collapsed": false
+          }
+        ],
+        "collapsed": false
+      }
+    ],
+    "collapsed": false
+  },
+  {
     "text": "Cashiers",
     "link": null,
     "items": [
@@ -56,6 +76,19 @@
         "text": "Payment Received",
         "link": "/AppDomain.Invoices.Contracts.IntegrationEvents.PaymentReceived",
         "items": [],
+        "collapsed": false
+      },
+      {
+        "text": "Domain Events",
+        "link": null,
+        "items": [
+          {
+            "text": "Invoice Generated",
+            "link": "/AppDomain.Invoices.Contracts.DomainEvents.InvoiceGenerated",
+            "items": [],
+            "collapsed": false
+          }
+        ],
         "collapsed": false
       }
     ],

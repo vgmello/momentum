@@ -4,6 +4,7 @@ editLink: false
 
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
+
 # InvoiceFinalized
 
 - **Status:** Active
@@ -11,7 +12,8 @@ editLink: false
 - **Entity:** `invoice`
 - **Type:** Integration Event
 - **Topic:** `{env}.appdomain.public.invoices.v1`
-- **Estimated Payload Size:** 68 bytes
+- **Estimated Payload Size:** 64 bytes ⚠️ *Contains dynamic properties*
+
 ## Description
 
 Published when an invoice is finalized and ready for processing in the AppDomain system.
@@ -38,7 +40,7 @@ This event can be used by other services to:
 | TenantId| `Guid` | ✓| 16 bytes | Unique identifier for the tenant |
 | InvoiceId| `Guid` | ✓| 16 bytes | Unique identifier for the invoice |
 | CustomerId| `Guid` | ✓| 16 bytes | Unique identifier for the customer |
-| PublicInvoiceNumber| `string` | ✓| 4 bytes | Public-facing invoice number for customer reference |
+| PublicInvoiceNumber| `string` | ✓| 0 bytes (Dynamic size - no MaxLength constraint) | Public-facing invoice number for customer reference |
 | FinalTotalAmount| `decimal` | ✓| 16 bytes | Final total amount of the invoice |
 
 
