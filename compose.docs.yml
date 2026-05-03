@@ -1,7 +1,8 @@
 # Standalone Docker Compose for local docs development.
 # Usage: docker compose -f compose.docs.yml up
-# The image is static (tools baked in); source files are mounted at runtime.
-# The docs_node_modules named volume caches bun install results across restarts.
+# The image contains baked-in tools (dotnet, bun, docfx, events-docsgen).
+# Source files are mounted at runtime; bun install runs on startup using the
+# docs_node_modules named volume as cache across container restarts.
 
 services:
   docs:

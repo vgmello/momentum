@@ -36,7 +36,8 @@ function getGitHubUrl(): string | null {
 }
 
 async function getFirstPartyDlls(): Promise<string[]> {
-    // Discover all csproj files under ../src to get first-party project names
+    // Discover all csproj files under ../src to get first-party project names.
+    // The script runs from the docs/ directory, so ../src always points to the repo src/.
     const csprojFiles = await glob('../src/**/*.csproj', { absolute: false });
     const projectNames = csprojFiles.map(f => path.basename(f, '.csproj'));
 
@@ -47,14 +48,17 @@ async function getFirstPartyDlls(): Promise<string[]> {
 
     log(`Discovered ${projectNames.length} projects: ${projectNames.join(', ')}`);
 
-    // For each project, find the matching DLL under its bin directory
+    // For each project, find the matching DLL under its bin directory.
+    // Matching by exact project name ensures only first-party assemblies are picked up.
     const allFiles: string[] = [];
     for (const name of projectNames) {
         const matches = await glob(`../src/**/bin/**/${name}.dll`, { absolute: true });
         allFiles.push(...matches);
     }
 
-    // Deduplicate by assembly name - keeps one DLL per project (handles Debug/Release configs)
+    // Deduplicate by assembly name - keeps one DLL per project.
+    // Multiple matches arise from Debug/Release configs or different framework versions;
+    // any copy is equally valid for event type extraction, so first match wins.
     const seenAssemblyNames = new Map<string, string>();
     for (const assemblyPath of allFiles) {
         const assemblyName = path.basename(assemblyPath);
