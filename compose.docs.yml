@@ -1,0 +1,24 @@
+# Standalone Docker Compose for local docs development.
+# Usage: docker compose -f compose.docs.yml up
+# The image is static (tools baked in); source files are mounted at runtime.
+
+services:
+  docs:
+    build:
+      context: .
+      dockerfile: docs/Dockerfile
+    ports:
+      - "8119:5173"
+    volumes:
+      - ./:/app
+      - docs_node_modules:/app/docs/node_modules
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -nv -t 1 -O /dev/null http://localhost:5173/ || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  docs_node_modules:
