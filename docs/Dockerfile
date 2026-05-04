@@ -1,17 +1,17 @@
+FROM oven/bun:alpine AS bun
+
 FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine
 
-ENV BUN_INSTALL="/root/.bun"
-ENV PATH="${BUN_INSTALL}/bin:${PATH}:/root/.dotnet/tools"
+ENV PATH="${PATH}:/root/.dotnet/tools"
 
-# Install git, unzip (required for bun), bun, and docfx
-RUN apk add --no-cache git unzip curl bash && \
-    curl -fsSL https://bun.sh/install | bash && \
-    dotnet tool install -g docfx  && \
+# Copy bun binary from the official bun image (avoids curl/unzip/bash)
+COPY --from=bun /usr/local/bin/bun /usr/local/bin/bun
+
+# Install git (required by vitepress lastUpdated and docfx) and curl (used by the docs service healthcheck), then install dotnet tools
+RUN apk add --no-cache git curl && \
+    dotnet tool install -g docfx && \
     dotnet tool install -g Momentum.Extensions.EventMarkdownGenerator
 
 WORKDIR /app/docs
-COPY --link docs/package.json docs/bun.lock ./
-RUN bun install --frozen-lockfile
 
-WORKDIR /app/docs
-CMD ["bun", "run", "dev", "--", "--host"]
+CMD ["sh", "-c", "bun install --frozen-lockfile && bun run docs:serve"]

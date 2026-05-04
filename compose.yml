@@ -296,11 +296,9 @@ services:
     profiles: [ "docs" ]
     ports:
       - "8119:5173"
-    user: "1001:1001"
     volumes:
       - ./:/app
       - bun_node_modules:/app/docs/node_modules
-    command: [ "bun", "run", "dev", "--", "--host" ]
     healthcheck:
       test: [ "CMD-SHELL", "curl -f http://localhost:5173/index.html || exit 1" ]
       interval: 30s

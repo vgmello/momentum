@@ -12,7 +12,8 @@
     "docs:preview": "vitepress preview",
     "docs:dotnet": "bun .vitepress/scripts/docs-dotnet.ts",
     "docs:adr": "bun .vitepress/scripts/adrlogs-table-gen.ts",
-    "docs:events": "bun .vitepress/scripts/generate-events-docs.ts \"../src/AppDomain.Contracts/bin/**/AppDomain.Contracts.dll\""
+    "docs:events": "bun .vitepress/scripts/generate-events-docs.ts",
+    "docs:serve": "bun run docs:build && vitepress preview --host --port 5173"
   },
   "dependencies": {
     "glob": "^13.0.6",

@@ -1,9 +1,8 @@
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import fs from 'node:fs';
-import { glob } from 'glob';
 
-const log = (message: string) => console.log(`[${new Date().toISOString()}] ${message}`);
+import { log, getFirstPartyDlls } from './docs-utils.js';
 
 function getGitHubUrl(): string | null {
     try {
@@ -35,54 +34,13 @@ function getGitHubUrl(): string | null {
     }
 }
 
-async function getAssemblyFiles(patterns: string[]): Promise<string[]> {
-    const allFiles: string[] = [];
-
-    for (const pattern of patterns) {
-        const matches = await glob(pattern, {
-            absolute: true
-        });
-        allFiles.push(...matches);
-    }
-
-    // Remove duplicates by full path
-    const uniquePaths = [...new Set(allFiles)];
-
-    // Deduplicate by assembly name - keep only the first match for each assembly
-    // This prevents duplicate events when multiple builds exist (Debug/Release, different .NET versions)
-    const seenAssemblyNames = new Map<string, string>();
-    for (const assemblyPath of uniquePaths) {
-        const assemblyName = path.basename(assemblyPath);
-        if (!seenAssemblyNames.has(assemblyName)) {
-            seenAssemblyNames.set(assemblyName, assemblyPath);
-        }
-    }
-
-    return Array.from(seenAssemblyNames.values());
-}
-
 try {
     const startTime = Date.now();
-    const args = process.argv.slice(2);
-    const patternsArg = args[0];
-
-    if (!patternsArg) {
-        log('Usage: tsx generate-events-docs.ts <glob-patterns>');
-        log('Example: tsx generate-events-docs.ts "../src/**/bin/**/AppDomain*.dll"');
-        log('Multiple: tsx generate-events-docs.ts "pattern1.dll,pattern2.dll"');
-        process.exit(1);
-    }
 
     log('Generating events documentation...');
+    log('Scanning for first-party assembly files under ../src...');
 
-    // Parse comma-delimited glob patterns
-    const patterns = patternsArg
-        .split(',')
-        .map(p => p.trim())
-        .filter(p => p.length > 0);
-
-    log('Scanning for assembly files...');
-    const assemblyPaths = await getAssemblyFiles(patterns);
+    const assemblyPaths = await getFirstPartyDlls();
 
     log(`Found ${assemblyPaths.length} assemblies:`);
 
@@ -145,3 +103,4 @@ try {
     log(`Error: ${error}`);
     process.exit(1);
 }
+
