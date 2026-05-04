@@ -69,7 +69,7 @@
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.5.0" />
     <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.5.0" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.4.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />
     <!--#if (INCLUDE_ORLEANS) -->
     <PackageVersion Include="Microsoft.Orleans.Analyzers" Version="$(MicrosoftOrleansVersion)" />
     <PackageVersion Include="Microsoft.Orleans.Client" Version="$(MicrosoftOrleansVersion)" />
