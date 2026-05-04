@@ -45,6 +45,7 @@
         <PackageReference Include="Aspire.Npgsql"/>
         <PackageReference Include="CloudNative.CloudEvents.SystemTextJson"/>
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions"/>
+    <PackageReference Include="Google.Protobuf" VersionOverride="3.34.1" />
         <PackageReference Include="Microsoft.Extensions.Http.Resilience"/>
         <PackageReference Include="Microsoft.Extensions.ServiceDiscovery"/>
         <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol"/>
