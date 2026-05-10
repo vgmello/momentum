@@ -119,7 +119,7 @@
     <PackageVersion Include="Testcontainers" Version="4.11.0" />
     <PackageVersion Include="Testcontainers.Kafka" Version="4.11.0" />
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.11.0" />
-    <PackageVersion Include="WolverineFx" Version="5.32.1" />
+    <PackageVersion Include="WolverineFx" Version="5.36.2" />
     <!--#if (USE_KAFKA) -->
     <PackageVersion Include="WolverineFx.Kafka" Version="5.32.1" />
     <!--#endif -->
