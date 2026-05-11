@@ -18,8 +18,15 @@ public static class GrpcRegistrationExtensions
 {
     private const BindingFlags STATIC_METHODS = BindingFlags.Public | BindingFlags.Static;
 
-    private static readonly MethodInfo GrpcMapServiceMethod = typeof(GrpcEndpointRouteBuilderExtensions)
-        .GetMethod(nameof(GrpcEndpointRouteBuilderExtensions.MapGrpcService), STATIC_METHODS)!;
+    // Explicitly select the single-parameter overload to avoid AmbiguousMatchException
+    // when Grpc.AspNetCore introduces additional MapGrpcService overloads (e.g. v2.80.0+)
+    private static readonly MethodInfo GrpcMapServiceMethod =
+        typeof(GrpcEndpointRouteBuilderExtensions)
+            .GetMethods(STATIC_METHODS)
+            .Single(m => m.Name == nameof(GrpcEndpointRouteBuilderExtensions.MapGrpcService)
+                      && m.IsGenericMethodDefinition
+                      && m.GetParameters().Length == 1
+                      && m.GetParameters()[0].ParameterType == typeof(IEndpointRouteBuilder));
 
     /// <summary>
     ///     Maps all gRPC services found in the specified assembly to endpoints.
