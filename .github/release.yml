@@ -2,9 +2,6 @@ changelog:
   exclude:
     labels:
       - skip-changelog
-    authors:
-      - dependabot[bot]
-      - github-actions[bot]
 
   categories:
     - title: "💥 Breaking Changes"
