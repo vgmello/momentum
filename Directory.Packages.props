@@ -82,7 +82,7 @@
     <PackageVersion Include="Microsoft.Orleans.Dashboard" Version="$(MicrosoftOrleansVersion)" />
     <PackageVersion Include="Microsoft.Orleans.GrainDirectory.AzureStorage" Version="$(MicrosoftOrleansVersion)" />
     <!--#endif -->
-    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.203" />
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.300" />
     <PackageVersion Include="Momentum.Extensions" Version="$(MomentumVersion)" />
     <PackageVersion Include="Momentum.Extensions.Abstractions" Version="$(MomentumVersion)" />
     <PackageVersion Include="Momentum.Extensions.Messaging.Kafka" Version="$(MomentumVersion)" />
