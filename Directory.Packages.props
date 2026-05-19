@@ -37,7 +37,7 @@
     <PackageVersion Include="CloudNative.CloudEvents.Kafka" Version="2.8.0" />
     <PackageVersion Include="CloudNative.CloudEvents.SystemTextJson" Version="2.8.0" />
     <PackageVersion Include="coverlet.collector" Version="10.0.0" />
-    <PackageVersion Include="Dapper" Version="2.1.72" />
+    <PackageVersion Include="Dapper" Version="2.1.79" />
     <PackageVersion Include="Fluid.Core" Version="2.31.0" />
     <PackageVersion Include="FluentValidation" Version="12.1.1" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
@@ -49,8 +49,8 @@
     <PackageVersion Include="Grpc.Net.Client" Version="$(GrpcVersion)" />
     <PackageVersion Include="Grpc.Tools" Version="2.80.0" />
     <!--#endif -->
-    <PackageVersion Include="linq2db" Version="6.2.1" />
-    <PackageVersion Include="linq2db.Extensions" Version="6.2.1" />
+    <PackageVersion Include="linq2db" Version="6.3.0" />
+    <PackageVersion Include="linq2db.Extensions" Version="6.3.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.TestHost" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="$(MicrosoftExtensionsVersion)" />
