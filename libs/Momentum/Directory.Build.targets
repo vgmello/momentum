@@ -1,14 +1,16 @@
 <Project>
     <Target Name="CleanOldPackages" BeforeTargets="Build;Clean" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' ">
         <PropertyGroup>
-            <_PackageIdPattern>^$([System.Text.RegularExpressions.Regex]::Escape($(PackageId)))\.\d</_PackageIdPattern>
+            <!-- Use [.][0-9] instead of \.\d — MSBuild converts backslashes to forward slashes on
+                 non-Windows, which corrupts regex escape sequences like \. and \d. -->
+            <_PackageIdPattern>^$([System.Text.RegularExpressions.Regex]::Escape($(PackageId)))[.][0-9]</_PackageIdPattern>
         </PropertyGroup>
         <ItemGroup>
             <OldPackagesToDelete Include="$(TargetDir)../*.*upkg"/>
             <!-- Use regex to match only this exact PackageId followed by a version (digit),
                  avoiding deletion of similarly-prefixed packages (e.g. Momentum.ServiceDefaults
                  must not delete Momentum.ServiceDefaults.Api) -->
-            <_FeedCandidates Include="$(MSBuildThisFileDirectory).local/nuget/$(PackageId.ToLowerInvariant())/**/*.*upkg"/>
+            <_FeedCandidates Include="$(MSBuildThisFileDirectory).local/nuget/$(PackageId).*.*upkg"/>
             <OldPackagesToDelete Include="@(_FeedCandidates)"
                 Condition="$([System.Text.RegularExpressions.Regex]::IsMatch('%(Filename)', '$(_PackageIdPattern)'))" />
         </ItemGroup>
