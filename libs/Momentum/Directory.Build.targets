@@ -1,14 +1,19 @@
 <Project>
     <Target Name="CleanOldPackages" BeforeTargets="Build;Clean" Condition=" '$(IsPackable)' == 'true' and '$(Configuration)' == 'Debug' ">
         <PropertyGroup>
-            <_PackageIdPattern>^$([System.Text.RegularExpressions.Regex]::Escape($(PackageId)))\.\d</_PackageIdPattern>
+            <!-- GetFullPath resolves '..' before the glob runs — MSBuild's glob engine can mishandle '..' path components -->
+            <_PackageOutputDir>$([System.IO.Path]::GetFullPath('$(TargetDir)..'))</_PackageOutputDir>
+            <_LocalFeedDir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory).local/nuget'))</_LocalFeedDir>
+            <!-- Use [.][0-9] instead of \.\d — MSBuild converts backslashes to forward slashes on
+                 non-Windows, corrupting regex escape sequences like \. and \d. -->
+            <_PackageIdPattern>^$([System.Text.RegularExpressions.Regex]::Escape($(PackageId)))[.][0-9]</_PackageIdPattern>
         </PropertyGroup>
         <ItemGroup>
-            <OldPackagesToDelete Include="$(TargetDir)../*.*upkg"/>
+            <OldPackagesToDelete Include="$(_PackageOutputDir)/*.*upkg"/>
             <!-- Use regex to match only this exact PackageId followed by a version (digit),
                  avoiding deletion of similarly-prefixed packages (e.g. Momentum.ServiceDefaults
                  must not delete Momentum.ServiceDefaults.Api) -->
-            <_FeedCandidates Include="$(MSBuildThisFileDirectory).local/nuget/$(PackageId).*.*upkg"/>
+            <_FeedCandidates Include="$(_LocalFeedDir)/$(PackageId).*.*upkg"/>
             <OldPackagesToDelete Include="@(_FeedCandidates)"
                 Condition="$([System.Text.RegularExpressions.Regex]::IsMatch('%(Filename)', '$(_PackageIdPattern)'))" />
         </ItemGroup>
