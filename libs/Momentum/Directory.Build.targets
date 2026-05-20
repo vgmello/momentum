@@ -17,7 +17,7 @@
             <OldPackagesToDelete Include="@(_FeedCandidates)"
                 Condition="$([System.Text.RegularExpressions.Regex]::IsMatch('%(Filename)', '$(_PackageIdPattern)'))" />
         </ItemGroup>
-        <Message Text="Cleaning up $(ProjectName) nupkg files. Target: $(TargetDir)" Importance="high"/>
+        <Message Text="Cleaning up $(ProjectName) nupkg files. Output dir: $(_PackageOutputDir), Local feed: $(_LocalFeedDir)" Importance="high"/>
         <Delete Files="@(OldPackagesToDelete)"/>
     </Target>
 
