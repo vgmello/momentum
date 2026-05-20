@@ -8,7 +8,7 @@
             <!-- Use regex to match only this exact PackageId followed by a version (digit),
                  avoiding deletion of similarly-prefixed packages (e.g. Momentum.ServiceDefaults
                  must not delete Momentum.ServiceDefaults.Api) -->
-            <_FeedCandidates Include="$(MSBuildThisFileDirectory).local/nuget/$(PackageId).*.*upkg"/>
+            <_FeedCandidates Include="$(MSBuildThisFileDirectory).local/nuget/$(PackageId.ToLowerInvariant())/**/*.*upkg"/>
             <OldPackagesToDelete Include="@(_FeedCandidates)"
                 Condition="$([System.Text.RegularExpressions.Regex]::IsMatch('%(Filename)', '$(_PackageIdPattern)'))" />
         </ItemGroup>
