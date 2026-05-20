@@ -20,7 +20,6 @@ public static class GrpcRegistrationExtensions
 
     private static readonly MethodInfo GrpcMapServiceMethod = typeof(GrpcEndpointRouteBuilderExtensions)
         .GetMethods(STATIC_METHODS)
-<<<<<<< HEAD
         .Single(m => m.Name == nameof(GrpcEndpointRouteBuilderExtensions.MapGrpcService)
                      && m.IsGenericMethodDefinition
                      && m.GetParameters().Length == 1
