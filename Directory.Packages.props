@@ -3,7 +3,7 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <AspireVersion>13.3.5</AspireVersion>
     <AspireAppHostSdkVersion>$(AspireVersion)</AspireAppHostSdkVersion>
-    <MicrosoftExtensionsVersion>10.0.7</MicrosoftExtensionsVersion>
+    <MicrosoftExtensionsVersion>10.0.8</MicrosoftExtensionsVersion>
     <!--#if (INCLUDE_ORLEANS) -->
     <MicrosoftOrleansVersion>10.1.0</MicrosoftOrleansVersion>
     <!--#endif -->
@@ -64,11 +64,11 @@
     <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Diagnostics.Testing" Version="10.5.0" />
+    <PackageVersion Include="Microsoft.Extensions.Diagnostics.Testing" Version="10.6.0" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.5.0" />
-    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.5.0" />
+    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.6.0" />
+    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.6.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />
     <!--#if (INCLUDE_ORLEANS) -->
     <PackageVersion Include="Microsoft.Orleans.Analyzers" Version="$(MicrosoftOrleansVersion)" />
