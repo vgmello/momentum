@@ -7,7 +7,7 @@
     <!--#if (INCLUDE_ORLEANS) -->
     <MicrosoftOrleansVersion>10.1.0</MicrosoftOrleansVersion>
     <!--#endif -->
-    <OpenTelemetryCoreVersion>1.15.3</OpenTelemetryCoreVersion>
+    <OpenTelemetryCoreVersion>1.16.0</OpenTelemetryCoreVersion>
     <OpenTelemetryInstrumentationVersion>1.15.1</OpenTelemetryInstrumentationVersion>
     <!--#if (INCLUDE_GRPC) -->
     <GrpcVersion>2.80.0</GrpcVersion>
