@@ -4,6 +4,7 @@ editLink: false
 
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
+
 # PaymentReceived
 
 - **Status:** Active
@@ -11,7 +12,8 @@ editLink: false
 - **Entity:** ``
 - **Type:** Integration Event
 - **Topic:** `{env}.appdomain.public.payments.v1`
-- **Estimated Payload Size:** 68 bytes
+- **Estimated Payload Size:** 56 bytes ⚠️ *Contains dynamic properties*
+
 ## Description
 
 Published when a payment is received for an invoice in the AppDomain system.
@@ -37,11 +39,11 @@ This event can be used by other services to:
 | ----------------------------------------------------------------- | --------- | -------- | -------- | --------------------------------------------------------------------- |
 | TenantId| `Guid` | ✓| 16 bytes | Unique identifier for the tenant |
 | InvoiceId| `Guid` | ✓| 16 bytes | Unique identifier of the invoice the payment is for |
-| Currency| `string` | ✓| 4 bytes | Currency of the payment |
+| Currency| `string` | ✓| 0 bytes (Dynamic size - no MaxLength constraint) | Currency of the payment |
 | PaymentAmount| `decimal` | ✓| 16 bytes | Amount of the payment received |
 | PaymentDate| `DateTime` | ✓| 8 bytes | Date and time when the payment was received |
-| PaymentMethod| `string` |  | 4 bytes | Method used for the payment (optional) |
-| PaymentReference| `string` | ✓| 4 bytes | Unique reference or transaction ID for the payment, used for tracking and reconciliation |
+| PaymentMethod| `string` |  | 0 bytes (Dynamic size - no MaxLength constraint) | Method used for the payment (optional) |
+| PaymentReference| `string` | ✓| 0 bytes (Dynamic size - no MaxLength constraint) | Unique reference or transaction ID for the payment, used for tracking and reconciliation |
 
 
 ## Technical Details
