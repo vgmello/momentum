@@ -9,29 +9,29 @@ namespace Momentum.Extensions.EventMarkdownGenerator.Services;
 
 public static class AssemblyEventDiscovery
 {
-    private const string EventTopicAttributeName = nameof(EventTopicAttribute);
+    private const string DefaultAttributeNamePrefix = nameof(EventTopicAttribute);
 
     public static IEnumerable<EventMetadata> DiscoverEvents(Assembly assembly, XmlDocumentationParser? xmlParser,
-        PayloadSizeCalculator calculator)
+        PayloadSizeCalculator calculator, string attributeNamePrefix = DefaultAttributeNamePrefix)
     {
         var defaultDomain = GetMainDomainName(assembly);
-        var integrationEventTypes = GetEventTypes(assembly);
+        var integrationEventTypes = GetEventTypes(assembly, attributeNamePrefix);
 
-        return integrationEventTypes.Select(type => CreateEventMetadata(type, defaultDomain, xmlParser, calculator));
+        return integrationEventTypes.Select(type => CreateEventMetadata(type, defaultDomain, xmlParser, calculator, attributeNamePrefix));
     }
 
-    private static IEnumerable<Type> GetEventTypes(Assembly assembly)
+    private static IEnumerable<Type> GetEventTypes(Assembly assembly, string attributeNamePrefix)
     {
         try
         {
-            return assembly.GetTypes().Where(IsEventType);
+            return assembly.GetTypes().Where(t => IsEventType(t, attributeNamePrefix));
         }
         catch (ReflectionTypeLoadException ex)
         {
             // Handle missing dependencies gracefully - return only the types that loaded successfully
             var loadedTypes = ex.Types.Where(t => t != null).Cast<Type>();
 
-            return loadedTypes.Where(IsEventType);
+            return loadedTypes.Where(t => IsEventType(t, attributeNamePrefix));
         }
         catch (Exception ex) when (ex is FileNotFoundException or FileLoadException or TypeLoadException)
         {
@@ -40,19 +40,18 @@ public static class AssemblyEventDiscovery
         }
     }
 
-    private static bool IsEventType(Type type)
+    private static bool IsEventType(Type type, string attributeNamePrefix)
     {
-        // Check for EventTopicAttribute by name only, to work across assembly load contexts
-        // Return true if it has the attribute, regardless of namespace
+        // Check for the attribute by name prefix only, to work across assembly load contexts
         return type.GetCustomAttributes()
-            .Any(attr => attr.GetType().Name.StartsWith(EventTopicAttributeName));
+            .Any(attr => attr.GetType().Name.StartsWith(attributeNamePrefix));
     }
 
     private static EventMetadata CreateEventMetadata(Type eventType, string defaultDomain,
-        XmlDocumentationParser? xmlParser, PayloadSizeCalculator calculator)
+        XmlDocumentationParser? xmlParser, PayloadSizeCalculator calculator, string attributeNamePrefix)
     {
         // Use dynamic attribute handling to work across assembly contexts
-        var topicAttribute = GetEventTopicAttributeDynamic(eventType);
+        var topicAttribute = GetEventTopicAttributeDynamic(eventType, attributeNamePrefix);
         var obsoleteAttribute = eventType.GetCustomAttribute<ObsoleteAttribute>();
         var (properties, partitionKeys) = GetEventPropertiesAndPartitionKeys(eventType, xmlParser, calculator);
 
@@ -87,28 +86,27 @@ public static class AssemblyEventDiscovery
             Version = version,
             IsInternal = isInternal,
             EventType = eventType,
-            TopicAttribute = GetEventTopicAttribute<Attribute>(eventType),
+            TopicAttribute = GetEventTopicAttribute<Attribute>(eventType, attributeNamePrefix),
             Properties = properties,
             PartitionKeys = partitionKeys,
             ObsoleteMessage = obsoleteAttribute?.Message
         };
     }
 
-    private static Attribute GetEventTopicAttributeDynamic(Type type)
+    private static Attribute GetEventTopicAttributeDynamic(Type type, string attributeNamePrefix)
     {
-        // Find attribute by name to work across assembly load contexts
         var foundAttribute = type.GetCustomAttributes()
-            .FirstOrDefault(attr => attr.GetType().Name.StartsWith(EventTopicAttributeName));
+            .FirstOrDefault(attr => attr.GetType().Name.StartsWith(attributeNamePrefix));
 
         if (foundAttribute == null)
         {
-            throw new InvalidOperationException($"EventTopicAttribute not found on type {type.Name}");
+            throw new InvalidOperationException($"Attribute with prefix '{attributeNamePrefix}' not found on type {type.Name}");
         }
 
         return foundAttribute;
     }
 
-    private static T GetEventTopicAttribute<T>(Type type) where T : Attribute
+    private static T GetEventTopicAttribute<T>(Type type, string attributeNamePrefix) where T : Attribute
     {
         var attribute = type.GetCustomAttributes<T>().FirstOrDefault();
 
@@ -118,20 +116,19 @@ public static class AssemblyEventDiscovery
         }
 
         var foundAttribute = type.GetCustomAttributes()
-            .FirstOrDefault(attr => attr.GetType().Name.StartsWith(EventTopicAttributeName));
+            .FirstOrDefault(attr => attr.GetType().Name.StartsWith(attributeNamePrefix));
 
         if (foundAttribute is T typedAttribute)
         {
             return typedAttribute;
         }
 
-        // If T is an attribute (base type), return any EventTopicAttribute found
         if (typeof(T) == typeof(Attribute) && foundAttribute != null)
         {
             return (T)foundAttribute;
         }
 
-        throw new InvalidOperationException($"EventTopicAttribute not found on type {type.Name}");
+        throw new InvalidOperationException($"Attribute with prefix '{attributeNamePrefix}' not found on type {type.Name}");
     }
 
     private static (List<EventPropertyMetadata> properties, List<PartitionKeyMetadata> partitionKeys) GetEventPropertiesAndPartitionKeys(
