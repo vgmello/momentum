@@ -8,7 +8,9 @@ let mermaidInstance: MermaidAPI | null = null;
 async function getMermaid(): Promise<MermaidAPI> {
     if (!mermaidInstance) {
         const mod = await import("mermaid");
+        const { default: elkLayouts } = await import("@mermaid-js/layout-elk");
         mermaidInstance = mod.default;
+        mermaidInstance.registerLayoutLoaders(elkLayouts);
         mermaidInstance.registerIconPacks([
             {
                 name: "logos",

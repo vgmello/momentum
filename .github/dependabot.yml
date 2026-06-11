@@ -67,6 +67,12 @@ updates:
       # Ignore major version updates for stable packages
       - dependency-name: "Microsoft.EntityFrameworkCore.*"
         update-types: ["version-update:semver-major"]
+      # Pin Roslyn/CodeAnalysis to versions compatible with the .NET 10 SDK (Roslyn ≤ 5.0.0).
+      # Microsoft.CodeAnalysis.CSharp 5.x+ requires a Roslyn version that .NET 10 SDK 10.0.100
+      # does not ship, causing CS9057 and silent generator skipping. Only bump when the SDK
+      # ships a matching Roslyn version.
+      - dependency-name: "Microsoft.CodeAnalysis.*"
+        update-types: ["version-update:semver-major"]
 
   # NPM packages for VitePress documentation (main docs)
   - package-ecosystem: "npm"

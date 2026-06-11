@@ -19,6 +19,9 @@ public record GeneratorOptions
     /// <summary>Serialization format for overhead calculation. Default: "json". Options: "json", "binary".</summary>
     public string SerializationFormat { get; init; } = "json";
 
+    /// <summary>Name (or name prefix) of the attribute used to discover events. Default: "EventTopicAttribute".</summary>
+    public string EventAttributeName { get; init; } = "EventTopicAttribute";
+
     public string GetSidebarPath() => Path.Combine(OutputDirectory, Path.GetFileName(SidebarFileName));
 
     public void EnsureOutputDirectoryExists()
