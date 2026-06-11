@@ -419,6 +419,7 @@ FodyWeavers.xsd
 
 # Docs
 **/docs/reference
+**/docs/.docfx.generated.json
 **/docs/.vitepress/cache
 **/docs/.vitepress/dist
 **/docs/.vitepress/.temp

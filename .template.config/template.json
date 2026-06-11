@@ -705,6 +705,22 @@
           }
         }
       ]
+    },
+    "**.md": {
+      "operations": [
+        {
+          "type": "conditional",
+          "configuration": {
+            "actionableIf": ["# #if"],
+            "actionableElse": ["# #else"],
+            "actionableElseif": ["# #elseif"],
+            "endif": ["# #endif"],
+            "trim": "true",
+            "wholeLine": "true",
+            "evaluator": "C++"
+          }
+        }
+      ]
     }
   }
 }
