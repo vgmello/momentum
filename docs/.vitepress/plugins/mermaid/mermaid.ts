@@ -1,6 +1,37 @@
 import type { MarkdownRenderer } from "vitepress";
 
-const MermaidPlugin = (md: MarkdownRenderer) => {
+type MermaidAPI = typeof import("mermaid").default;
+type MermaidConfig = Parameters<MermaidAPI["initialize"]>[0];
+
+let mermaidInstance: MermaidAPI | null = null;
+
+async function getMermaid(): Promise<MermaidAPI> {
+    if (!mermaidInstance) {
+        const mod = await import("mermaid");
+        const { default: elkLayouts } = await import("@mermaid-js/layout-elk");
+        mermaidInstance = mod.default;
+        mermaidInstance.registerLayoutLoaders(elkLayouts);
+        mermaidInstance.registerIconPacks([
+            {
+                name: "logos",
+                loader: () =>
+                    fetch("https://unpkg.com/@iconify-json/logos/icons.json").then((res) =>
+                        res.json()
+                    ),
+            },
+        ]);
+    }
+    return mermaidInstance;
+}
+
+export const render = async (id: string, code: string, config: MermaidConfig): Promise<string> => {
+    const m = await getMermaid();
+    m.initialize(config);
+    const { svg } = await m.render(id, code);
+    return svg;
+};
+
+export const MermaidPlugin = (md: MarkdownRenderer) => {
     const defaultRenderer = md.renderer.rules.fence;
 
     if (!defaultRenderer) {
@@ -41,5 +72,3 @@ const MermaidPlugin = (md: MarkdownRenderer) => {
         return defaultRenderer(tokens, index, options, env, slf);
     };
 };
-
-export default MermaidPlugin;

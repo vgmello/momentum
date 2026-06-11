@@ -1,6 +1,6 @@
 import { defineConfig, type MarkdownOptions } from "vitepress";
 
-import MermaidExample from "./plugins/mermaid";
+import { MermaidPlugin } from "./plugins/mermaid/mermaid";
 import SnippetPluginExt from "./plugins/snippet";
 import TocSidebar from "./plugins/tocSidebar";
 import AdrSidebar from "./plugins/adr/adrSidebar";
@@ -22,7 +22,7 @@ const markdownOptions: MarkdownOptions = {
     },
 
     config: (md) => {
-        MermaidExample(md);
+        MermaidPlugin(md);
     },
 };
 
@@ -135,6 +135,10 @@ export default defineConfig({
     cleanUrls: true,
     ignoreDeadLinks: [/^https?:\/\/.*/, /API_BASE_URL/],
     vite: {
+        // Prevent Vite from externalizing mermaid during SSR since it uses browser APIs
+        ssr: {
+            noExternal: ['mermaid'],
+        },
         define: {
             __API_BASE_URL__: JSON.stringify(API_BASE_URL),
         },
