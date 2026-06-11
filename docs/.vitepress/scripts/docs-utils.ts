@@ -3,11 +3,18 @@ import { glob } from 'glob';
 
 export const log = (message: string) => console.log(`[${new Date().toISOString()}] ${message}`);
 
+// Project name suffixes to skip during discovery. These are not documentable
+// domain assemblies: AppHost is the Aspire orchestration host, and *.Tests are
+// test projects (defensive — they normally live under tests/, not src/).
+const EXCLUDED_PROJECT_SUFFIXES = ['.AppHost', '.Tests'];
+
 export async function getFirstPartyDlls(): Promise<string[]> {
     // Discover all csproj files under ../src to get first-party project names.
     // The script runs from the docs/ directory, so ../src always points to the repo src/.
     const csprojFiles = await glob('../src/**/*.csproj', { absolute: false });
-    const projectNames = csprojFiles.map(f => path.basename(f, '.csproj'));
+    const projectNames = csprojFiles
+        .map(f => path.basename(f, '.csproj'))
+        .filter(name => !EXCLUDED_PROJECT_SUFFIXES.some(suffix => name.endsWith(suffix)));
 
     if (projectNames.length === 0) {
         log('No .csproj files found under ../src');
