@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { parse } from "yaml";
 import { DefaultTheme } from "vitepress";
 
@@ -42,6 +42,10 @@ function convertTocToVitePressSidebar(tocItems: TocItem[], collapsed: boolean = 
 }
 
 function parseTocYaml(tocFilePath: string): TocItem[] {
+    if (!existsSync(tocFilePath)) {
+        return [];
+    }
+
     try {
         const yamlContent = readFileSync(tocFilePath, "utf-8");
         const parsedYaml = parse(yamlContent);

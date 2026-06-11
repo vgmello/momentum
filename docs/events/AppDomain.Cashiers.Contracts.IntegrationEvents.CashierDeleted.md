@@ -4,6 +4,7 @@ editLink: false
 
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
+
 # CashierDeleted
 
 - **Status:** Active
@@ -12,6 +13,7 @@ editLink: false
 - **Type:** Integration Event
 - **Topic:** `{env}.appdomain.public.cashiers.v1`
 - **Estimated Payload Size:** 40 bytes
+
 ## Description
 
 Published when a cashier is successfully deleted from the AppDomain system.

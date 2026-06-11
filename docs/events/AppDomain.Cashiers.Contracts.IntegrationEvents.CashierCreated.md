@@ -4,6 +4,7 @@ editLink: false
 
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
+
 # CashierCreated
 
 - **Status:** Active
@@ -11,7 +12,8 @@ editLink: false
 - **Entity:** `cashier`
 - **Type:** Integration Event
 - **Topic:** `{env}.appdomain.public.cashiers.v1`
-- **Estimated Payload Size:** 476 bytes ⚠️ *Contains dynamic properties*
+- **Estimated Payload Size:** 1008 bytes ⚠️ *Contains dynamic properties*
+
 ## Description
 
 Published when a new cashier is successfully created in the AppDomain system. This event contains the complete cashier data and
@@ -37,7 +39,7 @@ This event can be used by other services to:
 | Property | Type | Required | Size | Description |
 | ----------------------------------------------------------------- | --------- | -------- | -------- | --------------------------------------------------------------------- |
 | TenantId| `Guid` | ✓| 16 bytes | Unique identifier for the tenant |
-| [Cashier](/events/schemas/AppDomain.Cashiers.Contracts.Models.Cashier.md)| `Cashier` | ✓| 460 bytes (CashierPayments: Collection size estimated (no Range constraint)) | Complete cashier object containing all cashier data and configuration |
+| [Cashier](/events/schemas/AppDomain.Cashiers.Contracts.Models.Cashier.md)| `Cashier` | ✓| 992 bytes (Name: Dynamic size - no MaxLength constraint, Email: Dynamic size - no MaxLength constraint, CashierPayments: Collection size estimated (no Range constraint)) | Complete cashier object containing all cashier data and configuration |
 
 
 
