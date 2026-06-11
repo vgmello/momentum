@@ -49,6 +49,11 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
         [DefaultValue("json")]
         public string Format { get; init; } = "json";
 
+        [CommandOption("--event-attribute")]
+        [Description("Name (or name prefix) of the attribute used to discover events. Default: EventTopicAttribute")]
+        [DefaultValue("EventTopicAttribute")]
+        public string EventAttribute { get; init; } = "EventTopicAttribute";
+
         [CommandOption("-v|--verbose")]
         [Description("Enable verbose output")]
         public bool Verbose { get; init; }
@@ -86,7 +91,8 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
                 SidebarFileName = settings.SidebarFile,
                 TemplatesDirectory = settings.Templates,
                 GitHubBaseUrl = settings.GitHubUrl,
-                SerializationFormat = settings.Format
+                SerializationFormat = settings.Format,
+                EventAttributeName = settings.EventAttribute
             };
 
             await GenerateDocumentationAsync(options, cancellationToken);
@@ -146,7 +152,7 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
                     () => LoadAssemblyWithDependencyResolution(assemblyPath, out loadContext),
                     cts.Token);
 
-                var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser, calculator);
+                var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser, calculator, options.EventAttributeName);
 
                 foreach (var eventMetadata in events)
                 {
