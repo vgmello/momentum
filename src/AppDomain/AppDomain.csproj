@@ -30,6 +30,7 @@
         <!--#else
     <ItemGroup>
         #endif -->
+        <PackageReference Include="Microsoft.Orleans.Analyzers" VersionOverride="10.2.0" />
         <PackageReference Include="Momentum.Extensions.Abstractions"/>
         <!--#if (!LIBS_INCLUDES_EXT) -->
         <PackageReference Include="Momentum.Extensions"/>
