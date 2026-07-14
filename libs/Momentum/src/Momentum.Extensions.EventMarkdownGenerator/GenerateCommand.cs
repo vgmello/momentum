@@ -54,6 +54,11 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
         [DefaultValue("EventTopicAttribute")]
         public string EventAttribute { get; init; } = "EventTopicAttribute";
 
+        [CommandOption("--partition-key-attribute")]
+        [Description("Name (or name prefix) of the attribute used to discover partition keys. Default: PartitionKeyAttribute")]
+        [DefaultValue("PartitionKeyAttribute")]
+        public string PartitionKeyAttribute { get; init; } = "PartitionKeyAttribute";
+
         [CommandOption("-v|--verbose")]
         [Description("Enable verbose output")]
         public bool Verbose { get; init; }
@@ -92,7 +97,8 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
                 TemplatesDirectory = settings.Templates,
                 GitHubBaseUrl = settings.GitHubUrl,
                 SerializationFormat = settings.Format,
-                EventAttributeName = settings.EventAttribute
+                EventAttributeName = settings.EventAttribute,
+                PartitionKeyAttributeName = settings.PartitionKeyAttribute
             };
 
             await GenerateDocumentationAsync(options, cancellationToken);
@@ -152,7 +158,8 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
                     () => LoadAssemblyWithDependencyResolution(assemblyPath, out loadContext),
                     cts.Token);
 
-                var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser, calculator, options.EventAttributeName);
+                var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser, calculator,
+                    options.EventAttributeName, options.PartitionKeyAttributeName);
 
                 foreach (var eventMetadata in events)
                 {

@@ -11,7 +11,8 @@ editLink: false
 - **Version:** v1
 - **Entity:** `user-created`
 - **Type:** Integration Event
-- **Topic:** `{env}.testevents.public.user-createds.v1`
+- **Topic:** `Users`
+- **Fully Qualified Topic:** `{env}.testevents.public.user-createds.v1`
 - **Estimated Payload Size:** 16 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 

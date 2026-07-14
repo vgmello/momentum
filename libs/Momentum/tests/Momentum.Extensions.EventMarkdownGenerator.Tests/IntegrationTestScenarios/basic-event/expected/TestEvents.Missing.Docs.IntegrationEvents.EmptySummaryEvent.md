@@ -11,7 +11,8 @@ editLink: false
 - **Version:** v1
 - **Entity:** `empty-summary-event`
 - **Type:** Integration Event
-- **Topic:** `{env}.testevents.public.empty-summary-events.v1`
+- **Topic:** `TestEvents`
+- **Fully Qualified Topic:** `{env}.testevents.public.empty-summary-events.v1`
 - **Estimated Payload Size:** 16 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 

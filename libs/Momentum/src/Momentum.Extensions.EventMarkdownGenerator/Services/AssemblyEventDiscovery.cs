@@ -10,14 +10,17 @@ namespace Momentum.Extensions.EventMarkdownGenerator.Services;
 public static class AssemblyEventDiscovery
 {
     private const string DefaultAttributeNamePrefix = nameof(EventTopicAttribute);
+    private const string DefaultPartitionKeyAttributeNamePrefix = nameof(PartitionKeyAttribute);
 
     public static IEnumerable<EventMetadata> DiscoverEvents(Assembly assembly, XmlDocumentationParser? xmlParser,
-        PayloadSizeCalculator calculator, string attributeNamePrefix = DefaultAttributeNamePrefix)
+        PayloadSizeCalculator calculator, string attributeNamePrefix = DefaultAttributeNamePrefix,
+        string partitionKeyAttributeNamePrefix = DefaultPartitionKeyAttributeNamePrefix)
     {
         var defaultDomain = GetMainDomainName(assembly);
         var integrationEventTypes = GetEventTypes(assembly, attributeNamePrefix);
 
-        return integrationEventTypes.Select(type => CreateEventMetadata(type, defaultDomain, xmlParser, calculator, attributeNamePrefix));
+        return integrationEventTypes.Select(type =>
+            CreateEventMetadata(type, defaultDomain, xmlParser, calculator, attributeNamePrefix, partitionKeyAttributeNamePrefix));
     }
 
     private static IEnumerable<Type> GetEventTypes(Assembly assembly, string attributeNamePrefix)
@@ -48,17 +51,19 @@ public static class AssemblyEventDiscovery
     }
 
     private static EventMetadata CreateEventMetadata(Type eventType, string defaultDomain,
-        XmlDocumentationParser? xmlParser, PayloadSizeCalculator calculator, string attributeNamePrefix)
+        XmlDocumentationParser? xmlParser, PayloadSizeCalculator calculator, string attributeNamePrefix,
+        string partitionKeyAttributeNamePrefix)
     {
         // Use dynamic attribute handling to work across assembly contexts
         var topicAttribute = GetEventTopicAttributeDynamic(eventType, attributeNamePrefix);
         var obsoleteAttribute = eventType.GetCustomAttribute<ObsoleteAttribute>();
-        var (properties, partitionKeys) = GetEventPropertiesAndPartitionKeys(eventType, xmlParser, calculator);
+        var (properties, partitionKeys) =
+            GetEventPropertiesAndPartitionKeys(eventType, xmlParser, calculator, partitionKeyAttributeNamePrefix);
 
         var topicName = GetTopicName(topicAttribute, eventType);
 
         // Access properties via reflection for cross-assembly compatibility
-        var (shouldPluralize, domain, isInternal, version) = GetTopicAttributeProperties(topicAttribute);
+        var (shouldPluralize, domain, isInternal, version, eventNameOverride) = GetTopicAttributeProperties(topicAttribute);
 
         // Simple pluralization fallback - add 's' to the end
         // This is a fallback when the extension method is not available
@@ -78,10 +83,11 @@ public static class AssemblyEventDiscovery
 
         return new EventMetadata
         {
-            EventName = eventType.Name,
+            EventName = !string.IsNullOrWhiteSpace(eventNameOverride) ? eventNameOverride : eventType.Name,
             FullTypeName = eventType.FullName ?? eventType.Name,
             Namespace = eventType.Namespace ?? string.Empty,
-            TopicName = fullTopicName,
+            Topic = eventDomain,
+            FullyQualifiedTopicName = fullTopicName,
             Domain = eventDomain,
             Version = version,
             IsInternal = isInternal,
@@ -132,7 +138,7 @@ public static class AssemblyEventDiscovery
     }
 
     private static (List<EventPropertyMetadata> properties, List<PartitionKeyMetadata> partitionKeys) GetEventPropertiesAndPartitionKeys(
-        Type eventType, XmlDocumentationParser? xmlParser, PayloadSizeCalculator calculator)
+        Type eventType, XmlDocumentationParser? xmlParser, PayloadSizeCalculator calculator, string partitionKeyAttributeNamePrefix)
     {
         var properties = new List<EventPropertyMetadata>();
         var partitionKeys = new List<PartitionKeyMetadata>();
@@ -149,16 +155,20 @@ public static class AssemblyEventDiscovery
             var isComplexType = !TypeUtils.IsPrimitiveType(property.PropertyType);
             var isRequired = TypeUtils.IsRequiredProperty(property);
 
-            // Check for PartitionKey attribute on the property
-            var partitionKeyAttr = property.GetCustomAttribute<PartitionKeyAttribute>();
+            // Check for the partition key attribute by name (generic, works across assembly load contexts)
+            var partitionKeyAttr = FindAttributeByName(property.GetCustomAttributes(), partitionKeyAttributeNamePrefix);
             var isPartitionKey = partitionKeyAttr != null;
 
             // If not found on property, check corresponding constructor parameter for records
             if (!isPartitionKey && parameterToPropertyMap.TryGetValue(property.Name, out var parameter))
             {
-                partitionKeyAttr = parameter.GetCustomAttribute<PartitionKeyAttribute>();
+                partitionKeyAttr = FindAttributeByName(parameter.GetCustomAttributes(), partitionKeyAttributeNamePrefix);
                 isPartitionKey = partitionKeyAttr != null;
             }
+
+            var partitionKeyOrder = partitionKeyAttr is null
+                ? (int?)null
+                : GetPropertyValue<int?>(partitionKeyAttr.GetType(), partitionKeyAttr, "Order") ?? 0;
 
             var description = eventDoc?.PropertyDescriptions?.GetValueOrDefault(property.Name) ?? "No description available";
             var sizeResult = calculator.CalculatePropertySize(property, property.PropertyType);
@@ -171,7 +181,7 @@ public static class AssemblyEventDiscovery
                 IsRequired = isRequired,
                 IsComplexType = isComplexType,
                 IsPartitionKey = isPartitionKey,
-                PartitionKeyOrder = partitionKeyAttr?.Order,
+                PartitionKeyOrder = partitionKeyOrder,
                 Description = description,
                 EstimatedSizeBytes = sizeResult.SizeBytes,
                 IsAccurate = sizeResult.IsAccurate,
@@ -185,7 +195,7 @@ public static class AssemblyEventDiscovery
                     Name = property.Name,
                     TypeName = TypeUtils.GetFriendlyTypeName(property.PropertyType),
                     Description = description,
-                    Order = partitionKeyAttr!.Order,
+                    Order = partitionKeyOrder ?? 0,
                     IsFromParameter = parameterToPropertyMap.ContainsKey(property.Name)
                 });
             }
@@ -262,8 +272,8 @@ public static class AssemblyEventDiscovery
     /// <summary>
     ///     Extracts properties from EventTopicAttribute using reflection for cross-assembly compatibility.
     /// </summary>
-    private static (bool shouldPluralize, string? domain, bool isInternal, string version) GetTopicAttributeProperties(
-        object topicAttribute)
+    private static (bool shouldPluralize, string? domain, bool isInternal, string version, string? eventName)
+        GetTopicAttributeProperties(object topicAttribute)
     {
         var attrType = topicAttribute.GetType();
 
@@ -271,9 +281,17 @@ public static class AssemblyEventDiscovery
         var domain = GetPropertyValue<string?>(attrType, topicAttribute, "Domain");
         var isInternal = GetPropertyValue<bool?>(attrType, topicAttribute, "Internal") ?? false;
         var version = GetPropertyValue<string?>(attrType, topicAttribute, "Version") ?? "v1";
+        var eventName = GetPropertyValue<string?>(attrType, topicAttribute, "EventName");
 
-        return (shouldPluralize, domain, isInternal, version);
+        return (shouldPluralize, domain, isInternal, version, eventName);
     }
+
+    /// <summary>
+    ///     Finds a custom attribute by name (or name prefix) so discovery works across assembly load contexts
+    ///     and for any attribute type matching the configured convention, not just a hardcoded compiled type.
+    /// </summary>
+    private static Attribute? FindAttributeByName(IEnumerable<Attribute> attributes, string attributeNamePrefix) =>
+        attributes.FirstOrDefault(attr => attr.GetType().Name.StartsWith(attributeNamePrefix));
 
     /// <summary>
     ///     Gets a property value from an object using reflection with safe null handling.

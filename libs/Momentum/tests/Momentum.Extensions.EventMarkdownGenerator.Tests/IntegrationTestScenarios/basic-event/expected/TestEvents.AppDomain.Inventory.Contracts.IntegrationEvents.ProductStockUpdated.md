@@ -11,7 +11,8 @@ editLink: false
 - **Version:** v1
 - **Entity:** `product`
 - **Type:** Integration Event
-- **Topic:** `{env}.testevents.public.products.v1`
+- **Topic:** `Inventory`
+- **Fully Qualified Topic:** `{env}.testevents.public.products.v1`
 - **Estimated Payload Size:** 64 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId, WarehouseId, ProductCategory
 

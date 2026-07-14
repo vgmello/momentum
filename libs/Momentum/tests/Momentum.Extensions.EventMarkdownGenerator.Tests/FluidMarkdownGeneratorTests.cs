@@ -31,7 +31,8 @@ public class FluidMarkdownGeneratorTests
                 EventName = "TestEvent",
                 FullTypeName = eventType.FullName!,
                 Namespace = eventType.Namespace!,
-                TopicName = "{env}.test.public.tests.v1",
+                Topic = "tests",
+                FullyQualifiedTopicName = "{env}.test.public.tests.v1",
                 Domain = "Tests",
                 Version = "v1",
                 IsInternal = false,
@@ -150,6 +151,66 @@ public class FluidMarkdownGeneratorTests
 
             result.Content.ShouldContain("Test event for unit testing");
             result.Content.ShouldContain("{env}.test.public.tests.v1");
+        }
+        finally
+        {
+            Directory.Delete(outputDir, true);
+        }
+    }
+
+    [Fact]
+    public async Task GenerateMarkdown_ShouldExposeTopicAndFullyQualifiedTopicSeparately()
+    {
+        var generator = await FluidMarkdownGenerator.CreateAsync();
+        var eventWithDoc = CreateTestEventWithDocumentation();
+        var outputDir = CreateTempDirectory();
+
+        try
+        {
+            var result = generator.GenerateMarkdown(eventWithDoc, outputDir);
+
+            result.Content.ShouldContain("**Topic:** `Tests`");
+            result.Content.ShouldContain("**Fully Qualified Topic:** `{env}.test.public.tests.v1`");
+        }
+        finally
+        {
+            Directory.Delete(outputDir, true);
+        }
+    }
+
+    [Fact]
+    public async Task GenerateMarkdown_WithMultiLinePropertyDescription_ShouldKeepDescriptionOnSingleTableRow()
+    {
+        var generator = await FluidMarkdownGenerator.CreateAsync();
+        var eventWithDoc = CreateTestEventWithDocumentation();
+
+        // Simulate a property whose XML doc summary wraps onto multiple lines. The XML parser trims each
+        // line's indentation and joins with '\n', so the raw description contains bare newlines between words.
+        eventWithDoc.Metadata.Properties[1] = eventWithDoc.Metadata.Properties[1] with
+        {
+            Description = "Partitions the Event Hub by reservation so that all events\nare delivered in publication order (per-key FIFO)."
+        };
+
+        var outputDir = CreateTempDirectory();
+
+        try
+        {
+            var result = generator.GenerateMarkdown(eventWithDoc, outputDir);
+
+            // The payload table row for the property must not be split by an embedded newline:
+            // the whole description, including its tail, must stay inside the row's last cell,
+            // and the wrapped words must be joined by a single space (not glued together).
+            var tableRow = result.Content.Split('\n')
+                .FirstOrDefault(line => line.TrimStart().StartsWith("| Name"));
+
+            tableRow.ShouldNotBeNull();
+            tableRow.ShouldContain("all events are delivered in publication order (per-key FIFO).");
+            tableRow.ShouldNotContain("eventsare");
+            tableRow.TrimEnd().ShouldEndWith("|");
+
+            // The tail must not spill out as an orphaned line below the table.
+            result.Content.Split('\n')
+                .ShouldNotContain(line => line.TrimStart().StartsWith("are delivered in publication order"));
         }
         finally
         {

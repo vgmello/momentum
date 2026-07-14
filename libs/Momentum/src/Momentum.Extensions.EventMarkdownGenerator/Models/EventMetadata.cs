@@ -9,7 +9,13 @@ public record EventMetadata
     public required string EventName { get; init; }
     public required string FullTypeName { get; init; }
     public required string Namespace { get; init; }
-    public required string TopicName { get; init; }
+
+    /// <summary>The actual topic / event hub name (e.g. "reservations"), without the fully-qualified convention applied.</summary>
+    public required string Topic { get; init; }
+
+    /// <summary>The composed <c>{env}.{domain}.{visibility}.{topic}.{version}</c> Kafka-style fully-qualified topic name.</summary>
+    public required string FullyQualifiedTopicName { get; init; }
+
     public required string Domain { get; init; }
     public required string Version { get; init; }
     public required bool IsInternal { get; init; }
