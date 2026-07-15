@@ -12,7 +12,7 @@ namespace Momentum.Extensions.EventMarkdownGenerator.Services;
 ///     Factory for creating view models used in Liquid template rendering.
 ///     Extracts complex object creation logic from FluidMarkdownGenerator.
 /// </summary>
-public static class EventViewModelFactory
+public static partial class EventViewModelFactory
 {
     /// <summary>
     ///     Creates an event view model for template rendering.
@@ -207,10 +207,11 @@ public static class EventViewModelFactory
         return CollapseWhitespace(partitionKey.Description ?? "Used for message routing");
     }
 
-    private static readonly Regex WhitespaceRegex = new(@"\s+", RegexOptions.Compiled);
+    [GeneratedRegex(@"\s+")]
+    private static partial Regex WhitespaceRegex();
 
     /// <summary>Collapses any run of whitespace (including newlines) into a single space for inline rendering.</summary>
-    private static string CollapseWhitespace(string value) => WhitespaceRegex.Replace(value, " ").Trim();
+    private static string CollapseWhitespace(string value) => WhitespaceRegex().Replace(value, " ").Trim();
 
     private static string GetTypeDescription(Type type)
     {
