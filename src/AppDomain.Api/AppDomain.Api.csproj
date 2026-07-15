@@ -22,6 +22,7 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <!--#if (!LIBS_INCLUDES_DEFAULTS) -->
+        <PackageReference Include="Microsoft.Orleans.Analyzers" VersionOverride="10.2.1" />
         <PackageReference Include="Momentum.ServiceDefaults"/>
         <!--#endif -->
         <!--#if (!LIBS_INCLUDES_API) -->
