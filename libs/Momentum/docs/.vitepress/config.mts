@@ -83,6 +83,7 @@ export default defineConfig({
                             { text: "Domain Events", link: "/messaging/domain-events" },
                             { text: "Kafka Configuration", link: "/messaging/kafka" },
                             { text: "Wolverine", link: "/messaging/wolverine" },
+                            { text: "Event Documentation Generator", link: "/messaging/event-documentation" },
                         ],
                     },
                     {
