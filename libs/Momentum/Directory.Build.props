@@ -7,7 +7,8 @@
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <CodeAnalysisRuleSet>../../Momentum.ruleset</CodeAnalysisRuleSet>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <NoWarn>$(NoWarn);CS1591;LOGGEN036;LOGGEN031;S3267;NU1603</NoWarn>
+        <!-- NU5104: OpenTelemetry.Instrumentation.GrpcNetClient has never shipped a stable release (all versions are -beta/-rc upstream) -->
+        <NoWarn>$(NoWarn);CS1591;LOGGEN036;LOGGEN031;S3267;NU1603;NU5104</NoWarn>
         <BaseVersion Condition="'$(BaseVersion)' == ''">1000.0.0</BaseVersion>
         <!-- Fixed version for local debug builds. Since .local/nuget/ is cleaned before each
              build, only one version ever exists. ClearNuGetCache in Directory.Build.targets
