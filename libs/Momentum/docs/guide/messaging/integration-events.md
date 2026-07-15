@@ -5,6 +5,7 @@ Integration events enable communication between different services or bounded co
 ## What are Integration Events?
 
 Integration events are:
+
 - **Cross-service communication**: Messages sent between different services
 - **Business significant**: Represent important business events like "CashierCreated" or "InvoicePaid"
 - **Asynchronous**: Processed in the background without blocking the caller
@@ -43,7 +44,7 @@ public record CashierCreated(/* parameters */);
 // With custom configuration
 [EventTopic<Invoice>(
     Topic = "invoice-updates",
-    Domain = "invoicing", 
+    Domain = "invoicing",
     Version = "v2",
     Internal = false,
     ShouldPluralizeTopicName = true
@@ -52,6 +53,7 @@ public record InvoiceUpdated(/* parameters */);
 ```
 
 **Parameters:**
+
 - `Topic`: Custom topic name (defaults to class name)
 - `Domain`: Business domain (defaults to assembly domain)
 - `Version`: Event schema version
@@ -76,6 +78,7 @@ public record ComplexEvent(
 ```
 
 **Benefits of Partition Keys:**
+
 - **Message ordering**: Messages with the same partition key are processed in order
 - **Load balancing**: Events are distributed across Kafka partitions
 - **Tenant isolation**: Multi-tenant applications can isolate by tenant
@@ -87,7 +90,7 @@ public record ComplexEvent(
 ```csharp
 [EventTopic<Guid>]
 public record CashierDeleted(
-    [PartitionKey] Guid TenantId, 
+    [PartitionKey] Guid TenantId,
     Guid CashierId
 );
 ```
@@ -129,7 +132,7 @@ Integration events are automatically published when returned from command handle
 public static class CreateCashierCommandHandler
 {
     public static async Task<(Result<Cashier>, CashierCreated?)> Handle(
-        CreateCashierCommand command, 
+        CreateCashierCommand command,
         IMessageBus messaging,
         CancellationToken cancellationToken)
     {
@@ -138,11 +141,11 @@ public static class CreateCashierCommandHandler
         var insertedCashier = await messaging.InvokeCommandAsync(dbCommand, cancellationToken);
 
         var result = insertedCashier.ToModel();
-        
+
         // Create integration event
         var createdEvent = new CashierCreated(
-            result.TenantId, 
-            PartitionKeyTest: 0, 
+            result.TenantId,
+            PartitionKeyTest: 0,
             result
         );
 
@@ -160,11 +163,11 @@ You can also publish events manually using the message bus:
 public static class SomeService
 {
     public static async Task DoSomethingAsync(
-        IMessageBus messageBus, 
+        IMessageBus messageBus,
         CancellationToken cancellationToken)
     {
         // Your business logic here
-        
+
         // Publish event manually
         var event = new CashierCreated(tenantId, 0, cashier);
         await messageBus.PublishAsync(event, cancellationToken);
@@ -181,12 +184,12 @@ Other services can subscribe to integration events by creating handlers:
 public static class CashierCreatedHandler
 {
     public static async Task Handle(
-        CashierCreated cashierCreated, 
+        CashierCreated cashierCreated,
         IEmailService emailService,
         ILogger<CashierCreatedHandler> logger,
         CancellationToken cancellationToken)
     {
-        logger.LogInformation("Processing CashierCreated event for tenant {TenantId}", 
+        logger.LogInformation("Processing CashierCreated event for tenant {TenantId}",
             cashierCreated.TenantId);
 
         try
@@ -196,12 +199,12 @@ public static class CashierCreatedHandler
                 cashierCreated.Cashier.Name,
                 cancellationToken);
 
-            logger.LogInformation("Welcome email sent to {Email}", 
+            logger.LogInformation("Welcome email sent to {Email}",
                 cashierCreated.Cashier.Email);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to send welcome email to {Email}", 
+            logger.LogError(ex, "Failed to send welcome email to {Email}",
                 cashierCreated.Cashier.Email);
             throw; // Re-throw to trigger retry logic
         }
@@ -216,6 +219,7 @@ Momentum automatically generates Kafka topic names based on the event configurat
 **Format:** `{environment}.{domain}.{scope}.{topic}.{version}`
 
 **Examples:**
+
 - `dev.appdomain.public.cashiers.v1`
 - `prod.invoicing.internal.payments`
 - `test.notifications.public.emails.v2`
@@ -291,22 +295,22 @@ public static class OrderCreatedHandler
         try
         {
             await inventoryService.ReserveItemsAsync(
-                orderCreated.OrderItems, 
+                orderCreated.OrderItems,
                 cancellationToken);
         }
         catch (InventoryNotAvailableException ex)
         {
-            logger.LogWarning("Inventory not available for order {OrderId}: {Message}", 
+            logger.LogWarning("Inventory not available for order {OrderId}: {Message}",
                 orderCreated.OrderId, ex.Message);
-            
+
             // Don't retry for business exceptions
             return;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to process order created event for order {OrderId}", 
+            logger.LogError(ex, "Failed to process order created event for order {OrderId}",
                 orderCreated.OrderId);
-            
+
             // Re-throw to trigger retry
             throw;
         }
@@ -324,8 +328,8 @@ public async Task Handle_ValidCommand_PublishesIntegrationEvent()
 {
     // Arrange
     var command = new CreateCashierCommand(
-        Guid.NewGuid(), 
-        "John Doe", 
+        Guid.NewGuid(),
+        "John Doe",
         "john@example.com"
     );
 
@@ -354,8 +358,8 @@ public async Task Handle_CashierCreated_SendsWelcomeEmail()
     var cashierCreated = new CashierCreated(
         Guid.NewGuid(),
         0,
-        new Cashier 
-        { 
+        new Cashier
+        {
             Id = Guid.NewGuid(),
             Name = "John Doe",
             Email = "john@example.com"
@@ -367,9 +371,9 @@ public async Task Handle_CashierCreated_SendsWelcomeEmail()
 
     // Act
     await CashierCreatedHandler.Handle(
-        cashierCreated, 
-        mockEmailService.Object, 
-        logger.Object, 
+        cashierCreated,
+        mockEmailService.Object,
+        logger.Object,
         CancellationToken.None);
 
     // Assert
@@ -435,4 +439,5 @@ See [Kafka Configuration](./kafka) for detailed Kafka setup instructions.
 - Learn about [Domain Events](./domain-events) for internal service events
 - Understand [Kafka Configuration](./kafka) for message broker setup
 - Explore [Wolverine](./wolverine) messaging framework details
+- Generate reference docs for your events with the [Event Documentation Generator](./event-documentation)
 - See [Testing](../testing/) for comprehensive testing strategies

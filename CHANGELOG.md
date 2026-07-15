@@ -16,6 +16,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   generically via reflection instead of a hardcoded `PartitionKeyAttribute` type.
 - **EventMarkdownGenerator**: event attributes may expose an optional `EventName` property to override the
   documented event name (falls back to the CLR type name when absent).
+- **Docs**: new VitePress guide page for the Event Documentation Generator
+  (`libs/Momentum/docs/guide/messaging/event-documentation.md`), covering MSBuild/CLI usage, template
+  customization, and generated output structure.
 
 ### Changed
 
