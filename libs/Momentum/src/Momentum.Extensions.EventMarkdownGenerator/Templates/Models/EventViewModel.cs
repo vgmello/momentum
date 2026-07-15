@@ -7,13 +7,8 @@ public class EventViewModel
     public string EventName { get; set; } = string.Empty;
     public string FullTypeName { get; set; } = string.Empty;
     public string Namespace { get; set; } = string.Empty;
-
-    /// <summary>The actual topic / event hub name (e.g. "reservations").</summary>
     public string Topic { get; set; } = string.Empty;
-
-    /// <summary>The composed <c>{env}.{domain}.{visibility}.{topic}.{version}</c> fully-qualified topic name.</summary>
     public string FullyQualifiedTopicName { get; set; } = string.Empty;
-
     public string Version { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
     public string Entity { get; set; } = string.Empty;
