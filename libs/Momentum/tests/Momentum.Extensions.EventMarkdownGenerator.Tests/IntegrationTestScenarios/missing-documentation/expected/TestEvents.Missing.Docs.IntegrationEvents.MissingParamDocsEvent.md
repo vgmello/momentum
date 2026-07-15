@@ -11,7 +11,8 @@ editLink: false
 - **Version:** v1
 - **Entity:** `missing-param-docs-event`
 - **Type:** Integration Event
-- **Topic:** `{env}.testevents.public.missing-param-docs-events.v1`
+- **Topic:** `missing-param-docs-events`
+- **Fully Qualified Topic:** `{env}.testevents.public.missing-param-docs-events.v1`
 - **Estimated Payload Size:** 16 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 

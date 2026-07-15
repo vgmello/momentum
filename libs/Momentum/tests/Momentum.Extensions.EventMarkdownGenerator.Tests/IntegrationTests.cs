@@ -253,7 +253,8 @@ public class IntegrationTests
         content.ShouldContain("---\neditLink: false\n---");
 
         // Validate topic format
-        content.ShouldContain("**Topic:** `{env}.testevents.public.cashiers.v1`");
+        content.ShouldContain("**Topic:** `Cashiers`");
+        content.ShouldContain("**Fully Qualified Topic:** `{env}.testevents.public.cashiers.v1`");
 
         // Validate entity field
         content.ShouldContain("**Entity:** `cashier`");

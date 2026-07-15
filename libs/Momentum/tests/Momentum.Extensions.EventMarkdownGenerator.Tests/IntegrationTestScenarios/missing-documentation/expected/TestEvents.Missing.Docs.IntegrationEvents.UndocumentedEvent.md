@@ -11,7 +11,8 @@ editLink: false
 - **Version:** v1
 - **Entity:** `missing`
 - **Type:** Domain Event
-- **Topic:** `{env}.testevents.internal.missings.v1`
+- **Topic:** `missings`
+- **Fully Qualified Topic:** `{env}.testevents.internal.missings.v1`
 - **Estimated Payload Size:** 16 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 

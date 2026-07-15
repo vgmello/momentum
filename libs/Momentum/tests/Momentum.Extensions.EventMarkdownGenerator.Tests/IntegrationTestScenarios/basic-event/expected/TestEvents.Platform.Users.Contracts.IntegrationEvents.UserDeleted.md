@@ -11,7 +11,8 @@ editLink: false
 - **Version:** v1
 - **Entity:** `user-deleted`
 - **Type:** Integration Event
-- **Topic:** `{env}.testevents.public.user-deleteds.v1`
+- **Topic:** `user-deleteds`
+- **Fully Qualified Topic:** `{env}.testevents.public.user-deleteds.v1`
 - **Estimated Payload Size:** 24 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 

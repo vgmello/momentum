@@ -2,6 +2,7 @@
 
 using Momentum.Extensions.Abstractions.Extensions;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using Momentum.Extensions.EventMarkdownGenerator.Models;
 using Momentum.Extensions.EventMarkdownGenerator.Templates.Models;
 
@@ -11,7 +12,7 @@ namespace Momentum.Extensions.EventMarkdownGenerator.Services;
 ///     Factory for creating view models used in Liquid template rendering.
 ///     Extracts complex object creation logic from FluidMarkdownGenerator.
 /// </summary>
-public static class EventViewModelFactory
+public static partial class EventViewModelFactory
 {
     /// <summary>
     ///     Creates an event view model for template rendering.
@@ -27,7 +28,8 @@ public static class EventViewModelFactory
             EventName = metadata.EventName,
             FullTypeName = metadata.FullTypeName,
             Namespace = metadata.Namespace,
-            TopicName = metadata.TopicName,
+            Topic = metadata.Topic,
+            FullyQualifiedTopicName = metadata.FullyQualifiedTopicName,
             Version = metadata.Version,
             Status = metadata.GetStatus(),
             Entity = ExtractEntityFromEventType(metadata.EventType),
@@ -167,7 +169,9 @@ public static class EventViewModelFactory
             description += " (partition key)";
         }
 
-        return description;
+        // Descriptions are rendered inline in a markdown table cell, so multi-line XML doc summaries
+        // must be flattened to a single line (collapsing newlines and their surrounding whitespace).
+        return CollapseWhitespace(description);
     }
 
     private static string GetPropertyDescription(PropertyInfo property) => $"Gets or sets the {property.Name.ToLowerInvariant()}.";
@@ -200,8 +204,14 @@ public static class EventViewModelFactory
 
     private static string GetPartitionKeyDescription(PartitionKeyMetadata partitionKey)
     {
-        return partitionKey.Description ?? "Used for message routing";
+        return CollapseWhitespace(partitionKey.Description ?? "Used for message routing");
     }
+
+    [GeneratedRegex(@"\s+")]
+    private static partial Regex WhitespaceRegex();
+
+    /// <summary>Collapses any run of whitespace (including newlines) into a single space for inline rendering.</summary>
+    private static string CollapseWhitespace(string value) => WhitespaceRegex().Replace(value, " ").Trim();
 
     private static string GetTypeDescription(Type type)
     {

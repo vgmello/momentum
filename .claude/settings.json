@@ -9,6 +9,16 @@
             "command": "filepath=\"$TOOL_INPUT_FILE_PATH\"; if echo \"$filepath\" | grep -qE '(\\.env|\\.github/workflows/|settings\\.local\\.json)$'; then echo 'BLOCK: Protected file - confirm with user first' >&2; exit 2; fi"
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/check-changelog-before-pr.sh\"",
+            "if": "Bash(gh pr create:*)"
+          }
+        ]
       }
     ],
     "PostToolUse": [

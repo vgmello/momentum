@@ -7,7 +7,8 @@ public class EventViewModel
     public string EventName { get; set; } = string.Empty;
     public string FullTypeName { get; set; } = string.Empty;
     public string Namespace { get; set; } = string.Empty;
-    public string TopicName { get; set; } = string.Empty;
+    public string Topic { get; set; } = string.Empty;
+    public string FullyQualifiedTopicName { get; set; } = string.Empty;
     public string Version { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
     public string Entity { get; set; } = string.Empty;

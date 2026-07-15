@@ -9,7 +9,8 @@ public record EventMetadata
     public required string EventName { get; init; }
     public required string FullTypeName { get; init; }
     public required string Namespace { get; init; }
-    public required string TopicName { get; init; }
+    public required string Topic { get; init; }
+    public required string FullyQualifiedTopicName { get; init; }
     public required string Domain { get; init; }
     public required string Version { get; init; }
     public required bool IsInternal { get; init; }

@@ -79,15 +79,17 @@ events-docsgen [OPTIONS]
 
 **Required Options:**
 
--   `-a|--assemblies <ASSEMBLIES>`: Comma-separated list of assembly paths to scan for events
+- `-a|--assemblies <ASSEMBLIES>`: Comma-separated list of assembly paths to scan for events
 
 **Optional Options:**
 
--   `--xml-docs <XML_DOCS>`: Comma-separated list of XML documentation file paths (auto-discovered if not provided)
--   `-o|--output <OUTPUT>`: Output directory for generated documentation (default: `./docs/events/`)
--   `--sidebar-file <SIDEBAR_FILE>`: Filename for sidebar navigation JSON (default: `events-sidebar.json`)
--   `--templates <TEMPLATES>`: Directory containing custom Liquid templates
--   `-v|--verbose`: Enable verbose output for debugging
+- `--xml-docs <XML_DOCS>`: Comma-separated list of XML documentation file paths (auto-discovered if not provided)
+- `-o|--output <OUTPUT>`: Output directory for generated documentation (default: `./docs/events/`)
+- `--sidebar-file <SIDEBAR_FILE>`: Filename for sidebar navigation JSON (default: `events-sidebar.json`)
+- `--templates <TEMPLATES>`: Directory containing custom Liquid templates
+- `--event-attribute <NAME>`: Name (or name prefix) of the attribute used to discover events (default: `EventTopicAttribute`)
+- `--partition-key-attribute <NAME>`: Name (or name prefix) of the attribute used to discover partition keys (default: `PartitionKeyAttribute`)
+- `-v|--verbose`: Enable verbose output for debugging
 
 **Examples:**
 
@@ -112,8 +114,8 @@ events-docsgen copy-templates [OPTIONS]
 
 **Options:**
 
--   `-o|--output <OUTPUT>`: Output directory for template files (default: `./templates`)
--   `-f|--force`: Overwrite existing template files if they exist
+- `-o|--output <OUTPUT>`: Output directory for template files (default: `./templates`)
+- `-f|--force`: Overwrite existing template files if they exist
 
 **Examples:**
 
@@ -176,22 +178,22 @@ docs/events/
 
 Each generated event documentation includes:
 
--   **Event Metadata**: Status, version, Kafka topic, entity information
--   **Description**: Extracted from XML documentation comments
--   **Structured Remarks**: Organized sections from XML `<remarks>` tags
--   **Event Payload**: Table showing all properties with types and descriptions
--   **Partition Keys**: Information about Kafka partitioning strategy
--   **Referenced Schemas**: Links to complex type documentation
--   **Technical Details**: Size estimates and deprecation warnings
--   **Source Link**: GitHub link to event definition (when configured)
+- **Event Metadata**: Status, version, Kafka topic, entity information
+- **Description**: Extracted from XML documentation comments
+- **Structured Remarks**: Organized sections from XML `<remarks>` tags
+- **Event Payload**: Table showing all properties with types and descriptions
+- **Partition Keys**: Information about Kafka partitioning strategy
+- **Referenced Schemas**: Links to complex type documentation
+- **Technical Details**: Size estimates and deprecation warnings
+- **Source Link**: GitHub link to event definition (when configured)
 
 ### Schema Documentation
 
 Complex types referenced by events get their own schema documentation:
 
--   **Type Information**: Full type name and description
--   **Properties Table**: All properties with types, requirements, and descriptions
--   **Nested Schema Links**: References to other complex types
+- **Type Information**: Full type name and description
+- **Properties Table**: All properties with types, requirements, and descriptions
+- **Nested Schema Links**: References to other complex types
 
 ## Template Customization
 
@@ -324,9 +326,9 @@ public record UserCreated(Guid UserId, string Name);
 
 **Solutions**:
 
--   Enable XML documentation generation in your project: `<GenerateDocumentationFile>true</GenerateDocumentationFile>`
--   Manually specify XML documentation paths: `--xml-docs "path/to/MyApp.xml"`
--   Ensure XML documentation files are in the same directory as assemblies
+- Enable XML documentation generation in your project: `<GenerateDocumentationFile>true</GenerateDocumentationFile>`
+- Manually specify XML documentation paths: `--xml-docs "path/to/MyApp.xml"`
+- Ensure XML documentation files are in the same directory as assemblies
 
 ### Assembly Loading Issues
 
@@ -334,9 +336,9 @@ public record UserCreated(Guid UserId, string Name);
 
 **Solutions**:
 
--   Ensure all dependent assemblies are in the same directory as the target assembly
--   Use absolute paths when specifying assembly locations
--   Check that the assembly was built for a compatible .NET framework
+- Ensure all dependent assemblies are in the same directory as the target assembly
+- Use absolute paths when specifying assembly locations
+- Check that the assembly was built for a compatible .NET framework
 
 ### Template Errors
 
@@ -344,16 +346,16 @@ public record UserCreated(Guid UserId, string Name);
 
 **Solutions**:
 
--   Validate Liquid syntax using online Liquid template validators
--   Check that all referenced variables exist in the template context
--   Review default templates as reference for correct syntax and available variables
+- Validate Liquid syntax using online Liquid template validators
+- Check that all referenced variables exist in the template context
+- Review default templates as reference for correct syntax and available variables
 
 ### Common Error Messages
 
--   **"Assembly not found"**: Check assembly paths and ensure files exist
--   **"No XML documentation found"**: Enable XML documentation generation or specify paths manually
--   **"Template parsing failed"**: Verify Liquid template syntax is correct
--   **"No events discovered"**: Ensure events have `EventTopic` attributes
+- **"Assembly not found"**: Check assembly paths and ensure files exist
+- **"No XML documentation found"**: Enable XML documentation generation or specify paths manually
+- **"Template parsing failed"**: Verify Liquid template syntax is correct
+- **"No events discovered"**: Ensure events have `EventTopic` attributes
 
 ## Architecture Notes
 

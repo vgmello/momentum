@@ -11,7 +11,8 @@ editLink: false
 - **Version:** v1
 - **Entity:** `simple-notification`
 - **Type:** Integration Event
-- **Topic:** `{env}.testevents.public.simple-notifications.v1`
+- **Topic:** `simple-notifications`
+- **Fully Qualified Topic:** `{env}.testevents.public.simple-notifications.v1`
 - **Estimated Payload Size:** 16 bytes ⚠️ *Contains dynamic properties*
 
 ## Description

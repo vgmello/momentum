@@ -7,9 +7,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Momentum .NET** is a comprehensive template system that generates production-ready microservices solutions using .NET 10. The repository contains both the template engine (`mmt`) and supporting library ecosystem.
 
 **Key Components**:
+
 - **Template System** (`dotnet new mmt`): Generates complete microservices solutions
 - **Momentum Libraries**: Reusable .NET libraries for service defaults, extensions, and patterns
 - **Sample Application** (AppDomain): Complete microservices example demonstrating patterns
+
+## Changelog & Pull Requests
+
+**Every PR must update `CHANGELOG.md` before it is created.** Add a `## [YYYY-MM-DD]` section (today's
+date; reuse it if a section for today already exists) using the [Keep a Changelog](https://keepachangelog.com/)
+categories (`Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`). Do this as the last step
+before opening the PR.
+
+A `PreToolUse` hook (`scripts/check-changelog-before-pr.sh`, wired in `.claude/settings.json`) blocks
+`gh pr create` when `CHANGELOG.md` has not been touched on the current branch. If it blocks you, add a
+changelog entry and retry.
 
 ## Development Commands
 
@@ -91,6 +103,7 @@ cd docs && bun install && bun run dev
 ```
 
 **Aspire Database Setup**:
+
 - PostgreSQL with persistent storage
 - Automatic Liquibase migrations on startup
 - PgAdmin for database management
@@ -98,6 +111,7 @@ cd docs && bun install && bun run dev
 - Services wait for database and migrations before starting
 
 **Database Connection**:
+
 - Services automatically get connection strings from Aspire
 - Health checks validate connectivity and schema integrity
 - LinqToDB configured with snake_case naming conventions
@@ -139,6 +153,7 @@ dotnet test libs/Momentum/tests/Momentum.Extensions.SourceGenerators.Tests
 The template (`mmt`) generates microservices solutions with:
 
 **Generated Project Structure**:
+
 ```
 YourService/
 ├── src/
@@ -157,6 +172,7 @@ YourService/
 ```
 
 **Template Configuration**:
+
 - Components: `--api`, `--backoffice`, `--orleans`, `--aspire`, `--docs`, `--bff`
 - Infrastructure: `--db-config [default|none|npgsql|liquibase]`, `--kafka`
 - Customization: `--org "Company"`, `--port 8100`, `--no-sample`
@@ -188,6 +204,7 @@ YourService/
 ### Technology Stack Integration
 
 **Core Technologies**:
+
 - **.NET 10** with **Aspire**: Orchestration and observability
 - **Wolverine**: CQRS message handling with PostgreSQL persistence
 - **Orleans**: Stateful actor processing (optional)
@@ -196,6 +213,7 @@ YourService/
 - **OpenTelemetry**: Distributed tracing and metrics
 
 **Port Allocation** (base port configurable, default 8100):
+
 - Aspire Dashboard: 18110 (HTTPS), 18100 (HTTP)
 - API: 8111 (HTTPS), 8101 (HTTP), 8102 (gRPC)
 - BackOffice: 8113 (HTTPS), 8103 (HTTP)
@@ -219,19 +237,22 @@ YourService/
 The `--local` flag enables template testing with locally built Momentum libraries:
 
 **What it does**:
+
 - Copies `local-mmt-version.txt` and `local-feed-path.txt` to the generated project
 - The post-setup tool reads these files and:
-  - Hardcodes the local version into `Directory.Packages.props` (`MomentumVersion`)
-  - Creates a `nuget.config` with the local NuGet feed source
-  - Cleans up the text files
+    - Hardcodes the local version into `Directory.Packages.props` (`MomentumVersion`)
+    - Creates a `nuget.config` with the local NuGet feed source
+    - Cleans up the text files
 - Automatically used by `Run-TemplateTests.ps1` for template testing
 
 **How the lib build generates local packages**:
+
 - `libs/Momentum/Directory.Build.targets` generates version `1000.0.0-pre.{timestamp}`
 - Packs all libraries to `libs/Momentum/.local/nuget/`
 - Writes `local-mmt-version.txt` and `local-feed-path.txt` to the repo root
 
 **Usage**:
+
 ```bash
 # Build and pack libraries first
 dotnet build libs/Momentum/Momentum.slnx
@@ -330,6 +351,7 @@ await messageBus.PublishAsync(new CustomerCreated(customer.Id, customer.Name));
 ### MSBuild Properties
 
 Global configuration in `Directory.Build.props`:
+
 - **Target Framework**: .NET 10.0
 - **Nullable Reference Types**: Enabled
 - **Analyzers**: .NET analyzers + SonarAnalyzer enabled
@@ -351,23 +373,27 @@ Template uses sophisticated conditional compilation:
 ### Template vs Library Development
 
 The repository serves dual purposes:
+
 - **Template development**: Testing and building the `mmt` template
 - **Library development**: Standalone Momentum libraries in `libs/Momentum/`
 
 ### Database Migrations
 
 Uses Liquibase for version-controlled schema management:
+
 - Setup scripts in `infra/YourService.Database/Liquibase/`
 - Automatic migration via Docker Compose
 - Separate service_bus and application schemas
 
 **IMPORTANT - Database Organization Rules**:
+
 - **Table Definitions**: Each table should be in its own file under `tables/` directory
 - **Constraints & Indexes**: Should be defined WITHIN the same file as the table they apply to
 - **Avoid Separate Constraint Files**: Do NOT create separate `constraints_and_indexes.sql` files
 - **Logical Grouping**: Keep related constraints, indexes, triggers, and functions with their tables
 
 **Correct Structure**:
+
 ```
 infra/YourService.Database/Liquibase/main/
 ├── main.sql                    # Schema creation
@@ -384,6 +410,7 @@ infra/YourService.Database/Liquibase/main/
 ```
 
 **Example Table File Structure**:
+
 ```sql
 -- Table creation
 CREATE TABLE main.invoices (...);
@@ -410,59 +437,66 @@ CREATE TRIGGER tr_invoice_version BEFORE UPDATE ON main.invoices ...;
 **Common Problems and Solutions**:
 
 1. **Health Checks Failing**:
-   ```bash
-   # Check if database is running
-   curl http://localhost:8101/status
 
-   # Check Aspire dashboard for service status
-   open https://localhost:18110
-   ```
+    ```bash
+    # Check if database is running
+    curl http://localhost:8101/status
+
+    # Check Aspire dashboard for service status
+    open https://localhost:18110
+    ```
 
 2. **Migration Issues**:
-   ```bash
-   # Check Liquibase logs in Aspire dashboard
-   # Verify changelog.xml includes all table files
-   # Ensure changesets have unique IDs
-   ```
+
+    ```bash
+    # Check Liquibase logs in Aspire dashboard
+    # Verify changelog.xml includes all table files
+    # Ensure changesets have unique IDs
+    ```
 
 3. **Missing Constraints/Indexes**:
-   ```sql
-   -- Verify constraints exist
-   SELECT constraint_name, constraint_type
-   FROM information_schema.table_constraints
-   WHERE table_schema = 'main';
 
-   -- Verify indexes exist
-   SELECT schemaname, tablename, indexname
-   FROM pg_indexes
-   WHERE schemaname = 'main';
-   ```
+    ```sql
+    -- Verify constraints exist
+    SELECT constraint_name, constraint_type
+    FROM information_schema.table_constraints
+    WHERE table_schema = 'main';
+
+    -- Verify indexes exist
+    SELECT schemaname, tablename, indexname
+    FROM pg_indexes
+    WHERE schemaname = 'main';
+    ```
 
 4. **Connection String Issues**:
-   - Aspire automatically configures connection strings
-   - Check appsettings.json for overrides
-   - Verify service references in AppHost Program.cs
+    - Aspire automatically configures connection strings
+    - Check appsettings.json for overrides
+    - Verify service references in AppHost Program.cs
 
 ### Observability Integration
 
 Complete observability stack configured by default:
+
 - **Structured Logging**: Serilog with enrichment
 - **Metrics**: OpenTelemetry with custom meters
 - **Tracing**: Distributed tracing across services
 - **Health Checks**: Built-in health endpoints
 
 **Health Check Endpoints**:
+
 - `/status` - Liveness probe (cached status, no auth)
 - `/health/internal` - Readiness probe (localhost only, detailed in dev)
 - `/health` - Public health check (requires auth, detailed)
 
 **Database Health Checks**:
+
 - Connectivity validation
 - Schema verification (tables, constraints, indexes)
 - Basic data access testing
 - Constraint and foreign key validation
 
 **Aspire Configuration**:
+
 - Database resources with health checks
 - Liquibase migration dependencies
 - Service orchestration with proper wait conditions
@@ -471,6 +505,7 @@ Complete observability stack configured by default:
 ### Development vs Production Configuration
 
 Template generates environment-specific configurations:
+
 - **Development**: Uses Aspire dashboard, verbose logging
 - **Production**: Optimized for container deployment
 - **Docker Compose**: Full-stack local development environment

@@ -22,6 +22,9 @@ public record GeneratorOptions
     /// <summary>Name (or name prefix) of the attribute used to discover events. Default: "EventTopicAttribute".</summary>
     public string EventAttributeName { get; init; } = "EventTopicAttribute";
 
+    /// <summary>Name (or name prefix) of the attribute used to discover partition keys. Default: "PartitionKeyAttribute".</summary>
+    public string PartitionKeyAttributeName { get; init; } = "PartitionKeyAttribute";
+
     public string GetSidebarPath() => Path.Combine(OutputDirectory, Path.GetFileName(SidebarFileName));
 
     public void EnsureOutputDirectoryExists()
