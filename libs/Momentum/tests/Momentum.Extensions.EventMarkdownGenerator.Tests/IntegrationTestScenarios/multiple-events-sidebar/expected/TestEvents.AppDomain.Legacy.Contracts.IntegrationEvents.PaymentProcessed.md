@@ -14,7 +14,7 @@ editLink: false
 - **Version:** v1
 - **Entity:** `payment-processed`
 - **Type:** Integration Event
-- **Topic:** `Legacy`
+- **Topic:** `payment-processeds`
 - **Fully Qualified Topic:** `{env}.testevents.public.payment-processeds.v1`
 - **Estimated Payload Size:** 32 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId

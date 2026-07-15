@@ -55,7 +55,7 @@ public class GenericAttributeDiscoveryTests
         conventionEvent.EventName.ShouldBe("ReservationBooked");
 
         // Ask #3: Topic exposes the plain topic/hub name; the fully-qualified name keeps the composed convention.
-        conventionEvent.Topic.ShouldBe("reservations");
+        conventionEvent.Topic.ShouldBe("reservation-created");
         conventionEvent.FullyQualifiedTopicName.ShouldBe("{env}.momentum.public.reservation-created.v1");
 
         // Ask #2: partition keys discovered via the custom attribute, ordered by Order.

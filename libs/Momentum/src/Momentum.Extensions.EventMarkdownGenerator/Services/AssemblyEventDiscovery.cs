@@ -86,7 +86,7 @@ public static class AssemblyEventDiscovery
             EventName = !string.IsNullOrWhiteSpace(eventNameOverride) ? eventNameOverride : eventType.Name,
             FullTypeName = eventType.FullName ?? eventType.Name,
             Namespace = eventType.Namespace ?? string.Empty,
-            Topic = eventDomain,
+            Topic = topicName,
             FullyQualifiedTopicName = fullTopicName,
             Domain = eventDomain,
             Version = version,

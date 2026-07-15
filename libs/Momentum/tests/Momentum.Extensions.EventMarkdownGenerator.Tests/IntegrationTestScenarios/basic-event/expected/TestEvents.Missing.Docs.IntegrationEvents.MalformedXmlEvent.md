@@ -11,7 +11,7 @@ editLink: false
 - **Version:** v1
 - **Entity:** `malformed-xml-event`
 - **Type:** Integration Event
-- **Topic:** `TestEvents`
+- **Topic:** `malformed-xml-events`
 - **Fully Qualified Topic:** `{env}.testevents.public.malformed-xml-events.v1`
 - **Estimated Payload Size:** 16 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId

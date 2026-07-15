@@ -11,7 +11,7 @@ editLink: false
 - **Version:** v1
 - **Entity:** `audit-log`
 - **Type:** Domain Event
-- **Topic:** `TestEvents`
+- **Topic:** `audit-logs`
 - **Fully Qualified Topic:** `{env}.testevents.internal.audit-logs.v1`
 - **Estimated Payload Size:** 24 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId

@@ -11,7 +11,7 @@ editLink: false
 - **Version:** v1
 - **Entity:** `order`
 - **Type:** Integration Event
-- **Topic:** `Orders`
+- **Topic:** `orders`
 - **Fully Qualified Topic:** `{env}.testevents.public.orders.v1`
 - **Estimated Payload Size:** 1388 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId

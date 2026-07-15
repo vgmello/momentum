@@ -11,7 +11,7 @@ editLink: false
 - **Version:** v1
 - **Entity:** `minimal-event`
 - **Type:** Integration Event
-- **Topic:** `TestEvents`
+- **Topic:** `minimal-events`
 - **Fully Qualified Topic:** `{env}.testevents.public.minimal-events.v1`
 - **Estimated Payload Size:** 16 bytes
 - **Partition Keys**: Id
