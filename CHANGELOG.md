@@ -29,3 +29,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - **EventMarkdownGenerator**: property descriptions whose XML doc summary wrapped onto multiple lines
   previously spilled out of their table cell as an orphaned line.
+
+### Security
+
+- **docs-dotnet.ts**: the `docfx metadata` build step now resolves the `docfx` executable from the
+  fixed `.NET` global-tools directory instead of an unpinned `PATH` lookup, closing a SonarCloud
+  security hotspot (`typescript:S4036`).
