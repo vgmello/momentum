@@ -4,6 +4,15 @@ All notable changes to this project are documented in this file, grouped by date
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2026-07-16]
+
+### Changed
+
+- **Docs**: widened both VitePress sites (`docs/`, `libs/Momentum/docs/`) — layout frame now maxes out at
+  1640px (`--vp-layout-max-width`) and the doc content column at 900px, up from the VitePress defaults.
+- **Docs**: nav "Changelog" link now renders `CHANGELOG.md` inline as a docs page (`/changelog`) instead of
+  linking out to GitHub.
+
 ## [2026-07-15]
 
 ### Added

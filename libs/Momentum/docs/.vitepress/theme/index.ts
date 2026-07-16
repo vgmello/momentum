@@ -1,5 +1,6 @@
 import type { Theme } from "vitepress";
 import DefaultTheme from "vitepress/theme";
+import "./style.css";
 import Mermaid from "../plugins/mermaid/Mermaid.vue";
 
 export default {

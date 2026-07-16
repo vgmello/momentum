@@ -1,0 +1,25 @@
+/**
+ * Widen the overall page frame and the doc content column beyond VitePress defaults.
+ */
+
+:root {
+    --vp-layout-max-width: 1640px;
+}
+
+@media (min-width: 1440px) {
+    #VPContent .VPDoc:not(.has-sidebar) .container {
+        max-width: 1600px;
+    }
+
+    #VPContent .VPDoc:not(.has-sidebar) .content {
+        max-width: 1200px;
+    }
+
+    #VPContent .VPDoc .container {
+        max-width: 1600px;
+    }
+}
+
+#VPContent .VPDoc.has-aside .content-container {
+    max-width: 900px;
+}
