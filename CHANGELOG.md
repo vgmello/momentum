@@ -20,6 +20,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Docs**: fixed 115 Mermaid diagrams across both sites using the invalid arrow `-/->`, which failed to
   parse and silently dropped every affected diagram (most notably all of `docs/arch/*.md`).
 
+### Changed
+
+- **Docs**: Mermaid diagrams now render with the `neo` look (was unset, defaulting to `classic`).
+- **Docs**: the architecture/system diagrams in `docs/arch/*.md` (`index.md`, `eda.md`, `events.md`,
+  `background-processing.md`) now use a consistent C4-style palette — blue for containers, light blue for
+  domain/component-level nodes, grey for external systems (Kafka, third-party services) — replacing the
+  ad-hoc pastel `style` overrides that only existed on one of the four diagrams.
+
 ## [2026-07-15]
 
 ### Added

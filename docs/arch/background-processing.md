@@ -57,6 +57,14 @@ graph TB
     SagaGrain --> Database
     TimerGrain --> Database
     Orleans --> EventStore
+
+    classDef container fill:#438dd5,stroke:#3079b0,color:#ffffff
+    classDef component fill:#85bbf0,stroke:#5b93c8,color:#000000
+    classDef external fill:#999999,stroke:#8a8a8a,color:#ffffff
+
+    class API,Scheduled,Wolverine,LocalQueues,BackOffice,Orleans,Jobs,Database,EventStore container
+    class InvoiceGrain,NotificationGrain,SagaGrain,TimerGrain component
+    class External,Kafka external
 ```
 
 ## BackOffice Service Structure
@@ -82,6 +90,7 @@ The BackOffice service handles background processing, event consumption, and sch
 ```
 
 **Naming Conventions:**
+
 - `{DomainName}InboxHandler/` - Handlers for events from a specific domain (e.g., `CashiersInboxHandler/`, `InvoicesInboxHandler/`)
 - `{ExternalDomain}InboxHandler/` - Handlers for events from external services (e.g., `AccountingInboxHandler/`)
 - Handlers are named after the event they handle with a `Handler` suffix
@@ -113,6 +122,7 @@ public static class CashierCreatedHandler
 ```
 
 **Handler Responsibilities:**
+
 - Consume integration events from Kafka topics
 - Update read models or denormalized views
 - Trigger notifications or external integrations
@@ -142,6 +152,7 @@ public class DataSyncJob(IMessageBus bus, ILogger<DataSyncJob> logger) : Backgro
 ```
 
 **Common Job Types:**
+
 - Data synchronization jobs
 - Report generation
 - Cache warming
