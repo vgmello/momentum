@@ -15,7 +15,8 @@ namespace Momentum.Extensions.EventMarkdownGenerator.Services;
 public static class EventMetadataBuilder
 {
     public static EventMetadata Build(Type eventType, string defaultDomain, XmlDocumentationParser? xmlParser,
-        PayloadSizeCalculator calculator, string attributeNamePrefix, string partitionKeyAttributeNamePrefix)
+        PayloadSizeCalculator calculator, string attributeNamePrefix, string partitionKeyAttributeNamePrefix,
+        bool emitPublicVisibility = false)
     {
         // Use dynamic attribute handling to work across assembly contexts
         var topicAttribute = GetEventTopicAttributeDynamic(eventType, attributeNamePrefix);
@@ -29,6 +30,7 @@ public static class EventMetadataBuilder
         var topic = TypeUtils.GetPropertyValue<string?>(attrType, topicAttribute, "Topic");
         var shouldPluralize = TypeUtils.GetPropertyValue<bool?>(attrType, topicAttribute, "ShouldPluralizeTopicName") ?? false;
         var domain = TypeUtils.GetPropertyValue<string?>(attrType, topicAttribute, "Domain");
+        var subdomain = TypeUtils.GetPropertyValue<string?>(attrType, topicAttribute, "Subdomain");
         var isInternal = TypeUtils.GetPropertyValue<bool?>(attrType, topicAttribute, "Internal") ?? false;
         var version = TypeUtils.GetPropertyValue<string?>(attrType, topicAttribute, "Version") ?? "v1";
         var eventNameOverride = TypeUtils.GetPropertyValue<string?>(attrType, topicAttribute, "EventName");
@@ -44,14 +46,32 @@ public static class EventMetadataBuilder
             topicName = topicName.Pluralize();
         }
 
-        var eventDomain = !string.IsNullOrWhiteSpace(domain)
-            ? domain
-            : GetDomainFromNamespace(eventType.Namespace) ?? defaultDomain;
+        var eventDomain = !string.IsNullOrWhiteSpace(domain) ? domain : defaultDomain;
 
-        // Build full topic name: {domain}.{visibility}.{topic}.{version}
-        var visibility = isInternal ? "internal" : "public";
+        var eventSubdomain = !string.IsNullOrWhiteSpace(subdomain)
+            ? subdomain
+            : GetSubdomainFromNamespace(eventType.Namespace);
 
-        var fullTopicName = $"{eventDomain.ToKebabCase()}.{visibility}.{topicName}.{version}";
+        // Build full topic name: {visibility}.{domain}.{subdomain}.{topic}.{version}
+        // Internal events always render the "internal" segment. Public events only render "public"
+        // when explicitly requested (emitPublicVisibility); otherwise the segment is omitted entirely.
+        string? visibilitySegment = null;
+
+        if (isInternal)
+            visibilitySegment = "internal";
+        else if (emitPublicVisibility)
+            visibilitySegment = "public";
+
+        var segments = new List<string?>
+        {
+            visibilitySegment,
+            eventDomain.ToKebabCase(),
+            eventSubdomain?.ToKebabCase(),
+            topicName,
+            version
+        };
+
+        var fullTopicName = string.Join('.', segments.Where(s => !string.IsNullOrEmpty(s)));
 
         var eventName = !string.IsNullOrWhiteSpace(eventNameOverride) ? eventNameOverride : eventType.Name;
 
@@ -65,6 +85,7 @@ public static class EventMetadataBuilder
             Topic = topicName,
             FullyQualifiedTopicName = fullTopicName,
             Domain = eventDomain,
+            Subdomain = eventSubdomain,
             Version = version,
             IsInternal = isInternal,
             TopicAttribute = topicAttribute,
@@ -145,7 +166,7 @@ public static class EventMetadataBuilder
         return foundAttribute;
     }
 
-    private static string? GetDomainFromNamespace(string? namespaceName)
+    private static string? GetSubdomainFromNamespace(string? namespaceName)
     {
         if (string.IsNullOrEmpty(namespaceName))
             return null;
@@ -156,11 +177,6 @@ public static class EventMetadataBuilder
 
         var contractsIndex = Array.LastIndexOf(parts, "Contracts");
 
-        if (contractsIndex > 0)
-        {
-            return parts[contractsIndex - 1];
-        }
-
-        return parts[0];
+        return contractsIndex > 0 ? parts[contractsIndex - 1] : null;
     }
 }

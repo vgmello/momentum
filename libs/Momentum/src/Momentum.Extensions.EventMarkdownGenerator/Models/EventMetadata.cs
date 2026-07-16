@@ -21,6 +21,7 @@ public record EventMetadata
     public required string Topic { get; init; }
     public required string FullyQualifiedTopicName { get; init; }
     public required string Domain { get; init; }
+    public string? Subdomain { get; init; }
     public required string Version { get; init; }
     public required bool IsInternal { get; init; }
     public required Attribute TopicAttribute { get; init; }

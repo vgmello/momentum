@@ -12,11 +12,12 @@ editLink: false
 
 - **Status:** Deprecated
 - **Domain:** comprehensive-domain
+- **Subdomain:** Comprehensive
 - **Version:** v9
 - **Entity:** `showcase-location`
 - **Type:** Domain Event
 - **Topic:** `comprehensive-topic`
-- **Fully Qualified Topic:** `comprehensive-domain.internal.comprehensive-topic.v9`
+- **Fully Qualified Topic:** `internal.comprehensive-domain.comprehensive.comprehensive-topic.v9`
 - **Estimated Payload Size:** 372 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId, SequenceNumber
 
@@ -61,5 +62,6 @@ This event uses multiple partition keys for message routing:
 - `ShouldPluralizeTopicName`: `False`
 - `Topic`: `comprehensive-topic`
 - `Domain`: `comprehensive-domain`
+- `Subdomain`: *(empty)*
 - `Version`: `v9`
 - `Internal`: `True`

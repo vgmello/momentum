@@ -13,7 +13,7 @@ editLink: false
 - **Entity:** `missing`
 - **Type:** Domain Event
 - **Topic:** `missings`
-- **Fully Qualified Topic:** `test-events.internal.missings.v1`
+- **Fully Qualified Topic:** `internal.test-events.missings.v1`
 - **Estimated Payload Size:** 16 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
@@ -44,5 +44,6 @@ This event uses a partition key for message routing:
 - `ShouldPluralizeTopicName`: `True`
 - `Topic`: `missing`
 - `Domain`: *(empty)*
+- `Subdomain`: *(empty)*
 - `Version`: `v1`
 - `Internal`: `True`

@@ -119,7 +119,7 @@ public class IntegrationTests
     }
 
     [Fact]
-    public void EventDiscovery_ShouldDetectDomainFromNamespace()
+    public void EventDiscovery_ShouldDetectSubdomainFromNamespace()
     {
         // Arrange
         var assembly = Assembly.LoadFrom(TestAssemblyPath);
@@ -132,7 +132,8 @@ public class IntegrationTests
         events.Count.ShouldBeGreaterThan(0);
         var cashierEvent = events.FirstOrDefault(e => e.EventTypeName == "CashierCreated");
         cashierEvent.ShouldNotBeNull();
-        cashierEvent.Domain.ShouldBe("Cashiers"); // Now returns subdomain instead of domain
+        cashierEvent.Domain.ShouldBe("TestEvents"); // Assembly-level default domain
+        cashierEvent.Subdomain.ShouldBe("Cashiers"); // Namespace-convention subdomain
     }
 
     [Fact]
@@ -241,8 +242,9 @@ public class IntegrationTests
         content.ShouldContain("---\neditLink: false\n---");
 
         // Validate topic format
+        // Public events omit the visibility segment by default (emitPublicVisibility defaults to false).
         content.ShouldContain("**Topic:** `Cashiers`");
-        content.ShouldContain("**Fully Qualified Topic:** `cashiers.public.cashiers.v1`");
+        content.ShouldContain("**Fully Qualified Topic:** `test-events.cashiers.cashiers.v1`");
 
         // Validate entity field
         content.ShouldContain("**Entity:** `cashier`");

@@ -32,6 +32,7 @@ public static partial class EventViewModelFactory
             Topic = metadata.Topic,
             FullyQualifiedTopicName = metadata.FullyQualifiedTopicName,
             Domain = metadata.Domain,
+            Subdomain = metadata.Subdomain,
             Version = metadata.Version,
             Status = metadata.GetStatus(),
             Entity = metadata.Entity,

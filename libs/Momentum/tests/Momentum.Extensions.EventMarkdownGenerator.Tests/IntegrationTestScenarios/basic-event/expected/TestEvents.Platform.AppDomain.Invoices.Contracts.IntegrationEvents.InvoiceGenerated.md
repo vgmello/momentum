@@ -8,12 +8,13 @@ editLink: false
 # InvoiceGenerated
 
 - **Status:** Active
-- **Domain:** Invoices
+- **Domain:** TestEvents
+- **Subdomain:** Invoices
 - **Version:** v1
 - **Entity:** `invoice-generated`
 - **Type:** Integration Event
 - **Topic:** `invoice-generateds`
-- **Fully Qualified Topic:** `invoices.public.invoice-generateds.v1`
+- **Fully Qualified Topic:** `test-events.invoices.invoice-generateds.v1`
 - **Estimated Payload Size:** 32 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
@@ -45,5 +46,6 @@ This event uses a partition key for message routing:
 - `ShouldPluralizeTopicName`: `True`
 - `Topic`: `invoice-generated`
 - `Domain`: *(empty)*
+- `Subdomain`: *(empty)*
 - `Version`: `v1`
 - `Internal`: `False`

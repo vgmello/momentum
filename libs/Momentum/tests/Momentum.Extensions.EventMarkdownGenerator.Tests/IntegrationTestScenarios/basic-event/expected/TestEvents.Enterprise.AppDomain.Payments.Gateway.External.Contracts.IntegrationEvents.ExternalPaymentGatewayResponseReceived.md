@@ -8,12 +8,13 @@ editLink: false
 # ExternalPaymentGatewayResponseReceived
 
 - **Status:** Active
-- **Domain:** External
+- **Domain:** TestEvents
+- **Subdomain:** External
 - **Version:** v1
 - **Entity:** `external-payment-gateway-response-received`
 - **Type:** Integration Event
 - **Topic:** `external-payment-gateway-response-receiveds`
-- **Fully Qualified Topic:** `external.public.external-payment-gateway-response-receiveds.v1`
+- **Fully Qualified Topic:** `test-events.external.external-payment-gateway-response-receiveds.v1`
 - **Estimated Payload Size:** 55 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
@@ -55,5 +56,6 @@ This event uses a partition key for message routing:
 - `ShouldPluralizeTopicName`: `True`
 - `Topic`: `external-payment-gateway-response-received`
 - `Domain`: *(empty)*
+- `Subdomain`: *(empty)*
 - `Version`: `v1`
 - `Internal`: `False`

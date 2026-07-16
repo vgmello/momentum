@@ -8,12 +8,13 @@ editLink: false
 # BulkDataProcessed
 
 - **Status:** Active
-- **Domain:** Collections
+- **Domain:** TestEvents
+- **Subdomain:** Collections
 - **Version:** v1
 - **Entity:** `bulk-data-processed`
 - **Type:** Integration Event
 - **Topic:** `bulk-data-processeds`
-- **Fully Qualified Topic:** `collections.public.bulk-data-processeds.v1`
+- **Fully Qualified Topic:** `test-events.collections.bulk-data-processeds.v1`
 - **Estimated Payload Size:** 399 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
@@ -72,5 +73,6 @@ This event uses a partition key for message routing:
 - `ShouldPluralizeTopicName`: `True`
 - `Topic`: `bulk-data-processed`
 - `Domain`: *(empty)*
+- `Subdomain`: *(empty)*
 - `Version`: `v1`
 - `Internal`: `False`

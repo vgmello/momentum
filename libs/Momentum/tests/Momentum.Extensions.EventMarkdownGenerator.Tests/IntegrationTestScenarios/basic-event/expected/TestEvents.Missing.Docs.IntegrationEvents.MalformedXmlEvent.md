@@ -13,7 +13,7 @@ editLink: false
 - **Entity:** `malformed-xml-event`
 - **Type:** Integration Event
 - **Topic:** `malformed-xml-events`
-- **Fully Qualified Topic:** `test-events.public.malformed-xml-events.v1`
+- **Fully Qualified Topic:** `test-events.malformed-xml-events.v1`
 - **Estimated Payload Size:** 16 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
@@ -44,5 +44,6 @@ This event uses a partition key for message routing:
 - `ShouldPluralizeTopicName`: `True`
 - `Topic`: `malformed-xml-event`
 - `Domain`: *(empty)*
+- `Subdomain`: *(empty)*
 - `Version`: `v1`
 - `Internal`: `False`

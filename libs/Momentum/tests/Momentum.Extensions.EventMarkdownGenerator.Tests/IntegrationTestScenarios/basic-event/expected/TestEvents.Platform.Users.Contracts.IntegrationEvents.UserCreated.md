@@ -8,12 +8,13 @@ editLink: false
 # UserCreated
 
 - **Status:** Active
-- **Domain:** Users
+- **Domain:** TestEvents
+- **Subdomain:** Users
 - **Version:** v1
 - **Entity:** `user-created`
 - **Type:** Integration Event
 - **Topic:** `user-createds`
-- **Fully Qualified Topic:** `users.public.user-createds.v1`
+- **Fully Qualified Topic:** `test-events.users.user-createds.v1`
 - **Estimated Payload Size:** 16 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
@@ -45,5 +46,6 @@ This event uses a partition key for message routing:
 - `ShouldPluralizeTopicName`: `True`
 - `Topic`: `user-created`
 - `Domain`: *(empty)*
+- `Subdomain`: *(empty)*
 - `Version`: `v1`
 - `Internal`: `False`

@@ -8,12 +8,13 @@ editLink: false
 # OrderCompleted
 
 - **Status:** Active
-- **Domain:** Orders
+- **Domain:** TestEvents
+- **Subdomain:** Orders
 - **Version:** v1
 - **Entity:** `order`
 - **Type:** Integration Event
 - **Topic:** `orders`
-- **Fully Qualified Topic:** `orders.public.orders.v1`
+- **Fully Qualified Topic:** `test-events.orders.orders.v1`
 - **Estimated Payload Size:** 1388 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
@@ -60,5 +61,6 @@ This event uses a partition key for message routing:
 - `ShouldPluralizeTopicName`: `True`
 - `Topic`: `order`
 - `Domain`: *(empty)*
+- `Subdomain`: *(empty)*
 - `Version`: `v1`
 - `Internal`: `False`

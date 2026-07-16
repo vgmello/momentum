@@ -14,6 +14,9 @@ editLink: false
 {% endif -%}
 - **Status:** {{ event.Status }}
 - **Domain:** {{ event.Domain }}
+{% if event.Subdomain -%}
+- **Subdomain:** {{ event.Subdomain }}
+{% endif -%}
 - **Version:** {{ event.Version }}
 {% if event.Entity -%}
 - **Entity:** `{{ event.Entity | downcase }}`

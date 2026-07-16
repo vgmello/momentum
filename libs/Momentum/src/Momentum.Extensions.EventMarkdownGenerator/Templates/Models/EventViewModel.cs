@@ -12,6 +12,7 @@ public class EventViewModel
     public string Topic { get; set; } = string.Empty;
     public string FullyQualifiedTopicName { get; set; } = string.Empty;
     public string Domain { get; set; } = string.Empty;
+    public string? Subdomain { get; set; }
     public string Version { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
     public string Entity { get; set; } = string.Empty;

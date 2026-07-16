@@ -13,7 +13,7 @@ editLink: false
 - **Entity:** `simple-notification`
 - **Type:** Integration Event
 - **Topic:** `simple-notifications`
-- **Fully Qualified Topic:** `test-events.public.simple-notifications.v1`
+- **Fully Qualified Topic:** `test-events.simple-notifications.v1`
 - **Estimated Payload Size:** 16 bytes ⚠️ *Contains dynamic properties*
 
 ## Description
@@ -39,5 +39,6 @@ No documentation available
 - `ShouldPluralizeTopicName`: `True`
 - `Topic`: `simple-notification`
 - `Domain`: *(empty)*
+- `Subdomain`: *(empty)*
 - `Version`: `v1`
 - `Internal`: `False`

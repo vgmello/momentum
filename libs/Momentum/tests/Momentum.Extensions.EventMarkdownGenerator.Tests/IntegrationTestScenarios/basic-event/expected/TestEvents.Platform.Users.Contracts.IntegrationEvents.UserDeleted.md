@@ -8,12 +8,13 @@ editLink: false
 # UserDeleted
 
 - **Status:** Active
-- **Domain:** Users
+- **Domain:** TestEvents
+- **Subdomain:** Users
 - **Version:** v1
 - **Entity:** `user-deleted`
 - **Type:** Integration Event
 - **Topic:** `user-deleteds`
-- **Fully Qualified Topic:** `users.public.user-deleteds.v1`
+- **Fully Qualified Topic:** `test-events.users.user-deleteds.v1`
 - **Estimated Payload Size:** 24 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
@@ -45,5 +46,6 @@ This event uses a partition key for message routing:
 - `ShouldPluralizeTopicName`: `True`
 - `Topic`: `user-deleted`
 - `Domain`: *(empty)*
+- `Subdomain`: *(empty)*
 - `Version`: `v1`
 - `Internal`: `False`

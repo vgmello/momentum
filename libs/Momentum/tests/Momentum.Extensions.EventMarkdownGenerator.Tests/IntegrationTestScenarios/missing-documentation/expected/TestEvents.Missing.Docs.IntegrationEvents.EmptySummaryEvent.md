@@ -13,7 +13,7 @@ editLink: false
 - **Entity:** `empty-summary-event`
 - **Type:** Integration Event
 - **Topic:** `empty-summary-events`
-- **Fully Qualified Topic:** `test-events.public.empty-summary-events.v1`
+- **Fully Qualified Topic:** `test-events.empty-summary-events.v1`
 - **Estimated Payload Size:** 16 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
@@ -44,5 +44,6 @@ This event uses a partition key for message routing:
 - `ShouldPluralizeTopicName`: `True`
 - `Topic`: `empty-summary-event`
 - `Domain`: *(empty)*
+- `Subdomain`: *(empty)*
 - `Version`: `v1`
 - `Internal`: `False`

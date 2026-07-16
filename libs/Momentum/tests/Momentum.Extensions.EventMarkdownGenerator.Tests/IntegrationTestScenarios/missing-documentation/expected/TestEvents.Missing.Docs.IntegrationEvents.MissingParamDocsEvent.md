@@ -13,7 +13,7 @@ editLink: false
 - **Entity:** `missing-param-docs-event`
 - **Type:** Integration Event
 - **Topic:** `missing-param-docs-events`
-- **Fully Qualified Topic:** `test-events.public.missing-param-docs-events.v1`
+- **Fully Qualified Topic:** `test-events.missing-param-docs-events.v1`
 - **Estimated Payload Size:** 16 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
@@ -44,5 +44,6 @@ This event uses a partition key for message routing:
 - `ShouldPluralizeTopicName`: `True`
 - `Topic`: `missing-param-docs-event`
 - `Domain`: *(empty)*
+- `Subdomain`: *(empty)*
 - `Version`: `v1`
 - `Internal`: `False`

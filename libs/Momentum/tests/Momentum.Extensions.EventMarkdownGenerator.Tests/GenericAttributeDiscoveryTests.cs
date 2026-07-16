@@ -55,8 +55,9 @@ public class GenericAttributeDiscoveryTests
         conventionEvent.EventName.ShouldBe("ReservationBooked");
 
         // Ask #3: Topic exposes the plain topic/hub name; the fully-qualified name keeps the composed convention.
+        // Public events omit the visibility segment by default (emitPublicVisibility defaults to false).
         conventionEvent.Topic.ShouldBe("reservation-created");
-        conventionEvent.FullyQualifiedTopicName.ShouldBe("reservations.public.reservation-created.v1");
+        conventionEvent.FullyQualifiedTopicName.ShouldBe("reservations.reservation-created.v1");
 
         // Ask #2: partition keys discovered via the custom attribute, ordered by Order.
         conventionEvent.PartitionKeys.Count.ShouldBe(2);
@@ -66,17 +67,17 @@ public class GenericAttributeDiscoveryTests
         conventionEvent.PartitionKeys[1].Order.ShouldBe(1);
     }
 
-    // Custom attribute exercising properties the generator has no dedicated EventMetadata field for
-    // (Subdomain), plus an explicitly empty Topic to verify the kebab-case fallback still applies.
+    // Custom attribute exercising a property the generator has no dedicated EventMetadata field for
+    // (Notes), plus an explicitly empty Topic to verify the kebab-case fallback still applies.
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class CustomAttribute : Attribute
     {
         public string Domain { get; init; } = string.Empty;
-        public string Subdomain { get; init; } = string.Empty;
+        public string Notes { get; init; } = string.Empty;
         public string Topic { get; init; } = string.Empty;
     }
 
-    [Custom(Domain = "billing", Subdomain = "invoicing", Topic = "")]
+    [Custom(Domain = "billing", Notes = "invoicing", Topic = "")]
     public record CustomAttributeEvent(Guid InvoiceId);
 
     [Fact]
@@ -96,10 +97,10 @@ public class GenericAttributeDiscoveryTests
         customEvent.Topic.ShouldBe("custom-attribute-event");
 
         // Every property of the attribute is captured, including ones with no dedicated EventMetadata
-        // field (Subdomain) — not just the well-known ones (Domain).
+        // field (Notes) — not just the well-known ones (Domain).
         customEvent.AttributeProperties.Count.ShouldBe(3);
         customEvent.AttributeProperties["Domain"].ShouldBe("billing");
-        customEvent.AttributeProperties["Subdomain"].ShouldBe("invoicing");
+        customEvent.AttributeProperties["Notes"].ShouldBe("invoicing");
         customEvent.AttributeProperties["Topic"].ShouldBe(string.Empty);
     }
 

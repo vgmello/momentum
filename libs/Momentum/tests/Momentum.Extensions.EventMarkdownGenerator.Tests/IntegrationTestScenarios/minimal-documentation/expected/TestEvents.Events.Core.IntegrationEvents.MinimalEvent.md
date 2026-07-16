@@ -13,7 +13,7 @@ editLink: false
 - **Entity:** `minimal-event`
 - **Type:** Integration Event
 - **Topic:** `minimal-events`
-- **Fully Qualified Topic:** `test-events.public.minimal-events.v1`
+- **Fully Qualified Topic:** `test-events.minimal-events.v1`
 - **Estimated Payload Size:** 16 bytes
 - **Partition Keys**: Id
 
@@ -43,5 +43,6 @@ This event uses a partition key for message routing:
 - `ShouldPluralizeTopicName`: `True`
 - `Topic`: `minimal-event`
 - `Domain`: *(empty)*
+- `Subdomain`: *(empty)*
 - `Version`: `v1`
 - `Internal`: `False`

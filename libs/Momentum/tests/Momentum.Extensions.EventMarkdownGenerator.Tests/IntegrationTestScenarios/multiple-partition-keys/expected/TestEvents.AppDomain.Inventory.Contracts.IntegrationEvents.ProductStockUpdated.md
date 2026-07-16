@@ -8,12 +8,13 @@ editLink: false
 # ProductStockUpdated
 
 - **Status:** Active
-- **Domain:** Inventory
+- **Domain:** TestEvents
+- **Subdomain:** Inventory
 - **Version:** v1
 - **Entity:** `product`
 - **Type:** Integration Event
 - **Topic:** `products`
-- **Fully Qualified Topic:** `inventory.public.products.v1`
+- **Fully Qualified Topic:** `test-events.inventory.products.v1`
 - **Estimated Payload Size:** 64 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId, WarehouseId, ProductCategory
 
@@ -51,5 +52,6 @@ This event uses multiple partition keys for message routing:
 - `ShouldPluralizeTopicName`: `True`
 - `Topic`: `product`
 - `Domain`: *(empty)*
+- `Subdomain`: *(empty)*
 - `Version`: `v1`
 - `Internal`: `False`

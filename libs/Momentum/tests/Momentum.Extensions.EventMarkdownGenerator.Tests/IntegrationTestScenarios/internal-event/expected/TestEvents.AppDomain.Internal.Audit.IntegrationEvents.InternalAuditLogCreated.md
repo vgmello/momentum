@@ -13,7 +13,7 @@ editLink: false
 - **Entity:** `audit-log`
 - **Type:** Domain Event
 - **Topic:** `audit-logs`
-- **Fully Qualified Topic:** `test-events.internal.audit-logs.v1`
+- **Fully Qualified Topic:** `internal.test-events.audit-logs.v1`
 - **Estimated Payload Size:** 24 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
@@ -48,5 +48,6 @@ This event uses a partition key for message routing:
 - `ShouldPluralizeTopicName`: `True`
 - `Topic`: `audit-log`
 - `Domain`: *(empty)*
+- `Subdomain`: *(empty)*
 - `Version`: `v1`
 - `Internal`: `True`

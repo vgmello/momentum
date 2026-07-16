@@ -25,6 +25,14 @@ public record GeneratorOptions
     /// <summary>Name (or name prefix) of the attribute used to discover partition keys. Default: "PartitionKeyAttribute".</summary>
     public string PartitionKeyAttributeName { get; init; } = "PartitionKeyAttribute";
 
+    /// <summary>
+    ///     Whether public events should render an explicit "public" visibility segment in
+    ///     <see cref="EventMetadata.FullyQualifiedTopicName"/>. Default: <c>false</c> (public events omit the
+    ///     segment entirely, e.g. <c>domain.subdomain.topic.v1</c>). Internal events always render "internal"
+    ///     regardless of this flag, e.g. <c>internal.domain.subdomain.topic.v1</c>.
+    /// </summary>
+    public bool EmitPublicVisibility { get; init; }
+
     public string GetSidebarPath() => Path.Combine(OutputDirectory, Path.GetFileName(SidebarFileName));
 
     public void EnsureOutputDirectoryExists()

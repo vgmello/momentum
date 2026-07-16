@@ -62,6 +62,13 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
         [CommandOption("-v|--verbose")]
         [Description("Enable verbose output")]
         public bool Verbose { get; init; }
+
+        [CommandOption("--emit-public-visibility")]
+        [Description(
+            "Render an explicit \"public\" visibility segment for public events (e.g. public.domain.subdomain.topic.v1). " +
+            "Default: false (public events omit the segment, e.g. domain.subdomain.topic.v1). Internal events always " +
+            "render \"internal\" regardless of this flag.")]
+        public bool EmitPublicVisibility { get; init; }
     }
 
     protected override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellationToken)
@@ -98,7 +105,8 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
                 GitHubBaseUrl = settings.GitHubUrl,
                 SerializationFormat = settings.Format,
                 EventAttributeName = settings.EventAttribute,
-                PartitionKeyAttributeName = settings.PartitionKeyAttribute
+                PartitionKeyAttributeName = settings.PartitionKeyAttribute,
+                EmitPublicVisibility = settings.EmitPublicVisibility
             };
 
             await GenerateDocumentationAsync(options, cancellationToken);
@@ -159,7 +167,7 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
                     cts.Token);
 
                 var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser, calculator,
-                    options.EventAttributeName, options.PartitionKeyAttributeName);
+                    options.EventAttributeName, options.PartitionKeyAttributeName, options.EmitPublicVisibility);
 
                 allEvents.AddRange(events);
 
