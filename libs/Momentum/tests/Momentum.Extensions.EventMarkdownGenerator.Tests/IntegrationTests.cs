@@ -63,18 +63,10 @@ public class IntegrationTests
             var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser, PayloadSizeCalculator.Create("json")).ToList();
 
             events.Count.ShouldBeGreaterThan(0);
-            var cashierCreatedEvent = events.FirstOrDefault(e => e.EventName == "CashierCreated");
+            var cashierCreatedEvent = events.FirstOrDefault(e => e.Metadata.EventTypeName == "CashierCreated");
             cashierCreatedEvent.ShouldNotBeNull();
 
-            // Get documentation and generate markdown
-            var documentation = xmlParser.GetEventDocumentation(cashierCreatedEvent.EventType);
-            var eventWithDoc = new EventWithDocumentation
-            {
-                Metadata = cashierCreatedEvent,
-                Documentation = documentation
-            };
-
-            var generatedMarkdown = markdownGenerator.GenerateMarkdown(eventWithDoc, outputDir);
+            var generatedMarkdown = markdownGenerator.GenerateMarkdown(cashierCreatedEvent, outputDir);
 
             // Act - Use generated content directly (GenerateMarkdown returns content without writing to disk)
             var generatedContent = generatedMarkdown.Content;
@@ -109,11 +101,11 @@ public class IntegrationTests
 
         // Act
         var xmlParser = new XmlDocumentationParser();
-        var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser, PayloadSizeCalculator.Create("json")).ToList();
+        var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser, PayloadSizeCalculator.Create("json")).Select(e => e.Metadata).ToList();
 
         // Assert
         events.Count.ShouldBeGreaterThan(0);
-        var cashierEvent = events.FirstOrDefault(e => e.EventName == "CashierCreated");
+        var cashierEvent = events.FirstOrDefault(e => e.EventTypeName == "CashierCreated");
         cashierEvent.ShouldNotBeNull();
 
         cashierEvent.PartitionKeys.Count.ShouldBe(2);
@@ -134,11 +126,11 @@ public class IntegrationTests
 
         // Act
         var xmlParser = new XmlDocumentationParser();
-        var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser, PayloadSizeCalculator.Create("json")).ToList();
+        var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser, PayloadSizeCalculator.Create("json")).Select(e => e.Metadata).ToList();
 
         // Assert
         events.Count.ShouldBeGreaterThan(0);
-        var cashierEvent = events.FirstOrDefault(e => e.EventName == "CashierCreated");
+        var cashierEvent = events.FirstOrDefault(e => e.EventTypeName == "CashierCreated");
         cashierEvent.ShouldNotBeNull();
         cashierEvent.Domain.ShouldBe("Cashiers"); // Now returns subdomain instead of domain
     }
@@ -194,17 +186,13 @@ public class IntegrationTests
         var assembly = Assembly.LoadFrom(TestAssemblyPath);
         var xmlParser = new XmlDocumentationParser();
         var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser, PayloadSizeCalculator.Create("json")).ToList();
-        var eventsWithDoc = events.Select(e => new EventWithDocumentation
-        {
-            Metadata = e,
-            Documentation = new EventDocumentation { Summary = "Test" }
-        }).ToList();
+        var eventsWithDoc = events.Select(e => e with { Documentation = new EventDocumentation { Summary = "Test" } }).ToList();
 
         // Act
         var sidebarItems = JsonSidebarGenerator.GenerateSidebarItems(eventsWithDoc);
 
         // Assert
-        var cashierCreatedEvent = events.FirstOrDefault(e => e.EventName == "CashierCreated");
+        var cashierCreatedEvent = events.FirstOrDefault(e => e.Metadata.EventTypeName == "CashierCreated");
         sidebarItems.Count.ShouldBe(7); // Multiple domain sections + Schemas section
 
         // Validate AppDomain section exists (contains CashierCreated)
@@ -221,7 +209,7 @@ public class IntegrationTests
         // Check that CashierCreated is in the Cashiers subsection
         var cashierCreatedItem = cashiersSubsection.Items[0];
         cashierCreatedItem.Text.ShouldBe("Cashier Created");
-        cashierCreatedItem.Link.ShouldBe($"/{cashierCreatedEvent!.FullTypeName}");
+        cashierCreatedItem.Link.ShouldBe($"/{cashierCreatedEvent!.Metadata.FullTypeName}");
 
         // Validate schemas section exists
         var schemasSection = sidebarItems.FirstOrDefault(s => s.Text == "Schemas");
@@ -254,7 +242,7 @@ public class IntegrationTests
 
         // Validate topic format
         content.ShouldContain("**Topic:** `Cashiers`");
-        content.ShouldContain("**Fully Qualified Topic:** `{env}.testevents.public.cashiers.v1`");
+        content.ShouldContain("**Fully Qualified Topic:** `cashiers.public.cashiers.v1`");
 
         // Validate entity field
         content.ShouldContain("**Entity:** `cashier`");

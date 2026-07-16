@@ -8,11 +8,12 @@ editLink: false
 # NodeRelationshipCreated
 
 - **Status:** Active
+- **Domain:** Nodes
 - **Version:** v1
 - **Entity:** `node-relationship-created`
 - **Type:** Integration Event
 - **Topic:** `node-relationship-createds`
-- **Fully Qualified Topic:** `{env}.testevents.public.node-relationship-createds.v1`
+- **Fully Qualified Topic:** `nodes.public.node-relationship-createds.v1`
 - **Estimated Payload Size:** 382 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
@@ -48,5 +49,13 @@ This event uses a partition key for message routing:
 ## Technical Details
 
 - **Full Type:** [TestEvents.Graph.Nodes.Contracts.IntegrationEvents.NodeRelationshipCreated](#)
+- **Type Name:** `NodeRelationshipCreated`
+- **Event Slug:** `node-relationship-created`
 - **Namespace:** `TestEvents.Graph.Nodes.Contracts.IntegrationEvents`
-- **Topic Attribute:** `[EventTopic]`
+- **Topic Attribute:** `[EventTopic<NodeRelationshipCreated>]`
+- **Attribute Properties:**
+- `ShouldPluralizeTopicName`: `True`
+- `Topic`: `node-relationship-created`
+- `Domain`: *(empty)*
+- `Version`: `v1`
+- `Internal`: `False`

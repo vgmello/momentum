@@ -1,4 +1,5 @@
 import fs, { createReadStream } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -160,6 +161,24 @@ async function getFileInfo(filePath: string): Promise<FileInfo | null> {
     }
 }
 
+// docfx is always installed as a .NET global tool (see Build-Documentation.ps1 /
+// `dotnet tool install -g docfx`), which places it in a fixed, user-owned directory.
+// Resolving the executable there instead of trusting an arbitrary PATH lookup avoids
+// running a look-alike binary that a writable PATH entry could shadow (sonar S4036).
+function resolveDocfxPath(): string {
+    const toolName = process.platform === 'win32' ? 'docfx.exe' : 'docfx';
+    const dotnetToolsDir = path.join(os.homedir(), '.dotnet', 'tools');
+    const docfxPath = path.join(dotnetToolsDir, toolName);
+
+    if (!fs.existsSync(docfxPath)) {
+        throw new Error(
+            `DocFX executable not found at "${docfxPath}". Install it with: dotnet tool install -g docfx`
+        );
+    }
+
+    return docfxPath;
+}
+
 function runDocfx(dllPaths: string[]): void {
     log('Running docfx metadata...');
 
@@ -185,7 +204,7 @@ function runDocfx(dllPaths: string[]): void {
     fs.writeFileSync(configPath, JSON.stringify(generatedConfig, null, 2));
 
     try {
-        execFileSync('docfx', ['metadata', configPath], { stdio: 'inherit' });
+        execFileSync(resolveDocfxPath(), ['metadata', configPath], { stdio: 'inherit' });
         log('Documentation generated successfully');
     } catch (error) {
         log(`Error running docfx: ${error}`);

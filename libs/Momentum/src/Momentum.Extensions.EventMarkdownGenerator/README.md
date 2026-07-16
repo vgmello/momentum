@@ -216,28 +216,70 @@ events-docsgen generate --assemblies "MyApp.dll" --templates "./my-templates/"
 
 #### Event Template (event.liquid)
 
-The following variables are available in event templates:
+The following variables are available in event templates, bound to the top-level `event` object:
 
-| Variable                                | Type    | Description                           |
-| --------------------------------------- | ------- | ------------------------------------- |
-| `event.EventName`                       | string  | Event class name                      |
-| `event.FullTypeName`                    | string  | Full type name with namespace         |
-| `event.Namespace`                       | string  | Event namespace                       |
-| `event.TopicName`                       | string  | Kafka topic name                      |
-| `event.Version`                         | string  | Event version                         |
-| `event.Status`                          | string  | Active/Deprecated status              |
-| `event.Entity`                          | string  | Entity name extracted from event type |
-| `event.IsInternal`                      | boolean | Whether event is domain or int        |
-| `event.IsObsolete`                      | boolean | Whether event is marked obsolete      |
-| `event.ObsoleteMessage`                 | string  | Deprecation message if obsolete       |
-| `event.Documentation.Description`       | string  | Event description from XML docs       |
-| `event.Documentation.StructuredRemarks` | object  | Key-value pairs from XML remarks      |
-| `event.Properties`                      | array   | Array of event properties             |
-| `event.PartitionKeys`                   | array   | Array of partition key definitions    |
-| `event.TotalEstimatedSizeBytes`         | number  | Total estimated payload size          |
-| `event.HasInaccurateEstimates`          | boolean | Warning flag for dynamic size         |
-| `event.GithubUrl`                       | string  | Link to source code on GitHub         |
-| `event.TopicAttributeDisplayName`       | string  | Display name for topic attribute      |
+| Variable                          | Type    | Description                                                                                             |
+| --------------------------------- | ------- | ------------------------------------------------------------------------------------------------------- |
+| `event.EventName`                 | string  | Documented event name — the `EventName` attribute override if set, otherwise the CLR type name          |
+| `event.EventNameKebab`            | string  | Kebab-cased form of `EventName` (same override precedence), for topic-adjacent/URL-safe uses            |
+| `event.EventTypeName`             | string  | The event's CLR type name, always as-is (never overridden)                                              |
+| `event.FullTypeName`              | string  | Full type name with namespace                                                                           |
+| `event.Namespace`                 | string  | Event namespace                                                                                         |
+| `event.Topic`                     | string  | Plain topic / event hub name (e.g. `cashiers`)                                                          |
+| `event.FullyQualifiedTopicName`   | string  | Composed `{domain}.{visibility}.{topic}.{version}` convention string, domain kebab-cased                |
+| `event.Domain`                    | string  | Resolved domain — explicit attribute `Domain` override, then namespace-derived, then assembly default   |
+| `event.Version`                   | string  | Event version (default `v1`)                                                                            |
+| `event.Status`                    | string  | `Active` or `Deprecated`                                                                                |
+| `event.Entity`                    | string  | Kebab-cased entity name — from a generic topic attribute's `TEntity`, or a stripped event-name suffix   |
+| `event.IsInternal`                | boolean | Whether the event is a domain event (internal) vs. an integration event (public)                        |
+| `event.IsObsolete`                | boolean | Whether the event is marked obsolete                                                                    |
+| `event.ObsoleteMessage`           | string? | Deprecation message if obsolete                                                                         |
+| `event.GithubUrl`                 | string  | Link to source code on GitHub (built from `EventTypeName` + `Namespace`; `#` if no base URL configured) |
+| `event.TopicAttributeDisplayName` | string  | Display name for the topic attribute, e.g. `[EventTopic<Cashier>]`                                      |
+| `event.AttributeProperties`       | array   | Every public property of the topic attribute, reflected into `{ Key, Value }` pairs                     |
+| `event.Description`               | string  | Event description — `Summary` if set, else a fallback message                                           |
+| `event.Summary`                   | string  | Summary from the XML doc `<summary>` tag                                                                |
+| `event.Remarks`                   | string? | Content from the XML doc `<remarks>` tag                                                                |
+| `event.Example`                   | string? | Content from the XML doc `<example>` tag                                                                |
+| `event.Properties`                | array   | Array of event properties (shape below)                                                                 |
+| `event.PartitionKeys`             | array   | Array of partition key definitions (shape below), ordered by `Order`                                    |
+| `event.TotalEstimatedSizeBytes`   | number  | Total estimated payload size                                                                            |
+| `event.HasInaccurateEstimates`    | boolean | Warning flag — true if any property's size estimate is dynamic (no fixed constraint)                    |
+
+**Property Objects** (in `event.Properties` array):
+
+| Property               | Type    | Description                                                           |
+| ---------------------- | ------- | --------------------------------------------------------------------- |
+| `Name`                 | string  | Property name                                                         |
+| `TypeName`             | string  | Friendly type name (e.g. `string`, `Guid`, `List<Cashier>`)           |
+| `IsRequired`           | boolean | Whether the property is required                                      |
+| `IsComplexType`        | boolean | Whether the property is a complex (non-primitive) type                |
+| `IsCollectionType`     | boolean | Whether the property is a collection type                             |
+| `Description`          | string  | Property description from XML docs (whitespace-collapsed to one line) |
+| `SchemaLink`           | string? | Markdown link path to the complex type's schema, if applicable        |
+| `SchemaPath`           | string? | File path to the schema documentation, if applicable                  |
+| `ElementTypeName`      | string? | Element type name, for collection properties                          |
+| `ElementSchemaPath`    | string? | Schema path for the collection's element type, if complex             |
+| `EstimatedSizeBytes`   | number  | Estimated payload size in bytes                                       |
+| `IsAccurate`           | boolean | Whether the size estimate is a fixed/accurate value                   |
+| `SizeWarning`          | string? | Explanation when the estimate is dynamic (e.g. no `MaxLength`)        |
+| `EstimatedSizeDisplay` | string  | Human-readable size, e.g. `16 bytes` or `0 bytes (dynamic)`           |
+
+**Partition Key Objects** (in `event.PartitionKeys` array):
+
+| Property      | Type   | Description                             |
+| ------------- | ------ | --------------------------------------- |
+| `Name`        | string | Property name used as the partition key |
+| `TypeName`    | string | Friendly type name                      |
+| `Description` | string | Description from XML docs               |
+| `Order`       | number | Ordering among multiple partition keys  |
+
+**Attribute Property Objects** (in `event.AttributeProperties` array):
+
+| Property | Type   | Description                         |
+| -------- | ------ | ----------------------------------- |
+| `Key`    | string | The topic attribute's property name |
+| `Value`  | string | The property's stringified value    |
 
 #### Schema Template (schema.liquid)
 
@@ -246,20 +288,22 @@ The following variables are available in schema templates:
 | Variable             | Type   | Description                    |
 | -------------------- | ------ | ------------------------------ |
 | `schema.name`        | string | Type name                      |
+| `schema.fullName`    | string | Full type name with namespace  |
 | `schema.description` | string | Type description from XML docs |
 | `schema.properties`  | array  | Array of type properties       |
 
 **Property Objects** (in `schema.properties` array):
 
-| Property        | Type    | Description                          |
-| --------------- | ------- | ------------------------------------ |
-| `name`          | string  | Property name                        |
-| `typeName`      | string  | Property type                        |
-| `isRequired`    | boolean | Whether property is required         |
-| `isComplexType` | boolean | Whether property is a complex type   |
-| `description`   | string  | Property description from XML docs   |
-| `schemaLink`    | string  | Markdown link to complex type schema |
-| `schemaPath`    | string  | File path to schema documentation    |
+| Property           | Type    | Description                           |
+| ------------------ | ------- | ------------------------------------- |
+| `name`             | string  | Property name                         |
+| `typeName`         | string  | Property type                         |
+| `isRequired`       | boolean | Whether property is required          |
+| `isComplexType`    | boolean | Whether property is a complex type    |
+| `isCollectionType` | boolean | Whether property is a collection type |
+| `description`      | string  | Property description from XML docs    |
+| `schemaLink`       | string  | Markdown link to complex type schema  |
+| `schemaPath`       | string  | File path to schema documentation     |
 
 ### Custom Template Usage
 

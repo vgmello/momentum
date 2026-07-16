@@ -193,28 +193,33 @@ A custom templates directory only needs to contain the file(s) you want to overr
 
 ### `event.liquid` variables
 
-| Variable                          | Type    | Description                                             |
-| --------------------------------- | ------- | ------------------------------------------------------- |
-| `event.EventName`                 | string  | Event class name                                        |
-| `event.FullTypeName`              | string  | Full type name with namespace                           |
-| `event.Namespace`                 | string  | Event namespace                                         |
-| `event.Topic`                     | string  | Kafka topic name                                        |
-| `event.FullyQualifiedTopicName`   | string  | `{env}.{domain}.{scope}.{topic}.{version}`              |
-| `event.Version`                   | string  | Event schema version                                    |
-| `event.Status`                    | string  | `Active` / `Deprecated`                                 |
-| `event.Entity`                    | string  | Entity name extracted from a generic `EventTopic<T>`    |
-| `event.IsInternal`                | boolean | Domain event vs. integration event                      |
-| `event.IsObsolete`                | boolean | Whether `[Obsolete]` is present                         |
-| `event.ObsoleteMessage`           | string  | Deprecation message, if any                             |
-| `event.Description`               | string  | From XML `<summary>`                                    |
-| `event.Remarks`                   | string  | From XML `<remarks>`                                    |
-| `event.Example`                   | string  | From XML `<example>`                                    |
-| `event.Properties`                | array   | See below                                               |
-| `event.PartitionKeys`             | array   | `Name`, `Description`, `Order` per key                  |
-| `event.TotalEstimatedSizeBytes`   | number  | Sum of estimated property sizes                         |
-| `event.HasInaccurateEstimates`    | boolean | True when a property's size can't be reliably estimated |
-| `event.GithubUrl`                 | string  | Source link, when `--github-url` is configured          |
-| `event.TopicAttributeDisplayName` | string  | e.g. `[EventTopic<Cashier>]`                            |
+| Variable                          | Type    | Description                                                                                                                                            |
+| --------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `event.EventName`                 | string  | Documented event name — an `EventName` attribute override if set, else the CLR type name                                                               |
+| `event.EventNameKebab`            | string  | Kebab-cased form of `EventName` (same override precedence), for URL-safe/topic-adjacent uses                                                           |
+| `event.EventTypeName`             | string  | The event's CLR type name, always as-is (never overridden)                                                                                             |
+| `event.FullTypeName`              | string  | Full type name with namespace                                                                                                                          |
+| `event.Namespace`                 | string  | Event namespace                                                                                                                                        |
+| `event.Topic`                     | string  | Kafka topic name                                                                                                                                       |
+| `event.FullyQualifiedTopicName`   | string  | `{domain}.{visibility}.{topic}.{version}`, domain kebab-cased                                                                                          |
+| `event.Domain`                    | string  | Resolved domain — explicit attribute `Domain` override, then namespace-derived, then default                                                           |
+| `event.Version`                   | string  | Event schema version                                                                                                                                   |
+| `event.Status`                    | string  | `Active` / `Deprecated`                                                                                                                                |
+| `event.Entity`                    | string  | Kebab-cased entity name — from a generic `EventTopic<T>`, or a stripped event-name suffix (`Created`, `Updated`, ...) when the attribute isn't generic |
+| `event.IsInternal`                | boolean | Domain event vs. integration event                                                                                                                     |
+| `event.IsObsolete`                | boolean | Whether `[Obsolete]` is present                                                                                                                        |
+| `event.ObsoleteMessage`           | string  | Deprecation message, if any                                                                                                                            |
+| `event.Description`               | string  | From XML `<summary>`, with a fallback message when absent                                                                                              |
+| `event.Summary`                   | string  | Raw XML `<summary>` text                                                                                                                               |
+| `event.Remarks`                   | string  | From XML `<remarks>`                                                                                                                                   |
+| `event.Example`                   | string  | From XML `<example>`                                                                                                                                   |
+| `event.Properties`                | array   | See below                                                                                                                                              |
+| `event.PartitionKeys`             | array   | `Name`, `TypeName`, `Description`, `Order` per key                                                                                                     |
+| `event.AttributeProperties`       | array   | Every public property of the topic attribute, reflected into `Key`/`Value` pairs                                                                       |
+| `event.TotalEstimatedSizeBytes`   | number  | Sum of estimated property sizes                                                                                                                        |
+| `event.HasInaccurateEstimates`    | boolean | True when a property's size can't be reliably estimated                                                                                                |
+| `event.GithubUrl`                 | string  | Source link, when `--github-url` is configured                                                                                                         |
+| `event.TopicAttributeDisplayName` | string  | e.g. `[EventTopic<Cashier>]`                                                                                                                           |
 
 Each item in `event.Properties`:
 

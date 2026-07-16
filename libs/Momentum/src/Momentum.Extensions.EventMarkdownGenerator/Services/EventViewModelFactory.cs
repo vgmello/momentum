@@ -1,6 +1,5 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-using Momentum.Extensions.Abstractions.Extensions;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Momentum.Extensions.EventMarkdownGenerator.Models;
@@ -26,18 +25,24 @@ public static partial class EventViewModelFactory
         return new EventViewModel
         {
             EventName = metadata.EventName,
+            EventNameKebab = metadata.EventNameKebab,
+            EventTypeName = metadata.EventTypeName,
             FullTypeName = metadata.FullTypeName,
             Namespace = metadata.Namespace,
             Topic = metadata.Topic,
             FullyQualifiedTopicName = metadata.FullyQualifiedTopicName,
+            Domain = metadata.Domain,
             Version = metadata.Version,
             Status = metadata.GetStatus(),
-            Entity = ExtractEntityFromEventType(metadata.EventType),
+            Entity = metadata.Entity,
             IsObsolete = metadata.IsObsolete,
             ObsoleteMessage = metadata.ObsoleteMessage,
             IsInternal = metadata.IsInternal,
             GithubUrl = GenerateGitHubUrl(metadata, options?.GitHubBaseUrl),
             TopicAttributeDisplayName = GetTopicAttributeDisplayName(metadata.TopicAttribute),
+            AttributeProperties = metadata.AttributeProperties
+                .Select(kvp => new AttributePropertyViewModel { Key = kvp.Key, Value = kvp.Value })
+                .ToArray(),
             Description = documentation.GetDescription(),
             Summary = documentation.Summary,
             Remarks = documentation.Remarks,
@@ -98,29 +103,6 @@ public static partial class EventViewModelFactory
         };
     }
 
-    private static string ExtractEntityFromEventType(Type eventType)
-    {
-        // Get the EventTopicAttribute directly from the event type to preserve generic information
-        var topicAttribute = eventType.GetCustomAttributes()
-            .FirstOrDefault(attr => attr.GetType().Name.StartsWith("EventTopicAttribute"));
-
-        if (topicAttribute == null) return string.Empty;
-
-        var attrType = topicAttribute.GetType();
-
-        if (attrType.IsGenericType && attrType.Name.StartsWith("EventTopicAttribute"))
-        {
-            var genericArgs = attrType.GetGenericArguments();
-
-            if (genericArgs.Length > 0)
-            {
-                return genericArgs[0].Name.ToKebabCase();
-            }
-        }
-
-        return string.Empty;
-    }
-
     private static string GenerateGitHubUrl(EventMetadata metadata, string? gitHubBaseUrl)
     {
         if (string.IsNullOrEmpty(gitHubBaseUrl))
@@ -129,7 +111,7 @@ public static partial class EventViewModelFactory
         }
 
         var pathParts = metadata.Namespace.Split('.');
-        var filePath = string.Join("/", pathParts) + $"/{metadata.EventName}.cs";
+        var filePath = string.Join("/", pathParts) + $"/{metadata.EventTypeName}.cs";
 
         return $"{gitHubBaseUrl}/{filePath}";
     }

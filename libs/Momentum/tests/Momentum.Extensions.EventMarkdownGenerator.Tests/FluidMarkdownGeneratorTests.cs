@@ -29,14 +29,16 @@ public class FluidMarkdownGeneratorTests
             Metadata = new EventMetadata
             {
                 EventName = "TestEvent",
+                EventNameKebab = "test-event",
+                EventTypeName = eventType.Name,
                 FullTypeName = eventType.FullName!,
                 Namespace = eventType.Namespace!,
                 Topic = "tests",
-                FullyQualifiedTopicName = "{env}.test.public.tests.v1",
+                FullyQualifiedTopicName = "test.public.tests.v1",
                 Domain = "Tests",
                 Version = "v1",
                 IsInternal = false,
-                EventType = eventType,
+                Entity = string.Empty,
                 TopicAttribute = (Attribute)topicAttribute,
                 Properties =
                 [
@@ -150,7 +152,7 @@ public class FluidMarkdownGeneratorTests
             var result = generator.GenerateMarkdown(eventWithDoc, outputDir);
 
             result.Content.ShouldContain("Test event for unit testing");
-            result.Content.ShouldContain("{env}.test.public.tests.v1");
+            result.Content.ShouldContain("test.public.tests.v1");
         }
         finally
         {
@@ -170,7 +172,7 @@ public class FluidMarkdownGeneratorTests
             var result = generator.GenerateMarkdown(eventWithDoc, outputDir);
 
             result.Content.ShouldContain("**Topic:** `Tests`");
-            result.Content.ShouldContain("**Fully Qualified Topic:** `{env}.test.public.tests.v1`");
+            result.Content.ShouldContain("**Fully Qualified Topic:** `test.public.tests.v1`");
         }
         finally
         {
@@ -211,6 +213,110 @@ public class FluidMarkdownGeneratorTests
             // The tail must not spill out as an orphaned line below the table.
             result.Content.Split('\n')
                 .ShouldNotContain(line => line.TrimStart().StartsWith("are delivered in publication order"));
+        }
+        finally
+        {
+            Directory.Delete(outputDir, true);
+        }
+    }
+
+    [Fact]
+    public async Task GenerateMarkdown_ShouldRenderEveryEventMetadataProperty()
+    {
+        var generator = await FluidMarkdownGenerator.CreateAsync();
+
+        var eventType = typeof(TestEvent);
+        var topicAttribute = eventType.GetCustomAttributes(false).First(a => a.GetType().Name.Contains("EventTopic"));
+
+        var eventWithDoc = new EventWithDocumentation
+        {
+            Metadata = new EventMetadata
+            {
+                EventName = "MarkerEventName",
+                EventNameKebab = "marker-event-name-kebab",
+                EventTypeName = "MarkerEventTypeName",
+                FullTypeName = "Marker.Namespace.MarkerFullTypeName",
+                Namespace = "Marker.Namespace",
+                Topic = "marker-topic",
+                FullyQualifiedTopicName = "marker-domain.public.marker-topic.v7",
+                Domain = "MarkerDomain",
+                Version = "v7",
+                IsInternal = false,
+                Entity = string.Empty,
+                TopicAttribute = (Attribute)topicAttribute,
+                AttributeProperties = new Dictionary<string, string>
+                {
+                    ["MarkerAttributeKey"] = "MarkerAttributeValue"
+                },
+                ObsoleteMessage = "MarkerObsoleteMessage",
+                Properties =
+                [
+                    new EventPropertyMetadata
+                    {
+                        Name = "MarkerPropertyName",
+                        TypeName = "MarkerPropertyTypeName",
+                        PropertyType = typeof(string),
+                        IsRequired = true,
+                        IsComplexType = false,
+                        IsPartitionKey = true,
+                        Description = "MarkerPropertyDescription",
+                        EstimatedSizeBytes = 42,
+                        IsAccurate = true
+                    }
+                ],
+                PartitionKeys =
+                [
+                    new PartitionKeyMetadata
+                    {
+                        Name = "MarkerPropertyName",
+                        TypeName = "MarkerPropertyTypeName",
+                        Description = "MarkerPartitionKeyDescription",
+                        Order = 0,
+                        IsFromParameter = false
+                    }
+                ]
+            },
+            Documentation = new EventDocumentation
+            {
+                Summary = "MarkerSummary",
+                Remarks = "MarkerRemarks",
+                Example = "MarkerExample",
+                PropertyDescriptions = new Dictionary<string, string>
+                {
+                    ["MarkerPropertyName"] = "MarkerPropertyDescription"
+                }
+            }
+        };
+
+        var outputDir = CreateTempDirectory();
+
+        try
+        {
+            var result = generator.GenerateMarkdown(eventWithDoc, outputDir);
+
+            // Every scalar EventMetadata property the generator can render has a distinct marker value
+            // above. EventType/TopicAttribute are excluded: they're reflected *sources* (their data
+            // surfaces through EventTypeName/FullTypeName and TopicAttributeDisplayName/AttributeProperties
+            // respectively), not values rendered verbatim themselves.
+            result.Content.ShouldContain("MarkerEventName");
+            result.Content.ShouldContain("MarkerEventTypeName");
+            result.Content.ShouldContain("marker-event-name-kebab");
+            result.Content.ShouldContain("Marker.Namespace.MarkerFullTypeName");
+            result.Content.ShouldContain("Marker.Namespace");
+            result.Content.ShouldContain("marker-topic");
+            result.Content.ShouldContain("marker-domain.public.marker-topic.v7");
+            result.Content.ShouldContain("MarkerDomain");
+            result.Content.ShouldContain("v7");
+            result.Content.ShouldContain("MarkerObsoleteMessage");
+            result.Content.ShouldContain("MarkerAttributeKey");
+            result.Content.ShouldContain("MarkerAttributeValue");
+            result.Content.ShouldContain("MarkerPropertyName");
+            result.Content.ShouldContain("MarkerPropertyTypeName");
+            result.Content.ShouldContain("MarkerPropertyDescription");
+            result.Content.ShouldContain("MarkerPartitionKeyDescription");
+            result.Content.ShouldContain("MarkerSummary");
+            result.Content.ShouldContain("MarkerRemarks");
+            result.Content.ShouldContain("MarkerExample");
         }
         finally
         {
@@ -414,7 +520,7 @@ public class FluidMarkdownGeneratorTests
     }
 
     // Test types
-    [EventTopic("{env}.test.public.tests.v1")]
+    [EventTopic("test.public.tests.v1")]
     public record TestEvent(Guid Id, string Name);
 
     public class TestSchemaType

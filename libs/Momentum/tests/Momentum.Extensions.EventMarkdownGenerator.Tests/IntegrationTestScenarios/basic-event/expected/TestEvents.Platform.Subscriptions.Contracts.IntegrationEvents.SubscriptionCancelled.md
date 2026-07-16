@@ -8,11 +8,12 @@ editLink: false
 # SubscriptionCancelled
 
 - **Status:** Active
+- **Domain:** Subscriptions
 - **Version:** v1
 - **Entity:** `subscription-cancelled`
 - **Type:** Integration Event
 - **Topic:** `subscription-cancelleds`
-- **Fully Qualified Topic:** `{env}.testevents.public.subscription-cancelleds.v1`
+- **Fully Qualified Topic:** `subscriptions.public.subscription-cancelleds.v1`
 - **Estimated Payload Size:** 24 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
@@ -37,5 +38,13 @@ This event uses a partition key for message routing:
     ## Technical Details
 
 - **Full Type:** [TestEvents.Platform.Subscriptions.Contracts.IntegrationEvents.SubscriptionCancelled](#)
+- **Type Name:** `SubscriptionCancelled`
+- **Event Slug:** `subscription-cancelled`
 - **Namespace:** `TestEvents.Platform.Subscriptions.Contracts.IntegrationEvents`
-- **Topic Attribute:** `[EventTopic]`
+- **Topic Attribute:** `[EventTopic<SubscriptionCancelled>]`
+- **Attribute Properties:**
+- `ShouldPluralizeTopicName`: `True`
+- `Topic`: `subscription-cancelled`
+- `Domain`: *(empty)*
+- `Version`: `v1`
+- `Internal`: `False`

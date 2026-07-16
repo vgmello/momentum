@@ -8,11 +8,12 @@ editLink: false
 # PaymentProcessed
 
 - **Status:** Active
+- **Domain:** Payments
 - **Version:** v1
 - **Entity:** `payment-processed`
 - **Type:** Integration Event
 - **Topic:** `payment-processeds`
-- **Fully Qualified Topic:** `{env}.testevents.public.payment-processeds.v1`
+- **Fully Qualified Topic:** `payments.public.payment-processeds.v1`
 - **Estimated Payload Size:** 32 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
@@ -36,5 +37,13 @@ This event uses a partition key for message routing:
     ## Technical Details
 
 - **Full Type:** [TestEvents.Platform.AppDomain.Payments.Contracts.IntegrationEvents.PaymentProcessed](#)
+- **Type Name:** `PaymentProcessed`
+- **Event Slug:** `payment-processed`
 - **Namespace:** `TestEvents.Platform.AppDomain.Payments.Contracts.IntegrationEvents`
-- **Topic Attribute:** `[EventTopic]`
+- **Topic Attribute:** `[EventTopic<PaymentProcessed>]`
+- **Attribute Properties:**
+- `ShouldPluralizeTopicName`: `True`
+- `Topic`: `payment-processed`
+- `Domain`: *(empty)*
+- `Version`: `v1`
+- `Internal`: `False`

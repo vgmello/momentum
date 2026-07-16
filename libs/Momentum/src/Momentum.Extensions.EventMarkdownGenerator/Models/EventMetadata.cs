@@ -7,6 +7,15 @@ namespace Momentum.Extensions.EventMarkdownGenerator.Models;
 public record EventMetadata
 {
     public required string EventName { get; init; }
+
+    /// <summary>
+    ///     Kebab-cased form of <see cref="EventName"/> (respects an <c>EventName</c> attribute override
+    ///     the same way EventName itself does). Intended for topic-adjacent/URL-safe uses in templates
+    ///     that want a slug without kebab-casing the human-facing heading itself.
+    /// </summary>
+    public required string EventNameKebab { get; init; }
+
+    public required string EventTypeName { get; init; }
     public required string FullTypeName { get; init; }
     public required string Namespace { get; init; }
     public required string Topic { get; init; }
@@ -14,8 +23,23 @@ public record EventMetadata
     public required string Domain { get; init; }
     public required string Version { get; init; }
     public required bool IsInternal { get; init; }
-    public required Type EventType { get; init; }
     public required Attribute TopicAttribute { get; init; }
+
+    /// <summary>
+    ///     Kebab-cased name of the entity type argument on a generic topic attribute (e.g.
+    ///     <c>EventTopicAttribute&lt;Cashier&gt;</c> yields "cashier"), or empty when the topic
+    ///     attribute isn't generic.
+    /// </summary>
+    public required string Entity { get; init; }
+
+    /// <summary>
+    ///     Every public property of <see cref="TopicAttribute"/>, name to stringified value, discovered via
+    ///     reflection. Captures custom/unknown attribute properties (beyond the well-known ones already
+    ///     mapped onto this record, e.g. Domain/Version/Topic) so templates can render them without the
+    ///     generator needing to know about them ahead of time.
+    /// </summary>
+    public IReadOnlyDictionary<string, string> AttributeProperties { get; init; } = new Dictionary<string, string>();
+
     public List<EventPropertyMetadata> Properties { get; init; } = [];
     public List<PartitionKeyMetadata> PartitionKeys { get; init; } = [];
     public string? ObsoleteMessage { get; init; }

@@ -1,0 +1,10 @@
+{
+  "strictFileMatching": false,
+  "ignoreFiles": [],
+  "customAssertions": {
+    "TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents.AllPropertiesShowcaseEvent.md": "Should render every EventMetadata property: EventTypeName, Domain, AttributeProperties, obsolete warning, multiple partition keys, complex + collection reference schemas, and real XML doc Summary/Remarks/Example/param descriptions"
+  },
+  "generateSchemas": true,
+  "generateSidebar": true,
+  "focusedEvents": ["AllPropertiesShowcaseEvent"]
+}

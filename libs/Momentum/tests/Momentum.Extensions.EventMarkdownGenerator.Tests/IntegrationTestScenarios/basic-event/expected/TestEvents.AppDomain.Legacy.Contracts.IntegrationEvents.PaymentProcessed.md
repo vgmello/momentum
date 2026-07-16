@@ -11,11 +11,12 @@ editLink: false
     > This event is deprecated. This event has been replaced by the new PaymentCompleted event. Please migrate to use the new event structure for enhanced functionality.
 
 - **Status:** Deprecated
+- **Domain:** Legacy
 - **Version:** v1
 - **Entity:** `payment-processed`
 - **Type:** Integration Event
 - **Topic:** `payment-processeds`
-- **Fully Qualified Topic:** `{env}.testevents.public.payment-processeds.v1`
+- **Fully Qualified Topic:** `legacy.public.payment-processeds.v1`
 - **Estimated Payload Size:** 32 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
@@ -39,5 +40,13 @@ This event uses a partition key for message routing:
     ## Technical Details
 
 - **Full Type:** [TestEvents.AppDomain.Legacy.Contracts.IntegrationEvents.PaymentProcessed](#)
+- **Type Name:** `PaymentProcessed`
+- **Event Slug:** `payment-processed`
 - **Namespace:** `TestEvents.AppDomain.Legacy.Contracts.IntegrationEvents`
-- **Topic Attribute:** `[EventTopic]`
+- **Topic Attribute:** `[EventTopic<PaymentProcessed>]`
+- **Attribute Properties:**
+- `ShouldPluralizeTopicName`: `True`
+- `Topic`: `payment-processed`
+- `Domain`: *(empty)*
+- `Version`: `v1`
+- `Internal`: `False`

@@ -34,6 +34,12 @@
         "link": null,
         "items": [
           {
+            "text": "All Properties Showcase Event",
+            "link": "/TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents.AllPropertiesShowcaseEvent",
+            "items": [],
+            "collapsed": false
+          },
+          {
             "text": "Internal Audit Log Created",
             "link": "/TestEvents.AppDomain.Internal.Audit.IntegrationEvents.InternalAuditLogCreated",
             "items": [],
@@ -302,6 +308,12 @@
           {
             "text": "OrderItem",
             "link": "/schemas/TestEvents.AppDomain.Orders.Contracts.Models.OrderItem",
+            "items": [],
+            "collapsed": false
+          },
+          {
+            "text": "ShowcaseLocation",
+            "link": "/schemas/TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents.ShowcaseLocation",
             "items": [],
             "collapsed": false
           }

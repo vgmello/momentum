@@ -161,17 +161,7 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
                 var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser, calculator,
                     options.EventAttributeName, options.PartitionKeyAttributeName);
 
-                foreach (var eventMetadata in events)
-                {
-                    var documentation = xmlParser.GetEventDocumentation(eventMetadata.EventType);
-                    var eventWithDoc = new EventWithDocumentation
-                    {
-                        Metadata = eventMetadata,
-                        Documentation = documentation
-                    };
-
-                    allEvents.Add(eventWithDoc);
-                }
+                allEvents.AddRange(events);
 
                 processedAssemblies++;
             }

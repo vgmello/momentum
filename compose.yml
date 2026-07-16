@@ -127,7 +127,10 @@ services:
       - "10002:10002" # Table service
     volumes:
       - azurite-data:/data
-    command: "azurite --silent --location /data --debug /data/debug.log --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0"
+    # --skipApiVersionCheck: the Azure SDK clients (Aspire.Azure.Data.Tables / Aspire.Azure.Storage.Blobs)
+    # request the latest Azure Storage service API version, which is routinely ahead of what Azurite has
+    # added support for yet. See https://github.com/Azure/Azurite/discussions/2627.
+    command: "azurite --silent --location /data --debug /data/debug.log --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0 --skipApiVersionCheck"
     restart: unless-stopped
     healthcheck:
       test: [ "CMD-SHELL", "netstat -ltn | grep :10000 || exit 1" ]

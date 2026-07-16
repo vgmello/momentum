@@ -8,11 +8,12 @@ editLink: false
 # SubscriptionActivated
 
 - **Status:** Active
+- **Domain:** Subscriptions
 - **Version:** v1
 - **Entity:** `subscription-activated`
 - **Type:** Integration Event
 - **Topic:** `subscription-activateds`
-- **Fully Qualified Topic:** `{env}.testevents.public.subscription-activateds.v1`
+- **Fully Qualified Topic:** `subscriptions.public.subscription-activateds.v1`
 - **Estimated Payload Size:** 16 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
@@ -36,5 +37,13 @@ This event uses a partition key for message routing:
     ## Technical Details
 
 - **Full Type:** [TestEvents.Platform.Subscriptions.Contracts.IntegrationEvents.SubscriptionActivated](#)
+- **Type Name:** `SubscriptionActivated`
+- **Event Slug:** `subscription-activated`
 - **Namespace:** `TestEvents.Platform.Subscriptions.Contracts.IntegrationEvents`
-- **Topic Attribute:** `[EventTopic]`
+- **Topic Attribute:** `[EventTopic<SubscriptionActivated>]`
+- **Attribute Properties:**
+- `ShouldPluralizeTopicName`: `True`
+- `Topic`: `subscription-activated`
+- `Domain`: *(empty)*
+- `Version`: `v1`
+- `Internal`: `False`

@@ -313,22 +313,20 @@ public class ScenarioBasedIntegrationTests
     {
         // Initialize services
         var xmlParser = new XmlDocumentationParser();
-        var fluidGenerator = await FluidMarkdownGenerator.CreateAsync();
+
+        // A scenario may ship its own Liquid templates (e.g. a "templates/event.liquid") to override
+        // the default rendering just for that scenario, instead of always using the shared template.
+        var scenarioTemplatesDir = Path.Combine(Path.GetDirectoryName(scenario.InputXmlPath)!, "templates");
+        var fluidGenerator = await FluidMarkdownGenerator.CreateAsync(
+            Directory.Exists(scenarioTemplatesDir) ? scenarioTemplatesDir : null);
         // Load XML documentation
         var xmlLoaded = await xmlParser.LoadMultipleDocumentationAsync([scenario.InputXmlPath], TestContext.Current.CancellationToken);
 
         xmlLoaded.ShouldBeTrue($"Should be able to load XML from {scenario.InputXmlPath}");
 
-        // Load and discover events
+        // Load and discover events (already paired with their XML documentation)
         var assembly = Assembly.LoadFrom(scenario.AssemblyPath);
-        var discoveredEvents = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser, PayloadSizeCalculator.Create("json")).ToList();
-
-        // Generate event documentation
-        var eventsWithDocumentation = discoveredEvents.Select(eventMetadata => new EventWithDocumentation
-        {
-            Metadata = eventMetadata,
-            Documentation = xmlParser.GetEventDocumentation(eventMetadata.EventType)
-        }).ToList();
+        var eventsWithDocumentation = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser, PayloadSizeCalculator.Create("json")).ToList();
 
         var results = new MarkdownGenerationResults();
 

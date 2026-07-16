@@ -8,11 +8,12 @@ editLink: false
 # BulkDataProcessed
 
 - **Status:** Active
+- **Domain:** Collections
 - **Version:** v1
 - **Entity:** `bulk-data-processed`
 - **Type:** Integration Event
 - **Topic:** `bulk-data-processeds`
-- **Fully Qualified Topic:** `{env}.testevents.public.bulk-data-processeds.v1`
+- **Fully Qualified Topic:** `collections.public.bulk-data-processeds.v1`
 - **Estimated Payload Size:** 399 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
@@ -63,5 +64,13 @@ This event uses a partition key for message routing:
 ## Technical Details
 
 - **Full Type:** [TestEvents.AppDomain.Collections.Contracts.IntegrationEvents.BulkDataProcessed](#)
+- **Type Name:** `BulkDataProcessed`
+- **Event Slug:** `bulk-data-processed`
 - **Namespace:** `TestEvents.AppDomain.Collections.Contracts.IntegrationEvents`
-- **Topic Attribute:** `[EventTopic]`
+- **Topic Attribute:** `[EventTopic<BulkDataProcessed>]`
+- **Attribute Properties:**
+- `ShouldPluralizeTopicName`: `True`
+- `Topic`: `bulk-data-processed`
+- `Domain`: *(empty)*
+- `Version`: `v1`
+- `Internal`: `False`

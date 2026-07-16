@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TestEvents</name>
+    </assembly>
+    <members>
+        <member name="T:TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents.AllPropertiesShowcaseEvent">
+            <summary>
+            Exercises every EventMetadata property in a single event: explicit domain/topic/version,
+            internal visibility, an obsolete marker, multiple partition keys, a complex nested property,
+            and a collection of a complex type.
+            </summary>
+            <remarks>
+            ## When It's Triggered
+
+            This event exists purely as a documentation-generator test fixture, showcasing every
+            renderable field of the generated markdown at once.
+            </remarks>
+            <example>
+            <code>
+            await bus.PublishAsync(new AllPropertiesShowcaseEvent(tenantId, 1, primaryLocation, relatedLocations));
+            </code>
+            </example>
+        </member>
+        <member name="M:TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents.AllPropertiesShowcaseEvent.#ctor(System.Guid,System.Int32,TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents.ShowcaseLocation,System.Collections.Generic.List{TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents.ShowcaseLocation})">
+            <param name="tenantId">Identifier of the tenant that owns this record</param>
+            <param name="sequenceNumber">Secondary partition key used for ordering within a tenant</param>
+            <param name="primaryLocation">The primary complex-type property, rendered with its own reference schema</param>
+            <param name="relatedLocations">A collection of complex-type entries, rendered with an element reference schema</param>
+        </member>
+        <member name="T:TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents.ShowcaseLocation">
+            <summary>
+            A complex nested type referenced by AllPropertiesShowcaseEvent, both directly and inside a
+            collection, so both reference-schema rendering paths are exercised.
+            </summary>
+        </member>
+        <member name="P:TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents.ShowcaseLocation.Id">
+            <summary>Unique identifier for the location</summary>
+        </member>
+        <member name="P:TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents.ShowcaseLocation.Name">
+            <summary>Display name of the location</summary>
+        </member>
+    </members>
+</doc>
