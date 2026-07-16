@@ -5,13 +5,11 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# SubscriptionActivated
+# SubscriptionActivated <Badge type="tip" text="Active" />
 
-- **Status:** Active
-- **Domain:** TestEvents
-- **Subdomain:** Subscriptions
+- **Domain:** TestEvents.Subscriptions
 - **Version:** v1
-- **Entity:** `subscription-activated`
+- **Entity:** `SubscriptionActivated`
 - **Type:** Integration Event
 - **Topic:** `subscription-activateds`
 - **Fully Qualified Topic:** `test-events.subscriptions.subscription-activateds.v1`
@@ -42,10 +40,3 @@ This event uses a partition key for message routing:
 - **Event Slug:** `subscription-activated`
 - **Namespace:** `TestEvents.Platform.Subscriptions.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<SubscriptionActivated>]`
-- **Attribute Properties:**
-- `ShouldPluralizeTopicName`: `True`
-- `Topic`: `subscription-activated`
-- `Domain`: *(empty)*
-- `Subdomain`: *(empty)*
-- `Version`: `v1`
-- `Internal`: `False`

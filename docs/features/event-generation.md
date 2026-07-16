@@ -107,8 +107,9 @@ The `event.liquid` template has access to a comprehensive event model:
 | `event.Domain`                    | string  | Resolved domain — explicit attribute override, else assembly default                                                                    |
 | `event.Subdomain`                 | string? | Resolved subdomain — explicit attribute override, else namespace-derived                                                                |
 | `event.Version`                   | string  | Event version (e.g., "v1")                                                                                                              |
-| `event.Status`                    | string  | Event status ("Active" or "Deprecated")                                                                                                 |
-| `event.Entity`                    | string  | Extracted entity name (e.g., "cashier")                                                                                                 |
+| `event.Status`                    | string  | Event status ("Active" or "Deprecated"). Rendered as a badge next to the title, not its own bullet                                      |
+| `event.Entity`                    | string  | PascalCase entity name (e.g., "Cashier"), linked to its schema page via `event.EntitySchemaLink` when one exists                        |
+| `event.EntitySchemaLink`          | string? | Schema page path for `Entity`, or `null` if `TEntity` has no generated schema documentation                                             |
 | `event.IsInternal`                | boolean | `true` for domain events, `false` for integration events                                                                                |
 | `event.IsObsolete`                | boolean | Whether event is marked with `[Obsolete]`                                                                                               |
 | `event.ObsoleteMessage`           | string  | Deprecation message if obsolete                                                                                                         |

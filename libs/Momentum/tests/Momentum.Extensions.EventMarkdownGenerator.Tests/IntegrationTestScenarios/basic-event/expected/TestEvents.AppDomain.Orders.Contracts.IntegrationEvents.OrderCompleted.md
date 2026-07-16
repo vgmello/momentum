@@ -5,13 +5,11 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# OrderCompleted
+# OrderCompleted <Badge type="tip" text="Active" />
 
-- **Status:** Active
-- **Domain:** TestEvents
-- **Subdomain:** Orders
+- **Domain:** TestEvents.Orders
 - **Version:** v1
-- **Entity:** `order`
+- **Entity:** `Order`
 - **Type:** Integration Event
 - **Topic:** `orders`
 - **Fully Qualified Topic:** `test-events.orders.orders.v1`
@@ -57,10 +55,3 @@ This event uses a partition key for message routing:
 - **Event Slug:** `order-completed`
 - **Namespace:** `TestEvents.AppDomain.Orders.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<Order>]`
-- **Attribute Properties:**
-- `ShouldPluralizeTopicName`: `True`
-- `Topic`: `order`
-- `Domain`: *(empty)*
-- `Subdomain`: *(empty)*
-- `Version`: `v1`
-- `Internal`: `False`

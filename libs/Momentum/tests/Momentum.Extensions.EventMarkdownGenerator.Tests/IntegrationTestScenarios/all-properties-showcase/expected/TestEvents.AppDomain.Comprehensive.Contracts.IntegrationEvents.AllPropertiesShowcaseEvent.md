@@ -20,7 +20,7 @@ editLink: false
 - **Domain:** comprehensive-domain
 - **Version:** v9
 - **Status:** Deprecated
-- **Entity:** showcase-location
+- **Entity:** ShowcaseLocation
 - **IsObsolete:** true
 - **IsInternal:** true
 - **ObsoleteMessage:** Superseded by a hypothetical future event; kept only as a documentation-generator test fixture.

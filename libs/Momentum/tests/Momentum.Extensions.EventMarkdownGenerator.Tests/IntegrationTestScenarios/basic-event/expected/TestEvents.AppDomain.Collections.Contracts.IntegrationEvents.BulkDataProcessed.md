@@ -5,13 +5,11 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# BulkDataProcessed
+# BulkDataProcessed <Badge type="tip" text="Active" />
 
-- **Status:** Active
-- **Domain:** TestEvents
-- **Subdomain:** Collections
+- **Domain:** TestEvents.Collections
 - **Version:** v1
-- **Entity:** `bulk-data-processed`
+- **Entity:** `BulkDataProcessed`
 - **Type:** Integration Event
 - **Topic:** `bulk-data-processeds`
 - **Fully Qualified Topic:** `test-events.collections.bulk-data-processeds.v1`
@@ -69,10 +67,3 @@ This event uses a partition key for message routing:
 - **Event Slug:** `bulk-data-processed`
 - **Namespace:** `TestEvents.AppDomain.Collections.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<BulkDataProcessed>]`
-- **Attribute Properties:**
-- `ShouldPluralizeTopicName`: `True`
-- `Topic`: `bulk-data-processed`
-- `Domain`: *(empty)*
-- `Subdomain`: *(empty)*
-- `Version`: `v1`
-- `Internal`: `False`

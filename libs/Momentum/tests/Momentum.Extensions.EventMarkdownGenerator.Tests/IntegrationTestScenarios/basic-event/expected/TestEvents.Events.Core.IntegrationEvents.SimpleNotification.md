@@ -5,12 +5,11 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# SimpleNotification
+# SimpleNotification <Badge type="tip" text="Active" />
 
-- **Status:** Active
 - **Domain:** TestEvents
 - **Version:** v1
-- **Entity:** `simple-notification`
+- **Entity:** `SimpleNotification`
 - **Type:** Integration Event
 - **Topic:** `simple-notifications`
 - **Fully Qualified Topic:** `test-events.simple-notifications.v1`
@@ -35,10 +34,3 @@ No documentation available
 - **Event Slug:** `simple-notification`
 - **Namespace:** `TestEvents.Events.Core.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<SimpleNotification>]`
-- **Attribute Properties:**
-- `ShouldPluralizeTopicName`: `True`
-- `Topic`: `simple-notification`
-- `Domain`: *(empty)*
-- `Subdomain`: *(empty)*
-- `Version`: `v1`
-- `Internal`: `False`

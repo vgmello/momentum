@@ -201,16 +201,19 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
 
         cancellationToken.ThrowIfCancellationRequested();
 
+        // Collected up front (cheap - only reflects already-discovered event properties) so markdown
+        // generation knows which entity types have a schema page to link to.
+        var schemaTypes = CollectAllSchemaTypes(allEvents);
+
         // Generate individual markdown files
-        var markdownFiles = markdownGenerator.GenerateAllMarkdown(allEvents, options.OutputDirectory, options).ToList();
+        var markdownFiles = markdownGenerator.GenerateAllMarkdown(allEvents, options.OutputDirectory, options, schemaTypes).ToList();
 
         // Write markdown files
         await WriteMarkdownFilesAsync(markdownFiles, cancellationToken);
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        // Extract and generate schema files
-        var schemaTypes = CollectAllSchemaTypes(allEvents);
+        // Generate schema files
         var schemaFiles = markdownGenerator.GenerateAllSchemas(schemaTypes, options.OutputDirectory).ToList();
 
         // Write schema files

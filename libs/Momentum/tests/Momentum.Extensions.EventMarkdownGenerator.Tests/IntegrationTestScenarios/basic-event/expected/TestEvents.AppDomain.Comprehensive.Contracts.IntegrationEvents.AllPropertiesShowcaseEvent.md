@@ -5,16 +5,14 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# AllPropertiesShowcaseEvent
+# AllPropertiesShowcaseEvent <Badge type="danger" text="Deprecated" />
 
 > [!CAUTION]
     > This event is deprecated. Superseded by a hypothetical future event; kept only as a documentation-generator test fixture.
 
-- **Status:** Deprecated
-- **Domain:** comprehensive-domain
-- **Subdomain:** Comprehensive
+- **Domain:** comprehensive-domain.Comprehensive
 - **Version:** v9
-- **Entity:** `showcase-location`
+- **Entity:** `ShowcaseLocation`
 - **Type:** Domain Event
 - **Topic:** `comprehensive-topic`
 - **Fully Qualified Topic:** `internal.comprehensive-domain.comprehensive.comprehensive-topic.v9`
@@ -58,10 +56,3 @@ This event uses multiple partition keys for message routing:
 - **Event Slug:** `all-properties-showcase-event`
 - **Namespace:** `TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<ShowcaseLocation>]`
-- **Attribute Properties:**
-- `ShouldPluralizeTopicName`: `False`
-- `Topic`: `comprehensive-topic`
-- `Domain`: `comprehensive-domain`
-- `Subdomain`: *(empty)*
-- `Version`: `v9`
-- `Internal`: `True`

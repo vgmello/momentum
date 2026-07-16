@@ -5,13 +5,11 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# SubscriptionCancelled
+# SubscriptionCancelled <Badge type="tip" text="Active" />
 
-- **Status:** Active
-- **Domain:** TestEvents
-- **Subdomain:** Subscriptions
+- **Domain:** TestEvents.Subscriptions
 - **Version:** v1
-- **Entity:** `subscription-cancelled`
+- **Entity:** `SubscriptionCancelled`
 - **Type:** Integration Event
 - **Topic:** `subscription-cancelleds`
 - **Fully Qualified Topic:** `test-events.subscriptions.subscription-cancelleds.v1`
@@ -43,10 +41,3 @@ This event uses a partition key for message routing:
 - **Event Slug:** `subscription-cancelled`
 - **Namespace:** `TestEvents.Platform.Subscriptions.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<SubscriptionCancelled>]`
-- **Attribute Properties:**
-- `ShouldPluralizeTopicName`: `True`
-- `Topic`: `subscription-cancelled`
-- `Domain`: *(empty)*
-- `Subdomain`: *(empty)*
-- `Version`: `v1`
-- `Internal`: `False`

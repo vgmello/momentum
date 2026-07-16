@@ -16,6 +16,7 @@ public class EventViewModel
     public string Version { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
     public string Entity { get; set; } = string.Empty;
+    public string? EntitySchemaLink { get; set; }
     public bool IsObsolete { get; set; }
     public bool IsInternal { get; set; }
 

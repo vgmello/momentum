@@ -5,13 +5,11 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# ProductStockUpdated
+# ProductStockUpdated <Badge type="tip" text="Active" />
 
-- **Status:** Active
-- **Domain:** TestEvents
-- **Subdomain:** Inventory
+- **Domain:** TestEvents.Inventory
 - **Version:** v1
-- **Entity:** `product`
+- **Entity:** `Product`
 - **Type:** Integration Event
 - **Topic:** `products`
 - **Fully Qualified Topic:** `test-events.inventory.products.v1`
@@ -48,10 +46,3 @@ This event uses multiple partition keys for message routing:
 - **Event Slug:** `product-stock-updated`
 - **Namespace:** `TestEvents.AppDomain.Inventory.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<Product>]`
-- **Attribute Properties:**
-- `ShouldPluralizeTopicName`: `True`
-- `Topic`: `product`
-- `Domain`: *(empty)*
-- `Subdomain`: *(empty)*
-- `Version`: `v1`
-- `Internal`: `False`

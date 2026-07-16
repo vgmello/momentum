@@ -5,12 +5,11 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# MalformedXmlEvent
+# MalformedXmlEvent <Badge type="tip" text="Active" />
 
-- **Status:** Active
 - **Domain:** TestEvents
 - **Version:** v1
-- **Entity:** `malformed-xml-event`
+- **Entity:** `MalformedXmlEvent`
 - **Type:** Integration Event
 - **Topic:** `malformed-xml-events`
 - **Fully Qualified Topic:** `test-events.malformed-xml-events.v1`
@@ -40,10 +39,3 @@ This event uses a partition key for message routing:
 - **Event Slug:** `malformed-xml-event`
 - **Namespace:** `TestEvents.Missing.Docs.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<MalformedXmlEvent>]`
-- **Attribute Properties:**
-- `ShouldPluralizeTopicName`: `True`
-- `Topic`: `malformed-xml-event`
-- `Domain`: *(empty)*
-- `Subdomain`: *(empty)*
-- `Version`: `v1`
-- `Internal`: `False`

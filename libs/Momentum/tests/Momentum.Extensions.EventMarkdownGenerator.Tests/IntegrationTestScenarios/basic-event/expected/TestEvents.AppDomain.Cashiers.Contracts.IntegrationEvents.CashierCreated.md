@@ -5,13 +5,11 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# CashierCreated
+# CashierCreated <Badge type="tip" text="Active" />
 
-- **Status:** Active
-- **Domain:** TestEvents
-- **Subdomain:** Cashiers
+- **Domain:** TestEvents.Cashiers
 - **Version:** v1
-- **Entity:** `cashier`
+- **Entity:** `Cashier`
 - **Type:** Integration Event
 - **Topic:** `cashiers`
 - **Fully Qualified Topic:** `test-events.cashiers.cashiers.v1`
@@ -50,10 +48,3 @@ This event uses multiple partition keys for message routing:
 - **Event Slug:** `cashier-created`
 - **Namespace:** `TestEvents.AppDomain.Cashiers.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<Cashier>]`
-- **Attribute Properties:**
-- `ShouldPluralizeTopicName`: `True`
-- `Topic`: `cashier`
-- `Domain`: *(empty)*
-- `Subdomain`: *(empty)*
-- `Version`: `v1`
-- `Internal`: `False`

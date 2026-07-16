@@ -121,7 +121,7 @@ public class GenericAttributeDiscoveryTests
         // ConventionEventTopicAttribute is non-generic (no TEntity), so Entity can only come from
         // stripping a known event-verb suffix off the type's own name.
         var widgetCreated = events.Single(e => e.FullTypeName == typeof(WidgetCreated).FullName);
-        widgetCreated.Entity.ShouldBe("widget");
+        widgetCreated.Entity.ShouldBe("Widget");
 
         // ConventionEvent's name matches no known suffix, so Entity stays empty rather than guessing.
         var conventionEvent = events.Single(e => e.FullTypeName == typeof(ConventionEvent).FullName);

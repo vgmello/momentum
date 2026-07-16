@@ -16,11 +16,22 @@ public static partial class EventViewModelFactory
     /// <summary>
     ///     Creates an event view model for template rendering.
     /// </summary>
+    /// <param name="metadata">The event metadata to render.</param>
+    /// <param name="documentation">The event's XML documentation.</param>
+    /// <param name="options">Optional generator options for customization.</param>
+    /// <param name="schemaTypes">
+    ///     Types with generated schema documentation, used to link <see cref="EventViewModel.Entity"/> to its
+    ///     schema page when <see cref="EventMetadata.EntityType"/> is among them.
+    /// </param>
     public static EventViewModel CreateEventModel(EventMetadata metadata, EventDocumentation documentation,
-        GeneratorOptions? options = null)
+        GeneratorOptions? options = null, IReadOnlySet<Type>? schemaTypes = null)
     {
         var totalSize = metadata.Properties.Sum(p => p.EstimatedSizeBytes);
         var hasInaccurateEstimates = metadata.Properties.Any(p => !p.IsAccurate);
+
+        var entitySchemaLink = metadata.EntityType != null && schemaTypes?.Contains(metadata.EntityType) == true
+            ? GetSchemaFileName(metadata.EntityType)
+            : null;
 
         return new EventViewModel
         {
@@ -36,6 +47,7 @@ public static partial class EventViewModelFactory
             Version = metadata.Version,
             Status = metadata.GetStatus(),
             Entity = metadata.Entity,
+            EntitySchemaLink = entitySchemaLink,
             IsObsolete = metadata.IsObsolete,
             ObsoleteMessage = metadata.ObsoleteMessage,
             IsInternal = metadata.IsInternal,

@@ -5,12 +5,11 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# MinimalEvent
+# MinimalEvent <Badge type="tip" text="Active" />
 
-- **Status:** Active
 - **Domain:** TestEvents
 - **Version:** v1
-- **Entity:** `minimal-event`
+- **Entity:** `MinimalEvent`
 - **Type:** Integration Event
 - **Topic:** `minimal-events`
 - **Fully Qualified Topic:** `test-events.minimal-events.v1`
@@ -39,10 +38,3 @@ This event uses a partition key for message routing:
 - **Event Slug:** `minimal-event`
 - **Namespace:** `TestEvents.Events.Core.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<MinimalEvent>]`
-- **Attribute Properties:**
-- `ShouldPluralizeTopicName`: `True`
-- `Topic`: `minimal-event`
-- `Domain`: *(empty)*
-- `Subdomain`: *(empty)*
-- `Version`: `v1`
-- `Internal`: `False`

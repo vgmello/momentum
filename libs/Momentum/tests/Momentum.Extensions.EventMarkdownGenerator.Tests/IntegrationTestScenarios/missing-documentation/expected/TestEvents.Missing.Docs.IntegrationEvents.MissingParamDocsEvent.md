@@ -5,12 +5,11 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# MissingParamDocsEvent
+# MissingParamDocsEvent <Badge type="tip" text="Active" />
 
-- **Status:** Active
 - **Domain:** TestEvents
 - **Version:** v1
-- **Entity:** `missing-param-docs-event`
+- **Entity:** `MissingParamDocsEvent`
 - **Type:** Integration Event
 - **Topic:** `missing-param-docs-events`
 - **Fully Qualified Topic:** `test-events.missing-param-docs-events.v1`
@@ -40,10 +39,3 @@ This event uses a partition key for message routing:
 - **Event Slug:** `missing-param-docs-event`
 - **Namespace:** `TestEvents.Missing.Docs.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<MissingParamDocsEvent>]`
-- **Attribute Properties:**
-- `ShouldPluralizeTopicName`: `True`
-- `Topic`: `missing-param-docs-event`
-- `Domain`: *(empty)*
-- `Subdomain`: *(empty)*
-- `Version`: `v1`
-- `Internal`: `False`

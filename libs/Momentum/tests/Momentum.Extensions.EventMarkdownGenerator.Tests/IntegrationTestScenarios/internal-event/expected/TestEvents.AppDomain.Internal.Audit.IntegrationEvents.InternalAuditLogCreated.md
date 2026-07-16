@@ -5,12 +5,11 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# InternalAuditLogCreated
+# InternalAuditLogCreated <Badge type="tip" text="Active" />
 
-- **Status:** Active
 - **Domain:** TestEvents
 - **Version:** v1
-- **Entity:** `audit-log`
+- **Entity:** `AuditLog`
 - **Type:** Domain Event
 - **Topic:** `audit-logs`
 - **Fully Qualified Topic:** `internal.test-events.audit-logs.v1`
@@ -44,10 +43,3 @@ This event uses a partition key for message routing:
 - **Event Slug:** `internal-audit-log-created`
 - **Namespace:** `TestEvents.AppDomain.Internal.Audit.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<AuditLog>]`
-- **Attribute Properties:**
-- `ShouldPluralizeTopicName`: `True`
-- `Topic`: `audit-log`
-- `Domain`: *(empty)*
-- `Subdomain`: *(empty)*
-- `Version`: `v1`
-- `Internal`: `True`

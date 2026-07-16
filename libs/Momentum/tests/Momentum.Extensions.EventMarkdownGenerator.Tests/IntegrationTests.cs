@@ -76,9 +76,9 @@ public class IntegrationTests
             {
                 var referenceContent = await File.ReadAllTextAsync(ReferenceMarkdownPath, TestContext.Current.CancellationToken);
 
-                // Compare key sections
+                // Compare key sections. Status is rendered as a badge next to the title, not its own
+                // section, so it's covered by the title comparison rather than a separate one.
                 CompareMarkdownSection(generatedContent, referenceContent, "# CashierCreated", "Title should match");
-                CompareMarkdownSection(generatedContent, referenceContent, "**Status:**", "Status should match");
                 CompareMarkdownSection(generatedContent, referenceContent, "**Topic:**", "Topic should match");
                 CompareMarkdownSection(generatedContent, referenceContent, "**Type:**", "Type should match");
             }
@@ -222,7 +222,7 @@ public class IntegrationTests
     {
         // Validate basic structure
         content.ShouldContain("# CashierCreated");
-        content.ShouldContain("**Status:**");
+        content.ShouldContain("<Badge type=\"tip\" text=\"Active\" />");
         content.ShouldContain("**Version:**");
         content.ShouldContain("**Topic:**");
         content.ShouldContain("**Type:** Integration Event");
@@ -246,8 +246,8 @@ public class IntegrationTests
         content.ShouldContain("**Topic:** `Cashiers`");
         content.ShouldContain("**Fully Qualified Topic:** `test-events.cashiers.cashiers.v1`");
 
-        // Validate entity field
-        content.ShouldContain("**Entity:** `cashier`");
+        // Validate entity field (PascalCase, not linked since Cashier has no generated schema in this test)
+        content.ShouldContain("**Entity:** `Cashier`");
 
         // Validate domain detection
         content.ShouldContain("AppDomain.Cashiers.Contracts.IntegrationEvents");

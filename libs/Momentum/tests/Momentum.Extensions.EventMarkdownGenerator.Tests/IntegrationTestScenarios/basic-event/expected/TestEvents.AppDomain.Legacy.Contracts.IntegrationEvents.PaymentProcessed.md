@@ -5,16 +5,14 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# PaymentProcessed
+# PaymentProcessed <Badge type="danger" text="Deprecated" />
 
 > [!CAUTION]
     > This event is deprecated. This event has been replaced by the new PaymentCompleted event. Please migrate to use the new event structure for enhanced functionality.
 
-- **Status:** Deprecated
-- **Domain:** TestEvents
-- **Subdomain:** Legacy
+- **Domain:** TestEvents.Legacy
 - **Version:** v1
-- **Entity:** `payment-processed`
+- **Entity:** `PaymentProcessed`
 - **Type:** Integration Event
 - **Topic:** `payment-processeds`
 - **Fully Qualified Topic:** `test-events.legacy.payment-processeds.v1`
@@ -45,10 +43,3 @@ This event uses a partition key for message routing:
 - **Event Slug:** `payment-processed`
 - **Namespace:** `TestEvents.AppDomain.Legacy.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<PaymentProcessed>]`
-- **Attribute Properties:**
-- `ShouldPluralizeTopicName`: `True`
-- `Topic`: `payment-processed`
-- `Domain`: *(empty)*
-- `Subdomain`: *(empty)*
-- `Version`: `v1`
-- `Internal`: `False`
