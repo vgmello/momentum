@@ -13,7 +13,7 @@ editLink: false
 - **Entity:** `subscription-activated`
 - **Type:** Integration Event
 - **Topic:** `subscription-activateds`
-- **Fully Qualified Topic:** `{env}.subscriptions.public.subscription-activateds.v1`
+- **Fully Qualified Topic:** `subscriptions.public.subscription-activateds.v1`
 - **Estimated Payload Size:** 16 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 

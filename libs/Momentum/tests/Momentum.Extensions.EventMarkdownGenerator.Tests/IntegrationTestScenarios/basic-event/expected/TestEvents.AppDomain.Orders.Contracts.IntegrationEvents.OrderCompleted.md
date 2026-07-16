@@ -13,7 +13,7 @@ editLink: false
 - **Entity:** `order`
 - **Type:** Integration Event
 - **Topic:** `orders`
-- **Fully Qualified Topic:** `{env}.orders.public.orders.v1`
+- **Fully Qualified Topic:** `orders.public.orders.v1`
 - **Estimated Payload Size:** 1388 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 

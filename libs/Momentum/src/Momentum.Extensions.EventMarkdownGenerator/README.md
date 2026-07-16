@@ -226,7 +226,7 @@ The following variables are available in event templates, bound to the top-level
 | `event.FullTypeName`              | string  | Full type name with namespace                                                                           |
 | `event.Namespace`                 | string  | Event namespace                                                                                         |
 | `event.Topic`                     | string  | Plain topic / event hub name (e.g. `cashiers`)                                                          |
-| `event.FullyQualifiedTopicName`   | string  | Composed `{env}.{domain}.{visibility}.{topic}.{version}` convention string, domain kebab-cased          |
+| `event.FullyQualifiedTopicName`   | string  | Composed `{domain}.{visibility}.{topic}.{version}` convention string, domain kebab-cased                |
 | `event.Domain`                    | string  | Resolved domain — explicit attribute `Domain` override, then namespace-derived, then assembly default   |
 | `event.Version`                   | string  | Event version (default `v1`)                                                                            |
 | `event.Status`                    | string  | `Active` or `Deprecated`                                                                                |

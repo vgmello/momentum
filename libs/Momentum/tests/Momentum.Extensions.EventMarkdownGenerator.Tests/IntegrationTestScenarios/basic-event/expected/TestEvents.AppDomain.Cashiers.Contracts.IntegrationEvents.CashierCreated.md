@@ -13,7 +13,7 @@ editLink: false
 - **Entity:** `cashier`
 - **Type:** Integration Event
 - **Topic:** `cashiers`
-- **Fully Qualified Topic:** `{env}.cashiers.public.cashiers.v1`
+- **Fully Qualified Topic:** `cashiers.public.cashiers.v1`
 - **Estimated Payload Size:** 73 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId, PartitionKeyTest
 

@@ -84,6 +84,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **EventMarkdownGenerator**: removed `EventMetadata.EventType` — the raw CLR `Type` was only ever
   used to re-look-up XML documentation or extract `Entity`, both of which now happen once during
   metadata construction instead of being deferred to callers.
+- **EventMarkdownGenerator**: `FullyQualifiedTopicName` no longer includes a leading `{env}.`
+  placeholder segment. It was never substituted by the doc generator (a design-time tool with no
+  concept of a deployment environment), so it only ever showed up as a literal, unresolved token in
+  generated docs. Now composed as `{domain}.{visibility}.{topic}.{version}`.
 
 ### Fixed
 

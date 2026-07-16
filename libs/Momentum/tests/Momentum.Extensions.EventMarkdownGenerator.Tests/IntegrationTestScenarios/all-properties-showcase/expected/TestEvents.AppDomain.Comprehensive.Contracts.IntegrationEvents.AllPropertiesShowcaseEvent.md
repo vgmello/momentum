@@ -16,7 +16,7 @@ editLink: false
 - **FullTypeName:** TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents.AllPropertiesShowcaseEvent
 - **Namespace:** TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents
 - **Topic:** comprehensive-topic
-- **FullyQualifiedTopicName:** {env}.comprehensive-domain.internal.comprehensive-topic.v9
+- **FullyQualifiedTopicName:** comprehensive-domain.internal.comprehensive-topic.v9
 - **Domain:** comprehensive-domain
 - **Version:** v9
 - **Status:** Deprecated
