@@ -451,3 +451,6 @@ local-feed-path.txt
 
 # Perf Tests Results
 **/tests/**/results
+
+# Playwright MCP screenshots/traces
+.playwright-mcp/

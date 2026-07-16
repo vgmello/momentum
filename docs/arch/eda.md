@@ -59,15 +59,6 @@ graph TB
     KAFKA --> SERVICE_A
     KAFKA --> SERVICE_B
     KAFKA --> SERVICE_C
-
-    classDef container fill:#438dd5,stroke:#3079b0,color:#ffffff
-    classDef component fill:#85bbf0,stroke:#5b93c8,color:#000000
-    classDef external fill:#999999,stroke:#8a8a8a,color:#ffffff
-    classDef person fill:#08427b,stroke:#052e56,color:#ffffff
-
-    class COMMANDS,QUERIES,HANDLERS,INTEGRATION,WOLVERINE,POSTGRES,OUTBOX container
-    class DOMAIN,DOMAIN_EVENTS,AGGREGATE component
-    class KAFKA,SERVICE_A,SERVICE_B,SERVICE_C external
 ```
 
 ## AppDomain Domain Implementation
