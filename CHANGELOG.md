@@ -27,6 +27,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   `background-processing.md`) now use a consistent C4-style palette — blue for containers, light blue for
   domain/component-level nodes, grey for external systems (Kafka, third-party services) — replacing the
   ad-hoc pastel `style` overrides that only existed on one of the four diagrams.
+- **Deps**: bumped `mermaid` from `^11.10.1` to `^11.16.0` (latest) in both `docs/` and `libs/Momentum/docs/`.
+- **Docs**: Mermaid subgraph/cluster backgrounds are now white instead of the default pale-yellow theme
+  color (light theme only, via `themeVariables.clusterBkg`).
 
 ## [2026-07-15]
 

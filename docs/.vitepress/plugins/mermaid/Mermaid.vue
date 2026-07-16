@@ -97,6 +97,12 @@ const renderChart = async () => {
         theme: hasDarkClass ? "dark" : "default",
         layout: "elk",
         look: "neo",
+        themeVariables: hasDarkClass
+            ? {}
+            : {
+                  clusterBkg: "#ffffff",
+                  clusterBorder: "#d0d7de",
+              },
     };
     let svgCode = await render(props.id, code.value, mermaidConfig);
     // This is a hack to force v-html to re-render, otherwise the diagram disappears
