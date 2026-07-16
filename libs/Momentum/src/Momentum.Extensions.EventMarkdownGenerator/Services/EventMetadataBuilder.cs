@@ -35,6 +35,10 @@ public static class EventMetadataBuilder
 
         var topicName = !string.IsNullOrEmpty(topic) ? topic : eventType.Name.ToKebabCase();
 
+        // shouldPluralize (ShouldPluralizeTopicName) is the topic-explicit signal: for EventTopicAttribute<T>
+        // it's true only when the attribute's own topic ctor argument was null, i.e. Topic was auto-derived
+        // from the entity type name rather than explicitly set (Topic itself is never empty by this point —
+        // the base ctor defaults it to the kebab-cased entity name even when not explicitly given).
         if (shouldPluralize && !topicName.EndsWith("s", StringComparison.OrdinalIgnoreCase))
         {
             topicName = topicName.Pluralize();
