@@ -23,10 +23,16 @@ public static class EventMetadataBuilder
         var (properties, partitionKeys) =
             EventPropertyMetadataBuilder.Build(eventType, xmlParser, calculator, partitionKeyAttributeNamePrefix);
 
-        var topicName = GetTopicName(topicAttribute, eventType);
-
         // Access properties via reflection for cross-assembly compatibility
-        var (shouldPluralize, domain, isInternal, version, eventNameOverride) = GetTopicAttributeProperties(topicAttribute);
+        var attrType = topicAttribute.GetType();
+        var topic = TypeUtils.GetPropertyValue<string?>(attrType, topicAttribute, "Topic");
+        var shouldPluralize = TypeUtils.GetPropertyValue<bool?>(attrType, topicAttribute, "ShouldPluralizeTopicName") ?? false;
+        var domain = TypeUtils.GetPropertyValue<string?>(attrType, topicAttribute, "Domain");
+        var isInternal = TypeUtils.GetPropertyValue<bool?>(attrType, topicAttribute, "Internal") ?? false;
+        var version = TypeUtils.GetPropertyValue<string?>(attrType, topicAttribute, "Version") ?? "v1";
+        var eventNameOverride = TypeUtils.GetPropertyValue<string?>(attrType, topicAttribute, "EventName");
+
+        var topicName = !string.IsNullOrEmpty(topic) ? topic : eventType.Name.ToKebabCase();
 
         if (shouldPluralize && !topicName.EndsWith("s", StringComparison.OrdinalIgnoreCase))
         {
@@ -115,33 +121,5 @@ public static class EventMetadataBuilder
         }
 
         return parts[0];
-    }
-
-    /// <summary>
-    ///     Extracts properties from EventTopicAttribute using reflection for cross-assembly compatibility.
-    /// </summary>
-    private static (bool shouldPluralize, string? domain, bool isInternal, string version, string? eventName)
-        GetTopicAttributeProperties(object topicAttribute)
-    {
-        var attrType = topicAttribute.GetType();
-
-        var shouldPluralize = TypeUtils.GetPropertyValue<bool?>(attrType, topicAttribute, "ShouldPluralizeTopicName") ?? false;
-        var domain = TypeUtils.GetPropertyValue<string?>(attrType, topicAttribute, "Domain");
-        var isInternal = TypeUtils.GetPropertyValue<bool?>(attrType, topicAttribute, "Internal") ?? false;
-        var version = TypeUtils.GetPropertyValue<string?>(attrType, topicAttribute, "Version") ?? "v1";
-        var eventName = TypeUtils.GetPropertyValue<string?>(attrType, topicAttribute, "EventName");
-
-        return (shouldPluralize, domain, isInternal, version, eventName);
-    }
-
-    /// <summary>
-    ///     Gets the topic name from either generic or string-based EventTopicAttribute
-    /// </summary>
-    private static string GetTopicName(object topicAttribute, Type eventType)
-    {
-        var attrType = topicAttribute.GetType();
-        var topic = TypeUtils.GetPropertyValue<string?>(attrType, topicAttribute, "Topic");
-
-        return !string.IsNullOrEmpty(topic) ? topic : eventType.Name.ToKebabCase();
     }
 }
