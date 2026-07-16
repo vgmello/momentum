@@ -26,10 +26,12 @@ public static partial class EventViewModelFactory
         return new EventViewModel
         {
             EventName = metadata.EventName,
+            EventTypeName = metadata.EventTypeName,
             FullTypeName = metadata.FullTypeName,
             Namespace = metadata.Namespace,
             Topic = metadata.Topic,
             FullyQualifiedTopicName = metadata.FullyQualifiedTopicName,
+            Domain = metadata.Domain,
             Version = metadata.Version,
             Status = metadata.GetStatus(),
             Entity = ExtractEntityFromEventType(metadata.EventType),
@@ -38,6 +40,9 @@ public static partial class EventViewModelFactory
             IsInternal = metadata.IsInternal,
             GithubUrl = GenerateGitHubUrl(metadata, options?.GitHubBaseUrl),
             TopicAttributeDisplayName = GetTopicAttributeDisplayName(metadata.TopicAttribute),
+            AttributeProperties = metadata.AttributeProperties
+                .Select(kvp => new AttributePropertyViewModel { Key = kvp.Key, Value = kvp.Value })
+                .ToArray(),
             Description = documentation.GetDescription(),
             Summary = documentation.Summary,
             Remarks = documentation.Remarks,

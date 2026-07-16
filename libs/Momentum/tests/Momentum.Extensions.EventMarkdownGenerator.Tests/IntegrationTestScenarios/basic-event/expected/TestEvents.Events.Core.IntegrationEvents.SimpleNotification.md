@@ -8,6 +8,7 @@ editLink: false
 # SimpleNotification
 
 - **Status:** Active
+- **Domain:** TestEvents
 - **Version:** v1
 - **Entity:** `simple-notification`
 - **Type:** Integration Event
@@ -30,5 +31,12 @@ No documentation available
 ## Technical Details
 
 - **Full Type:** [TestEvents.Events.Core.IntegrationEvents.SimpleNotification](#)
+- **Type Name:** `SimpleNotification`
 - **Namespace:** `TestEvents.Events.Core.IntegrationEvents`
-- **Topic Attribute:** `[EventTopic]`
+- **Topic Attribute:** `[EventTopic<SimpleNotification>]`
+- **Attribute Properties:**
+- `ShouldPluralizeTopicName`: `True`
+- `Topic`: `simple-notification`
+- `Domain`: *(empty)*
+- `Version`: `v1`
+- `Internal`: `False`

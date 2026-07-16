@@ -8,6 +8,7 @@ editLink: false
 # EmptySummaryEvent
 
 - **Status:** Active
+- **Domain:** TestEvents
 - **Version:** v1
 - **Entity:** `empty-summary-event`
 - **Type:** Integration Event
@@ -35,5 +36,12 @@ This event uses a partition key for message routing:
     ## Technical Details
 
 - **Full Type:** [TestEvents.Missing.Docs.IntegrationEvents.EmptySummaryEvent](#)
+- **Type Name:** `EmptySummaryEvent`
 - **Namespace:** `TestEvents.Missing.Docs.IntegrationEvents`
-- **Topic Attribute:** `[EventTopic]`
+- **Topic Attribute:** `[EventTopic<EmptySummaryEvent>]`
+- **Attribute Properties:**
+- `ShouldPluralizeTopicName`: `True`
+- `Topic`: `empty-summary-event`
+- `Domain`: *(empty)*
+- `Version`: `v1`
+- `Internal`: `False`

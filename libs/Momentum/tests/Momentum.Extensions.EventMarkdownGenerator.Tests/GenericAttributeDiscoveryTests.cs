@@ -65,4 +65,41 @@ public class GenericAttributeDiscoveryTests
         conventionEvent.PartitionKeys[1].Name.ShouldBe("ReservationId");
         conventionEvent.PartitionKeys[1].Order.ShouldBe(1);
     }
+
+    // Custom attribute exercising properties the generator has no dedicated EventMetadata field for
+    // (Subdomain), plus an explicitly empty Topic to verify the kebab-case fallback still applies.
+    [AttributeUsage(AttributeTargets.Class)]
+    public sealed class CustomAttribute : Attribute
+    {
+        public string Domain { get; init; } = string.Empty;
+        public string Subdomain { get; init; } = string.Empty;
+        public string Topic { get; init; } = string.Empty;
+    }
+
+    [Custom(Domain = "billing", Subdomain = "invoicing", Topic = "")]
+    public record CustomAttributeEvent(Guid InvoiceId);
+
+    [Fact]
+    public void DiscoverEvents_WithCustomAttribute_PopulatesAttributePropertiesDictionaryAndFallsBackTopic()
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+
+        var events = AssemblyEventDiscovery.DiscoverEvents(
+            assembly,
+            xmlParser: null,
+            PayloadSizeCalculator.Create("json"),
+            attributeNamePrefix: nameof(CustomAttribute)).ToList();
+
+        var customEvent = events.Single(e => e.EventType == typeof(CustomAttributeEvent));
+
+        // Empty Topic falls back to the kebab-cased CLR type name, same as a missing Topic would.
+        customEvent.Topic.ShouldBe("custom-attribute-event");
+
+        // Every property of the attribute is captured, including ones with no dedicated EventMetadata
+        // field (Subdomain) — not just the well-known ones (Domain).
+        customEvent.AttributeProperties.Count.ShouldBe(3);
+        customEvent.AttributeProperties["Domain"].ShouldBe("billing");
+        customEvent.AttributeProperties["Subdomain"].ShouldBe("invoicing");
+        customEvent.AttributeProperties["Topic"].ShouldBe(string.Empty);
+    }
 }

@@ -8,6 +8,7 @@ editLink: false
 # UserCreated
 
 - **Status:** Active
+- **Domain:** Users
 - **Version:** v1
 - **Entity:** `user-created`
 - **Type:** Integration Event
@@ -36,5 +37,12 @@ This event uses a partition key for message routing:
     ## Technical Details
 
 - **Full Type:** [TestEvents.Platform.Users.Contracts.IntegrationEvents.UserCreated](#)
+- **Type Name:** `UserCreated`
 - **Namespace:** `TestEvents.Platform.Users.Contracts.IntegrationEvents`
-- **Topic Attribute:** `[EventTopic]`
+- **Topic Attribute:** `[EventTopic<UserCreated>]`
+- **Attribute Properties:**
+- `ShouldPluralizeTopicName`: `True`
+- `Topic`: `user-created`
+- `Domain`: *(empty)*
+- `Version`: `v1`
+- `Internal`: `False`

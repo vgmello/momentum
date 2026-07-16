@@ -25,10 +25,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **EventMarkdownGenerator**: multi-line XML doc property descriptions are flattened to a single line
   (whitespace collapsed) so they no longer break the generated markdown payload table.
 
+### Added
+
+- **EventMarkdownGenerator**: `EventMetadata.EventTypeName` exposes the event's CLR type name
+  separately from `EventName` (which may be overridden via the topic attribute's `EventName`
+  property). Rendered in generated docs as "Type Name".
+- **EventMarkdownGenerator**: `EventMetadata.AttributeProperties` captures every public property of
+  the discovered topic attribute (via reflection) into a name/value dictionary, so custom attribute
+  properties the generator has no dedicated field for still surface in generated docs, under
+  "Attribute Properties".
+
+### Changed
+
+- **EventMarkdownGenerator**: extracted `EventMetadataBuilder` from `AssemblyEventDiscovery` so
+  assembly/type scanning stays independent from reflecting a single event type and its topic
+  attribute into `EventMetadata`.
+
 ### Fixed
 
 - **EventMarkdownGenerator**: property descriptions whose XML doc summary wrapped onto multiple lines
   previously spilled out of their table cell as an orphaned line.
+- **EventMarkdownGenerator**: `EventMetadata.Domain` was computed but never mapped onto the Liquid
+  view model, so it never appeared in generated docs. Now rendered as "Domain".
+- **EventMarkdownGenerator**: the `TopicAttribute` field on `EventMetadata` could point at a
+  different attribute instance than the one topic/domain/version were actually parsed from (its own
+  lookup used `GetCustomAttributes<Attribute>().FirstOrDefault()`, which matches _any_ attribute, not
+  specifically the topic one). It now reuses the single correctly-matched instance throughout.
 - **DummyInvoiceGenerator** (sample BackOffice service): resolved a DI lifetime crash on startup —
   the singleton `BackgroundService` was constructor-injecting the scoped `Wolverine.IMessageBus`
   directly, which fails ASP.NET Core's DI validation. It now resolves `IMessageBus` from a new

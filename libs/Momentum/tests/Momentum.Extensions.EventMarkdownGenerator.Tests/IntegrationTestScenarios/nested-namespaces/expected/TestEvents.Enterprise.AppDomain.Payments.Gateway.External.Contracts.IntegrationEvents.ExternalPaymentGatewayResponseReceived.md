@@ -8,6 +8,7 @@ editLink: false
 # ExternalPaymentGatewayResponseReceived
 
 - **Status:** Active
+- **Domain:** External
 - **Version:** v1
 - **Entity:** `external-payment-gateway-response-received`
 - **Type:** Integration Event
@@ -46,5 +47,12 @@ This event uses a partition key for message routing:
 ## Technical Details
 
 - **Full Type:** [TestEvents.Enterprise.AppDomain.Payments.Gateway.External.Contracts.IntegrationEvents.ExternalPaymentGatewayResponseReceived](#)
+- **Type Name:** `ExternalPaymentGatewayResponseReceived`
 - **Namespace:** `TestEvents.Enterprise.AppDomain.Payments.Gateway.External.Contracts.IntegrationEvents`
-- **Topic Attribute:** `[EventTopic]`
+- **Topic Attribute:** `[EventTopic<ExternalPaymentGatewayResponseReceived>]`
+- **Attribute Properties:**
+- `ShouldPluralizeTopicName`: `True`
+- `Topic`: `external-payment-gateway-response-received`
+- `Domain`: *(empty)*
+- `Version`: `v1`
+- `Internal`: `False`

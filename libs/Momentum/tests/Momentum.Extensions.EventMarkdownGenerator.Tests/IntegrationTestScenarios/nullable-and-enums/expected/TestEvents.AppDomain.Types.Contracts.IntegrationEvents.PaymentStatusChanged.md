@@ -8,6 +8,7 @@ editLink: false
 # PaymentStatusChanged
 
 - **Status:** Active
+- **Domain:** Types
 - **Version:** v1
 - **Entity:** `payment-status-changed`
 - **Type:** Integration Event
@@ -42,5 +43,12 @@ This event uses a partition key for message routing:
     ## Technical Details
 
 - **Full Type:** [TestEvents.AppDomain.Types.Contracts.IntegrationEvents.PaymentStatusChanged](#)
+- **Type Name:** `PaymentStatusChanged`
 - **Namespace:** `TestEvents.AppDomain.Types.Contracts.IntegrationEvents`
-- **Topic Attribute:** `[EventTopic]`
+- **Topic Attribute:** `[EventTopic<PaymentStatusChanged>]`
+- **Attribute Properties:**
+- `ShouldPluralizeTopicName`: `True`
+- `Topic`: `payment-status-changed`
+- `Domain`: *(empty)*
+- `Version`: `v1`
+- `Internal`: `False`

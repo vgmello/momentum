@@ -7,6 +7,7 @@ namespace Momentum.Extensions.EventMarkdownGenerator.Models;
 public record EventMetadata
 {
     public required string EventName { get; init; }
+    public required string EventTypeName { get; init; }
     public required string FullTypeName { get; init; }
     public required string Namespace { get; init; }
     public required string Topic { get; init; }
@@ -16,6 +17,15 @@ public record EventMetadata
     public required bool IsInternal { get; init; }
     public required Type EventType { get; init; }
     public required Attribute TopicAttribute { get; init; }
+
+    /// <summary>
+    ///     Every public property of <see cref="TopicAttribute"/>, name to stringified value, discovered via
+    ///     reflection. Captures custom/unknown attribute properties (beyond the well-known ones already
+    ///     mapped onto this record, e.g. Domain/Version/Topic) so templates can render them without the
+    ///     generator needing to know about them ahead of time.
+    /// </summary>
+    public IReadOnlyDictionary<string, string> AttributeProperties { get; init; } = new Dictionary<string, string>();
+
     public List<EventPropertyMetadata> Properties { get; init; } = [];
     public List<PartitionKeyMetadata> PartitionKeys { get; init; } = [];
     public string? ObsoleteMessage { get; init; }

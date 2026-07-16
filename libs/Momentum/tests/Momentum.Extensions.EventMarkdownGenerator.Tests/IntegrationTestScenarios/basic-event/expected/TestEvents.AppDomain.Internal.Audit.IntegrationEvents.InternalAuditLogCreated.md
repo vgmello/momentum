@@ -8,6 +8,7 @@ editLink: false
 # InternalAuditLogCreated
 
 - **Status:** Active
+- **Domain:** TestEvents
 - **Version:** v1
 - **Entity:** `audit-log`
 - **Type:** Domain Event
@@ -39,5 +40,12 @@ This event uses a partition key for message routing:
     ## Technical Details
 
 - **Full Type:** [TestEvents.AppDomain.Internal.Audit.IntegrationEvents.InternalAuditLogCreated](#)
+- **Type Name:** `InternalAuditLogCreated`
 - **Namespace:** `TestEvents.AppDomain.Internal.Audit.IntegrationEvents`
-- **Topic Attribute:** `[EventTopic]`
+- **Topic Attribute:** `[EventTopic<AuditLog>]`
+- **Attribute Properties:**
+- `ShouldPluralizeTopicName`: `True`
+- `Topic`: `audit-log`
+- `Domain`: *(empty)*
+- `Version`: `v1`
+- `Internal`: `True`

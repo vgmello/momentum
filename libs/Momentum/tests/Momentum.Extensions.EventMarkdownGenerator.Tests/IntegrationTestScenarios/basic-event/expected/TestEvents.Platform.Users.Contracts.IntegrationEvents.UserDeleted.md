@@ -8,6 +8,7 @@ editLink: false
 # UserDeleted
 
 - **Status:** Active
+- **Domain:** Users
 - **Version:** v1
 - **Entity:** `user-deleted`
 - **Type:** Integration Event
@@ -36,5 +37,12 @@ This event uses a partition key for message routing:
     ## Technical Details
 
 - **Full Type:** [TestEvents.Platform.Users.Contracts.IntegrationEvents.UserDeleted](#)
+- **Type Name:** `UserDeleted`
 - **Namespace:** `TestEvents.Platform.Users.Contracts.IntegrationEvents`
-- **Topic Attribute:** `[EventTopic]`
+- **Topic Attribute:** `[EventTopic<UserDeleted>]`
+- **Attribute Properties:**
+- `ShouldPluralizeTopicName`: `True`
+- `Topic`: `user-deleted`
+- `Domain`: *(empty)*
+- `Version`: `v1`
+- `Internal`: `False`

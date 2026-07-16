@@ -8,6 +8,7 @@ editLink: false
 # PaymentProcessed
 
 - **Status:** Active
+- **Domain:** Payments
 - **Version:** v1
 - **Entity:** `payment-processed`
 - **Type:** Integration Event
@@ -36,5 +37,12 @@ This event uses a partition key for message routing:
     ## Technical Details
 
 - **Full Type:** [TestEvents.Platform.AppDomain.Payments.Contracts.IntegrationEvents.PaymentProcessed](#)
+- **Type Name:** `PaymentProcessed`
 - **Namespace:** `TestEvents.Platform.AppDomain.Payments.Contracts.IntegrationEvents`
-- **Topic Attribute:** `[EventTopic]`
+- **Topic Attribute:** `[EventTopic<PaymentProcessed>]`
+- **Attribute Properties:**
+- `ShouldPluralizeTopicName`: `True`
+- `Topic`: `payment-processed`
+- `Domain`: *(empty)*
+- `Version`: `v1`
+- `Internal`: `False`

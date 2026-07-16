@@ -8,6 +8,7 @@ editLink: false
 # CashierCreated
 
 - **Status:** Active
+- **Domain:** Cashiers
 - **Version:** v1
 - **Entity:** `cashier`
 - **Type:** Integration Event
@@ -44,5 +45,12 @@ This event uses multiple partition keys for message routing:
 ## Technical Details
 
 - **Full Type:** [TestEvents.AppDomain.Cashiers.Contracts.IntegrationEvents.CashierCreated](#)
+- **Type Name:** `CashierCreated`
 - **Namespace:** `TestEvents.AppDomain.Cashiers.Contracts.IntegrationEvents`
-- **Topic Attribute:** `[EventTopic]`
+- **Topic Attribute:** `[EventTopic<Cashier>]`
+- **Attribute Properties:**
+- `ShouldPluralizeTopicName`: `True`
+- `Topic`: `cashier`
+- `Domain`: *(empty)*
+- `Version`: `v1`
+- `Internal`: `False`

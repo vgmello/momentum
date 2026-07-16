@@ -8,6 +8,7 @@ editLink: false
 # UndocumentedEvent
 
 - **Status:** Active
+- **Domain:** TestEvents
 - **Version:** v1
 - **Entity:** `missing`
 - **Type:** Domain Event
@@ -35,5 +36,12 @@ This event uses a partition key for message routing:
     ## Technical Details
 
 - **Full Type:** [TestEvents.Missing.Docs.IntegrationEvents.UndocumentedEvent](#)
+- **Type Name:** `UndocumentedEvent`
 - **Namespace:** `TestEvents.Missing.Docs.IntegrationEvents`
-- **Topic Attribute:** `[EventTopic]`
+- **Topic Attribute:** `[EventTopic<Missing>]`
+- **Attribute Properties:**
+- `ShouldPluralizeTopicName`: `True`
+- `Topic`: `missing`
+- `Domain`: *(empty)*
+- `Version`: `v1`
+- `Internal`: `True`

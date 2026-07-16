@@ -8,6 +8,7 @@ editLink: false
 # SubscriptionActivated
 
 - **Status:** Active
+- **Domain:** Subscriptions
 - **Version:** v1
 - **Entity:** `subscription-activated`
 - **Type:** Integration Event
@@ -36,5 +37,12 @@ This event uses a partition key for message routing:
     ## Technical Details
 
 - **Full Type:** [TestEvents.Platform.Subscriptions.Contracts.IntegrationEvents.SubscriptionActivated](#)
+- **Type Name:** `SubscriptionActivated`
 - **Namespace:** `TestEvents.Platform.Subscriptions.Contracts.IntegrationEvents`
-- **Topic Attribute:** `[EventTopic]`
+- **Topic Attribute:** `[EventTopic<SubscriptionActivated>]`
+- **Attribute Properties:**
+- `ShouldPluralizeTopicName`: `True`
+- `Topic`: `subscription-activated`
+- `Domain`: *(empty)*
+- `Version`: `v1`
+- `Internal`: `False`

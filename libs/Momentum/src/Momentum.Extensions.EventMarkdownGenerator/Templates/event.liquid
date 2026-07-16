@@ -13,6 +13,7 @@ editLink: false
 
 {% endif -%}
 - **Status:** {{ event.Status }}
+- **Domain:** {{ event.Domain }}
 - **Version:** {{ event.Version }}
 {% if event.Entity -%}
 - **Entity:** `{{ event.Entity | downcase }}`
@@ -87,5 +88,12 @@ This event uses multiple partition keys for message routing:
 ## Technical Details
 
 - **Full Type:** [{{ event.FullTypeName }}]({{ event.GithubUrl }})
+- **Type Name:** `{{ event.EventTypeName }}`
 - **Namespace:** `{{ event.Namespace }}`
 - **Topic Attribute:** `{{ event.TopicAttributeDisplayName }}`
+{% if event.AttributeProperties.size > 0 -%}
+- **Attribute Properties:**
+{% for entry in event.AttributeProperties -%}
+    - `{{ entry.Key }}`: {% if entry.Value == "" %}*(empty)*{% else %}`{{ entry.Value }}`{% endif %}
+{% endfor -%}
+{% endif -%}

@@ -8,6 +8,7 @@ editLink: false
 # InvoiceGenerated
 
 - **Status:** Active
+- **Domain:** Invoices
 - **Version:** v1
 - **Entity:** `invoice-generated`
 - **Type:** Integration Event
@@ -36,5 +37,12 @@ This event uses a partition key for message routing:
     ## Technical Details
 
 - **Full Type:** [TestEvents.Platform.AppDomain.Invoices.Contracts.IntegrationEvents.InvoiceGenerated](#)
+- **Type Name:** `InvoiceGenerated`
 - **Namespace:** `TestEvents.Platform.AppDomain.Invoices.Contracts.IntegrationEvents`
-- **Topic Attribute:** `[EventTopic]`
+- **Topic Attribute:** `[EventTopic<InvoiceGenerated>]`
+- **Attribute Properties:**
+- `ShouldPluralizeTopicName`: `True`
+- `Topic`: `invoice-generated`
+- `Domain`: *(empty)*
+- `Version`: `v1`
+- `Internal`: `False`

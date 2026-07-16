@@ -8,6 +8,7 @@ editLink: false
 # MissingParamDocsEvent
 
 - **Status:** Active
+- **Domain:** TestEvents
 - **Version:** v1
 - **Entity:** `missing-param-docs-event`
 - **Type:** Integration Event
@@ -35,5 +36,12 @@ This event uses a partition key for message routing:
     ## Technical Details
 
 - **Full Type:** [TestEvents.Missing.Docs.IntegrationEvents.MissingParamDocsEvent](#)
+- **Type Name:** `MissingParamDocsEvent`
 - **Namespace:** `TestEvents.Missing.Docs.IntegrationEvents`
-- **Topic Attribute:** `[EventTopic]`
+- **Topic Attribute:** `[EventTopic<MissingParamDocsEvent>]`
+- **Attribute Properties:**
+- `ShouldPluralizeTopicName`: `True`
+- `Topic`: `missing-param-docs-event`
+- `Domain`: *(empty)*
+- `Version`: `v1`
+- `Internal`: `False`
