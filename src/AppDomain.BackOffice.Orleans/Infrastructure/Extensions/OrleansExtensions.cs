@@ -37,14 +37,13 @@ public static class OrleansExtensions
             if (string.IsNullOrEmpty(orleansConnectionString))
                 throw new InvalidOperationException($"Orleans connection string '{orleansConnectionString}' is not set.");
 
-            var grainDirectoryServiceName = GetServiceName(config, "GrainDirectory:Default:ServiceKey", "GrainDirectory");
+            var grainDirectoryServiceName = GetReadOnlyServiceName(config, "GrainDirectory:Default:ServiceKey", "GrainDirectory");
 
             // Fall back to clustering connection string when grain directory has no dedicated connection
-            // (e.g., Docker Compose where only ConnectionStrings:Orleans is set)
+            // (e.g., Docker Compose where only ConnectionStrings:Orleans is set).
             if (string.IsNullOrEmpty(builder.Configuration.GetConnectionString(grainDirectoryServiceName)))
             {
                 grainDirectoryServiceName = clusterServiceName;
-                config["GrainDirectory:Default:ServiceKey"] = clusterServiceName;
             }
 
             grainDirectoryConnectionString = builder.Configuration.GetConnectionString(grainDirectoryServiceName)
@@ -87,6 +86,10 @@ public static class OrleansExtensions
         return builder;
     }
 
+    // Writes the resolved value back into IConfiguration: Orleans' own configuration-driven provider
+    // discovery binds "<Kind>:ServiceKey" (e.g. "Clustering:ServiceKey") directly from configuration
+    // to know which keyed Azure client to resolve from DI, so Clustering/GrainStorage require this
+    // round-trip. Do NOT reuse this for GrainDirectory — see GetReadOnlyServiceName below.
     private static string GetServiceName(IConfigurationSection config, string keyPath, string defaultValue)
     {
         var serviceName = config.GetValue<string>(keyPath);
@@ -99,6 +102,13 @@ public static class OrleansExtensions
 
         return serviceName;
     }
+
+    // GrainDirectory is configured purely via the fluent AddAzureTableGrainDirectory call below, never
+    // declaratively. Writing "GrainDirectory:Default:ServiceKey" into IConfiguration (as GetServiceName
+    // does) creates a "GrainDirectory:Default" section with no ProviderType, which Orleans' own
+    // configuration-driven provider discovery then tries — and fails — to auto-register on startup.
+    private static string GetReadOnlyServiceName(IConfigurationSection config, string keyPath, string defaultValue) =>
+        config.GetValue<string>(keyPath) ?? defaultValue;
 
     private static void SetupLocalCluster(IConfigurationSection config)
     {
