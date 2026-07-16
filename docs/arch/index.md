@@ -5,6 +5,10 @@ The AppDomain Solution follows Domain-Oriented Vertical Slice Architecture (CQRS
 ## Architecture Layers
 
 ```mermaid
+---
+config:
+  theme: neutral
+---
 graph TB
     subgraph "Presentation Layer"
         API["AppDomain.Api<br/>REST & gRPC Endpoints"]
@@ -43,6 +47,15 @@ graph TB
     Events ---> MessageBus
     Orleans ---> Database
     MessageBus ---> Orleans
+
+    classDef container fill:#438dd5,stroke:#3079b0,color:#ffffff
+    classDef component fill:#85bbf0,stroke:#5b93c8,color:#000000
+    classDef external fill:#999999,stroke:#8a8a8a,color:#ffffff
+    classDef person fill:#08427b,stroke:#052e56,color:#ffffff
+
+    class API,WebUI,Commands,Queries,Handlers,Events,MessageBus,Orleans,Database container
+    class Entities,ValueObjects,DomainEvents,Rules component
+    class External external
 ```
 
 ## Core Principles

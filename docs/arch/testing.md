@@ -11,11 +11,15 @@ The AppDomain Solution implements a comprehensive testing strategy that ensures 
 ## Testing Pyramid Overview
 
 ```mermaid
+---
+config:
+  theme: neutral
+---
 graph TB
     subgraph "Testing Pyramid"
         E2E[End-to-End Tests<br/>Few, High-Value Scenarios]
-        Integration[Integration Tests<br/>Service Boundaries & Infrastructure]
-        Unit[Unit Tests<br/>Business Logic & Domain Models]
+        Integration[Integration Tests<br/>Service Boundaries &<br/>Infrastructure]
+        Unit[Unit Tests<br/>Business Logic &<br/>Domain Models]
     end
 
     subgraph "Additional Testing"
@@ -29,6 +33,12 @@ graph TB
     Unit --> Arch
     Integration --> Perf
     Integration --> Contract
+
+    classDef container fill:#438dd5,stroke:#3079b0,color:#ffffff
+    classDef component fill:#85bbf0,stroke:#5b93c8,color:#000000
+
+    class Unit,Integration,E2E container
+    class Arch,Perf,Contract component
 ```
 
 ## Unit Testing
@@ -1294,68 +1304,68 @@ dotnet test --collect:"XPlat Code Coverage"
 name: Test Pipeline
 
 on:
-  push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main]
+    push:
+        branches: [main, develop]
+    pull_request:
+        branches: [main]
 
 jobs:
-  unit-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+    unit-tests:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: '10.0.x'
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v5
+              with:
+                  dotnet-version: "10.0.x"
 
-      - name: Restore dependencies
-        run: dotnet restore
+            - name: Restore dependencies
+              run: dotnet restore
 
-      - name: Run unit tests
-        run: dotnet test --filter "Category=Unit" --logger trx --collect:"XPlat Code Coverage"
+            - name: Run unit tests
+              run: dotnet test --filter "Category=Unit" --logger trx --collect:"XPlat Code Coverage"
 
-      - name: Upload coverage reports
-        uses: codecov/codecov-action@v3
-        with:
-          file: coverage.cobertura.xml
+            - name: Upload coverage reports
+              uses: codecov/codecov-action@v3
+              with:
+                  file: coverage.cobertura.xml
 
-  integration-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+    integration-tests:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: '10.0.x'
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v5
+              with:
+                  dotnet-version: "10.0.x"
 
-      - name: Start containers
-        run: docker compose up -d AppDomain-db kafka
+            - name: Start containers
+              run: docker compose up -d AppDomain-db kafka
 
-      - name: Wait for services
-        run: |
-          timeout 60 bash -c 'until docker compose ps | grep -q healthy; do sleep 2; done'
+            - name: Wait for services
+              run: |
+                  timeout 60 bash -c 'until docker compose ps | grep -q healthy; do sleep 2; done'
 
-      - name: Run integration tests
-        run: dotnet test --filter "Category=Integration" --logger trx
+            - name: Run integration tests
+              run: dotnet test --filter "Category=Integration" --logger trx
 
-      - name: Stop containers
-        run: docker compose down
+            - name: Stop containers
+              run: docker compose down
 
-  architecture-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+    architecture-tests:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: '10.0.x'
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v5
+              with:
+                  dotnet-version: "10.0.x"
 
-      - name: Run architecture tests
-        run: dotnet test --filter "Category=Architecture" --logger trx
+            - name: Run architecture tests
+              run: dotnet test --filter "Category=Architecture" --logger trx
 ```
 
 ## Best Practices

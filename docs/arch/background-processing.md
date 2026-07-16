@@ -11,6 +11,10 @@ The AppDomain Solution implements sophisticated background processing using Orle
 ## Architecture Overview
 
 ```mermaid
+---
+config:
+  theme: neutral
+---
 graph TB
     subgraph SOURCES ["Event Sources"]
         API[AppDomain.Api<br/>Commands & Events]
@@ -57,6 +61,15 @@ graph TB
     SagaGrain --> Database
     TimerGrain --> Database
     Orleans --> EventStore
+
+    classDef container fill:#438dd5,stroke:#3079b0,color:#ffffff
+    classDef component fill:#85bbf0,stroke:#5b93c8,color:#000000
+    classDef external fill:#999999,stroke:#8a8a8a,color:#ffffff
+    classDef person fill:#08427b,stroke:#052e56,color:#ffffff
+
+    class API,Scheduled,Wolverine,LocalQueues,BackOffice,Orleans,Jobs,Database,EventStore container
+    class InvoiceGrain,NotificationGrain,SagaGrain,TimerGrain component
+    class External,Kafka external
 ```
 
 ## BackOffice Service Structure

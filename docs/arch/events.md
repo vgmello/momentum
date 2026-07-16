@@ -11,6 +11,10 @@ The AppDomain Solution implements a robust event-driven architecture (EDA) that 
 ## Architecture Overview
 
 ```mermaid
+---
+config:
+  theme: neutral
+---
 graph TB
     subgraph "Frontend Services"
         API[AppDomain.Api<br/>REST & gRPC]
@@ -46,6 +50,13 @@ graph TB
     BackOffice --> Orleans
     Orleans --> Database
     EventBus --> EventStore
+
+    classDef container fill:#438dd5,stroke:#3079b0,color:#ffffff
+    classDef external fill:#999999,stroke:#8a8a8a,color:#ffffff
+    classDef person fill:#08427b,stroke:#052e56,color:#ffffff
+
+    class API,WebUI,Commands,Validation,EventBus,BackOffice,Orleans,Saga,Database,EventStore container
+    class Kafka,Topics external
 ```
 
 ## Event Types

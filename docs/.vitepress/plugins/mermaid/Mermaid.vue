@@ -94,7 +94,7 @@ const renderChart = async () => {
     const mermaidConfig = {
         securityLevel: "loose",
         startOnLoad: false,
-        theme: hasDarkClass ? "dark" : "neutral",
+        theme: hasDarkClass ? "dark" : "default",
         layout: "elk",
         look: "neo",
     };

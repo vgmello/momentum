@@ -16,8 +16,6 @@ The event-driven architecture in the Platform follows a layered approach with cl
 ---
 config:
   theme: neutral
-  layout: elk
-  look: neo
 ---
 graph TB
     subgraph "Event-Driven Architecture"
@@ -59,6 +57,15 @@ graph TB
     KAFKA --> SERVICE_A
     KAFKA --> SERVICE_B
     KAFKA --> SERVICE_C
+
+    classDef container fill:#438dd5,stroke:#3079b0,color:#ffffff
+    classDef component fill:#85bbf0,stroke:#5b93c8,color:#000000
+    classDef external fill:#999999,stroke:#8a8a8a,color:#ffffff
+    classDef person fill:#08427b,stroke:#052e56,color:#ffffff
+
+    class COMMANDS,QUERIES,HANDLERS,INTEGRATION,WOLVERINE,POSTGRES,OUTBOX container
+    class DOMAIN,DOMAIN_EVENTS,AGGREGATE component
+    class KAFKA,SERVICE_A,SERVICE_B,SERVICE_C external
 ```
 
 ## AppDomain Domain Implementation
@@ -348,6 +355,10 @@ private void SetupSubscribers(WolverineOptions options)
 The Platform implements a comprehensive middleware pipeline for event processing:
 
 ```mermaid
+---
+config:
+  theme: neutral
+---
 graph TD
     subgraph "Event Processing Pipeline"
         MSG[Incoming Message] --> AUTH[Authentication]
@@ -365,15 +376,11 @@ graph TD
 
         RETRY -.->|On Failure| DLQ[Dead Letter Queue]
         CB -.->|Circuit Open| FALLBACK[Fallback Response]
-
-        style MSG fill:#e3f2fd
-        style VAL fill:#ffebee
-        style LOG fill:#f3e5f5
-        style TRACE fill:#e8f5e8
-        style HANDLER fill:#fff3e0
-        style CLOUD fill:#fce4ec
-        style DLQ fill:#ffcdd2
     end
+
+    classDef container fill:#438dd5,stroke:#3079b0,color:#ffffff
+
+    class MSG,AUTH,VAL,LOG,TRACE,RETRY,CB,HANDLER,CLOUD,PUB,OUTBOX,KAFKA,RESP,DLQ,FALLBACK container
 ```
 
 ### Middleware Components
@@ -414,6 +421,10 @@ Transforms messages to CloudEvents format for standardized event processing.
 The Platform implements the transactional outbox pattern to ensure consistency between database updates and event publishing:
 
 ```mermaid
+---
+config:
+  theme: neutral
+---
 graph LR
     subgraph "Outbox Pattern Flow"
         HANDLER[Message Handler]
@@ -432,11 +443,9 @@ graph LR
     OUTBOX_PROCESSOR --> KAFKA_PUBLISH
     KAFKA_PUBLISH --> OUTBOX_CLEANUP
 
-    style HANDLER fill:#e3f2fd
-    style DB_UPDATE fill:#e8f5e8
-    style OUTBOX_INSERT fill:#fff3e0
-    style COMMIT fill:#f3e5f5
-    style KAFKA_PUBLISH fill:#fce4ec
+    classDef container fill:#438dd5,stroke:#3079b0,color:#ffffff
+
+    class HANDLER,DB_UPDATE,OUTBOX_INSERT,COMMIT,OUTBOX_PROCESSOR,KAFKA_PUBLISH,OUTBOX_CLEANUP container
 ```
 
 **Benefits:**
