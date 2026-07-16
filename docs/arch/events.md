@@ -49,6 +49,7 @@ graph TB
 
     classDef container fill:#438dd5,stroke:#3079b0,color:#ffffff
     classDef external fill:#999999,stroke:#8a8a8a,color:#ffffff
+    classDef person fill:#08427b,stroke:#052e56,color:#ffffff
 
     class API,WebUI,Commands,Validation,EventBus,BackOffice,Orleans,Saga,Database,EventStore container
     class Kafka,Topics external

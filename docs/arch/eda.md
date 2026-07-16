@@ -13,6 +13,12 @@ This document provides a comprehensive guide to implementing event-driven archit
 The event-driven architecture in the Platform follows a layered approach with clear separation between domain logic, application services, and infrastructure concerns:
 
 ```mermaid
+---
+config:
+  theme: neutral
+  layout: elk
+  look: neo
+---
 graph TB
     subgraph "Event-Driven Architecture"
         subgraph "Domain Layer"
@@ -57,6 +63,7 @@ graph TB
     classDef container fill:#438dd5,stroke:#3079b0,color:#ffffff
     classDef component fill:#85bbf0,stroke:#5b93c8,color:#000000
     classDef external fill:#999999,stroke:#8a8a8a,color:#ffffff
+    classDef person fill:#08427b,stroke:#052e56,color:#ffffff
 
     class COMMANDS,QUERIES,HANDLERS,INTEGRATION,WOLVERINE,POSTGRES,OUTBOX container
     class DOMAIN,DOMAIN_EVENTS,AGGREGATE component

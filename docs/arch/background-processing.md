@@ -12,32 +12,32 @@ The AppDomain Solution implements sophisticated background processing using Orle
 
 ```mermaid
 graph TB
-    subgraph "Event Sources"
+    subgraph SOURCES ["Event Sources"]
         API[AppDomain.Api<br/>Commands & Events]
         External[External Systems<br/>Webhooks & Integrations]
         Scheduled[Scheduled Jobs<br/>Time-based Triggers]
     end
 
-    subgraph "Message Infrastructure"
+    subgraph MSGINFRA ["Message Infrastructure"]
         Wolverine[Wolverine<br/>Message Bus]
         Kafka[(Apache Kafka<br/>Event Stream)]
         LocalQueues[Local Queues<br/>In-Memory Processing]
     end
 
-    subgraph "Background Services"
+    subgraph BGSVC ["Background Services"]
         BackOffice[AppDomain.BackOffice<br/>Event Handlers]
         Orleans[Orleans Cluster<br/>Stateful Grains]
         Jobs[Background Jobs<br/>Recurring Tasks]
     end
 
-    subgraph "Orleans Grains"
+    subgraph GRAINS ["Orleans Grains"]
         InvoiceGrain[Invoice Grains<br/>Payment Processing]
         NotificationGrain[Notification Grains<br/>Message Delivery]
         SagaGrain[Saga Grains<br/>Workflow Coordination]
         TimerGrain[Timer Grains<br/>Scheduled Operations]
     end
 
-    subgraph "Persistence"
+    subgraph PERSIST ["Persistence"]
         Database[(PostgreSQL<br/>Grain State Storage)]
         EventStore[Event Store<br/>Audit & Recovery]
     end
@@ -61,6 +61,7 @@ graph TB
     classDef container fill:#438dd5,stroke:#3079b0,color:#ffffff
     classDef component fill:#85bbf0,stroke:#5b93c8,color:#000000
     classDef external fill:#999999,stroke:#8a8a8a,color:#ffffff
+    classDef person fill:#08427b,stroke:#052e56,color:#ffffff
 
     class API,Scheduled,Wolverine,LocalQueues,BackOffice,Orleans,Jobs,Database,EventStore container
     class InvoiceGrain,NotificationGrain,SagaGrain,TimerGrain component

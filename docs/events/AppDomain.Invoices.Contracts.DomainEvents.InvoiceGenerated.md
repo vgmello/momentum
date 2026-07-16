@@ -8,11 +8,14 @@ editLink: false
 # InvoiceGenerated
 
 - **Status:** Active
+- **Domain:** Invoices
 - **Version:** v1
 - **Entity:** `invoice`
 - **Type:** Domain Event
-- **Topic:** `{env}.appdomain.internal.invoices.v1`
+- **Topic:** `invoices`
+- **Fully Qualified Topic:** `invoices.internal.invoices.v1`
 - **Estimated Payload Size:** 310 bytes ⚠️ *Contains dynamic properties*
+- **Partition Keys**: TenantId
 
 ## Description
 
@@ -36,12 +39,16 @@ This domain event is handled within the same domain to:
 
 | Property | Type | Required | Size | Description |
 | ----------------------------------------------------------------- | --------- | -------- | -------- | --------------------------------------------------------------------- |
-| TenantId| `Guid` | ✓| 16 bytes | Unique identifier for the tenant |
+| TenantId| `Guid` | ✓| 16 bytes | Unique identifier for the tenant (partition key) |
 | [Invoice](/events/schemas/AppDomain.Invoices.Contracts.Models.Invoice.md)| `Invoice` | ✓| 286 bytes (Name: Dynamic size - no MaxLength constraint, Currency: Dynamic size - no MaxLength constraint) | Generated invoice object |
 | GeneratedAt| `DateTime` | ✓| 8 bytes | Date and time when the invoice was generated |
 
 
+### Partition Keys
 
+This event uses a partition key for message routing:
+- `TenantId` - Unique identifier for the tenant
+    
 ### Reference Schemas
 
 #### Invoice
@@ -51,5 +58,13 @@ This domain event is handled within the same domain to:
 ## Technical Details
 
 - **Full Type:** [AppDomain.Invoices.Contracts.DomainEvents.InvoiceGenerated](https://github.com/vgmello/momentum/blob/main/src/AppDomain/Invoices/Contracts/DomainEvents/InvoiceGenerated.cs)
+- **Type Name:** `InvoiceGenerated`
+- **Event Slug:** `invoice-generated`
 - **Namespace:** `AppDomain.Invoices.Contracts.DomainEvents`
-- **Topic Attribute:** `[EventTopic]`
+- **Topic Attribute:** `[EventTopic<Invoice>]`
+- **Attribute Properties:**
+- `ShouldPluralizeTopicName`: `True`
+- `Topic`: `invoice`
+- `Domain`: *(empty)*
+- `Version`: `v1`
+- `Internal`: `True`

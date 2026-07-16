@@ -83,7 +83,7 @@ You can override default templates by:
 
 ```bash
 # Install the EventMarkdownGenerator as a global tool
-dotnet tool install --global Momentum.Extensions.EventMarkdownGenerator --prerelease
+dotnet tool install --global Momentum.Extensions.EventMarkdownGenerator
 
 # Use the tool with custom templates
 events-docsgen --assemblies "path/to/assembly.dll" \
@@ -212,7 +212,7 @@ Generate documentation for multiple assemblies in a single run:
 
 ```bash
 # Install the tool globally first
-dotnet tool install --global Momentum.Extensions.EventMarkdownGenerator --prerelease
+dotnet tool install --global Momentum.Extensions.EventMarkdownGenerator
 
 # Generate documentation for multiple assemblies
 events-docsgen --assemblies "App.Core.dll,App.Contracts.dll,App.Events.dll" \
@@ -247,7 +247,7 @@ jobs:
               run: dotnet build
 
             - name: Install EventMarkdownGenerator
-              run: dotnet tool install --global Momentum.Extensions.EventMarkdownGenerator --prerelease
+              run: dotnet tool install --global Momentum.Extensions.EventMarkdownGenerator
 
             - name: Generate Event Documentation
               run: |
@@ -274,7 +274,7 @@ For development workflows, create a script that rebuilds and regenerates documen
 # scripts/update-event-docs.sh
 
 echo "Installing/updating EventMarkdownGenerator..."
-dotnet tool install --global Momentum.Extensions.EventMarkdownGenerator --prerelease
+dotnet tool install --global Momentum.Extensions.EventMarkdownGenerator
 
 echo "Building projects..."
 dotnet build

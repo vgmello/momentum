@@ -8,10 +8,12 @@ editLink: false
 # BusinessDayEnded
 
 - **Status:** Active
+- **Domain:** accounting
 - **Version:** v1
 - **Entity:** ``
 - **Type:** Integration Event
-- **Topic:** `{env}.appdomain.public.momentum.v1`
+- **Topic:** `momentum`
+- **Fully Qualified Topic:** `accounting.public.momentum.v1`
 - **Estimated Payload Size:** 8 bytes ⚠️ *Contains dynamic properties*
 
 ## Description
@@ -30,5 +32,13 @@ Represents an event indicating that a business day has ended for a specific mark
 ## Technical Details
 
 - **Full Type:** [AppDomain.BackOffice.Messaging.AccountingInboxHandler.BusinessDayEnded](https://github.com/vgmello/momentum/blob/main/src/AppDomain/BackOffice/Messaging/AccountingInboxHandler/BusinessDayEnded.cs)
+- **Type Name:** `BusinessDayEnded`
+- **Event Slug:** `business-day-ended`
 - **Namespace:** `AppDomain.BackOffice.Messaging.AccountingInboxHandler`
 - **Topic Attribute:** `[EventTopic]`
+- **Attribute Properties:**
+- `Topic`: `momentum`
+- `Domain`: `accounting`
+- `Version`: `v1`
+- `Internal`: `False`
+- `ShouldPluralizeTopicName`: `False`
