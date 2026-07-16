@@ -16,7 +16,7 @@ editLink: false
 - **Entity:** `showcase-location`
 - **Type:** Domain Event
 - **Topic:** `comprehensive-topic`
-- **Fully Qualified Topic:** `{env}.testevents.internal.comprehensive-topic.v9`
+- **Fully Qualified Topic:** `{env}.comprehensive-domain.internal.comprehensive-topic.v9`
 - **Estimated Payload Size:** 372 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId, SequenceNumber
 

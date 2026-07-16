@@ -13,7 +13,7 @@ editLink: false
 - **Entity:** `product`
 - **Type:** Integration Event
 - **Topic:** `products`
-- **Fully Qualified Topic:** `{env}.testevents.public.products.v1`
+- **Fully Qualified Topic:** `{env}.inventory.public.products.v1`
 - **Estimated Payload Size:** 64 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId, WarehouseId, ProductCategory
 

@@ -13,7 +13,7 @@ editLink: false
 - **Entity:** `node-relationship-created`
 - **Type:** Integration Event
 - **Topic:** `node-relationship-createds`
-- **Fully Qualified Topic:** `{env}.testevents.public.node-relationship-createds.v1`
+- **Fully Qualified Topic:** `{env}.nodes.public.node-relationship-createds.v1`
 - **Estimated Payload Size:** 382 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 

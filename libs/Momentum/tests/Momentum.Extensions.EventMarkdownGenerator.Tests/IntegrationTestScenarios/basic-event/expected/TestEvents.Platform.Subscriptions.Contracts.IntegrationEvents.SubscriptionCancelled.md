@@ -13,7 +13,7 @@ editLink: false
 - **Entity:** `subscription-cancelled`
 - **Type:** Integration Event
 - **Topic:** `subscription-cancelleds`
-- **Fully Qualified Topic:** `{env}.testevents.public.subscription-cancelleds.v1`
+- **Fully Qualified Topic:** `{env}.subscriptions.public.subscription-cancelleds.v1`
 - **Estimated Payload Size:** 24 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 

@@ -65,6 +65,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **EventMarkdownGenerator**: `FullyQualifiedTopicName` used the assembly-level default domain
+  instead of the event's actually-resolved domain (explicit attribute `Domain` override, then
+  namespace-derived, then the default) — so an event could render `Domain: comprehensive-domain` in
+  one field while its fully-qualified topic string still showed the unrelated default domain segment.
+  Both fields now agree.
 - **EventMarkdownGenerator**: property descriptions whose XML doc summary wrapped onto multiple lines
   previously spilled out of their table cell as an orphaned line.
 - **EventMarkdownGenerator**: `EventMetadata.Domain` was computed but never mapped onto the Liquid

@@ -51,7 +51,7 @@ public static class EventMetadataBuilder
         // Build full topic name: {env}.{domain}.{visibility}.{topic}.{version}
         var visibility = isInternal ? "internal" : "public";
 
-        var fullTopicName = $"{{env}}.{defaultDomain.ToLowerInvariant()}.{visibility}.{topicName}.{version}";
+        var fullTopicName = $"{{env}}.{eventDomain.ToLowerInvariant()}.{visibility}.{topicName}.{version}";
 
         return new EventMetadata
         {

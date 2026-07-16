@@ -13,7 +13,7 @@ editLink: false
 - **Entity:** `payment-status-changed`
 - **Type:** Integration Event
 - **Topic:** `payment-status-changeds`
-- **Fully Qualified Topic:** `{env}.testevents.public.payment-status-changeds.v1`
+- **Fully Qualified Topic:** `{env}.types.public.payment-status-changeds.v1`
 - **Estimated Payload Size:** 56 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
