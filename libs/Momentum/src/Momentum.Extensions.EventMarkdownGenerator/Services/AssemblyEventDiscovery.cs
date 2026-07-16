@@ -11,7 +11,7 @@ public static class AssemblyEventDiscovery
     private const string DefaultAttributeNamePrefix = nameof(EventTopicAttribute);
     private const string DefaultPartitionKeyAttributeNamePrefix = nameof(PartitionKeyAttribute);
 
-    public static IEnumerable<EventMetadata> DiscoverEvents(Assembly assembly, XmlDocumentationParser? xmlParser,
+    public static IEnumerable<EventWithDocumentation> DiscoverEvents(Assembly assembly, XmlDocumentationParser? xmlParser,
         PayloadSizeCalculator calculator, string attributeNamePrefix = DefaultAttributeNamePrefix,
         string partitionKeyAttributeNamePrefix = DefaultPartitionKeyAttributeNamePrefix)
     {
@@ -19,7 +19,16 @@ public static class AssemblyEventDiscovery
         var integrationEventTypes = GetEventTypes(assembly, attributeNamePrefix);
 
         return integrationEventTypes.Select(type =>
-            EventMetadataBuilder.Build(type, defaultDomain, xmlParser, calculator, attributeNamePrefix, partitionKeyAttributeNamePrefix));
+        {
+            var metadata =
+                EventMetadataBuilder.Build(type, defaultDomain, xmlParser, calculator, attributeNamePrefix, partitionKeyAttributeNamePrefix);
+
+            return new EventWithDocumentation
+            {
+                Metadata = metadata,
+                Documentation = xmlParser?.GetEventDocumentation(type) ?? new EventDocumentation { Summary = string.Empty }
+            };
+        });
     }
 
     private static IEnumerable<Type> GetEventTypes(Assembly assembly, string attributeNamePrefix)

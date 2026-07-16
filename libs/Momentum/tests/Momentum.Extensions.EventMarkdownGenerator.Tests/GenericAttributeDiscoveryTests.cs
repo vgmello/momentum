@@ -47,7 +47,7 @@ public class GenericAttributeDiscoveryTests
             xmlParser: null,
             PayloadSizeCalculator.Create("json"),
             attributeNamePrefix: nameof(ConventionEventTopicAttribute),
-            partitionKeyAttributeNamePrefix: nameof(ConventionPartitionKeyAttribute)).ToList();
+            partitionKeyAttributeNamePrefix: nameof(ConventionPartitionKeyAttribute)).Select(e => e.Metadata).ToList();
 
         var conventionEvent = events.ShouldHaveSingleItem();
 
@@ -88,9 +88,9 @@ public class GenericAttributeDiscoveryTests
             assembly,
             xmlParser: null,
             PayloadSizeCalculator.Create("json"),
-            attributeNamePrefix: nameof(CustomAttribute)).ToList();
+            attributeNamePrefix: nameof(CustomAttribute)).Select(e => e.Metadata).ToList();
 
-        var customEvent = events.Single(e => e.EventType == typeof(CustomAttributeEvent));
+        var customEvent = events.Single(e => e.FullTypeName == typeof(CustomAttributeEvent).FullName);
 
         // Empty Topic falls back to the kebab-cased CLR type name, same as a missing Topic would.
         customEvent.Topic.ShouldBe("custom-attribute-event");

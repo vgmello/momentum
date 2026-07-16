@@ -64,8 +64,8 @@ public static class EventMetadataBuilder
             Domain = eventDomain,
             Version = version,
             IsInternal = isInternal,
-            EventType = eventType,
             TopicAttribute = topicAttribute,
+            Entity = GetEntity(attrType),
             AttributeProperties = GetAttributeProperties(topicAttribute),
             Properties = properties,
             PartitionKeys = partitionKeys,
@@ -95,6 +95,20 @@ public static class EventMetadataBuilder
         }
 
         return result;
+    }
+
+    /// <summary>
+    ///     Kebab-cases the entity type argument on a generic topic attribute (e.g.
+    ///     <c>EventTopicAttribute&lt;Cashier&gt;</c> yields "cashier"), or empty when it isn't generic.
+    /// </summary>
+    private static string GetEntity(Type attrType)
+    {
+        if (!attrType.IsGenericType)
+            return string.Empty;
+
+        var genericArgs = attrType.GetGenericArguments();
+
+        return genericArgs.Length > 0 ? genericArgs[0].Name.ToKebabCase() : string.Empty;
     }
 
     private static Attribute GetEventTopicAttributeDynamic(Type type, string attributeNamePrefix)

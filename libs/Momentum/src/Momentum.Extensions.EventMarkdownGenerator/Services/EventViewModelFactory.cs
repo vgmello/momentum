@@ -1,6 +1,5 @@
 // Copyright (c) Momentum .NET. All rights reserved.
 
-using Momentum.Extensions.Abstractions.Extensions;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Momentum.Extensions.EventMarkdownGenerator.Models;
@@ -34,7 +33,7 @@ public static partial class EventViewModelFactory
             Domain = metadata.Domain,
             Version = metadata.Version,
             Status = metadata.GetStatus(),
-            Entity = ExtractEntityFromEventType(metadata.EventType),
+            Entity = metadata.Entity,
             IsObsolete = metadata.IsObsolete,
             ObsoleteMessage = metadata.ObsoleteMessage,
             IsInternal = metadata.IsInternal,
@@ -101,29 +100,6 @@ public static partial class EventViewModelFactory
                 schemaPath = GetSchemaPath(p.PropertyType)
             }).ToArray()
         };
-    }
-
-    private static string ExtractEntityFromEventType(Type eventType)
-    {
-        // Get the EventTopicAttribute directly from the event type to preserve generic information
-        var topicAttribute = eventType.GetCustomAttributes()
-            .FirstOrDefault(attr => attr.GetType().Name.StartsWith("EventTopicAttribute"));
-
-        if (topicAttribute == null) return string.Empty;
-
-        var attrType = topicAttribute.GetType();
-
-        if (attrType.IsGenericType && attrType.Name.StartsWith("EventTopicAttribute"))
-        {
-            var genericArgs = attrType.GetGenericArguments();
-
-            if (genericArgs.Length > 0)
-            {
-                return genericArgs[0].Name.ToKebabCase();
-            }
-        }
-
-        return string.Empty;
     }
 
     private static string GenerateGitHubUrl(EventMetadata metadata, string? gitHubBaseUrl)

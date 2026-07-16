@@ -15,8 +15,14 @@ public record EventMetadata
     public required string Domain { get; init; }
     public required string Version { get; init; }
     public required bool IsInternal { get; init; }
-    public required Type EventType { get; init; }
     public required Attribute TopicAttribute { get; init; }
+
+    /// <summary>
+    ///     Kebab-cased name of the entity type argument on a generic topic attribute (e.g.
+    ///     <c>EventTopicAttribute&lt;Cashier&gt;</c> yields "cashier"), or empty when the topic
+    ///     attribute isn't generic.
+    /// </summary>
+    public required string Entity { get; init; }
 
     /// <summary>
     ///     Every public property of <see cref="TopicAttribute"/>, name to stringified value, discovered via

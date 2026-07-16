@@ -37,7 +37,7 @@ public class FluidMarkdownGeneratorTests
                 Domain = "Tests",
                 Version = "v1",
                 IsInternal = false,
-                EventType = eventType,
+                Entity = string.Empty,
                 TopicAttribute = (Attribute)topicAttribute,
                 Properties =
                 [
@@ -240,7 +240,7 @@ public class FluidMarkdownGeneratorTests
                 Domain = "MarkerDomain",
                 Version = "v7",
                 IsInternal = false,
-                EventType = eventType,
+                Entity = string.Empty,
                 TopicAttribute = (Attribute)topicAttribute,
                 AttributeProperties = new Dictionary<string, string>
                 {
