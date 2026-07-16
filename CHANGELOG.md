@@ -91,6 +91,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   placeholder segment. It was never substituted by the doc generator (a design-time tool with no
   concept of a deployment environment), so it only ever showed up as a literal, unresolved token in
   generated docs. Now composed as `{domain}.{visibility}.{topic}.{version}`.
+- **Docs**: synced the `event.liquid` variable table in the new VitePress guide page
+  (`libs/Momentum/docs/guide/messaging/event-documentation.md`) with the fields and behavior
+  described above — dropped the stale `{env}` prefix, and added `EventNameKebab`, `EventTypeName`,
+  `Domain`, `Summary`, and `AttributeProperties`.
 
 ### Fixed
 
