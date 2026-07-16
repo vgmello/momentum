@@ -179,7 +179,7 @@ public static class JsonSidebarGenerator
     private static List<SidebarItem> CreateEventItems(List<EventWithDocumentation> events)
     {
         return events
-            .OrderBy(e => e.Metadata.EventName)
+            .OrderBy(e => e.Metadata.EventTypeName)
             .Select(CreateEventSidebarItem)
             .ToList();
     }
@@ -304,7 +304,7 @@ public static class JsonSidebarGenerator
     private static SidebarItem CreateEventSidebarItem(EventWithDocumentation eventWithDoc)
     {
         var metadata = eventWithDoc.Metadata;
-        var displayName = metadata.EventName.ToDisplayName();
+        var displayName = metadata.EventTypeName.ToDisplayName();
         var link = "/" + metadata.GetFileName().Replace(".md", "");
 
         return new SidebarItem
