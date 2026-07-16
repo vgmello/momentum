@@ -40,6 +40,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **EventMarkdownGenerator**: extracted `EventMetadataBuilder` from `AssemblyEventDiscovery` so
   assembly/type scanning stays independent from reflecting a single event type and its topic
   attribute into `EventMetadata`.
+- **EventMarkdownGenerator**: extracted `EventPropertyMetadataBuilder` from `EventMetadataBuilder` so
+  reflecting an event type's own properties/partition keys stays independent from resolving its topic
+  attribute and computed fields (topic, domain, fully-qualified topic name, etc).
+- **EventMarkdownGenerator**: moved generic reflection helpers (`FindAttributeByName`,
+  `GetPropertyValue<T>`, `MapConstructorParametersToProperties`) that carry no event-metadata-specific
+  meaning from `EventMetadataBuilder` into `TypeUtils`. Also removed a private kebab-case fallback
+  that duplicated the `Momentum.Extensions.Abstractions.Extensions.ToKebabCase()` extension already
+  imported in the same file.
+
+### Tests
+
+- **EventMarkdownGenerator**: added an `all-properties-showcase` scenario (real `TestEvents` fixture
+  and XML doc input, checked into `IntegrationTestScenarios/`) that exercises every renderable
+  `EventMetadata` property at once — obsolete marker, explicit domain/topic/version, internal
+  visibility, multiple partition keys, a complex nested property, a collection of a complex type,
+  and real Summary/Remarks/Example/param documentation — as a durable, reviewable example alongside
+  the existing marker-value completeness unit test.
 
 ### Fixed
 

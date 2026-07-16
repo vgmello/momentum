@@ -315,4 +315,49 @@ public static class TypeUtils
 
         return nullabilityInfo.WriteState == NullabilityState.NotNull;
     }
+
+    /// <summary>
+    ///     Finds a custom attribute by name (or name prefix) so discovery works across assembly load contexts
+    ///     and for any attribute type matching a configured convention, not just a hardcoded compiled type.
+    /// </summary>
+    public static Attribute? FindAttributeByName(IEnumerable<Attribute> attributes, string attributeNamePrefix) =>
+        attributes.FirstOrDefault(attr => attr.GetType().Name.StartsWith(attributeNamePrefix));
+
+    /// <summary>
+    ///     Gets a property value from an object using reflection with safe null handling.
+    /// </summary>
+    public static T? GetPropertyValue<T>(Type type, object instance, string propertyName)
+    {
+        var property = type.GetProperty(propertyName);
+
+        if (property == null)
+            return default;
+
+        var value = property.GetValue(instance);
+
+        return value is T typedValue ? typedValue : default;
+    }
+
+    /// <summary>
+    ///     Maps constructor parameters to same-named properties (case-insensitive), so attributes applied
+    ///     to a record's positional parameters can be found via their corresponding property.
+    /// </summary>
+    public static Dictionary<string, ParameterInfo> MapConstructorParametersToProperties(Type type,
+        ParameterInfo[] constructorParameters)
+    {
+        var map = new Dictionary<string, ParameterInfo>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var parameter in constructorParameters)
+        {
+            var property = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .FirstOrDefault(p => string.Equals(p.Name, parameter.Name, StringComparison.OrdinalIgnoreCase));
+
+            if (property != null)
+            {
+                map[property.Name] = parameter;
+            }
+        }
+
+        return map;
+    }
 }
