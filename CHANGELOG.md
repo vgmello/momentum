@@ -57,6 +57,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   visibility, multiple partition keys, a complex nested property, a collection of a complex type,
   and real Summary/Remarks/Example/param documentation — as a durable, reviewable example alongside
   the existing marker-value completeness unit test.
+- **EventMarkdownGenerator**: `ScenarioBasedIntegrationTests` now supports a per-scenario
+  `templates/event.liquid` override (falling back to the default embedded template when absent).
+  Used by `all-properties-showcase`, whose override renders every single `EventViewModel` field
+  verbatim — including every entry of `Properties`, `PartitionKeys`, and `AttributeProperties` — as a
+  raw, exhaustive dump distinct from the polished default rendering.
 
 ### Fixed
 

@@ -313,7 +313,12 @@ public class ScenarioBasedIntegrationTests
     {
         // Initialize services
         var xmlParser = new XmlDocumentationParser();
-        var fluidGenerator = await FluidMarkdownGenerator.CreateAsync();
+
+        // A scenario may ship its own Liquid templates (e.g. a "templates/event.liquid") to override
+        // the default rendering just for that scenario, instead of always using the shared template.
+        var scenarioTemplatesDir = Path.Combine(Path.GetDirectoryName(scenario.InputXmlPath)!, "templates");
+        var fluidGenerator = await FluidMarkdownGenerator.CreateAsync(
+            Directory.Exists(scenarioTemplatesDir) ? scenarioTemplatesDir : null);
         // Load XML documentation
         var xmlLoaded = await xmlParser.LoadMultipleDocumentationAsync([scenario.InputXmlPath], TestContext.Current.CancellationToken);
 

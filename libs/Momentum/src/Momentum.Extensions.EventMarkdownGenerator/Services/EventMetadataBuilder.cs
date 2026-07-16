@@ -20,6 +20,7 @@ public static class EventMetadataBuilder
         // Use dynamic attribute handling to work across assembly contexts
         var topicAttribute = GetEventTopicAttributeDynamic(eventType, attributeNamePrefix);
         var obsoleteAttribute = eventType.GetCustomAttribute<ObsoleteAttribute>();
+
         var (properties, partitionKeys) =
             EventPropertyMetadataBuilder.Build(eventType, xmlParser, calculator, partitionKeyAttributeNamePrefix);
 

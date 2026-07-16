@@ -2,72 +2,138 @@
 editLink: false
 ---
 
-<!-- // @formatter:off -->
-<!-- prettier-ignore -->
+<!-- Scenario-local override of event.liquid: dumps every single EventViewModel field verbatim,
+     instead of the polished default rendering, so the raw data reaching the template is fully
+     visible and reviewable in one place. -->
 
-# AllPropertiesShowcaseEvent
+# Raw EventViewModel Dump: AllPropertiesShowcaseEvent
 
-> [!CAUTION]
-    > This event is deprecated. Superseded by a hypothetical future event; kept only as a documentation-generator test fixture.
+## Scalars
 
-- **Status:** Deprecated
+- **EventName:** AllPropertiesShowcaseEvent
+- **EventTypeName:** AllPropertiesShowcaseEvent
+- **FullTypeName:** TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents.AllPropertiesShowcaseEvent
+- **Namespace:** TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents
+- **Topic:** comprehensive-topic
+- **FullyQualifiedTopicName:** {env}.testevents.internal.comprehensive-topic.v9
 - **Domain:** comprehensive-domain
 - **Version:** v9
-- **Entity:** `showcase-location`
-- **Type:** Domain Event
-- **Topic:** `comprehensive-topic`
-- **Fully Qualified Topic:** `{env}.testevents.internal.comprehensive-topic.v9`
-- **Estimated Payload Size:** 372 bytes ⚠️ *Contains dynamic properties*
-- **Partition Keys**: TenantId, SequenceNumber
-
-## Description
-
-Exercises every EventMetadata property in a single event: explicit domain/topic/version,
+- **Status:** Deprecated
+- **Entity:** showcase-location
+- **IsObsolete:** true
+- **IsInternal:** true
+- **ObsoleteMessage:** Superseded by a hypothetical future event; kept only as a documentation-generator test fixture.
+- **GithubUrl:** #
+- **TopicAttributeDisplayName:** [EventTopic<ShowcaseLocation>]
+- **Description:** Exercises every EventMetadata property in a single event: explicit domain/topic/version,
 internal visibility, an obsolete marker, multiple partition keys, a complex nested property,
 and a collection of a complex type.
-
-## When It's Triggered
+- **Summary:** Exercises every EventMetadata property in a single event: explicit domain/topic/version,
+internal visibility, an obsolete marker, multiple partition keys, a complex nested property,
+and a collection of a complex type.
+- **Remarks:** ## When It's Triggered
 
 This event exists purely as a documentation-generator test fixture, showcasing every
 renderable field of the generated markdown at once.
-### Example
+- **Example:** await bus.PublishAsync(new AllPropertiesShowcaseEvent(tenantId, 1, primaryLocation, relatedLocations));
+- **TotalEstimatedSizeBytes:** 372
+- **HasInaccurateEstimates:** true
 
-await bus.PublishAsync(new AllPropertiesShowcaseEvent(tenantId, 1, primaryLocation, relatedLocations));
-## Event Payload
+## AttributeProperties (5)
 
-| Property | Type | Required | Size | Description |
-| ----------------------------------------------------------------- | --------- | -------- | -------- | --------------------------------------------------------------------- |
-| TenantId| `Guid` | ✓| 16 bytes | Identifier of the tenant that owns this record (partition key) |
-| SequenceNumber| `int` | ✓| 4 bytes | Secondary partition key used for ordering within a tenant (partition key) |
-| [PrimaryLocation](/events/schemas/TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents.ShowcaseLocation.md)| `ShowcaseLocation` | ✓| 31 bytes (Name: Dynamic size - no MaxLength constraint) | The primary complex-type property, rendered with its own reference schema |
-| [RelatedLocations](/events/schemas/TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents.ShowcaseLocation.md)| `List<ShowcaseLocation>` | ✓| 321 bytes (Collection size estimated (no Range constraint)) | A collection of complex-type entries, rendered with an element reference schema |
+- `ShouldPluralizeTopicName` = `False`
+- `Topic` = `comprehensive-topic`
+- `Domain` = `comprehensive-domain`
+- `Version` = `v9`
+- `Internal` = `True`
 
 
-### Partition Keys
+## Properties (4)
 
-This event uses multiple partition keys for message routing:
-- `TenantId` - Identifier of the tenant that owns this record
-    - `SequenceNumber` - Secondary partition key used for ordering within a tenant
-    
-### Reference Schemas
+### TenantId
 
-#### ShowcaseLocation
+- **Name:** TenantId
+- **TypeName:** Guid
+- **IsRequired:** true
+- **IsComplexType:** false
+- **IsCollectionType:** false
+- **Description:** Identifier of the tenant that owns this record (partition key)
+- **SchemaLink:** 
+- **SchemaPath:** 
+- **ElementTypeName:** 
+- **ElementSchemaPath:** 
+- **EstimatedSizeBytes:** 16
+- **IsAccurate:** true
+- **SizeWarning:** 
+- **EstimatedSizeDisplay:** 16 bytes
 
-<!--@include: @/events/schemas/TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents.ShowcaseLocation.md#schema-->
+### SequenceNumber
 
-#### ShowcaseLocations
+- **Name:** SequenceNumber
+- **TypeName:** int
+- **IsRequired:** true
+- **IsComplexType:** false
+- **IsCollectionType:** false
+- **Description:** Secondary partition key used for ordering within a tenant (partition key)
+- **SchemaLink:** 
+- **SchemaPath:** 
+- **ElementTypeName:** 
+- **ElementSchemaPath:** 
+- **EstimatedSizeBytes:** 4
+- **IsAccurate:** true
+- **SizeWarning:** 
+- **EstimatedSizeDisplay:** 4 bytes
 
-<!--@include: @/events/schemas/TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents.ShowcaseLocation.md#schema-->
+### PrimaryLocation
 
-## Technical Details
+- **Name:** PrimaryLocation
+- **TypeName:** ShowcaseLocation
+- **IsRequired:** true
+- **IsComplexType:** true
+- **IsCollectionType:** false
+- **Description:** The primary complex-type property, rendered with its own reference schema
+- **SchemaLink:** TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents.ShowcaseLocation.md
+- **SchemaPath:** TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents.ShowcaseLocation.md
+- **ElementTypeName:** 
+- **ElementSchemaPath:** TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents.ShowcaseLocation.md
+- **EstimatedSizeBytes:** 31
+- **IsAccurate:** false
+- **SizeWarning:** Name: Dynamic size - no MaxLength constraint
+- **EstimatedSizeDisplay:** 31 bytes (Name: Dynamic size - no MaxLength constraint)
 
-- **Full Type:** [TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents.AllPropertiesShowcaseEvent](#)
-- **Type Name:** `AllPropertiesShowcaseEvent`
-- **Namespace:** `TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents`
-- **Topic Attribute:** `[EventTopic<ShowcaseLocation>]`
-- **Attribute Properties:**
-- `ShouldPluralizeTopicName`: `False`
-- `Topic`: `comprehensive-topic`
-- `Domain`: `comprehensive-domain`
-- `Version`: `v9`
-- `Internal`: `True`
+### RelatedLocations
+
+- **Name:** RelatedLocations
+- **TypeName:** List<ShowcaseLocation>
+- **IsRequired:** true
+- **IsComplexType:** true
+- **IsCollectionType:** true
+- **Description:** A collection of complex-type entries, rendered with an element reference schema
+- **SchemaLink:** TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents.ShowcaseLocation.md
+- **SchemaPath:** TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents.ShowcaseLocation.md
+- **ElementTypeName:** ShowcaseLocation
+- **ElementSchemaPath:** TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents.ShowcaseLocation.md
+- **EstimatedSizeBytes:** 321
+- **IsAccurate:** false
+- **SizeWarning:** Collection size estimated (no Range constraint)
+- **EstimatedSizeDisplay:** 321 bytes (Collection size estimated (no Range constraint))
+
+
+
+## PartitionKeys (2)
+
+### TenantId
+
+- **Name:** TenantId
+- **TypeName:** Guid
+- **Description:** Identifier of the tenant that owns this record
+- **Order:** 0
+
+### SequenceNumber
+
+- **Name:** SequenceNumber
+- **TypeName:** int
+- **Description:** Secondary partition key used for ordering within a tenant
+- **Order:** 1
+
+

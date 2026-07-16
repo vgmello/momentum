@@ -1,0 +1,73 @@
+---
+editLink: false
+---
+
+<!-- Scenario-local override of event.liquid: dumps every single EventViewModel field verbatim,
+     instead of the polished default rendering, so the raw data reaching the template is fully
+     visible and reviewable in one place. -->
+
+# Raw EventViewModel Dump: {{ event.EventName }}
+
+## Scalars
+
+- **EventName:** {{ event.EventName }}
+- **EventTypeName:** {{ event.EventTypeName }}
+- **FullTypeName:** {{ event.FullTypeName }}
+- **Namespace:** {{ event.Namespace }}
+- **Topic:** {{ event.Topic }}
+- **FullyQualifiedTopicName:** {{ event.FullyQualifiedTopicName }}
+- **Domain:** {{ event.Domain }}
+- **Version:** {{ event.Version }}
+- **Status:** {{ event.Status }}
+- **Entity:** {{ event.Entity }}
+- **IsObsolete:** {{ event.IsObsolete }}
+- **IsInternal:** {{ event.IsInternal }}
+- **ObsoleteMessage:** {{ event.ObsoleteMessage }}
+- **GithubUrl:** {{ event.GithubUrl }}
+- **TopicAttributeDisplayName:** {{ event.TopicAttributeDisplayName }}
+- **Description:** {{ event.Description }}
+- **Summary:** {{ event.Summary }}
+- **Remarks:** {{ event.Remarks }}
+- **Example:** {{ event.Example }}
+- **TotalEstimatedSizeBytes:** {{ event.TotalEstimatedSizeBytes }}
+- **HasInaccurateEstimates:** {{ event.HasInaccurateEstimates }}
+
+## AttributeProperties ({{ event.AttributeProperties.size }})
+
+{% for entry in event.AttributeProperties -%}
+- `{{ entry.Key }}` = `{{ entry.Value }}`
+{% endfor %}
+
+## Properties ({{ event.Properties.size }})
+
+{% for property in event.Properties -%}
+### {{ property.Name }}
+
+- **Name:** {{ property.Name }}
+- **TypeName:** {{ property.TypeName }}
+- **IsRequired:** {{ property.IsRequired }}
+- **IsComplexType:** {{ property.IsComplexType }}
+- **IsCollectionType:** {{ property.IsCollectionType }}
+- **Description:** {{ property.Description }}
+- **SchemaLink:** {{ property.SchemaLink }}
+- **SchemaPath:** {{ property.SchemaPath }}
+- **ElementTypeName:** {{ property.ElementTypeName }}
+- **ElementSchemaPath:** {{ property.ElementSchemaPath }}
+- **EstimatedSizeBytes:** {{ property.EstimatedSizeBytes }}
+- **IsAccurate:** {{ property.IsAccurate }}
+- **SizeWarning:** {{ property.SizeWarning }}
+- **EstimatedSizeDisplay:** {{ property.EstimatedSizeDisplay }}
+
+{% endfor %}
+
+## PartitionKeys ({{ event.PartitionKeys.size }})
+
+{% for partitionKey in event.PartitionKeys -%}
+### {{ partitionKey.Name }}
+
+- **Name:** {{ partitionKey.Name }}
+- **TypeName:** {{ partitionKey.TypeName }}
+- **Description:** {{ partitionKey.Description }}
+- **Order:** {{ partitionKey.Order }}
+
+{% endfor %}
