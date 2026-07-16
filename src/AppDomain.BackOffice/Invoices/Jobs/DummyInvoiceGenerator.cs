@@ -10,10 +10,10 @@ namespace AppDomain.BackOffice.Invoices.Jobs;
 ///     Background service that generates dummy invoice paid events for testing and demonstration purposes.
 ///     Publishes fake invoice events at regular intervals to simulate invoice processing activity.
 /// </summary>
-/// <param name="bus">The message bus for publishing integration events.</param>
+/// <param name="scopeFactory">Used to resolve the scoped message bus per iteration.</param>
 /// <param name="logger">Logger instance for tracking operations.</param>
 [ExcludeFromCodeCoverage]
-public class DummyInvoiceGenerator(IMessageBus bus, ILogger<DummyInvoiceGenerator> logger) : BackgroundService
+public class DummyInvoiceGenerator(IServiceScopeFactory scopeFactory, ILogger<DummyInvoiceGenerator> logger) : BackgroundService
 {
     /// <summary>
     ///     Executes the background job, continuously publishing dummy invoice paid events.
@@ -45,6 +45,9 @@ public class DummyInvoiceGenerator(IMessageBus bus, ILogger<DummyInvoiceGenerato
                     UpdatedDateUtc: now,
                     Version: 1
                 );
+
+                await using var scope = scopeFactory.CreateAsyncScope();
+                var bus = scope.ServiceProvider.GetRequiredService<IMessageBus>();
 
                 await bus.PublishAsync(new InvoicePaid(
                     tenantId,

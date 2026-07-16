@@ -35,3 +35,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **docs-dotnet.ts**: the `docfx metadata` build step now resolves the `docfx` executable from the
   fixed `.NET` global-tools directory instead of an unpinned `PATH` lookup, closing a SonarCloud
   security hotspot (`typescript:S4036`).
+
+### Fixed
+
+- **DummyInvoiceGenerator** (sample BackOffice service): resolved a DI lifetime crash on startup —
+  the singleton `BackgroundService` was constructor-injecting the scoped `Wolverine.IMessageBus`
+  directly, which fails ASP.NET Core's DI validation. It now resolves `IMessageBus` from a new
+  `IServiceScopeFactory`-created scope on each publish iteration.
