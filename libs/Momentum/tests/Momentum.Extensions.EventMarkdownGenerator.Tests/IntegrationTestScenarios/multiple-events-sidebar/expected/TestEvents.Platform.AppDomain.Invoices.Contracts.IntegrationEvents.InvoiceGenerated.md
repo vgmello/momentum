@@ -38,6 +38,7 @@ This event uses a partition key for message routing:
 
 - **Full Type:** [TestEvents.Platform.AppDomain.Invoices.Contracts.IntegrationEvents.InvoiceGenerated](#)
 - **Type Name:** `InvoiceGenerated`
+- **Event Slug:** `invoice-generated`
 - **Namespace:** `TestEvents.Platform.AppDomain.Invoices.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<InvoiceGenerated>]`
 - **Attribute Properties:**

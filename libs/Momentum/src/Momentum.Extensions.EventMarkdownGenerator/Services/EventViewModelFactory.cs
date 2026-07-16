@@ -25,6 +25,7 @@ public static partial class EventViewModelFactory
         return new EventViewModel
         {
             EventName = metadata.EventName,
+            EventNameKebab = metadata.EventNameKebab,
             EventTypeName = metadata.EventTypeName,
             FullTypeName = metadata.FullTypeName,
             Namespace = metadata.Namespace,
@@ -110,7 +111,7 @@ public static partial class EventViewModelFactory
         }
 
         var pathParts = metadata.Namespace.Split('.');
-        var filePath = string.Join("/", pathParts) + $"/{metadata.EventName}.cs";
+        var filePath = string.Join("/", pathParts) + $"/{metadata.EventTypeName}.cs";
 
         return $"{gitHubBaseUrl}/{filePath}";
     }

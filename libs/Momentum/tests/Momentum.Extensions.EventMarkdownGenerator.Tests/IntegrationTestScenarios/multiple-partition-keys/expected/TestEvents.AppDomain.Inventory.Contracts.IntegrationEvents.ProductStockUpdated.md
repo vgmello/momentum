@@ -44,6 +44,7 @@ This event uses multiple partition keys for message routing:
 
 - **Full Type:** [TestEvents.AppDomain.Inventory.Contracts.IntegrationEvents.ProductStockUpdated](#)
 - **Type Name:** `ProductStockUpdated`
+- **Event Slug:** `product-stock-updated`
 - **Namespace:** `TestEvents.AppDomain.Inventory.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<Product>]`
 - **Attribute Properties:**

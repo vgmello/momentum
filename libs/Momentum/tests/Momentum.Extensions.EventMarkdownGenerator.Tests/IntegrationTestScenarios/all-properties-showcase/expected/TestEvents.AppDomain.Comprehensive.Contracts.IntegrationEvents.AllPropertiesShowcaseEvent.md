@@ -11,6 +11,7 @@ editLink: false
 ## Scalars
 
 - **EventName:** AllPropertiesShowcaseEvent
+- **EventNameKebab:** all-properties-showcase-event
 - **EventTypeName:** AllPropertiesShowcaseEvent
 - **FullTypeName:** TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents.AllPropertiesShowcaseEvent
 - **Namespace:** TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents

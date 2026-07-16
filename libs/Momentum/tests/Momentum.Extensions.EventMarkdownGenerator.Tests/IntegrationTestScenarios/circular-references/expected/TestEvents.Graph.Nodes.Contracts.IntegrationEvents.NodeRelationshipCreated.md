@@ -50,6 +50,7 @@ This event uses a partition key for message routing:
 
 - **Full Type:** [TestEvents.Graph.Nodes.Contracts.IntegrationEvents.NodeRelationshipCreated](#)
 - **Type Name:** `NodeRelationshipCreated`
+- **Event Slug:** `node-relationship-created`
 - **Namespace:** `TestEvents.Graph.Nodes.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<NodeRelationshipCreated>]`
 - **Attribute Properties:**

@@ -46,6 +46,7 @@ This event uses multiple partition keys for message routing:
 
 - **Full Type:** [TestEvents.AppDomain.Cashiers.Contracts.IntegrationEvents.CashierCreated](#)
 - **Type Name:** `CashierCreated`
+- **Event Slug:** `cashier-created`
 - **Namespace:** `TestEvents.AppDomain.Cashiers.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<Cashier>]`
 - **Attribute Properties:**

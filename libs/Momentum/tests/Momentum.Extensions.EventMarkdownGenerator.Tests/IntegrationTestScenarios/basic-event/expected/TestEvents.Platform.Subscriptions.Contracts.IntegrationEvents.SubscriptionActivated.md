@@ -38,6 +38,7 @@ This event uses a partition key for message routing:
 
 - **Full Type:** [TestEvents.Platform.Subscriptions.Contracts.IntegrationEvents.SubscriptionActivated](#)
 - **Type Name:** `SubscriptionActivated`
+- **Event Slug:** `subscription-activated`
 - **Namespace:** `TestEvents.Platform.Subscriptions.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<SubscriptionActivated>]`
 - **Attribute Properties:**

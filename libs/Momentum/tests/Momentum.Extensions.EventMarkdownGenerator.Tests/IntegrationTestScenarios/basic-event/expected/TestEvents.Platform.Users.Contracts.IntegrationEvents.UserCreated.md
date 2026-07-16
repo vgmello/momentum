@@ -38,6 +38,7 @@ This event uses a partition key for message routing:
 
 - **Full Type:** [TestEvents.Platform.Users.Contracts.IntegrationEvents.UserCreated](#)
 - **Type Name:** `UserCreated`
+- **Event Slug:** `user-created`
 - **Namespace:** `TestEvents.Platform.Users.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<UserCreated>]`
 - **Attribute Properties:**

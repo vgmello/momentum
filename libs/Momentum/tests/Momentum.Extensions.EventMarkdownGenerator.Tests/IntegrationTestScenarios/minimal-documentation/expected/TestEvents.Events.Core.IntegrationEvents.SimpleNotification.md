@@ -13,7 +13,7 @@ editLink: false
 - **Entity:** `simple-notification`
 - **Type:** Integration Event
 - **Topic:** `simple-notifications`
-- **Fully Qualified Topic:** `{env}.testevents.public.simple-notifications.v1`
+- **Fully Qualified Topic:** `{env}.test-events.public.simple-notifications.v1`
 - **Estimated Payload Size:** 16 bytes ⚠️ *Contains dynamic properties*
 
 ## Description
@@ -32,6 +32,7 @@ No documentation available
 
 - **Full Type:** [TestEvents.Events.Core.IntegrationEvents.SimpleNotification](#)
 - **Type Name:** `SimpleNotification`
+- **Event Slug:** `simple-notification`
 - **Namespace:** `TestEvents.Events.Core.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<SimpleNotification>]`
 - **Attribute Properties:**

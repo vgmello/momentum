@@ -89,6 +89,7 @@ This event uses multiple partition keys for message routing:
 
 - **Full Type:** [{{ event.FullTypeName }}]({{ event.GithubUrl }})
 - **Type Name:** `{{ event.EventTypeName }}`
+- **Event Slug:** `{{ event.EventNameKebab }}`
 - **Namespace:** `{{ event.Namespace }}`
 - **Topic Attribute:** `{{ event.TopicAttributeDisplayName }}`
 {% if event.AttributeProperties.size > 0 -%}

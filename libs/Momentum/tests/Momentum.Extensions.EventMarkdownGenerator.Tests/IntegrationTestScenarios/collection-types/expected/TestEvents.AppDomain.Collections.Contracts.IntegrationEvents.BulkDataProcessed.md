@@ -65,6 +65,7 @@ This event uses a partition key for message routing:
 
 - **Full Type:** [TestEvents.AppDomain.Collections.Contracts.IntegrationEvents.BulkDataProcessed](#)
 - **Type Name:** `BulkDataProcessed`
+- **Event Slug:** `bulk-data-processed`
 - **Namespace:** `TestEvents.AppDomain.Collections.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<BulkDataProcessed>]`
 - **Attribute Properties:**

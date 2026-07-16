@@ -63,7 +63,7 @@ public class IntegrationTests
             var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser, PayloadSizeCalculator.Create("json")).ToList();
 
             events.Count.ShouldBeGreaterThan(0);
-            var cashierCreatedEvent = events.FirstOrDefault(e => e.Metadata.EventName == "CashierCreated");
+            var cashierCreatedEvent = events.FirstOrDefault(e => e.Metadata.EventTypeName == "CashierCreated");
             cashierCreatedEvent.ShouldNotBeNull();
 
             var generatedMarkdown = markdownGenerator.GenerateMarkdown(cashierCreatedEvent, outputDir);
@@ -105,7 +105,7 @@ public class IntegrationTests
 
         // Assert
         events.Count.ShouldBeGreaterThan(0);
-        var cashierEvent = events.FirstOrDefault(e => e.EventName == "CashierCreated");
+        var cashierEvent = events.FirstOrDefault(e => e.EventTypeName == "CashierCreated");
         cashierEvent.ShouldNotBeNull();
 
         cashierEvent.PartitionKeys.Count.ShouldBe(2);
@@ -130,7 +130,7 @@ public class IntegrationTests
 
         // Assert
         events.Count.ShouldBeGreaterThan(0);
-        var cashierEvent = events.FirstOrDefault(e => e.EventName == "CashierCreated");
+        var cashierEvent = events.FirstOrDefault(e => e.EventTypeName == "CashierCreated");
         cashierEvent.ShouldNotBeNull();
         cashierEvent.Domain.ShouldBe("Cashiers"); // Now returns subdomain instead of domain
     }
@@ -192,7 +192,7 @@ public class IntegrationTests
         var sidebarItems = JsonSidebarGenerator.GenerateSidebarItems(eventsWithDoc);
 
         // Assert
-        var cashierCreatedEvent = events.FirstOrDefault(e => e.Metadata.EventName == "CashierCreated");
+        var cashierCreatedEvent = events.FirstOrDefault(e => e.Metadata.EventTypeName == "CashierCreated");
         sidebarItems.Count.ShouldBe(7); // Multiple domain sections + Schemas section
 
         // Validate AppDomain section exists (contains CashierCreated)

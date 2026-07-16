@@ -7,6 +7,14 @@ namespace Momentum.Extensions.EventMarkdownGenerator.Models;
 public record EventMetadata
 {
     public required string EventName { get; init; }
+
+    /// <summary>
+    ///     Kebab-cased form of <see cref="EventName"/> (respects an <c>EventName</c> attribute override
+    ///     the same way EventName itself does). Intended for topic-adjacent/URL-safe uses in templates
+    ///     that want a slug without kebab-casing the human-facing heading itself.
+    /// </summary>
+    public required string EventNameKebab { get; init; }
+
     public required string EventTypeName { get; init; }
     public required string FullTypeName { get; init; }
     public required string Namespace { get; init; }

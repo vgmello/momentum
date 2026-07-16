@@ -54,6 +54,7 @@ This event uses multiple partition keys for message routing:
 
 - **Full Type:** [TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents.AllPropertiesShowcaseEvent](#)
 - **Type Name:** `AllPropertiesShowcaseEvent`
+- **Event Slug:** `all-properties-showcase-event`
 - **Namespace:** `TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<ShowcaseLocation>]`
 - **Attribute Properties:**

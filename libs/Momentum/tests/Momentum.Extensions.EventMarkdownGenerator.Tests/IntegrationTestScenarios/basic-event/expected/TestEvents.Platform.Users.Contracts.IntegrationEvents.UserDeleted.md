@@ -38,6 +38,7 @@ This event uses a partition key for message routing:
 
 - **Full Type:** [TestEvents.Platform.Users.Contracts.IntegrationEvents.UserDeleted](#)
 - **Type Name:** `UserDeleted`
+- **Event Slug:** `user-deleted`
 - **Namespace:** `TestEvents.Platform.Users.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<UserDeleted>]`
 - **Attribute Properties:**

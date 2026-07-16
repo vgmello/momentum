@@ -53,6 +53,7 @@ This event uses a partition key for message routing:
 
 - **Full Type:** [TestEvents.AppDomain.Orders.Contracts.IntegrationEvents.OrderCompleted](#)
 - **Type Name:** `OrderCompleted`
+- **Event Slug:** `order-completed`
 - **Namespace:** `TestEvents.AppDomain.Orders.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<Order>]`
 - **Attribute Properties:**

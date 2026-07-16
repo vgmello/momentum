@@ -13,7 +13,7 @@ editLink: false
 - **Entity:** `missing`
 - **Type:** Domain Event
 - **Topic:** `missings`
-- **Fully Qualified Topic:** `{env}.testevents.internal.missings.v1`
+- **Fully Qualified Topic:** `{env}.test-events.internal.missings.v1`
 - **Estimated Payload Size:** 16 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
@@ -37,6 +37,7 @@ This event uses a partition key for message routing:
 
 - **Full Type:** [TestEvents.Missing.Docs.IntegrationEvents.UndocumentedEvent](#)
 - **Type Name:** `UndocumentedEvent`
+- **Event Slug:** `undocumented-event`
 - **Namespace:** `TestEvents.Missing.Docs.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<Missing>]`
 - **Attribute Properties:**

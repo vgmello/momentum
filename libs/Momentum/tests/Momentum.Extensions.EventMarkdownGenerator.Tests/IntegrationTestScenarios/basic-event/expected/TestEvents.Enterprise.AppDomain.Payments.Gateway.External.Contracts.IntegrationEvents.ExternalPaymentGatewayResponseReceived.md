@@ -48,6 +48,7 @@ This event uses a partition key for message routing:
 
 - **Full Type:** [TestEvents.Enterprise.AppDomain.Payments.Gateway.External.Contracts.IntegrationEvents.ExternalPaymentGatewayResponseReceived](#)
 - **Type Name:** `ExternalPaymentGatewayResponseReceived`
+- **Event Slug:** `external-payment-gateway-response-received`
 - **Namespace:** `TestEvents.Enterprise.AppDomain.Payments.Gateway.External.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<ExternalPaymentGatewayResponseReceived>]`
 - **Attribute Properties:**

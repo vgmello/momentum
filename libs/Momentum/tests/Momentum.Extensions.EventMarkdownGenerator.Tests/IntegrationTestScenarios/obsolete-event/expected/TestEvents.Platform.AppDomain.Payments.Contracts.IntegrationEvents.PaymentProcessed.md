@@ -38,6 +38,7 @@ This event uses a partition key for message routing:
 
 - **Full Type:** [TestEvents.Platform.AppDomain.Payments.Contracts.IntegrationEvents.PaymentProcessed](#)
 - **Type Name:** `PaymentProcessed`
+- **Event Slug:** `payment-processed`
 - **Namespace:** `TestEvents.Platform.AppDomain.Payments.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<PaymentProcessed>]`
 - **Attribute Properties:**

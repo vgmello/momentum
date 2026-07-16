@@ -29,6 +29,7 @@ public class FluidMarkdownGeneratorTests
             Metadata = new EventMetadata
             {
                 EventName = "TestEvent",
+                EventNameKebab = "test-event",
                 EventTypeName = eventType.Name,
                 FullTypeName = eventType.FullName!,
                 Namespace = eventType.Namespace!,
@@ -232,6 +233,7 @@ public class FluidMarkdownGeneratorTests
             Metadata = new EventMetadata
             {
                 EventName = "MarkerEventName",
+                EventNameKebab = "marker-event-name-kebab",
                 EventTypeName = "MarkerEventTypeName",
                 FullTypeName = "Marker.Namespace.MarkerFullTypeName",
                 Namespace = "Marker.Namespace",
@@ -298,6 +300,7 @@ public class FluidMarkdownGeneratorTests
             // respectively), not values rendered verbatim themselves.
             result.Content.ShouldContain("MarkerEventName");
             result.Content.ShouldContain("MarkerEventTypeName");
+            result.Content.ShouldContain("marker-event-name-kebab");
             result.Content.ShouldContain("Marker.Namespace.MarkerFullTypeName");
             result.Content.ShouldContain("Marker.Namespace");
             result.Content.ShouldContain("marker-topic");

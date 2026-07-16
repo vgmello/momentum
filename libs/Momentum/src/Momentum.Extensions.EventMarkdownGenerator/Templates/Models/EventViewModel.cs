@@ -5,6 +5,7 @@ namespace Momentum.Extensions.EventMarkdownGenerator.Templates.Models;
 public class EventViewModel
 {
     public string EventName { get; set; } = string.Empty;
+    public string EventNameKebab { get; set; } = string.Empty;
     public string EventTypeName { get; set; } = string.Empty;
     public string FullTypeName { get; set; } = string.Empty;
     public string Namespace { get; set; } = string.Empty;

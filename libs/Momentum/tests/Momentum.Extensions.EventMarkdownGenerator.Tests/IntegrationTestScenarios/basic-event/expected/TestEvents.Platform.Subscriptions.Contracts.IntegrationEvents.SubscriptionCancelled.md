@@ -39,6 +39,7 @@ This event uses a partition key for message routing:
 
 - **Full Type:** [TestEvents.Platform.Subscriptions.Contracts.IntegrationEvents.SubscriptionCancelled](#)
 - **Type Name:** `SubscriptionCancelled`
+- **Event Slug:** `subscription-cancelled`
 - **Namespace:** `TestEvents.Platform.Subscriptions.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<SubscriptionCancelled>]`
 - **Attribute Properties:**

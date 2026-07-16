@@ -44,6 +44,7 @@ This event uses a partition key for message routing:
 
 - **Full Type:** [TestEvents.AppDomain.Types.Contracts.IntegrationEvents.PaymentStatusChanged](#)
 - **Type Name:** `PaymentStatusChanged`
+- **Event Slug:** `payment-status-changed`
 - **Namespace:** `TestEvents.AppDomain.Types.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<PaymentStatusChanged>]`
 - **Attribute Properties:**

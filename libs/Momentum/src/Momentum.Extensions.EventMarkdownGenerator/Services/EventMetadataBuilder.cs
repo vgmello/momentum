@@ -51,11 +51,14 @@ public static class EventMetadataBuilder
         // Build full topic name: {env}.{domain}.{visibility}.{topic}.{version}
         var visibility = isInternal ? "internal" : "public";
 
-        var fullTopicName = $"{{env}}.{eventDomain.ToLowerInvariant()}.{visibility}.{topicName}.{version}";
+        var fullTopicName = $"{{env}}.{eventDomain.ToKebabCase()}.{visibility}.{topicName}.{version}";
+
+        var eventName = !string.IsNullOrWhiteSpace(eventNameOverride) ? eventNameOverride : eventType.Name;
 
         return new EventMetadata
         {
-            EventName = !string.IsNullOrWhiteSpace(eventNameOverride) ? eventNameOverride : eventType.Name,
+            EventName = eventName,
+            EventNameKebab = eventName.ToKebabCase(),
             EventTypeName = eventType.Name,
             FullTypeName = eventType.FullName ?? eventType.Name,
             Namespace = eventType.Namespace ?? string.Empty,

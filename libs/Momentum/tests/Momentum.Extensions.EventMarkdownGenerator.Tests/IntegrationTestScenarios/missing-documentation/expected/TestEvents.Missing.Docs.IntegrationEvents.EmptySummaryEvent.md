@@ -13,7 +13,7 @@ editLink: false
 - **Entity:** `empty-summary-event`
 - **Type:** Integration Event
 - **Topic:** `empty-summary-events`
-- **Fully Qualified Topic:** `{env}.testevents.public.empty-summary-events.v1`
+- **Fully Qualified Topic:** `{env}.test-events.public.empty-summary-events.v1`
 - **Estimated Payload Size:** 16 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
@@ -37,6 +37,7 @@ This event uses a partition key for message routing:
 
 - **Full Type:** [TestEvents.Missing.Docs.IntegrationEvents.EmptySummaryEvent](#)
 - **Type Name:** `EmptySummaryEvent`
+- **Event Slug:** `empty-summary-event`
 - **Namespace:** `TestEvents.Missing.Docs.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<EmptySummaryEvent>]`
 - **Attribute Properties:**

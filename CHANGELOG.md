@@ -69,6 +69,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   (moved off `EventViewModelFactory`). When the topic attribute isn't generic (no `TEntity` to
   reflect), it falls back to stripping a common event-verb suffix (`Created`, `Updated`, `Deleted`,
   `Completed`, `Processed`, etc.) off the event type's own name, e.g. `WidgetCreated` → `widget`.
+- **EventMarkdownGenerator**: `EventMetadata.EventNameKebab` exposes a kebab-cased form of
+  `EventName` (respecting the same `EventName` attribute override) for topic-adjacent/URL-safe uses,
+  without kebab-casing the human-facing `EventName`/heading itself. Rendered in generated docs as
+  "Event Slug".
 
 ### Changed
 
@@ -88,6 +92,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   namespace-derived, then the default) — so an event could render `Domain: comprehensive-domain` in
   one field while its fully-qualified topic string still showed the unrelated default domain segment.
   Both fields now agree.
+- **EventMarkdownGenerator**: the domain segment of `FullyQualifiedTopicName` was only
+  lowercased (`ToLowerInvariant()`), not kebab-cased, so a multi-word domain like `TestEvents`
+  produced the glued `testevents` instead of `test-events`. Now uses `ToKebabCase()`, consistent
+  with how `Topic` and `Entity` are derived.
 - **EventMarkdownGenerator**: property descriptions whose XML doc summary wrapped onto multiple lines
   previously spilled out of their table cell as an orphaned line.
 - **EventMarkdownGenerator**: `EventMetadata.Domain` was computed but never mapped onto the Liquid

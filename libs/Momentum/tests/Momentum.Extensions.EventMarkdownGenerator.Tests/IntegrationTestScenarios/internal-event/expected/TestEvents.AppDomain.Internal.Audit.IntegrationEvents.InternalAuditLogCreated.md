@@ -13,7 +13,7 @@ editLink: false
 - **Entity:** `audit-log`
 - **Type:** Domain Event
 - **Topic:** `audit-logs`
-- **Fully Qualified Topic:** `{env}.testevents.internal.audit-logs.v1`
+- **Fully Qualified Topic:** `{env}.test-events.internal.audit-logs.v1`
 - **Estimated Payload Size:** 24 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
@@ -41,6 +41,7 @@ This event uses a partition key for message routing:
 
 - **Full Type:** [TestEvents.AppDomain.Internal.Audit.IntegrationEvents.InternalAuditLogCreated](#)
 - **Type Name:** `InternalAuditLogCreated`
+- **Event Slug:** `internal-audit-log-created`
 - **Namespace:** `TestEvents.AppDomain.Internal.Audit.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<AuditLog>]`
 - **Attribute Properties:**
