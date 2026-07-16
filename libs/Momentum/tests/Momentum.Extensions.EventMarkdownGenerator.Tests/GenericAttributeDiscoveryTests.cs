@@ -49,7 +49,7 @@ public class GenericAttributeDiscoveryTests
             attributeNamePrefix: nameof(ConventionEventTopicAttribute),
             partitionKeyAttributeNamePrefix: nameof(ConventionPartitionKeyAttribute)).Select(e => e.Metadata).ToList();
 
-        var conventionEvent = events.ShouldHaveSingleItem();
+        var conventionEvent = events.Single(e => e.FullTypeName == typeof(ConventionEvent).FullName);
 
         // Ask #4: EventName override read from the attribute instead of the CLR type name.
         conventionEvent.EventName.ShouldBe("ReservationBooked");
@@ -101,5 +101,29 @@ public class GenericAttributeDiscoveryTests
         customEvent.AttributeProperties["Domain"].ShouldBe("billing");
         customEvent.AttributeProperties["Subdomain"].ShouldBe("invoicing");
         customEvent.AttributeProperties["Topic"].ShouldBe(string.Empty);
+    }
+
+    [ConventionEventTopic(Domain = "widgets", Topic = "widget-created")]
+    public record WidgetCreated(Guid WidgetId);
+
+    [Fact]
+    public void DiscoverEvents_WithNonGenericAttribute_InfersEntityFromEventNameSuffix()
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+
+        var events = AssemblyEventDiscovery.DiscoverEvents(
+            assembly,
+            xmlParser: null,
+            PayloadSizeCalculator.Create("json"),
+            attributeNamePrefix: nameof(ConventionEventTopicAttribute)).Select(e => e.Metadata).ToList();
+
+        // ConventionEventTopicAttribute is non-generic (no TEntity), so Entity can only come from
+        // stripping a known event-verb suffix off the type's own name.
+        var widgetCreated = events.Single(e => e.FullTypeName == typeof(WidgetCreated).FullName);
+        widgetCreated.Entity.ShouldBe("widget");
+
+        // ConventionEvent's name matches no known suffix, so Entity stays empty rather than guessing.
+        var conventionEvent = events.Single(e => e.FullTypeName == typeof(ConventionEvent).FullName);
+        conventionEvent.Entity.ShouldBe(string.Empty);
     }
 }

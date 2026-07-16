@@ -63,6 +63,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   verbatim — including every entry of `Properties`, `PartitionKeys`, and `AttributeProperties` — as a
   raw, exhaustive dump distinct from the polished default rendering.
 
+### Added
+
+- **EventMarkdownGenerator**: `EventMetadata.Entity` is now computed once at metadata-build time
+  (moved off `EventViewModelFactory`). When the topic attribute isn't generic (no `TEntity` to
+  reflect), it falls back to stripping a common event-verb suffix (`Created`, `Updated`, `Deleted`,
+  `Completed`, `Processed`, etc.) off the event type's own name, e.g. `WidgetCreated` → `widget`.
+
+### Changed
+
+- **EventMarkdownGenerator**: `AssemblyEventDiscovery.DiscoverEvents` now returns
+  `IEnumerable<EventWithDocumentation>` (metadata paired with its XML documentation) instead of bare
+  `EventMetadata`, doing the `xmlParser.GetEventDocumentation(...)` lookup internally. Removes the
+  repeated `events.Select(m => new EventWithDocumentation { ... })` boilerplate every caller
+  (`GenerateCommand`, tests) previously had to write itself.
+- **EventMarkdownGenerator**: removed `EventMetadata.EventType` — the raw CLR `Type` was only ever
+  used to re-look-up XML documentation or extract `Entity`, both of which now happen once during
+  metadata construction instead of being deferred to callers.
+
 ### Fixed
 
 - **EventMarkdownGenerator**: `FullyQualifiedTopicName` used the assembly-level default domain

@@ -65,7 +65,7 @@ public static class EventMetadataBuilder
             Version = version,
             IsInternal = isInternal,
             TopicAttribute = topicAttribute,
-            Entity = GetEntity(attrType),
+            Entity = GetEntity(attrType, eventType),
             AttributeProperties = GetAttributeProperties(topicAttribute),
             Properties = properties,
             PartitionKeys = partitionKeys,
@@ -97,18 +97,37 @@ public static class EventMetadataBuilder
         return result;
     }
 
+    // Common past-tense verb suffixes event types are named with (CashierCreated, OrderCompleted, ...).
+    // Longer/more specific suffixes are listed first so e.g. "Cancelled" isn't shadowed by a shorter
+    // unrelated match.
+    private static readonly string[] CommonEventNameSuffixes =
+    [
+        "Created", "Updated", "Deleted", "Cancelled", "Canceled", "Completed", "Processed", "Published",
+        "Received", "Generated", "Activated", "Deactivated", "Registered", "Requested", "Approved",
+        "Rejected", "Started", "Finished", "Changed", "Removed", "Added", "Modified"
+    ];
+
     /// <summary>
     ///     Kebab-cases the entity type argument on a generic topic attribute (e.g.
-    ///     <c>EventTopicAttribute&lt;Cashier&gt;</c> yields "cashier"), or empty when it isn't generic.
+    ///     <c>EventTopicAttribute&lt;Cashier&gt;</c> yields "cashier"). When the attribute isn't generic
+    ///     (no TEntity to reflect), falls back to stripping a common event-verb suffix from the event
+    ///     type's own name (e.g. "CashierCreated" yields "cashier"); if no known suffix matches, empty.
     /// </summary>
-    private static string GetEntity(Type attrType)
+    private static string GetEntity(Type attrType, Type eventType)
     {
-        if (!attrType.IsGenericType)
-            return string.Empty;
+        if (attrType.IsGenericType)
+        {
+            var genericArgs = attrType.GetGenericArguments();
 
-        var genericArgs = attrType.GetGenericArguments();
+            if (genericArgs.Length > 0)
+                return genericArgs[0].Name.ToKebabCase();
+        }
 
-        return genericArgs.Length > 0 ? genericArgs[0].Name.ToKebabCase() : string.Empty;
+        var typeName = eventType.Name;
+        var suffix = CommonEventNameSuffixes.FirstOrDefault(s =>
+            typeName.Length > s.Length && typeName.EndsWith(s, StringComparison.Ordinal));
+
+        return suffix != null ? typeName[..^suffix.Length].ToKebabCase() : string.Empty;
     }
 
     private static Attribute GetEventTopicAttributeDynamic(Type type, string attributeNamePrefix)
