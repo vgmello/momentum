@@ -34,7 +34,7 @@ public class FluidMarkdownGeneratorTests
                 FullTypeName = eventType.FullName!,
                 Namespace = eventType.Namespace!,
                 Topic = "tests",
-                FullyQualifiedTopicName = "{env}.test.public.tests.v1",
+                FullyQualifiedTopicName = "test.public.tests.v1",
                 Domain = "Tests",
                 Version = "v1",
                 IsInternal = false,
@@ -152,7 +152,7 @@ public class FluidMarkdownGeneratorTests
             var result = generator.GenerateMarkdown(eventWithDoc, outputDir);
 
             result.Content.ShouldContain("Test event for unit testing");
-            result.Content.ShouldContain("{env}.test.public.tests.v1");
+            result.Content.ShouldContain("test.public.tests.v1");
         }
         finally
         {
@@ -172,7 +172,7 @@ public class FluidMarkdownGeneratorTests
             var result = generator.GenerateMarkdown(eventWithDoc, outputDir);
 
             result.Content.ShouldContain("**Topic:** `Tests`");
-            result.Content.ShouldContain("**Fully Qualified Topic:** `{env}.test.public.tests.v1`");
+            result.Content.ShouldContain("**Fully Qualified Topic:** `test.public.tests.v1`");
         }
         finally
         {
@@ -238,7 +238,7 @@ public class FluidMarkdownGeneratorTests
                 FullTypeName = "Marker.Namespace.MarkerFullTypeName",
                 Namespace = "Marker.Namespace",
                 Topic = "marker-topic",
-                FullyQualifiedTopicName = "{env}.marker-domain.public.marker-topic.v7",
+                FullyQualifiedTopicName = "marker-domain.public.marker-topic.v7",
                 Domain = "MarkerDomain",
                 Version = "v7",
                 IsInternal = false,
@@ -304,7 +304,7 @@ public class FluidMarkdownGeneratorTests
             result.Content.ShouldContain("Marker.Namespace.MarkerFullTypeName");
             result.Content.ShouldContain("Marker.Namespace");
             result.Content.ShouldContain("marker-topic");
-            result.Content.ShouldContain("{env}.marker-domain.public.marker-topic.v7");
+            result.Content.ShouldContain("marker-domain.public.marker-topic.v7");
             result.Content.ShouldContain("MarkerDomain");
             result.Content.ShouldContain("v7");
             result.Content.ShouldContain("MarkerObsoleteMessage");
@@ -520,7 +520,7 @@ public class FluidMarkdownGeneratorTests
     }
 
     // Test types
-    [EventTopic("{env}.test.public.tests.v1")]
+    [EventTopic("test.public.tests.v1")]
     public record TestEvent(Guid Id, string Name);
 
     public class TestSchemaType

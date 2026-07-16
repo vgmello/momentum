@@ -48,10 +48,10 @@ public static class EventMetadataBuilder
             ? domain
             : GetDomainFromNamespace(eventType.Namespace) ?? defaultDomain;
 
-        // Build full topic name: {env}.{domain}.{visibility}.{topic}.{version}
+        // Build full topic name: {domain}.{visibility}.{topic}.{version}
         var visibility = isInternal ? "internal" : "public";
 
-        var fullTopicName = $"{{env}}.{eventDomain.ToKebabCase()}.{visibility}.{topicName}.{version}";
+        var fullTopicName = $"{eventDomain.ToKebabCase()}.{visibility}.{topicName}.{version}";
 
         var eventName = !string.IsNullOrWhiteSpace(eventNameOverride) ? eventNameOverride : eventType.Name;
 
