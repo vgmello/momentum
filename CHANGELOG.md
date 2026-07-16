@@ -13,6 +13,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Docs**: nav "Changelog" link now renders `CHANGELOG.md` inline as a docs page (`/changelog`) instead of
   linking out to GitHub.
 
+### Fixed
+
+- **Docs**: Mermaid diagrams now render with the registered ELK layout (`layout: "elk"` was never passed to
+  `mermaid.render`, so the loader was registered but unused).
+- **Docs**: fixed 115 Mermaid diagrams across both sites using the invalid arrow `-/->`, which failed to
+  parse and silently dropped every affected diagram (most notably all of `docs/arch/*.md`).
+
 ## [2026-07-15]
 
 ### Added

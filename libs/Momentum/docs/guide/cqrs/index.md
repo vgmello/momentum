@@ -29,14 +29,14 @@ CQRS divides your application logic into two distinct responsibilities:
 
 ```mermaid
 graph TD
-    A["API Request"] -/-> B["Command/Query Record"]
-    B -/-> C["FluentValidation"]
-    C -/-> D["Wolverine Message Bus"]
-    D -/-> E["Main Handler (Business Logic)"]
-    E -/-> F["DbCommand Handler (Data Access)"]
-    F -/-> G["PostgreSQL Function"]
-    E -/-> H["Integration Events"]
-    H -/-> I["Kafka Topic"]
+    A["API Request"] --> B["Command/Query Record"]
+    B --> C["FluentValidation"]
+    C --> D["Wolverine Message Bus"]
+    D --> E["Main Handler (Business Logic)"]
+    E --> F["DbCommand Handler (Data Access)"]
+    F --> G["PostgreSQL Function"]
+    E --> H["Integration Events"]
+    H --> I["Kafka Topic"]
 
     style A fill:#e1f5fe
     style E fill:#f3e5f5

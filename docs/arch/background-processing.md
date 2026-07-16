@@ -42,21 +42,21 @@ graph TB
         EventStore[Event Store<br/>Audit & Recovery]
     end
 
-    API -/-> Wolverine
-    External -/-> Wolverine
-    Scheduled -/-> Wolverine
-    Wolverine -/-> Kafka
-    Kafka -/-> BackOffice
-    BackOffice -/-> Orleans
-    Orleans -/-> InvoiceGrain
-    Orleans -/-> NotificationGrain
-    Orleans -/-> SagaGrain
-    Orleans -/-> TimerGrain
-    InvoiceGrain -/-> Database
-    NotificationGrain -/-> Database
-    SagaGrain -/-> Database
-    TimerGrain -/-> Database
-    Orleans -/-> EventStore
+    API --> Wolverine
+    External --> Wolverine
+    Scheduled --> Wolverine
+    Wolverine --> Kafka
+    Kafka --> BackOffice
+    BackOffice --> Orleans
+    Orleans --> InvoiceGrain
+    Orleans --> NotificationGrain
+    Orleans --> SagaGrain
+    Orleans --> TimerGrain
+    InvoiceGrain --> Database
+    NotificationGrain --> Database
+    SagaGrain --> Database
+    TimerGrain --> Database
+    Orleans --> EventStore
 ```
 
 ## BackOffice Service Structure

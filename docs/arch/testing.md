@@ -24,11 +24,11 @@ graph TB
         Contract[Contract Tests<br/>API Compatibility]
     end
 
-    Unit -/-> Integration
-    Integration -/-> E2E
-    Unit -/-> Arch
-    Integration -/-> Perf
-    Integration -/-> Contract
+    Unit --> Integration
+    Integration --> E2E
+    Unit --> Arch
+    Integration --> Perf
+    Integration --> Contract
 ```
 
 ## Unit Testing
