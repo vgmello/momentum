@@ -45,13 +45,13 @@ This event can be used by other services to:
 | PublicInvoiceNumber| `string` | ✓| 0 bytes (Dynamic size - no MaxLength constraint) | Public-facing invoice number for customer reference |
 | FinalTotalAmount| `decimal` | ✓| 16 bytes | Final total amount of the invoice |
 
-
 ### Partition Keys
 
 This event uses multiple partition keys for message routing:
 - `TenantId` - Unique identifier for the tenant
-    - `InvoiceId` - Unique identifier for the invoice
-    ## Technical Details
+- `InvoiceId` - Unique identifier for the invoice
+
+## Technical Details
 
 - **Full Type:** [AppDomain.Invoices.Contracts.IntegrationEvents.InvoiceFinalized](https://github.com/vgmello/momentum/blob/main/src/AppDomain/Invoices/Contracts/IntegrationEvents/InvoiceFinalized.cs)
 - **Type Name:** `InvoiceFinalized`

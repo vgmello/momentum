@@ -34,12 +34,12 @@ No documentation available
 | PaymentMethod| `PaymentMethod` | ✓| 4 bytes | No description available |
 | FailureReason| `FailureReason?` |  | 4 bytes | No description available |
 
-
 ### Partition Keys
 
 This event uses a partition key for message routing:
 - `TenantId` - No description available
-    ## Technical Details
+
+## Technical Details
 
 - **Full Type:** [TestEvents.AppDomain.Types.Contracts.IntegrationEvents.PaymentStatusChanged](#)
 - **Type Name:** `PaymentStatusChanged`

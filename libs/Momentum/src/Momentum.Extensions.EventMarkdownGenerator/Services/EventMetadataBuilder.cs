@@ -2,6 +2,7 @@
 
 using System.Reflection;
 using Momentum.Extensions.Abstractions.Extensions;
+using Momentum.Extensions.Abstractions.Messaging;
 using Momentum.Extensions.EventMarkdownGenerator.Models;
 
 namespace Momentum.Extensions.EventMarkdownGenerator.Services;
@@ -74,7 +75,7 @@ public static class EventMetadataBuilder
         var fullTopicName = string.Join('.', segments.Where(s => !string.IsNullOrEmpty(s)));
 
         var eventName = !string.IsNullOrWhiteSpace(eventNameOverride) ? eventNameOverride : eventType.Name;
-        var (entityName, entityType) = GetEntity(attrType, eventType);
+        var (entityName, entityType) = GetEntity(attrType, eventType, properties);
 
         return new EventMetadata
         {
@@ -143,12 +144,21 @@ public static class EventMetadataBuilder
     ///     matching, so e.g. "OrderCompletedEvent" still yields "Order" rather than failing to match "Completed"
     ///     against "OrderCompletedEvent". If no known suffix matches, falls back further to the event type's own
     ///     name (with the trailing "Event" word, if any, still trimmed) — e.g. "BusinessDayReported" with no
-    ///     matching suffix yields "BusinessDayReported", and "WidgetEvent" yields "Widget". Still with no
-    ///     corresponding Type in either fallback case.
+    ///     matching suffix yields "BusinessDayReported", and "WidgetEvent" yields "Widget". In either fallback
+    ///     case, if a complex-type payload property's name matches the derived entity name exactly (e.g.
+    ///     "CashierCreated" with a "Cashier" property), that property's type is used as the entity Type — this
+    ///     is what lets the entity link to a generated schema page even without a generic attribute. The
+    ///     generic-argument path only applies to the framework's own <c>EventTopicAttribute&lt;TEntity&gt;</c>
+    ///     (matched by name, for cross-assembly-context compatibility) — a custom generic attribute with a
+    ///     different name is treated as non-generic and always falls through to the name-derivation/property-match
+    ///     path instead.
     /// </summary>
-    private static (string Name, Type? Type) GetEntity(Type attrType, Type eventType)
+    private static (string Name, Type? Type) GetEntity(Type attrType, Type eventType,
+        IReadOnlyList<EventPropertyMetadata> properties)
     {
-        if (attrType.IsGenericType)
+        var isBuiltInEventTopicAttribute = attrType.Name.StartsWith(nameof(EventTopicAttribute), StringComparison.Ordinal);
+
+        if (attrType.IsGenericType && isBuiltInEventTopicAttribute)
         {
             var genericArgs = attrType.GetGenericArguments();
 
@@ -164,7 +174,12 @@ public static class EventMetadataBuilder
         var suffix = CommonEventNameSuffixes.FirstOrDefault(s =>
             typeName.Length > s.Length && typeName.EndsWith(s, StringComparison.Ordinal));
 
-        return (suffix != null ? typeName[..^suffix.Length] : typeName, null);
+        var entityName = suffix != null ? typeName[..^suffix.Length] : typeName;
+
+        var matchingProperty = properties.FirstOrDefault(p =>
+            p.IsComplexType && string.Equals(p.Name, entityName, StringComparison.Ordinal));
+
+        return (entityName, matchingProperty?.PropertyType);
     }
 
     private static Attribute GetEventTopicAttributeDynamic(Type type, string attributeNamePrefix)

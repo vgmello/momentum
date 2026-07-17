@@ -27,17 +27,18 @@ public record EventMetadata
     public required Attribute TopicAttribute { get; init; }
 
     /// <summary>
-    ///     PascalCase name of the entity type argument on a generic topic attribute (e.g.
-    ///     <c>EventTopicAttribute&lt;Cashier&gt;</c> yields "Cashier"), or empty when the topic
-    ///     attribute isn't generic.
+    ///     PascalCase entity name: the type argument on a generic topic attribute (e.g.
+    ///     <c>EventTopicAttribute&lt;Cashier&gt;</c> yields "Cashier"), or, when the attribute isn't generic,
+    ///     the event type's own name with a common event-verb suffix stripped (e.g. "CashierCreated" yields
+    ///     "Cashier").
     /// </summary>
     public required string Entity { get; init; }
 
     /// <summary>
-    ///     The entity type argument reflected from a generic topic attribute (e.g.
-    ///     <c>EventTopicAttribute&lt;Cashier&gt;</c> yields <c>typeof(Cashier)</c>), or <c>null</c> when the
-    ///     topic attribute isn't generic. Used to link <see cref="Entity"/> to its schema documentation when
-    ///     one was generated for this type.
+    ///     The reflectable entity <see cref="Type"/>: the type argument reflected from a generic topic
+    ///     attribute, or, when the attribute isn't generic, a payload property's type when that property's
+    ///     name exactly matches <see cref="Entity"/>. <c>null</c> when neither resolves. Used to link
+    ///     <see cref="Entity"/> to its schema documentation when one was generated for this type.
     /// </summary>
     public Type? EntityType { get; init; }
 

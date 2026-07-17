@@ -29,12 +29,11 @@ No documentation available
 | [TargetNode](/events/schemas/TestEvents.Graph.Nodes.Contracts.Models.GraphNode.md)| `GraphNode` | ✓| 183 bytes (Name: Dynamic size - no MaxLength constraint, Parent: Circular reference detected, Children: Collection size estimated (no Range constraint), Metadata: CreatedBy: Dynamic size - no MaxLength constraint, Tags: Collection size estimated (no Range constraint), OwnerNode: Circular reference detected) | No description available |
 | RelationshipType| `string` | ✓| 0 bytes (Dynamic size - no MaxLength constraint) | No description available |
 
-
 ### Partition Keys
 
 This event uses a partition key for message routing:
 - `TenantId` - No description available
-    
+
 ### Reference Schemas
 
 #### GraphNode

@@ -43,13 +43,12 @@ This event can be used by other services to:
 | InvoiceId| `Guid` | ✓| 16 bytes | Unique identifier for the invoice (partition key) |
 | [Invoice](/events/schemas/AppDomain.Invoices.Contracts.Models.Invoice.md)| `Invoice` | ✓| 286 bytes (Name: Dynamic size - no MaxLength constraint, Currency: Dynamic size - no MaxLength constraint) | Cancelled invoice object with updated status |
 
-
 ### Partition Keys
 
 This event uses multiple partition keys for message routing:
 - `TenantId` - Unique identifier for the tenant
-    - `InvoiceId` - Unique identifier for the invoice
-    
+- `InvoiceId` - Unique identifier for the invoice
+
 ### Reference Schemas
 
 #### Invoice

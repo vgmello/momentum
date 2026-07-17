@@ -43,12 +43,11 @@ This event can be used by other services to:
 | TenantId| `Guid` | ✓| 16 bytes | Unique identifier for the tenant (partition key) |
 | [Cashier](/events/schemas/AppDomain.Cashiers.Contracts.Models.Cashier.md)| `Cashier` | ✓| 992 bytes (Name: Dynamic size - no MaxLength constraint, Email: Dynamic size - no MaxLength constraint, CashierPayments: Collection size estimated (no Range constraint)) | Complete cashier object containing all cashier data and configuration |
 
-
 ### Partition Keys
 
 This event uses a partition key for message routing:
 - `TenantId` - Unique identifier for the tenant
-    
+
 ### Reference Schemas
 
 #### Cashier

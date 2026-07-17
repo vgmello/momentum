@@ -31,12 +31,11 @@ No documentation available
 | [ResponseData](/events/schemas/System.Object.md)| `Dictionary<string, Object>` | ✓| 31 bytes (Collection size estimated (no Range constraint)) | No description available |
 | ReceivedAt| `DateTime` | ✓| 8 bytes | No description available |
 
-
 ### Partition Keys
 
 This event uses a partition key for message routing:
 - `TenantId` - No description available
-    
+
 ### Reference Schemas
 
 #### Objects

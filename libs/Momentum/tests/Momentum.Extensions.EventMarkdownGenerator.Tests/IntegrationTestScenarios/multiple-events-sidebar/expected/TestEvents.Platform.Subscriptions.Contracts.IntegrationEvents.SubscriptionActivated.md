@@ -28,12 +28,12 @@ No documentation available
 | SubscriptionId| `string` | ✓| 0 bytes (Dynamic size - no MaxLength constraint) | No description available |
 | PlanName| `string` | ✓| 0 bytes (Dynamic size - no MaxLength constraint) | No description available |
 
-
 ### Partition Keys
 
 This event uses a partition key for message routing:
 - `TenantId` - No description available
-    ## Technical Details
+
+## Technical Details
 
 - **Full Type:** [TestEvents.Platform.Subscriptions.Contracts.IntegrationEvents.SubscriptionActivated](#)
 - **Type Name:** `SubscriptionActivated`

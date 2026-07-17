@@ -31,12 +31,12 @@ No documentation available
 | Amount| `decimal` | ✓| 16 bytes | No description available |
 | TransactionId| `string` | ✓| 0 bytes (Dynamic size - no MaxLength constraint) | No description available |
 
-
 ### Partition Keys
 
 This event uses a partition key for message routing:
 - `TenantId` - No description available
-    ## Technical Details
+
+## Technical Details
 
 - **Full Type:** [TestEvents.AppDomain.Legacy.Contracts.IntegrationEvents.PaymentProcessed](#)
 - **Type Name:** `PaymentProcessed`

@@ -28,13 +28,12 @@ No documentation available
 | PartitionKeyTest| `int` | ✓| 4 bytes | No description available (partition key) |
 | [Cashier](/events/schemas/TestEvents.AppDomain.Cashiers.Contracts.IntegrationEvents.Cashier.md)| `Cashier` | ✓| 53 bytes (Name: Dynamic size - no MaxLength constraint, Email: Dynamic size - no MaxLength constraint) | No description available |
 
-
 ### Partition Keys
 
 This event uses multiple partition keys for message routing:
 - `TenantId` - No description available
-    - `PartitionKeyTest` - No description available
-    
+- `PartitionKeyTest` - No description available
+
 ### Reference Schemas
 
 #### Cashier

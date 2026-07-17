@@ -42,12 +42,11 @@ This domain event is handled within the same domain to:
 | [Invoice](/events/schemas/AppDomain.Invoices.Contracts.Models.Invoice.md)| `Invoice` | ✓| 286 bytes (Name: Dynamic size - no MaxLength constraint, Currency: Dynamic size - no MaxLength constraint) | Generated invoice object |
 | GeneratedAt| `DateTime` | ✓| 8 bytes | Date and time when the invoice was generated |
 
-
 ### Partition Keys
 
 This event uses a partition key for message routing:
 - `TenantId` - Unique identifier for the tenant
-    
+
 ### Reference Schemas
 
 #### Invoice
