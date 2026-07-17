@@ -252,7 +252,7 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
 
     private static HashSet<Type> CollectAllSchemaTypes(List<EventWithDocumentation> allEvents)
     {
-        var schemaTypes = new HashSet<Type>();
+        var schemaTypes = new HashSet<Type>(TypeUtils.FullNameComparer);
 
         foreach (var eventWithDoc in allEvents)
         {

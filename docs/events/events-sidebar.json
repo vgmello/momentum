@@ -155,12 +155,6 @@
             "link": "/schemas/AppDomain.Cashiers.Contracts.Models.Cashier",
             "items": [],
             "collapsed": false
-          },
-          {
-            "text": "Cashier",
-            "link": "/schemas/AppDomain.Cashiers.Contracts.Models.Cashier",
-            "items": [],
-            "collapsed": false
           }
         ],
         "collapsed": false
@@ -169,12 +163,6 @@
         "text": "Invoices",
         "link": null,
         "items": [
-          {
-            "text": "Invoice",
-            "link": "/schemas/AppDomain.Invoices.Contracts.Models.Invoice",
-            "items": [],
-            "collapsed": false
-          },
           {
             "text": "Invoice",
             "link": "/schemas/AppDomain.Invoices.Contracts.Models.Invoice",

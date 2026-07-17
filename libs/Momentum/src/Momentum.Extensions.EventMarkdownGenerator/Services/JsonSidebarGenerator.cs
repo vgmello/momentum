@@ -231,7 +231,7 @@ public static class JsonSidebarGenerator
     private static SidebarItem? GenerateSchemasSection(IEnumerable<EventWithDocumentation> events)
     {
         // Collect all unique complex types from all events
-        var complexTypes = new HashSet<Type>();
+        var complexTypes = new HashSet<Type>(TypeUtils.FullNameComparer);
 
         foreach (var eventWithDoc in events)
         {

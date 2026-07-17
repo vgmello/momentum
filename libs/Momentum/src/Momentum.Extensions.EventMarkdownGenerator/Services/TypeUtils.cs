@@ -13,6 +13,25 @@ namespace Momentum.Extensions.EventMarkdownGenerator.Services;
 public static class TypeUtils
 {
     /// <summary>
+    ///     Compares types by <see cref="Type.FullName"/> rather than reference/runtime-handle identity. The
+    ///     generator loads each assembly path into its own isolated <c>AssemblyLoadContext</c>
+    ///     (see <c>GenerateCommand.LoadAssemblyWithDependencyResolution</c>), so the same source type
+    ///     compiled into multiple scanned assemblies (e.g. a model referenced from both a project's own
+    ///     assembly and a downstream assembly that copies it to its output) surfaces as multiple distinct
+    ///     <see cref="Type"/> instances that default <see cref="HashSet{T}"/>/<see cref="Type.Equals(object)"/>
+    ///     would treat as different — producing duplicate schema files and duplicate sidebar entries. Use
+    ///     this comparer wherever complex types are deduplicated across events/assemblies.
+    /// </summary>
+    public static readonly IEqualityComparer<Type> FullNameComparer = new TypeFullNameComparer();
+
+    private sealed class TypeFullNameComparer : IEqualityComparer<Type>
+    {
+        public bool Equals(Type? x, Type? y) => (x?.FullName ?? x?.Name) == (y?.FullName ?? y?.Name);
+
+        public int GetHashCode(Type obj) => (obj.FullName ?? obj.Name).GetHashCode();
+    }
+
+    /// <summary>
     ///     Determines if a type is a simple value type (primitives, enums, common framework types).
     /// </summary>
     public static bool IsPrimitiveType(Type type)
@@ -242,7 +261,7 @@ public static class TypeUtils
     /// </summary>
     public static HashSet<Type> CollectComplexTypesFromProperties(IEnumerable<EventPropertyMetadata> properties)
     {
-        var complexTypes = new HashSet<Type>();
+        var complexTypes = new HashSet<Type>(FullNameComparer);
 
         foreach (var property in properties)
         {
