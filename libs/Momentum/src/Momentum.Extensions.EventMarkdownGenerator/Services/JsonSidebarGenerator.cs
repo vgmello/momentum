@@ -162,11 +162,24 @@ public static class JsonSidebarGenerator
     {
         return new SidebarItem
         {
-            Text = CapitalizeDomain(section),
+            Text = HumanizeSection(section),
             Link = null,
             Collapsed = false,
             Items = CreateEventItems(sectionEvents)
         };
+    }
+
+    /// <summary>
+    ///     Humanizes a (possibly multi-segment) section string extracted from a namespace that doesn't
+    ///     follow the <c>Domain.Subdomain.Contracts.IntegrationEvents</c> convention — e.g. an event
+    ///     defined alongside its handler rather than in a <c>Contracts</c> folder. Each dot-separated
+    ///     namespace segment is PascalCase-split into words (same as event names), then joined with " / "
+    ///     (e.g. "Messaging.AccountingInboxHandler" becomes "Messaging / Accounting Inbox Handler" instead
+    ///     of rendering the raw, unsplit segment names).
+    /// </summary>
+    private static string HumanizeSection(string section)
+    {
+        return string.Join(" / ", section.Split('.').Select(s => s.ToDisplayName()));
     }
 
     private static void AddEventsDirectlyToSubdomain(
