@@ -5,15 +5,14 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# PaymentReceived
+# PaymentReceived <Badge type="tip" text="Active" />
 
-- **Status:** Active
-- **Domain:** Invoices
+- **Domain:** AppDomain.Invoices
 - **Version:** v1
-- **Entity:** `payment`
+- **Entity:** `Payment`
 - **Type:** Integration Event
 - **Topic:** `payments`
-- **Fully Qualified Topic:** `invoices.public.payments.v1`
+- **Fully Qualified Topic:** `app-domain.invoices.payments.v1`
 - **Estimated Payload Size:** 56 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId, InvoiceId
 
@@ -61,9 +60,3 @@ This event uses multiple partition keys for message routing:
 - **Event Slug:** `payment-received`
 - **Namespace:** `AppDomain.Invoices.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic]`
-- **Attribute Properties:**
-- `Topic`: `payments`
-- `Domain`: *(empty)*
-- `Version`: `v1`
-- `Internal`: `False`
-- `ShouldPluralizeTopicName`: `False`

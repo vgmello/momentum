@@ -5,15 +5,14 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# BusinessDayEnded
+# BusinessDayEnded <Badge type="tip" text="Active" />
 
-- **Status:** Active
 - **Domain:** accounting
 - **Version:** v1
-- **Entity:** ``
+- **Entity:** `BusinessDay`
 - **Type:** Integration Event
 - **Topic:** `momentum`
-- **Fully Qualified Topic:** `accounting.public.momentum.v1`
+- **Fully Qualified Topic:** `accounting.momentum.v1`
 - **Estimated Payload Size:** 8 bytes ⚠️ *Contains dynamic properties*
 
 ## Description
@@ -36,9 +35,3 @@ Represents an event indicating that a business day has ended for a specific mark
 - **Event Slug:** `business-day-ended`
 - **Namespace:** `AppDomain.BackOffice.Messaging.AccountingInboxHandler`
 - **Topic Attribute:** `[EventTopic]`
-- **Attribute Properties:**
-- `Topic`: `momentum`
-- `Domain`: `accounting`
-- `Version`: `v1`
-- `Internal`: `False`
-- `ShouldPluralizeTopicName`: `False`

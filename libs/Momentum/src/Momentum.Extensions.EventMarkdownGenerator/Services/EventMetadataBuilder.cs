@@ -130,7 +130,8 @@ public static class EventMetadataBuilder
     [
         "Created", "Updated", "Deleted", "Cancelled", "Canceled", "Completed", "Processed", "Published",
         "Received", "Generated", "Activated", "Deactivated", "Registered", "Requested", "Approved",
-        "Rejected", "Started", "Finished", "Changed", "Removed", "Added", "Modified"
+        "Rejected", "Started", "Finished", "Ended", "Changed", "Removed", "Added", "Modified", "Opened",
+        "Closed", "Failed", "Succeeded", "Expired", "Confirmed", "Submitted", "Scheduled"
     ];
 
     /// <summary>
@@ -138,7 +139,12 @@ public static class EventMetadataBuilder
     ///     the type argument of a generic topic attribute (e.g. <c>EventTopicAttribute&lt;Cashier&gt;</c> yields
     ///     ("Cashier", typeof(Cashier))). When the attribute isn't generic (no TEntity to reflect), falls back to
     ///     stripping a common event-verb suffix from the event type's own name (e.g. "CashierCreated" yields
-    ///     "Cashier", with no corresponding Type); if no known suffix matches, empty name and null Type.
+    ///     "Cashier", with no corresponding Type). A trailing "Event" word is trimmed first, before suffix
+    ///     matching, so e.g. "OrderCompletedEvent" still yields "Order" rather than failing to match "Completed"
+    ///     against "OrderCompletedEvent". If no known suffix matches, falls back further to the event type's own
+    ///     name (with the trailing "Event" word, if any, still trimmed) — e.g. "BusinessDayReported" with no
+    ///     matching suffix yields "BusinessDayReported", and "WidgetEvent" yields "Widget". Still with no
+    ///     corresponding Type in either fallback case.
     /// </summary>
     private static (string Name, Type? Type) GetEntity(Type attrType, Type eventType)
     {
@@ -151,10 +157,14 @@ public static class EventMetadataBuilder
         }
 
         var typeName = eventType.Name;
+
+        if (typeName.Length > "Event".Length && typeName.EndsWith("Event", StringComparison.Ordinal))
+            typeName = typeName[..^"Event".Length];
+
         var suffix = CommonEventNameSuffixes.FirstOrDefault(s =>
             typeName.Length > s.Length && typeName.EndsWith(s, StringComparison.Ordinal));
 
-        return suffix != null ? (typeName[..^suffix.Length], null) : (string.Empty, null);
+        return (suffix != null ? typeName[..^suffix.Length] : typeName, null);
     }
 
     private static Attribute GetEventTopicAttributeDynamic(Type type, string attributeNamePrefix)

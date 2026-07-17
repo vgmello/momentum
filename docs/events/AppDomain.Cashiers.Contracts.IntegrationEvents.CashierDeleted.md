@@ -5,15 +5,14 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# CashierDeleted
+# CashierDeleted <Badge type="tip" text="Active" />
 
-- **Status:** Active
-- **Domain:** Cashiers
+- **Domain:** AppDomain.Cashiers
 - **Version:** v1
-- **Entity:** `cashier`
+- **Entity:** [Cashier](/events/schemas/AppDomain.Cashiers.Contracts.Models.Cashier.md)
 - **Type:** Integration Event
 - **Topic:** `cashiers`
-- **Fully Qualified Topic:** `cashiers.public.cashiers.v1`
+- **Fully Qualified Topic:** `app-domain.cashiers.cashiers.v1`
 - **Estimated Payload Size:** 40 bytes
 - **Partition Keys**: TenantId
 
@@ -56,9 +55,3 @@ This event uses a partition key for message routing:
 - **Event Slug:** `cashier-deleted`
 - **Namespace:** `AppDomain.Cashiers.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<Cashier>]`
-- **Attribute Properties:**
-- `ShouldPluralizeTopicName`: `True`
-- `Topic`: `cashier`
-- `Domain`: *(empty)*
-- `Version`: `v1`
-- `Internal`: `False`

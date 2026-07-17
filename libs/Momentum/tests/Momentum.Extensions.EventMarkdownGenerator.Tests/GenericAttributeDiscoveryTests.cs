@@ -107,6 +107,12 @@ public class GenericAttributeDiscoveryTests
     [ConventionEventTopic(Domain = "widgets", Topic = "widget-created")]
     public record WidgetCreated(Guid WidgetId);
 
+    [ConventionEventTopic(Domain = "orders", Topic = "order-completed-event")]
+    public record OrderCompletedEvent(Guid OrderId);
+
+    [ConventionEventTopic(Domain = "gadgets", Topic = "gadget-event")]
+    public record GadgetEvent(Guid GadgetId);
+
     [Fact]
     public void DiscoverEvents_WithNonGenericAttribute_InfersEntityFromEventNameSuffix()
     {
@@ -123,8 +129,19 @@ public class GenericAttributeDiscoveryTests
         var widgetCreated = events.Single(e => e.FullTypeName == typeof(WidgetCreated).FullName);
         widgetCreated.Entity.ShouldBe("Widget");
 
-        // ConventionEvent's name matches no known suffix, so Entity stays empty rather than guessing.
+        // A trailing "Event" word is trimmed BEFORE suffix matching, so the "Completed" suffix still
+        // matches against "OrderCompleted" rather than failing against the untrimmed "OrderCompletedEvent".
+        var orderCompletedEvent = events.Single(e => e.FullTypeName == typeof(OrderCompletedEvent).FullName);
+        orderCompletedEvent.Entity.ShouldBe("Order");
+
+        // "Event" trimmed, remainder ("Gadget") matches no known suffix, so Entity falls back to the
+        // trimmed name rather than the untrimmed "GadgetEvent".
+        var gadgetEvent = events.Single(e => e.FullTypeName == typeof(GadgetEvent).FullName);
+        gadgetEvent.Entity.ShouldBe("Gadget");
+
+        // ConventionEvent's name (after trimming the trailing "Event" word) matches no known suffix, so
+        // Entity falls back to the trimmed event type name.
         var conventionEvent = events.Single(e => e.FullTypeName == typeof(ConventionEvent).FullName);
-        conventionEvent.Entity.ShouldBe(string.Empty);
+        conventionEvent.Entity.ShouldBe("Convention");
     }
 }

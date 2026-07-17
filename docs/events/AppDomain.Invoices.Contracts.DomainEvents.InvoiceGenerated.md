@@ -5,15 +5,14 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# InvoiceGenerated
+# InvoiceGenerated <Badge type="tip" text="Active" />
 
-- **Status:** Active
-- **Domain:** Invoices
+- **Domain:** AppDomain.Invoices
 - **Version:** v1
-- **Entity:** `invoice`
+- **Entity:** [Invoice](/events/schemas/AppDomain.Invoices.Contracts.Models.Invoice.md)
 - **Type:** Domain Event
 - **Topic:** `invoices`
-- **Fully Qualified Topic:** `invoices.internal.invoices.v1`
+- **Fully Qualified Topic:** `internal.app-domain.invoices.invoices.v1`
 - **Estimated Payload Size:** 310 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
@@ -62,9 +61,3 @@ This event uses a partition key for message routing:
 - **Event Slug:** `invoice-generated`
 - **Namespace:** `AppDomain.Invoices.Contracts.DomainEvents`
 - **Topic Attribute:** `[EventTopic<Invoice>]`
-- **Attribute Properties:**
-- `ShouldPluralizeTopicName`: `True`
-- `Topic`: `invoice`
-- `Domain`: *(empty)*
-- `Version`: `v1`
-- `Internal`: `True`

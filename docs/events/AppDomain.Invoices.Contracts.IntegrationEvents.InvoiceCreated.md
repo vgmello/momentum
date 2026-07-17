@@ -5,15 +5,14 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# InvoiceCreated
+# InvoiceCreated <Badge type="tip" text="Active" />
 
-- **Status:** Active
-- **Domain:** Invoices
+- **Domain:** AppDomain.Invoices
 - **Version:** v1
-- **Entity:** `invoice`
+- **Entity:** [Invoice](/events/schemas/AppDomain.Invoices.Contracts.Models.Invoice.md)
 - **Type:** Integration Event
 - **Topic:** `invoices`
-- **Fully Qualified Topic:** `invoices.public.invoices.v1`
+- **Fully Qualified Topic:** `app-domain.invoices.invoices.v1`
 - **Estimated Payload Size:** 318 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId, InvoiceId
 
@@ -64,9 +63,3 @@ This event uses multiple partition keys for message routing:
 - **Event Slug:** `invoice-created`
 - **Namespace:** `AppDomain.Invoices.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<Invoice>]`
-- **Attribute Properties:**
-- `ShouldPluralizeTopicName`: `True`
-- `Topic`: `invoice`
-- `Domain`: *(empty)*
-- `Version`: `v1`
-- `Internal`: `False`

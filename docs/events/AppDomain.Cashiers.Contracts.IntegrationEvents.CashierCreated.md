@@ -5,15 +5,14 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# CashierCreated
+# CashierCreated <Badge type="tip" text="Active" />
 
-- **Status:** Active
-- **Domain:** Cashiers
+- **Domain:** AppDomain.Cashiers
 - **Version:** v1
-- **Entity:** `cashier`
+- **Entity:** [Cashier](/events/schemas/AppDomain.Cashiers.Contracts.Models.Cashier.md)
 - **Type:** Integration Event
 - **Topic:** `cashiers`
-- **Fully Qualified Topic:** `cashiers.public.cashiers.v1`
+- **Fully Qualified Topic:** `app-domain.cashiers.cashiers.v1`
 - **Estimated Payload Size:** 1008 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
@@ -63,9 +62,3 @@ This event uses a partition key for message routing:
 - **Event Slug:** `cashier-created`
 - **Namespace:** `AppDomain.Cashiers.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<Cashier>]`
-- **Attribute Properties:**
-- `ShouldPluralizeTopicName`: `True`
-- `Topic`: `cashier`
-- `Domain`: *(empty)*
-- `Version`: `v1`
-- `Internal`: `False`
