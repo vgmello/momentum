@@ -29,12 +29,12 @@ No documentation available
 | Reason| `string` | ✓| 0 bytes (Dynamic size - no MaxLength constraint) | No description available |
 | CancelledAt| `DateTime` | ✓| 8 bytes | No description available |
 
-
 ### Partition Keys
 
 This event uses a partition key for message routing:
 - `TenantId` - No description available
-    ## Technical Details
+
+## Technical Details
 
 - **Full Type:** [TestEvents.Platform.Subscriptions.Contracts.IntegrationEvents.SubscriptionCancelled](#)
 - **Type Name:** `SubscriptionCancelled`

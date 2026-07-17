@@ -26,7 +26,6 @@ No documentation available
 | NotificationId| `Guid` | ✓| 16 bytes | No description available |
 | Message| `string` | ✓| 0 bytes (Dynamic size - no MaxLength constraint) | No description available |
 
-
 ## Technical Details
 
 - **Full Type:** [TestEvents.Events.Core.IntegrationEvents.SimpleNotification](#)

@@ -43,12 +43,12 @@ This event can be used by other services to:
 | CashierId| `Guid` | ✓| 16 bytes | Unique identifier of the deleted cashier |
 | DeletedAt| `DateTime` | ✓| 8 bytes | Date and time when the cashier was deleted (UTC) |
 
-
 ### Partition Keys
 
 This event uses a partition key for message routing:
 - `TenantId` - Unique identifier for the tenant
-    ## Technical Details
+
+## Technical Details
 
 - **Full Type:** [AppDomain.Cashiers.Contracts.IntegrationEvents.CashierDeleted](https://github.com/vgmello/momentum/blob/main/src/AppDomain/Cashiers/Contracts/IntegrationEvents/CashierDeleted.cs)
 - **Type Name:** `CashierDeleted`

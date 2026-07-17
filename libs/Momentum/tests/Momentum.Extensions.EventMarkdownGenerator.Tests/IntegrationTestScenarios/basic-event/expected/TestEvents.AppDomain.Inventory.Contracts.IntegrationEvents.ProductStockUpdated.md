@@ -32,14 +32,14 @@ No documentation available
 | NewQuantity| `int` | ✓| 4 bytes | No description available |
 | UpdatedAt| `DateTime` | ✓| 8 bytes | No description available |
 
-
 ### Partition Keys
 
 This event uses multiple partition keys for message routing:
 - `TenantId` - No description available
-    - `WarehouseId` - No description available
-    - `ProductCategory` - No description available
-    ## Technical Details
+- `WarehouseId` - No description available
+- `ProductCategory` - No description available
+
+## Technical Details
 
 - **Full Type:** [TestEvents.AppDomain.Inventory.Contracts.IntegrationEvents.ProductStockUpdated](#)
 - **Type Name:** `ProductStockUpdated`

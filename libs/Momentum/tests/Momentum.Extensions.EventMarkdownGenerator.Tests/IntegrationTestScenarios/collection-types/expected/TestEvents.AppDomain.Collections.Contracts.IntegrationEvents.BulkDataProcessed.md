@@ -32,12 +32,11 @@ No documentation available
 | Metadata| `Dictionary<string, string>` | ✓| 51 bytes (Collection size estimated (no Range constraint)) | No description available |
 | CompletedAt| `DateTime` | ✓| 8 bytes | No description available |
 
-
 ### Partition Keys
 
 This event uses a partition key for message routing:
 - `TenantId` - No description available
-    
+
 ### Reference Schemas
 
 #### Strings

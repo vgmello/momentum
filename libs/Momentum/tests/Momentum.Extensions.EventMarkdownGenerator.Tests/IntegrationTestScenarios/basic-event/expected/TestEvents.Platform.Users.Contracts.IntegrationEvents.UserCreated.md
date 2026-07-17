@@ -28,12 +28,12 @@ No documentation available
 | UserId| `string` | ✓| 0 bytes (Dynamic size - no MaxLength constraint) | No description available |
 | Email| `string` | ✓| 0 bytes (Dynamic size - no MaxLength constraint) | No description available |
 
-
 ### Partition Keys
 
 This event uses a partition key for message routing:
 - `TenantId` - No description available
-    ## Technical Details
+
+## Technical Details
 
 - **Full Type:** [TestEvents.Platform.Users.Contracts.IntegrationEvents.UserCreated](#)
 - **Type Name:** `UserCreated`

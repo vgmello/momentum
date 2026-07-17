@@ -47,13 +47,13 @@ This event can be used by other services to:
 | PaymentMethod| `string` |  | 0 bytes (Dynamic size - no MaxLength constraint) | Method used for the payment (optional) |
 | PaymentReference| `string` | ✓| 0 bytes (Dynamic size - no MaxLength constraint) | Unique reference or transaction ID for the payment, used for tracking and reconciliation |
 
-
 ### Partition Keys
 
 This event uses multiple partition keys for message routing:
 - `TenantId` - Unique identifier for the tenant
-    - `InvoiceId` - Unique identifier of the invoice the payment is for
-    ## Technical Details
+- `InvoiceId` - Unique identifier of the invoice the payment is for
+
+## Technical Details
 
 - **Full Type:** [AppDomain.Invoices.Contracts.IntegrationEvents.PaymentReceived](https://github.com/vgmello/momentum/blob/main/src/AppDomain/Invoices/Contracts/IntegrationEvents/PaymentReceived.cs)
 - **Type Name:** `PaymentReceived`

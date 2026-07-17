@@ -26,12 +26,12 @@ No documentation available
 | ----------------------------------------------------------------- | --------- | -------- | -------- | --------------------------------------------------------------------- |
 | Id| `Guid` | ✓| 16 bytes | No description available (partition key) |
 
-
 ### Partition Keys
 
 This event uses a partition key for message routing:
 - `Id` - No description available
-    ## Technical Details
+
+## Technical Details
 
 - **Full Type:** [TestEvents.Events.Core.IntegrationEvents.MinimalEvent](#)
 - **Type Name:** `MinimalEvent`

@@ -32,13 +32,12 @@ No documentation available
 | [PrimaryLocation](/events/schemas/TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents.ShowcaseLocation.md)| `ShowcaseLocation` | ✓| 31 bytes (Name: Dynamic size - no MaxLength constraint) | No description available |
 | [RelatedLocations](/events/schemas/TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents.ShowcaseLocation.md)| `List<ShowcaseLocation>` | ✓| 321 bytes (Collection size estimated (no Range constraint)) | No description available |
 
-
 ### Partition Keys
 
 This event uses multiple partition keys for message routing:
 - `TenantId` - No description available
-    - `SequenceNumber` - No description available
-    
+- `SequenceNumber` - No description available
+
 ### Reference Schemas
 
 #### ShowcaseLocation

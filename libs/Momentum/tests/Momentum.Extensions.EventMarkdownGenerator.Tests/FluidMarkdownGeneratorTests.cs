@@ -387,6 +387,57 @@ public class FluidMarkdownGeneratorTests
     }
 
     [Fact]
+    public void CreateEventModel_WhenAttributeIsNotGenericButPropertyNameMatchesEntity_LinksEntityToSchema()
+    {
+        // Non-generic [EventTopic(...)]: EntityType normally has no generic TEntity to reflect. But
+        // CashierCreated has a "Cashier" property whose name matches the derived entity name ("Cashier",
+        // from stripping the "Created" suffix) — EventMetadataBuilder.GetEntity uses that property's type
+        // as EntityType, so it can still link once a schema page exists for it.
+        var eventType = typeof(CashierCreated);
+
+        var metadata = EventMetadataBuilder.Build(eventType, defaultDomain: "Tests", xmlParser: null,
+            PayloadSizeCalculator.Create("json"), attributeNamePrefix: "EventTopic", partitionKeyAttributeNamePrefix: "PartitionKey");
+
+        metadata.Entity.ShouldBe("Cashier");
+        metadata.EntityType.ShouldBe(typeof(TestSchemaType));
+
+        // Mirrors GenerateCommand.CollectAllSchemaTypes: schema types come from the event's own
+        // complex-type properties.
+        var schemaTypes = TypeUtils.CollectComplexTypesFromProperties(metadata.Properties);
+        schemaTypes.ShouldContain(typeof(TestSchemaType));
+
+        var documentation = new EventDocumentation { Summary = string.Empty };
+        var model = EventViewModelFactory.CreateEventModel(metadata, documentation, schemaTypes: schemaTypes);
+
+        model.Entity.ShouldBe("Cashier");
+        model.EntitySchemaLink.ShouldBe($"{typeof(TestSchemaType).FullName}.md");
+    }
+
+    [Fact]
+    public void CreateEventModel_WhenAttributeIsNotGenericAndNoPropertyNameMatchesEntity_NeverLinksEntity()
+    {
+        // Non-generic attribute, and no payload property is named "Widget" (it's "Payload" instead) —
+        // the name-matching fallback has nothing to bind to, so EntityType stays null and there's no link,
+        // even though the Payload property's own type still gets a generated schema page.
+        var eventType = typeof(WidgetCreated);
+
+        var metadata = EventMetadataBuilder.Build(eventType, defaultDomain: "Tests", xmlParser: null,
+            PayloadSizeCalculator.Create("json"), attributeNamePrefix: "EventTopic", partitionKeyAttributeNamePrefix: "PartitionKey");
+
+        metadata.Entity.ShouldBe("Widget");
+        metadata.EntityType.ShouldBeNull();
+
+        var schemaTypes = TypeUtils.CollectComplexTypesFromProperties(metadata.Properties);
+        schemaTypes.ShouldContain(typeof(TestSchemaType));
+
+        var documentation = new EventDocumentation { Summary = string.Empty };
+        var model = EventViewModelFactory.CreateEventModel(metadata, documentation, schemaTypes: schemaTypes);
+
+        model.Entity.ShouldBe("Widget");
+        model.EntitySchemaLink.ShouldBeNull();
+    }
+
+    [Fact]
     public async Task GenerateAllMarkdown_WithEmptyList_ShouldReturnEmpty()
     {
         var generator = await FluidMarkdownGenerator.CreateAsync();
@@ -541,6 +592,22 @@ public class FluidMarkdownGeneratorTests
     }
 
     [Fact]
+    public void CreateEventModel_WhenGenericAttributeIsNotBuiltInEventTopicAttribute_IgnoresGenericArgument()
+    {
+        // CustomTopicAttribute<TEntity> is generic, but it's not the framework's own EventTopicAttribute<T> —
+        // GetEntity must not trust its generic argument (AnotherSchemaType) as the entity type. It should
+        // fall through to name-derivation ("GadgetCreated" -> "Gadget") and the property-name-match fallback,
+        // which also fails here (the property is "Widget", not "Gadget"), so EntityType stays null.
+        var eventType = typeof(GadgetCreated);
+
+        var metadata = EventMetadataBuilder.Build(eventType, defaultDomain: "Tests", xmlParser: null,
+            PayloadSizeCalculator.Create("json"), attributeNamePrefix: "CustomTopic", partitionKeyAttributeNamePrefix: "PartitionKey");
+
+        metadata.Entity.ShouldBe("Gadget");
+        metadata.EntityType.ShouldBeNull();
+    }
+
+    [Fact]
     public async Task CopyDefaultTemplatesToDirectoryAsync_ShouldCreateDirectoryIfNotExists()
     {
         var parentDir = CreateTempDirectory();
@@ -563,6 +630,22 @@ public class FluidMarkdownGeneratorTests
     // Test types
     [EventTopic("test.public.tests.v1")]
     public record TestEvent(Guid Id, string Name);
+
+    [EventTopic("cashiers.cashier-created")]
+    public record CashierCreated(Guid TenantId, TestSchemaType Cashier);
+
+    [EventTopic("widgets.widget-created")]
+    public record WidgetCreated(Guid TenantId, TestSchemaType Payload);
+
+    [AttributeUsage(AttributeTargets.Class)]
+    public class CustomTopicAttribute<TEntity> : Attribute
+    {
+        public string Topic { get; } = "custom-topic";
+        public Type EntityType { get; } = typeof(TEntity);
+    }
+
+    [CustomTopic<AnotherSchemaType>]
+    public record GadgetCreated(Guid Id, TestSchemaType Widget);
 
     public class TestSchemaType
     {

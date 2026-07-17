@@ -218,6 +218,44 @@ public class IntegrationTests
         schemasSection!.Items.Count.ShouldBeGreaterThan(0);
     }
 
+    [Fact]
+    public async Task GenerateMarkdown_WhenEntityPropertyPresent_LinksEntityToGeneratedSchema()
+    {
+        // CashierCreated is [EventTopic<Cashier>] AND carries a `Cashier Cashier` property, so the
+        // entity type is both reflectable (generic arg) and present in the payload — the two
+        // conditions EventViewModelFactory needs to link Entity to a schema page.
+        var outputDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        Directory.CreateDirectory(outputDir);
+
+        try
+        {
+            var xmlParser = new XmlDocumentationParser();
+            var markdownGenerator = await FluidMarkdownGenerator.CreateAsync();
+
+            await xmlParser.LoadMultipleDocumentationAsync([TestXmlPath], TestContext.Current.CancellationToken);
+
+            var assembly = Assembly.LoadFrom(TestAssemblyPath);
+            var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser, PayloadSizeCalculator.Create("json")).ToList();
+
+            var cashierCreatedEvent = events.First(e => e.Metadata.EventTypeName == "CashierCreated");
+            var entityType = cashierCreatedEvent.Metadata.EntityType;
+            entityType.ShouldNotBeNull();
+
+            // Mirrors GenerateCommand.CollectAllSchemaTypes: schema types come from the event's own
+            // complex-type properties, not from EntityType directly.
+            var schemaTypes = TypeUtils.CollectComplexTypesFromProperties(cashierCreatedEvent.Metadata.Properties);
+            schemaTypes.ShouldContain(entityType!);
+
+            var generatedMarkdown = markdownGenerator.GenerateMarkdown(cashierCreatedEvent, outputDir, schemaTypes: schemaTypes);
+
+            generatedMarkdown.Content.ShouldContain($"**Entity:** [Cashier](/events/schemas/{entityType!.FullName}.md)");
+        }
+        finally
+        {
+            Directory.Delete(outputDir, true);
+        }
+    }
+
     private static void ValidateGeneratedContent(string content)
     {
         // Validate basic structure

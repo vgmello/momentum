@@ -28,12 +28,12 @@ No documentation available
 | InvoiceId| `string` | ✓| 0 bytes (Dynamic size - no MaxLength constraint) | No description available |
 | Amount| `decimal` | ✓| 16 bytes | No description available |
 
-
 ### Partition Keys
 
 This event uses a partition key for message routing:
 - `TenantId` - No description available
-    ## Technical Details
+
+## Technical Details
 
 - **Full Type:** [TestEvents.Platform.AppDomain.Invoices.Contracts.IntegrationEvents.InvoiceGenerated](#)
 - **Type Name:** `InvoiceGenerated`
