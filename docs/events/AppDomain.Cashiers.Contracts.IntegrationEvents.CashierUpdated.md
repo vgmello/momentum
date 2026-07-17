@@ -5,14 +5,16 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# CashierUpdated
+# CashierUpdated <Badge type="tip" text="Active" />
 
-- **Status:** Active
+- **Domain:** AppDomain.Cashiers
 - **Version:** v1
-- **Entity:** `cashier`
+- **Entity:** [Cashier](/events/schemas/AppDomain.Cashiers.Contracts.Models.Cashier.md)
 - **Type:** Integration Event
-- **Topic:** `{env}.appdomain.public.cashiers.v1`
+- **Topic:** `cashiers`
+- **Fully Qualified Topic:** `app-domain.cashiers.cashiers.v1`
 - **Estimated Payload Size:** 1008 bytes ⚠️ *Contains dynamic properties*
+- **Partition Keys**: TenantId
 
 ## Description
 
@@ -36,11 +38,15 @@ This event can be used by other services to:
 
 | Property | Type | Required | Size | Description |
 | ----------------------------------------------------------------- | --------- | -------- | -------- | --------------------------------------------------------------------- |
-| TenantId| `Guid` | ✓| 16 bytes | Unique identifier for the tenant |
+| TenantId| `Guid` | ✓| 16 bytes | Unique identifier for the tenant (partition key) |
 | [Cashier](/events/schemas/AppDomain.Cashiers.Contracts.Models.Cashier.md)| `Cashier` | ✓| 992 bytes (Name: Dynamic size - no MaxLength constraint, Email: Dynamic size - no MaxLength constraint, CashierPayments: Collection size estimated (no Range constraint)) | Updated cashier object containing all current cashier data |
 
 
+### Partition Keys
 
+This event uses a partition key for message routing:
+- `TenantId` - Unique identifier for the tenant
+    
 ### Reference Schemas
 
 #### Cashier
@@ -50,5 +56,7 @@ This event can be used by other services to:
 ## Technical Details
 
 - **Full Type:** [AppDomain.Cashiers.Contracts.IntegrationEvents.CashierUpdated](https://github.com/vgmello/momentum/blob/main/src/AppDomain/Cashiers/Contracts/IntegrationEvents/CashierUpdated.cs)
+- **Type Name:** `CashierUpdated`
+- **Event Slug:** `cashier-updated`
 - **Namespace:** `AppDomain.Cashiers.Contracts.IntegrationEvents`
-- **Topic Attribute:** `[EventTopic]`
+- **Topic Attribute:** `[EventTopic<Cashier>]`

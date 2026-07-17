@@ -5,15 +5,14 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# EmptySummaryEvent
+# EmptySummaryEvent <Badge type="tip" text="Active" />
 
-- **Status:** Active
 - **Domain:** TestEvents
 - **Version:** v1
-- **Entity:** `empty-summary-event`
+- **Entity:** `EmptySummaryEvent`
 - **Type:** Integration Event
 - **Topic:** `empty-summary-events`
-- **Fully Qualified Topic:** `test-events.public.empty-summary-events.v1`
+- **Fully Qualified Topic:** `test-events.empty-summary-events.v1`
 - **Estimated Payload Size:** 16 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
@@ -40,9 +39,3 @@ This event uses a partition key for message routing:
 - **Event Slug:** `empty-summary-event`
 - **Namespace:** `TestEvents.Missing.Docs.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<EmptySummaryEvent>]`
-- **Attribute Properties:**
-- `ShouldPluralizeTopicName`: `True`
-- `Topic`: `empty-summary-event`
-- `Domain`: *(empty)*
-- `Version`: `v1`
-- `Internal`: `False`

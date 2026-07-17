@@ -5,14 +5,16 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# InvoiceCancelled
+# InvoiceCancelled <Badge type="tip" text="Active" />
 
-- **Status:** Active
+- **Domain:** AppDomain.Invoices
 - **Version:** v1
-- **Entity:** `invoice`
+- **Entity:** [Invoice](/events/schemas/AppDomain.Invoices.Contracts.Models.Invoice.md)
 - **Type:** Integration Event
-- **Topic:** `{env}.appdomain.public.invoices.v1`
+- **Topic:** `invoices`
+- **Fully Qualified Topic:** `app-domain.invoices.invoices.v1`
 - **Estimated Payload Size:** 318 bytes ⚠️ *Contains dynamic properties*
+- **Partition Keys**: TenantId, InvoiceId
 
 ## Description
 
@@ -37,12 +39,17 @@ This event can be used by other services to:
 
 | Property | Type | Required | Size | Description |
 | ----------------------------------------------------------------- | --------- | -------- | -------- | --------------------------------------------------------------------- |
-| TenantId| `Guid` | ✓| 16 bytes | Unique identifier for the tenant |
-| InvoiceId| `Guid` | ✓| 16 bytes | Unique identifier for the invoice |
+| TenantId| `Guid` | ✓| 16 bytes | Unique identifier for the tenant (partition key) |
+| InvoiceId| `Guid` | ✓| 16 bytes | Unique identifier for the invoice (partition key) |
 | [Invoice](/events/schemas/AppDomain.Invoices.Contracts.Models.Invoice.md)| `Invoice` | ✓| 286 bytes (Name: Dynamic size - no MaxLength constraint, Currency: Dynamic size - no MaxLength constraint) | Cancelled invoice object with updated status |
 
 
+### Partition Keys
 
+This event uses multiple partition keys for message routing:
+- `TenantId` - Unique identifier for the tenant
+    - `InvoiceId` - Unique identifier for the invoice
+    
 ### Reference Schemas
 
 #### Invoice
@@ -52,5 +59,7 @@ This event can be used by other services to:
 ## Technical Details
 
 - **Full Type:** [AppDomain.Invoices.Contracts.IntegrationEvents.InvoiceCancelled](https://github.com/vgmello/momentum/blob/main/src/AppDomain/Invoices/Contracts/IntegrationEvents/InvoiceCancelled.cs)
+- **Type Name:** `InvoiceCancelled`
+- **Event Slug:** `invoice-cancelled`
 - **Namespace:** `AppDomain.Invoices.Contracts.IntegrationEvents`
-- **Topic Attribute:** `[EventTopic]`
+- **Topic Attribute:** `[EventTopic<Invoice>]`

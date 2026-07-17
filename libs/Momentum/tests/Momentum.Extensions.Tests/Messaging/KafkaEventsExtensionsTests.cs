@@ -251,7 +251,7 @@ public class KafkaSetupExtensionsTests
 
     [AttributeUsage(AttributeTargets.Class)]
     private class TestPluralizeEventTopicAttribute(string topic, string? domain = null, string version = "v1")
-        : EventTopicAttribute(topic, domain, version)
+        : EventTopicAttribute(topic, domain: domain, version: version)
     {
         public override bool ShouldPluralizeTopicName => true;
     }

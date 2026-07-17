@@ -12,12 +12,12 @@ The platform includes an automated event documentation generation system that cr
 
 The event generation system automatically discovers distributed events in your .NET assemblies, extracts their metadata, and generates well-structured markdown documentation. The system supports:
 
--   **Automatic Event Discovery**: Finds events decorated with `EventTopic` attributes
--   **Schema Documentation**: Generates documentation for complex types referenced by events
--   **Liquid Template Customization**: Fully customizable output using the Liquid templating engine
--   **MSBuild Integration**: Automatic generation during build process
--   **CLI Support**: Standalone command-line tool for CI/CD and manual generation
--   **VitePress Integration**: Structured sidebar generation for documentation sites
+- **Automatic Event Discovery**: Finds events decorated with `EventTopic` attributes
+- **Schema Documentation**: Generates documentation for complex types referenced by events
+- **Liquid Template Customization**: Fully customizable output using the Liquid templating engine
+- **MSBuild Integration**: Automatic generation during build process
+- **CLI Support**: Standalone command-line tool for CI/CD and manual generation
+- **VitePress Integration**: Structured sidebar generation for documentation sites
 
 ## How It Works with EventMarkdownGenerator
 
@@ -43,10 +43,10 @@ tsx .vitepress/scripts/generate-events-docs.ts "../src/AppDomain.BackOffice/bin/
 
 This script:
 
--   Locates the pre-built EventMarkdownGenerator tool
--   Passes assembly paths to the generator
--   Configures GitHub URL linking for source code references
--   Outputs documentation to `docs/events/` directory
+- Locates the pre-built EventMarkdownGenerator tool
+- Passes assembly paths to the generator
+- Configures GitHub URL linking for source code references
+- Outputs documentation to `docs/events/` directory
 
 ### Generated Output Structure
 
@@ -70,8 +70,8 @@ The EventMarkdownGenerator uses the [Liquid templating engine](https://shopify.g
 
 The system includes two embedded templates:
 
--   **`event.liquid`**: Template for individual event documentation
--   **`schema.liquid`**: Template for complex type schema documentation
+- **`event.liquid`**: Template for individual event documentation
+- **`schema.liquid`**: Template for complex type schema documentation
 
 ### Template Override Mechanism
 
@@ -83,7 +83,7 @@ You can override default templates by:
 
 ```bash
 # Install the EventMarkdownGenerator as a global tool
-dotnet tool install --global Momentum.Extensions.EventMarkdownGenerator --prerelease
+dotnet tool install --global Momentum.Extensions.EventMarkdownGenerator
 
 # Use the tool with custom templates
 events-docsgen --assemblies "path/to/assembly.dll" \
@@ -97,28 +97,32 @@ events-docsgen --assemblies "path/to/assembly.dll" \
 
 The `event.liquid` template has access to a comprehensive event model:
 
-| Variable                          | Type    | Description                                              |
-| --------------------------------- | ------- | -------------------------------------------------------- |
-| `event.EventName`                 | string  | Event class name (e.g., "CashierCreated")                |
-| `event.FullTypeName`              | string  | Full type name with namespace                            |
-| `event.Namespace`                 | string  | Event namespace                                          |
-| `event.TopicName`                 | string  | Kafka topic name pattern                                 |
-| `event.Version`                   | string  | Event version (e.g., "v1")                               |
-| `event.Status`                    | string  | Event status ("Active" or "Deprecated")                  |
-| `event.Entity`                    | string  | Extracted entity name (e.g., "cashier")                  |
-| `event.IsInternal`                | boolean | `true` for domain events, `false` for integration events |
-| `event.IsObsolete`                | boolean | Whether event is marked with `[Obsolete]`                |
-| `event.ObsoleteMessage`           | string  | Deprecation message if obsolete                          |
-| `event.Description`               | string  | Event description from XML `<summary>`                   |
-| `event.Summary`                   | string  | XML summary content                                      |
-| `event.Remarks`                   | string  | XML remarks content                                      |
-| `event.Example`                   | string  | XML example content                                      |
-| `event.Properties`                | array   | Array of event property objects                          |
-| `event.PartitionKeys`             | array   | Array of partition key objects                           |
-| `event.TotalEstimatedSizeBytes`   | number  | Total estimated payload size in bytes                    |
-| `event.HasInaccurateEstimates`    | boolean | Warning flag for dynamic size properties                 |
-| `event.GithubUrl`                 | string  | Link to source code on GitHub                            |
-| `event.TopicAttributeDisplayName` | string  | Display name for topic attribute                         |
+| Variable                          | Type    | Description                                                                                                                             |
+| --------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `event.EventName`                 | string  | Event class name (e.g., "CashierCreated")                                                                                               |
+| `event.FullTypeName`              | string  | Full type name with namespace                                                                                                           |
+| `event.Namespace`                 | string  | Event namespace                                                                                                                         |
+| `event.Topic`                     | string  | Plain topic / event hub name (e.g., "cashiers")                                                                                         |
+| `event.FullyQualifiedTopicName`   | string  | Composed `{visibility}.{domain}.{subdomain}.{topic}.{version}` convention string (`visibility`/`subdomain` omitted when not applicable) |
+| `event.Domain`                    | string  | Resolved domain — explicit attribute override, else assembly default                                                                    |
+| `event.Subdomain`                 | string? | Resolved subdomain — explicit attribute override, else namespace-derived                                                                |
+| `event.Version`                   | string  | Event version (e.g., "v1")                                                                                                              |
+| `event.Status`                    | string  | Event status ("Active" or "Deprecated"). Rendered as a badge next to the title, not its own bullet                                      |
+| `event.Entity`                    | string  | PascalCase entity name (e.g., "Cashier"), linked to its schema page via `event.EntitySchemaLink` when one exists                        |
+| `event.EntitySchemaLink`          | string? | Schema page path for `Entity`, or `null` if `TEntity` has no generated schema documentation                                             |
+| `event.IsInternal`                | boolean | `true` for domain events, `false` for integration events                                                                                |
+| `event.IsObsolete`                | boolean | Whether event is marked with `[Obsolete]`                                                                                               |
+| `event.ObsoleteMessage`           | string  | Deprecation message if obsolete                                                                                                         |
+| `event.Description`               | string  | Event description from XML `<summary>`                                                                                                  |
+| `event.Summary`                   | string  | XML summary content                                                                                                                     |
+| `event.Remarks`                   | string  | XML remarks content                                                                                                                     |
+| `event.Example`                   | string  | XML example content                                                                                                                     |
+| `event.Properties`                | array   | Array of event property objects                                                                                                         |
+| `event.PartitionKeys`             | array   | Array of partition key objects                                                                                                          |
+| `event.TotalEstimatedSizeBytes`   | number  | Total estimated payload size in bytes                                                                                                   |
+| `event.HasInaccurateEstimates`    | boolean | Warning flag for dynamic size properties                                                                                                |
+| `event.GithubUrl`                 | string  | Link to source code on GitHub                                                                                                           |
+| `event.TopicAttributeDisplayName` | string  | Display name for topic attribute                                                                                                        |
 
 #### Property Objects (event.Properties)
 
@@ -195,14 +199,15 @@ When using MSBuild integration, configure generation using these properties:
 
 The internal `GeneratorOptions` record supports these properties:
 
-| Property                | Type           | Required | Description                          |
-| ----------------------- | -------------- | -------- | ------------------------------------ |
-| `AssemblyPaths`         | `List<string>` | Yes      | List of assembly file paths to scan  |
-| `XmlDocumentationPaths` | `List<string>` | No       | List of XML documentation file paths |
-| `OutputDirectory`       | `string`       | Yes      | Target directory for generated files |
-| `SidebarFileName`       | `string`       | Yes      | Sidebar JSON filename                |
-| `TemplatesDirectory`    | `string`       | No       | Custom templates directory path      |
-| `GitHubBaseUrl`         | `string`       | No       | Base GitHub URL for source linking   |
+| Property                | Type           | Required | Description                                                                         |
+| ----------------------- | -------------- | -------- | ----------------------------------------------------------------------------------- |
+| `AssemblyPaths`         | `List<string>` | Yes      | List of assembly file paths to scan                                                 |
+| `XmlDocumentationPaths` | `List<string>` | No       | List of XML documentation file paths                                                |
+| `OutputDirectory`       | `string`       | Yes      | Target directory for generated files                                                |
+| `SidebarFileName`       | `string`       | Yes      | Sidebar JSON filename                                                               |
+| `TemplatesDirectory`    | `string`       | No       | Custom templates directory path                                                     |
+| `GitHubBaseUrl`         | `string`       | No       | Base GitHub URL for source linking                                                  |
+| `EmitPublicVisibility`  | `bool`         | No       | Render an explicit `public` visibility segment for public events (default: `false`) |
 
 ## Advanced Usage Scenarios
 
@@ -212,7 +217,7 @@ Generate documentation for multiple assemblies in a single run:
 
 ```bash
 # Install the tool globally first
-dotnet tool install --global Momentum.Extensions.EventMarkdownGenerator --prerelease
+dotnet tool install --global Momentum.Extensions.EventMarkdownGenerator
 
 # Generate documentation for multiple assemblies
 events-docsgen --assemblies "App.Core.dll,App.Contracts.dll,App.Events.dll" \
@@ -247,7 +252,7 @@ jobs:
               run: dotnet build
 
             - name: Install EventMarkdownGenerator
-              run: dotnet tool install --global Momentum.Extensions.EventMarkdownGenerator --prerelease
+              run: dotnet tool install --global Momentum.Extensions.EventMarkdownGenerator
 
             - name: Generate Event Documentation
               run: |
@@ -274,7 +279,7 @@ For development workflows, create a script that rebuilds and regenerates documen
 # scripts/update-event-docs.sh
 
 echo "Installing/updating EventMarkdownGenerator..."
-dotnet tool install --global Momentum.Extensions.EventMarkdownGenerator --prerelease
+dotnet tool install --global Momentum.Extensions.EventMarkdownGenerator
 
 echo "Building projects..."
 dotnet build
@@ -297,10 +302,10 @@ cd docs && bun run dev
 
 **Solutions**:
 
--   Ensure events implement `IDistributedEvent` interface
--   Verify `EventTopic` attribute is properly applied
--   Check that assemblies are built and accessible
--   Use `--verbose` flag to see discovery process details
+- Ensure events implement `IDistributedEvent` interface
+- Verify `EventTopic` attribute is properly applied
+- Check that assemblies are built and accessible
+- Use `--verbose` flag to see discovery process details
 
 ### XML Documentation Missing
 
@@ -308,14 +313,14 @@ cd docs && bun run dev
 
 **Solutions**:
 
--   Enable XML documentation in project files:
+- Enable XML documentation in project files:
     ```xml
     <PropertyGroup>
       <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
     ```
--   Ensure XML documentation files are in assembly directory
--   Manually specify XML paths using `--xml-docs` option
+- Ensure XML documentation files are in assembly directory
+- Manually specify XML paths using `--xml-docs` option
 
 ### Template Customization Best Practices
 
@@ -327,9 +332,9 @@ cd docs && bun run dev
 
 ### Performance Optimization
 
--   **Assembly Filtering**: Only include assemblies that contain events
--   **XML Documentation**: Place XML files in same directory as assemblies for faster discovery
--   **Template Simplification**: Avoid complex logic in templates; use simple conditionals and loops
--   **Batch Processing**: Process multiple assemblies in single run rather than multiple executions
+- **Assembly Filtering**: Only include assemblies that contain events
+- **XML Documentation**: Place XML files in same directory as assemblies for faster discovery
+- **Template Simplification**: Avoid complex logic in templates; use simple conditionals and loops
+- **Batch Processing**: Process multiple assemblies in single run rather than multiple executions
 
 The event generation system provides powerful automation for maintaining up-to-date event documentation, ensuring your integration events are well-documented and easily discoverable by development teams.

@@ -13,7 +13,7 @@ public static class AssemblyEventDiscovery
 
     public static IEnumerable<EventWithDocumentation> DiscoverEvents(Assembly assembly, XmlDocumentationParser? xmlParser,
         PayloadSizeCalculator calculator, string attributeNamePrefix = DefaultAttributeNamePrefix,
-        string partitionKeyAttributeNamePrefix = DefaultPartitionKeyAttributeNamePrefix)
+        string partitionKeyAttributeNamePrefix = DefaultPartitionKeyAttributeNamePrefix, bool emitPublicVisibility = false)
     {
         var defaultDomain = GetMainDomainName(assembly);
         var integrationEventTypes = GetEventTypes(assembly, attributeNamePrefix);
@@ -21,7 +21,8 @@ public static class AssemblyEventDiscovery
         return integrationEventTypes.Select(type =>
         {
             var metadata =
-                EventMetadataBuilder.Build(type, defaultDomain, xmlParser, calculator, attributeNamePrefix, partitionKeyAttributeNamePrefix);
+                EventMetadataBuilder.Build(type, defaultDomain, xmlParser, calculator, attributeNamePrefix,
+                    partitionKeyAttributeNamePrefix, emitPublicVisibility);
 
             return new EventWithDocumentation
             {

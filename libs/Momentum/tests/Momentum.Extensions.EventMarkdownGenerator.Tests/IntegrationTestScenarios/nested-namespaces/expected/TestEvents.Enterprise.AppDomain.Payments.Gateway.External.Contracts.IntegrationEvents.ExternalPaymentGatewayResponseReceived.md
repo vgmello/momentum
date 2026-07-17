@@ -5,15 +5,14 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# ExternalPaymentGatewayResponseReceived
+# ExternalPaymentGatewayResponseReceived <Badge type="tip" text="Active" />
 
-- **Status:** Active
-- **Domain:** External
+- **Domain:** TestEvents.External
 - **Version:** v1
-- **Entity:** `external-payment-gateway-response-received`
+- **Entity:** `ExternalPaymentGatewayResponseReceived`
 - **Type:** Integration Event
 - **Topic:** `external-payment-gateway-response-receiveds`
-- **Fully Qualified Topic:** `external.public.external-payment-gateway-response-receiveds.v1`
+- **Fully Qualified Topic:** `test-events.external.external-payment-gateway-response-receiveds.v1`
 - **Estimated Payload Size:** 55 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
@@ -51,9 +50,3 @@ This event uses a partition key for message routing:
 - **Event Slug:** `external-payment-gateway-response-received`
 - **Namespace:** `TestEvents.Enterprise.AppDomain.Payments.Gateway.External.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<ExternalPaymentGatewayResponseReceived>]`
-- **Attribute Properties:**
-- `ShouldPluralizeTopicName`: `True`
-- `Topic`: `external-payment-gateway-response-received`
-- `Domain`: *(empty)*
-- `Version`: `v1`
-- `Internal`: `False`

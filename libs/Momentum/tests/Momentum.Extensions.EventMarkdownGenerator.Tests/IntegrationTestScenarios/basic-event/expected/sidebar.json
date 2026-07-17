@@ -108,7 +108,7 @@
     "link": null,
     "items": [
       {
-        "text": "AppDomain.Payments.Gateway.External",
+        "text": "App Domain / Payments / Gateway / External",
         "link": null,
         "items": [
           {
@@ -219,7 +219,7 @@
     "link": null,
     "items": [
       {
-        "text": "AppDomain.Invoices",
+        "text": "App Domain / Invoices",
         "link": null,
         "items": [
           {
@@ -232,7 +232,7 @@
         "collapsed": false
       },
       {
-        "text": "AppDomain.Payments",
+        "text": "App Domain / Payments",
         "link": null,
         "items": [
           {

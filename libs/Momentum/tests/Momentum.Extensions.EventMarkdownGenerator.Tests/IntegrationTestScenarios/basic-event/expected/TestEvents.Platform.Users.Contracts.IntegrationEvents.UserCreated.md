@@ -5,15 +5,14 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# UserCreated
+# UserCreated <Badge type="tip" text="Active" />
 
-- **Status:** Active
-- **Domain:** Users
+- **Domain:** TestEvents.Users
 - **Version:** v1
-- **Entity:** `user-created`
+- **Entity:** `UserCreated`
 - **Type:** Integration Event
 - **Topic:** `user-createds`
-- **Fully Qualified Topic:** `users.public.user-createds.v1`
+- **Fully Qualified Topic:** `test-events.users.user-createds.v1`
 - **Estimated Payload Size:** 16 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
@@ -41,9 +40,3 @@ This event uses a partition key for message routing:
 - **Event Slug:** `user-created`
 - **Namespace:** `TestEvents.Platform.Users.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<UserCreated>]`
-- **Attribute Properties:**
-- `ShouldPluralizeTopicName`: `True`
-- `Topic`: `user-created`
-- `Domain`: *(empty)*
-- `Version`: `v1`
-- `Internal`: `False`

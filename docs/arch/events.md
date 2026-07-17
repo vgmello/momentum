@@ -11,6 +11,10 @@ The AppDomain Solution implements a robust event-driven architecture (EDA) that 
 ## Architecture Overview
 
 ```mermaid
+---
+config:
+  theme: neutral
+---
 graph TB
     subgraph "Frontend Services"
         API[AppDomain.Api<br/>REST & gRPC]
@@ -39,13 +43,20 @@ graph TB
         EventStore[Event Store<br/>Audit & Replay]
     end
 
-    API -/-> Commands
-    Commands -/-> EventBus
-    EventBus -/-> Kafka
-    Kafka -/-> BackOffice
-    BackOffice -/-> Orleans
-    Orleans -/-> Database
-    EventBus -/-> EventStore
+    API --> Commands
+    Commands --> EventBus
+    EventBus --> Kafka
+    Kafka --> BackOffice
+    BackOffice --> Orleans
+    Orleans --> Database
+    EventBus --> EventStore
+
+    classDef container fill:#438dd5,stroke:#3079b0,color:#ffffff
+    classDef external fill:#999999,stroke:#8a8a8a,color:#ffffff
+    classDef person fill:#08427b,stroke:#052e56,color:#ffffff
+
+    class API,WebUI,Commands,Validation,EventBus,BackOffice,Orleans,Saga,Database,EventStore container
+    class Kafka,Topics external
 ```
 
 ## Event Types
@@ -56,9 +67,9 @@ graph TB
 
 **Characteristics**:
 
--   Synchronous processing within the same transaction
--   Maintain data consistency
--   Trigger side effects within the same domain
+- Synchronous processing within the same transaction
+- Maintain data consistency
+- Trigger side effects within the same domain
 
 **Example**:
 
@@ -103,9 +114,9 @@ public partial class CreateInvoiceCommandHandler : IRequestHandler<CreateInvoice
 
 **Characteristics**:
 
--   Asynchronous processing across service boundaries
--   Enable loose coupling between microservices
--   Support eventual consistency patterns
+- Asynchronous processing across service boundaries
+- Enable loose coupling between microservices
+- Support eventual consistency patterns
 
 **Event Schema Definition**:
 
@@ -938,9 +949,9 @@ public class EventSourcedInvoiceRepository : IInvoiceRepository
 
 ## Related Resources
 
--   [Background Processing](/arch/background-processing) - Orleans and async processing
--   [Testing Strategies](/arch/testing) - Comprehensive testing approaches
--   [Database Design](/arch/database) - Event sourcing and persistence patterns
--   [CQRS Implementation](/arch/cqrs) - Command Query Responsibility Segregation
--   [Wolverine Documentation](https://wolverine.netlify.app/) - Message bus framework
--   [Apache Kafka Documentation](https://kafka.apache.org/documentation/) - Event streaming platform
+- [Background Processing](/arch/background-processing) - Orleans and async processing
+- [Testing Strategies](/arch/testing) - Comprehensive testing approaches
+- [Database Design](/arch/database) - Event sourcing and persistence patterns
+- [CQRS Implementation](/arch/cqrs) - Command Query Responsibility Segregation
+- [Wolverine Documentation](https://wolverine.netlify.app/) - Message bus framework
+- [Apache Kafka Documentation](https://kafka.apache.org/documentation/) - Event streaming platform

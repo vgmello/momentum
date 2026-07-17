@@ -5,15 +5,14 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# CashierCreated
+# CashierCreated <Badge type="tip" text="Active" />
 
-- **Status:** Active
-- **Domain:** Cashiers
+- **Domain:** TestEvents.Cashiers
 - **Version:** v1
-- **Entity:** `cashier`
+- **Entity:** `Cashier`
 - **Type:** Integration Event
 - **Topic:** `cashiers`
-- **Fully Qualified Topic:** `cashiers.public.cashiers.v1`
+- **Fully Qualified Topic:** `test-events.cashiers.cashiers.v1`
 - **Estimated Payload Size:** 73 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId, PartitionKeyTest
 
@@ -49,9 +48,3 @@ This event uses multiple partition keys for message routing:
 - **Event Slug:** `cashier-created`
 - **Namespace:** `TestEvents.AppDomain.Cashiers.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<Cashier>]`
-- **Attribute Properties:**
-- `ShouldPluralizeTopicName`: `True`
-- `Topic`: `cashier`
-- `Domain`: *(empty)*
-- `Version`: `v1`
-- `Internal`: `False`

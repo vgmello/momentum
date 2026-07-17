@@ -40,7 +40,7 @@ export default defineConfig({
             { text: "Guide", link: "/guide/" },
             { text: "Architecture", link: "/arch/" },
             { text: "Reference", link: "/reference/AppDomain" },
-            { text: "Changelog", link: "https://github.com/vgmello/momentum/blob/main/CHANGELOG.md" },
+            { text: "Changelog", link: "/changelog" },
         ],
 
         editLink: {

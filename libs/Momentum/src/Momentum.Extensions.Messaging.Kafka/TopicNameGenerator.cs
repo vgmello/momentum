@@ -11,7 +11,7 @@ public interface ITopicNameGenerator
     /// </summary>
     /// <param name="messageType">The integration event type.</param>
     /// <param name="topicAttribute">The event topic attribute.</param>
-    /// <returns>A topic name in the format: {env}.{domain}.{scope}.{topic}.{version}</returns>
+    /// <returns>A topic name in the format: {env}.{domain}.{subdomain}.{scope}.{topic}.{version}</returns>
     string GetTopicName(Type messageType, EventTopicAttribute topicAttribute);
 }
 
@@ -25,12 +25,14 @@ public class TopicNameGenerator(IHostEnvironment environment) : ITopicNameGenera
             ? topicAttribute.Domain
             : DefaultDomainAttribute.GetDomainName(messageType.Assembly);
 
+        var subdomainSegment = string.IsNullOrWhiteSpace(topicAttribute.Subdomain) ? null : $".{topicAttribute.Subdomain}";
+
         var scope = topicAttribute.Internal ? "internal" : "public";
 
         var topicName = topicAttribute.ShouldPluralizeTopicName ? topicAttribute.Topic.Pluralize() : topicAttribute.Topic;
 
         var versionSuffix = string.IsNullOrWhiteSpace(topicAttribute.Version) ? null : $".{topicAttribute.Version}";
 
-        return $"{_envName}.{domainName}.{scope}.{topicName}{versionSuffix}".ToLowerInvariant();
+        return $"{_envName}.{domainName}{subdomainSegment}.{scope}.{topicName}{versionSuffix}".ToLowerInvariant();
     }
 }

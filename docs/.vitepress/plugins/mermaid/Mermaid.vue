@@ -77,8 +77,8 @@ onMounted(async () => {
                             (img) =>
                                 new Promise((resolve) => {
                                     img.onload = img.onerror = resolve;
-                                })
-                        )
+                                }),
+                        ),
                 ).then(() => {
                     renderChart();
                 });
@@ -95,6 +95,8 @@ const renderChart = async () => {
         securityLevel: "loose",
         startOnLoad: false,
         theme: hasDarkClass ? "dark" : "default",
+        layout: "elk",
+        look: "neo",
     };
     let svgCode = await render(props.id, code.value, mermaidConfig);
     // This is a hack to force v-html to re-render, otherwise the diagram disappears

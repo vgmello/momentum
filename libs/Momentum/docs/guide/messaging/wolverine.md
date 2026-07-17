@@ -16,15 +16,15 @@ Wolverine (formerly Jasper) is a .NET messaging framework that provides:
 
 ```mermaid
 graph TD
-    A[API Request] -/-> B[Wolverine Message Bus]
-    B -/-> C[Validation Middleware]
-    C -/-> D[Performance Middleware]
-    D -/-> E[OpenTelemetry Middleware]
-    E -/-> F[Handler]
-    F -/-> G[Database]
-    B -/-> H[Event Publisher]
-    H -/-> I[Kafka]
-    H -/-> J[Local Queues]
+    A[API Request] --> B[Wolverine Message Bus]
+    B --> C[Validation Middleware]
+    C --> D[Performance Middleware]
+    D --> E[OpenTelemetry Middleware]
+    E --> F[Handler]
+    F --> G[Database]
+    B --> H[Event Publisher]
+    H --> I[Kafka]
+    H --> J[Local Queues]
 ```
 
 ## Basic Configuration

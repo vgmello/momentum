@@ -72,7 +72,7 @@ try {
             log('❌ The events-docsgen tool is not installed.');
             log('');
             log('Please install it using:');
-            log('  dotnet tool install -g Momentum.Extensions.EventMarkdownGenerator --prerelease');
+            log('  dotnet tool install -g Momentum.Extensions.EventMarkdownGenerator');
             log('');
             log('After installation, make sure the dotnet tools directory is in your PATH.');
             process.exit(1);

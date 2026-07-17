@@ -4,6 +4,33 @@ All notable changes to this project are documented in this file, grouped by date
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2026-07-16]
+
+### Changed
+
+- **Docs**: widened both VitePress sites (`docs/`, `libs/Momentum/docs/`) — layout frame now maxes out at
+  1640px (`--vp-layout-max-width`) and the doc content column at 900px, up from the VitePress defaults.
+- **Docs**: nav "Changelog" link now renders `CHANGELOG.md` inline as a docs page (`/changelog`) instead of
+  linking out to GitHub.
+
+### Fixed
+
+- **Docs**: Mermaid diagrams now render with the registered ELK layout (`layout: "elk"` was never passed to
+  `mermaid.render`, so the loader was registered but unused).
+- **Docs**: fixed 115 Mermaid diagrams across both sites using the invalid arrow `-/->`, which failed to
+  parse and silently dropped every affected diagram (most notably all of `docs/arch/*.md`).
+
+### Changed
+
+- **Docs**: Mermaid diagrams now render with the `neo` look (was unset, defaulting to `classic`).
+- **Docs**: the architecture/system diagrams in `docs/arch/*.md` (`index.md`, `eda.md`, `events.md`,
+  `background-processing.md`) now use a consistent C4-style palette — blue for containers, light blue for
+  domain/component-level nodes, grey for external systems (Kafka, third-party services) — replacing the
+  ad-hoc pastel `style` overrides that only existed on one of the four diagrams.
+- **Deps**: bumped `mermaid` from `^11.10.1` to `^11.16.0` (latest) in both `docs/` and `libs/Momentum/docs/`.
+- **Docs**: Mermaid subgraph/cluster backgrounds are now white instead of the default pale-yellow theme
+  color (light theme only, via `themeVariables.clusterBkg`).
+
 ## [2026-07-15]
 
 ### Added

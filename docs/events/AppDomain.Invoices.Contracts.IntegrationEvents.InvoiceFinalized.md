@@ -5,14 +5,16 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# InvoiceFinalized
+# InvoiceFinalized <Badge type="tip" text="Active" />
 
-- **Status:** Active
+- **Domain:** AppDomain.Invoices
 - **Version:** v1
-- **Entity:** `invoice`
+- **Entity:** [Invoice](/events/schemas/AppDomain.Invoices.Contracts.Models.Invoice.md)
 - **Type:** Integration Event
-- **Topic:** `{env}.appdomain.public.invoices.v1`
+- **Topic:** `invoices`
+- **Fully Qualified Topic:** `app-domain.invoices.invoices.v1`
 - **Estimated Payload Size:** 64 bytes ⚠️ *Contains dynamic properties*
+- **Partition Keys**: TenantId, InvoiceId
 
 ## Description
 
@@ -37,15 +39,22 @@ This event can be used by other services to:
 
 | Property | Type | Required | Size | Description |
 | ----------------------------------------------------------------- | --------- | -------- | -------- | --------------------------------------------------------------------- |
-| TenantId| `Guid` | ✓| 16 bytes | Unique identifier for the tenant |
-| InvoiceId| `Guid` | ✓| 16 bytes | Unique identifier for the invoice |
+| TenantId| `Guid` | ✓| 16 bytes | Unique identifier for the tenant (partition key) |
+| InvoiceId| `Guid` | ✓| 16 bytes | Unique identifier for the invoice (partition key) |
 | CustomerId| `Guid` | ✓| 16 bytes | Unique identifier for the customer |
 | PublicInvoiceNumber| `string` | ✓| 0 bytes (Dynamic size - no MaxLength constraint) | Public-facing invoice number for customer reference |
 | FinalTotalAmount| `decimal` | ✓| 16 bytes | Final total amount of the invoice |
 
 
-## Technical Details
+### Partition Keys
+
+This event uses multiple partition keys for message routing:
+- `TenantId` - Unique identifier for the tenant
+    - `InvoiceId` - Unique identifier for the invoice
+    ## Technical Details
 
 - **Full Type:** [AppDomain.Invoices.Contracts.IntegrationEvents.InvoiceFinalized](https://github.com/vgmello/momentum/blob/main/src/AppDomain/Invoices/Contracts/IntegrationEvents/InvoiceFinalized.cs)
+- **Type Name:** `InvoiceFinalized`
+- **Event Slug:** `invoice-finalized`
 - **Namespace:** `AppDomain.Invoices.Contracts.IntegrationEvents`
-- **Topic Attribute:** `[EventTopic]`
+- **Topic Attribute:** `[EventTopic<Invoice>]`

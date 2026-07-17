@@ -5,15 +5,14 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# UndocumentedEvent
+# UndocumentedEvent <Badge type="tip" text="Active" />
 
-- **Status:** Active
 - **Domain:** TestEvents
 - **Version:** v1
-- **Entity:** `missing`
+- **Entity:** `Missing`
 - **Type:** Domain Event
 - **Topic:** `missings`
-- **Fully Qualified Topic:** `test-events.internal.missings.v1`
+- **Fully Qualified Topic:** `internal.test-events.missings.v1`
 - **Estimated Payload Size:** 16 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
@@ -40,9 +39,3 @@ This event uses a partition key for message routing:
 - **Event Slug:** `undocumented-event`
 - **Namespace:** `TestEvents.Missing.Docs.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<Missing>]`
-- **Attribute Properties:**
-- `ShouldPluralizeTopicName`: `True`
-- `Topic`: `missing`
-- `Domain`: *(empty)*
-- `Version`: `v1`
-- `Internal`: `True`

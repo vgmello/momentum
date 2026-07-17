@@ -5,15 +5,14 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# SubscriptionActivated
+# SubscriptionActivated <Badge type="tip" text="Active" />
 
-- **Status:** Active
-- **Domain:** Subscriptions
+- **Domain:** TestEvents.Subscriptions
 - **Version:** v1
-- **Entity:** `subscription-activated`
+- **Entity:** `SubscriptionActivated`
 - **Type:** Integration Event
 - **Topic:** `subscription-activateds`
-- **Fully Qualified Topic:** `subscriptions.public.subscription-activateds.v1`
+- **Fully Qualified Topic:** `test-events.subscriptions.subscription-activateds.v1`
 - **Estimated Payload Size:** 16 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
@@ -41,9 +40,3 @@ This event uses a partition key for message routing:
 - **Event Slug:** `subscription-activated`
 - **Namespace:** `TestEvents.Platform.Subscriptions.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<SubscriptionActivated>]`
-- **Attribute Properties:**
-- `ShouldPluralizeTopicName`: `True`
-- `Topic`: `subscription-activated`
-- `Domain`: *(empty)*
-- `Version`: `v1`
-- `Internal`: `False`

@@ -5,15 +5,14 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# PaymentProcessed
+# PaymentProcessed <Badge type="tip" text="Active" />
 
-- **Status:** Active
-- **Domain:** Payments
+- **Domain:** TestEvents.Payments
 - **Version:** v1
-- **Entity:** `payment-processed`
+- **Entity:** `PaymentProcessed`
 - **Type:** Integration Event
 - **Topic:** `payment-processeds`
-- **Fully Qualified Topic:** `payments.public.payment-processeds.v1`
+- **Fully Qualified Topic:** `test-events.payments.payment-processeds.v1`
 - **Estimated Payload Size:** 32 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
@@ -41,9 +40,3 @@ This event uses a partition key for message routing:
 - **Event Slug:** `payment-processed`
 - **Namespace:** `TestEvents.Platform.AppDomain.Payments.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<PaymentProcessed>]`
-- **Attribute Properties:**
-- `ShouldPluralizeTopicName`: `True`
-- `Topic`: `payment-processed`
-- `Domain`: *(empty)*
-- `Version`: `v1`
-- `Internal`: `False`

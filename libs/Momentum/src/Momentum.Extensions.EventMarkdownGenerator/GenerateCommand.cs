@@ -62,6 +62,13 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
         [CommandOption("-v|--verbose")]
         [Description("Enable verbose output")]
         public bool Verbose { get; init; }
+
+        [CommandOption("--emit-public-visibility")]
+        [Description(
+            "Render an explicit \"public\" visibility segment for public events (e.g. public.domain.subdomain.topic.v1). " +
+            "Default: false (public events omit the segment, e.g. domain.subdomain.topic.v1). Internal events always " +
+            "render \"internal\" regardless of this flag.")]
+        public bool EmitPublicVisibility { get; init; }
     }
 
     protected override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellationToken)
@@ -98,7 +105,8 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
                 GitHubBaseUrl = settings.GitHubUrl,
                 SerializationFormat = settings.Format,
                 EventAttributeName = settings.EventAttribute,
-                PartitionKeyAttributeName = settings.PartitionKeyAttribute
+                PartitionKeyAttributeName = settings.PartitionKeyAttribute,
+                EmitPublicVisibility = settings.EmitPublicVisibility
             };
 
             await GenerateDocumentationAsync(options, cancellationToken);
@@ -159,7 +167,7 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
                     cts.Token);
 
                 var events = AssemblyEventDiscovery.DiscoverEvents(assembly, xmlParser, calculator,
-                    options.EventAttributeName, options.PartitionKeyAttributeName);
+                    options.EventAttributeName, options.PartitionKeyAttributeName, options.EmitPublicVisibility);
 
                 allEvents.AddRange(events);
 
@@ -193,16 +201,19 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
 
         cancellationToken.ThrowIfCancellationRequested();
 
+        // Collected up front (cheap - only reflects already-discovered event properties) so markdown
+        // generation knows which entity types have a schema page to link to.
+        var schemaTypes = CollectAllSchemaTypes(allEvents);
+
         // Generate individual markdown files
-        var markdownFiles = markdownGenerator.GenerateAllMarkdown(allEvents, options.OutputDirectory, options).ToList();
+        var markdownFiles = markdownGenerator.GenerateAllMarkdown(allEvents, options.OutputDirectory, options, schemaTypes).ToList();
 
         // Write markdown files
         await WriteMarkdownFilesAsync(markdownFiles, cancellationToken);
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        // Extract and generate schema files
-        var schemaTypes = CollectAllSchemaTypes(allEvents);
+        // Generate schema files
         var schemaFiles = markdownGenerator.GenerateAllSchemas(schemaTypes, options.OutputDirectory).ToList();
 
         // Write schema files
@@ -241,7 +252,7 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
 
     private static HashSet<Type> CollectAllSchemaTypes(List<EventWithDocumentation> allEvents)
     {
-        var schemaTypes = new HashSet<Type>();
+        var schemaTypes = new HashSet<Type>(TypeUtils.FullNameComparer);
 
         foreach (var eventWithDoc in allEvents)
         {

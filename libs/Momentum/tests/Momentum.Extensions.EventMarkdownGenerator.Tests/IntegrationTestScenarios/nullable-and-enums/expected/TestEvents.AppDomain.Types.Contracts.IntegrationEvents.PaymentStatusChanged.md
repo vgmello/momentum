@@ -5,15 +5,14 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# PaymentStatusChanged
+# PaymentStatusChanged <Badge type="tip" text="Active" />
 
-- **Status:** Active
-- **Domain:** Types
+- **Domain:** TestEvents.Types
 - **Version:** v1
-- **Entity:** `payment-status-changed`
+- **Entity:** `PaymentStatusChanged`
 - **Type:** Integration Event
 - **Topic:** `payment-status-changeds`
-- **Fully Qualified Topic:** `types.public.payment-status-changeds.v1`
+- **Fully Qualified Topic:** `test-events.types.payment-status-changeds.v1`
 - **Estimated Payload Size:** 56 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
@@ -47,9 +46,3 @@ This event uses a partition key for message routing:
 - **Event Slug:** `payment-status-changed`
 - **Namespace:** `TestEvents.AppDomain.Types.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<PaymentStatusChanged>]`
-- **Attribute Properties:**
-- `ShouldPluralizeTopicName`: `True`
-- `Topic`: `payment-status-changed`
-- `Domain`: *(empty)*
-- `Version`: `v1`
-- `Internal`: `False`

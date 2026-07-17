@@ -55,8 +55,9 @@ public class GenericAttributeDiscoveryTests
         conventionEvent.EventName.ShouldBe("ReservationBooked");
 
         // Ask #3: Topic exposes the plain topic/hub name; the fully-qualified name keeps the composed convention.
+        // Public events omit the visibility segment by default (emitPublicVisibility defaults to false).
         conventionEvent.Topic.ShouldBe("reservation-created");
-        conventionEvent.FullyQualifiedTopicName.ShouldBe("reservations.public.reservation-created.v1");
+        conventionEvent.FullyQualifiedTopicName.ShouldBe("reservations.reservation-created.v1");
 
         // Ask #2: partition keys discovered via the custom attribute, ordered by Order.
         conventionEvent.PartitionKeys.Count.ShouldBe(2);
@@ -66,17 +67,17 @@ public class GenericAttributeDiscoveryTests
         conventionEvent.PartitionKeys[1].Order.ShouldBe(1);
     }
 
-    // Custom attribute exercising properties the generator has no dedicated EventMetadata field for
-    // (Subdomain), plus an explicitly empty Topic to verify the kebab-case fallback still applies.
+    // Custom attribute exercising a property the generator has no dedicated EventMetadata field for
+    // (Notes), plus an explicitly empty Topic to verify the kebab-case fallback still applies.
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class CustomAttribute : Attribute
     {
         public string Domain { get; init; } = string.Empty;
-        public string Subdomain { get; init; } = string.Empty;
+        public string Notes { get; init; } = string.Empty;
         public string Topic { get; init; } = string.Empty;
     }
 
-    [Custom(Domain = "billing", Subdomain = "invoicing", Topic = "")]
+    [Custom(Domain = "billing", Notes = "invoicing", Topic = "")]
     public record CustomAttributeEvent(Guid InvoiceId);
 
     [Fact]
@@ -96,15 +97,21 @@ public class GenericAttributeDiscoveryTests
         customEvent.Topic.ShouldBe("custom-attribute-event");
 
         // Every property of the attribute is captured, including ones with no dedicated EventMetadata
-        // field (Subdomain) — not just the well-known ones (Domain).
+        // field (Notes) — not just the well-known ones (Domain).
         customEvent.AttributeProperties.Count.ShouldBe(3);
         customEvent.AttributeProperties["Domain"].ShouldBe("billing");
-        customEvent.AttributeProperties["Subdomain"].ShouldBe("invoicing");
+        customEvent.AttributeProperties["Notes"].ShouldBe("invoicing");
         customEvent.AttributeProperties["Topic"].ShouldBe(string.Empty);
     }
 
     [ConventionEventTopic(Domain = "widgets", Topic = "widget-created")]
     public record WidgetCreated(Guid WidgetId);
+
+    [ConventionEventTopic(Domain = "orders", Topic = "order-completed-event")]
+    public record OrderCompletedEvent(Guid OrderId);
+
+    [ConventionEventTopic(Domain = "gadgets", Topic = "gadget-event")]
+    public record GadgetEvent(Guid GadgetId);
 
     [Fact]
     public void DiscoverEvents_WithNonGenericAttribute_InfersEntityFromEventNameSuffix()
@@ -120,10 +127,21 @@ public class GenericAttributeDiscoveryTests
         // ConventionEventTopicAttribute is non-generic (no TEntity), so Entity can only come from
         // stripping a known event-verb suffix off the type's own name.
         var widgetCreated = events.Single(e => e.FullTypeName == typeof(WidgetCreated).FullName);
-        widgetCreated.Entity.ShouldBe("widget");
+        widgetCreated.Entity.ShouldBe("Widget");
 
-        // ConventionEvent's name matches no known suffix, so Entity stays empty rather than guessing.
+        // A trailing "Event" word is trimmed BEFORE suffix matching, so the "Completed" suffix still
+        // matches against "OrderCompleted" rather than failing against the untrimmed "OrderCompletedEvent".
+        var orderCompletedEvent = events.Single(e => e.FullTypeName == typeof(OrderCompletedEvent).FullName);
+        orderCompletedEvent.Entity.ShouldBe("Order");
+
+        // "Event" trimmed, remainder ("Gadget") matches no known suffix, so Entity falls back to the
+        // trimmed name rather than the untrimmed "GadgetEvent".
+        var gadgetEvent = events.Single(e => e.FullTypeName == typeof(GadgetEvent).FullName);
+        gadgetEvent.Entity.ShouldBe("Gadget");
+
+        // ConventionEvent's name (after trimming the trailing "Event" word) matches no known suffix, so
+        // Entity falls back to the trimmed event type name.
         var conventionEvent = events.Single(e => e.FullTypeName == typeof(ConventionEvent).FullName);
-        conventionEvent.Entity.ShouldBe(string.Empty);
+        conventionEvent.Entity.ShouldBe("Convention");
     }
 }

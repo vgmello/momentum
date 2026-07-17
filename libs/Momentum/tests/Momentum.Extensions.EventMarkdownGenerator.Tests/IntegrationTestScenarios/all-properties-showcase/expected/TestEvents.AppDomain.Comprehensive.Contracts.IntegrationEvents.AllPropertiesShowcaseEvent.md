@@ -16,11 +16,11 @@ editLink: false
 - **FullTypeName:** TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents.AllPropertiesShowcaseEvent
 - **Namespace:** TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents
 - **Topic:** comprehensive-topic
-- **FullyQualifiedTopicName:** comprehensive-domain.internal.comprehensive-topic.v9
+- **FullyQualifiedTopicName:** internal.comprehensive-domain.comprehensive.comprehensive-topic.v9
 - **Domain:** comprehensive-domain
 - **Version:** v9
 - **Status:** Deprecated
-- **Entity:** showcase-location
+- **Entity:** ShowcaseLocation
 - **IsObsolete:** true
 - **IsInternal:** true
 - **ObsoleteMessage:** Superseded by a hypothetical future event; kept only as a documentation-generator test fixture.
@@ -40,11 +40,12 @@ renderable field of the generated markdown at once.
 - **TotalEstimatedSizeBytes:** 372
 - **HasInaccurateEstimates:** true
 
-## AttributeProperties (5)
+## AttributeProperties (6)
 
 - `ShouldPluralizeTopicName` = `False`
 - `Topic` = `comprehensive-topic`
 - `Domain` = `comprehensive-domain`
+- `Subdomain` = ``
 - `Version` = `v9`
 - `Internal` = `True`
 

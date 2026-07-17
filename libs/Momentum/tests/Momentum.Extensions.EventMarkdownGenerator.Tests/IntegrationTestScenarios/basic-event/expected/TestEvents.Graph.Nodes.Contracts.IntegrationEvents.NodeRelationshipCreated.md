@@ -5,15 +5,14 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# NodeRelationshipCreated
+# NodeRelationshipCreated <Badge type="tip" text="Active" />
 
-- **Status:** Active
-- **Domain:** Nodes
+- **Domain:** TestEvents.Nodes
 - **Version:** v1
-- **Entity:** `node-relationship-created`
+- **Entity:** `NodeRelationshipCreated`
 - **Type:** Integration Event
 - **Topic:** `node-relationship-createds`
-- **Fully Qualified Topic:** `nodes.public.node-relationship-createds.v1`
+- **Fully Qualified Topic:** `test-events.nodes.node-relationship-createds.v1`
 - **Estimated Payload Size:** 382 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 
@@ -53,9 +52,3 @@ This event uses a partition key for message routing:
 - **Event Slug:** `node-relationship-created`
 - **Namespace:** `TestEvents.Graph.Nodes.Contracts.IntegrationEvents`
 - **Topic Attribute:** `[EventTopic<NodeRelationshipCreated>]`
-- **Attribute Properties:**
-- `ShouldPluralizeTopicName`: `True`
-- `Topic`: `node-relationship-created`
-- `Domain`: *(empty)*
-- `Version`: `v1`
-- `Internal`: `False`

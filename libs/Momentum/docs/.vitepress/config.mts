@@ -44,7 +44,7 @@ export default defineConfig({
             { text: "Home", link: "/" },
             { text: "Guide", link: "/guide/getting-started" },
             { text: "Reference", link: "/reference/Momentum" },
-            { text: "Changelog", link: "https://github.com/vgmello/momentum/blob/main/CHANGELOG.md" },
+            { text: "Changelog", link: "/changelog" },
         ],
 
         editLink: {

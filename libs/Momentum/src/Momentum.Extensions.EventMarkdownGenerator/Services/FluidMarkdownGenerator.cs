@@ -47,9 +47,13 @@ public class FluidMarkdownGenerator
     /// <param name="eventWithDoc">The event metadata and documentation to render.</param>
     /// <param name="outputDirectory">The base output directory for generated files.</param>
     /// <param name="options">Optional generator options for customization.</param>
+    /// <param name="schemaTypes">
+    ///     Types with generated schema documentation, used to link <c>event.Entity</c> to its schema page when
+    ///     the entity type is among them.
+    /// </param>
     /// <returns>The generated markdown output containing content and file path.</returns>
     public IndividualMarkdownOutput GenerateMarkdown(EventWithDocumentation eventWithDoc, string outputDirectory,
-        GeneratorOptions? options = null)
+        GeneratorOptions? options = null, IReadOnlySet<Type>? schemaTypes = null)
     {
         var metadata = eventWithDoc.Metadata;
         var documentation = eventWithDoc.Documentation;
@@ -58,7 +62,7 @@ public class FluidMarkdownGenerator
         var filePath = GenerateFilePath(outputDirectory, fileName);
 
         var context = new TemplateContext(TemplateOptions);
-        var eventModel = EventViewModelFactory.CreateEventModel(metadata, documentation, options);
+        var eventModel = EventViewModelFactory.CreateEventModel(metadata, documentation, options, schemaTypes);
         context.SetValue("event", eventModel);
 
         var content = _eventTemplate.Render(context);
@@ -77,11 +81,15 @@ public class FluidMarkdownGenerator
     /// <param name="events">The events to render.</param>
     /// <param name="outputDirectory">The base output directory for generated files.</param>
     /// <param name="options">Optional generator options for customization.</param>
+    /// <param name="schemaTypes">
+    ///     Types with generated schema documentation, used to link <c>event.Entity</c> to its schema page when
+    ///     the entity type is among them.
+    /// </param>
     /// <returns>An enumerable of generated markdown outputs.</returns>
     public IEnumerable<IndividualMarkdownOutput> GenerateAllMarkdown(IEnumerable<EventWithDocumentation> events, string outputDirectory,
-        GeneratorOptions? options = null)
+        GeneratorOptions? options = null, IReadOnlySet<Type>? schemaTypes = null)
     {
-        return events.Select(eventWithDoc => GenerateMarkdown(eventWithDoc, outputDirectory, options));
+        return events.Select(eventWithDoc => GenerateMarkdown(eventWithDoc, outputDirectory, options, schemaTypes));
     }
 
     /// <summary>

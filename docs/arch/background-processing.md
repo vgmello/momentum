@@ -11,52 +11,65 @@ The AppDomain Solution implements sophisticated background processing using Orle
 ## Architecture Overview
 
 ```mermaid
+---
+config:
+  theme: neutral
+---
 graph TB
-    subgraph "Event Sources"
+    subgraph SOURCES ["Event Sources"]
         API[AppDomain.Api<br/>Commands & Events]
         External[External Systems<br/>Webhooks & Integrations]
         Scheduled[Scheduled Jobs<br/>Time-based Triggers]
     end
 
-    subgraph "Message Infrastructure"
+    subgraph MSGINFRA ["Message Infrastructure"]
         Wolverine[Wolverine<br/>Message Bus]
         Kafka[(Apache Kafka<br/>Event Stream)]
         LocalQueues[Local Queues<br/>In-Memory Processing]
     end
 
-    subgraph "Background Services"
+    subgraph BGSVC ["Background Services"]
         BackOffice[AppDomain.BackOffice<br/>Event Handlers]
         Orleans[Orleans Cluster<br/>Stateful Grains]
         Jobs[Background Jobs<br/>Recurring Tasks]
     end
 
-    subgraph "Orleans Grains"
+    subgraph GRAINS ["Orleans Grains"]
         InvoiceGrain[Invoice Grains<br/>Payment Processing]
         NotificationGrain[Notification Grains<br/>Message Delivery]
         SagaGrain[Saga Grains<br/>Workflow Coordination]
         TimerGrain[Timer Grains<br/>Scheduled Operations]
     end
 
-    subgraph "Persistence"
+    subgraph PERSIST ["Persistence"]
         Database[(PostgreSQL<br/>Grain State Storage)]
         EventStore[Event Store<br/>Audit & Recovery]
     end
 
-    API -/-> Wolverine
-    External -/-> Wolverine
-    Scheduled -/-> Wolverine
-    Wolverine -/-> Kafka
-    Kafka -/-> BackOffice
-    BackOffice -/-> Orleans
-    Orleans -/-> InvoiceGrain
-    Orleans -/-> NotificationGrain
-    Orleans -/-> SagaGrain
-    Orleans -/-> TimerGrain
-    InvoiceGrain -/-> Database
-    NotificationGrain -/-> Database
-    SagaGrain -/-> Database
-    TimerGrain -/-> Database
-    Orleans -/-> EventStore
+    API --> Wolverine
+    External --> Wolverine
+    Scheduled --> Wolverine
+    Wolverine --> Kafka
+    Kafka --> BackOffice
+    BackOffice --> Orleans
+    Orleans --> InvoiceGrain
+    Orleans --> NotificationGrain
+    Orleans --> SagaGrain
+    Orleans --> TimerGrain
+    InvoiceGrain --> Database
+    NotificationGrain --> Database
+    SagaGrain --> Database
+    TimerGrain --> Database
+    Orleans --> EventStore
+
+    classDef container fill:#438dd5,stroke:#3079b0,color:#ffffff
+    classDef component fill:#85bbf0,stroke:#5b93c8,color:#000000
+    classDef external fill:#999999,stroke:#8a8a8a,color:#ffffff
+    classDef person fill:#08427b,stroke:#052e56,color:#ffffff
+
+    class API,Scheduled,Wolverine,LocalQueues,BackOffice,Orleans,Jobs,Database,EventStore container
+    class InvoiceGrain,NotificationGrain,SagaGrain,TimerGrain component
+    class External,Kafka external
 ```
 
 ## BackOffice Service Structure
@@ -82,6 +95,7 @@ The BackOffice service handles background processing, event consumption, and sch
 ```
 
 **Naming Conventions:**
+
 - `{DomainName}InboxHandler/` - Handlers for events from a specific domain (e.g., `CashiersInboxHandler/`, `InvoicesInboxHandler/`)
 - `{ExternalDomain}InboxHandler/` - Handlers for events from external services (e.g., `AccountingInboxHandler/`)
 - Handlers are named after the event they handle with a `Handler` suffix
@@ -113,6 +127,7 @@ public static class CashierCreatedHandler
 ```
 
 **Handler Responsibilities:**
+
 - Consume integration events from Kafka topics
 - Update read models or denormalized views
 - Trigger notifications or external integrations
@@ -142,6 +157,7 @@ public class DataSyncJob(IMessageBus bus, ILogger<DataSyncJob> logger) : Backgro
 ```
 
 **Common Job Types:**
+
 - Data synchronization jobs
 - Report generation
 - Cache warming

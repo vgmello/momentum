@@ -20,7 +20,7 @@ namespace Momentum.Extensions.Abstractions.Messaging;
 /// </code>
 /// </example>
 [AttributeUsage(AttributeTargets.Class)]
-public class EventTopicAttribute(string topic, string? domain = null, string version = "v1") : Attribute
+public class EventTopicAttribute(string topic, string? domain = null, string? subdomain = null, string version = "v1") : Attribute
 {
     /// <summary>
     ///     Topic name for the event.
@@ -38,6 +38,17 @@ public class EventTopicAttribute(string topic, string? domain = null, string ver
     ///     assembly name as a fallback (e.g., <c>AppDomain.Contracts</c> → <c>AppDomain</c>).
     /// </value>
     public string? Domain { get; } = domain;
+
+    /// <summary>
+    ///     Subdomain for the event.
+    /// </summary>
+    /// <value>
+    ///     The subdomain name for this event, or <c>null</c> to use the namespace convention.
+    ///     When <c>null</c> or empty, the subdomain is resolved from the segment of the event's
+    ///     namespace immediately preceding a <c>Contracts</c> segment
+    ///     (e.g., <c>AppDomain.Cashiers.Contracts.IntegrationEvents</c> → <c>Cashiers</c>).
+    /// </value>
+    public string? Subdomain { get; } = subdomain;
 
     /// <summary>
     ///     Event major version (Default: 'v1')
@@ -73,8 +84,8 @@ public class EventTopicAttribute(string topic, string? domain = null, string ver
 /// </code>
 /// </example>
 [AttributeUsage(AttributeTargets.Class)]
-public class EventTopicAttribute<TEntity>(string? domain = null, string? topic = null, string version = "v1")
-    : EventTopicAttribute(topic: topic ?? typeof(TEntity).Name.ToKebabCase(), domain: domain, version: version)
+public class EventTopicAttribute<TEntity>(string? domain = null, string? subdomain = null, string? topic = null, string version = "v1")
+    : EventTopicAttribute(topic: topic ?? typeof(TEntity).Name.ToKebabCase(), domain: domain, subdomain: subdomain, version: version)
 {
     public override bool ShouldPluralizeTopicName { get; } = string.IsNullOrEmpty(topic);
 }

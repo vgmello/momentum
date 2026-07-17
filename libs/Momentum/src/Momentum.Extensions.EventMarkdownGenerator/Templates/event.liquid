@@ -5,18 +5,17 @@ editLink: false
 <!-- // @formatter:off -->
 <!-- prettier-ignore -->
 
-# {{ event.EventName }}
+# {{ event.EventName }} <Badge type="{% if event.IsObsolete %}danger{% else %}tip{% endif %}" text="{{ event.Status }}" />
 
 {% if event.IsObsolete -%}
     > [!CAUTION]
     > This event is deprecated. {{ event.ObsoleteMessage | default: "Use alternative event instead." }}
 
 {% endif -%}
-- **Status:** {{ event.Status }}
-- **Domain:** {{ event.Domain }}
+- **Domain:** {{ event.Domain }}{% if event.Subdomain %}.{{ event.Subdomain }}{% endif %}
 - **Version:** {{ event.Version }}
-{% if event.Entity -%}
-- **Entity:** `{{ event.Entity | downcase }}`
+{% if event.Entity != empty -%}
+- **Entity:** {% if event.EntitySchemaLink %}[{{ event.Entity }}](/events/schemas/{{ event.EntitySchemaLink }}){% else %}`{{ event.Entity }}`{% endif %}
 {% endif -%}
 - **Type:** {% if event.IsInternal %}Domain Event{% else %}Integration Event{% endif %}
 - **Topic:** `{{ event.Topic }}`
@@ -92,9 +91,3 @@ This event uses multiple partition keys for message routing:
 - **Event Slug:** `{{ event.EventNameKebab }}`
 - **Namespace:** `{{ event.Namespace }}`
 - **Topic Attribute:** `{{ event.TopicAttributeDisplayName }}`
-{% if event.AttributeProperties.size > 0 -%}
-- **Attribute Properties:**
-{% for entry in event.AttributeProperties -%}
-    - `{{ entry.Key }}`: {% if entry.Value == "" %}*(empty)*{% else %}`{{ entry.Value }}`{% endif %}
-{% endfor -%}
-{% endif -%}

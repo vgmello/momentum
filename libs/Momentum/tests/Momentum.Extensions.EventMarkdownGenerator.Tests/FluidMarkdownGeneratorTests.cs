@@ -296,8 +296,10 @@ public class FluidMarkdownGeneratorTests
 
             // Every scalar EventMetadata property the generator can render has a distinct marker value
             // above. EventType/TopicAttribute are excluded: they're reflected *sources* (their data
-            // surfaces through EventTypeName/FullTypeName and TopicAttributeDisplayName/AttributeProperties
-            // respectively), not values rendered verbatim themselves.
+            // surfaces through EventTypeName/FullTypeName and TopicAttributeDisplayName respectively),
+            // not values rendered verbatim themselves. AttributeProperties is also excluded: the default
+            // template intentionally doesn't render it (it exists for custom templates that need access to
+            // non-well-known attribute properties), so no marker value from it reaches rendered content.
             result.Content.ShouldContain("MarkerEventName");
             result.Content.ShouldContain("MarkerEventTypeName");
             result.Content.ShouldContain("marker-event-name-kebab");
@@ -308,8 +310,6 @@ public class FluidMarkdownGeneratorTests
             result.Content.ShouldContain("MarkerDomain");
             result.Content.ShouldContain("v7");
             result.Content.ShouldContain("MarkerObsoleteMessage");
-            result.Content.ShouldContain("MarkerAttributeKey");
-            result.Content.ShouldContain("MarkerAttributeValue");
             result.Content.ShouldContain("MarkerPropertyName");
             result.Content.ShouldContain("MarkerPropertyTypeName");
             result.Content.ShouldContain("MarkerPropertyDescription");
@@ -343,6 +343,47 @@ public class FluidMarkdownGeneratorTests
         {
             Directory.Delete(outputDir, true);
         }
+    }
+
+    [Fact]
+    public void CreateEventModel_WhenEntityTypeHasGeneratedSchema_LinksEntityToSchemaPage()
+    {
+        var eventType = typeof(TestEvent);
+        var topicAttribute = eventType.GetCustomAttributes(false).First(a => a.GetType().Name.Contains("EventTopic"));
+
+        var metadata = new EventMetadata
+        {
+            EventName = "TestEvent",
+            EventNameKebab = "test-event",
+            EventTypeName = eventType.Name,
+            FullTypeName = eventType.FullName!,
+            Namespace = eventType.Namespace!,
+            Topic = "tests",
+            FullyQualifiedTopicName = "test.tests.v1",
+            Domain = "Tests",
+            Version = "v1",
+            IsInternal = false,
+            Entity = "TestSchemaType",
+            EntityType = typeof(TestSchemaType),
+            TopicAttribute = (Attribute)topicAttribute
+        };
+
+        var documentation = new EventDocumentation { Summary = string.Empty };
+
+        // Entity type is among the generated schema types: link.
+        var linkedModel = EventViewModelFactory.CreateEventModel(metadata, documentation,
+            schemaTypes: new HashSet<Type> { typeof(TestSchemaType) });
+        linkedModel.EntitySchemaLink.ShouldBe($"{typeof(TestSchemaType).FullName}.md");
+
+        // Entity type is NOT among the generated schema types (e.g. never referenced as a complex-type
+        // property anywhere): no link, would 404.
+        var unlinkedModel = EventViewModelFactory.CreateEventModel(metadata, documentation,
+            schemaTypes: new HashSet<Type> { typeof(AnotherSchemaType) });
+        unlinkedModel.EntitySchemaLink.ShouldBeNull();
+
+        // No schemaTypes set at all: no link.
+        var noSchemaTypesModel = EventViewModelFactory.CreateEventModel(metadata, documentation);
+        noSchemaTypesModel.EntitySchemaLink.ShouldBeNull();
     }
 
     [Fact]

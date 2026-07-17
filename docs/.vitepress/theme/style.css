@@ -1,0 +1,35 @@
+/**
+ * Widen the overall page frame and the doc content column beyond VitePress defaults.
+ */
+
+:root {
+    --vp-layout-max-width: 1640px;
+}
+
+@media (min-width: 1440px) {
+    #VPContent .VPDoc:not(.has-sidebar) .container {
+        max-width: 1600px;
+    }
+
+    #VPContent .VPDoc:not(.has-sidebar) .content {
+        max-width: 1200px;
+    }
+
+    #VPContent .VPDoc .container {
+        max-width: 1600px;
+    }
+}
+
+#VPContent .VPDoc.has-aside .content-container {
+    max-width: 900px;
+}
+
+/**
+ * VitePress's article typography (.vp-doc p) sets its own line-height on <p> tags,
+ * which leaks into the <p> mermaid injects inside node-label foreignObjects. Mermaid
+ * sizes each label's foreignObject using its own line-height (1.5), so the taller
+ * inherited line-height overflows and clips multi-line labels. Reset it back.
+ */
+.vp-doc svg[id^="mermaid-"] foreignObject p {
+    line-height: 1.5 !important;
+}

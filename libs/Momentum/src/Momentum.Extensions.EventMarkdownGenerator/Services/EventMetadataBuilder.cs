@@ -15,7 +15,8 @@ namespace Momentum.Extensions.EventMarkdownGenerator.Services;
 public static class EventMetadataBuilder
 {
     public static EventMetadata Build(Type eventType, string defaultDomain, XmlDocumentationParser? xmlParser,
-        PayloadSizeCalculator calculator, string attributeNamePrefix, string partitionKeyAttributeNamePrefix)
+        PayloadSizeCalculator calculator, string attributeNamePrefix, string partitionKeyAttributeNamePrefix,
+        bool emitPublicVisibility = false)
     {
         // Use dynamic attribute handling to work across assembly contexts
         var topicAttribute = GetEventTopicAttributeDynamic(eventType, attributeNamePrefix);
@@ -29,6 +30,7 @@ public static class EventMetadataBuilder
         var topic = TypeUtils.GetPropertyValue<string?>(attrType, topicAttribute, "Topic");
         var shouldPluralize = TypeUtils.GetPropertyValue<bool?>(attrType, topicAttribute, "ShouldPluralizeTopicName") ?? false;
         var domain = TypeUtils.GetPropertyValue<string?>(attrType, topicAttribute, "Domain");
+        var subdomain = TypeUtils.GetPropertyValue<string?>(attrType, topicAttribute, "Subdomain");
         var isInternal = TypeUtils.GetPropertyValue<bool?>(attrType, topicAttribute, "Internal") ?? false;
         var version = TypeUtils.GetPropertyValue<string?>(attrType, topicAttribute, "Version") ?? "v1";
         var eventNameOverride = TypeUtils.GetPropertyValue<string?>(attrType, topicAttribute, "EventName");
@@ -44,16 +46,35 @@ public static class EventMetadataBuilder
             topicName = topicName.Pluralize();
         }
 
-        var eventDomain = !string.IsNullOrWhiteSpace(domain)
-            ? domain
-            : GetDomainFromNamespace(eventType.Namespace) ?? defaultDomain;
+        var eventDomain = !string.IsNullOrWhiteSpace(domain) ? domain : defaultDomain;
 
-        // Build full topic name: {domain}.{visibility}.{topic}.{version}
-        var visibility = isInternal ? "internal" : "public";
+        var eventSubdomain = !string.IsNullOrWhiteSpace(subdomain)
+            ? subdomain
+            : GetSubdomainFromNamespace(eventType.Namespace);
 
-        var fullTopicName = $"{eventDomain.ToKebabCase()}.{visibility}.{topicName}.{version}";
+        // Build full topic name: {visibility}.{domain}.{subdomain}.{topic}.{version}
+        // Internal events always render the "internal" segment. Public events only render "public"
+        // when explicitly requested (emitPublicVisibility); otherwise the segment is omitted entirely.
+        string? visibilitySegment = null;
+
+        if (isInternal)
+            visibilitySegment = "internal";
+        else if (emitPublicVisibility)
+            visibilitySegment = "public";
+
+        var segments = new List<string?>
+        {
+            visibilitySegment,
+            eventDomain.ToKebabCase(),
+            eventSubdomain?.ToKebabCase(),
+            topicName,
+            version
+        };
+
+        var fullTopicName = string.Join('.', segments.Where(s => !string.IsNullOrEmpty(s)));
 
         var eventName = !string.IsNullOrWhiteSpace(eventNameOverride) ? eventNameOverride : eventType.Name;
+        var (entityName, entityType) = GetEntity(attrType, eventType);
 
         return new EventMetadata
         {
@@ -65,10 +86,12 @@ public static class EventMetadataBuilder
             Topic = topicName,
             FullyQualifiedTopicName = fullTopicName,
             Domain = eventDomain,
+            Subdomain = eventSubdomain,
             Version = version,
             IsInternal = isInternal,
             TopicAttribute = topicAttribute,
-            Entity = GetEntity(attrType, eventType),
+            Entity = entityName,
+            EntityType = entityType,
             AttributeProperties = GetAttributeProperties(topicAttribute),
             Properties = properties,
             PartitionKeys = partitionKeys,
@@ -107,30 +130,41 @@ public static class EventMetadataBuilder
     [
         "Created", "Updated", "Deleted", "Cancelled", "Canceled", "Completed", "Processed", "Published",
         "Received", "Generated", "Activated", "Deactivated", "Registered", "Requested", "Approved",
-        "Rejected", "Started", "Finished", "Changed", "Removed", "Added", "Modified"
+        "Rejected", "Started", "Finished", "Ended", "Changed", "Removed", "Added", "Modified", "Opened",
+        "Closed", "Failed", "Succeeded", "Expired", "Confirmed", "Submitted", "Scheduled"
     ];
 
     /// <summary>
-    ///     Kebab-cases the entity type argument on a generic topic attribute (e.g.
-    ///     <c>EventTopicAttribute&lt;Cashier&gt;</c> yields "cashier"). When the attribute isn't generic
-    ///     (no TEntity to reflect), falls back to stripping a common event-verb suffix from the event
-    ///     type's own name (e.g. "CashierCreated" yields "cashier"); if no known suffix matches, empty.
+    ///     Resolves the PascalCase entity name and, when available, the reflectable entity <see cref="Type"/> —
+    ///     the type argument of a generic topic attribute (e.g. <c>EventTopicAttribute&lt;Cashier&gt;</c> yields
+    ///     ("Cashier", typeof(Cashier))). When the attribute isn't generic (no TEntity to reflect), falls back to
+    ///     stripping a common event-verb suffix from the event type's own name (e.g. "CashierCreated" yields
+    ///     "Cashier", with no corresponding Type). A trailing "Event" word is trimmed first, before suffix
+    ///     matching, so e.g. "OrderCompletedEvent" still yields "Order" rather than failing to match "Completed"
+    ///     against "OrderCompletedEvent". If no known suffix matches, falls back further to the event type's own
+    ///     name (with the trailing "Event" word, if any, still trimmed) — e.g. "BusinessDayReported" with no
+    ///     matching suffix yields "BusinessDayReported", and "WidgetEvent" yields "Widget". Still with no
+    ///     corresponding Type in either fallback case.
     /// </summary>
-    private static string GetEntity(Type attrType, Type eventType)
+    private static (string Name, Type? Type) GetEntity(Type attrType, Type eventType)
     {
         if (attrType.IsGenericType)
         {
             var genericArgs = attrType.GetGenericArguments();
 
             if (genericArgs.Length > 0)
-                return genericArgs[0].Name.ToKebabCase();
+                return (genericArgs[0].Name, genericArgs[0]);
         }
 
         var typeName = eventType.Name;
+
+        if (typeName.Length > "Event".Length && typeName.EndsWith("Event", StringComparison.Ordinal))
+            typeName = typeName[..^"Event".Length];
+
         var suffix = CommonEventNameSuffixes.FirstOrDefault(s =>
             typeName.Length > s.Length && typeName.EndsWith(s, StringComparison.Ordinal));
 
-        return suffix != null ? typeName[..^suffix.Length].ToKebabCase() : string.Empty;
+        return (suffix != null ? typeName[..^suffix.Length] : typeName, null);
     }
 
     private static Attribute GetEventTopicAttributeDynamic(Type type, string attributeNamePrefix)
@@ -145,7 +179,7 @@ public static class EventMetadataBuilder
         return foundAttribute;
     }
 
-    private static string? GetDomainFromNamespace(string? namespaceName)
+    private static string? GetSubdomainFromNamespace(string? namespaceName)
     {
         if (string.IsNullOrEmpty(namespaceName))
             return null;
@@ -156,11 +190,6 @@ public static class EventMetadataBuilder
 
         var contractsIndex = Array.LastIndexOf(parts, "Contracts");
 
-        if (contractsIndex > 0)
-        {
-            return parts[contractsIndex - 1];
-        }
-
-        return parts[0];
+        return contractsIndex > 0 ? parts[contractsIndex - 1] : null;
     }
 }
