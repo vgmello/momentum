@@ -21,10 +21,10 @@ public class UpdateCashierCommandHandlerTests
         messagingMock.InvokeCommandAsync(Arg.Any<UpdateCashierCommandHandler.DbCommand>(), Arg.Any<CancellationToken>())
             .Returns(x => new CashierEntity
             {
-                TenantId = ((UpdateCashierCommandHandler.DbCommand)x[0]).TenantId,
-                CashierId = ((UpdateCashierCommandHandler.DbCommand)x[0]).CashierId,
-                Name = ((UpdateCashierCommandHandler.DbCommand)x[0]).Name,
-                Email = ((UpdateCashierCommandHandler.DbCommand)x[0]).Email,
+                TenantId = x.ArgAt<UpdateCashierCommandHandler.DbCommand>(0).TenantId,
+                CashierId = x.ArgAt<UpdateCashierCommandHandler.DbCommand>(0).CashierId,
+                Name = x.ArgAt<UpdateCashierCommandHandler.DbCommand>(0).Name,
+                Email = x.ArgAt<UpdateCashierCommandHandler.DbCommand>(0).Email,
                 CreatedDateUtc = DateTime.UtcNow,
                 UpdatedDateUtc = DateTime.UtcNow,
                 Version = 2 // Version should be incremented after update
@@ -99,9 +99,9 @@ public class UpdateCashierCommandHandlerTests
         messagingMock.InvokeCommandAsync(Arg.Any<UpdateCashierCommandHandler.DbCommand>(), Arg.Any<CancellationToken>())
             .Returns(x => new CashierEntity
             {
-                TenantId = ((UpdateCashierCommandHandler.DbCommand)x[0]).TenantId,
-                CashierId = ((UpdateCashierCommandHandler.DbCommand)x[0]).CashierId,
-                Name = ((UpdateCashierCommandHandler.DbCommand)x[0]).Name,
+                TenantId = x.ArgAt<UpdateCashierCommandHandler.DbCommand>(0).TenantId,
+                CashierId = x.ArgAt<UpdateCashierCommandHandler.DbCommand>(0).CashierId,
+                Name = x.ArgAt<UpdateCashierCommandHandler.DbCommand>(0).Name,
                 Email = "Not Updated", // When email is null in command, it should remain unchanged (original value)
                 CreatedDateUtc = DateTime.UtcNow,
                 UpdatedDateUtc = DateTime.UtcNow,

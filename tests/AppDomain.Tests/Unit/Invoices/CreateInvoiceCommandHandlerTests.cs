@@ -21,14 +21,14 @@ public class CreateInvoiceCommandHandlerTests
         messagingMock.InvokeCommandAsync(Arg.Any<CreateInvoiceCommandHandler.DbCommand>(), Arg.Any<CancellationToken>())
             .Returns(x => new AppDomain.Invoices.Data.Entities.Invoice
             {
-                TenantId = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.TenantId,
-                InvoiceId = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.InvoiceId,
-                Name = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.Name,
+                TenantId = x.ArgAt<CreateInvoiceCommandHandler.DbCommand>(0).Invoice.TenantId,
+                InvoiceId = x.ArgAt<CreateInvoiceCommandHandler.DbCommand>(0).Invoice.InvoiceId,
+                Name = x.ArgAt<CreateInvoiceCommandHandler.DbCommand>(0).Invoice.Name,
                 Status = nameof(InvoiceStatus.Draft),
-                Amount = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.Amount,
-                Currency = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.Currency,
-                DueDate = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.DueDate,
-                CashierId = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.CashierId,
+                Amount = x.ArgAt<CreateInvoiceCommandHandler.DbCommand>(0).Invoice.Amount,
+                Currency = x.ArgAt<CreateInvoiceCommandHandler.DbCommand>(0).Invoice.Currency,
+                DueDate = x.ArgAt<CreateInvoiceCommandHandler.DbCommand>(0).Invoice.DueDate,
+                CashierId = x.ArgAt<CreateInvoiceCommandHandler.DbCommand>(0).Invoice.CashierId,
                 CreatedDateUtc = DateTime.UtcNow,
                 UpdatedDateUtc = DateTime.UtcNow,
                 Version = 1 // Initial version for new entity
@@ -81,14 +81,14 @@ public class CreateInvoiceCommandHandlerTests
         messagingMock.InvokeCommandAsync(Arg.Any<CreateInvoiceCommandHandler.DbCommand>(), Arg.Any<CancellationToken>())
             .Returns(x => new AppDomain.Invoices.Data.Entities.Invoice
             {
-                TenantId = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.TenantId,
-                InvoiceId = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.InvoiceId,
-                Name = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.Name,
+                TenantId = x.ArgAt<CreateInvoiceCommandHandler.DbCommand>(0).Invoice.TenantId,
+                InvoiceId = x.ArgAt<CreateInvoiceCommandHandler.DbCommand>(0).Invoice.InvoiceId,
+                Name = x.ArgAt<CreateInvoiceCommandHandler.DbCommand>(0).Invoice.Name,
                 Status = nameof(InvoiceStatus.Draft),
-                Amount = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.Amount,
-                Currency = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.Currency,
-                DueDate = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.DueDate,
-                CashierId = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.CashierId,
+                Amount = x.ArgAt<CreateInvoiceCommandHandler.DbCommand>(0).Invoice.Amount,
+                Currency = x.ArgAt<CreateInvoiceCommandHandler.DbCommand>(0).Invoice.Currency,
+                DueDate = x.ArgAt<CreateInvoiceCommandHandler.DbCommand>(0).Invoice.DueDate,
+                CashierId = x.ArgAt<CreateInvoiceCommandHandler.DbCommand>(0).Invoice.CashierId,
                 CreatedDateUtc = DateTime.UtcNow,
                 UpdatedDateUtc = DateTime.UtcNow,
                 Version = 1 // Initial version for new entity
@@ -117,14 +117,14 @@ public class CreateInvoiceCommandHandlerTests
         messagingMock.InvokeCommandAsync(Arg.Any<CreateInvoiceCommandHandler.DbCommand>(), Arg.Any<CancellationToken>())
             .Returns(x => new AppDomain.Invoices.Data.Entities.Invoice
             {
-                TenantId = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.TenantId,
-                InvoiceId = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.InvoiceId,
-                Name = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.Name,
+                TenantId = x.ArgAt<CreateInvoiceCommandHandler.DbCommand>(0).Invoice.TenantId,
+                InvoiceId = x.ArgAt<CreateInvoiceCommandHandler.DbCommand>(0).Invoice.InvoiceId,
+                Name = x.ArgAt<CreateInvoiceCommandHandler.DbCommand>(0).Invoice.Name,
                 Status = nameof(InvoiceStatus.Draft),
-                Amount = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.Amount,
-                Currency = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.Currency,
-                DueDate = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.DueDate,
-                CashierId = ((CreateInvoiceCommandHandler.DbCommand)x[0]).Invoice.CashierId,
+                Amount = x.ArgAt<CreateInvoiceCommandHandler.DbCommand>(0).Invoice.Amount,
+                Currency = x.ArgAt<CreateInvoiceCommandHandler.DbCommand>(0).Invoice.Currency,
+                DueDate = x.ArgAt<CreateInvoiceCommandHandler.DbCommand>(0).Invoice.DueDate,
+                CashierId = x.ArgAt<CreateInvoiceCommandHandler.DbCommand>(0).Invoice.CashierId,
                 CreatedDateUtc = DateTime.UtcNow,
                 UpdatedDateUtc = DateTime.UtcNow,
                 Version = 1 // Initial version for new entity

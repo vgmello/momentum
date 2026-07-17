@@ -4,6 +4,21 @@ All notable changes to this project are documented in this file, grouped by date
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2026-07-17]
+
+### Changed
+
+- **Deps**: bumped `NSubstitute` from `5.3.0` to `6.0.0` (major). Fixed three test files
+  (`CreateCashierCommandHandlerTests`, `UpdateCashierCommandHandlerTests`, `CreateInvoiceCommandHandlerTests`)
+  that cast `CallInfo`'s indexer directly (`(T)x[0]`), which no longer compiles under 6.0's nullable-annotated
+  public API — switched to the null-safe `x.ArgAt<T>(0)` extension instead.
+
+### Skipped
+
+- **Deps**: `Refitter.MSBuild` `2.0.0` → `2.1.0` was left in place — 2.1.0 refactored the MSBuild task itself
+  (upstream decoupled the CLI binary from the task) and fails code generation locally with
+  `MissingMethodException: System.Text.ValueStringBuilder.AsSpan()`. Needs an upstream fix before retrying.
+
 ## [2026-07-16]
 
 ### Changed

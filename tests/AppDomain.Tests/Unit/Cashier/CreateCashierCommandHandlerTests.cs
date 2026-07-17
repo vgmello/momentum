@@ -18,10 +18,10 @@ public class CreateCashierCommandHandlerTests
         messagingMock.InvokeCommandAsync(Arg.Any<CreateCashierCommandHandler.DbCommand>(), Arg.Any<CancellationToken>())
             .Returns(x => new AppDomain.Cashiers.Data.Entities.Cashier
             {
-                TenantId = ((CreateCashierCommandHandler.DbCommand)x[0]).Cashier.TenantId,
-                CashierId = ((CreateCashierCommandHandler.DbCommand)x[0]).Cashier.CashierId,
-                Name = ((CreateCashierCommandHandler.DbCommand)x[0]).Cashier.Name,
-                Email = ((CreateCashierCommandHandler.DbCommand)x[0]).Cashier.Email,
+                TenantId = x.ArgAt<CreateCashierCommandHandler.DbCommand>(0).Cashier.TenantId,
+                CashierId = x.ArgAt<CreateCashierCommandHandler.DbCommand>(0).Cashier.CashierId,
+                Name = x.ArgAt<CreateCashierCommandHandler.DbCommand>(0).Cashier.Name,
+                Email = x.ArgAt<CreateCashierCommandHandler.DbCommand>(0).Cashier.Email,
                 CreatedDateUtc = DateTime.UtcNow,
                 UpdatedDateUtc = DateTime.UtcNow,
                 Version = 12345 // Some mock xmin value
@@ -65,10 +65,10 @@ public class CreateCashierCommandHandlerTests
         messagingMock.InvokeCommandAsync(Arg.Any<CreateCashierCommandHandler.DbCommand>(), Arg.Any<CancellationToken>())
             .Returns(x => new AppDomain.Cashiers.Data.Entities.Cashier
             {
-                TenantId = ((CreateCashierCommandHandler.DbCommand)x[0]).Cashier.TenantId,
-                CashierId = ((CreateCashierCommandHandler.DbCommand)x[0]).Cashier.CashierId,
-                Name = ((CreateCashierCommandHandler.DbCommand)x[0]).Cashier.Name,
-                Email = ((CreateCashierCommandHandler.DbCommand)x[0]).Cashier.Email,
+                TenantId = x.ArgAt<CreateCashierCommandHandler.DbCommand>(0).Cashier.TenantId,
+                CashierId = x.ArgAt<CreateCashierCommandHandler.DbCommand>(0).Cashier.CashierId,
+                Name = x.ArgAt<CreateCashierCommandHandler.DbCommand>(0).Cashier.Name,
+                Email = x.ArgAt<CreateCashierCommandHandler.DbCommand>(0).Cashier.Email,
                 CreatedDateUtc = DateTime.UtcNow,
                 UpdatedDateUtc = DateTime.UtcNow,
                 Version = 12345 // Some mock xmin value
