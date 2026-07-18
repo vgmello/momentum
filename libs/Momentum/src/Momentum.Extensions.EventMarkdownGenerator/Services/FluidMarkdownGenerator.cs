@@ -59,7 +59,7 @@ public class FluidMarkdownGenerator
         var documentation = eventWithDoc.Documentation;
 
         var fileName = metadata.GetFileName();
-        var filePath = GenerateFilePath(outputDirectory, fileName);
+        var filePath = GenerateFilePath(outputDirectory, fileName, metadata.GetEventKindFolder());
 
         var context = new TemplateContext(TemplateOptions);
         var eventModel = EventViewModelFactory.CreateEventModel(metadata, documentation, options, schemaTypes);

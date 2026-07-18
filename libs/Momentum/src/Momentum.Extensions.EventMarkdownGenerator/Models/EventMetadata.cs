@@ -60,6 +60,16 @@ public record EventMetadata
     public string GetTypeNameFileName() => $"{FullTypeName.ToSafeFileName()}.md";
     public string GetFileName() => GetTypeNameFileName();
     public string GetStatus() => IsObsolete ? "Deprecated" : "Active";
+
+    /// <summary>
+    ///     The output subfolder this event's markdown belongs under: <c>domain_events</c> for events marked
+    ///     <c>Internal</c> on their topic attribute, <c>integration_events</c> otherwise. Reuses
+    ///     <see cref="IsInternal"/> (rather than inspecting the namespace for an
+    ///     IntegrationEvents/DomainEvents segment) so placement always matches the "Domain Events" sidebar
+    ///     grouping <see cref="Momentum.Extensions.EventMarkdownGenerator.Services.JsonSidebarGenerator"/>
+    ///     already produces from the same flag.
+    /// </summary>
+    public string GetEventKindFolder() => IsInternal ? "domain_events" : "integration_events";
 }
 
 public record EventPropertyMetadata

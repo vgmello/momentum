@@ -24,6 +24,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   `"orders"` + topic `"orders"` → `"orders.v1"` instead of `"orders.orders.v1"`); set to `false` to always
   keep both segments.
 
+### Changed
+
+- **EventMarkdownGenerator**: generated event docs now nest under `integration_events/`/`domain_events/`
+  subfolders instead of sitting flat in `docs/events/`, classified by the same `IsInternal` flag the
+  sidebar already groups "Domain Events" by (not by namespace text, which can disagree with it — e.g. an
+  event under an `IntegrationEvents` namespace but marked `Internal = true`). Sidebar links, the VitePress
+  fallback sidebar generator, and the static `integration_events.md` overview page all updated to match;
+  real `docs/events/` regenerated onto the new layout.
+
 ## [2026-07-17]
 
 ### Changed

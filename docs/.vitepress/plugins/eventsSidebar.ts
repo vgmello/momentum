@@ -21,29 +21,29 @@ const generateFallbackSidebar = (): DefaultTheme.SidebarItem[] => {
         return [{ text: 'Events', link: '/' }];
     }
 
-    const files = fs.readdirSync(eventsDir)
-        .filter(f => f.endsWith('.md') && !f.startsWith('index') && !f.startsWith('domain_events') && !f.startsWith('integration_events'));
+    // Events are generated into integration_events/ and domain_events/ subfolders (see
+    // EventMetadata.GetEventKindFolder in the generator) rather than flat alongside this directory, so
+    // each subfolder is scanned directly instead of a single non-recursive readdir.
+    const scanEventsSubfolder = (subfolder: string): DefaultTheme.SidebarItem[] => {
+        const subfolderDir = path.join(eventsDir, subfolder);
 
-    const integrationEvents: DefaultTheme.SidebarItem[] = [];
-    const domainEvents: DefaultTheme.SidebarItem[] = [];
-
-    for (const file of files) {
-        const name = file.replace('.md', '');
-        const parts = name.split('.');
-        const eventName = parts[parts.length - 1];
-        const isIntegration = name.includes('IntegrationEvents');
-
-        const item: DefaultTheme.SidebarItem = {
-            text: eventName,
-            link: `/${name}`
-        };
-
-        if (isIntegration) {
-            integrationEvents.push(item);
-        } else if (name.includes('DomainEvents')) {
-            domainEvents.push(item);
+        if (!fs.existsSync(subfolderDir)) {
+            return [];
         }
-    }
+
+        return fs.readdirSync(subfolderDir)
+            .filter(f => f.endsWith('.md'))
+            .map(file => {
+                const name = file.replace('.md', '');
+                const parts = name.split('.');
+                const eventName = parts[parts.length - 1];
+
+                return { text: eventName, link: `/${subfolder}/${name}` };
+            });
+    };
+
+    const integrationEvents = scanEventsSubfolder('integration_events');
+    const domainEvents = scanEventsSubfolder('domain_events');
 
     const items: DefaultTheme.SidebarItem[] = [
         { text: 'Overview', link: '/' }

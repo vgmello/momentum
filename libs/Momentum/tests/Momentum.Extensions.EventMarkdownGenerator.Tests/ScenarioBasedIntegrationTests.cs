@@ -133,8 +133,9 @@ public class ScenarioBasedIntegrationTests
             Directory.Exists(Path.Combine(scenarioFolder, "expected"))
                 .ShouldBeTrue($"Scenario '{scenarioName}' must have expected folder");
 
-            // Validate expected folder has at least one markdown file
-            var expectedFiles = Directory.GetFiles(Path.Combine(scenarioFolder, "expected"), "*.md");
+            // Validate expected folder has at least one markdown file (events now nest under
+            // integration_events/domain_events subfolders, so this must search recursively)
+            var expectedFiles = Directory.GetFiles(Path.Combine(scenarioFolder, "expected"), "*.md", SearchOption.AllDirectories);
             expectedFiles.Length.ShouldBeGreaterThan(0, $"Scenario '{scenarioName}' must have at least one expected .md file");
 
             // Validate optional config file structure
