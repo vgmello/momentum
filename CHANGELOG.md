@@ -29,6 +29,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   e.g. `docs/index.md`). The mismatch meant the directives were never recognized, so every default-generated
   project shipped these two overview pages with the raw markers leaking into the rendered output. Both files
   now use the `# #if` style already used elsewhere.
+- **Template README**: same `<!--#if -->` vs `# #if` mismatch as above also broke `ProjectREADME.md` (the
+  generated project's root `README.md`) and `src/AppDomain.Contracts/README.md` — every generated project's
+  README shipped with ~100 raw conditional-marker lines instead of the intended content. Converted both to
+  `# #if` style; verified default, `--no-sample`, and `--orleans` generations all render correctly with no
+  leftover markers.
 
 ### Added
 
