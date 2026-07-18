@@ -85,6 +85,12 @@ try {
         if (githubUrl) {
             log(`Using GitHub URL: ${githubUrl}`);
             args.push('--github-url', githubUrl);
+
+            // Verifies each guessed source link actually exists before publishing it (e.g. a type declared
+            // in a file that doesn't match its own name can't be found via reflection alone) rather than
+            // risk a confidently wrong link.
+            const sourceRoot = path.resolve('..', 'src');
+            args.push('--source-root', sourceRoot);
         } else {
             log('No GitHub URL found - links will use anchor references');
         }

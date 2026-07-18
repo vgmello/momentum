@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **EventMarkdownGenerator**: GitHub source links for generated events no longer guess wrong when a project
+  folder's name itself contains a dot (e.g. `AppDomain.BackOffice` was being split into
+  `AppDomain/BackOffice/...`) — the compiled assembly name is now used as the (unsplit) root segment. New
+  optional `--source-root` CLI flag additionally verifies the guessed file exists before emitting a link,
+  falling back to `#` otherwise (catches cases reflection can never resolve, e.g. a type colocated in a file
+  named after something else entirely).
+
 - **EventMarkdownGenerator**: `Pluralize()` no longer mangles past-tense/participle words (e.g.
   `"reservation-created"` → `"reservation-createds"`) — words ending in `-ed` are now left unchanged, except
   for a small set of genuine `-ed` nouns (`bed`, `seed`, `speed`, ...).

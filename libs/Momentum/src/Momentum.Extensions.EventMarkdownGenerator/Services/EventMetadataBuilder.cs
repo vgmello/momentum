@@ -98,6 +98,7 @@ public static class EventMetadataBuilder
             EventTypeName = eventType.Name,
             FullTypeName = eventType.FullName ?? eventType.Name,
             Namespace = eventType.Namespace ?? string.Empty,
+            AssemblyName = eventType.Assembly.GetName().Name ?? string.Empty,
             Topic = topicName,
             FullyQualifiedTopicName = fullTopicName,
             Domain = eventDomain,
