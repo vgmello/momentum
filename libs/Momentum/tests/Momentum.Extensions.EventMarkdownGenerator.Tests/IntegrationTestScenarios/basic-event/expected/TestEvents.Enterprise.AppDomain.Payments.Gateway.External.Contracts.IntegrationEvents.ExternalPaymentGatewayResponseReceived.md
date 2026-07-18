@@ -11,8 +11,8 @@ editLink: false
 - **Version:** v1
 - **Entity:** `ExternalPaymentGatewayResponseReceived`
 - **Type:** Integration Event
-- **Topic:** `external-payment-gateway-response-receiveds`
-- **Fully Qualified Topic:** `test-events.external.external-payment-gateway-response-receiveds.v1`
+- **Topic:** `external-payment-gateway-response-received`
+- **Fully Qualified Topic:** `test-events.external.external-payment-gateway-response-received.v1`
 - **Estimated Payload Size:** 55 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 

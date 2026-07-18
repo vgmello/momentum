@@ -11,8 +11,8 @@ editLink: false
 - **Version:** v1
 - **Entity:** `BulkDataProcessed`
 - **Type:** Integration Event
-- **Topic:** `bulk-data-processeds`
-- **Fully Qualified Topic:** `test-events.collections.bulk-data-processeds.v1`
+- **Topic:** `bulk-data-processed`
+- **Fully Qualified Topic:** `test-events.collections.bulk-data-processed.v1`
 - **Estimated Payload Size:** 399 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 

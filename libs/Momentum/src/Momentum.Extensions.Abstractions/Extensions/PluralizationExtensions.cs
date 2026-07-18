@@ -148,6 +148,13 @@ public static class PluralizationExtensions
         "volcano", "tornado", "mosquito", "domino", "mango"
     };
 
+    // Words ending in -ed that are genuine nouns, not past-tense/participle verb forms (e.g. "created",
+    // "processed") that shouldn't be pluralized at all — see ShouldPluralize.
+    private static readonly HashSet<string> EdEndingNouns = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "bed", "sled", "shed", "reed", "seed", "weed", "deed", "need", "feed", "speed", "breed", "creed", "greed"
+    };
+
     private static readonly HashSet<char> Vowels = ['a', 'e', 'i', 'o', 'u'];
 
     private static readonly HashSet<string> PluralIndicatingSuffixes = new(StringComparer.OrdinalIgnoreCase)
@@ -278,8 +285,21 @@ public static class PluralizationExtensions
         if (UncountableNouns.Contains(word))
             return false;
 
+        // Check if it looks like a past-tense verb/participle rather than a noun (e.g. "created",
+        // "order-completed") — pluralizing those produces nonsense like "createds". A trailing hyphenated
+        // segment still matches, since EndsWith only looks at the tail of the string.
+        if (LooksLikePastParticiple(word))
+            return false;
+
         return !IsPluralByRules(word);
     }
+
+    /// <summary>
+    ///     Heuristic: a word ending in "-ed" is treated as a past-tense verb/participle, not a pluralizable
+    ///     noun, unless it's one of the handful of genuine short "-ed" nouns (bed, seed, speed, ...).
+    /// </summary>
+    private static bool LooksLikePastParticiple(string word) =>
+        word.Length > 2 && word.EndsWith("ed", StringComparison.OrdinalIgnoreCase) && !EdEndingNouns.Contains(word);
 
     private static bool IsPluralByRules(string word)
     {
