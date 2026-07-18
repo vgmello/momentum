@@ -29,12 +29,17 @@ public static class EventMetadataBuilder
         // Access properties via reflection for cross-assembly compatibility
         var attrType = topicAttribute.GetType();
         var topic = TypeUtils.GetPropertyValue<string?>(attrType, topicAttribute, "Topic");
+
+        // Behavior flags shaping how the topic segment is derived/rendered, not raw metadata values.
         var shouldPluralize = TypeUtils.GetPropertyValue<bool?>(attrType, topicAttribute, "ShouldPluralizeTopicName") ?? true;
+        var collapseTopicOnDomain = TypeUtils.GetPropertyValue<bool?>(attrType, topicAttribute, "CollapseTopicOnDomain") ?? true;
+
         var domain = TypeUtils.GetPropertyValue<string?>(attrType, topicAttribute, "Domain");
         var subdomain = TypeUtils.GetPropertyValue<string?>(attrType, topicAttribute, "Subdomain");
         var isInternal = TypeUtils.GetPropertyValue<bool?>(attrType, topicAttribute, "Internal") ?? false;
         var version = TypeUtils.GetPropertyValue<string?>(attrType, topicAttribute, "Version") ?? "v1";
         var eventNameOverride = TypeUtils.GetPropertyValue<string?>(attrType, topicAttribute, "EventName");
+
         var eventName = !string.IsNullOrWhiteSpace(eventNameOverride) ? eventNameOverride : eventType.Name;
         var eventNameKebab = eventName.ToKebabCase();
 
@@ -42,12 +47,7 @@ public static class EventMetadataBuilder
 
         // topicIsExplicit just picks which string is used: the attribute's own Topic when non-empty,
         // otherwise the entity name.
-        //
-        // Pluralization is a separate concern, driven purely by the shouldPluralize flag read above from
-        // ShouldPluralizeTopicName, which defaults to true when an attribute doesn't declare it at all.
-        // It applies to whichever string got selected, explicit or not.
         var topicIsExplicit = !string.IsNullOrEmpty(topic);
-
         var topicName = topicIsExplicit ? topic! : entityName.ToKebabCase();
 
         if (shouldPluralize && !topicName.EndsWith("s", StringComparison.OrdinalIgnoreCase))
@@ -74,16 +74,11 @@ public static class EventMetadataBuilder
         var domainPath = string.Join('.',
             new[] { eventDomain.ToKebabCase(), eventSubdomain?.ToKebabCase() }.Where(s => !string.IsNullOrEmpty(s)));
 
-        // An auto-derived topic (entity name, pluralized) can collide with the domain/subdomain path itself —
-        // e.g. domain "orders" with no subdomain and entity "Order" both kebab to "orders". In that case skip
-        // re-appending the topic segment rather than emitting a redundant "orders.orders". An explicit Topic
-        // is never collapsed this way, even if it happens to match the domain path.
-        //
-        // topicIsExplicit alone isn't enough here: EventTopicAttribute<T> always pre-fills Topic to the
-        // kebab-cased entity name even when its own topic ctor argument was omitted, so a non-empty Topic
-        // doesn't necessarily mean the caller chose it — shouldPluralize is what actually signals that.
-        var topicIsAutoDerived = !topicIsExplicit || shouldPluralize;
-        var topicDuplicatesDomainPath = topicIsAutoDerived && string.Equals(topicName, domainPath, StringComparison.OrdinalIgnoreCase);
+        // A topic that exactly matches the domain[.subdomain] path would otherwise produce a redundant
+        // segment (e.g. domain "orders" + topic "orders" -> "orders.orders.v1"). CollapseTopicOnDomain
+        // (read above, default true) controls whether that segment is dropped; set it to false on the
+        // attribute to always keep both segments even when they duplicate each other.
+        var topicDuplicatesDomainPath = collapseTopicOnDomain && string.Equals(topicName, domainPath, StringComparison.OrdinalIgnoreCase);
 
         var segments = new List<string?>
         {

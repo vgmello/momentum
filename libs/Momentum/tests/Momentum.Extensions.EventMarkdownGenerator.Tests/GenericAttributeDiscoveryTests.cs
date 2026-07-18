@@ -24,6 +24,7 @@ public class GenericAttributeDiscoveryTests
         public bool Internal { get; init; }
         public string? Topic { get; init; }
         public string? EventName { get; init; }
+        public bool CollapseTopicOnDomain { get; init; } = true;
     }
 
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter)]
@@ -113,6 +114,51 @@ public class GenericAttributeDiscoveryTests
         orderApproved.Entity.ShouldBe("Order");
         orderApproved.Topic.ShouldBe("orders");
         orderApproved.FullyQualifiedTopicName.ShouldBe("orders.v1");
+    }
+
+    [ConventionEventTopic(Domain = "orders", Topic = "orders")]
+    public record OrderRefunded(Guid OrderId);
+
+    [Fact]
+    public void DiscoverEvents_WithExplicitTopicMatchingDomain_CollapsesByDefault()
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+
+        var events = AssemblyEventDiscovery.DiscoverEvents(
+            assembly,
+            xmlParser: null,
+            PayloadSizeCalculator.Create("json"),
+            attributeNamePrefix: nameof(ConventionEventTopicAttribute)).Select(e => e.Metadata).ToList();
+
+        var orderRefunded = events.Single(e => e.FullTypeName == typeof(OrderRefunded).FullName);
+
+        // CollapseTopicOnDomain defaults to true regardless of whether Topic was explicit or auto-derived
+        // from the entity — here it's explicit ("orders") and still collapses because it matches the
+        // domain path exactly.
+        orderRefunded.Topic.ShouldBe("orders");
+        orderRefunded.FullyQualifiedTopicName.ShouldBe("orders.v1");
+    }
+
+    [ConventionEventTopic(Domain = "orders", Topic = "orders", CollapseTopicOnDomain = false)]
+    public record OrderIssued(Guid OrderId);
+
+    [Fact]
+    public void DiscoverEvents_WithCollapseTopicOnDomainFalse_KeepsDuplicateSegment()
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+
+        var events = AssemblyEventDiscovery.DiscoverEvents(
+            assembly,
+            xmlParser: null,
+            PayloadSizeCalculator.Create("json"),
+            attributeNamePrefix: nameof(ConventionEventTopicAttribute)).Select(e => e.Metadata).ToList();
+
+        var orderIssued = events.Single(e => e.FullTypeName == typeof(OrderIssued).FullName);
+
+        // Explicitly opting out (CollapseTopicOnDomain = false) keeps both segments even though topic and
+        // domain are identical — the caller's choice always wins over the default.
+        orderIssued.Topic.ShouldBe("orders");
+        orderIssued.FullyQualifiedTopicName.ShouldBe("orders.orders.v1");
     }
 
     [ConventionEventTopic(Domain = "commerce", Subdomain = "orders")]
