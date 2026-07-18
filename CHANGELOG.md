@@ -23,6 +23,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **EventMarkdownGenerator**: 22 event-doc scenario baselines regenerated to drop the bad pluralization they
   had baked in (`payment-processeds` → `payment-processed`, etc); `docs/events/events-sidebar.json`
   duplicate entries removed as a byproduct of regeneration.
+- **Template docs**: `docs/events/domain_events.md` and `integration_events.md` used HTML-comment-style
+  `<!--#if (INCLUDE_SAMPLE) -->` conditional markers, but `.template.config/template.json` configures `.md`
+  conditional processing for shell-style `# #if` / `# #endif` syntax (matching the rest of the repo's docs,
+  e.g. `docs/index.md`). The mismatch meant the directives were never recognized, so every default-generated
+  project shipped these two overview pages with the raw markers leaking into the rendered output. Both files
+  now use the `# #if` style already used elsewhere.
 
 ### Added
 
