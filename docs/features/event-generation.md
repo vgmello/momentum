@@ -54,13 +54,19 @@ The system generates a structured documentation layout:
 
 ```
 docs/events/
-├── AppDomain.Cashiers.Contracts.IntegrationEvents.CashierCreated.md
-├── AppDomain.Invoices.Contracts.IntegrationEvents.InvoiceCreated.md
+├── integration_events/
+│   ├── AppDomain.Cashiers.Contracts.IntegrationEvents.CashierCreated.md
+│   └── AppDomain.Invoices.Contracts.IntegrationEvents.InvoiceCreated.md
+├── domain_events/
+│   └── AppDomain.Invoices.Contracts.DomainEvents.InvoiceGenerated.md
 ├── schemas/
 │   ├── AppDomain.Cashiers.Contracts.Models.Cashier.md
 │   └── AppDomain.Invoices.Contracts.Models.Invoice.md
 └── events-sidebar.json
 ```
+
+Events are split into `integration_events/` and `domain_events/` based on whether their `EventTopic`
+attribute sets `Internal = true` (domain events) or not (integration events).
 
 ## Liquid Templating Capabilities
 

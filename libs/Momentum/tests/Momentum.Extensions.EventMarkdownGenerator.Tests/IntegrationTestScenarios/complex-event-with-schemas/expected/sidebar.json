@@ -9,7 +9,7 @@
         "items": [
           {
             "text": "Cashier Created",
-            "link": "/TestEvents.AppDomain.Cashiers.Contracts.IntegrationEvents.CashierCreated",
+            "link": "/integration_events/TestEvents.AppDomain.Cashiers.Contracts.IntegrationEvents.CashierCreated",
             "items": [],
             "collapsed": false
           }
@@ -22,7 +22,7 @@
         "items": [
           {
             "text": "Bulk Data Processed",
-            "link": "/TestEvents.AppDomain.Collections.Contracts.IntegrationEvents.BulkDataProcessed",
+            "link": "/integration_events/TestEvents.AppDomain.Collections.Contracts.IntegrationEvents.BulkDataProcessed",
             "items": [],
             "collapsed": false
           }
@@ -35,13 +35,13 @@
         "items": [
           {
             "text": "All Properties Showcase Event",
-            "link": "/TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents.AllPropertiesShowcaseEvent",
+            "link": "/domain_events/TestEvents.AppDomain.Comprehensive.Contracts.IntegrationEvents.AllPropertiesShowcaseEvent",
             "items": [],
             "collapsed": false
           },
           {
             "text": "Internal Audit Log Created",
-            "link": "/TestEvents.AppDomain.Internal.Audit.IntegrationEvents.InternalAuditLogCreated",
+            "link": "/domain_events/TestEvents.AppDomain.Internal.Audit.IntegrationEvents.InternalAuditLogCreated",
             "items": [],
             "collapsed": false
           }
@@ -54,7 +54,7 @@
         "items": [
           {
             "text": "Product Stock Updated",
-            "link": "/TestEvents.AppDomain.Inventory.Contracts.IntegrationEvents.ProductStockUpdated",
+            "link": "/integration_events/TestEvents.AppDomain.Inventory.Contracts.IntegrationEvents.ProductStockUpdated",
             "items": [],
             "collapsed": false
           }
@@ -67,7 +67,7 @@
         "items": [
           {
             "text": "Payment Processed",
-            "link": "/TestEvents.AppDomain.Legacy.Contracts.IntegrationEvents.PaymentProcessed",
+            "link": "/integration_events/TestEvents.AppDomain.Legacy.Contracts.IntegrationEvents.PaymentProcessed",
             "items": [],
             "collapsed": false
           }
@@ -80,7 +80,7 @@
         "items": [
           {
             "text": "Order Completed",
-            "link": "/TestEvents.AppDomain.Orders.Contracts.IntegrationEvents.OrderCompleted",
+            "link": "/integration_events/TestEvents.AppDomain.Orders.Contracts.IntegrationEvents.OrderCompleted",
             "items": [],
             "collapsed": false
           }
@@ -93,7 +93,7 @@
         "items": [
           {
             "text": "Payment Status Changed",
-            "link": "/TestEvents.AppDomain.Types.Contracts.IntegrationEvents.PaymentStatusChanged",
+            "link": "/integration_events/TestEvents.AppDomain.Types.Contracts.IntegrationEvents.PaymentStatusChanged",
             "items": [],
             "collapsed": false
           }
@@ -113,7 +113,7 @@
         "items": [
           {
             "text": "External Payment Gateway Response Received",
-            "link": "/TestEvents.Enterprise.AppDomain.Payments.Gateway.External.Contracts.IntegrationEvents.ExternalPaymentGatewayResponseReceived",
+            "link": "/integration_events/TestEvents.Enterprise.AppDomain.Payments.Gateway.External.Contracts.IntegrationEvents.ExternalPaymentGatewayResponseReceived",
             "items": [],
             "collapsed": false
           }
@@ -133,13 +133,13 @@
         "items": [
           {
             "text": "Minimal Event",
-            "link": "/TestEvents.Events.Core.IntegrationEvents.MinimalEvent",
+            "link": "/integration_events/TestEvents.Events.Core.IntegrationEvents.MinimalEvent",
             "items": [],
             "collapsed": false
           },
           {
             "text": "Simple Notification",
-            "link": "/TestEvents.Events.Core.IntegrationEvents.SimpleNotification",
+            "link": "/integration_events/TestEvents.Events.Core.IntegrationEvents.SimpleNotification",
             "items": [],
             "collapsed": false
           }
@@ -159,7 +159,7 @@
         "items": [
           {
             "text": "Node Relationship Created",
-            "link": "/TestEvents.Graph.Nodes.Contracts.IntegrationEvents.NodeRelationshipCreated",
+            "link": "/integration_events/TestEvents.Graph.Nodes.Contracts.IntegrationEvents.NodeRelationshipCreated",
             "items": [],
             "collapsed": false
           }
@@ -179,19 +179,19 @@
         "items": [
           {
             "text": "Empty Summary Event",
-            "link": "/TestEvents.Missing.Docs.IntegrationEvents.EmptySummaryEvent",
+            "link": "/integration_events/TestEvents.Missing.Docs.IntegrationEvents.EmptySummaryEvent",
             "items": [],
             "collapsed": false
           },
           {
             "text": "Malformed Xml Event",
-            "link": "/TestEvents.Missing.Docs.IntegrationEvents.MalformedXmlEvent",
+            "link": "/integration_events/TestEvents.Missing.Docs.IntegrationEvents.MalformedXmlEvent",
             "items": [],
             "collapsed": false
           },
           {
             "text": "Missing Param Docs Event",
-            "link": "/TestEvents.Missing.Docs.IntegrationEvents.MissingParamDocsEvent",
+            "link": "/integration_events/TestEvents.Missing.Docs.IntegrationEvents.MissingParamDocsEvent",
             "items": [],
             "collapsed": false
           }
@@ -204,7 +204,7 @@
         "items": [
           {
             "text": "Undocumented Event",
-            "link": "/TestEvents.Missing.Docs.IntegrationEvents.UndocumentedEvent",
+            "link": "/domain_events/TestEvents.Missing.Docs.IntegrationEvents.UndocumentedEvent",
             "items": [],
             "collapsed": false
           }
@@ -224,7 +224,7 @@
         "items": [
           {
             "text": "Invoice Generated",
-            "link": "/TestEvents.Platform.AppDomain.Invoices.Contracts.IntegrationEvents.InvoiceGenerated",
+            "link": "/integration_events/TestEvents.Platform.AppDomain.Invoices.Contracts.IntegrationEvents.InvoiceGenerated",
             "items": [],
             "collapsed": false
           }
@@ -237,7 +237,7 @@
         "items": [
           {
             "text": "Payment Processed",
-            "link": "/TestEvents.Platform.AppDomain.Payments.Contracts.IntegrationEvents.PaymentProcessed",
+            "link": "/integration_events/TestEvents.Platform.AppDomain.Payments.Contracts.IntegrationEvents.PaymentProcessed",
             "items": [],
             "collapsed": false
           }
@@ -250,13 +250,13 @@
         "items": [
           {
             "text": "Subscription Activated",
-            "link": "/TestEvents.Platform.Subscriptions.Contracts.IntegrationEvents.SubscriptionActivated",
+            "link": "/integration_events/TestEvents.Platform.Subscriptions.Contracts.IntegrationEvents.SubscriptionActivated",
             "items": [],
             "collapsed": false
           },
           {
             "text": "Subscription Cancelled",
-            "link": "/TestEvents.Platform.Subscriptions.Contracts.IntegrationEvents.SubscriptionCancelled",
+            "link": "/integration_events/TestEvents.Platform.Subscriptions.Contracts.IntegrationEvents.SubscriptionCancelled",
             "items": [],
             "collapsed": false
           }
@@ -269,13 +269,13 @@
         "items": [
           {
             "text": "User Created",
-            "link": "/TestEvents.Platform.Users.Contracts.IntegrationEvents.UserCreated",
+            "link": "/integration_events/TestEvents.Platform.Users.Contracts.IntegrationEvents.UserCreated",
             "items": [],
             "collapsed": false
           },
           {
             "text": "User Deleted",
-            "link": "/TestEvents.Platform.Users.Contracts.IntegrationEvents.UserDeleted",
+            "link": "/integration_events/TestEvents.Platform.Users.Contracts.IntegrationEvents.UserDeleted",
             "items": [],
             "collapsed": false
           }

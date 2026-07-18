@@ -210,7 +210,7 @@ public class IntegrationTests
         // Check that CashierCreated is in the Cashiers subsection
         var cashierCreatedItem = cashiersSubsection.Items[0];
         cashierCreatedItem.Text.ShouldBe("Cashier Created");
-        cashierCreatedItem.Link.ShouldBe($"/{cashierCreatedEvent!.Metadata.FullTypeName}");
+        cashierCreatedItem.Link.ShouldBe($"/integration_events/{cashierCreatedEvent!.Metadata.FullTypeName}");
 
         // Validate schemas section exists
         var schemasSection = sidebarItems.FirstOrDefault(s => s.Text == "Schemas");

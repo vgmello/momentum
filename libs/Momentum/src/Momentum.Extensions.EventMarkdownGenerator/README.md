@@ -87,6 +87,11 @@ events-docsgen [OPTIONS]
 - `-o|--output <OUTPUT>`: Output directory for generated documentation (default: `./docs/events/`)
 - `--sidebar-file <SIDEBAR_FILE>`: Filename for sidebar navigation JSON (default: `events-sidebar.json`)
 - `--templates <TEMPLATES>`: Directory containing custom Liquid templates
+- `--github-url <URL>`: Base GitHub URL for source code links (e.g., `https://github.com/org/repo/blob/main/src`)
+- `--source-root <PATH>`: Path to the source checkout root (the parent of each project's folder, e.g. the parent of
+  `src/MyApp/`). When set, a GitHub source link is only emitted if the guessed file actually exists under this root;
+  otherwise it falls back to `#` instead of a possibly wrong link (e.g. a type declared in a file whose name doesn't
+  match the type's own name). Optional; has no effect without `--github-url`.
 - `--event-attribute <NAME>`: Name (or name prefix) of the attribute used to discover events (default: `EventTopicAttribute`)
 - `--partition-key-attribute <NAME>`: Name (or name prefix) of the attribute used to discover partition keys (default: `PartitionKeyAttribute`)
 - `--emit-public-visibility`: Render an explicit `public` visibility segment for public events (e.g. `public.domain.subdomain.topic.v1`).

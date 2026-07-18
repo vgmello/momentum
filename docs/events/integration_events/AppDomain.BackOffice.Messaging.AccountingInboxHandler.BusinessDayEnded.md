@@ -29,7 +29,7 @@ Represents an event indicating that a business day has ended for a specific mark
 
 ## Technical Details
 
-- **Full Type:** [AppDomain.BackOffice.Messaging.AccountingInboxHandler.BusinessDayEnded](https://github.com/vgmello/momentum/blob/main/src/AppDomain/BackOffice/Messaging/AccountingInboxHandler/BusinessDayEnded.cs)
+- **Full Type:** [AppDomain.BackOffice.Messaging.AccountingInboxHandler.BusinessDayEnded](#)
 - **Type Name:** `BusinessDayEnded`
 - **Event Slug:** `business-day-ended`
 - **Namespace:** `AppDomain.BackOffice.Messaging.AccountingInboxHandler`

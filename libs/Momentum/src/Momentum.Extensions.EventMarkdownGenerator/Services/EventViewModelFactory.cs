@@ -51,7 +51,7 @@ public static partial class EventViewModelFactory
             IsObsolete = metadata.IsObsolete,
             ObsoleteMessage = metadata.ObsoleteMessage,
             IsInternal = metadata.IsInternal,
-            GithubUrl = GenerateGitHubUrl(metadata, options?.GitHubBaseUrl),
+            GithubUrl = GenerateGitHubUrl(metadata, options),
             TopicAttributeDisplayName = GetTopicAttributeDisplayName(metadata.TopicAttribute),
             AttributeProperties = metadata.AttributeProperties
                 .Select(kvp => new AttributePropertyViewModel { Key = kvp.Key, Value = kvp.Value })
@@ -116,17 +116,54 @@ public static partial class EventViewModelFactory
         };
     }
 
-    private static string GenerateGitHubUrl(EventMetadata metadata, string? gitHubBaseUrl)
+    private static string GenerateGitHubUrl(EventMetadata metadata, GeneratorOptions? options)
     {
-        if (string.IsNullOrEmpty(gitHubBaseUrl))
+        if (options is null || string.IsNullOrEmpty(options.GitHubBaseUrl))
         {
             return "#";
         }
 
-        var pathParts = metadata.Namespace.Split('.');
-        var filePath = string.Join("/", pathParts) + $"/{metadata.EventTypeName}.cs";
+        var relativeFilePath = GetGuessedSourceFilePath(metadata);
 
-        return $"{gitHubBaseUrl}/{filePath}";
+        // Best-effort guess: the type may not actually live in a file matching its own name (e.g. colocated
+        // with a handler), which is unknowable via reflection alone. When a source root is available, verify
+        // the guess before publishing a link, rather than risk a confidently wrong one.
+        if (!string.IsNullOrEmpty(options.SourceRootDirectory) && !File.Exists(Path.Combine(options.SourceRootDirectory, relativeFilePath)))
+        {
+            return "#";
+        }
+
+        return $"{options.GitHubBaseUrl}/{relativeFilePath}";
+    }
+
+    private static string GetGuessedSourceFilePath(EventMetadata metadata)
+    {
+        var namespaceName = metadata.Namespace;
+        var assemblyName = metadata.AssemblyName;
+
+        // Project folder names can themselves contain dots (e.g. "AppDomain.BackOffice"), which a naive
+        // per-namespace-segment split would wrongly scatter across nested folders ("AppDomain/BackOffice/...").
+        // The compiled assembly name is the actual project folder, so treat it as one unsplit segment when the
+        // namespace starts with it, and only split whatever namespace remains after that prefix.
+        var isNamespaceUnderAssembly = !string.IsNullOrEmpty(assemblyName) &&
+            (namespaceName == assemblyName || namespaceName.StartsWith(assemblyName + ".", StringComparison.Ordinal));
+
+        string[] pathParts;
+
+        if (isNamespaceUnderAssembly)
+        {
+            var remainder = namespaceName.Length > assemblyName.Length
+                ? namespaceName[(assemblyName.Length + 1)..]
+                : string.Empty;
+
+            pathParts = string.IsNullOrEmpty(remainder) ? [assemblyName] : [assemblyName, ..remainder.Split('.')];
+        }
+        else
+        {
+            pathParts = namespaceName.Split('.');
+        }
+
+        return string.Join("/", pathParts) + $"/{metadata.EventTypeName}.cs";
     }
 
     private static string GetTopicAttributeDisplayName(Attribute topicAttribute)

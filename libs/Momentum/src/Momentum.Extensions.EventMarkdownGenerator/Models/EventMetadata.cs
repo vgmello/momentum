@@ -18,6 +18,16 @@ public record EventMetadata
     public required string EventTypeName { get; init; }
     public required string FullTypeName { get; init; }
     public required string Namespace { get; init; }
+
+    /// <summary>
+    ///     Name of the compiled assembly the event type was discovered in (e.g. <c>"AppDomain.BackOffice"</c>).
+    ///     Used, when non-empty, to correctly locate the event's GitHub source link — the assembly name is the
+    ///     actual project folder, which can itself contain dots that a naive per-namespace-segment split would
+    ///     otherwise wrongly turn into nested folders. Empty for <see cref="EventMetadata"/> instances built
+    ///     by hand rather than via <see cref="Momentum.Extensions.EventMarkdownGenerator.Services.EventMetadataBuilder"/>.
+    /// </summary>
+    public string AssemblyName { get; init; } = string.Empty;
+
     public required string Topic { get; init; }
     public required string FullyQualifiedTopicName { get; init; }
     public required string Domain { get; init; }

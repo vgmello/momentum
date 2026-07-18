@@ -9,7 +9,7 @@
         "items": [
           {
             "text": "Business Day Ended",
-            "link": "/AppDomain.BackOffice.Messaging.AccountingInboxHandler.BusinessDayEnded",
+            "link": "/integration_events/AppDomain.BackOffice.Messaging.AccountingInboxHandler.BusinessDayEnded",
             "items": [],
             "collapsed": false
           }
@@ -25,19 +25,19 @@
     "items": [
       {
         "text": "Cashier Created",
-        "link": "/AppDomain.Cashiers.Contracts.IntegrationEvents.CashierCreated",
+        "link": "/integration_events/AppDomain.Cashiers.Contracts.IntegrationEvents.CashierCreated",
         "items": [],
         "collapsed": false
       },
       {
         "text": "Cashier Deleted",
-        "link": "/AppDomain.Cashiers.Contracts.IntegrationEvents.CashierDeleted",
+        "link": "/integration_events/AppDomain.Cashiers.Contracts.IntegrationEvents.CashierDeleted",
         "items": [],
         "collapsed": false
       },
       {
         "text": "Cashier Updated",
-        "link": "/AppDomain.Cashiers.Contracts.IntegrationEvents.CashierUpdated",
+        "link": "/integration_events/AppDomain.Cashiers.Contracts.IntegrationEvents.CashierUpdated",
         "items": [],
         "collapsed": false
       }
@@ -50,31 +50,31 @@
     "items": [
       {
         "text": "Invoice Cancelled",
-        "link": "/AppDomain.Invoices.Contracts.IntegrationEvents.InvoiceCancelled",
+        "link": "/integration_events/AppDomain.Invoices.Contracts.IntegrationEvents.InvoiceCancelled",
         "items": [],
         "collapsed": false
       },
       {
         "text": "Invoice Created",
-        "link": "/AppDomain.Invoices.Contracts.IntegrationEvents.InvoiceCreated",
+        "link": "/integration_events/AppDomain.Invoices.Contracts.IntegrationEvents.InvoiceCreated",
         "items": [],
         "collapsed": false
       },
       {
         "text": "Invoice Finalized",
-        "link": "/AppDomain.Invoices.Contracts.IntegrationEvents.InvoiceFinalized",
+        "link": "/integration_events/AppDomain.Invoices.Contracts.IntegrationEvents.InvoiceFinalized",
         "items": [],
         "collapsed": false
       },
       {
         "text": "Invoice Paid",
-        "link": "/AppDomain.Invoices.Contracts.IntegrationEvents.InvoicePaid",
+        "link": "/integration_events/AppDomain.Invoices.Contracts.IntegrationEvents.InvoicePaid",
         "items": [],
         "collapsed": false
       },
       {
         "text": "Payment Received",
-        "link": "/AppDomain.Invoices.Contracts.IntegrationEvents.PaymentReceived",
+        "link": "/integration_events/AppDomain.Invoices.Contracts.IntegrationEvents.PaymentReceived",
         "items": [],
         "collapsed": false
       },
@@ -84,7 +84,7 @@
         "items": [
           {
             "text": "Invoice Generated",
-            "link": "/AppDomain.Invoices.Contracts.DomainEvents.InvoiceGenerated",
+            "link": "/domain_events/AppDomain.Invoices.Contracts.DomainEvents.InvoiceGenerated",
             "items": [],
             "collapsed": false
           }

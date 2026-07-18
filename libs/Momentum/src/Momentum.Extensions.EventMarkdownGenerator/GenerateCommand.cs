@@ -44,6 +44,13 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
         [Description("Base GitHub URL for source code links (e.g., https://github.com/org/repo/blob/main/src)")]
         public string? GitHubUrl { get; init; }
 
+        [CommandOption("--source-root")]
+        [Description(
+            "Path to the source checkout root (the parent of each project's folder, e.g. the parent of src/AppDomain/). " +
+            "When set, a GitHub source link is only emitted if the guessed file actually exists under this root; " +
+            "otherwise it falls back to \"#\" instead of a possibly wrong link. Optional; has no effect without --github-url.")]
+        public string? SourceRoot { get; init; }
+
         [CommandOption("--format")]
         [Description("Serialization format for payload size calculation (json, binary)")]
         [DefaultValue("json")]
@@ -103,6 +110,7 @@ public sealed class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
                 SidebarFileName = settings.SidebarFile,
                 TemplatesDirectory = settings.Templates,
                 GitHubBaseUrl = settings.GitHubUrl,
+                SourceRootDirectory = settings.SourceRoot,
                 SerializationFormat = settings.Format,
                 EventAttributeName = settings.EventAttribute,
                 PartitionKeyAttributeName = settings.PartitionKeyAttribute,
