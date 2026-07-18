@@ -11,8 +11,8 @@ editLink: false
 - **Version:** v1
 - **Entity:** `PaymentProcessed`
 - **Type:** Integration Event
-- **Topic:** `payment-processeds`
-- **Fully Qualified Topic:** `test-events.payments.payment-processeds.v1`
+- **Topic:** `payment-processed`
+- **Fully Qualified Topic:** `test-events.payments.payment-processed.v1`
 - **Estimated Payload Size:** 32 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 

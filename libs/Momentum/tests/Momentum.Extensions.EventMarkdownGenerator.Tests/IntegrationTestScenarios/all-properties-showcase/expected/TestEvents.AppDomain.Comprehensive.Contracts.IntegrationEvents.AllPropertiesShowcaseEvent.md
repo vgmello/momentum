@@ -40,7 +40,7 @@ renderable field of the generated markdown at once.
 - **TotalEstimatedSizeBytes:** 372
 - **HasInaccurateEstimates:** true
 
-## AttributeProperties (6)
+## AttributeProperties (7)
 
 - `ShouldPluralizeTopicName` = `False`
 - `Topic` = `comprehensive-topic`
@@ -48,6 +48,7 @@ renderable field of the generated markdown at once.
 - `Subdomain` = ``
 - `Version` = `v9`
 - `Internal` = `True`
+- `CollapseTopicOnDomain` = `True`
 
 
 ## Properties (4)

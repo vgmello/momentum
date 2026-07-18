@@ -29,19 +29,27 @@ public static class EventMetadataBuilder
         // Access properties via reflection for cross-assembly compatibility
         var attrType = topicAttribute.GetType();
         var topic = TypeUtils.GetPropertyValue<string?>(attrType, topicAttribute, "Topic");
-        var shouldPluralize = TypeUtils.GetPropertyValue<bool?>(attrType, topicAttribute, "ShouldPluralizeTopicName") ?? false;
+
+        // Behavior flags shaping how the topic segment is derived/rendered, not raw metadata values.
+        var shouldPluralize = TypeUtils.GetPropertyValue<bool?>(attrType, topicAttribute, "ShouldPluralizeTopicName") ?? true;
+        var collapseTopicOnDomain = TypeUtils.GetPropertyValue<bool?>(attrType, topicAttribute, "CollapseTopicOnDomain") ?? true;
+
         var domain = TypeUtils.GetPropertyValue<string?>(attrType, topicAttribute, "Domain");
         var subdomain = TypeUtils.GetPropertyValue<string?>(attrType, topicAttribute, "Subdomain");
         var isInternal = TypeUtils.GetPropertyValue<bool?>(attrType, topicAttribute, "Internal") ?? false;
         var version = TypeUtils.GetPropertyValue<string?>(attrType, topicAttribute, "Version") ?? "v1";
         var eventNameOverride = TypeUtils.GetPropertyValue<string?>(attrType, topicAttribute, "EventName");
 
-        var topicName = !string.IsNullOrEmpty(topic) ? topic : eventType.Name.ToKebabCase();
+        var eventName = !string.IsNullOrWhiteSpace(eventNameOverride) ? eventNameOverride : eventType.Name;
+        var eventNameKebab = eventName.ToKebabCase();
 
-        // shouldPluralize (ShouldPluralizeTopicName) is the topic-explicit signal: for EventTopicAttribute<T>
-        // it's true only when the attribute's own topic ctor argument was null, i.e. Topic was auto-derived
-        // from the entity type name rather than explicitly set (Topic itself is never empty by this point —
-        // the base ctor defaults it to the kebab-cased entity name even when not explicitly given).
+        var (entityName, entityType) = GetEntity(attrType, eventType, properties);
+
+        // topicIsExplicit just picks which string is used: the attribute's own Topic when non-empty,
+        // otherwise the entity name.
+        var topicIsExplicit = !string.IsNullOrEmpty(topic);
+        var topicName = topicIsExplicit ? topic! : entityName.ToKebabCase();
+
         if (shouldPluralize && !topicName.EndsWith("s", StringComparison.OrdinalIgnoreCase))
         {
             topicName = topicName.Pluralize();
@@ -63,24 +71,30 @@ public static class EventMetadataBuilder
         else if (emitPublicVisibility)
             visibilitySegment = "public";
 
+        var domainPath = string.Join('.',
+            new[] { eventDomain.ToKebabCase(), eventSubdomain?.ToKebabCase() }.Where(s => !string.IsNullOrEmpty(s)));
+
+        // A topic that exactly matches the domain[.subdomain] path would otherwise produce a redundant
+        // segment (e.g. domain "orders" + topic "orders" -> "orders.orders.v1"). CollapseTopicOnDomain
+        // (read above, default true) controls whether that segment is dropped; set it to false on the
+        // attribute to always keep both segments even when they duplicate each other.
+        var topicDuplicatesDomainPath = collapseTopicOnDomain && string.Equals(topicName, domainPath, StringComparison.OrdinalIgnoreCase);
+
         var segments = new List<string?>
         {
             visibilitySegment,
             eventDomain.ToKebabCase(),
             eventSubdomain?.ToKebabCase(),
-            topicName,
+            topicDuplicatesDomainPath ? null : topicName,
             version
         };
 
         var fullTopicName = string.Join('.', segments.Where(s => !string.IsNullOrEmpty(s)));
 
-        var eventName = !string.IsNullOrWhiteSpace(eventNameOverride) ? eventNameOverride : eventType.Name;
-        var (entityName, entityType) = GetEntity(attrType, eventType, properties);
-
         return new EventMetadata
         {
             EventName = eventName,
-            EventNameKebab = eventName.ToKebabCase(),
+            EventNameKebab = eventNameKebab,
             EventTypeName = eventType.Name,
             FullTypeName = eventType.FullName ?? eventType.Name,
             Namespace = eventType.Namespace ?? string.Empty,

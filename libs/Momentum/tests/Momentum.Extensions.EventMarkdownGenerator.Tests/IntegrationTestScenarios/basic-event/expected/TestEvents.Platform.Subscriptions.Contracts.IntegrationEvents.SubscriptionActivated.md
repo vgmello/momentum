@@ -11,8 +11,8 @@ editLink: false
 - **Version:** v1
 - **Entity:** `SubscriptionActivated`
 - **Type:** Integration Event
-- **Topic:** `subscription-activateds`
-- **Fully Qualified Topic:** `test-events.subscriptions.subscription-activateds.v1`
+- **Topic:** `subscription-activated`
+- **Fully Qualified Topic:** `test-events.subscriptions.subscription-activated.v1`
 - **Estimated Payload Size:** 16 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 

@@ -60,12 +60,19 @@ public class EventTopicAttribute(string topic, string? domain = null, string? su
     /// </summary>
     public bool Internal { get; set; }
 
-
     /// <summary>
     ///     Gets a value indicating whether the topic name should be pluralized.
     ///     Returns <c>false</c> for explicitly named topics.
     /// </summary>
     public virtual bool ShouldPluralizeTopicName => false;
+
+    /// <summary>
+    ///     Whether the topic segment should be dropped from the fully-qualified topic name when it exactly
+    ///     matches the domain[.subdomain] path (e.g. domain <c>"orders"</c> with no subdomain and topic
+    ///     <c>"orders"</c> would otherwise produce <c>"orders.orders.v1"</c>). Defaults to <c>true</c>; set
+    ///     to <c>false</c> to always keep the topic segment even when it duplicates the domain path.
+    /// </summary>
+    public bool CollapseTopicOnDomain { get; set; } = true;
 }
 
 /// <summary>

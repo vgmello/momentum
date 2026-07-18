@@ -128,6 +128,17 @@ public class PluralizationServiceTests
     [InlineData("Business", "Businesses")]
     [InlineData("Businesses", "Businesses")]
     [InlineData("Human", "Humans")]
+    // Past-tense verbs/participles - left unchanged, not pluralized
+    [InlineData("created", "created")]
+    [InlineData("updated", "updated")]
+    [InlineData("processed", "processed")]
+    [InlineData("reservation-created", "reservation-created")]
+    [InlineData("order-completed", "order-completed")]
+    // Genuine short "-ed" nouns - still pluralized normally
+    [InlineData("bed", "beds")]
+    [InlineData("shed", "sheds")]
+    [InlineData("seed", "seeds")]
+    [InlineData("speed", "speeds")]
     public void ToPlural_AllCases_ReturnsCorrectPlural(string value, string expectedPlural)
     {
         // Arrange & Act

@@ -19,10 +19,12 @@ public class GenericAttributeDiscoveryTests
     public sealed class ConventionEventTopicAttribute : Attribute
     {
         public string? Domain { get; init; }
+        public string? Subdomain { get; init; }
         public string Version { get; init; } = "v1";
         public bool Internal { get; init; }
         public string? Topic { get; init; }
         public string? EventName { get; init; }
+        public bool CollapseTopicOnDomain { get; init; } = true;
     }
 
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter)]
@@ -67,8 +69,127 @@ public class GenericAttributeDiscoveryTests
         conventionEvent.PartitionKeys[1].Order.ShouldBe(1);
     }
 
+    [ConventionEventTopic(Domain = "sales")]
+    public record OrderCreated(Guid OrderId);
+
+    [Fact]
+    public void DiscoverEvents_WithNoTopic_DerivesTopicFromPluralizedEntityNotEventName()
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+
+        var events = AssemblyEventDiscovery.DiscoverEvents(
+            assembly,
+            xmlParser: null,
+            PayloadSizeCalculator.Create("json"),
+            attributeNamePrefix: nameof(ConventionEventTopicAttribute)).Select(e => e.Metadata).ToList();
+
+        var orderCreated = events.Single(e => e.FullTypeName == typeof(OrderCreated).FullName);
+
+        // No Topic set: the fallback derives from the pluralized, kebab-cased Entity ("Order" -> "orders"),
+        // not the event name ("OrderCreated" -> "order-created") and not the raw CLR type name.
+        orderCreated.Entity.ShouldBe("Order");
+        orderCreated.Topic.ShouldBe("orders");
+        orderCreated.FullyQualifiedTopicName.ShouldBe("sales.orders.v1");
+    }
+
+    [ConventionEventTopic(Domain = "orders")]
+    public record OrderApproved(Guid OrderId);
+
+    [Fact]
+    public void DiscoverEvents_WithNoTopicAndDomainMatchingEntity_CollapsesDuplicateSegment()
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+
+        var events = AssemblyEventDiscovery.DiscoverEvents(
+            assembly,
+            xmlParser: null,
+            PayloadSizeCalculator.Create("json"),
+            attributeNamePrefix: nameof(ConventionEventTopicAttribute)).Select(e => e.Metadata).ToList();
+
+        var orderApproved = events.Single(e => e.FullTypeName == typeof(OrderApproved).FullName);
+
+        // Domain "orders" (no subdomain) and the auto-derived topic ("Order" -> "orders") both kebab to
+        // the same string. Topic itself still reports "orders", but the fully-qualified name must not
+        // repeat the segment ("orders.v1", not "orders.orders.v1").
+        orderApproved.Entity.ShouldBe("Order");
+        orderApproved.Topic.ShouldBe("orders");
+        orderApproved.FullyQualifiedTopicName.ShouldBe("orders.v1");
+    }
+
+    [ConventionEventTopic(Domain = "orders", Topic = "orders")]
+    public record OrderRefunded(Guid OrderId);
+
+    [Fact]
+    public void DiscoverEvents_WithExplicitTopicMatchingDomain_CollapsesByDefault()
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+
+        var events = AssemblyEventDiscovery.DiscoverEvents(
+            assembly,
+            xmlParser: null,
+            PayloadSizeCalculator.Create("json"),
+            attributeNamePrefix: nameof(ConventionEventTopicAttribute)).Select(e => e.Metadata).ToList();
+
+        var orderRefunded = events.Single(e => e.FullTypeName == typeof(OrderRefunded).FullName);
+
+        // CollapseTopicOnDomain defaults to true regardless of whether Topic was explicit or auto-derived
+        // from the entity — here it's explicit ("orders") and still collapses because it matches the
+        // domain path exactly.
+        orderRefunded.Topic.ShouldBe("orders");
+        orderRefunded.FullyQualifiedTopicName.ShouldBe("orders.v1");
+    }
+
+    [ConventionEventTopic(Domain = "orders", Topic = "orders", CollapseTopicOnDomain = false)]
+    public record OrderIssued(Guid OrderId);
+
+    [Fact]
+    public void DiscoverEvents_WithCollapseTopicOnDomainFalse_KeepsDuplicateSegment()
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+
+        var events = AssemblyEventDiscovery.DiscoverEvents(
+            assembly,
+            xmlParser: null,
+            PayloadSizeCalculator.Create("json"),
+            attributeNamePrefix: nameof(ConventionEventTopicAttribute)).Select(e => e.Metadata).ToList();
+
+        var orderIssued = events.Single(e => e.FullTypeName == typeof(OrderIssued).FullName);
+
+        // Explicitly opting out (CollapseTopicOnDomain = false) keeps both segments even though topic and
+        // domain are identical — the caller's choice always wins over the default.
+        orderIssued.Topic.ShouldBe("orders");
+        orderIssued.FullyQualifiedTopicName.ShouldBe("orders.orders.v1");
+    }
+
+    [ConventionEventTopic(Domain = "commerce", Subdomain = "orders")]
+    public record OrderSubmitted(Guid OrderId);
+
+    [Fact]
+    public void DiscoverEvents_WithNoTopicAndSubdomainMatchingEntity_DoesNotCollapse()
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+
+        var events = AssemblyEventDiscovery.DiscoverEvents(
+            assembly,
+            xmlParser: null,
+            PayloadSizeCalculator.Create("json"),
+            attributeNamePrefix: nameof(ConventionEventTopicAttribute)).Select(e => e.Metadata).ToList();
+
+        var orderSubmitted = events.Single(e => e.FullTypeName == typeof(OrderSubmitted).FullName);
+
+        // The dedupe only collapses when the topic duplicates the FULL domain[.subdomain] path. Here the
+        // subdomain alone ("orders") matches the auto-derived topic, but the domain ("commerce") doesn't,
+        // so the full path "commerce.orders" != "orders" and the topic segment is NOT dropped — unlike
+        // DiscoverEvents_WithNoTopicAndDomainMatchingEntity_CollapsesDuplicateSegment, where domain alone
+        // (no subdomain) matches and the segment IS dropped.
+        orderSubmitted.Entity.ShouldBe("Order");
+        orderSubmitted.Topic.ShouldBe("orders");
+        orderSubmitted.Subdomain.ShouldBe("orders");
+        orderSubmitted.FullyQualifiedTopicName.ShouldBe("commerce.orders.orders.v1");
+    }
+
     // Custom attribute exercising a property the generator has no dedicated EventMetadata field for
-    // (Notes), plus an explicitly empty Topic to verify the kebab-case fallback still applies.
+    // (Notes), plus an explicitly empty Topic to verify the entity-fallback still applies.
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class CustomAttribute : Attribute
     {
@@ -93,8 +214,10 @@ public class GenericAttributeDiscoveryTests
 
         var customEvent = events.Single(e => e.FullTypeName == typeof(CustomAttributeEvent).FullName);
 
-        // Empty Topic falls back to the kebab-cased CLR type name, same as a missing Topic would.
-        customEvent.Topic.ShouldBe("custom-attribute-event");
+        // Empty Topic falls back to the pluralized, kebab-cased Entity, same as a missing Topic would.
+        // CustomAttribute has no TEntity to reflect, so Entity is derived by stripping the trailing
+        // "Event" word from the CLR type name ("CustomAttributeEvent" -> "CustomAttribute" -> "custom-attributes").
+        customEvent.Topic.ShouldBe("custom-attributes");
 
         // Every property of the attribute is captured, including ones with no dedicated EventMetadata
         // field (Notes) — not just the well-known ones (Domain).

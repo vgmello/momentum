@@ -11,8 +11,8 @@ editLink: false
 - **Version:** v1
 - **Entity:** `InvoiceGenerated`
 - **Type:** Integration Event
-- **Topic:** `invoice-generateds`
-- **Fully Qualified Topic:** `test-events.invoices.invoice-generateds.v1`
+- **Topic:** `invoice-generated`
+- **Fully Qualified Topic:** `test-events.invoices.invoice-generated.v1`
 - **Estimated Payload Size:** 32 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 

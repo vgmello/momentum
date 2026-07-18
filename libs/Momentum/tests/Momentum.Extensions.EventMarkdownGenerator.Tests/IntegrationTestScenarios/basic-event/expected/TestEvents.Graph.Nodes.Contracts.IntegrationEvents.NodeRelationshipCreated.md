@@ -11,8 +11,8 @@ editLink: false
 - **Version:** v1
 - **Entity:** `NodeRelationshipCreated`
 - **Type:** Integration Event
-- **Topic:** `node-relationship-createds`
-- **Fully Qualified Topic:** `test-events.nodes.node-relationship-createds.v1`
+- **Topic:** `node-relationship-created`
+- **Fully Qualified Topic:** `test-events.nodes.node-relationship-created.v1`
 - **Estimated Payload Size:** 382 bytes ⚠️ *Contains dynamic properties*
 - **Partition Keys**: TenantId
 

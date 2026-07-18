@@ -4,6 +4,26 @@ All notable changes to this project are documented in this file, grouped by date
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2026-07-18]
+
+### Fixed
+
+- **EventMarkdownGenerator**: `Pluralize()` no longer mangles past-tense/participle words (e.g.
+  `"reservation-created"` → `"reservation-createds"`) — words ending in `-ed` are now left unchanged, except
+  for a small set of genuine `-ed` nouns (`bed`, `seed`, `speed`, ...).
+- **EventMarkdownGenerator**: topic fallback (when `Topic` isn't set) now derives from the pluralized entity
+  name instead of the event name.
+- **EventMarkdownGenerator**: 22 event-doc scenario baselines regenerated to drop the bad pluralization they
+  had baked in (`payment-processeds` → `payment-processed`, etc); `docs/events/events-sidebar.json`
+  duplicate entries removed as a byproduct of regeneration.
+
+### Added
+
+- **EventTopicAttribute**: new `CollapseTopicOnDomain` property (default `true`) — drops the topic segment
+  from the fully-qualified topic name when it exactly duplicates the domain[.subdomain] path (e.g. domain
+  `"orders"` + topic `"orders"` → `"orders.v1"` instead of `"orders.orders.v1"`); set to `false` to always
+  keep both segments.
+
 ## [2026-07-17]
 
 ### Changed
