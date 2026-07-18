@@ -318,7 +318,7 @@ public static class JsonSidebarGenerator
     {
         var metadata = eventWithDoc.Metadata;
         var displayName = metadata.EventTypeName.ToDisplayName();
-        var link = "/" + metadata.GetEventKindFolder() + "/" + metadata.GetFileName().Replace(".md", "");
+        var link = "/" + eventWithDoc.GetEventKindFolder() + "/" + metadata.GetFileName().Replace(".md", "");
 
         return new SidebarItem
         {
