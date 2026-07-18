@@ -118,25 +118,22 @@ public static partial class EventViewModelFactory
 
     private static string GenerateGitHubUrl(EventMetadata metadata, GeneratorOptions? options)
     {
-        var gitHubBaseUrl = options?.GitHubBaseUrl;
-
-        if (string.IsNullOrEmpty(gitHubBaseUrl))
+        if (options is null || string.IsNullOrEmpty(options.GitHubBaseUrl))
         {
             return "#";
         }
 
         var relativeFilePath = GetGuessedSourceFilePath(metadata);
-        var sourceRoot = options?.SourceRootDirectory;
 
         // Best-effort guess: the type may not actually live in a file matching its own name (e.g. colocated
         // with a handler), which is unknowable via reflection alone. When a source root is available, verify
         // the guess before publishing a link, rather than risk a confidently wrong one.
-        if (!string.IsNullOrEmpty(sourceRoot) && !File.Exists(Path.Combine(sourceRoot, relativeFilePath)))
+        if (!string.IsNullOrEmpty(options.SourceRootDirectory) && !File.Exists(Path.Combine(options.SourceRootDirectory, relativeFilePath)))
         {
             return "#";
         }
 
-        return $"{gitHubBaseUrl}/{relativeFilePath}";
+        return $"{options.GitHubBaseUrl}/{relativeFilePath}";
     }
 
     private static string GetGuessedSourceFilePath(EventMetadata metadata)
