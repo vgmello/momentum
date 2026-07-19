@@ -11,18 +11,18 @@ Contracts (models, integration events, and optional gRPC protobufs) that define 
 <!-- prettier-ignore-start -->
 
 -   Domain Models
-    <!--#if (INCLUDE_SAMPLE) -->
+    # #if (INCLUDE_SAMPLE)
     -   Cashiers: `Cashier`, `CashierPayment`, …
     -   Invoices: domain-facing DTOs where applicable
-    <!--#endif -->
+    # #endif
 -   Integration Events
-    <!--#if (INCLUDE_SAMPLE) -->
+    # #if (INCLUDE_SAMPLE)
     -   Cashiers: `CashierCreated`, `CashierUpdated`, `CashierDeleted`
     -   Invoices: e.g. `InvoiceCancelled`
-    <!--#endif -->
-    <!--#if (INCLUDE_API) -->
+    # #endif
+    # #if (INCLUDE_API)
 -   gRPC Protobuf contracts (if AppDomain.Api is included at build time) - Shipped under the package path `Protos/` (e.g. `Invoices/Protos/...`)
-    <!--#endif -->
+    # #endif
 
 <!-- prettier-ignore-end -->
 
@@ -51,7 +51,7 @@ Note: In Debug builds the package may be published as a prerelease (suffix `-pre
 
 Implement a handler that consumes events from this package. Handlers generally follow the pattern Task Handle(TEvent) and can use constructor injection for dependencies like ILogger or IMessageBus.
 
-<!--#if (INCLUDE_SAMPLE) -->
+# #if (INCLUDE_SAMPLE)
 
 ```csharp
 using AppDomain.Cashiers.Contracts.IntegrationEvents;
@@ -79,7 +79,7 @@ Notes:
 -   Handler discovery and wiring depend on your messaging/bus setup. Many frameworks will auto-discover classes with a Handle(TEvent) method when registered in DI.
 -   Events use attributes from Momentum.Extensions.Abstractions.Messaging (e.g., EventTopic<T>, PartitionKey) that your transport can leverage for routing.
 
-<!--#else -->
+# #else
 
 ```csharp
 using AppDomain.Foo.Contracts.IntegrationEvents;
@@ -102,9 +102,9 @@ public class FooCreatedHandler(ILogger<FooCreatedHandler> logger)
 }
 ```
 
-<!--#endif -->
+# #endif
 
-<!--#if (INCLUDE_API) -->
+# #if (INCLUDE_API)
 
 ### Using the shipped protobufs (optional)
 
@@ -124,7 +124,7 @@ Your project file should look similar to this:
 </Project>
 ```
 
-<!--#endif -->
+# #endif
 
 ## Versioning
 
