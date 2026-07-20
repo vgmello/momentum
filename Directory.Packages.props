@@ -8,8 +8,8 @@
     <!--#if (INCLUDE_ORLEANS) -->
     <MicrosoftOrleansVersion>10.2.1</MicrosoftOrleansVersion>
     <!--#endif -->
-    <OpenTelemetryCoreVersion>1.16.0</OpenTelemetryCoreVersion>
-    <OpenTelemetryInstrumentationVersion>1.15.1</OpenTelemetryInstrumentationVersion>
+    <OpenTelemetryCoreVersion>1.17.0</OpenTelemetryCoreVersion>
+    <OpenTelemetryInstrumentationVersion>1.17.0</OpenTelemetryInstrumentationVersion>
     <!--#if (INCLUDE_GRPC) -->
     <GrpcVersion>2.80.0</GrpcVersion>
     <!--#endif -->
@@ -105,9 +105,9 @@
     <PackageVersion Include="Refitter.MSBuild" Version="2.0.0" />
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemetryCoreVersion)" />
     <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryCoreVersion)" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.16.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.17.0" />
     <!--#if (INCLUDE_GRPC) -->
-    <PackageVersion Include="OpenTelemetry.Instrumentation.GrpcCore" Version="1.0.0-beta.13" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.GrpcCore" Version="1.0.0-beta.14" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.GrpcNetClient" Version="1.15.0-beta.1" />
     <!--#endif -->
     <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="$(OpenTelemetryInstrumentationVersion)" />
