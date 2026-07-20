@@ -4,6 +4,58 @@ All notable changes to this project are documented in this file, grouped by date
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2026-07-20]
+
+### Changed
+
+- **Infra**: PostgreSQL bumped **17 → 18** across compose, the Aspire AppHost, and the Testcontainers
+  integration fixture. PostgreSQL 18's official image moves the cluster from `/var/lib/postgresql/data`
+  to `/var/lib/postgresql/{major}/docker`, so the compose volume now mounts the whole
+  `/var/lib/postgresql` tree instead of `.../data` (this also enables future major upgrades with
+  `pg_upgrade --link`).
+  **Action required for local dev:** an existing `postgres_data` volume holds a PG17 cluster that PG18
+  will not start against — run `docker compose down -v` before the first `up`. Local data is
+  disposable; Liquibase recreates the schema.
+- **Deps**: `WolverineFx`/`.Kafka`/`.Postgresql`/`.RuntimeCompilation` `6.20.0` → **6.21.0**. Headline
+  is durable-inbox listener batching, which directly benefits the durable inbox enabled yesterday
+  (upstream measured a 2,000 msg/s Kafka stream going from unbounded backlog to a steady 32ms delivery
+  p50, +83% sustained durable throughput), plus a sender-batching flush fix and a faster/lower-allocation
+  Kafka mapping hot path. Two upstream behavior changes to note: the per-message "success" log now
+  defaults to `Debug` (was `Information`), and `wolverine-execution-time` became a floating-point
+  histogram (same name/unit, different point type — check dashboards built on it).
+- **Deps**: `CloudNative.CloudEvents.Kafka` `2.8.0` → **3.9.0** and `CloudNative.CloudEvents.SystemTextJson`
+  `2.8.0` → **2.9.0**. This resolves a latent version mismatch: the 2.8.0 Kafka package declares
+  `Confluent.Kafka 1.9.3` while `WolverineFx.Kafka` pulls `2.14.x`, so `CloudEventMapper` was compiled
+  against a five-major-versions-old client API and unified upward at runtime. 3.9.0 targets
+  `Confluent.Kafka 2.14.2`, matching Wolverine exactly. (The 2.x → 3.x jump is the Kafka package's own
+  version line; core `CloudNative.CloudEvents` remains 2.9.0.)
+- **Deps**: OpenTelemetry family → **1.17.0** (exporter, hosting, and the AspNetCore/Http/Runtime
+  instrumentation packages, now all driven by one property); `Microsoft.Extensions.Http.Resilience`,
+  `.ServiceDiscovery`, `.Diagnostics.Testing` → **10.8.0**; `Microsoft.NET.Test.Sdk` → **18.8.1**;
+  `SonarAnalyzer.CSharp` → **10.29.0.143774**; `Microsoft.SourceLink.GitHub` → **10.0.301**;
+  `Scalar.AspNetCore` → **2.16.15**; `Microsoft.CodeAnalysis.Analyzers` → **5.6.0** (the 5.0.0 pin was
+  already being overridden transitively to 5.3.0).
+- **Infra**: Kafka image `confluentinc/cp-kafka` `7.6.0` → **7.9.8** in compose and the integration
+  fixture. 8.x was evaluated and rejected for now: Testcontainers 4.13's `KafkaBuilder` does not set
+  `KAFKA_PROCESS_ROLES`, which the 8.x entrypoint requires, so every integration test fails to start
+  the broker. Revisit when Testcontainers adds 8.x support.
+
+### Fixed
+
+- **Tests**: the integration fixture set `Aspire:Confluent:Kafka:Messaging:Consumer:Config:EnableAutoCommit=true`,
+  the same setting removed from `appsettings` yesterday — it suppressed Wolverine's at-least-once offset
+  management, so the tests were not exercising the delivery guarantee the template ships. Removed.
+
+### Notes
+
+- `Refitter.MSBuild` is **held at 2.0.0**: 2.1.0's generator throws
+  `Method not found: System.Text.ValueStringBuilder.AsSpan()` against the current runtime and fails the
+  E2E client generation at build time.
+- Still outstanding (unchanged): `OpenTelemetry.Instrumentation.GrpcCore 1.0.0-beta.13` is abandoned
+  upstream and tied to the end-of-life `Grpc.Core` library; it should be removed if the API only uses
+  grpc-dotnet. `dpage/pgadmin4:latest` and `azurite:latest` still float their tags, and there is no
+  `global.json` pinning the SDK.
+
 ## [2026-07-19]
 
 ### Changed

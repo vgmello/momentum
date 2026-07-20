@@ -8,8 +8,8 @@
     <!--#if (INCLUDE_ORLEANS) -->
     <MicrosoftOrleansVersion>10.2.1</MicrosoftOrleansVersion>
     <!--#endif -->
-    <OpenTelemetryCoreVersion>1.16.0</OpenTelemetryCoreVersion>
-    <OpenTelemetryInstrumentationVersion>1.15.1</OpenTelemetryInstrumentationVersion>
+    <OpenTelemetryCoreVersion>1.17.0</OpenTelemetryCoreVersion>
+    <OpenTelemetryInstrumentationVersion>1.17.0</OpenTelemetryInstrumentationVersion>
     <!--#if (INCLUDE_GRPC) -->
     <GrpcVersion>2.80.0</GrpcVersion>
     <!--#endif -->
@@ -35,8 +35,8 @@
     <!--#endif -->
     <PackageVersion Include="Aspire.Npgsql" Version="$(AspireVersion)" />
     <PackageVersion Include="Bogus" Version="35.6.5" />
-    <PackageVersion Include="CloudNative.CloudEvents.Kafka" Version="2.8.0" />
-    <PackageVersion Include="CloudNative.CloudEvents.SystemTextJson" Version="2.8.0" />
+    <PackageVersion Include="CloudNative.CloudEvents.Kafka" Version="3.9.0" />
+    <PackageVersion Include="CloudNative.CloudEvents.SystemTextJson" Version="2.9.0" />
     <PackageVersion Include="coverlet.collector" Version="10.0.1" />
     <PackageVersion Include="Dapper" Version="2.1.79" />
     <PackageVersion Include="Fluid.Core" Version="2.31.0" />
@@ -58,7 +58,7 @@
     <!-- Transitive from Microsoft.AspNetCore.OpenApi; pinned to patch GHSA-v5pm-xwqc-g5wc (stack overflow on circular schema refs) -->
     <PackageVersion Include="Microsoft.OpenApi" Version="2.7.5" />
     <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="$(MicrosoftExtensionsVersion)" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="5.0.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="5.6.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="5.0.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="$(MicrosoftExtensionsVersion)" />
@@ -67,12 +67,12 @@
     <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Diagnostics.Testing" Version="10.7.0" />
+    <PackageVersion Include="Microsoft.Extensions.Diagnostics.Testing" Version="10.8.0" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.7.0" />
-    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.7.0" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.6.0" />
+    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.8.0" />
+    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.8.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
     <!--#if (INCLUDE_ORLEANS) -->
     <PackageVersion Include="Microsoft.Orleans.Analyzers" Version="$(MicrosoftOrleansVersion)" />
     <PackageVersion Include="Microsoft.Orleans.Client" Version="$(MicrosoftOrleansVersion)" />
@@ -87,7 +87,7 @@
     <!--#endif -->
     <!-- Transitive from Aspire.Hosting.AppHost (and Orleans when included); pinned to patch GHSA-hv8m-jj95-wg3x and related LZ4/MessagePack advisories -->
     <PackageVersion Include="MessagePack" Version="2.5.302" />
-    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.300" />
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.301" />
     <PackageVersion Include="Momentum.Extensions" Version="$(MomentumVersion)" />
     <PackageVersion Include="Momentum.Extensions.Abstractions" Version="$(MomentumVersion)" />
     <PackageVersion Include="Momentum.Extensions.Messaging.Kafka" Version="$(MomentumVersion)" />
@@ -102,10 +102,12 @@
     <PackageVersion Include="OneOf.SourceGenerator" Version="3.0.271" />
     <PackageVersion Include="Refit" Version="13.1.0" />
     <PackageVersion Include="Refit.HttpClientFactory" Version="13.1.0" />
+    <!-- Held at 2.0.0: 2.1.0's generator throws "Method not found: System.Text.ValueStringBuilder.AsSpan()"
+         against the current runtime, failing the E2E client generation at build time. -->
     <PackageVersion Include="Refitter.MSBuild" Version="2.0.0" />
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemetryCoreVersion)" />
     <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryCoreVersion)" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.16.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="$(OpenTelemetryInstrumentationVersion)" />
     <!--#if (INCLUDE_GRPC) -->
     <PackageVersion Include="OpenTelemetry.Instrumentation.GrpcCore" Version="1.0.0-beta.13" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.GrpcNetClient" Version="1.15.0-beta.1" />
@@ -113,23 +115,23 @@
     <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="$(OpenTelemetryInstrumentationVersion)" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="$(OpenTelemetryInstrumentationVersion)" />
     <PackageVersion Include="Riok.Mapperly" Version="4.3.1" />
-    <PackageVersion Include="Scalar.AspNetCore" Version="2.16.11" />
+    <PackageVersion Include="Scalar.AspNetCore" Version="2.16.15" />
     <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageVersion Include="Serilog.Exceptions" Version="8.4.0" />
     <PackageVersion Include="Serilog.Sinks.OpenTelemetry" Version="4.2.0" />
     <PackageVersion Include="Shouldly" Version="4.3.0" />
-    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.27.0.140913" />
+    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.29.0.143774" />
     <PackageVersion Include="Spectre.Console.Cli" Version="0.55.0" />
     <PackageVersion Include="System.Net.Http.Json" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Testcontainers" Version="4.13.0" />
     <PackageVersion Include="Testcontainers.Kafka" Version="4.13.0" />
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.13.0" />
-    <PackageVersion Include="WolverineFx" Version="6.20.0" />
+    <PackageVersion Include="WolverineFx" Version="6.21.0" />
     <!--#if (USE_KAFKA) -->
-    <PackageVersion Include="WolverineFx.Kafka" Version="6.20.0" />
+    <PackageVersion Include="WolverineFx.Kafka" Version="6.21.0" />
     <!--#endif -->
-    <PackageVersion Include="WolverineFx.Postgresql" Version="6.20.0" />
-    <PackageVersion Include="WolverineFx.RuntimeCompilation" Version="6.20.0" />
+    <PackageVersion Include="WolverineFx.Postgresql" Version="6.21.0" />
+    <PackageVersion Include="WolverineFx.RuntimeCompilation" Version="6.21.0" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
     <PackageVersion Include="xunit.v3" Version="3.2.2" />
   </ItemGroup>

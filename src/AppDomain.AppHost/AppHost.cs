@@ -7,7 +7,7 @@ var dbPassword = builder.AddParameter("DbPassword", secret: true);
 
 var pgsql = builder
     .AddPostgres("app-domain-db", password: dbPassword, port: 54320)
-    .WithImage("postgres", "17-alpine")
+    .WithImage("postgres", "18-alpine")
     .WithContainerName("app-domain-db")
     .WithEndpointProxySupport(false)
     .WithPgAdmin(pgAdmin => pgAdmin

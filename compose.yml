@@ -7,7 +7,7 @@ services:
   # #if (USE_PGSQL)
   # Database services
   app-domain-db:
-    image: postgres:17-alpine
+    image: postgres:18-alpine
     profiles: [ "db", "api", "backoffice" ]
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
@@ -59,7 +59,10 @@ services:
 
     restart: unless-stopped
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      # PostgreSQL 18+ stores the cluster under /var/lib/postgresql/{major}/docker, so the whole
+      # /var/lib/postgresql tree is mounted (not .../data) to keep the data directory on the volume
+      # and allow future major upgrades with pg_upgrade --link.
+      - postgres_data:/var/lib/postgresql
 
   # #if (USE_LIQUIBASE)
   app-domain-db-migrations:
@@ -87,7 +90,7 @@ services:
   # #if (USE_KAFKA)
   # Kafka Infrastructure
   kafka:
-    image: confluentinc/cp-kafka:7.6.0
+    image: confluentinc/cp-kafka:7.9.8
     profiles: [ "messaging", "api", "backoffice" ]
     ports:
       - "9092:9092"

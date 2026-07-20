@@ -181,7 +181,7 @@ public class IntegrationTestFixture : WebApplicationFactory<AppDomain.Api.Progra
     public IntegrationTestFixture()
     {
         _postgres = new PostgreSqlBuilder()
-            .WithImage("postgres:17-alpine")
+            .WithImage("postgres:18-alpine")
             .WithUsername("postgres")
             .WithPassword("postgres")
             .WithNetwork(_containerNetwork)
