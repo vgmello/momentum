@@ -1024,7 +1024,7 @@ Momentum applications use a specific configuration strategy designed for cloud-n
   "AllowedHosts": "*",
   "ConnectionStrings": {
     "AppDomainDb": "Host=localhost;Port=54320;Database=app_domain;",
-    "ServiceBus": "Host=localhost;Port=54320;Database=service_bus;",
+    "ServiceBus": "Host=localhost;Port=54320;Database=app_domain;",
     "Messaging": "localhost:9092"
   },
   "Aspire": {

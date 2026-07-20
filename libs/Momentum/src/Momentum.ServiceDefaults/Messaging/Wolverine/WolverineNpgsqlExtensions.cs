@@ -19,12 +19,13 @@ public class WolverineNpgsqlExtensions(IConfiguration configuration, IOptions<Se
     ///     This method:
     ///     <list type="bullet">
     ///         <item>Sets up PostgreSQL for both persistence and transport</item>
-    ///         <item>Creates a schema based on the service name</item>
+    ///         <item>Creates a persistence schema named "svcbus_{service-name}" (inbox/outbox/dead letters)</item>
     ///         <item>Enables auto-provisioning of database objects</item>
-    ///         <item>Uses "queues" as the transport schema</item>
+    ///         <item>Uses "svcbus_queues" as the transport schema</item>
     ///     </list>
-    ///     The persistence schema name is derived from the service name by replacing
-    ///     dots and hyphens with underscores and converting to lowercase.
+    ///     The service-name part is derived by replacing dots and hyphens with underscores and
+    ///     converting to lowercase. The "svcbus_" prefix keeps Wolverine's schemas clearly
+    ///     distinguishable from application schemas in the shared database.
     /// </remarks>
     public void Configure(WolverineOptions options)
     {
@@ -48,13 +49,13 @@ public class WolverineNpgsqlExtensions(IConfiguration configuration, IOptions<Se
                 $"The DB connection string '{ServiceBusOptions.SectionName}' has an invalid format: {ex.Message}", ex);
         }
 
-        var persistenceSchema = options.ServiceName
+        var persistenceSchema = "svcbus_" + options.ServiceName
             .Replace(".", "_")
             .Replace("-", "_")
             .ToLowerInvariant();
 
         options
             .PersistMessagesWithPostgresql(connectionString, schemaName: persistenceSchema)
-            .EnableMessageTransport(transport => transport.TransportSchemaName("queues"));
+            .EnableMessageTransport(transport => transport.TransportSchemaName("svcbus_queues"));
     }
 }

@@ -28,7 +28,7 @@ public class FluentValidationExecutorTests
         var validator = new TestValidator();
         var message = new TestMessage("Alice", 30);
 
-        var failures = await FluentValidationExecutor.ExecuteOne(validator, message);
+        var failures = await FluentValidationExecutor.ExecuteOne(validator, message, TestContext.Current.CancellationToken);
 
         failures.ShouldBeEmpty();
     }
@@ -39,7 +39,7 @@ public class FluentValidationExecutorTests
         var validator = new TestValidator();
         var message = new TestMessage("", -1);
 
-        var failures = await FluentValidationExecutor.ExecuteOne(validator, message);
+        var failures = await FluentValidationExecutor.ExecuteOne(validator, message, TestContext.Current.CancellationToken);
 
         failures.ShouldNotBeEmpty();
         failures.Count.ShouldBe(2);
@@ -53,7 +53,7 @@ public class FluentValidationExecutorTests
         var validators = new IValidator<TestMessage>[] { new TestValidator() };
         var message = new TestMessage("Alice", 30);
 
-        var failures = await FluentValidationExecutor.ExecuteMany(validators, message);
+        var failures = await FluentValidationExecutor.ExecuteMany(validators, message, TestContext.Current.CancellationToken);
 
         failures.ShouldBeEmpty();
     }
@@ -64,7 +64,7 @@ public class FluentValidationExecutorTests
         var validators = new IValidator<TestMessage>[] { new TestValidator(), new TestValidator() };
         var message = new TestMessage("", -1);
 
-        var failures = await FluentValidationExecutor.ExecuteMany(validators, message);
+        var failures = await FluentValidationExecutor.ExecuteMany(validators, message, TestContext.Current.CancellationToken);
 
         failures.Count.ShouldBe(4);
     }
@@ -75,7 +75,7 @@ public class FluentValidationExecutorTests
         var validators = Array.Empty<IValidator<TestMessage>>();
         var message = new TestMessage("Alice", 30);
 
-        var failures = await FluentValidationExecutor.ExecuteMany(validators, message);
+        var failures = await FluentValidationExecutor.ExecuteMany(validators, message, TestContext.Current.CancellationToken);
 
         failures.ShouldBeEmpty();
     }
@@ -86,7 +86,7 @@ public class FluentValidationExecutorTests
         var validators = new IValidator<TestMessage>[] { new AlwaysPassValidator(), new TestValidator() };
         var message = new TestMessage("", -1);
 
-        var failures = await FluentValidationExecutor.ExecuteMany(validators, message);
+        var failures = await FluentValidationExecutor.ExecuteMany(validators, message, TestContext.Current.CancellationToken);
 
         failures.Count.ShouldBe(2);
     }

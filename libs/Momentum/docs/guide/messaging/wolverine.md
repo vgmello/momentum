@@ -6,11 +6,11 @@ Wolverine is a powerful messaging framework that serves as the backbone of Momen
 
 Wolverine (formerly Jasper) is a .NET messaging framework that provides:
 
--   **In-process messaging**: CQRS command/query handling
--   **External transports**: Kafka, RabbitMQ, Azure Service Bus integration
--   **Middleware pipeline**: Powerful interceptor pattern
--   **Message persistence**: Reliable message delivery with PostgreSQL
--   **Code generation**: High-performance handlers through source generation
+- **In-process messaging**: CQRS command/query handling
+- **External transports**: Kafka, RabbitMQ, Azure Service Bus integration
+- **Middleware pipeline**: Powerful interceptor pattern
+- **Message persistence**: Reliable message delivery with PostgreSQL
+- **Code generation**: High-performance handlers through source generation
 
 ## Architecture Overview
 
@@ -371,35 +371,71 @@ builder.Services.AddWolverine(opts =>
 
 ## Error Handling
 
-### Exception Policies
+### Default Failure Policy
 
-Configure how different exceptions are handled:
+With reliable messaging enabled (the default), Momentum installs a transient-failure policy for
+`NpgsqlException` (transient) and `TimeoutException`:
+
+1. Two quick in-process retries with cooldown (50ms, 250ms)
+2. Two **durable scheduled retries** (5s, 30s) — the message is persisted with a future execution
+   time and the listener is released, so a Kafka partition is never blocked by a cooling-down message
+3. Dead letter queue
+
+Application-specific rules added in the `AddServiceBus` configure callback run before these defaults
+and take precedence:
 
 ```csharp
-builder.Services.AddWolverine(opts =>
+builder.AddServiceBus(opts =>
 {
-    // Retry transient exceptions
-    opts.Policies.OnException<SqlException>().Retry(3);
-    opts.Policies.OnException<HttpRequestException>().RetryWithCooldown(1.Seconds(), 5.Seconds());
+    // Never retry business rule violations
+    opts.OnException<BusinessRuleException>().MoveToErrorQueue();
 
-    // Move poison messages to error queue
-    opts.Policies.OnException<BusinessRuleException>().MoveToErrorQueue();
-
-    // Continue processing for validation errors
-    opts.Policies.OnException<ValidationException>().ContinueProcessing();
+    // Retry an external dependency harder than the default
+    opts.OnException<HttpRequestException>()
+        .RetryWithCooldown(1.Seconds(), 5.Seconds())
+        .Then.ScheduleRetry(1.Minutes(), 5.Minutes())
+        .Then.MoveToErrorQueue();
 });
 ```
 
-### Dead Letter Queues
+### Dead Letter Queue: Inspect and Replay
 
-Failed messages are moved to dead letter queues:
+Failed messages land in the Wolverine persistence schema of the application database
+(`svcbus_{service}.wolverine_dead_letters`). To inspect and recover:
 
-```csharp
-// Dead letter queues are automatically configured
-// Messages that fail after all retries are moved to:
-// - {original-queue-name}.dead-letter (for local queues)
-// - {original-topic-name}.dead-letter (for Kafka topics)
+```bash
+# Summarize persisted envelope counts (incoming/outgoing/scheduled/dead-letter)
+dotnet run -- storage counts
+
+# Replay dead-lettered messages (marks them replayable; the durability agent re-enqueues them)
+dotnet run -- storage replay
+
+# Replay only dead letters caused by a specific exception type
+dotnet run -- storage replay --exception-type Npgsql.NpgsqlException
 ```
+
+Note: `storage clear` exists but deletes **all** persisted envelopes (incoming, outgoing,
+scheduled, and dead letter) — do not use it to discard dead letters only; use
+`IDeadLetterAdminService.DiscardAsync` for targeted removal.
+
+Programmatic access is available through Wolverine's `IDeadLetterAdminService` (query, discard,
+replay by message type, exception type, or time range), which is registered automatically with the
+PostgreSQL message store. Dead-letter rows include the exception type, message, and full envelope,
+so a fixed bug can be followed by a targeted replay instead of manual reprocessing.
+
+### At-Least-Once Delivery on Kafka
+
+Kafka listeners use Wolverine's `CommitMode.StoreThenAutoFlush`: offsets are stored only after a
+message is successfully processed (or persisted to the durable inbox) and never ahead of the lowest
+in-flight offset. Combined with the durable inbox (enabled by default via reliable messaging),
+this gives at-least-once delivery with duplicate detection by message id.
+
+::: warning
+Do not set `EnableAutoCommit` in the Kafka consumer configuration. An explicit
+`EnableAutoCommit: true` suppresses Wolverine's offset management and reverts to librdkafka's
+store-on-consume behavior, where a crash during message processing loses the message. Momentum logs
+a warning at startup if this misconfiguration is detected.
+:::
 
 ### Custom Error Handling
 
@@ -686,7 +722,7 @@ await app.RunAsync(args);
 
 ## Next Steps
 
--   Learn about [Integration Events](./integration-events) publishing
--   Understand [Kafka Configuration](./kafka) for external messaging
--   Explore [Domain Events](./domain-events) for internal messaging
--   See [Testing](../testing/) for comprehensive testing strategies
+- Learn about [Integration Events](./integration-events) publishing
+- Understand [Kafka Configuration](./kafka) for external messaging
+- Explore [Domain Events](./domain-events) for internal messaging
+- See [Testing](../testing/) for comprehensive testing strategies

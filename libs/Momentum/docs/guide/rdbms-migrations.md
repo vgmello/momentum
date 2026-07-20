@@ -32,7 +32,6 @@ Momentum organizes database migrations in a dedicated infrastructure project tha
 infra/AppDomain.Database/
 ├── AppDomain.Database.csproj          # Minimal project file for build integration
 ├── liquibase.properties               # Main main database configuration
-├── liquibase.servicebus.properties    # Service bus database configuration
 ├── liquibase.setup.properties         # Database setup and initial schemas
 └── Liquibase/                         # Migration files directory
     ├── changelog.xml                  # Root changelog with includeAll directive
@@ -51,26 +50,26 @@ infra/AppDomain.Database/
     │       └── procedures/
     │           ├── invoices_cancel.sql
     │           └── invoices_mark_paid.sql
-    └── service_bus/                   # Message infrastructure migrations
-        ├── changelog.xml              # Service bus changelog
-        └── service_bus.sql            # Message queues and schemas
 ```
 
-### Multi-Database Architecture
+Wolverine's messaging schemas (per-service `svcbus_{service}` inbox/outbox persistence schema
+and the `svcbus_queues` transport schema) live in the same application database and are auto-provisioned at startup;
+the domain changelog only pre-creates the `svcbus_queues` schema.
 
-Momentum uses a **dual-database approach** to separate concerns:
+### Single-Database, Multi-Schema Architecture
 
-#### 1. **main Database**
-- Contains business domain entities and logic
+Momentum uses **one application database with separate schemas** to isolate concerns while
+keeping Wolverine's outbox transactionally co-located with business data:
+
+#### 1. **Domain schemas** (e.g. `main`)
+- Contain business domain entities and logic
 - Organized by domain boundaries (cashiers, invoices, etc.)
-- Supports complex business queries and transactions
-- Configured via `liquibase.properties`
+- Managed by Liquibase via `liquibase.properties`
 
-#### 2. **service_bus Database**
-- Manages message queues and event sourcing infrastructure
-- Contains schemas for asynchronous processing
-- Supports reliable message delivery patterns
-- Configured via `liquibase.servicebus.properties`
+#### 2. **Messaging schemas** (Wolverine-managed)
+- A per-service `svcbus_{service}` persistence schema holds the durable inbox/outbox envelope tables
+- The `svcbus_queues` schema backs the PostgreSQL queue transport
+- Auto-provisioned by Wolverine at startup — no Liquibase changelog required
 
 ### Migration Project Configuration
 
@@ -275,7 +274,6 @@ public static class LiquibaseExtensions
             .WithEntrypoint("/bin/sh")
             .WithArgs("-c",
                 """
-                liquibase --url=jdbc:postgresql://app-domain-db:5432/service_bus update --changelog-file=service_bus/changelog.xml && \
                 liquibase --url=jdbc:postgresql://app-domain-db:5432/main update --changelog-file=main/changelog.xml
                 """);
     }
@@ -339,12 +337,10 @@ builder.AddProject<Projects.AppDomain_Api>("app-domain-api")
     .WaitFor(migrations);    // Wait for migrations to complete
 ```
 
-#### Sequential Database Creation
-The migration container executes databases in sequence:
-1. **service_bus** database (messaging infrastructure)
-2. **main** database (business domain)
-
-This ensures proper dependency ordering and prevents connection conflicts.
+#### Migration Execution
+The migration container runs the server-level setup changelog first (database creation),
+then the application database changelog. Wolverine provisions its own messaging schemas
+when the services start.
 
 ## Docker Compose Integration
 
@@ -368,7 +364,6 @@ app-domain-db-migrations:
     - |
       echo 'Running database migrations...' && \
       liquibase update --defaults-file liquibase.setup.properties --url=jdbc:postgresql://app-domain-db:5432/postgres && \
-      liquibase update --defaults-file liquibase.servicebus.properties --url=jdbc:postgresql://app-domain-db:5432/service_bus && \
       liquibase update --url=jdbc:postgresql://app-domain-db:5432/main && \
       echo 'Database migrations completed successfully!'
 ```
@@ -384,14 +379,7 @@ username=postgres
 password=password@
 ```
 
-#### Service Bus (`liquibase.servicebus.properties`)
-```properties
-changeLogFile=service_bus/changelog.xml
-liquibase.searchPath=./Liquibase/
-liquibase.command.url=jdbc:postgresql://localhost:5432/service_bus
-username=postgres
-password=password@
-```
+
 
 #### Setup Configuration (`liquibase.setup.properties`)
 Used for initial database and schema creation in containerized environments.
@@ -456,11 +444,8 @@ docker compose up app-domain-db app-domain-db-migrations
 # Navigate to database project
 cd infra/AppDomain.Database
 
-# Run main database migrations
+# Run application database migrations
 liquibase update
-
-# Run service bus migrations
-liquibase update --defaults-file=liquibase.servicebus.properties
 ```
 
 #### 3. Validating Changes

@@ -60,10 +60,7 @@ cd AppDomain/infra/AppDomain.Database/
 # Step 1: Setup databases (creates actual dbs)
 liquibase update --defaults-file liquibase.setup.properties
 
-# Step 2: Service bus schema
-liquibase update --defaults-file liquibase.servicebus.properties
-
-# Step 3: Application schema
+# Step 2: Application schema (includes Wolverine messaging schemas)
 liquibase update
 ```
 

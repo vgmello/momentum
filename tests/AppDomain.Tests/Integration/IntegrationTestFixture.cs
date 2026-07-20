@@ -57,7 +57,7 @@ public class IntegrationTestFixture : IAsyncLifetime
 
     public string AppDomainDbConnectionString => _postgres.GetDbConnectionString("app_domain");
 
-    public string ServiceBusDbConnectionString => _postgres.GetDbConnectionString("service_bus");
+    public string ServiceBusDbConnectionString => _postgres.GetDbConnectionString("app_domain");
 
     //#endif
     //#if (USE_KAFKA)
@@ -125,7 +125,7 @@ public class IntegrationTestFixture : IAsyncLifetime
         {
             //#if (USE_DB)
             ["ConnectionStrings:AppDomainDb"] = _postgres.GetDbConnectionString("app_domain"),
-            ["ConnectionStrings:ServiceBus"] = _postgres.GetDbConnectionString("service_bus"),
+            ["ConnectionStrings:ServiceBus"] = _postgres.GetDbConnectionString("app_domain"),
             //#endif
             ["Orleans:UseLocalhostClustering"] = "true",
             ["ServiceBus:Wolverine:CodegenEnabled"] = "true",

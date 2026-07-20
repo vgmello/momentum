@@ -18,10 +18,12 @@ public static class FluentValidationExecutor
     /// <typeparam name="T">The type of message to validate.</typeparam>
     /// <param name="validator">The validator to execute.</param>
     /// <param name="message">The message instance to validate.</param>
+    /// <param name="cancellationToken">Token that cancels validation together with the message.</param>
     /// <returns>A list of validation failures, empty if validation succeeds.</returns>
-    public static async Task<List<ValidationFailure>> ExecuteOne<T>(IValidator<T> validator, T message)
+    public static async Task<List<ValidationFailure>> ExecuteOne<T>(IValidator<T> validator, T message,
+        CancellationToken cancellationToken)
     {
-        var result = await validator.ValidateAsync(message);
+        var result = await validator.ValidateAsync(message, cancellationToken);
 
         return result.Errors;
     }
@@ -32,21 +34,23 @@ public static class FluentValidationExecutor
     /// <typeparam name="T">The type of message to validate.</typeparam>
     /// <param name="validators">The validators to execute.</param>
     /// <param name="message">The message instance to validate.</param>
+    /// <param name="cancellationToken">Token that cancels validation together with the message.</param>
     /// <returns>A list of all validation failures from all validators, empty if all validations succeed.</returns>
-    public static async Task<List<ValidationFailure>> ExecuteMany<T>(IEnumerable<IValidator<T>> validators, T message)
+    public static async Task<List<ValidationFailure>> ExecuteMany<T>(IEnumerable<IValidator<T>> validators, T message,
+        CancellationToken cancellationToken)
     {
-        var failures = new List<ValidationFailure>();
+        List<ValidationFailure>? failures = null;
 
         foreach (var validator in validators)
         {
-            var result = await validator.ValidateAsync(message);
+            var result = await validator.ValidateAsync(message, cancellationToken);
 
             if (result.Errors.Count is not 0)
             {
-                failures.AddRange(result.Errors);
+                (failures ??= []).AddRange(result.Errors);
             }
         }
 
-        return failures;
+        return failures ?? [];
     }
 }

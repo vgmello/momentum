@@ -7,7 +7,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Momentum.ServiceDefaults.Messaging.Middlewares;
+using Npgsql;
 using System.Reflection;
+using Wolverine.ErrorHandling;
 using Wolverine.Runtime;
 
 namespace Momentum.ServiceDefaults.Messaging.Wolverine;
@@ -33,11 +35,18 @@ public static class WolverineSetupExtensions
     ///         <strong>Persistence and Reliability:</strong>
     ///     </para>
     ///     <list type="bullet">
-    ///         <item>PostgreSQL persistence for message durability and transaction support</item>
-    ///         <item>Reliable messaging with inbox/outbox patterns for guaranteed delivery</item>
-    ///         <item>Automatic transaction scoping for consistency across business operations</item>
-    ///         <item>Dead letter queue handling for failed message processing</item>
+    ///         <item>PostgreSQL persistence for message durability (inbox/outbox patterns)</item>
+    ///         <item>Automatic transaction scoping for Wolverine-integrated persistence operations</item>
+    ///         <item>Default retry policy for transient database/timeout failures, then dead letter queue</item>
     ///     </list>
+    ///     <para>
+    ///         <strong>Important:</strong> message persistence (inbox/outbox) and the PostgreSQL queue
+    ///         transport share the database behind the <c>ServiceBus</c> connection string — Wolverine
+    ///         does not support splitting them. Point <c>ServiceBus</c> at the application database
+    ///         (the template default) so the outbox lives beside the business data in its own schema;
+    ///         pointing it at a separate database reopens a crash window between the business commit
+    ///         and the outbox persist in which outgoing messages can be lost.
+    ///     </para>
     ///
     ///     <para>
     ///         <strong>Integration and Transport:</strong>
@@ -80,6 +89,8 @@ public static class WolverineSetupExtensions
         var wolverineConfig = configuration.GetSection(SectionName);
         services.Configure<WolverineOptions>(wolverineConfig);
 
+        var serviceNameCustomized = false;
+
         services.AddWolverine(ExtensionDiscovery.ManualOnly, opts =>
         {
             opts.ApplicationAssembly = ServiceDefaultsExtensions.EntryAssembly;
@@ -92,15 +103,25 @@ public static class WolverineSetupExtensions
             opts.Policies.Add<FluentValidationPolicy>();
             opts.Policies.AddMiddleware<RequestPerformanceMiddleware>();
 
-            opts.Policies.ConventionalLocalRoutingIsAdditive();
-
+            // Local conventional routing deliberately stays non-additive: an integration event with
+            // both a local handler and an explicit external route (e.g. Kafka) is published only to
+            // the external transport and processed once when it is consumed back, instead of being
+            // handled locally AND again via the broker round trip.
             opts.ConfigureAppHandlers(opts.ApplicationAssembly);
 
             var codegenEnabled = wolverineConfig.GetValue<bool>("CodegenEnabled");
             opts.CodeGeneration.TypeLoadMode = codegenEnabled ? TypeLoadMode.Dynamic : TypeLoadMode.Static;
 
-            var autoProvision = configuration.GetValue<bool>("AutoProvision");
-            var configAutoProvisionStorage = configuration.GetValue<string>("AutoBuildMessageStorageOnStartup");
+            if (codegenEnabled)
+            {
+                // WolverineFx.RuntimeCompilation normally self-registers via assembly-attribute
+                // discovery, but ExtensionDiscovery.ManualOnly above disables that scan, so the
+                // Roslyn-backed IAssemblyGenerator TypeLoadMode.Dynamic needs must be wired up explicitly.
+                opts.UseRuntimeCompilation();
+            }
+
+            var autoProvision = wolverineConfig.GetValue<bool>("AutoProvision");
+            var configAutoProvisionStorage = wolverineConfig.GetValue<string>("AutoBuildMessageStorageOnStartup");
 
             if (!autoProvision && configAutoProvisionStorage is null)
             {
@@ -109,12 +130,19 @@ public static class WolverineSetupExtensions
 
             opts.Services.AddResourceSetupOnStartup();
 
+            var conventionServiceName = opts.ServiceName;
             configure?.Invoke(opts);
+            serviceNameCustomized = !string.Equals(opts.ServiceName, conventionServiceName, StringComparison.Ordinal);
         });
 
         services.AddSingleton<IConfigureOptions<WolverineOptions>>(prov =>
             new ConfigureNamedOptions<WolverineOptions>(string.Empty, wolverineOptions =>
             {
+                // A ServiceName explicitly set in the user's configure callback wins over the
+                // ServiceBus-derived default.
+                if (serviceNameCustomized)
+                    return;
+
                 var options = prov.GetRequiredService<IOptions<ServiceBusOptions>>();
 
                 wolverineOptions.ServiceName = options.Value.PublicServiceName;
@@ -151,15 +179,40 @@ public static class WolverineSetupExtensions
     ///         <item>Automatic transaction middleware</item>
     ///         <item>Durable local queues for reliable processing</item>
     ///         <item>Durable outbox pattern on all sending endpoints</item>
+    ///         <item>
+    ///             Durable inbox on all listening endpoints — incoming messages (e.g. from Kafka) are
+    ///             persisted before processing, giving at-least-once delivery with duplicate detection
+    ///             by message id across redeliveries
+    ///         </item>
+    ///         <item>
+    ///             Transient-failure policy (<see cref="NpgsqlException" /> marked transient, and
+    ///             <see cref="TimeoutException" />): two quick in-process retries (50ms/250ms), then
+    ///             durable scheduled retries (5s/30s) that release the listener instead of blocking it
+    ///             (important for Kafka partitions), then the dead letter queue
+    ///         </item>
     ///     </list>
-    ///     These settings ensure message delivery reliability and prevent message loss
-    ///     in case of failures.
+    ///     Failure rules added by the application (via the <c>configure</c> callback of
+    ///     <c>AddServiceBus</c>) are evaluated before these defaults and therefore take precedence.
+    ///     Dead-lettered messages are stored in the Wolverine persistence schema
+    ///     (<c>svcbus_*.wolverine_dead_letters</c>) and can be inspected and replayed with the
+    ///     <c>storage</c> CLI command or <c>IDeadLetterAdminService</c>.
     /// </remarks>
     public static WolverineOptions ConfigureReliableMessaging(this WolverineOptions options)
     {
         options.Policies.AutoApplyTransactions();
         options.Policies.UseDurableLocalQueues();
         options.Policies.UseDurableOutboxOnAllSendingEndpoints();
+        options.Policies.UseDurableInboxOnAllListeners();
+
+        options.OnException<NpgsqlException>(ex => ex.IsTransient)
+            .Or<TimeoutException>()
+            .RetryWithCooldown(
+                TimeSpan.FromMilliseconds(50),
+                TimeSpan.FromMilliseconds(250))
+            .Then.ScheduleRetry(
+                TimeSpan.FromSeconds(5),
+                TimeSpan.FromSeconds(30))
+            .Then.MoveToErrorQueue();
 
         return options;
     }

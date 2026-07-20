@@ -62,6 +62,9 @@
         <PackageReference Include="Serilog.Sinks.OpenTelemetry"/>
         <PackageReference Include="WolverineFx"/>
         <PackageReference Include="WolverineFx.Postgresql"/>
+        <!-- Wolverine 6.0 split Roslyn out of core; required whenever CodeGeneration.TypeLoadMode
+             can resolve to Dynamic/Auto (see WolverineSetupExtensions.CodegenEnabled) -->
+        <PackageReference Include="WolverineFx.RuntimeCompilation"/>
         <!--#if (!LIBS_INCLUDES_EXT)
         <PackageReference Include="Momentum.Extensions"/>
         #endif -->

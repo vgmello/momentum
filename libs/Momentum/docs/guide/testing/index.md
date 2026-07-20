@@ -215,7 +215,7 @@ public class IntegrationTestFixture : WebApplicationFactory<AppDomain.Api.Progra
         builder.UseSetting("ConnectionStrings:AppDomainDb",
             _postgres.GetDbConnectionString("app_domain"));
         builder.UseSetting("ConnectionStrings:ServiceBus",
-            _postgres.GetDbConnectionString("service_bus"));
+            _postgres.GetDbConnectionString("app_domain"));
         builder.UseSetting("ConnectionStrings:Messaging",
             _kafka.GetBootstrapAddress());
         builder.UseSetting("Orleans:UseLocalhostClustering", "true");

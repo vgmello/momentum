@@ -4,7 +4,115 @@ All notable changes to this project are documented in this file, grouped by date
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2026-07-19]
+
+### Changed
+
+- **Messaging topology**: Wolverine message persistence (inbox/outbox) and the PostgreSQL queue
+  transport now live in the **application database** (`app_domain`) instead of a separate
+  `service_bus` database — the `ServiceBus` connection string now points at the application database
+  everywhere (appsettings, compose, AppHost, integration tests). Wolverine does not support splitting
+  the transport from the message store, and a separate database made the outbox non-atomic with
+  business writes; co-locating them (per-service `svcbus_{service}` persistence schema + `svcbus_queues` schema alongside
+  `main`) removes the crash window in which committed business data could lose its outgoing events.
+  The `service_bus` database, its Liquibase changelog, and `liquibase.servicebus.properties` were
+  removed; the `svcbus_queues` schema is now pre-created by the `app_domain` changelog. The AppHost passes
+  the `ServiceBus` connection name via `WithReference(database, connectionName: "ServiceBus")`.
+- **Messaging routing**: removed `ConventionalLocalRoutingIsAdditive()`. An integration event that a
+  service both publishes and handles was previously processed twice — once via local routing at
+  publish time and again when consumed back from its own Kafka subscription. With the default
+  (non-additive) routing, such events go only to the external transport and are processed exactly
+  once on consumption; messages without explicit external routes (commands, queries, local events)
+  still route locally as before.
+- **ServiceDefaults/Messaging**: Wolverine schema names now carry a `svcbus_` prefix so messaging
+  infrastructure is clearly distinguishable from application schemas in the shared database — the
+  per-service persistence schema is `svcbus_{service}` (e.g. `svcbus_appdomain_api`) and the
+  PostgreSQL transport schema is `svcbus_queues` (was `queues`).
+- **ServiceDefaults/Messaging**: `Envelope.GetMessageName(fullName: true)` caches the sanitized full type
+  name per message type (previously four `string.Replace` allocations per processed message via the OTel
+  and performance middlewares).
+
+### Added
+
+- **Template**: new `TransactionalOutboxMiddleware` (applied to all `ICommand<>` handler chains via
+  the AppDomain Wolverine extension) makes command handling fully atomic: it opens a single
+  transaction on the application database, exposes it ambiently (`TransactionalOutbox.CurrentTransaction`),
+  `AppDomainDb` (LinqToDB) instances resolved during the message execution attach to that transaction,
+  and Wolverine's outbox is enlisted in it (`MessageContext.EnlistInOutboxAsync` +
+  `DatabaseEnvelopeTransaction`), so cascaded integration events are persisted to the outgoing
+  envelope table in the same transaction as the business writes — one commit covers both, and
+  failures roll back both. Nested command invocations (the DbCommand pattern) join the ambient
+  transaction instead of opening their own.
+
+- **ServiceDefaults/Messaging**: `ConfigureReliableMessaging` now installs a default failure policy —
+  transient `NpgsqlException`s and `TimeoutException`s get two quick in-process retries (50ms/250ms),
+  then two durable **scheduled retries** (5s/30s) that release the listener instead of blocking it (so
+  a cooling-down message never stalls a Kafka partition), then the dead letter queue. Previously no
+  retry rules existed anywhere, so any transient failure dead-lettered on first attempt despite the
+  docs claiming retry support. Application failure rules (added via the `AddServiceBus` configure
+  callback) still take precedence.
+- **ServiceDefaults/Messaging**: reliable messaging now also enables the **durable inbox on all
+  listening endpoints** (`UseDurableInboxOnAllListeners`) — incoming Kafka messages are persisted
+  before processing, giving at-least-once delivery with duplicate detection by message id, and failed
+  messages land in the replayable database dead-letter table.
+- **Docs**: new dead-letter operations guide in `guide/messaging/wolverine.md` — inspect
+  (`storage counts`), replay (`storage replay [--exception-type ...]`), and programmatic
+  `IDeadLetterAdminService` usage — closing the "no DLQ recovery story" gap.
+
+### Fixed
+
+- **Kafka at-least-once delivery**: removed `EnableAutoCommit: true` / `AutoCommitIntervalMs` from the
+  template's Kafka consumer configuration. Under Wolverine 6, an explicit `EnableAutoCommit=true`
+  suppresses Wolverine's commit management (`KafkaOffsetCommitter.ResolveStrategy`) and falls back to
+  librdkafka storing offsets **at consume time** — a crash during message processing lost the message
+  (the failure mode JasperFx/wolverine#2114 was opened against). With the keys removed, Wolverine's
+  default `CommitMode.StoreThenAutoFlush` applies: `EnableAutoOffsetStore=false`, offsets stored only
+  after successful processing, and the commit watermark never advances past an in-flight message.
+  `KafkaWolverineExtensions` now logs a startup warning if configuration reintroduces the unsafe
+  combination.
+
+- **ServiceDefaults/Messaging**: `AutoProvision`/`AutoBuildMessageStorageOnStartup` are now read from the
+  `ServiceBus:Wolverine` section — the same path `appsettings.json` and the Kafka extension already use.
+  Previously `WolverineSetupExtensions` read `ServiceBus:AutoProvision`, a key nothing sets, so
+  `AutoBuildMessageStorageOnStartup` was forced to `None` in every environment.
+- **ServiceDefaults/Messaging**: a `ServiceName` set explicitly in the `AddServiceBus` configure callback
+  is no longer silently overwritten by the `ServiceBus:PublicServiceName`-derived default (which also
+  feeds the Postgres persistence schema name).
+- **ServiceDefaults/Messaging**: integration-event publisher discovery now unions the explicitly marked
+  `[DomainAssembly]` assemblies (force-loaded via their type markers) into the loaded-assembly sweep, and
+  prefix-matches on full namespace segments (`Name` or `Name.`) instead of raw `StartsWith`. Fixes events
+  being missed when a referenced contracts assembly had not been lazily loaded yet, and accidental matches
+  of unrelated assemblies sharing a name prefix.
+- **Kafka**: the "Configured Kafka subscriptions" log line now reports the actual consumer group id from
+  the Aspire consumer config instead of Wolverine's `ServiceName`, which is not the group id.
+- **ServiceDefaults/Messaging**: FluentValidation middleware now flows the message `CancellationToken`
+  into `ValidateAsync`, so async validators cancel with the request.
+- **Docs**: `AddWolverineWithDefaults` XML remarks no longer overstate delivery guarantees — they now
+  document that the outbox is only atomic with business data when both share the same database
+  connection/transaction (not the case with the default separate `service_bus` database + LinqToDB
+  topology).
+
 ## [2026-07-18]
+
+### Changed
+
+- **Deps**: bumped `WolverineFx`/`WolverineFx.Kafka`/`WolverineFx.Postgresql` from `5.39.x` to `6.20.0`
+  (major). Two runtime-default changes needed code fixes, both in the generated project template:
+    - Core `WolverineFx` no longer ships the Roslyn runtime compiler; `TypeLoadMode.Dynamic` (used locally
+      when `CodegenEnabled: true`, see `appsettings.Local.json`) now needs the new `WolverineFx.RuntimeCompilation`
+      package. Added it as an unconditional dependency of `Momentum.ServiceDefaults` (every host type uses
+      Dynamic mode locally) and call `opts.UseRuntimeCompilation()` explicitly in `WolverineSetupExtensions`
+      — the package's usual `[WolverineModule]` auto-registration relies on Wolverine's assembly-discovery
+      scan, which this codebase already disables via `ExtensionDiscovery.ManualOnly`.
+    - `WolverineOptions.ServiceLocationPolicy` now defaults to `NotAllowed` (was `AllowedButWarn`). LinqToDB's
+      `AddLinqToDBContext<T>` registers `DataOptions<T>` behind an opaque lambda factory Wolverine's codegen
+      can't statically resolve, which broke every command handler touching the database. Fixed with a scoped
+      allow-list (`opts.CodeGeneration.AlwaysUseServiceLocationFor<DataOptions<AppDomainDb>>()`) registered via
+      `IWolverineExtension` in the generated project's `DependencyInjection.cs`, rather than disabling the new
+      policy repo-wide.
+    - Verified: `dotnet new mmt --local` (default flags) restores, builds, and passes all 47 integration tests
+      (Testcontainers Postgres + Liquibase); this repo's own `AppDomain.slnx` passes 350 unit + 209
+      integration/arch tests including all 49 real Wolverine-handler integration tests.
 
 ### Fixed
 

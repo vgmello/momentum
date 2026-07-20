@@ -10,6 +10,8 @@
         <!--#if (USE_PGSQL) -->
         <PackageReference Include="Aspire.Npgsql"/>
         <PackageReference Include="Npgsql"/>
+        <!-- Provides Wolverine.RDBMS/DatabaseEnvelopeTransaction for the transactional outbox middleware -->
+        <PackageReference Include="WolverineFx.Postgresql"/>
         <!--#endif -->
         <!--#if (INCLUDE_ORLEANS) -->
         <PackageReference Include="Microsoft.Orleans.Client"/>

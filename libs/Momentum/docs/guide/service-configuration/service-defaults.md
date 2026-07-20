@@ -362,7 +362,7 @@ The `appsettings.json` file serves as the **baseline configuration** containing 
   "AllowedHosts": "*",
   "ConnectionStrings": {
     "AppDomainDb": "Host=localhost;Port=54320;Database=app_domain;",
-    "ServiceBus": "Host=localhost;Port=54320;Database=service_bus;",
+    "ServiceBus": "Host=localhost;Port=54320;Database=app_domain;",
     "Messaging": "localhost:9092"
   },
   "Aspire": {
@@ -382,7 +382,7 @@ The `appsettings.Local.json` file contains all **local development overrides** â
 {
   "ConnectionStrings": {
     "AppDomainDb": "Host=localhost;Port=54320;Database=app_domain;password=password@;username=postgres;",
-    "ServiceBus": "Host=localhost;Port=54320;Database=service_bus;password=password@;username=postgres;"
+    "ServiceBus": "Host=localhost;Port=54320;Database=app_domain;password=password@;username=postgres;"
   }
 }
 ```
@@ -406,7 +406,7 @@ Cloud environments (QA, Staging, Production) should use **environment-specific a
   },
   "ConnectionStrings": {
     "AppDomainDb": "Host=prod-db;Port=5432;Database=app_domain;",
-    "ServiceBus": "Host=prod-db;Port=5432;Database=service_bus;",
+    "ServiceBus": "Host=prod-db;Port=5432;Database=app_domain;",
     "Messaging": "prod-kafka:9092"
   },
   "Aspire": {
