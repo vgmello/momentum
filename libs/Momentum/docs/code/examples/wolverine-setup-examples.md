@@ -10,7 +10,7 @@ builder.AddWolverine(opts =>
     opts.PublishMessage<OrderCreated>()
         .ToKafkaTopic("ecommerce.orders.order-created")
         .UseDurableOutbox();
-        
+
     // Configure local queues for background processing
     opts.LocalQueue("order-processing")
         .UseDurableInbox()
@@ -48,13 +48,13 @@ public static class OrderHandlers
         // Command is guaranteed to be valid
         var order = new Order(command.CustomerId, command.Items);
         await orders.SaveAsync(order);
-        
+
         // Publish integration event for other services
         await bus.PublishAsync(new OrderCreated(order.Id, order.CustomerId));
-        
-        logger.LogInformation("Order {OrderId} created for customer {CustomerId}", 
+
+        logger.LogInformation("Order {OrderId} created for customer {CustomerId}",
             order.Id, order.CustomerId);
-            
+
         return new OrderCreated(order.Id, order.CustomerId);
     }
 }
@@ -79,9 +79,9 @@ public static class PaymentHandlers
         var order = await orders.GetByIdAsync(@event.OrderId);
         order.MarkAsPaid(@event.Amount);
         await orders.SaveAsync(order);
-        
+
         // Trigger fulfillment process
-        await bus.SendToQueueAsync("fulfillment", 
+        await bus.SendToQueueAsync("fulfillment",
             new FulfillOrder(order.Id, order.Items));
     }
 }
@@ -92,21 +92,24 @@ public static class PaymentHandlers
 ```json
 // appsettings.json
 {
-  "ConnectionStrings": {
-    "ServiceBus": "Host=postgres;Database=order_service_messaging;Username=app;Password=secret"
-  },
-  "ServiceBus": {
-    "Domain": "ECommerce",
-    "PublicServiceName": "order-service",
-    "CloudEvents": {
-      "Source": "https://api.mystore.com/orders",
-      "DefaultType": "com.mystore.orders"
+    "ConnectionStrings": {
+        // Standalone fallback only: used when no application NpgsqlDataSource is
+        // registered in DI. A generated service reuses its application data source
+        // (e.g. AppDomainDb) automatically and omits this entry.
+        "ServiceBus": "Host=postgres;Database=order_service_messaging;Username=app;Password=secret"
+    },
+    "ServiceBus": {
+        "Domain": "ECommerce",
+        "PublicServiceName": "order-service",
+        "CloudEvents": {
+            "Source": "https://api.mystore.com/orders",
+            "DefaultType": "com.mystore.orders"
+        }
+    },
+    "Kafka": {
+        "BootstrapServers": "kafka:9092",
+        "GroupId": "order-service-v1"
     }
-  },
-  "Kafka": {
-    "BootstrapServers": "kafka:9092",
-    "GroupId": "order-service-v1"
-  }
 }
 ```
 
@@ -117,26 +120,26 @@ public static class PaymentHandlers
 public class OrderServiceIntegrationTests : IClassFixture<TestFixture>
 {
     private readonly IServiceProvider _services;
-    
+
     public OrderServiceIntegrationTests(TestFixture fixture)
     {
         var services = new ServiceCollection();
         var config = fixture.Configuration;
         var env = fixture.Environment;
-        
+
         // Add Wolverine with test-specific configuration
         services.AddWolverineWithDefaults(env, config, opts =>
         {
             // Use in-memory transport for testing
             opts.UseInMemoryTransport();
-            
+
             // Disable external dependencies
             opts.DisableKafka();
-            
+
             // Enable immediate processing for synchronous testing
             opts.Policies.DisableConventionalLocalRouting();
         });
-        
+
         _services = services.BuildServiceProvider();
     }
 }
@@ -148,6 +151,8 @@ public class OrderServiceIntegrationTests : IClassFixture<TestFixture>
 // appsettings.Local.json (excluded from Docker — all local overrides)
 {
   "ConnectionStrings": {
+    // Standalone fallback only — generated services reuse the application
+    // NpgsqlDataSource and omit this entry.
     "ServiceBus": "Host=localhost;Database=dev_messaging;Username=dev;Password=dev"
   },
   "ServiceBus": {
@@ -158,9 +163,11 @@ public class OrderServiceIntegrationTests : IClassFixture<TestFixture>
   }
 }
 
-// appsettings.Production.json  
+// appsettings.Production.json
 {
   "ConnectionStrings": {
+    // Standalone fallback only — generated services reuse the application
+    // NpgsqlDataSource and omit this entry.
     "ServiceBus": "${MESSAGING_CONNECTION_STRING}"
   },
   "ServiceBus": {

@@ -33,7 +33,8 @@ public static class MessagingSetupExtensions
 
         builder.Services.AddWolverineWithDefaults(serviceBusConfig, configure);
 
-        builder.AddKeyedNpgsqlDataSource(ServiceBusOptions.SectionName);
+        // Wolverine persistence reuses the application's NpgsqlDataSource (see WolverineNpgsqlExtensions),
+        // so there is no separate "ServiceBus" data source/connection string to register here.
         builder.Services.ConfigureOptions<WolverineNpgsqlExtensions>();
 
         return builder;

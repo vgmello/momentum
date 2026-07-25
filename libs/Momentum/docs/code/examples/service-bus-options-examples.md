@@ -2,17 +2,20 @@
 
 ```json
 {
-  "ServiceBus": {
-    "Domain": "ECommerce",
-    "PublicServiceName": "order-service",
-    "CloudEvents": {
-      "Source": "https://api.mystore.com/orders",
-      "DefaultType": "com.mystore.orders"
+    "ServiceBus": {
+        "Domain": "ECommerce",
+        "PublicServiceName": "order-service",
+        "CloudEvents": {
+            "Source": "https://api.mystore.com/orders",
+            "DefaultType": "com.mystore.orders"
+        }
+    },
+    "ConnectionStrings": {
+        // Standalone fallback only: used when no application NpgsqlDataSource is
+        // registered in DI. A generated service reuses its application data source
+        // (e.g. AppDomainDb) automatically and omits this entry.
+        "ServiceBus": "Host=postgres;Database=order_messaging;Username=app;Password=secret"
     }
-  },
-  "ConnectionStrings": {
-    "ServiceBus": "Host=postgres;Database=order_messaging;Username=app;Password=secret"
-  }
 }
 ```
 
@@ -30,7 +33,7 @@
 // appsettings.Production.json
 {
   "ServiceBus": {
-    "Domain": "ECommerce", 
+    "Domain": "ECommerce",
     "PublicServiceName": "order-service",
     "CloudEvents": {
       "Source": "https://api.production.mystore.com/orders",
@@ -46,7 +49,7 @@
 // Domain: "ECommerce", PublicServiceName: "order-service"
 // Generated URN: "/e_commerce/order-service"
 
-// Domain: "CustomerManagement", PublicServiceName: "customer-api"  
+// Domain: "CustomerManagement", PublicServiceName: "customer-api"
 // Generated URN: "/customer_management/customer-api"
 ```
 
@@ -54,14 +57,14 @@
 
 ```json
 {
-  "ServiceBus": {
-    "CloudEvents": {
-      "Source": "https://api.mystore.com/orders",
-      "DefaultType": "com.mystore.orders",
-      "Subject": "orders",
-      "DataContentType": "application/json"
+    "ServiceBus": {
+        "CloudEvents": {
+            "Source": "https://api.mystore.com/orders",
+            "DefaultType": "com.mystore.orders",
+            "Subject": "orders",
+            "DataContentType": "application/json"
+        }
     }
-  }
 }
 ```
 
@@ -69,18 +72,18 @@
 
 ```json
 {
-  "specversion": "1.0",
-  "type": "com.mystore.orders.order-created",
-  "source": "https://api.mystore.com/orders",
-  "subject": "orders/12345",
-  "id": "550e8400-e29b-41d4-a716-446655440000",
-  "time": "2024-01-15T10:30:00Z",
-  "datacontenttype": "application/json",
-  "data": {
-    "orderId": "12345",
-    "customerId": "67890",
-    "totalAmount": 99.99
-  }
+    "specversion": "1.0",
+    "type": "com.mystore.orders.order-created",
+    "source": "https://api.mystore.com/orders",
+    "subject": "orders/12345",
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "time": "2024-01-15T10:30:00Z",
+    "datacontenttype": "application/json",
+    "data": {
+        "orderId": "12345",
+        "customerId": "67890",
+        "totalAmount": 99.99
+    }
 }
 ```
 
@@ -109,13 +112,14 @@ GetServiceName("payment-processor") // Returns: "payment-processor"
 // ServiceUrn = "/e_commerce/ecommerce-orderservice" (generated URN)
 ```
 
-## Warning Scenarios
+## Missing Data Source Scenario
 
 ```csharp
-// Missing connection string warning:
-// "ConnectionStrings:ServiceBus is not set. Transactional Inbox/Outbox 
-//  and Message Persistence features disabled"
+// Standalone use with neither an application NpgsqlDataSource registered in DI
+// nor a ServiceBus connection string configured throws at startup:
+// "No NpgsqlDataSource is registered and the DB string 'ServiceBus' is not set."
 
-// This allows the application to start without messaging persistence
-// but logs a clear warning about reduced functionality
+// A generated service always registers an application NpgsqlDataSource, so message
+// persistence reuses it automatically and this path is never hit. For standalone
+// library use, provide ConnectionStrings:ServiceBus as the fallback.
 ```

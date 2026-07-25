@@ -183,7 +183,6 @@ services:
       - ServiceName=AppDomain
       # #if (USE_DB)
       - ConnectionStrings__AppDomainDb=Host=app-domain-db;Port=5432;Database=app_domain;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-password@}
-      - ConnectionStrings__ServiceBus=Host=app-domain-db;Port=5432;Database=app_domain;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-password@}
       - ConnectionStrings__Messaging=kafka:9092
       # #endif
       # #if (INCLUDE_ORLEANS)
@@ -231,7 +230,6 @@ services:
       - ServiceName=AppDomain
       # #if (USE_DB)
       - ConnectionStrings__AppDomainDb=Host=app-domain-db;Port=5432;Database=app_domain;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-password@}
-      - ConnectionStrings__ServiceBus=Host=app-domain-db;Port=5432;Database=app_domain;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-password@}
       - ConnectionStrings__Messaging=kafka:9092
       # #endif
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://aspire-dashboard:18890
@@ -273,7 +271,6 @@ services:
       - ConnectionStrings__Orleans=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;TableEndpoint=http://azurite:10002/devstoreaccount1;BlobEndpoint=http://azurite:10000/devstoreaccount1
       # #if (USE_DB)
       - ConnectionStrings__AppDomainDb=Host=app-domain-db;Port=5432;Database=app_domain;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-password@}
-      - ConnectionStrings__ServiceBus=Host=app-domain-db;Port=5432;Database=app_domain;Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-password@}
       - ConnectionStrings__Messaging=kafka:9092
       # #endif
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://aspire-dashboard:18890

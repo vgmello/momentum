@@ -45,6 +45,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Tests**: the integration fixture set `Aspire:Confluent:Kafka:Messaging:Consumer:Config:EnableAutoCommit=true`,
   the same setting removed from `appsettings` yesterday — it suppressed Wolverine's at-least-once offset
   management, so the tests were not exercising the delivery guarantee the template ships. Removed.
+- **Template**: gated the AppHost's `Google.Protobuf` and `Grpc.AspNetCore` `PackageReference`s behind
+  `#if (INCLUDE_GRPC)` to match their `PackageVersion` (already `INCLUDE_GRPC`-gated in
+  `Directory.Packages.props`). Without this, gRPC-less configurations (`--grpc false`, `--api false`,
+  aspire-only) generated an AppHost referencing `Google.Protobuf` with no corresponding version under
+  Central Package Management and failed to build with `NU1010`. The AppHost uses only Aspire endpoint
+  types (`GrpcExtensions`), so it needs neither package when gRPC is excluded.
 
 ### Notes
 
@@ -62,14 +68,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - **Messaging topology**: Wolverine message persistence (inbox/outbox) and the PostgreSQL queue
   transport now live in the **application database** (`app_domain`) instead of a separate
-  `service_bus` database — the `ServiceBus` connection string now points at the application database
-  everywhere (appsettings, compose, AppHost, integration tests). Wolverine does not support splitting
-  the transport from the message store, and a separate database made the outbox non-atomic with
-  business writes; co-locating them (per-service `svcbus_{service}` persistence schema + `svcbus_queues` schema alongside
-  `main`) removes the crash window in which committed business data could lose its outgoing events.
-  The `service_bus` database, its Liquibase changelog, and `liquibase.servicebus.properties` were
-  removed; the `svcbus_queues` schema is now pre-created by the `app_domain` changelog. The AppHost passes
-  the `ServiceBus` connection name via `WithReference(database, connectionName: "ServiceBus")`.
+  `service_bus` database. Wolverine persistence reuses the application's registered `NpgsqlDataSource`
+  (`WolverineNpgsqlExtensions` resolves it from DI and passes the instance to
+  `PersistMessagesWithPostgresql`) — the same data source `TransactionalOutboxMiddleware` opens its
+  transaction on — so the outbox tables are structurally guaranteed to share the application database
+  and its connection. There is no longer a separate `ServiceBus` connection string that could be
+  pointed at a different database and silently break outbox atomicity; the dead `ServiceBus`
+  connection strings (appsettings, compose), the AppHost `WithReference(database, connectionName:
+"ServiceBus")` references, the keyed `ServiceBus` data source, and the integration fixture's
+  `ServiceBus` entry were all removed. The library keeps a `ConnectionStrings:ServiceBus` fallback for
+  standalone use (no application data source registered). Wolverine does not support splitting the
+  transport from the message store, and a separate database made the outbox non-atomic with business
+  writes; co-locating them (per-service `svcbus_{service}` persistence schema + `svcbus_queues` schema
+  alongside `main`) removes the crash window in which committed business data could lose its outgoing
+  events. The `service_bus` database, its Liquibase changelog, and `liquibase.servicebus.properties`
+  were removed; the `svcbus_queues` schema is now pre-created by the `app_domain` changelog.
 - **Messaging routing**: removed `ConventionalLocalRoutingIsAdditive()`. An integration event that a
   service both publishes and handles was previously processed twice — once via local routing at
   publish time and again when consumed back from its own Kafka subscription. With the default

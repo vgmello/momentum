@@ -57,8 +57,6 @@ public class IntegrationTestFixture : IAsyncLifetime
 
     public string AppDomainDbConnectionString => _postgres.GetDbConnectionString("app_domain");
 
-    public string ServiceBusDbConnectionString => _postgres.GetDbConnectionString("app_domain");
-
     //#endif
     //#if (USE_KAFKA)
     private readonly KafkaContainer _kafka;
@@ -124,8 +122,9 @@ public class IntegrationTestFixture : IAsyncLifetime
         var configData = new Dictionary<string, string?>
         {
             //#if (USE_DB)
+            // Wolverine reuses the AppDomainDb NpgsqlDataSource for message persistence, so there is
+            // no separate ServiceBus connection string (see WolverineNpgsqlExtensions).
             ["ConnectionStrings:AppDomainDb"] = _postgres.GetDbConnectionString("app_domain"),
-            ["ConnectionStrings:ServiceBus"] = _postgres.GetDbConnectionString("app_domain"),
             //#endif
             ["Orleans:UseLocalhostClustering"] = "true",
             ["ServiceBus:Wolverine:CodegenEnabled"] = "true",

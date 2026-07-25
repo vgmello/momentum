@@ -8,24 +8,24 @@ components.
 
 The AppDomain solution demonstrates modern enterprise architecture patterns including:
 
--   **Domain-Oriented Vertical Slice Architecture** with clear domain-centric slices
--   **DDD-inspired boundaries** with bounded contexts, domain language, and contracts/events
--   **Event-driven architecture** using Apache Kafka
--   **CQRS pattern** with separate command and query handling
--   **Pragmatic application-service style** over heavy domain object ceremony
--   **Microservices architecture** with proper service boundaries
-<!--#if (INCLUDE_ORLEANS) -->
--   **Orleans-based stateful processing** for complex business workflows
-<!--#endif -->
--   **Comprehensive testing strategy** with unit and integration tests
+- **Domain-Oriented Vertical Slice Architecture** with clear domain-centric slices
+- **DDD-inspired boundaries** with bounded contexts, domain language, and contracts/events
+- **Event-driven architecture** using Apache Kafka
+- **CQRS pattern** with separate command and query handling
+- **Pragmatic application-service style** over heavy domain object ceremony
+- **Microservices architecture** with proper service boundaries
+  <!--#if (INCLUDE_ORLEANS) -->
+- **Orleans-based stateful processing** for complex business workflows
+  <!--#endif -->
+- **Comprehensive testing strategy** with unit and integration tests
 
 <!--#if (INCLUDE_SAMPLE) -->
 
 ### Key Business Domains
 
--   **Cashiers**: Management of cashier entities and their payment capabilities
--   **Invoices**: Invoice lifecycle management with state transitions and payment processing
-<!--#endif -->
+- **Cashiers**: Management of cashier entities and their payment capabilities
+- **Invoices**: Invoice lifecycle management with state transitions and payment processing
+  <!--#endif -->
 
 ## Architecture
 
@@ -158,27 +158,27 @@ The solution uses the following port allocations (default base port: 8100):
 
 <!-- prettier-ignore-start -->
 
--   **.NET 10 SDK** or later
--   **Container Solution (Docker, Rancher, Podman, etc)** - Required for databases, Kafka, etc
-<!--#if (USE_PGSQL) -->
--   **PostgreSQL** (handled by Docker Compose)
+- **.NET 10 SDK** or later
+- **Container Solution (Docker, Rancher, Podman, etc)** - Required for databases, Kafka, etc
+  <!--#if (USE_PGSQL) -->
+- **PostgreSQL** (handled by Docker Compose)
     <!--#endif -->
     <!--#if (USE_KAFKA) -->
--   **Apache Kafka** (handled by Docker Compose)
-<!--#endif -->
--   **Git** for version control
-<!-- prettier-ignore-end -->
+- **Apache Kafka** (handled by Docker Compose)
+  <!--#endif -->
+- **Git** for version control
+  <!-- prettier-ignore-end -->
 
 ### Optional Tools
 
 <!-- prettier-ignore-start -->
 <!--#if (USE_PGSQL) -->
 
--   **pgAdmin** (included in Docker setup)
-<!--#endif -->
--   **Visual Studio 2022** or **JetBrains Rider**
--   **Postman** or similar for API testing
-<!-- prettier-ignore-end -->
+- **pgAdmin** (included in Docker setup)
+  <!--#endif -->
+- **Visual Studio 2022** or **JetBrains Rider**
+- **Postman** or similar for API testing
+  <!-- prettier-ignore-end -->
 
 ## Getting Started
 
@@ -199,11 +199,11 @@ dotnet run --project src/AppDomain.AppHost
 
 This will:
 
--   Start all services with proper orchestration
--   Launch the Aspire dashboard at https://localhost:18110
--   Set up service discovery and health monitoring
--   Configure distributed tracing with OpenTelemetry
-<!--#endif -->
+- Start all services with proper orchestration
+- Launch the Aspire dashboard at https://localhost:18110
+- Set up service discovery and health monitoring
+- Configure distributed tracing with OpenTelemetry
+  <!--#endif -->
 
 ### Option 2: Using Docker Compose
 
@@ -243,9 +243,9 @@ docker compose up AppDomain-db AppDomain-db-migrations
 
 #### Accessing the Database
 
--   **Connection String**: `Host=localhost;Port=54320;Database=app_domain;Username=postgres;Password=password@`
--   **pgAdmin**: http://localhost:54321 (admin@example.com / admin)
-<!--#endif -->
+- **Connection String**: `Host=localhost;Port=54320;Database=app_domain;Username=postgres;Password=password@`
+- **pgAdmin**: http://localhost:54321 (admin@example.com / admin)
+  <!--#endif -->
 
 ## Development Workflow
 
@@ -294,9 +294,9 @@ dotnet test tests/AppDomain.Tests
 
 ### Accessing API Documentation
 
--   **Scalar UI**: http://localhost:8101/scalar
--   **OpenAPI Spec**: http://localhost:8101/openapi/v1.json
--   **gRPC Reflection**: Enabled on port 8102
+- **Scalar UI**: http://localhost:8101/scalar
+- **OpenAPI Spec**: http://localhost:8101/openapi/v1.json
+- **gRPC Reflection**: Enabled on port 8102
 
 ### API Endpoints
 
@@ -359,16 +359,22 @@ Example: `app_domain.cashiers.created`, `app_domain.invoices.paid`
 | Variable               | Default     | Description         |
 | ---------------------- | ----------- | ------------------- |
 | ASPNETCORE_ENVIRONMENT | Development | Runtime environment |
+
 <!--#if (USE_DB) -->
-| ConnectionStrings\_\_AppDomainDb | - | PostgreSQL connection string |
-| ConnectionStrings\_\_ServiceBus | - | Service bus database connection |
+
+| ConnectionStrings\_\_AppDomainDb | - | PostgreSQL connection string (also used for Wolverine message persistence) |
+
 <!--#endif -->
 <!--#if (USE_KAFKA) -->
+
 | ConnectionStrings\_\_Messaging | localhost:59092 | Kafka broker addresses |
+
 <!--#endif -->
 <!--#if (INCLUDE_ORLEANS) -->
+
 | Orleans\_\_ClusterId | dev | Orleans cluster identifier |
 | Orleans\_\_ServiceId | AppDomain | Orleans service identifier |
+
 <!--#endif -->
 
 ### Application Settings
@@ -377,11 +383,11 @@ Configuration follows a cloud-native strategy optimized for deployment:
 
 #### Configuration File Strategy
 
--   **`appsettings.json`** - Baseline configuration with local development defaults
--   **`appsettings.{Environment}.json`** - Environment-specific configuration files for each target environment (Production, QA, Staging)
--   **`appsettings.Development.json`** - Local development overrides only (excluded from containers via `.dockerignore`)
--   **Environment Variables** - Deployment-specific overrides and values that vary by deployment instance
--   **Cloud Secret Management** - Azure Key Vault, AWS Secrets Manager, GCP Secret Manager for sensitive data
+- **`appsettings.json`** - Baseline configuration with local development defaults
+- **`appsettings.{Environment}.json`** - Environment-specific configuration files for each target environment (Production, QA, Staging)
+- **`appsettings.Development.json`** - Local development overrides only (excluded from containers via `.dockerignore`)
+- **Environment Variables** - Deployment-specific overrides and values that vary by deployment instance
+- **Cloud Secret Management** - Azure Key Vault, AWS Secrets Manager, GCP Secret Manager for sensitive data
 
 #### Configuration Hierarchy
 
@@ -428,9 +434,9 @@ docker build -f src/AppDomain.BackOffice.Orleans/Dockerfile -t appdomain-orleans
 
 All services expose health endpoints:
 
--   `/status` - Liveness probe
--   `/health/internal` - Readiness probe (only accessible from localhost, no auth)
--   `/health` - Public health endpoint, auth required
+- `/status` - Liveness probe
+- `/health/internal` - Readiness probe (only accessible from localhost, no auth)
+- `/health` - Public health endpoint, auth required
 
 ### Metrics
 
@@ -448,9 +454,9 @@ Traces can be exported to:
 
 <!--#endif -->
 
--   Jaeger
--   Zipkin
--   LGTM stack
+- Jaeger
+- Zipkin
+- LGTM stack
 
 ## Troubleshooting
 

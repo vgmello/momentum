@@ -214,8 +214,8 @@ public class IntegrationTestFixture : WebApplicationFactory<AppDomain.Api.Progra
     {
         builder.UseSetting("ConnectionStrings:AppDomainDb",
             _postgres.GetDbConnectionString("app_domain"));
-        builder.UseSetting("ConnectionStrings:ServiceBus",
-            _postgres.GetDbConnectionString("app_domain"));
+        // Wolverine message persistence reuses the application's NpgsqlDataSource
+        // (AppDomainDb), so no separate ServiceBus connection string is required.
         builder.UseSetting("ConnectionStrings:Messaging",
             _kafka.GetBootstrapAddress());
         builder.UseSetting("Orleans:UseLocalhostClustering", "true");

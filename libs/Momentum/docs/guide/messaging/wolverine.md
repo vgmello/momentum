@@ -316,10 +316,22 @@ builder.Services.AddWolverine(opts =>
 
 ### PostgreSQL Persistence
 
-Wolverine uses PostgreSQL for reliable message delivery:
+Wolverine uses PostgreSQL for reliable message delivery. In a generated service, message
+persistence reuses the application's registered `NpgsqlDataSource` — the same data source the
+transactional outbox middleware opens its transaction on — so the outbox tables always live in
+the application database:
 
 ```csharp
-// Configured automatically with connection string
+// Configured automatically by reusing the application's NpgsqlDataSource
+var appDataSource = serviceProvider.GetService<NpgsqlDataSource>();
+opts.PersistMessagesWithPostgresql(appDataSource, schemaName: "messaging");
+```
+
+When the library runs standalone, without an application `NpgsqlDataSource` registered in DI, it
+falls back to the `ServiceBus` connection string:
+
+```csharp
+// Standalone fallback
 var connectionString = configuration.GetConnectionString("ServiceBus");
 opts.PersistMessagesWithPostgresql(connectionString, schemaName: "messaging");
 ```

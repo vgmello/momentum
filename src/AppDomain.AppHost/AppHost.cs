@@ -59,7 +59,6 @@ var appDomainApi = builder
     .WithKestrelLaunchProfileEndpoints()
 #if (USE_DB)
     .WithReference(database)
-    .WithReference(database, connectionName: "ServiceBus")
 #endif
 #if (USE_KAFKA)
     .WithReference(kafka)
@@ -83,7 +82,6 @@ builder
     .WithEnvironment("ServiceName", "AppDomain")
 #if (USE_DB)
     .WithReference(database)
-    .WithReference(database, connectionName: "ServiceBus")
 #endif
 #if (USE_KAFKA)
     .WithReference(kafka)
@@ -106,7 +104,6 @@ builder
     .WithReference(orleans)
 #if (USE_DB)
     .WithReference(database)
-    .WithReference(database, connectionName: "ServiceBus")
 #endif
 #if (USE_KAFKA)
     .WithReference(kafka)
