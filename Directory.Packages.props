@@ -109,7 +109,7 @@
     <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryCoreVersion)" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="$(OpenTelemetryInstrumentationVersion)" />
     <!--#if (INCLUDE_GRPC) -->
-    <PackageVersion Include="OpenTelemetry.Instrumentation.GrpcCore" Version="1.0.0-beta.13" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.GrpcCore" Version="1.0.0-beta.14" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.GrpcNetClient" Version="1.15.0-beta.1" />
     <!--#endif -->
     <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="$(OpenTelemetryInstrumentationVersion)" />
