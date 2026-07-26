@@ -7,7 +7,7 @@ var dbPassword = builder.AddParameter("DbPassword", secret: true);
 
 var pgsql = builder
     .AddPostgres("app-domain-db", password: dbPassword, port: 54320)
-    .WithImage("postgres", "17-alpine")
+    .WithImage("postgres", "18-alpine")
     .WithContainerName("app-domain-db")
     .WithEndpointProxySupport(false)
     .WithPgAdmin(pgAdmin => pgAdmin
@@ -19,12 +19,10 @@ var pgsql = builder
     .WithLifetime(ContainerLifetime.Persistent);
 
 var database = pgsql.AddDatabase(name: "AppDomainDb", databaseName: "app_domain");
-var serviceBusDb = pgsql.AddDatabase(name: "ServiceBus", databaseName: "service_bus");
 
 #if (USE_LIQUIBASE)
 var liquibaseMigrations = builder.AddLiquibaseMigrations(pgsql, dbPassword)
-    .WaitFor(database)
-    .WaitFor(serviceBusDb);
+    .WaitFor(database);
 #endif
 
 #endif
@@ -61,7 +59,6 @@ var appDomainApi = builder
     .WithKestrelLaunchProfileEndpoints()
 #if (USE_DB)
     .WithReference(database)
-    .WithReference(serviceBusDb)
 #endif
 #if (USE_KAFKA)
     .WithReference(kafka)
@@ -85,7 +82,6 @@ builder
     .WithEnvironment("ServiceName", "AppDomain")
 #if (USE_DB)
     .WithReference(database)
-    .WithReference(serviceBusDb)
 #endif
 #if (USE_KAFKA)
     .WithReference(kafka)
@@ -108,7 +104,6 @@ builder
     .WithReference(orleans)
 #if (USE_DB)
     .WithReference(database)
-    .WithReference(serviceBusDb)
 #endif
 #if (USE_KAFKA)
     .WithReference(kafka)

@@ -21,38 +21,35 @@ infra/AppDomain.Database/Liquibase/
 │   │   └── procedures/   # Invoice-related procedures
 │   │       ├── invoices_cancel.sql
 │   │       └── invoices_mark_paid.sql
-│   └── app_domain.sql    # AppDomain domain schema setup
-└── service_bus/
-    └── service_bus.sql   # Messaging infrastructure
+│   └── app_domain.sql    # AppDomain schema setup (main + svcbus_queues schemas)
 ```
 
 ### Naming Conventions
 
 **Stored Procedures**: Follow the pattern `{subdomain}_{action}` where subdomain represents the business domain
 
--   Examples: `cashiers_get`, `cashiers_get_all`, `cashiers_create`, `invoices_get`, `invoices_create`
--   This ensures clear namespace separation and avoids conflicts
+- Examples: `cashiers_get`, `cashiers_get_all`, `cashiers_create`, `invoices_get`, `invoices_create`
+- This ensures clear namespace separation and avoids conflicts
 
 **Tables**: Use singular entity names within appropriate schemas
 
--   Domain tables: `AppDomain.{entity}` (e.g., `main.cashiers`, `main.invoices`)
--   Infrastructure tables: `service_bus.{entity}` (e.g., `service_bus.outbox`)
+- Domain tables: `AppDomain.{entity}` (e.g., `main.cashiers`, `main.invoices`)
+- Messaging infrastructure: Wolverine-managed schemas in the same database — a per-service persistence schema prefixed with `svcbus_` (inbox/outbox/dead letters, e.g. `svcbus_appdomain_api.wolverine_outgoing_envelopes`) and the `svcbus_queues` schema for the PostgreSQL transport. Co-locating these with the business schema keeps the outbox in the same database as domain data.
 
 ### Migration Configuration Files
 
--   `liquibase.properties` - Main domain schema migrations
--   `liquibase.servicebus.properties` - Service bus schema migrations
--   `liquibase.setup.properties` - Database setup and initialization
+- `liquibase.properties` - Main domain schema migrations
+- `liquibase.setup.properties` - Database setup and initialization
 
 ## Database Tables
 
-| Schema      | Table              | Purpose                                         |
-| ----------- | ------------------ | ----------------------------------------------- |
-| AppDomain   | cashiers           | Primary table for cashier management            |
-| AppDomain   | cashier_currencies | Multi-currency support for cashiers             |
-| AppDomain   | invoices           | Invoice information and status tracking         |
-| service_bus | outbox             | Outbox pattern for reliable message publishing  |
-| service_bus | inbox              | Inbox pattern for idempotent message processing |
+| Schema            | Table              | Purpose                                                             |
+| ----------------- | ------------------ | ------------------------------------------------------------------- |
+| AppDomain         | cashiers           | Primary table for cashier management                                |
+| AppDomain         | cashier_currencies | Multi-currency support for cashiers                                 |
+| AppDomain         | invoices           | Invoice information and status tracking                             |
+| svcbus\_{service} | wolverine\_\*      | Wolverine inbox/outbox tables (auto-provisioned per service schema) |
+| svcbus_queues     | \*                 | PostgreSQL transport queue tables (auto-provisioned by Wolverine)   |
 
 ## Stored Procedures
 
@@ -82,10 +79,10 @@ public partial record GetCashierDbQuery(Guid CashierId) : IQuery<Cashier?>;
 
 This generates:
 
--   Parameter binding methods
--   Result mapping logic
--   Compile-time validation
--   Type-safe stored procedure calls
+- Parameter binding methods
+- Result mapping logic
+- Compile-time validation
+- Type-safe stored procedure calls
 
 ## Migration Management
 
@@ -146,23 +143,23 @@ liquibase history
 
 ### Indexing Strategy
 
--   Primary keys on all tables for fast lookups
--   Foreign key indexes for join performance
--   Composite indexes for common query patterns
--   GIN indexes for JSONB metadata searches
+- Primary keys on all tables for fast lookups
+- Foreign key indexes for join performance
+- Composite indexes for common query patterns
+- GIN indexes for JSONB metadata searches
 
 ### Partitioning
 
 For high-volume tables like invoices, consider partitioning by:
 
--   Date ranges (monthly/quarterly partitions)
--   Status values (active vs. archived)
--   Currency codes for multi-tenant scenarios
+- Date ranges (monthly/quarterly partitions)
+- Status values (active vs. archived)
+- Currency codes for multi-tenant scenarios
 
 ### Connection Pooling
 
--   Use connection pooling for optimal performance
--   Configure appropriate pool sizes based on load
--   Monitor connection usage and adjust as needed
+- Use connection pooling for optimal performance
+- Configure appropriate pool sizes based on load
+- Monitor connection usage and adjust as needed
 
 This database schema provides a solid foundation for the AppDomain service with proper normalization, indexing, and migration management.

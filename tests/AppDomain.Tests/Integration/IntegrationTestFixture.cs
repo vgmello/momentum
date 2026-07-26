@@ -57,8 +57,6 @@ public class IntegrationTestFixture : IAsyncLifetime
 
     public string AppDomainDbConnectionString => _postgres.GetDbConnectionString("app_domain");
 
-    public string ServiceBusDbConnectionString => _postgres.GetDbConnectionString("service_bus");
-
     //#endif
     //#if (USE_KAFKA)
     private readonly KafkaContainer _kafka;
@@ -75,13 +73,13 @@ public class IntegrationTestFixture : IAsyncLifetime
     public IntegrationTestFixture()
     {
         //#if (USE_DB)
-        _postgres = new PostgreSqlBuilder("postgres:17-alpine")
+        _postgres = new PostgreSqlBuilder("postgres:18-alpine")
             .WithNetwork(_containerNetwork)
             .Build();
 
         //#endif
         //#if (USE_KAFKA)
-        _kafka = new KafkaBuilder("confluentinc/cp-kafka:7.6.0")
+        _kafka = new KafkaBuilder("confluentinc/cp-kafka:7.9.8")
             .WithNetwork(_containerNetwork)
             .Build();
         //#endif
@@ -124,8 +122,9 @@ public class IntegrationTestFixture : IAsyncLifetime
         var configData = new Dictionary<string, string?>
         {
             //#if (USE_DB)
+            // Wolverine reuses the AppDomainDb NpgsqlDataSource for message persistence, so there is
+            // no separate ServiceBus connection string (see WolverineNpgsqlExtensions).
             ["ConnectionStrings:AppDomainDb"] = _postgres.GetDbConnectionString("app_domain"),
-            ["ConnectionStrings:ServiceBus"] = _postgres.GetDbConnectionString("service_bus"),
             //#endif
             ["Orleans:UseLocalhostClustering"] = "true",
             ["ServiceBus:Wolverine:CodegenEnabled"] = "true",
@@ -134,7 +133,8 @@ public class IntegrationTestFixture : IAsyncLifetime
             ["Aspire:Confluent:Kafka:Messaging:BootstrapServers"] = _kafka.GetBootstrapAddress(),
             ["Aspire:Confluent:Kafka:Messaging:Consumer:Config:GroupId"] = "integration-test-group",
             ["Aspire:Confluent:Kafka:Messaging:Consumer:Config:AutoOffsetReset"] = "Latest",
-            ["Aspire:Confluent:Kafka:Messaging:Consumer:Config:EnableAutoCommit"] = "true",
+            // EnableAutoCommit is intentionally not set: it would suppress Wolverine's
+            // at-least-once offset management (see KafkaWolverineExtensions).
             ["Aspire:Confluent:Kafka:Messaging:Security:Protocol"] = "Plaintext"
             //#endif
         };

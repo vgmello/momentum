@@ -360,8 +360,7 @@ Example: `app_domain.cashiers.created`, `app_domain.invoices.paid`
 | ---------------------- | ----------- | ------------------- |
 | ASPNETCORE_ENVIRONMENT | Development | Runtime environment |
 # #if (USE_DB)
-| ConnectionStrings\_\_AppDomainDb | - | PostgreSQL connection string |
-| ConnectionStrings\_\_ServiceBus | - | Service bus database connection |
+| ConnectionStrings\_\_AppDomainDb | - | PostgreSQL connection string (also used for Wolverine message persistence) |
 # #endif
 # #if (USE_KAFKA)
 | ConnectionStrings\_\_Messaging | localhost:59092 | Kafka broker addresses |

@@ -7,6 +7,8 @@ namespace Momentum.ServiceDefaults.Messaging.Wolverine;
 /// </summary>
 public static class WolverineExtensions
 {
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<Type, string> FullNameCache = new();
+
     /// <summary>
     ///     Gets the message name from a Wolverine envelope.
     /// </summary>
@@ -29,7 +31,7 @@ public static class WolverineExtensions
         if (envelope.Message?.GetType() is { } messageType)
         {
             if (fullName)
-                return SanitizeTypeName(messageType.FullName) ?? messageType.Name;
+                return FullNameCache.GetOrAdd(messageType, static type => SanitizeTypeName(type.FullName) ?? type.Name);
 
             return messageType.Name;
         }

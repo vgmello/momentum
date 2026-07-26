@@ -77,6 +77,7 @@ using YourApp.Domain;
 ```
 
 **Why Domain Assemblies Matter:**
+
 - Automatic discovery of command and query handlers
 - FluentValidation validator registration
 - Integration event discovery
@@ -242,6 +243,7 @@ await app.RunAsync(args);
 ```
 
 **Features:**
+
 - Initialization logging
 - Wolverine command-line support
 - Proper exception handling
@@ -250,6 +252,7 @@ await app.RunAsync(args);
 ### Wolverine Commands
 
 Supported command-line operations:
+
 - `check-env` - Check environment configuration
 - `codegen` - Generate code
 - `db-apply` - Apply database migrations
@@ -355,35 +358,38 @@ Momentum follows .NET's standard configuration hierarchy with specific recommend
 ### Configuration File Strategy
 
 #### appsettings.json - Development Baseline Configuration
+
 The `appsettings.json` file serves as the **baseline configuration** containing common settings and local development defaults:
 
 ```json
 {
-  "AllowedHosts": "*",
-  "ConnectionStrings": {
-    "AppDomainDb": "Host=localhost;Port=54320;Database=app_domain;",
-    "ServiceBus": "Host=localhost;Port=54320;Database=service_bus;",
-    "Messaging": "localhost:9092"
-  },
-  "Aspire": {
-    "Npgsql:DisableHealthChecks": true,
-    "Npgsql:DisableTracing": true
-  },
-  "Wolverine": {
-    "CodegenEnabled": false
-  }
+    "AllowedHosts": "*",
+    "ConnectionStrings": {
+        "AppDomainDb": "Host=localhost;Port=54320;Database=app_domain;",
+        "Messaging": "localhost:9092"
+    },
+    "Aspire": {
+        "Npgsql:DisableHealthChecks": true,
+        "Npgsql:DisableTracing": true
+    },
+    "Wolverine": {
+        "CodegenEnabled": false
+    }
 }
 ```
 
+> [!NOTE]
+> A generated service does **not** define a separate `ServiceBus` connection string. Wolverine message persistence (inbox/outbox and the `svcbus_queues` PostgreSQL transport) automatically reuses the application's registered `NpgsqlDataSource` — the same `AppDomainDb` connection the transactional outbox middleware opens its transaction on. This guarantees the outbox tables live in the application database and that business writes and outbox commits stay atomic by construction. A `ConnectionStrings:ServiceBus` string is only used as a fallback when the library runs standalone, without an application `NpgsqlDataSource` registered in DI.
+
 #### appsettings.Local.json - Local Machine Overrides
+
 The `appsettings.Local.json` file contains all **local development overrides** — logging, connection strings, feature flags, etc. It is loaded when `ASPNETCORE_ENVIRONMENT=Development` and is **excluded from Docker images** via `.dockerignore`:
 
 ```json
 {
-  "ConnectionStrings": {
-    "AppDomainDb": "Host=localhost;Port=54320;Database=app_domain;password=password@;username=postgres;",
-    "ServiceBus": "Host=localhost;Port=54320;Database=service_bus;password=password@;username=postgres;"
-  }
+    "ConnectionStrings": {
+        "AppDomainDb": "Host=localhost;Port=54320;Database=app_domain;password=password@;username=postgres;"
+    }
 }
 ```
 
@@ -393,45 +399,46 @@ The `appsettings.Local.json` file contains all **local development overrides** �
 ### Cloud Environment Configuration
 
 #### Environment-Specific Configuration Files
+
 Cloud environments (QA, Staging, Production) should use **environment-specific appsettings files** as the primary configuration method:
 
 ```json
 // appsettings.Production.json
 {
-  "Logging": {
-    "LogLevel": {
-      "Default": "Warning",
-      "Microsoft.AspNetCore": "Warning"
+    "Logging": {
+        "LogLevel": {
+            "Default": "Warning",
+            "Microsoft.AspNetCore": "Warning"
+        }
+    },
+    "ConnectionStrings": {
+        "AppDomainDb": "Host=prod-db;Port=5432;Database=app_domain;",
+        "Messaging": "prod-kafka:9092"
+    },
+    "Aspire": {
+        "Npgsql:DisableHealthChecks": false,
+        "Npgsql:DisableTracing": false
     }
-  },
-  "ConnectionStrings": {
-    "AppDomainDb": "Host=prod-db;Port=5432;Database=app_domain;",
-    "ServiceBus": "Host=prod-db;Port=5432;Database=service_bus;",
-    "Messaging": "prod-kafka:9092"
-  },
-  "Aspire": {
-    "Npgsql:DisableHealthChecks": false,
-    "Npgsql:DisableTracing": false
-  }
 }
 ```
 
 ```json
 // appsettings.QA.json
 {
-  "Logging": {
-    "LogLevel": {
-      "Default": "Information"
+    "Logging": {
+        "LogLevel": {
+            "Default": "Information"
+        }
+    },
+    "ConnectionStrings": {
+        "AppDomainDb": "Host=qa-db;Port=5432;Database=app_domain;",
+        "Messaging": "qa-kafka:9092"
     }
-  },
-  "ConnectionStrings": {
-    "AppDomainDb": "Host=qa-db;Port=5432;Database=app_domain;",
-    "Messaging": "qa-kafka:9092"
-  }
 }
 ```
 
 #### Environment Variables for Specific Overrides
+
 Environment variables should be used for **deployment-specific values** and **overrides**, not as the primary configuration method:
 
 ```bash
@@ -446,6 +453,7 @@ export ConnectionStrings__AppDomainDb="Host=prod-db;Port=5432;Database=app_domai
 ```
 
 #### Cloud-Native Secret Management
+
 Secrets should use **cloud-native secret management** solutions:
 
 - **Azure**: Azure Key Vault
@@ -480,42 +488,44 @@ builder.Configuration.AddSystemsManager("/myapp",
 Service defaults adapt to different environments:
 
 ### Development Environment
+
 ```json
 // appsettings.json (baseline) + appsettings.Local.json (local overrides, when Development)
 {
-  "ConnectionStrings": {
-    "AppDomainDb": "Host=localhost;Port=54320;Database=app_domain;",
-    "Messaging": "localhost:9092"
-  },
-  "Aspire": {
-    "Npgsql:DisableHealthChecks": true,
-    "Npgsql:DisableTracing": true
-  },
-  "Logging": {
-    "LogLevel": {
-      "Default": "Debug"
+    "ConnectionStrings": {
+        "AppDomainDb": "Host=localhost;Port=54320;Database=app_domain;",
+        "Messaging": "localhost:9092"
+    },
+    "Aspire": {
+        "Npgsql:DisableHealthChecks": true,
+        "Npgsql:DisableTracing": true
+    },
+    "Logging": {
+        "LogLevel": {
+            "Default": "Debug"
+        }
     }
-  }
 }
 ```
 
 ### Production Environment
+
 ```json
 // appsettings.Production.json (primary configuration)
 {
-  "ConnectionStrings": {
-    "AppDomainDb": "Host=prod-db;Port=5432;Database=app_domain;",
-    "Messaging": "prod-kafka-cluster:9092"
-  },
-  "Aspire": {
-    "Npgsql:DisableHealthChecks": false,
-    "Npgsql:DisableTracing": false
-  },
-  "Logging": {
-    "LogLevel": {
-      "Default": "Warning"
+    "ConnectionStrings": {
+        "AppDomainDb": "Host=prod-db;Port=5432;Database=app_domain;",
+        "Messaging": "prod-kafka-cluster:9092"
+    },
+    "Aspire": {
+        "Npgsql:DisableHealthChecks": false,
+        "Npgsql:DisableTracing": false
+    },
+    "Logging": {
+        "LogLevel": {
+            "Default": "Warning"
+        }
     }
-  }
 }
 ```
 
@@ -587,6 +597,7 @@ await app.RunAsync(args);
 ### Common Issues
 
 **"Assembly not found" errors:**
+
 ```csharp
 // Ensure you've marked domain assemblies
 [assembly: DomainAssembly(typeof(IDomainMarker))]
@@ -596,6 +607,7 @@ ServiceDefaultsExtensions.EntryAssembly = typeof(Program).Assembly;
 ```
 
 **Validators not found:**
+
 ```csharp
 // Check that validators are in domain assemblies
 // Check that domain assemblies are marked with [DomainAssembly]
@@ -605,6 +617,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<MyValidator>();
 ```
 
 **Service discovery not working:**
+
 ```csharp
 // Ensure service defaults are added
 builder.AddServiceDefaults();
@@ -619,22 +632,26 @@ builder.Services.Configure<ServiceDiscoveryOptions>(options =>
 ## Best Practices
 
 ### Assembly Organization
+
 1. **Create domain marker interfaces**: Use interfaces to mark domain assemblies
 2. **Mark all domain assemblies**: Every assembly with commands/queries needs `[DomainAssembly]`
 3. **Use consistent naming**: Follow naming conventions for discoverable components
 
 ### Configuration Management
+
 1. **Environment-specific configuration**: Use appsettings.{Environment}.json files for each target environment (Production, QA, Staging)
 2. **Local development**: Use `appsettings.Local.json` for all local overrides (connection strings, logging, feature flags); it is excluded from Docker images via `.dockerignore`
 3. **Deployment overrides**: Use environment variables for deployment-specific values and temporary overrides
 4. **Secret management**: Use cloud-native secret management for sensitive data
 
 ### Service Registration
+
 1. **Leverage automatic registration**: Let service defaults handle common services
 2. **Register custom services after defaults**: Add your services after calling `AddServiceDefaults()`
 3. **Use appropriate lifetimes**: Choose correct service lifetimes (Singleton, Scoped, Transient)
 
 ### Error Handling
+
 1. **Use the RunAsync method**: Always use `app.RunAsync(args)` for proper lifecycle management
 2. **Configure logging early**: Service defaults configure logging before other services
 3. **Handle startup errors**: Use try/catch around configuration code if needed

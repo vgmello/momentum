@@ -26,7 +26,6 @@ public class LiquibaseMigrationContainer : IAsyncDisposable
             .WithEntrypoint("/bin/sh")
             .WithCommand("-c", $"""
                                 liquibase update --url=jdbc:postgresql://{dbServerSanitized}:5432/postgres --changelog-file=postgres/changelog.xml && \
-                                liquibase update --url=jdbc:postgresql://{dbServerSanitized}:5432/service_bus --changelog-file=service_bus/changelog.xml && \
                                 liquibase update --url=jdbc:postgresql://{dbServerSanitized}:5432/app_domain --changelog-file=app_domain/changelog.xml && \
                                 echo 'Database migrations completed successfully!'
                                 """)

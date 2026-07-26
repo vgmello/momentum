@@ -70,14 +70,14 @@ CloudEvents provides a standardized format for event data, enabling interoperabi
 
 ```json
 {
-  "ServiceBus": {
-    "CloudEvents": {
-      "Source": "https://api.mystore.com/orders",
-      "DefaultType": "com.mystore.orders",
-      "Subject": "orders",
-      "DataContentType": "application/json"
+    "ServiceBus": {
+        "CloudEvents": {
+            "Source": "https://api.mystore.com/orders",
+            "DefaultType": "com.mystore.orders",
+            "Subject": "orders",
+            "DataContentType": "application/json"
+        }
     }
-  }
 }
 ```
 
@@ -85,18 +85,18 @@ CloudEvents provides a standardized format for event data, enabling interoperabi
 
 ```json
 {
-  "specversion": "1.0",
-  "type": "com.mystore.orders.order-created",
-  "source": "https://api.mystore.com/orders",
-  "subject": "orders/12345",
-  "id": "550e8400-e29b-41d4-a716-446655440000",
-  "time": "2024-01-15T10:30:00Z",
-  "datacontenttype": "application/json",
-  "data": {
-    "orderId": "12345",
-    "customerId": "67890",
-    "totalAmount": 99.99
-  }
+    "specversion": "1.0",
+    "type": "com.mystore.orders.order-created",
+    "source": "https://api.mystore.com/orders",
+    "subject": "orders/12345",
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "time": "2024-01-15T10:30:00Z",
+    "datacontenttype": "application/json",
+    "data": {
+        "orderId": "12345",
+        "customerId": "67890",
+        "totalAmount": 99.99
+    }
 }
 ```
 
@@ -128,13 +128,14 @@ The configurator follows the .NET options pattern for post-configuration process
 // ServiceUrn = "/e_commerce/ecommerce-orderservice" (generated URN)
 ```
 
-### Warning Scenarios:
+### Missing Data Source Scenario:
 
 ```
-// Missing connection string warning:
-// "ConnectionStrings:ServiceBus is not set. Transactional Inbox/Outbox
-//  and Message Persistence features disabled"
+// Standalone use with neither an application NpgsqlDataSource registered in DI
+// nor a ServiceBus connection string configured throws at startup:
+// "No NpgsqlDataSource is registered and the DB string 'ServiceBus' is not set."
 
-// This allows the application to start without messaging persistence
-// but logs a clear warning about reduced functionality
+// A generated service always registers an application NpgsqlDataSource, so message
+// persistence reuses it automatically and this path is never hit. For standalone
+// library use, provide ConnectionStrings:ServiceBus as the fallback.
 ```

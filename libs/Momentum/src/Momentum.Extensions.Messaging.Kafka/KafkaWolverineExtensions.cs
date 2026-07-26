@@ -47,7 +47,24 @@ public class KafkaWolverineExtensions(
             .ConfigureListeners(cfg => cfg.UseInterop(cloudEventMapper));
 
         kafkaConfig.ConfigureClient(clientConfig => ApplyAspireClientConfig(configuration, serviceName, clientConfig));
-        kafkaConfig.ConfigureConsumers(consumerConfig => ApplyAspireConsumerConfig(configuration, serviceName, consumerConfig));
+        kafkaConfig.ConfigureConsumers(consumerConfig =>
+        {
+            ApplyAspireConsumerConfig(configuration, serviceName, consumerConfig);
+
+            // An explicit EnableAutoCommit in config suppresses Wolverine's commit strategy
+            // (KafkaOffsetCommitter.ResolveStrategy): with EnableAutoOffsetStore left at its default of
+            // true, librdkafka stores offsets at consume time and a crash mid-processing loses the
+            // message. Leave EnableAutoCommit unset to get CommitMode.StoreThenAutoFlush, which stores
+            // offsets only after successful processing (at-least-once).
+            if (consumerConfig.EnableAutoCommit == true && consumerConfig.EnableAutoOffsetStore != false)
+            {
+                logger.LogWarning(
+                    "Kafka consumer config sets EnableAutoCommit=true without EnableAutoOffsetStore=false; " +
+                    "this disables Wolverine's at-least-once offset management and messages can be lost if the " +
+                    "process crashes during handling. Remove EnableAutoCommit from configuration to restore " +
+                    "at-least-once delivery (CommitMode.StoreThenAutoFlush)");
+            }
+        });
         kafkaConfig.ConfigureProducers(producerConfig => ApplyAspireProducerConfig(configuration, serviceName, producerConfig));
 
         if (autoProvisionEnabled)
@@ -127,8 +144,13 @@ public class KafkaWolverineExtensions(
 
         if (topicsToSubscribe.Count > 0)
         {
+            // The effective group id is the one set on the consumer config (see
+            // KafkaAspireExtensions.SetConfigConsumerGroupId), not Wolverine's ServiceName.
+            var consumerGroupId = configuration.GetValue<string>(
+                $"{KafkaAspireExtensions.SectionName}:Consumer:{serviceName}:Config:GroupId") ?? options.ServiceName;
+
             logger.LogInformation("Configured Kafka subscriptions for {TopicCount} topics with consumer group {ConsumerGroup}: {Topics}",
-                topicsToSubscribe.Count, options.ServiceName, string.Join(", ", topicsToSubscribe));
+                topicsToSubscribe.Count, consumerGroupId, string.Join(", ", topicsToSubscribe));
         }
         else
         {

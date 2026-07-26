@@ -26,17 +26,20 @@ await app.RunAsync(args);
 
 ```json
 {
-  "ConnectionStrings": {
-    "ServiceBus": "Host=localhost;Database=ecommerce_messaging;Username=app;Password=secret"
-  },
-  "OpenTelemetry": {
-    "ActivitySourceName": "ECommerceAPI",
-    "MessagingMeterName": "ECommerce.Messaging"
-  },
-  "ServiceBus": {
-    "Domain": "ECommerce",
-    "PublicServiceName": "orders-api"
-  }
+    "ConnectionStrings": {
+        // Standalone fallback only: used when no application NpgsqlDataSource is
+        // registered in DI. A generated service reuses its application data source
+        // (e.g. AppDomainDb) automatically and omits this entry.
+        "ServiceBus": "Host=localhost;Database=ecommerce_messaging;Username=app;Password=secret"
+    },
+    "OpenTelemetry": {
+        "ActivitySourceName": "ECommerceAPI",
+        "MessagingMeterName": "ECommerce.Messaging"
+    },
+    "ServiceBus": {
+        "Domain": "ECommerce",
+        "PublicServiceName": "orders-api"
+    }
 }
 ```
 
@@ -74,11 +77,11 @@ public class CreateOrderValidator : AbstractValidator<CreateOrder>
         RuleFor(x => x.CustomerId)
             .NotEmpty()
             .WithMessage("Customer ID is required");
-            
+
         RuleFor(x => x.Items)
             .NotEmpty()
             .WithMessage("Order must contain at least one item");
-            
+
         RuleForEach(x => x.Items)
             .SetValidator(new OrderItemValidator());
     }
@@ -96,10 +99,10 @@ public static async Task<OrderCreated> Handle(
 {
     // Command is guaranteed to be valid when this executes
     // ValidationException is thrown automatically if invalid
-    
+
     var order = new Order(command.CustomerId, command.Items);
     await orders.SaveAsync(order);
-    
+
     return new OrderCreated(order.Id, order.CustomerId);
 }
 ```

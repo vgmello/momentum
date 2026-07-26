@@ -4,7 +4,180 @@ All notable changes to this project are documented in this file, grouped by date
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2026-07-20]
+
+### Changed
+
+- **Infra**: PostgreSQL bumped **17 → 18** across compose, the Aspire AppHost, and the Testcontainers
+  integration fixture. PostgreSQL 18's official image moves the cluster from `/var/lib/postgresql/data`
+  to `/var/lib/postgresql/{major}/docker`, so the compose volume now mounts the whole
+  `/var/lib/postgresql` tree instead of `.../data` (this also enables future major upgrades with
+  `pg_upgrade --link`).
+  **Action required for local dev:** an existing `postgres_data` volume holds a PG17 cluster that PG18
+  will not start against — run `docker compose down -v` before the first `up`. Local data is
+  disposable; Liquibase recreates the schema.
+- **Deps**: `WolverineFx`/`.Kafka`/`.Postgresql`/`.RuntimeCompilation` `6.20.0` → **6.21.0**. Headline
+  is durable-inbox listener batching, which directly benefits the durable inbox enabled yesterday
+  (upstream measured a 2,000 msg/s Kafka stream going from unbounded backlog to a steady 32ms delivery
+  p50, +83% sustained durable throughput), plus a sender-batching flush fix and a faster/lower-allocation
+  Kafka mapping hot path. Two upstream behavior changes to note: the per-message "success" log now
+  defaults to `Debug` (was `Information`), and `wolverine-execution-time` became a floating-point
+  histogram (same name/unit, different point type — check dashboards built on it).
+- **Deps**: `CloudNative.CloudEvents.Kafka` `2.8.0` → **3.9.0** and `CloudNative.CloudEvents.SystemTextJson`
+  `2.8.0` → **2.9.0**. This resolves a latent version mismatch: the 2.8.0 Kafka package declares
+  `Confluent.Kafka 1.9.3` while `WolverineFx.Kafka` pulls `2.14.x`, so `CloudEventMapper` was compiled
+  against a five-major-versions-old client API and unified upward at runtime. 3.9.0 targets
+  `Confluent.Kafka 2.14.2`, matching Wolverine exactly. (The 2.x → 3.x jump is the Kafka package's own
+  version line; core `CloudNative.CloudEvents` remains 2.9.0.)
+- **Deps**: OpenTelemetry family → **1.17.0** (exporter, hosting, and the AspNetCore/Http/Runtime
+  instrumentation packages, now all driven by one property); `Microsoft.Extensions.Http.Resilience`,
+  `.ServiceDiscovery`, `.Diagnostics.Testing` → **10.8.0**; `Microsoft.NET.Test.Sdk` → **18.8.1**;
+  `SonarAnalyzer.CSharp` → **10.29.0.143774**; `Microsoft.SourceLink.GitHub` → **10.0.301**;
+  `Scalar.AspNetCore` → **2.16.15**; `Microsoft.CodeAnalysis.Analyzers` → **5.6.0** (the 5.0.0 pin was
+  already being overridden transitively to 5.3.0).
+- **Infra**: Kafka image `confluentinc/cp-kafka` `7.6.0` → **7.9.8** in compose and the integration
+  fixture. 8.x was evaluated and rejected for now: Testcontainers 4.13's `KafkaBuilder` does not set
+  `KAFKA_PROCESS_ROLES`, which the 8.x entrypoint requires, so every integration test fails to start
+  the broker. Revisit when Testcontainers adds 8.x support.
+
+### Fixed
+
+- **Tests**: the integration fixture set `Aspire:Confluent:Kafka:Messaging:Consumer:Config:EnableAutoCommit=true`,
+  the same setting removed from `appsettings` yesterday — it suppressed Wolverine's at-least-once offset
+  management, so the tests were not exercising the delivery guarantee the template ships. Removed.
+- **Template**: gated the AppHost's `Google.Protobuf` and `Grpc.AspNetCore` `PackageReference`s behind
+  `#if (INCLUDE_GRPC)` to match their `PackageVersion` (already `INCLUDE_GRPC`-gated in
+  `Directory.Packages.props`). Without this, gRPC-less configurations (`--grpc false`, `--api false`,
+  aspire-only) generated an AppHost referencing `Google.Protobuf` with no corresponding version under
+  Central Package Management and failed to build with `NU1010`. The AppHost uses only Aspire endpoint
+  types (`GrpcExtensions`), so it needs neither package when gRPC is excluded.
+
+### Notes
+
+- `Refitter.MSBuild` is **held at 2.0.0**: 2.1.0's generator throws
+  `Method not found: System.Text.ValueStringBuilder.AsSpan()` against the current runtime and fails the
+  E2E client generation at build time.
+- Still outstanding (unchanged): `OpenTelemetry.Instrumentation.GrpcCore 1.0.0-beta.13` is abandoned
+  upstream and tied to the end-of-life `Grpc.Core` library; it should be removed if the API only uses
+  grpc-dotnet. `dpage/pgadmin4:latest` and `azurite:latest` still float their tags, and there is no
+  `global.json` pinning the SDK.
+
+## [2026-07-19]
+
+### Changed
+
+- **Messaging topology**: Wolverine message persistence (inbox/outbox) and the PostgreSQL queue
+  transport now live in the **application database** (`app_domain`) instead of a separate
+  `service_bus` database. Wolverine persistence reuses the application's registered `NpgsqlDataSource`
+  (`WolverineNpgsqlExtensions` resolves it from DI and passes the instance to
+  `PersistMessagesWithPostgresql`) — the same data source `TransactionalOutboxMiddleware` opens its
+  transaction on — so the outbox tables are structurally guaranteed to share the application database
+  and its connection. There is no longer a separate `ServiceBus` connection string that could be
+  pointed at a different database and silently break outbox atomicity; the dead `ServiceBus`
+  connection strings (appsettings, compose), the AppHost `WithReference(database, connectionName:
+"ServiceBus")` references, the keyed `ServiceBus` data source, and the integration fixture's
+  `ServiceBus` entry were all removed. The library keeps a `ConnectionStrings:ServiceBus` fallback for
+  standalone use (no application data source registered). Wolverine does not support splitting the
+  transport from the message store, and a separate database made the outbox non-atomic with business
+  writes; co-locating them (per-service `svcbus_{service}` persistence schema + `svcbus_queues` schema
+  alongside `main`) removes the crash window in which committed business data could lose its outgoing
+  events. The `service_bus` database, its Liquibase changelog, and `liquibase.servicebus.properties`
+  were removed; the `svcbus_queues` schema is now pre-created by the `app_domain` changelog.
+- **Messaging routing**: removed `ConventionalLocalRoutingIsAdditive()`. An integration event that a
+  service both publishes and handles was previously processed twice — once via local routing at
+  publish time and again when consumed back from its own Kafka subscription. With the default
+  (non-additive) routing, such events go only to the external transport and are processed exactly
+  once on consumption; messages without explicit external routes (commands, queries, local events)
+  still route locally as before.
+- **ServiceDefaults/Messaging**: Wolverine schema names now carry a `svcbus_` prefix so messaging
+  infrastructure is clearly distinguishable from application schemas in the shared database — the
+  per-service persistence schema is `svcbus_{service}` (e.g. `svcbus_appdomain_api`) and the
+  PostgreSQL transport schema is `svcbus_queues` (was `queues`).
+- **ServiceDefaults/Messaging**: `Envelope.GetMessageName(fullName: true)` caches the sanitized full type
+  name per message type (previously four `string.Replace` allocations per processed message via the OTel
+  and performance middlewares).
+
+### Added
+
+- **Template**: new `TransactionalOutboxMiddleware` (applied to all `ICommand<>` handler chains via
+  the AppDomain Wolverine extension) makes command handling fully atomic: it opens a single
+  transaction on the application database, exposes it ambiently (`TransactionalOutbox.CurrentTransaction`),
+  `AppDomainDb` (LinqToDB) instances resolved during the message execution attach to that transaction,
+  and Wolverine's outbox is enlisted in it (`MessageContext.EnlistInOutboxAsync` +
+  `DatabaseEnvelopeTransaction`), so cascaded integration events are persisted to the outgoing
+  envelope table in the same transaction as the business writes — one commit covers both, and
+  failures roll back both. Nested command invocations (the DbCommand pattern) join the ambient
+  transaction instead of opening their own.
+
+- **ServiceDefaults/Messaging**: `ConfigureReliableMessaging` now installs a default failure policy —
+  transient `NpgsqlException`s and `TimeoutException`s get two quick in-process retries (50ms/250ms),
+  then two durable **scheduled retries** (5s/30s) that release the listener instead of blocking it (so
+  a cooling-down message never stalls a Kafka partition), then the dead letter queue. Previously no
+  retry rules existed anywhere, so any transient failure dead-lettered on first attempt despite the
+  docs claiming retry support. Application failure rules (added via the `AddServiceBus` configure
+  callback) still take precedence.
+- **ServiceDefaults/Messaging**: reliable messaging now also enables the **durable inbox on all
+  listening endpoints** (`UseDurableInboxOnAllListeners`) — incoming Kafka messages are persisted
+  before processing, giving at-least-once delivery with duplicate detection by message id, and failed
+  messages land in the replayable database dead-letter table.
+- **Docs**: new dead-letter operations guide in `guide/messaging/wolverine.md` — inspect
+  (`storage counts`), replay (`storage replay [--exception-type ...]`), and programmatic
+  `IDeadLetterAdminService` usage — closing the "no DLQ recovery story" gap.
+
+### Fixed
+
+- **Kafka at-least-once delivery**: removed `EnableAutoCommit: true` / `AutoCommitIntervalMs` from the
+  template's Kafka consumer configuration. Under Wolverine 6, an explicit `EnableAutoCommit=true`
+  suppresses Wolverine's commit management (`KafkaOffsetCommitter.ResolveStrategy`) and falls back to
+  librdkafka storing offsets **at consume time** — a crash during message processing lost the message
+  (the failure mode JasperFx/wolverine#2114 was opened against). With the keys removed, Wolverine's
+  default `CommitMode.StoreThenAutoFlush` applies: `EnableAutoOffsetStore=false`, offsets stored only
+  after successful processing, and the commit watermark never advances past an in-flight message.
+  `KafkaWolverineExtensions` now logs a startup warning if configuration reintroduces the unsafe
+  combination.
+
+- **ServiceDefaults/Messaging**: `AutoProvision`/`AutoBuildMessageStorageOnStartup` are now read from the
+  `ServiceBus:Wolverine` section — the same path `appsettings.json` and the Kafka extension already use.
+  Previously `WolverineSetupExtensions` read `ServiceBus:AutoProvision`, a key nothing sets, so
+  `AutoBuildMessageStorageOnStartup` was forced to `None` in every environment.
+- **ServiceDefaults/Messaging**: a `ServiceName` set explicitly in the `AddServiceBus` configure callback
+  is no longer silently overwritten by the `ServiceBus:PublicServiceName`-derived default (which also
+  feeds the Postgres persistence schema name).
+- **ServiceDefaults/Messaging**: integration-event publisher discovery now unions the explicitly marked
+  `[DomainAssembly]` assemblies (force-loaded via their type markers) into the loaded-assembly sweep, and
+  prefix-matches on full namespace segments (`Name` or `Name.`) instead of raw `StartsWith`. Fixes events
+  being missed when a referenced contracts assembly had not been lazily loaded yet, and accidental matches
+  of unrelated assemblies sharing a name prefix.
+- **Kafka**: the "Configured Kafka subscriptions" log line now reports the actual consumer group id from
+  the Aspire consumer config instead of Wolverine's `ServiceName`, which is not the group id.
+- **ServiceDefaults/Messaging**: FluentValidation middleware now flows the message `CancellationToken`
+  into `ValidateAsync`, so async validators cancel with the request.
+- **Docs**: `AddWolverineWithDefaults` XML remarks no longer overstate delivery guarantees — they now
+  document that the outbox is only atomic with business data when both share the same database
+  connection/transaction (not the case with the default separate `service_bus` database + LinqToDB
+  topology).
+
 ## [2026-07-18]
+
+### Changed
+
+- **Deps**: bumped `WolverineFx`/`WolverineFx.Kafka`/`WolverineFx.Postgresql` from `5.39.x` to `6.20.0`
+  (major). Two runtime-default changes needed code fixes, both in the generated project template:
+    - Core `WolverineFx` no longer ships the Roslyn runtime compiler; `TypeLoadMode.Dynamic` (used locally
+      when `CodegenEnabled: true`, see `appsettings.Local.json`) now needs the new `WolverineFx.RuntimeCompilation`
+      package. Added it as an unconditional dependency of `Momentum.ServiceDefaults` (every host type uses
+      Dynamic mode locally) and call `opts.UseRuntimeCompilation()` explicitly in `WolverineSetupExtensions`
+      — the package's usual `[WolverineModule]` auto-registration relies on Wolverine's assembly-discovery
+      scan, which this codebase already disables via `ExtensionDiscovery.ManualOnly`.
+    - `WolverineOptions.ServiceLocationPolicy` now defaults to `NotAllowed` (was `AllowedButWarn`). LinqToDB's
+      `AddLinqToDBContext<T>` registers `DataOptions<T>` behind an opaque lambda factory Wolverine's codegen
+      can't statically resolve, which broke every command handler touching the database. Fixed with a scoped
+      allow-list (`opts.CodeGeneration.AlwaysUseServiceLocationFor<DataOptions<AppDomainDb>>()`) registered via
+      `IWolverineExtension` in the generated project's `DependencyInjection.cs`, rather than disabling the new
+      policy repo-wide.
+    - Verified: `dotnet new mmt --local` (default flags) restores, builds, and passes all 47 integration tests
+      (Testcontainers Postgres + Liquibase); this repo's own `AppDomain.slnx` passes 350 unit + 209
+      integration/arch tests including all 49 real Wolverine-handler integration tests.
 
 ### Fixed
 

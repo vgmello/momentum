@@ -47,13 +47,18 @@ public static class DistributedEventsDiscovery
             .ToHashSet();
         //-:replacements:noEmit
 
+        // The loaded-assembly sweep can miss referenced contracts assemblies that the runtime has
+        // not loaded yet, so the explicitly marked domain assemblies (force-loaded via their type
+        // markers) are always unioned in.
         var domainAssemblies = AppDomain.CurrentDomain.GetAssemblies()
             .Where(assembly =>
             {
                 var name = assembly.GetName().Name;
 
-                return name is not null && domainPrefixes.Any(prefix => name.StartsWith(prefix));
+                return name is not null && domainPrefixes.Any(prefix =>
+                    name.Length == prefix.Length ? name == prefix : name.StartsWith(prefix + ".", StringComparison.Ordinal));
             })
+            .Union(appAssemblies)
             .ToArray();
         //+:replacements:noEmit
 

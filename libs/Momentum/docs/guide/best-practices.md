@@ -8,16 +8,16 @@ This guide outlines proven practices for building robust, scalable, and maintain
 
 Structure your code to directly correspond to business operations:
 
--   **Commands represent business actions**: If your business can "Create Order" or "Process Payment", your code should have `CreateOrderCommand` and `ProcessPaymentCommand`
--   **Queries represent business information needs**: If your business needs to "Find Customer" or "Calculate Total", use `FindCustomerQuery` and `CalculateTotalQuery`
--   **Avoid technical abstractions**: Don't create repositories, services, or managers unless they mirror real business roles
--   **Use business language**: Non-technical stakeholders should understand your code structure
+- **Commands represent business actions**: If your business can "Create Order" or "Process Payment", your code should have `CreateOrderCommand` and `ProcessPaymentCommand`
+- **Queries represent business information needs**: If your business needs to "Find Customer" or "Calculate Total", use `FindCustomerQuery` and `CalculateTotalQuery`
+- **Avoid technical abstractions**: Don't create repositories, services, or managers unless they mirror real business roles
+- **Use business language**: Non-technical stakeholders should understand your code structure
 
 ### Template-Driven Development
 
--   **Copy and customize**: Take patterns from Momentum and adapt them to your specific needs
--   **No framework lock-in**: You own the code completely and can modify patterns as needed
--   **Maintain patterns**: Keep consistent approaches across your codebase for maintainability
+- **Copy and customize**: Take patterns from Momentum and adapt them to your specific needs
+- **No framework lock-in**: You own the code completely and can modify patterns as needed
+- **Maintain patterns**: Keep consistent approaches across your codebase for maintainability
 
 ## Architecture and Design
 
@@ -1012,6 +1012,7 @@ public class BusinessMetrics
 Momentum applications use a specific configuration strategy designed for cloud-native deployments:
 
 **Environment-Specific Configuration Files:**
+
 - `appsettings.json` contains **baseline configuration** and local development defaults
 - `appsettings.{Environment}.json` files contain **environment-specific configuration** for each target environment (Production, QA, Staging)
 - `appsettings.Local.json` contains **all local development overrides** (logging, connection strings, feature flags) and is excluded from Docker images via `.dockerignore`
@@ -1024,7 +1025,6 @@ Momentum applications use a specific configuration strategy designed for cloud-n
   "AllowedHosts": "*",
   "ConnectionStrings": {
     "AppDomainDb": "Host=localhost;Port=54320;Database=app_domain;",
-    "ServiceBus": "Host=localhost;Port=54320;Database=service_bus;",
     "Messaging": "localhost:9092"
   },
   "Aspire": {
@@ -1200,7 +1200,7 @@ Remember: these are guidelines, not absolute rules. Adapt them to your specific 
 
 ## Next Steps
 
--   Review the [Troubleshooting Guide](./troubleshooting) for common issues
--   Explore [Testing Strategies](./testing/) in detail
--   Check [Service Configuration](./service-configuration/) for operational setup
--   See the [Architecture Overview](./arch/) for system design patterns
+- Review the [Troubleshooting Guide](./troubleshooting) for common issues
+- Explore [Testing Strategies](./testing/) in detail
+- Check [Service Configuration](./service-configuration/) for operational setup
+- See the [Architecture Overview](./arch/) for system design patterns
