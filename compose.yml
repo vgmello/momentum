@@ -59,9 +59,6 @@ services:
 
     restart: unless-stopped
     volumes:
-      # PostgreSQL 18+ stores the cluster under /var/lib/postgresql/{major}/docker, so the whole
-      # /var/lib/postgresql tree is mounted (not .../data) to keep the data directory on the volume
-      # and allow future major upgrades with pg_upgrade --link.
       - postgres_data:/var/lib/postgresql
 
   # #if (USE_LIQUIBASE)
