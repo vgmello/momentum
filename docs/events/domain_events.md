@@ -4,8 +4,8 @@
 
 | Event Name                                 | Description                                                                 | Status |
 | ------------------------------------------ | --------------------------------------------------------------------------- | ------ |
-<!--#if (INCLUDE_SAMPLE) -->
+# #if (INCLUDE_SAMPLE)
 | InvoiceGenerated | Internal event triggered when an invoice is generated for domain processing | Active |
-<!--#endif -->
+# #endif
 
 <!-- prettier-ignore-end -->
