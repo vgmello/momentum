@@ -4,6 +4,17 @@ All notable changes to this project are documented in this file, grouped by date
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2026-07-26]
+
+### Changed
+
+- **Dependencies**: consolidated pending Dependabot updates —
+  `OpenTelemetry.Instrumentation.GrpcCore` 1.0.0-beta.13 → 1.0.0-beta.14 and the
+  `actions/setup-dotnet` GitHub Action v5 → v6 across all workflows. (The OpenTelemetry core and
+  instrumentation packages were already at 1.17.0.) `Refitter.MSBuild` is intentionally **not**
+  bumped to 2.1.0 — its generator throws `Method not found: ValueStringBuilder.AsSpan()` against the
+  current runtime and breaks E2E client generation.
+
 ## [2026-07-20]
 
 ### Changed
