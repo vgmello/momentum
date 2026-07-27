@@ -8,6 +8,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- **Analyzers**: `SonarAnalyzer.CSharp` `10.29.0.143774` → `10.30.0.144632`. The new version adds rules
+  that flagged pre-existing code (warnings-as-errors), all addressed: **S8949** — pass the request /
+  test `CancellationToken` to `WriteAsync`/`WriteAsJsonAsync`/`StartAsync`/`DeserializeAsync`/
+  `LoadDocumentationAsync`; **S8969** — removed redundant null-forgiving operators across app and test
+  code. One S8969 site in `CloudEventMapper` is suppressed with a comment instead: dropping the `!`
+  there re-exposes a benign `CS8620` variance (CloudNative's `IsCloudEvent` annotates the Kafka key
+  `string?` while Wolverine's `IIncomingMapper` fixes it `string` — identical at runtime).
+- **CI/Dependabot**: ignore `Refitter.MSBuild` `2.1.0` specifically (its generator breaks E2E client
+  generation); a later patch will be proposed again automatically.
 - **Dependencies**: consolidated pending Dependabot updates — `WolverineFx` (+`.Kafka`, `.Postgresql`,
   `.RuntimeCompilation`) `6.21.0` → `6.23.0` (Kafka aligned manually — Dependabot's group missed it),
   `Microsoft.Orleans` `10.2.1` → `10.2.2`, `Grpc.Tools` `2.82.0` → `2.83.0`, and `Scalar.AspNetCore`

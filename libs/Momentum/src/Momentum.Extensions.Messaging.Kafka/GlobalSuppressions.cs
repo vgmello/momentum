@@ -7,3 +7,8 @@ using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Performance", "CA1873",
     Justification = "Logging argument evaluation cost acceptable for startup-time configuration logging")]
+
+[assembly: SuppressMessage("Major Code Smell", "S8969",
+    Justification = "CloudEventMapper uses a null-forgiving operator on the Kafka message to bridge a " +
+                    "benign key-annotation variance (string vs string?) between Wolverine's IIncomingMapper " +
+                    "and CloudNative's IsCloudEvent; without it the compiler reports CS8620.")]

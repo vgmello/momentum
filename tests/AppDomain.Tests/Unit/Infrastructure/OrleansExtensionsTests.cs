@@ -1,6 +1,7 @@
 // Copyright (c) OrgName. All rights reserved.
 
 using AppDomain.Api.Infrastructure.Extensions;
+using System.Reflection;
 
 namespace AppDomain.Tests.Unit.Infrastructure;
 
@@ -227,5 +228,25 @@ public class OrleansExtensionsTests
         var primaryClientRegistration = builder.Services.Last(s =>
             s.ServiceType == typeof(IClusterClient) && !s.IsKeyedService);
         primaryClientRegistration.Lifetime.ShouldBe(ServiceLifetime.Singleton);
+    }
+
+    [Fact]
+    public void CreateKeyedClusterClient_WhenRegisteredAsInstance_CarriesTheSameInstance()
+    {
+        // Arrange — an IClusterClient registered as a singleton instance (ImplementationInstance set)
+        var instance = Substitute.For<IClusterClient>();
+        var registration = ServiceDescriptor.Singleton(typeof(IClusterClient), instance);
+
+        var method = typeof(OrleansExtensions)
+            .GetMethod("CreateKeyedClusterClient", BindingFlags.NonPublic | BindingFlags.Static);
+        method.ShouldNotBeNull();
+
+        // Act
+        var keyed = (ServiceDescriptor)method.Invoke(null, [registration])!;
+
+        // Assert — a keyed IClusterClient carrying the same instance
+        keyed.IsKeyedService.ShouldBeTrue();
+        keyed.ServiceType.ShouldBe(typeof(IClusterClient));
+        keyed.KeyedImplementationInstance.ShouldBe(instance);
     }
 }

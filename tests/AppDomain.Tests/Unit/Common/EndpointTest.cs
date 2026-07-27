@@ -42,7 +42,7 @@ public abstract class EndpointTest : IAsyncLifetime
         var builder = CreateAppBuilder();
         App = builder.Build();
         _configureApp?.Invoke(App);
-        await App.StartAsync();
+        await App.StartAsync(TestContext.Current.CancellationToken);
         Client = App.GetTestClient();
     }
 

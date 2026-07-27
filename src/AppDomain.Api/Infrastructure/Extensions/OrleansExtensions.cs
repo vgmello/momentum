@@ -118,7 +118,7 @@ public static class OrleansExtensions
         var serviceKey = registration;
 
         if (registration.ImplementationInstance is not null)
-            return new ServiceDescriptor(typeof(IClusterClient), serviceKey, registration.ImplementationInstance!);
+            return new ServiceDescriptor(typeof(IClusterClient), serviceKey, registration.ImplementationInstance);
 
         if (registration.ImplementationFactory is not null)
         {

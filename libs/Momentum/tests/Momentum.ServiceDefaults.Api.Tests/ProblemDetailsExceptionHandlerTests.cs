@@ -148,7 +148,7 @@ public class ProblemDetailsExceptionHandlerTests
     {
         httpContext.Response.Body.Position = 0;
         var body = await JsonSerializer.DeserializeAsync<ProblemDetails>(
-            httpContext.Response.Body, JsonOptions);
+            httpContext.Response.Body, JsonOptions, httpContext.RequestAborted);
         body.ShouldNotBeNull();
         return body;
     }

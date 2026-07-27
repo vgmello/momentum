@@ -71,7 +71,7 @@ public static class DomainDiscovery
         return GetAppDomainTypes()
             .GetTypes()
             .Where(t => t.Namespace?.Contains(".Actors") == true &&
-                        !t.Namespace!.StartsWith("AppDomain.BackOffice.Orleans") &&
+                        !t.Namespace.StartsWith("AppDomain.BackOffice.Orleans") &&
                         t.GetInterfaces().Any(i => typeof(IGrain).IsAssignableFrom(i)))
             .Select(t => t.Namespace!)
             .ToHashSet();
