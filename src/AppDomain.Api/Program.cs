@@ -3,10 +3,6 @@
 //#if (INCLUDE_ORLEANS)
 using AppDomain.Api.Infrastructure.Extensions;
 //#endif
-//#if (INCLUDE_SAMPLE)
-using AppDomain.Api.Cashiers;
-using AppDomain.Api.Invoices;
-//#endif
 using AppDomain.Infrastructure;
 //#if (USE_KAFKA)
 using Momentum.Extensions.Messaging.Kafka;
@@ -52,8 +48,9 @@ app.ConfigureApiUsingDefaults();
 app.UseFrontendIntegration();
 //#endif
 //#if (INCLUDE_SAMPLE)
-app.MapCashierEndpoints();
-app.MapInvoiceEndpoints();
+// Pass the assembly explicitly: Assembly.GetEntryAssembly() is null during build-time OpenAPI
+// document generation, which would otherwise discover no endpoints and emit an empty spec.
+app.MapEndpoints(typeof(Program).Assembly);
 //#endif
 app.MapDefaultHealthCheckEndpoints();
 

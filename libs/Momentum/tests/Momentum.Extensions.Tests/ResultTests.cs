@@ -110,4 +110,35 @@ public class ResultTests
         result.IsT1.ShouldBeTrue();
         result.AsT1.ShouldBeEmpty();
     }
+
+    [Fact]
+    public void ImplicitConversion_FromSingleValidationFailure_ShouldCreateFailureResult()
+    {
+        // Arrange
+        var failure = new ValidationFailure("Name", "Name is required");
+
+        // Act
+        Result<string> result = failure;
+
+        // Assert
+        result.IsT1.ShouldBeTrue();
+        result.AsT1.ShouldHaveSingleItem().ShouldBe(failure);
+    }
+
+    [Fact]
+    public void ExplicitConversion_FromValidationResult_ShouldCreateFailureResult()
+    {
+        // Arrange
+        var validationResult = new ValidationResult([
+            new ValidationFailure("Name", "Name is required"),
+            new ValidationFailure("Email", "Email is invalid")
+        ]);
+
+        // Act
+        var result = (Result<string>)validationResult;
+
+        // Assert
+        result.IsT1.ShouldBeTrue();
+        result.AsT1.ShouldBe(validationResult.Errors);
+    }
 }
