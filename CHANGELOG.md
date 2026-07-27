@@ -4,6 +4,23 @@ All notable changes to this project are documented in this file, grouped by date
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2026-07-27]
+
+### Added
+
+- **Extensions**: `Result<T>` now has an implicit conversion from `ValidationFailure` and an explicit
+  conversion from `ValidationResult`, so a handler can `return failure;` (single failure) or
+  `return (Result<T>)validationResult;` instead of hand-building the failure list.
+- **ServiceDefaults.Api**: `IEndpointDefinition` + `IEndpointRouteBuilder.MapEndpoints(assembly?, predicate?)` —
+  feature endpoint groups implement `static RouteGroupBuilder MapEndpoints(IEndpointRouteBuilder)` and are
+  auto-discovered (in deterministic full-name order) by scanning an assembly, replacing per-feature
+  `app.MapXEndpoints()` wiring. `MapEndpoints` nests every matched group under a shared parent group and
+  returns it, so conventions fan out to all mapped endpoints (`app.MapEndpoints(asm).RequireAuthorization()`).
+  An optional `Func<Type, bool>` predicate filters which definitions a call maps, and the method can be
+  called multiple times with complementary predicates to give different endpoint sets different conventions
+  (e.g. authorized vs anonymous). The sample's `CashierEndpoints`/`InvoiceEndpoints` now implement it, and
+  `Program.cs` calls a single `app.MapEndpoints(typeof(Program).Assembly)`.
+
 ## [2026-07-26]
 
 ### Changed

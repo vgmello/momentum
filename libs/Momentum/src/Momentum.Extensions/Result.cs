@@ -26,4 +26,20 @@ namespace Momentum.Extensions;
 /// </code>
 /// </example>
 [GenerateOneOf]
-public partial class Result<T> : OneOfBase<T, List<ValidationFailure>>;
+public partial class Result<T> : OneOfBase<T, List<ValidationFailure>>
+{
+    /// <summary>
+    ///     Creates a failed <see cref="Result{T}" /> from a single <see cref="ValidationFailure" />,
+    ///     so a handler can <c>return failure;</c> directly.
+    /// </summary>
+    public static implicit operator Result<T>(ValidationFailure failure) =>
+        new Result<T>(new List<ValidationFailure> { failure });
+
+    /// <summary>
+    ///     Creates a failed <see cref="Result{T}" /> from a <see cref="ValidationResult" />'s errors.
+    ///     Explicit because a valid result carries no failures — check <see cref="ValidationResult.IsValid" />
+    ///     before converting.
+    /// </summary>
+    public static explicit operator Result<T>(ValidationResult validationResult) =>
+        new Result<T>(validationResult.Errors);
+}
