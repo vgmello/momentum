@@ -73,6 +73,11 @@ updates:
       # ships a matching Roslyn version.
       - dependency-name: "Microsoft.CodeAnalysis.*"
         update-types: ["version-update:semver-major"]
+      # Refitter.MSBuild 2.1.0's generator throws "Method not found:
+      # System.Text.ValueStringBuilder.AsSpan()" against the current runtime and breaks E2E client
+      # generation. Skip 2.1.0 only — a later patch should pick back up.
+      - dependency-name: "Refitter.MSBuild"
+        versions: ["2.1.0"]
 
   # NPM packages for VitePress documentation (main docs)
   - package-ecosystem: "npm"

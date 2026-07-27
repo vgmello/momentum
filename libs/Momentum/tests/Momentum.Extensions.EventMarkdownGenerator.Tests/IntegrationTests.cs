@@ -199,12 +199,12 @@ public class IntegrationTests
         // Validate AppDomain section exists (contains CashierCreated)
         var appDomainSection = sidebarItems.FirstOrDefault(s => s.Text == "AppDomain");
         appDomainSection.ShouldNotBeNull();
-        appDomainSection!.Items.Count.ShouldBe(7);
+        appDomainSection.Items.Count.ShouldBe(7);
 
         // Find the Cashiers subsection within AppDomain section
         var cashiersSubsection = appDomainSection.Items.FirstOrDefault(i => i.Text == "Cashiers");
         cashiersSubsection.ShouldNotBeNull();
-        cashiersSubsection!.Items.ShouldNotBeNull();
+        cashiersSubsection.Items.ShouldNotBeNull();
         cashiersSubsection.Items.Count.ShouldBe(1);
 
         // Check that CashierCreated is in the Cashiers subsection
@@ -215,7 +215,7 @@ public class IntegrationTests
         // Validate schemas section exists
         var schemasSection = sidebarItems.FirstOrDefault(s => s.Text == "Schemas");
         schemasSection.ShouldNotBeNull();
-        schemasSection!.Items.Count.ShouldBeGreaterThan(0);
+        schemasSection.Items.Count.ShouldBeGreaterThan(0);
     }
 
     [Fact]
@@ -244,11 +244,11 @@ public class IntegrationTests
             // Mirrors GenerateCommand.CollectAllSchemaTypes: schema types come from the event's own
             // complex-type properties, not from EntityType directly.
             var schemaTypes = TypeUtils.CollectComplexTypesFromProperties(cashierCreatedEvent.Metadata.Properties);
-            schemaTypes.ShouldContain(entityType!);
+            schemaTypes.ShouldContain(entityType);
 
             var generatedMarkdown = markdownGenerator.GenerateMarkdown(cashierCreatedEvent, outputDir, schemaTypes: schemaTypes);
 
-            generatedMarkdown.Content.ShouldContain($"**Entity:** [Cashier](/events/schemas/{entityType!.FullName}.md)");
+            generatedMarkdown.Content.ShouldContain($"**Entity:** [Cashier](/events/schemas/{entityType.FullName}.md)");
         }
         finally
         {

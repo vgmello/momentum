@@ -25,7 +25,7 @@ public class XmlParsingDebugTests
         var cashierCreatedType = assembly.GetType("AppDomain.Cashiers.Contracts.IntegrationEvents.CashierCreated");
         cashierCreatedType.ShouldNotBeNull();
 
-        var documentation = parser.GetEventDocumentation(cashierCreatedType!);
+        var documentation = parser.GetEventDocumentation(cashierCreatedType);
 
         // Debug output - let's see what we actually get
         Console.WriteLine($"Summary: {documentation.Summary}");

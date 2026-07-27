@@ -31,7 +31,7 @@ public class XmlDocumentationParser(ILogger<XmlDocumentationService>? logger = n
         if (xmlFilePaths == null)
             return false;
 
-        var loadTasks = xmlFilePaths.Select(path => _xmlService.LoadDocumentationAsync(path));
+        var loadTasks = xmlFilePaths.Select(path => _xmlService.LoadDocumentationAsync(path, cancellationToken));
         var loadResults = await Task.WhenAll(loadTasks).WaitAsync(cancellationToken);
 
         return loadResults.Any(result => result);

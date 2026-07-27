@@ -87,7 +87,7 @@ public static partial class HealthCheckSetupExtensions
 
         return outputResult
             ? WriteReportObject(httpContext, report)
-            : httpContext.Response.WriteAsync(report.Status.ToString());
+            : httpContext.Response.WriteAsync(report.Status.ToString(), httpContext.RequestAborted);
     }
 
     private static void LogHealthCheckResponse(ILogger logger, HealthReport report)
@@ -127,7 +127,7 @@ public static partial class HealthCheckSetupExtensions
                 .ToList()
         };
 
-        return context.Response.WriteAsJsonAsync(response, options: JsonSerializerOptions);
+        return context.Response.WriteAsJsonAsync(response, options: JsonSerializerOptions, cancellationToken: context.RequestAborted);
     }
 
     private static ILogger GetHealthCheckLogger(IServiceProvider provider)

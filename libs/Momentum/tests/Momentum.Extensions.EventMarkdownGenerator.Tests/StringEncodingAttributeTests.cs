@@ -27,7 +27,7 @@ public class StringEncodingAttributeTests
         var usage = typeof(StringEncodingAttribute)
             .GetCustomAttribute<AttributeUsageAttribute>();
         usage.ShouldNotBeNull();
-        (usage!.ValidOn & AttributeTargets.Assembly).ShouldNotBe((AttributeTargets)0);
+        (usage.ValidOn & AttributeTargets.Assembly).ShouldNotBe((AttributeTargets)0);
     }
 
     [Fact]
@@ -36,7 +36,7 @@ public class StringEncodingAttributeTests
         var usage = typeof(StringEncodingAttribute)
             .GetCustomAttribute<AttributeUsageAttribute>();
         usage.ShouldNotBeNull();
-        (usage!.ValidOn & AttributeTargets.Class).ShouldNotBe((AttributeTargets)0);
+        (usage.ValidOn & AttributeTargets.Class).ShouldNotBe((AttributeTargets)0);
     }
 
     [Fact]
@@ -45,6 +45,6 @@ public class StringEncodingAttributeTests
         var usage = typeof(StringEncodingAttribute)
             .GetCustomAttribute<AttributeUsageAttribute>();
         usage.ShouldNotBeNull();
-        (usage!.ValidOn & AttributeTargets.Property).ShouldNotBe((AttributeTargets)0);
+        (usage.ValidOn & AttributeTargets.Property).ShouldNotBe((AttributeTargets)0);
     }
 }

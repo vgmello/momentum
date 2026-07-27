@@ -29,7 +29,7 @@ public class XmlDocumentationParserTests
         cashierCreatedType.ShouldNotBeNull();
 
         // Get documentation for the event
-        var documentation = parser.GetEventDocumentation(cashierCreatedType!);
+        var documentation = parser.GetEventDocumentation(cashierCreatedType);
 
         // Verify summary is parsed
         documentation.Summary.ShouldContain("Published when a new cashier is successfully created");
