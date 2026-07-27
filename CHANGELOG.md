@@ -4,6 +4,18 @@ All notable changes to this project are documented in this file, grouped by date
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2026-07-28]
+
+### Changed
+
+- **Dependencies**: consolidated pending Dependabot updates — `WolverineFx` (+`.Kafka`, `.Postgresql`,
+  `.RuntimeCompilation`) `6.21.0` → `6.23.0` (Kafka aligned manually — Dependabot's group missed it),
+  `Microsoft.Orleans` `10.2.1` → `10.2.2`, `Grpc.Tools` `2.82.0` → `2.83.0`, and `Scalar.AspNetCore`
+  `2.16.15` → `2.16.16`. Two updates are intentionally held back: `Refitter.MSBuild` 2.1.0 (its generator
+  breaks E2E client generation — `Method not found: ValueStringBuilder.AsSpan()`) and
+  `SonarAnalyzer.CSharp` 10.30 (introduces new analyzer rules that fail the build on existing code,
+  including a false-positive S8969 that conflicts with the compiler's nullability analysis).
+
 ## [2026-07-27]
 
 ### Added
