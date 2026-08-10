@@ -11,7 +11,7 @@
     <OpenTelemetryCoreVersion>1.17.0</OpenTelemetryCoreVersion>
     <OpenTelemetryInstrumentationVersion>1.17.0</OpenTelemetryInstrumentationVersion>
     <!--#if (INCLUDE_GRPC) -->
-    <GrpcVersion>2.80.0</GrpcVersion>
+    <GrpcVersion>2.83.0</GrpcVersion>
     <!--#endif -->
     <!--#if (!USE_LOCAL) -->
     <MomentumVersion>$(TemplateMomentumVersion)</MomentumVersion>
