@@ -20,7 +20,7 @@
     <!--#endif -->
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="Asp.Versioning.Http" Version="10.0.0" />
+    <PackageVersion Include="Asp.Versioning.Http" Version="10.2.2" />
     <PackageVersion Include="Aspire.Hosting.AppHost" Version="$(AspireVersion)" />
     <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="$(AspireVersion)" />
     <!--#if (INCLUDE_ORLEANS) -->
