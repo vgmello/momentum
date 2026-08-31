@@ -22,7 +22,7 @@
     "@mermaid-js/layout-elk": "^0.2.1",
     "@types/bun": "^1.2.14",
     "@types/node": "^26.0.0",
-    "markdown-it": "^14.1.0",
+    "markdown-it": "^15.0.1",
     "mermaid": "^11.16.0",
     "vitepress": "^1.6.4"
   }
