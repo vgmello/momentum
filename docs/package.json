@@ -21,7 +21,7 @@
     "yaml": "^2.8.1"
   },
   "devDependencies": {
-    "@mermaid-js/layout-elk": "^0.2.1",
+    "@mermaid-js/layout-elk": "^1.0.0",
     "@types/node": "^26.0.0",
     "markdown-it": "^14.1.0",
     "mermaid": "^11.16.0",
