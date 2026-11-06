@@ -283,6 +283,17 @@ public abstract class PayloadSizeCalculator
     {
         try
         {
+            // Uri serializes as a string of unknown length; IsPrimitiveType matches it, so check it first
+            if (type == typeof(Uri))
+            {
+                return new PayloadSizeResult
+                {
+                    SizeBytes = 0,
+                    IsAccurate = false,
+                    Warning = "Dynamic string size in collection"
+                };
+            }
+
             if (TypeUtils.IsPrimitiveType(type))
             {
                 return new PayloadSizeResult
@@ -318,10 +329,12 @@ public abstract class PayloadSizeCalculator
 
     private static DataAnnotationConstraints GetDataAnnotationConstraints(PropertyInfo property)
     {
-        var maxLengthAttr = GetPropertyOrParameterAttribute<MaxLengthAttribute>(property);
-        var stringLengthAttr = GetPropertyOrParameterAttribute<StringLengthAttribute>(property);
-        var lengthAttr = GetPropertyOrParameterAttribute<LengthAttribute>(property);
-        var rangeAttr = GetPropertyOrParameterAttribute<RangeAttribute>(property);
+        var source = GetDataAnnotationSource(property);
+
+        var maxLengthAttr = GetAttribute<MaxLengthAttribute>(source);
+        var stringLengthAttr = GetAttribute<StringLengthAttribute>(source);
+        var lengthAttr = GetAttribute<LengthAttribute>(source);
+        var rangeAttr = GetAttribute<RangeAttribute>(source);
 
         // [MaxLength] without an argument means "no limit" (Length = -1), so it gives no usable bound
         var maxLength = stringLengthAttr?.MaximumLength
@@ -335,23 +348,37 @@ public abstract class PayloadSizeCalculator
         };
     }
 
+    private static readonly Type[] SizeAnnotationTypes =
+        [typeof(MaxLengthAttribute), typeof(StringLengthAttribute), typeof(LengthAttribute), typeof(RangeAttribute)];
+
     /// <summary>
-    ///     Gets an attribute from the property or, for records, from the same-named primary constructor
-    ///     parameter — <c>record E([MaxLength(50)] string Name)</c> applies the attribute to the parameter.
+    ///     Picks where to read size annotations from: the property when it has any of them, otherwise the
+    ///     same-named, same-typed constructor parameter — <c>record E([MaxLength(50)] string Name)</c> applies
+    ///     the attribute to the parameter. Reading from a single source keeps property and parameter
+    ///     annotations from being mixed. The reflected (derived) type is searched before the declaring type
+    ///     so positional parameters forwarded to a base record are found too.
     /// </summary>
-    private static T? GetPropertyOrParameterAttribute<T>(PropertyInfo property) where T : Attribute
+    private static ICustomAttributeProvider GetDataAnnotationSource(PropertyInfo property)
     {
-        var attribute = property.GetCustomAttribute<T>();
+        if (SizeAnnotationTypes.Any(t => property.IsDefined(t, inherit: true)))
+            return property;
 
-        if (attribute is not null || property.DeclaringType is null)
-            return attribute;
+        Type?[] candidateTypes = [property.ReflectedType, property.DeclaringType];
 
-        var parameter = property.DeclaringType.GetConstructors()
+        var parameter = candidateTypes
+            .Where(t => t is not null)
+            .Distinct()
+            .SelectMany(t => t!.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
             .SelectMany(c => c.GetParameters())
-            .FirstOrDefault(p => string.Equals(p.Name, property.Name, StringComparison.OrdinalIgnoreCase));
+            .FirstOrDefault(p => p.ParameterType == property.PropertyType
+                                 && string.Equals(p.Name, property.Name, StringComparison.OrdinalIgnoreCase)
+                                 && SizeAnnotationTypes.Any(t => p.IsDefined(t, inherit: false)));
 
-        return parameter?.GetCustomAttribute<T>();
+        return (ICustomAttributeProvider?)parameter ?? property;
     }
+
+    private static T? GetAttribute<T>(ICustomAttributeProvider provider) where T : Attribute =>
+        provider.GetCustomAttributes(typeof(T), inherit: true).OfType<T>().FirstOrDefault();
 
     private static int GetPrimitiveTypeSize(Type type)
     {

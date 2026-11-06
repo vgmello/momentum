@@ -240,6 +240,48 @@ public class PayloadSizeCalculatorTests
         result.IsAccurate.ShouldBeTrue();
     }
 
+    [Fact]
+    public void CalculatePropertySize_PropertyAnnotations_ShouldTakePrecedenceOverParameterAnnotations()
+    {
+        var prop = typeof(TestPropertyAndParameterAnnotations).GetProperty(nameof(TestPropertyAndParameterAnnotations.Name))!;
+        var result = _jsonCalc.CalculatePropertySize(prop, prop.PropertyType);
+
+        // Property [MaxLength(100)] wins; the parameter's [StringLength(20)] is not mixed in -> 100 + 2
+        result.SizeBytes.ShouldBe(102);
+    }
+
+    [Fact]
+    public void CalculatePropertySize_AbstractBaseRecordProtectedConstructor_ShouldUseParameterAnnotation()
+    {
+        var prop = typeof(TestDerivedFromAbstract).GetProperty(nameof(TestDerivedFromAbstract.Name))!;
+        var result = _jsonCalc.CalculatePropertySize(prop, prop.PropertyType);
+
+        // [MaxLength(40)] on the abstract base's (protected) primary constructor -> 40 + 2
+        result.SizeBytes.ShouldBe(42);
+        result.IsAccurate.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void CalculatePropertySize_DerivedRecordForwardingParameter_ShouldUseDerivedParameterAnnotation()
+    {
+        var prop = typeof(TestDerivedForwarding).GetProperty(nameof(TestDerivedForwarding.Name))!;
+        var result = _jsonCalc.CalculatePropertySize(prop, prop.PropertyType);
+
+        // [MaxLength(30)] on the derived record's parameter forwarded to the base -> 30 + 2
+        result.SizeBytes.ShouldBe(32);
+        result.IsAccurate.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void CalculatePropertySize_ListOfUri_ShouldBeDynamic()
+    {
+        var prop = typeof(TestEventWithUri).GetProperty(nameof(TestEventWithUri.Links))!;
+        var result = _jsonCalc.CalculatePropertySize(prop, prop.PropertyType);
+
+        // Uri elements are strings of unknown length, so even with [Range] the estimate is not accurate
+        result.IsAccurate.ShouldBeFalse();
+    }
+
     // --- Various primitive types ---
 
     [Theory]
@@ -393,6 +435,21 @@ public class PayloadSizeCalculatorTests
         [Length(5, 30)] string Reference);
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1144:Unused private types or members should be removed")]
+    private record TestPropertyAndParameterAnnotations([property: MaxLength(100)][StringLength(20)] string Name);
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1144:Unused private types or members should be removed")]
+    private abstract record TestAbstractBase([MaxLength(40)] string Name);
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1144:Unused private types or members should be removed")]
+    private record TestDerivedFromAbstract(string Name) : TestAbstractBase(Name);
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1144:Unused private types or members should be removed")]
+    private record TestForwardingBase(string Name);
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1144:Unused private types or members should be removed")]
+    private record TestDerivedForwarding([MaxLength(30)] string Name) : TestForwardingBase(Name);
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1144:Unused private types or members should be removed")]
     private enum TestEnum { A, B, C }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1144:Unused private types or members should be removed")]
@@ -426,5 +483,8 @@ public class PayloadSizeCalculatorTests
         [MaxLength(200)]
         public Uri Callback { get; init; } = new("https://example.com");
         public Uri? Homepage { get; init; }
+
+        [Range(1, 5)]
+        public List<Uri> Links { get; init; } = [];
     }
 }
