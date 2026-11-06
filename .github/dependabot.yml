@@ -78,6 +78,13 @@ updates:
       # generation. Skip 2.1.0 only — a later patch should pick back up.
       - dependency-name: "Refitter.MSBuild"
         versions: ["2.1.0"]
+      # xunit v4 ships Microsoft.Testing.Platform 2, which drops VSTest-mode `dotnet test` on the
+      # .NET 10 SDK. Adopting it requires migrating CI, the template and test scripts to the new
+      # `dotnet test` experience (filters, trx reporting, coverage); hold the major until then.
+      - dependency-name: "xunit.v3"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "xunit.runner.visualstudio"
+        update-types: ["version-update:semver-major"]
 
   # NPM packages for VitePress documentation (main docs)
   - package-ecosystem: "npm"

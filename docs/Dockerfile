@@ -9,7 +9,7 @@ COPY --from=bun /usr/local/bin/bun /usr/local/bin/bun
 
 # Install git (required by vitepress lastUpdated and docfx) and curl (used by the docs service healthcheck), then install dotnet tools
 RUN apk add --no-cache git curl && \
-    dotnet tool install -g docfx && \
+    dotnet tool install -g docfx --version 2.78.5 && \
     dotnet tool install -g Momentum.Extensions.EventMarkdownGenerator
 
 WORKDIR /app/docs

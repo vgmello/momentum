@@ -20,8 +20,9 @@ public static class OpenApiExtensions
     /// <param name="configuration">
     ///     Optional application configuration. When provided, security schemes are bound from
     ///     <c>OpenApi:SecuritySchemes</c>. Each key becomes a scheme name with properties
-    ///     <c>Type</c>, <c>Scheme</c>, <c>BearerFormat</c>, and <c>Description</c>.
-    ///     When <c>null</c> or when the section is absent, no security schemes are added.
+    ///     <c>Type</c>, <c>Scheme</c>, <c>BearerFormat</c>, <c>Description</c>, and for <c>ApiKey</c> schemes
+    ///     <c>Name</c> and <c>In</c>. Schemes without a <c>Type</c>, and <c>ApiKey</c> schemes without a
+    ///     <c>Name</c>, are skipped. When <c>null</c> or when the section is absent, no security schemes are added.
     /// </param>
     /// <remarks>
     ///     This method applies Momentum's standard OpenAPI configuration:
@@ -146,6 +147,11 @@ public static class OpenApiExtensions
             child.Bind(scheme);
 
             if (scheme.Type is null)
+                continue;
+
+            // apiKey schemes require a name; Microsoft.OpenApi throws on serialization without one,
+            // which would fail the whole document rather than just this scheme
+            if (scheme.Type == SecuritySchemeType.ApiKey && string.IsNullOrWhiteSpace(scheme.Name))
                 continue;
 
             result[child.Key] = scheme;

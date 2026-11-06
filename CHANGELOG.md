@@ -4,6 +4,51 @@ All notable changes to this project are documented in this file, grouped by date
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2026-11-06]
+
+### Changed
+
+- **Dependencies**: consolidated pending Dependabot updates (#337, #344, #345, #346, #347, #348, #349,
+  #350, #360, #361, #362, #363, #365, #366):
+  - **NuGet**: Aspire `13.4.6` → `13.6.1`; `Microsoft.Extensions.Http.Resilience` and
+    `Microsoft.Extensions.ServiceDiscovery` `10.8.0` → `10.11.0`; `Dapper` `2.1.79` → `2.1.89`; `linq2db`
+    (+`.Extensions`) `6.3.0` → `6.5.0`; `Asp.Versioning.Http` `10.0.0` → `10.2.3`.
+  - **Testing**: `Microsoft.NET.Test.Sdk` `18.8.1` → `18.10.1`; `NSubstitute` `6.0.0` → `6.2.0`; `Testcontainers`
+    (+`.Kafka`, `.PostgreSql`) `4.13.0` → `4.16.0`.
+  - **Docs** (`docs/` and `libs/Momentum/docs/`): `mermaid` `^11` → `^12.0.0`, `markdown-it` `^14` →
+    `^15.0.2`, `@mermaid-js/layout-elk` `^0.2` → `^1.0.0` (all major); `bun.lock` files regenerated —
+    the individual Dependabot PRs had left them stale.
+  - **CI**: `actions/setup-java` `v5` → `v6`; `dorny/test-reporter` `v3.0.0` → `v3.2.0`.
+  - **Alignment** required by the above (NuGet `NU1109` downgrade errors): `Microsoft.Extensions.*` /
+    `Microsoft.AspNetCore.*` (`MicrosoftExtensionsVersion`) `10.0.10` → `10.0.14`, gRPC (`GrpcVersion`)
+    `2.80.0` → `2.83.0` (Aspire 13.6 requires ≥ these), and `Microsoft.Extensions.Diagnostics.Testing`
+    `10.8.0` → `10.11.0` to match `Http.Resilience`; `Microsoft.OpenApi` pin `2.7.5` → `2.12.2`
+    (required by `Microsoft.AspNetCore.OpenApi` 10.0.14).
+
+- **CI/Docs**: pin DocFX to `2.78.5` in the docs-build action and both docs Dockerfiles. The unpinned
+  `dotnet tool install -g docfx` picked up `2.81.0`, whose generated API reference markdown fails the
+  VitePress build (`Invalid end tag`); DocFX is a global tool Dependabot doesn't track, so bump it deliberately.
+- **CI/Dependabot**: hold back `xunit.v3` 4.x / `xunit.runner.visualstudio` 4.x (from #363) and ignore
+  their major updates. xunit v4 ships Microsoft.Testing.Platform 2, which no longer supports VSTest-mode
+  `dotnet test` on the .NET 10 SDK; adopting it needs a separate migration of CI, the template and test
+  scripts to the new `dotnet test` experience.
+
+### Fixed
+
+- **ServiceDefaults.Api**: `OpenApi:SecuritySchemes` entries of type `ApiKey` without a `Name` are now
+  skipped (like entries without a `Type`). `Microsoft.OpenApi` 2.12 throws when serializing such a scheme,
+  which would otherwise fail the whole OpenAPI document. `Name`/`In` are documented as bindable keys.
+- **ServiceDefaults.Api**: suppress the new `Asp.Versioning` 10.2 analyzer `AV0021` on
+  `AddEndpointsApiExplorer()`. Versioning only reads the URL-segment version and OpenAPI documents are
+  produced by `Microsoft.AspNetCore.OpenApi`, so behavior is unchanged from 10.0; adopting the versioned
+  API explorer (`Asp.Versioning.Mvc.ApiExplorer`) would change OpenAPI grouping and is left as a follow-up.
+
+### Security
+
+- `MessagePack` pin `2.5.302` → `2.5.307` (GHSA-qhrr-8q5h-9q3h) and `Microsoft.SourceLink.GitHub`
+  `10.0.301` → `10.0.303`, which brings a `Microsoft.Build.Tasks.Git` patched for GHSA-23fw-v26w-5fgq —
+  both new advisories that fail restore under warnings-as-errors (`NU1902`).
+
 ## [2026-07-28]
 
 ### Changed

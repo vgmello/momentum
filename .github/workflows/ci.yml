@@ -75,7 +75,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup JDK 17
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           java-version: 17
           distribution: "zulu"
@@ -220,7 +220,7 @@ jobs:
 
       - name: Test report
         if: always()
-        uses: dorny/test-reporter@v3.0.0
+        uses: dorny/test-reporter@v3.2.0
         with:
           name: Test Results
           path: TestResults/*.trx
