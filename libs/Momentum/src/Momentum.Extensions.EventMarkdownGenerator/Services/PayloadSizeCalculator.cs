@@ -358,6 +358,9 @@ public abstract class PayloadSizeCalculator
     ///     annotations from being mixed. The reflected (derived) type is searched before the declaring type
     ///     so positional parameters forwarded to a base record are found too.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S3011",
+        Justification = "Only reads constructor parameter metadata (attributes) of scanned event types; nothing " +
+                        "non-public is invoked. Non-public constructors are needed for abstract base records.")]
     private static ICustomAttributeProvider GetDataAnnotationSource(PropertyInfo property)
     {
         // Attribute.IsDefined (unlike PropertyInfo.IsDefined) honours inherit, so annotations on an
