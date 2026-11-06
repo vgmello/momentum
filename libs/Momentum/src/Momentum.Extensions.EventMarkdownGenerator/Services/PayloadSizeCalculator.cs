@@ -93,7 +93,8 @@ public abstract class PayloadSizeCalculator
         {
             var underlyingType = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
 
-            if (underlyingType == typeof(string))
+            // Uri serializes as a string, so it is sized the same way (MaxLength/StringLength or dynamic)
+            if (underlyingType == typeof(string) || underlyingType == typeof(Uri))
             {
                 return CalculateStringSize(property);
             }
@@ -282,6 +283,17 @@ public abstract class PayloadSizeCalculator
     {
         try
         {
+            // Uri serializes as a string of unknown length; IsPrimitiveType matches it, so check it first
+            if (type == typeof(Uri))
+            {
+                return new PayloadSizeResult
+                {
+                    SizeBytes = 0,
+                    IsAccurate = false,
+                    Warning = "Dynamic string size in collection"
+                };
+            }
+
             if (TypeUtils.IsPrimitiveType(type))
             {
                 return new PayloadSizeResult
@@ -317,16 +329,74 @@ public abstract class PayloadSizeCalculator
 
     private static DataAnnotationConstraints GetDataAnnotationConstraints(PropertyInfo property)
     {
-        var maxLengthAttr = property.GetCustomAttribute<MaxLengthAttribute>();
-        var stringLengthAttr = property.GetCustomAttribute<StringLengthAttribute>();
-        var rangeAttr = property.GetCustomAttribute<RangeAttribute>();
+        var source = GetDataAnnotationSource(property);
+
+        var maxLengthAttr = GetAttribute<MaxLengthAttribute>(source);
+        var stringLengthAttr = GetAttribute<StringLengthAttribute>(source);
+        var lengthAttr = GetAttribute<LengthAttribute>(source);
+        var rangeAttr = GetAttribute<RangeAttribute>(source);
+
+        // [MaxLength] without an argument means "no limit" (Length = -1), so it gives no usable bound
+        var maxLength = stringLengthAttr?.MaximumLength
+                        ?? (maxLengthAttr is { Length: > 0 } ? (int?)maxLengthAttr.Length : null)
+                        ?? lengthAttr?.MaximumLength;
 
         return new DataAnnotationConstraints
         {
-            MaxLength = stringLengthAttr?.MaximumLength ?? maxLengthAttr?.Length,
+            MaxLength = maxLength,
             MaxRange = rangeAttr is { Maximum: int maxRange } ? maxRange : null
         };
     }
+
+    private static readonly Type[] SizeAnnotationTypes =
+        [typeof(MaxLengthAttribute), typeof(StringLengthAttribute), typeof(LengthAttribute), typeof(RangeAttribute)];
+
+    /// <summary>
+    ///     Picks where to read size annotations from: the property when it has any of them, otherwise the
+    ///     same-named, same-typed constructor parameter — <c>record E([MaxLength(50)] string Name)</c> applies
+    ///     the attribute to the parameter. Reading from a single source keeps property and parameter
+    ///     annotations from being mixed. The reflected (derived) type is searched before the declaring type
+    ///     so positional parameters forwarded to a base record are found too.
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S3011",
+        Justification = "Only reads constructor parameter metadata (attributes) of scanned event types; nothing " +
+                        "non-public is invoked. Non-public constructors are needed for abstract base records.")]
+    private static ICustomAttributeProvider GetDataAnnotationSource(PropertyInfo property)
+    {
+        // Attribute.IsDefined (unlike PropertyInfo.IsDefined) honours inherit, so annotations on an
+        // overridden base property are still found
+        if (SizeAnnotationTypes.Any(t => Attribute.IsDefined(property, t, inherit: true)))
+            return property;
+
+        try
+        {
+            Type?[] candidateTypes = [property.ReflectedType, property.DeclaringType];
+
+            var parameter = candidateTypes
+                .Where(t => t is not null)
+                .Distinct()
+                .SelectMany(t => t!.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                    .OrderBy(c => c.MetadataToken))
+                .SelectMany(c => c.GetParameters())
+                .FirstOrDefault(p => p.ParameterType == property.PropertyType
+                                     && string.Equals(p.Name, property.Name, StringComparison.Ordinal)
+                                     && SizeAnnotationTypes.Any(t => Attribute.IsDefined(p, t, inherit: false)));
+
+            return (ICustomAttributeProvider?)parameter ?? property;
+        }
+        catch (Exception ex) when (ex is FileNotFoundException or FileLoadException or TypeLoadException)
+        {
+            // A constructor referencing a missing dependency shouldn't turn a plain estimate into a failure
+            return property;
+        }
+    }
+
+    private static T? GetAttribute<T>(ICustomAttributeProvider provider) where T : Attribute => provider switch
+    {
+        PropertyInfo property => property.GetCustomAttribute<T>(inherit: true),
+        ParameterInfo parameter => parameter.GetCustomAttribute<T>(),
+        _ => null
+    };
 
     private static int GetPrimitiveTypeSize(Type type)
     {
@@ -346,8 +416,13 @@ public abstract class PayloadSizeCalculator
             "Decimal" => 16,
             "DateTime" => 8,
             "DateTimeOffset" => 10,
+            "DateOnly" => 4,
+            "TimeOnly" => 8,
             "TimeSpan" => 8,
             "Guid" => 16,
+            "Half" => 2,
+            "Int128" => 16,
+            "UInt128" => 16,
             _ when type.IsEnum => 4,
             _ => 4 // Default fallback
         };
