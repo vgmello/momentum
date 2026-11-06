@@ -41,7 +41,8 @@ try {
     if ($LASTEXITCODE -ne 0) {
         throw "DocFX returned non-zero exit code"
     }
-    if (-not "$installedDocfx".StartsWith($DocfxVersion)) {
+    # Exact match; docfx prints e.g. "2.78.5+<commit>", and "2.78.50" must not pass for "2.78.5"
+    if ("$installedDocfx".Trim() -notmatch "^$([regex]::Escape($DocfxVersion))(\+|$)") {
         throw "Expected DocFX $DocfxVersion but found $installedDocfx"
     }
     Write-Host "✅ DocFX version: $installedDocfx"
