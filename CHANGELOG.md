@@ -35,13 +35,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
-- **events-docsgen**: `DateOnly`, `TimeOnly` (and nullable forms) — plus `Uri`, `Half`, `Int128` and
-  `UInt128` — are now treated as scalars instead of complex types, so they no longer produce `System.*`
-  schema pages, sidebar entries, property links or Reference Schemas sections for direct, nullable and nested
-  properties (#367; empty Reference Schemas entries for *collections* of scalars are addressed in #373).
-  `IsComplexType` now reuses `IsPrimitiveType` so nested types get the same handling. Payload size estimates added for these
-  types; `Uri` is sized like a string, and `Uri` collection elements are reported as dynamic (string collection
-  element sizing is unchanged).
+- **events-docsgen**: `DateOnly`, `TimeOnly` (and nullable forms) — plus `Uri`, `Half`, `Int128` and `UInt128`
+  — are now treated as scalars instead of complex types, so they no longer produce `System.*` schema pages,
+  sidebar entries, property links or Reference Schemas sections for direct, nullable and nested properties
+  (#367; empty Reference Schemas entries for *collections* of scalars are fixed separately by #373).
+  `IsComplexType` now reuses `IsPrimitiveType` so nested types get the same handling. Payload size estimates
+  added for these types; `Uri` is sized like a string, and `Uri` collection elements are reported as dynamic
+  (string collection element sizing is unchanged).
 - **events-docsgen**: string (and `Uri`) size estimates now also honour `[Length(min, max)]`, and read
   `[MaxLength]`/`[StringLength]`/`[Length]`/`[Range]` from a record's positional parameter when the
   property itself has none (`record E([MaxLength(50)] string Name)` targets the parameter) — including
