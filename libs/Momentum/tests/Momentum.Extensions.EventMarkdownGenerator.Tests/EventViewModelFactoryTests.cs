@@ -37,13 +37,17 @@ public class EventViewModelFactoryTests
 
     private static EventDocumentation CreateDocumentation() => new() { Summary = "Test" };
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1144:Unused private types or members should be removed")]
     private sealed record CollectionPropertiesEvent(
         List<string> Tags,
         List<DateOnly> Holidays,
         Dictionary<string, string> Labels,
         List<CollectionItem> Items,
+        CollectionItem[] ItemArray,
+        Dictionary<string, CollectionItem> ItemsByKey,
         CollectionItem Single);
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1144:Unused private types or members should be removed")]
     private sealed record CollectionItem(string Value);
 
     [Fact]
@@ -61,8 +65,13 @@ public class EventViewModelFactoryTests
         byName["Tags"].IsComplexType.ShouldBeFalse();
         byName["Holidays"].IsComplexType.ShouldBeFalse();
         byName["Labels"].IsComplexType.ShouldBeFalse();
-        byName["Items"].IsComplexType.ShouldBeTrue();
-        byName["Items"].ElementSchemaPath.ShouldBe($"{typeof(CollectionItem).FullName}.md");
+        var itemSchema = $"{typeof(CollectionItem).FullName}.md";
+        foreach (var name in new[] { "Items", "ItemArray", "ItemsByKey" })
+        {
+            byName[name].IsComplexType.ShouldBeTrue(name);
+            byName[name].ElementSchemaPath.ShouldBe(itemSchema, name);
+        }
+
         byName["Single"].IsComplexType.ShouldBeTrue();
     }
 
