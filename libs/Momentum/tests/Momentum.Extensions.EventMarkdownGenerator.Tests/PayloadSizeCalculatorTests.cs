@@ -220,6 +220,13 @@ public class PayloadSizeCalculatorTests
     [InlineData(nameof(TestPrimitiveTypes.DateTimeValue), 8)]
     [InlineData(nameof(TestPrimitiveTypes.DateTimeOffsetValue), 10)]
     [InlineData(nameof(TestPrimitiveTypes.TimeSpanValue), 8)]
+    [InlineData(nameof(TestPrimitiveTypes.DateOnlyValue), 4)]
+    [InlineData(nameof(TestPrimitiveTypes.TimeOnlyValue), 8)]
+    [InlineData(nameof(TestPrimitiveTypes.NullableDateOnlyValue), 4)]
+    [InlineData(nameof(TestPrimitiveTypes.NullableTimeOnlyValue), 8)]
+    [InlineData(nameof(TestPrimitiveTypes.HalfValue), 2)]
+    [InlineData(nameof(TestPrimitiveTypes.Int128Value), 16)]
+    [InlineData(nameof(TestPrimitiveTypes.UInt128Value), 16)]
     [InlineData(nameof(TestPrimitiveTypes.EnumValue), 4)]
     public void CalculatePropertySize_PrimitiveTypes_ShouldReturnCorrectSize(string propertyName, int expectedSize)
     {
@@ -227,6 +234,29 @@ public class PayloadSizeCalculatorTests
         var result = _jsonCalc.CalculatePropertySize(prop, prop.PropertyType);
         result.SizeBytes.ShouldBe(expectedSize);
         result.IsAccurate.ShouldBeTrue();
+    }
+
+    // --- Uri is sized like a string ---
+
+    [Fact]
+    public void CalculatePropertySize_UriWithMaxLength_ShouldBeSizedLikeString()
+    {
+        var prop = typeof(TestEventWithUri).GetProperty(nameof(TestEventWithUri.Callback))!;
+        var result = _jsonCalc.CalculatePropertySize(prop, prop.PropertyType);
+
+        // [MaxLength(200)] -> JSON: (200 * 1) + 2 = 202
+        result.SizeBytes.ShouldBe(202);
+        result.IsAccurate.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void CalculatePropertySize_UriWithoutMaxLength_ShouldReturnInaccurate()
+    {
+        var prop = typeof(TestEventWithUri).GetProperty(nameof(TestEventWithUri.Homepage))!;
+        var result = _jsonCalc.CalculatePropertySize(prop, prop.PropertyType);
+
+        result.SizeBytes.ShouldBe(0);
+        result.IsAccurate.ShouldBeFalse();
     }
 
     // --- Collection with complex element types ---
@@ -333,6 +363,21 @@ public class PayloadSizeCalculatorTests
         public DateTime DateTimeValue { get; init; }
         public DateTimeOffset DateTimeOffsetValue { get; init; }
         public TimeSpan TimeSpanValue { get; init; }
+        public DateOnly DateOnlyValue { get; init; }
+        public TimeOnly TimeOnlyValue { get; init; }
+        public DateOnly? NullableDateOnlyValue { get; init; }
+        public TimeOnly? NullableTimeOnlyValue { get; init; }
+        public Half HalfValue { get; init; }
+        public Int128 Int128Value { get; init; }
+        public UInt128 UInt128Value { get; init; }
         public TestEnum EnumValue { get; init; }
+    }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1144:Unused private types or members should be removed")]
+    private record TestEventWithUri
+    {
+        [MaxLength(200)]
+        public Uri Callback { get; init; } = new("https://example.com");
+        public Uri? Homepage { get; init; }
     }
 }

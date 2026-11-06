@@ -42,8 +42,14 @@ public static class TypeUtils
                type == typeof(decimal) ||
                type == typeof(DateTime) ||
                type == typeof(DateTimeOffset) ||
+               type == typeof(DateOnly) ||
+               type == typeof(TimeOnly) ||
                type == typeof(TimeSpan) ||
                type == typeof(Guid) ||
+               type == typeof(Uri) ||
+               type == typeof(Half) ||
+               type == typeof(Int128) ||
+               type == typeof(UInt128) ||
                Nullable.GetUnderlyingType(type) != null && IsPrimitiveType(Nullable.GetUnderlyingType(type)!);
     }
 
@@ -115,14 +121,7 @@ public static class TypeUtils
             }
 
             // Primitive types and common framework types are not complex
-            return !underlyingType.IsPrimitive
-                   && underlyingType != typeof(string)
-                   && underlyingType != typeof(DateTime)
-                   && underlyingType != typeof(DateTimeOffset)
-                   && underlyingType != typeof(TimeSpan)
-                   && underlyingType != typeof(Guid)
-                   && underlyingType != typeof(decimal)
-                   && !underlyingType.IsEnum;
+            return !IsPrimitiveType(underlyingType);
         }
         finally
         {

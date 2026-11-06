@@ -93,7 +93,8 @@ public abstract class PayloadSizeCalculator
         {
             var underlyingType = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
 
-            if (underlyingType == typeof(string))
+            // Uri serializes as a string, so it is sized the same way (MaxLength/StringLength or dynamic)
+            if (underlyingType == typeof(string) || underlyingType == typeof(Uri))
             {
                 return CalculateStringSize(property);
             }
@@ -282,6 +283,17 @@ public abstract class PayloadSizeCalculator
     {
         try
         {
+            // Checked before IsPrimitiveType, which also matches string and Uri
+            if (type == typeof(string) || type == typeof(Uri))
+            {
+                return new PayloadSizeResult
+                {
+                    SizeBytes = 0,
+                    IsAccurate = false,
+                    Warning = "Dynamic string size in collection"
+                };
+            }
+
             if (TypeUtils.IsPrimitiveType(type))
             {
                 return new PayloadSizeResult
@@ -289,16 +301,6 @@ public abstract class PayloadSizeCalculator
                     SizeBytes = GetPrimitiveTypeSize(type),
                     IsAccurate = true,
                     Warning = null
-                };
-            }
-
-            if (type == typeof(string))
-            {
-                return new PayloadSizeResult
-                {
-                    SizeBytes = 0,
-                    IsAccurate = false,
-                    Warning = "Dynamic string size in collection"
                 };
             }
 
@@ -346,8 +348,13 @@ public abstract class PayloadSizeCalculator
             "Decimal" => 16,
             "DateTime" => 8,
             "DateTimeOffset" => 10,
+            "DateOnly" => 4,
+            "TimeOnly" => 8,
             "TimeSpan" => 8,
             "Guid" => 16,
+            "Half" => 2,
+            "Int128" => 16,
+            "UInt128" => 16,
             _ when type.IsEnum => 4,
             _ => 4 // Default fallback
         };
