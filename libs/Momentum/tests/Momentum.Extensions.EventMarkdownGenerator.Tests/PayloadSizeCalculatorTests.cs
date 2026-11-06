@@ -273,6 +273,27 @@ public class PayloadSizeCalculatorTests
     }
 
     [Fact]
+    public void CalculatePropertySize_OverriddenPropertyWithBaseAnnotation_ShouldUseBaseAnnotation()
+    {
+        var prop = typeof(TestOverridingRecord).GetProperty(nameof(TestOverridingRecord.Name))!;
+        var result = _jsonCalc.CalculatePropertySize(prop, prop.PropertyType);
+
+        // [MaxLength(50)] on the abstract base property is inherited by the override -> 50 + 2
+        result.SizeBytes.ShouldBe(52);
+        result.IsAccurate.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void CalculatePropertySize_PositionalParameterWithUnboundedMaxLength_ShouldReturnInaccurate()
+    {
+        var prop = typeof(TestUnboundedPositional).GetProperty(nameof(TestUnboundedPositional.Notes))!;
+        var result = _jsonCalc.CalculatePropertySize(prop, prop.PropertyType);
+
+        result.SizeBytes.ShouldBe(0);
+        result.IsAccurate.ShouldBeFalse();
+    }
+
+    [Fact]
     public void CalculatePropertySize_ListOfUri_ShouldBeDynamic()
     {
         var prop = typeof(TestEventWithUri).GetProperty(nameof(TestEventWithUri.Links))!;
@@ -280,6 +301,7 @@ public class PayloadSizeCalculatorTests
 
         // Uri elements are strings of unknown length, so even with [Range] the estimate is not accurate
         result.IsAccurate.ShouldBeFalse();
+        result.Warning.ShouldBe("Dynamic string size in collection");
     }
 
     // --- Various primitive types ---
@@ -448,6 +470,22 @@ public class PayloadSizeCalculatorTests
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1144:Unused private types or members should be removed")]
     private record TestDerivedForwarding([MaxLength(30)] string Name) : TestForwardingBase(Name);
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1144:Unused private types or members should be removed")]
+    private abstract record TestAnnotatedAbstractBase
+    {
+        [MaxLength(50)]
+        public abstract string Name { get; init; }
+    }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1144:Unused private types or members should be removed")]
+    private record TestOverridingRecord : TestAnnotatedAbstractBase
+    {
+        public override string Name { get; init; } = "";
+    }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1144:Unused private types or members should be removed")]
+    private record TestUnboundedPositional([MaxLength] string Notes);
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1144:Unused private types or members should be removed")]
     private enum TestEnum { A, B, C }

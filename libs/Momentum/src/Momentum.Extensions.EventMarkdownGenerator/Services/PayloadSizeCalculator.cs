@@ -360,25 +360,40 @@ public abstract class PayloadSizeCalculator
     /// </summary>
     private static ICustomAttributeProvider GetDataAnnotationSource(PropertyInfo property)
     {
-        if (SizeAnnotationTypes.Any(t => property.IsDefined(t, inherit: true)))
+        // Attribute.IsDefined (unlike PropertyInfo.IsDefined) honours inherit, so annotations on an
+        // overridden base property are still found
+        if (SizeAnnotationTypes.Any(t => Attribute.IsDefined(property, t, inherit: true)))
             return property;
 
-        Type?[] candidateTypes = [property.ReflectedType, property.DeclaringType];
+        try
+        {
+            Type?[] candidateTypes = [property.ReflectedType, property.DeclaringType];
 
-        var parameter = candidateTypes
-            .Where(t => t is not null)
-            .Distinct()
-            .SelectMany(t => t!.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
-            .SelectMany(c => c.GetParameters())
-            .FirstOrDefault(p => p.ParameterType == property.PropertyType
-                                 && string.Equals(p.Name, property.Name, StringComparison.OrdinalIgnoreCase)
-                                 && SizeAnnotationTypes.Any(t => p.IsDefined(t, inherit: false)));
+            var parameter = candidateTypes
+                .Where(t => t is not null)
+                .Distinct()
+                .SelectMany(t => t!.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                    .OrderBy(c => c.MetadataToken))
+                .SelectMany(c => c.GetParameters())
+                .FirstOrDefault(p => p.ParameterType == property.PropertyType
+                                     && string.Equals(p.Name, property.Name, StringComparison.Ordinal)
+                                     && SizeAnnotationTypes.Any(t => Attribute.IsDefined(p, t, inherit: false)));
 
-        return (ICustomAttributeProvider?)parameter ?? property;
+            return (ICustomAttributeProvider?)parameter ?? property;
+        }
+        catch (Exception ex) when (ex is FileNotFoundException or FileLoadException or TypeLoadException)
+        {
+            // A constructor referencing a missing dependency shouldn't turn a plain estimate into a failure
+            return property;
+        }
     }
 
-    private static T? GetAttribute<T>(ICustomAttributeProvider provider) where T : Attribute =>
-        provider.GetCustomAttributes(typeof(T), inherit: true).OfType<T>().FirstOrDefault();
+    private static T? GetAttribute<T>(ICustomAttributeProvider provider) where T : Attribute => provider switch
+    {
+        PropertyInfo property => property.GetCustomAttribute<T>(inherit: true),
+        ParameterInfo parameter => parameter.GetCustomAttribute<T>(),
+        _ => null
+    };
 
     private static int GetPrimitiveTypeSize(Type type)
     {
