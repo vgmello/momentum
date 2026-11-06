@@ -1,6 +1,9 @@
 [CmdletBinding()]
 param(
     [string]$DocsPath = "libs/Momentum/docs",
+    # Pinned: docfx is a global tool Dependabot doesn't track, and unpinned installs picked up 2.81.0,
+    # whose generated reference markdown fails the VitePress (Vue) build. Bump deliberately.
+    [string]$DocfxVersion = "2.78.5",
     [switch]$CI
 )
 
@@ -11,7 +14,7 @@ $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ErrorActionPreference = "Stop"
 
 Write-Host "📦 Installing DocFX..."
-dotnet tool install -g docfx --verbosity normal
+dotnet tool install -g docfx --version $DocfxVersion --verbosity normal
 
 # Ensure .NET tools are in PATH
 $dotnetToolsPath = Join-Path $env:HOME ".dotnet/tools"

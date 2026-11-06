@@ -9,7 +9,7 @@ COPY --from=bun /usr/local/bin/bun /usr/local/bin/bun
 
 # Install git (required by vitepress lastUpdated and docfx), then install dotnet tools
 RUN apk add --no-cache git && \
-    dotnet tool install -g docfx
+    dotnet tool install -g docfx --version 2.78.5
 
 WORKDIR /app/docs
 
