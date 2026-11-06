@@ -35,6 +35,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **ServiceDefaults.Api**: `OpenApi:SecuritySchemes` entries of type `ApiKey` without a `Name` are now
   skipped (like entries without a `Type`). `Microsoft.OpenApi` 2.12 throws when serializing such a scheme,
   which would otherwise fail the whole OpenAPI document. `Name`/`In` are documented as bindable keys.
+- **ServiceDefaults.Api**: suppress the new `Asp.Versioning` 10.2 analyzer `AV0021` on
+  `AddEndpointsApiExplorer()`. Versioning only reads the URL-segment version and OpenAPI documents are
+  produced by `Microsoft.AspNetCore.OpenApi`, so behavior is unchanged from 10.0; adopting the versioned
+  API explorer (`Asp.Versioning.Mvc.ApiExplorer`) would change OpenAPI grouping and is left as a follow-up.
 
 ### Security
 
