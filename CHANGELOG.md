@@ -4,6 +4,23 @@ All notable changes to this project are documented in this file, grouped by date
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2026-11-06]
+
+### Changed
+
+- **Dependencies**: consolidated pending Dependabot updates (#337, #344, #345, #346, #347, #348, #349,
+  #350, #360, #361, #362, #363, #365, #366):
+  - **NuGet**: Aspire `13.4.6` → `13.6.1`; `Microsoft.Extensions.Http.Resilience` and
+    `Microsoft.Extensions.ServiceDiscovery` `10.8.0` → `10.11.0`; `Dapper` `2.1.79` → `2.1.89`; `linq2db`
+    (+`.Extensions`) `6.3.0` → `6.5.0`; `Asp.Versioning.Http` `10.0.0` → `10.2.3`.
+  - **Testing**: `xunit.v3` `3.2.2` → `4.0.2` and `xunit.runner.visualstudio` `3.1.5` → `4.0.1` (major);
+    `Microsoft.NET.Test.Sdk` `18.8.1` → `18.10.1`; `NSubstitute` `6.0.0` → `6.2.0`; `Testcontainers`
+    (+`.Kafka`, `.PostgreSql`) `4.13.0` → `4.16.0`.
+  - **Docs** (`docs/` and `libs/Momentum/docs/`): `mermaid` `^11` → `^12.0.0`, `markdown-it` `^14` →
+    `^15.0.2`, `@mermaid-js/layout-elk` `^0.2` → `^1.0.0` (all major); `bun.lock` files regenerated —
+    the individual Dependabot PRs had left them stale.
+  - **CI**: `actions/setup-java` `v5` → `v6`; `dorny/test-reporter` `v3.0.0` → `v3.2.0`.
+
 ## [2026-07-28]
 
 ### Changed
