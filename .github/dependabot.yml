@@ -87,13 +87,13 @@ updates:
       # `dotnet test` experience (filters, trx reporting, coverage); hold the major until then.
       - dependency-name: "xunit.v3"
         update-types: ["version-update:semver-major"]
+      - dependency-name: "xunit.runner.visualstudio"
+        update-types: ["version-update:semver-major"]
       # Transitive pins grouped with their drivers (dotnet-core / aspire); the drivers are built against
       # the 2.x lines, so only take majors deliberately
       - dependency-name: "Microsoft.OpenApi"
         update-types: ["version-update:semver-major"]
       - dependency-name: "MessagePack"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "xunit.runner.visualstudio"
         update-types: ["version-update:semver-major"]
 
   # NPM packages for VitePress documentation (main docs)
