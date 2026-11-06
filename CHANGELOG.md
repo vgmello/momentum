@@ -13,8 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   - **NuGet**: Aspire `13.4.6` → `13.6.1`; `Microsoft.Extensions.Http.Resilience` and
     `Microsoft.Extensions.ServiceDiscovery` `10.8.0` → `10.11.0`; `Dapper` `2.1.79` → `2.1.89`; `linq2db`
     (+`.Extensions`) `6.3.0` → `6.5.0`; `Asp.Versioning.Http` `10.0.0` → `10.2.3`.
-  - **Testing**: `xunit.v3` `3.2.2` → `4.0.2` and `xunit.runner.visualstudio` `3.1.5` → `4.0.1` (major);
-    `Microsoft.NET.Test.Sdk` `18.8.1` → `18.10.1`; `NSubstitute` `6.0.0` → `6.2.0`; `Testcontainers`
+  - **Testing**: `Microsoft.NET.Test.Sdk` `18.8.1` → `18.10.1`; `NSubstitute` `6.0.0` → `6.2.0`; `Testcontainers`
     (+`.Kafka`, `.PostgreSql`) `4.13.0` → `4.16.0`.
   - **Docs** (`docs/` and `libs/Momentum/docs/`): `mermaid` `^11` → `^12.0.0`, `markdown-it` `^14` →
     `^15.0.2`, `@mermaid-js/layout-elk` `^0.2` → `^1.0.0` (all major); `bun.lock` files regenerated —
@@ -25,6 +24,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
     `2.80.0` → `2.83.0` (Aspire 13.6 requires ≥ these), and `Microsoft.Extensions.Diagnostics.Testing`
     `10.8.0` → `10.11.0` to match `Http.Resilience`; `Microsoft.OpenApi` pin `2.7.5` → `2.12.2`
     (required by `Microsoft.AspNetCore.OpenApi` 10.0.14).
+
+- **CI/Dependabot**: hold back `xunit.v3` 4.x / `xunit.runner.visualstudio` 4.x (from #363) and ignore
+  their major updates. xunit v4 ships Microsoft.Testing.Platform 2, which no longer supports VSTest-mode
+  `dotnet test` on the .NET 10 SDK; adopting it needs a separate migration of CI, the template and test
+  scripts to the new `dotnet test` experience.
 
 ### Security
 
