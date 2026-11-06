@@ -283,17 +283,6 @@ public abstract class PayloadSizeCalculator
     {
         try
         {
-            // Checked before IsPrimitiveType, which also matches string and Uri
-            if (type == typeof(string) || type == typeof(Uri))
-            {
-                return new PayloadSizeResult
-                {
-                    SizeBytes = 0,
-                    IsAccurate = false,
-                    Warning = "Dynamic string size in collection"
-                };
-            }
-
             if (TypeUtils.IsPrimitiveType(type))
             {
                 return new PayloadSizeResult
@@ -301,6 +290,16 @@ public abstract class PayloadSizeCalculator
                     SizeBytes = GetPrimitiveTypeSize(type),
                     IsAccurate = true,
                     Warning = null
+                };
+            }
+
+            if (type == typeof(string))
+            {
+                return new PayloadSizeResult
+                {
+                    SizeBytes = 0,
+                    IsAccurate = false,
+                    Warning = "Dynamic string size in collection"
                 };
             }
 
