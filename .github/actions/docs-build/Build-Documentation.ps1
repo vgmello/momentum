@@ -25,7 +25,7 @@ if ($LASTEXITCODE -ne 0) {
 
 # Ensure .NET tools are in PATH
 $dotnetToolsPath = Join-Path $env:HOME ".dotnet/tools"
-$env:PATH = "$env:PATH;$dotnetToolsPath"
+$env:PATH = "$env:PATH$([IO.Path]::PathSeparator)$dotnetToolsPath"
 
 if ($env:GITHUB_PATH) {
     $dotnetToolsPath | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
@@ -43,7 +43,8 @@ try {
     Write-Host "✅ DocFX version: $docfxVersion"
 }
 catch {
-    Write-Error "❌ DocFX installation failed or not in PATH"
+    # Write-Host before Write-Error: under ErrorActionPreference=Stop, Write-Error terminates immediately
+    Write-Host "❌ DocFX installation failed or not in PATH: $($_.Exception.Message)"
     Write-Host "Diagnostic information:"
     Write-Host "   PATH: $env:PATH"
     Write-Host "   HOME: $env:HOME"
@@ -55,6 +56,7 @@ catch {
     else {
         Write-Host "   Tools directory not found: $dotnetToolsPath"
     }
+    Write-Error "❌ DocFX installation failed or not in PATH"
     exit 1
 }
 

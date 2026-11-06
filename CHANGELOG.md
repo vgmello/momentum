@@ -44,11 +44,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   can't fail the whole OpenAPI document. The AV0021 suppression comment now states accurately that no
   endpoint is versioned yet.
 - **CI/Docs**: the docs build now enforces the DocFX pin (falls back to `dotnet tool update --allow-downgrade`
-  when a different version is already installed, and fails if the installed version doesn't match); local
+  when a different version is already installed, and fails if the installed version doesn't match, now
+  printing the actual error); the tools directory is appended to `PATH` with the platform separator; local
   DocFX install hints include the pinned version.
 - **CI/Dependabot**: `Microsoft.OpenApi` joins the `dotnet-core` group and `MessagePack` the `aspire` group, so
   these transitive pins move together with the packages that require them (avoids the `NU1109` failures
-  #369 hit).
+  #369 hit); their major updates are ignored, since the drivers are built against the 2.x lines.
 - **ServiceDefaults.Api**: `OpenApi:SecuritySchemes` entries of type `ApiKey` without a `Name` are now
   skipped (like entries without a `Type`). `Microsoft.OpenApi` 2.12 throws when serializing such a scheme,
   which would otherwise fail the whole OpenAPI document. `Name`/`In` are documented as bindable keys.

@@ -163,7 +163,9 @@ public static class OpenApiExtensions
     }
 
     /// <summary>
-    ///     Mirrors the required-field checks Microsoft.OpenApi enforces when serializing a security scheme.
+    ///     Mirrors the per-type required-field checks Microsoft.OpenApi enforces when serializing a security
+    ///     scheme. <c>MutualTLS</c> has no required fields but is only valid in OpenAPI 3.1 documents (the
+    ///     ASP.NET Core 10 default); that version-dependent check is not replicated here.
     /// </summary>
     private static bool HasRequiredFields(OpenApiSecurityScheme scheme) => scheme.Type switch
     {
