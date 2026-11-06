@@ -205,6 +205,41 @@ public class PayloadSizeCalculatorTests
         result.IsAccurate.ShouldBeTrue();
     }
 
+    [Fact]
+    public void CalculatePropertySize_StringWithLengthAttribute_ShouldUseMaximumLength()
+    {
+        var prop = typeof(TestEventWithStringLength).GetProperty(nameof(TestEventWithStringLength.Reference))!;
+        var result = _jsonCalc.CalculatePropertySize(prop, prop.PropertyType);
+
+        // [Length(5, 30)] -> JSON: (30 * 1) + 2 = 32
+        result.SizeBytes.ShouldBe(32);
+        result.IsAccurate.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void CalculatePropertySize_StringWithUnboundedMaxLength_ShouldReturnInaccurate()
+    {
+        var prop = typeof(TestEventWithStringLength).GetProperty(nameof(TestEventWithStringLength.Notes))!;
+        var result = _jsonCalc.CalculatePropertySize(prop, prop.PropertyType);
+
+        // [MaxLength] with no argument means unlimited (Length = -1), so the size is dynamic
+        result.SizeBytes.ShouldBe(0);
+        result.IsAccurate.ShouldBeFalse();
+    }
+
+    [Theory]
+    [InlineData(nameof(TestPositionalRecord.Name), 52)]   // [MaxLength(50)] -> 50 + 2
+    [InlineData(nameof(TestPositionalRecord.Code), 22)]   // [StringLength(20)] -> 20 + 2
+    [InlineData(nameof(TestPositionalRecord.Reference), 32)] // [Length(5, 30)] -> 30 + 2
+    public void CalculatePropertySize_PositionalRecordParameterAttribute_ShouldUseMaximumLength(string propertyName, int expectedSize)
+    {
+        var prop = typeof(TestPositionalRecord).GetProperty(propertyName)!;
+        var result = _jsonCalc.CalculatePropertySize(prop, prop.PropertyType);
+
+        result.SizeBytes.ShouldBe(expectedSize);
+        result.IsAccurate.ShouldBeTrue();
+    }
+
     // --- Various primitive types ---
 
     [Theory]
@@ -343,7 +378,19 @@ public class PayloadSizeCalculatorTests
     {
         [StringLength(20)]
         public string Code { get; init; } = "";
+
+        [Length(5, 30)]
+        public string Reference { get; init; } = "";
+
+        [MaxLength]
+        public string Notes { get; init; } = "";
     }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1144:Unused private types or members should be removed")]
+    private record TestPositionalRecord(
+        [MaxLength(50)] string Name,
+        [StringLength(20)] string Code,
+        [Length(5, 30)] string Reference);
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1144:Unused private types or members should be removed")]
     private enum TestEnum { A, B, C }

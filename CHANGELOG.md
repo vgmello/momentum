@@ -41,6 +41,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   reuses `IsPrimitiveType` so nested types get the same handling. Payload size estimates added for these
   types; `Uri` is sized like a string, and string/`Uri` collection elements are now correctly reported as
   dynamic (the check was previously unreachable).
+- **events-docsgen**: string (and `Uri`) size estimates now also honour `[Length(min, max)]`, and read
+  `[MaxLength]`/`[StringLength]`/`[Length]`/`[Range]` from a record's positional parameter when the
+  property itself has none (`record E([MaxLength(50)] string Name)` targets the parameter). A bare
+  `[MaxLength]` (unlimited, `Length = -1`) is treated as dynamic instead of producing a 1-byte estimate.
 - **ServiceDefaults.Api**: `OpenApi:SecuritySchemes` entries of type `ApiKey` without a `Name` are now
   skipped (like entries without a `Type`). `Microsoft.OpenApi` 2.12 throws when serializing such a scheme,
   which would otherwise fail the whole OpenAPI document. `Name`/`In` are documented as bindable keys.

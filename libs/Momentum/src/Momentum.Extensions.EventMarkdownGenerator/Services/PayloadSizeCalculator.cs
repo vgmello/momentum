@@ -319,15 +319,39 @@ public abstract class PayloadSizeCalculator
 
     private static DataAnnotationConstraints GetDataAnnotationConstraints(PropertyInfo property)
     {
-        var maxLengthAttr = property.GetCustomAttribute<MaxLengthAttribute>();
-        var stringLengthAttr = property.GetCustomAttribute<StringLengthAttribute>();
-        var rangeAttr = property.GetCustomAttribute<RangeAttribute>();
+        var maxLengthAttr = GetPropertyOrParameterAttribute<MaxLengthAttribute>(property);
+        var stringLengthAttr = GetPropertyOrParameterAttribute<StringLengthAttribute>(property);
+        var lengthAttr = GetPropertyOrParameterAttribute<LengthAttribute>(property);
+        var rangeAttr = GetPropertyOrParameterAttribute<RangeAttribute>(property);
+
+        // [MaxLength] without an argument means "no limit" (Length = -1), so it gives no usable bound
+        var maxLength = stringLengthAttr?.MaximumLength
+                        ?? (maxLengthAttr is { Length: > 0 } ? maxLengthAttr.Length : null)
+                        ?? lengthAttr?.MaximumLength;
 
         return new DataAnnotationConstraints
         {
-            MaxLength = stringLengthAttr?.MaximumLength ?? maxLengthAttr?.Length,
+            MaxLength = maxLength,
             MaxRange = rangeAttr is { Maximum: int maxRange } ? maxRange : null
         };
+    }
+
+    /// <summary>
+    ///     Gets an attribute from the property or, for records, from the same-named primary constructor
+    ///     parameter — <c>record E([MaxLength(50)] string Name)</c> applies the attribute to the parameter.
+    /// </summary>
+    private static T? GetPropertyOrParameterAttribute<T>(PropertyInfo property) where T : Attribute
+    {
+        var attribute = property.GetCustomAttribute<T>();
+
+        if (attribute is not null || property.DeclaringType is null)
+            return attribute;
+
+        var parameter = property.DeclaringType.GetConstructors()
+            .SelectMany(c => c.GetParameters())
+            .FirstOrDefault(p => string.Equals(p.Name, property.Name, StringComparison.OrdinalIgnoreCase));
+
+        return parameter?.GetCustomAttribute<T>();
     }
 
     private static int GetPrimitiveTypeSize(Type type)
