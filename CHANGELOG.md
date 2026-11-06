@@ -30,6 +30,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   `dotnet test` on the .NET 10 SDK; adopting it needs a separate migration of CI, the template and test
   scripts to the new `dotnet test` experience.
 
+### Fixed
+
+- **ServiceDefaults.Api**: `OpenApi:SecuritySchemes` entries of type `ApiKey` without a `Name` are now
+  skipped (like entries without a `Type`). `Microsoft.OpenApi` 2.12 throws when serializing such a scheme,
+  which would otherwise fail the whole OpenAPI document. `Name`/`In` are documented as bindable keys.
+
 ### Security
 
 - `MessagePack` pin `2.5.302` → `2.5.307` (GHSA-qhrr-8q5h-9q3h) and `Microsoft.SourceLink.GitHub`

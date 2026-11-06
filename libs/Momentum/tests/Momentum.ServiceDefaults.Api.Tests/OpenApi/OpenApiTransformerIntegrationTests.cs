@@ -171,6 +171,8 @@ public class OpenApiTransformerIntegrationTests
             ["OpenApi:SecuritySchemes:Bearer:Type"] = "Http",
             ["OpenApi:SecuritySchemes:Bearer:Scheme"] = "bearer",
             ["OpenApi:SecuritySchemes:ApiKey:Type"] = "ApiKey",
+            ["OpenApi:SecuritySchemes:ApiKey:Name"] = "X-Api-Key",
+            ["OpenApi:SecuritySchemes:ApiKey:In"] = "Header",
             ["OpenApi:SecuritySchemes:ApiKey:Description"] = "API Key"
         };
 
@@ -185,7 +187,35 @@ public class OpenApiTransformerIntegrationTests
             .GetProperty("securitySchemes");
 
         securitySchemes.TryGetProperty("Bearer", out _).ShouldBeTrue("Bearer scheme should be present");
-        securitySchemes.TryGetProperty("ApiKey", out _).ShouldBeTrue("ApiKey scheme should be present");
+        securitySchemes.TryGetProperty("ApiKey", out var apiKeyScheme).ShouldBeTrue("ApiKey scheme should be present");
+        apiKeyScheme.GetProperty("name").GetString().ShouldBe("X-Api-Key");
+        apiKeyScheme.GetProperty("in").GetString().ShouldBe("header");
+    }
+
+    [Fact]
+    public async Task SecuritySchemes_WithApiKeySchemeWithoutName_ShouldBeSkipped()
+    {
+        var config = new Dictionary<string, string?>
+        {
+            ["OpenApi:SecuritySchemes:Bearer:Type"] = "Http",
+            ["OpenApi:SecuritySchemes:Bearer:Scheme"] = "bearer",
+            ["OpenApi:SecuritySchemes:ApiKey:Type"] = "ApiKey",
+            ["OpenApi:SecuritySchemes:ApiKey:Description"] = "API Key"
+            // No Name specified - invalid for apiKey, should be skipped without breaking the document
+        };
+
+        await using var app = await CreateAppWithDefaults(
+            configValues: config,
+            endpoints: app => app.MapGet("/test", () => new SimpleModel("ok")));
+
+        var doc = await FetchOpenApiDocument(app);
+
+        var securitySchemes = doc.RootElement
+            .GetProperty("components")
+            .GetProperty("securitySchemes");
+
+        securitySchemes.TryGetProperty("Bearer", out _).ShouldBeTrue("Bearer scheme should be present");
+        securitySchemes.TryGetProperty("ApiKey", out _).ShouldBeFalse("ApiKey scheme without Name should not be added");
     }
 
     [Fact]
