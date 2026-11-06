@@ -263,7 +263,7 @@ The following variables are available in event templates, bound to the top-level
 | `Name`                 | string  | Property name                                                         |
 | `TypeName`             | string  | Friendly type name (e.g. `string`, `Guid`, `List<Cashier>`)           |
 | `IsRequired`           | boolean | Whether the property is required                                      |
-| `IsComplexType`        | boolean | Whether the property is a complex (non-primitive) type                |
+| `IsComplexType`        | boolean | Whether the property is a complex (non-primitive) type; for collections, whether the element type has a schema |
 | `IsCollectionType`     | boolean | Whether the property is a collection type                             |
 | `Description`          | string  | Property description from XML docs (whitespace-collapsed to one line) |
 | `SchemaLink`           | string? | Markdown link path to the complex type's schema, if applicable        |

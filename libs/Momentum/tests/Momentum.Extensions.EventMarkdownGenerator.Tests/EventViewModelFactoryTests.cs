@@ -37,6 +37,35 @@ public class EventViewModelFactoryTests
 
     private static EventDocumentation CreateDocumentation() => new() { Summary = "Test" };
 
+    private sealed record CollectionPropertiesEvent(
+        List<string> Tags,
+        List<DateOnly> Holidays,
+        Dictionary<string, string> Labels,
+        List<CollectionItem> Items,
+        CollectionItem Single);
+
+    private sealed record CollectionItem(string Value);
+
+    [Fact]
+    public void CreateEventModel_CollectionOfTypesWithoutSchema_IsNotComplex()
+    {
+        // Collections of scalars must not be flagged complex, or event.liquid renders a Reference Schemas
+        // entry with an empty include; collections of schema types keep pointing at the element schema
+        var (properties, _) = EventPropertyMetadataBuilder.Build(typeof(CollectionPropertiesEvent), null,
+            PayloadSizeCalculator.Create("json"), "PartitionKey");
+        var metadata = CreateMetadata("CollectionPropertiesEvent", "Tests", "Tests") with { Properties = properties };
+
+        var viewModel = EventViewModelFactory.CreateEventModel(metadata, CreateDocumentation());
+
+        var byName = viewModel.Properties.ToDictionary(p => p.Name);
+        byName["Tags"].IsComplexType.ShouldBeFalse();
+        byName["Holidays"].IsComplexType.ShouldBeFalse();
+        byName["Labels"].IsComplexType.ShouldBeFalse();
+        byName["Items"].IsComplexType.ShouldBeTrue();
+        byName["Items"].ElementSchemaPath.ShouldBe($"{typeof(CollectionItem).FullName}.md");
+        byName["Single"].IsComplexType.ShouldBeTrue();
+    }
+
     [Fact]
     public void CreateEventModel_WithAssemblyNameContainingDot_DoesNotSplitItAcrossFolders()
     {
