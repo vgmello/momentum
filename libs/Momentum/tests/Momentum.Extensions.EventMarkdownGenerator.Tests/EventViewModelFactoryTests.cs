@@ -9,8 +9,8 @@ using Xunit;
 namespace Momentum.Extensions.EventMarkdownGenerator.Tests;
 
 /// <summary>
-///     Covers <see cref="EventViewModelFactory"/>'s GitHub source-link generation specifically — the rest of
-///     the view model is exercised via <see cref="FluidMarkdownGeneratorTests"/>.
+///     Covers <see cref="EventViewModelFactory"/>'s GitHub source-link generation and how collection properties
+///     are flagged complex — the rest of the view model is exercised via <see cref="FluidMarkdownGeneratorTests"/>.
 /// </summary>
 public class EventViewModelFactoryTests
 {
