@@ -45,7 +45,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   endpoint is versioned yet.
 - **CI/Docs**: the docs build now enforces the DocFX pin (falls back to `dotnet tool update --allow-downgrade`
   when a different version is already installed, and fails if the installed version doesn't match, now
-  printing the actual error); the tools directory is appended to `PATH` with the platform separator; local
+  printing the actual error); the tools directory is prepended to `PATH` with the platform separator; local
   DocFX install hints include the pinned version.
 - **CI/Dependabot**: `Microsoft.OpenApi` joins the `dotnet-core` group and `MessagePack` the `aspire` group, so
   these transitive pins move together with the packages that require them (avoids the `NU1109` failures

@@ -20,8 +20,9 @@ public static class OpenApiExtensions
     /// <param name="configuration">
     ///     Optional application configuration. When provided, security schemes are bound from
     ///     <c>OpenApi:SecuritySchemes</c>. Each key becomes a scheme name with properties
-    ///     <c>Type</c>, <c>Scheme</c>, <c>BearerFormat</c>, <c>Description</c>, and for <c>ApiKey</c> schemes
-    ///     <c>Name</c> and <c>In</c>. Schemes without a <c>Type</c>, or missing a field the OpenAPI spec requires
+    ///     <c>Type</c>, <c>Scheme</c>, <c>BearerFormat</c>, <c>Description</c>, for <c>ApiKey</c> schemes
+    ///     <c>Name</c> and <c>In</c>, for <c>OAuth2</c> <c>Flows</c> (e.g. <c>Flows:ClientCredentials:TokenUrl</c>),
+    ///     and for <c>OpenIdConnect</c> <c>OpenIdConnectUrl</c>. Schemes without a <c>Type</c>, or missing a field the OpenAPI spec requires
     ///     for their type (<c>ApiKey</c>: <c>Name</c> and <c>In</c>; <c>Http</c>: <c>Scheme</c>; <c>OAuth2</c>:
     ///     <c>Flows</c>; <c>OpenIdConnect</c>: <c>OpenIdConnectUrl</c>), are skipped.
     ///     When <c>null</c> or when the section is absent, no security schemes are added.

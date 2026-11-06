@@ -2,7 +2,8 @@
 param(
     [string]$DocsPath = "libs/Momentum/docs",
     # Pinned: docfx is a global tool Dependabot doesn't track, and unpinned installs picked up 2.81.0,
-    # whose generated reference markdown fails the VitePress (Vue) build. Bump deliberately.
+    # whose generated reference markdown fails the VitePress (Vue) build. Bump deliberately, together with
+    # docs/Dockerfile, libs/Momentum/docs/Dockerfile and the install hints in both docs-dotnet.ts scripts.
     [string]$DocfxVersion = "2.78.5",
     [switch]$CI
 )
@@ -25,7 +26,8 @@ if ($LASTEXITCODE -ne 0) {
 
 # Ensure .NET tools are in PATH
 $dotnetToolsPath = Join-Path $env:HOME ".dotnet/tools"
-$env:PATH = "$env:PATH$([IO.Path]::PathSeparator)$dotnetToolsPath"
+# Prepend so the pinned global tool wins over any other docfx already on PATH
+$env:PATH = "$dotnetToolsPath$([IO.Path]::PathSeparator)$env:PATH"
 
 if ($env:GITHUB_PATH) {
     $dotnetToolsPath | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
@@ -33,14 +35,16 @@ if ($env:GITHUB_PATH) {
 
 Write-Host "📋 Verifying DocFX installation..."
 try {
-    $docfxVersion = docfx --version 2>&1
+    # Not "$docfxVersion": PowerShell variable names are case-insensitive, so that would overwrite the
+    # $DocfxVersion parameter and the check below would compare the output with itself
+    $installedDocfx = docfx --version 2>&1
     if ($LASTEXITCODE -ne 0) {
         throw "DocFX returned non-zero exit code"
     }
-    if (-not "$docfxVersion".StartsWith($DocfxVersion)) {
-        throw "Expected DocFX $DocfxVersion but found $docfxVersion"
+    if (-not "$installedDocfx".StartsWith($DocfxVersion)) {
+        throw "Expected DocFX $DocfxVersion but found $installedDocfx"
     }
-    Write-Host "✅ DocFX version: $docfxVersion"
+    Write-Host "✅ DocFX version: $installedDocfx"
 }
 catch {
     # Write-Host before Write-Error: under ErrorActionPreference=Stop, Write-Error terminates immediately
