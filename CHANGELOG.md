@@ -25,6 +25,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
     `10.8.0` → `10.11.0` to match `Http.Resilience`; `Microsoft.OpenApi` pin `2.7.5` → `2.12.2`
     (required by `Microsoft.AspNetCore.OpenApi` 10.0.14).
 
+- **CI/Docs**: pin DocFX to `2.78.5` in the docs-build action and both docs Dockerfiles. The unpinned
+  `dotnet tool install -g docfx` picked up `2.81.0`, whose generated API reference markdown fails the
+  VitePress build (`Invalid end tag`); DocFX is a global tool Dependabot doesn't track, so bump it deliberately.
 - **CI/Dependabot**: hold back `xunit.v3` 4.x / `xunit.runner.visualstudio` 4.x (from #363) and ignore
   their major updates. xunit v4 ships Microsoft.Testing.Platform 2, which no longer supports VSTest-mode
   `dotnet test` on the .NET 10 SDK; adopting it needs a separate migration of CI, the template and test
