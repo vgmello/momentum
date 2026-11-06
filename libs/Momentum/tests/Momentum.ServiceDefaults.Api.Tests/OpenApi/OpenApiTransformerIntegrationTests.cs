@@ -235,6 +235,38 @@ public class OpenApiTransformerIntegrationTests
         }
     }
 
+    [Theory]
+    [InlineData("ApiKey", "In", "Header")]        // ApiKey without Name
+    [InlineData("ApiKey", "Name", "X-Api-Key")]   // ApiKey without In
+    [InlineData("Http", "Description", "Basic")]  // Http without Scheme
+    [InlineData("OAuth2", "Description", "OAuth")] // OAuth2 without Flows
+    [InlineData("OpenIdConnect", "Description", "OIDC")] // OpenIdConnect without OpenIdConnectUrl
+    public async Task SecuritySchemes_MissingRequiredField_ShouldBeSkippedWithoutBreakingDocument(
+        string type, string otherKey, string otherValue)
+    {
+        var config = new Dictionary<string, string?>
+        {
+            ["OpenApi:SecuritySchemes:Bearer:Type"] = "Http",
+            ["OpenApi:SecuritySchemes:Bearer:Scheme"] = "bearer",
+            ["OpenApi:SecuritySchemes:Incomplete:Type"] = type,
+            [$"OpenApi:SecuritySchemes:Incomplete:{otherKey}"] = otherValue
+        };
+
+        await using var app = await CreateAppWithDefaults(
+            configValues: config,
+            endpoints: app => app.MapGet("/test", () => new SimpleModel("ok")));
+
+        var doc = await FetchOpenApiDocument(app);
+
+        var securitySchemes = doc.RootElement
+            .GetProperty("components")
+            .GetProperty("securitySchemes");
+
+        securitySchemes.TryGetProperty("Bearer", out _).ShouldBeTrue("Valid scheme should still be present");
+        securitySchemes.TryGetProperty("Incomplete", out _).ShouldBeFalse(
+            $"{type} scheme missing a required field should not be added");
+    }
+
     [Fact]
     public async Task SecuritySchemes_WithSchemeWithoutType_ShouldBeSkipped()
     {

@@ -15,6 +15,13 @@ $ErrorActionPreference = "Stop"
 
 Write-Host "📦 Installing DocFX..."
 dotnet tool install -g docfx --version $DocfxVersion --verbosity normal
+if ($LASTEXITCODE -ne 0) {
+    # Already installed (possibly at another version): move it to the pinned one
+    dotnet tool update -g docfx --version $DocfxVersion --allow-downgrade --verbosity normal
+    if ($LASTEXITCODE -ne 0) {
+        throw "Failed to install DocFX $DocfxVersion"
+    }
+}
 
 # Ensure .NET tools are in PATH
 $dotnetToolsPath = Join-Path $env:HOME ".dotnet/tools"
@@ -29,6 +36,9 @@ try {
     $docfxVersion = docfx --version 2>&1
     if ($LASTEXITCODE -ne 0) {
         throw "DocFX returned non-zero exit code"
+    }
+    if (-not "$docfxVersion".StartsWith($DocfxVersion)) {
+        throw "Expected DocFX $DocfxVersion but found $docfxVersion"
     }
     Write-Host "✅ DocFX version: $docfxVersion"
 }

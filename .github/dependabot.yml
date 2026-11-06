@@ -15,9 +15,13 @@ updates:
           - "Microsoft.AspNetCore.*"
           - "System.*"
           - "Microsoft.EntityFrameworkCore.*"
+          # Transitive pin that must stay >= what Microsoft.AspNetCore.OpenApi requires
+          - "Microsoft.OpenApi"
       aspire:
         patterns:
           - "Aspire.*"
+          # Transitive (security) pin that must stay >= what Aspire.Hosting.AppHost requires
+          - "MessagePack"
       orleans:
         patterns:
           - "Microsoft.Orleans.*"

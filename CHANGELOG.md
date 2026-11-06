@@ -35,6 +35,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **Dependencies (follow-up to #369)**: `AppDomain.AppHost` no longer overrides `Grpc.AspNetCore` to `2.80.0`
+  (a stale pin from #203) and uses the central `GrpcVersion` (`2.83.0`); `Google.Protobuf` `3.35.1` →
+  `3.36.1`. Both are the minimums declared by `Aspire.Hosting.AppHost` 13.6.1.
+- **ServiceDefaults.Api**: `OpenApi:SecuritySchemes` entries missing any field Microsoft.OpenApi requires for
+  their type are skipped — not just `ApiKey` without `Name`, but also `ApiKey` without `In`, `Http` without
+  `Scheme`, `OAuth2` without `Flows` and `OpenIdConnect` without `OpenIdConnectUrl` — so one incomplete entry
+  can't fail the whole OpenAPI document. The AV0021 suppression comment now states accurately that no
+  endpoint is versioned yet.
+- **CI/Docs**: the docs build now enforces the DocFX pin (falls back to `dotnet tool update --allow-downgrade`
+  when a different version is already installed, and fails if the installed version doesn't match); local
+  DocFX install hints include the pinned version.
+- **CI/Dependabot**: `Microsoft.OpenApi` joins the `dotnet-core` group and `MessagePack` the `aspire` group, so
+  these transitive pins move together with the packages that require them (avoids the `NU1109` failures
+  #369 hit).
 - **ServiceDefaults.Api**: `OpenApi:SecuritySchemes` entries of type `ApiKey` without a `Name` are now
   skipped (like entries without a `Type`). `Microsoft.OpenApi` 2.12 throws when serializing such a scheme,
   which would otherwise fail the whole OpenAPI document. `Name`/`In` are documented as bindable keys.

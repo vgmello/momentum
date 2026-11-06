@@ -64,8 +64,9 @@ public static class ApiExtensions
     {
         builder.Services.AddSingleton(new ApiAuthConfiguration(requireAuth));
 
-        // API versioning is used only to read the URL-segment version; OpenAPI documents come from
-        // Microsoft.AspNetCore.OpenApi, so the versioned API explorer AV0021 asks for is not wired in
+        // API versioning is configured below but no endpoint is versioned yet, and OpenAPI documents come
+        // from Microsoft.AspNetCore.OpenApi without per-version grouping, so the versioned API explorer
+        // AV0021 asks for is deliberately not wired in
 #pragma warning disable AV0021
         builder.Services.AddEndpointsApiExplorer();
 #pragma warning restore AV0021
