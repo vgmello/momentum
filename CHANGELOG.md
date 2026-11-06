@@ -37,7 +37,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - **events-docsgen**: `DateOnly`, `TimeOnly` (and nullable forms) — plus `Uri`, `Half`, `Int128` and
   `UInt128` — are now treated as scalars instead of complex types, so they no longer produce `System.*`
-  schema pages, sidebar entries, property links or Reference Schemas sections (#367). `IsComplexType` now
+  schema pages, sidebar entries, property links or Reference Schemas sections for direct, nullable and nested
+  properties (#367; empty Reference Schemas entries for *collections* of scalars are a separate fix). `IsComplexType` now
   reuses `IsPrimitiveType` so nested types get the same handling. Payload size estimates added for these
   types; `Uri` is sized like a string, and `Uri` collection elements are reported as dynamic (string collection
   element sizing is unchanged).
@@ -47,6 +48,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   protected primary constructors of abstract base records and parameters forwarded from a derived record.
   Annotations are read from the property *or* the parameter, never mixed. A bare
   `[MaxLength]` (unlimited, `Length = -1`) is treated as dynamic instead of producing a 1-byte estimate.
+- **events-docsgen**: `[Range]` on a record's positional collection parameter (`record E([Range(1, 5)]
+  List<int> Items)`) now sets the estimated element count, like `[Range]` on the property already did.
+  Nullable scalar collection elements (`List<long?>`, `List<TimeOnly?>`) are sized like their underlying type
+  instead of a 4-byte fallback.
 - **ServiceDefaults.Api**: `OpenApi:SecuritySchemes` entries of type `ApiKey` without a `Name` are now
   skipped (like entries without a `Type`). `Microsoft.OpenApi` 2.12 throws when serializing such a scheme,
   which would otherwise fail the whole OpenAPI document. `Name`/`In` are documented as bindable keys.

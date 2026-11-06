@@ -278,8 +278,34 @@ public class PayloadSizeCalculatorTests
         var prop = typeof(TestOverridingRecord).GetProperty(nameof(TestOverridingRecord.Name))!;
         var result = _jsonCalc.CalculatePropertySize(prop, prop.PropertyType);
 
-        // [MaxLength(50)] on the abstract base property is inherited by the override -> 50 + 2
+        // [MaxLength(50)] on the abstract base property is inherited by the override and must win over the
+        // same-named constructor parameter's [StringLength(20)] -> 50 + 2 (a non-inheriting lookup gives 22)
         result.SizeBytes.ShouldBe(52);
+        result.IsAccurate.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void CalculatePropertySize_PositionalCollectionParameterWithRange_ShouldUseRangeCount()
+    {
+        var prop = typeof(TestPositionalCollection).GetProperty(nameof(TestPositionalCollection.Items))!;
+        var result = _jsonCalc.CalculatePropertySize(prop, prop.PropertyType);
+
+        // [Range(1, 5)] on the positional parameter -> 5 ints: (4 * 5) + 2 (brackets) + 4 (commas) = 26
+        result.SizeBytes.ShouldBe(26);
+        result.IsAccurate.ShouldBeTrue();
+    }
+
+    [Theory]
+    [InlineData(nameof(TestNullableElementCollections.Longs), 8)]
+    [InlineData(nameof(TestNullableElementCollections.Times), 8)]
+    [InlineData(nameof(TestNullableElementCollections.BigNumbers), 16)]
+    public void CalculatePropertySize_NullableScalarElements_ShouldUseUnderlyingTypeSize(string propertyName, int elementSize)
+    {
+        var prop = typeof(TestNullableElementCollections).GetProperty(propertyName)!;
+        var result = _jsonCalc.CalculatePropertySize(prop, prop.PropertyType);
+
+        // [Range(1, 3)] -> 3 elements: (elementSize * 3) + 2 (brackets) + 2 (commas)
+        result.SizeBytes.ShouldBe(elementSize * 3 + 4);
         result.IsAccurate.ShouldBeTrue();
     }
 
@@ -479,9 +505,25 @@ public class PayloadSizeCalculatorTests
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1144:Unused private types or members should be removed")]
-    private record TestOverridingRecord : TestAnnotatedAbstractBase
+    private record TestOverridingRecord([StringLength(20)] string Name) : TestAnnotatedAbstractBase
     {
-        public override string Name { get; init; } = "";
+        public override string Name { get; init; } = Name;
+    }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1144:Unused private types or members should be removed")]
+    private record TestPositionalCollection([Range(1, 5)] List<int> Items);
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1144:Unused private types or members should be removed")]
+    private record TestNullableElementCollections
+    {
+        [Range(1, 3)]
+        public List<long?> Longs { get; init; } = [];
+
+        [Range(1, 3)]
+        public List<TimeOnly?> Times { get; init; } = [];
+
+        [Range(1, 3)]
+        public List<Int128?> BigNumbers { get; init; } = [];
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1144:Unused private types or members should be removed")]
