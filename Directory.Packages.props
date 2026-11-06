@@ -4,14 +4,14 @@
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
     <AspireVersion>13.6.1</AspireVersion>
     <AspireAppHostSdkVersion>$(AspireVersion)</AspireAppHostSdkVersion>
-    <MicrosoftExtensionsVersion>10.0.10</MicrosoftExtensionsVersion>
+    <MicrosoftExtensionsVersion>10.0.14</MicrosoftExtensionsVersion>
     <!--#if (INCLUDE_ORLEANS) -->
     <MicrosoftOrleansVersion>10.2.2</MicrosoftOrleansVersion>
     <!--#endif -->
     <OpenTelemetryCoreVersion>1.17.0</OpenTelemetryCoreVersion>
     <OpenTelemetryInstrumentationVersion>1.17.0</OpenTelemetryInstrumentationVersion>
     <!--#if (INCLUDE_GRPC) -->
-    <GrpcVersion>2.80.0</GrpcVersion>
+    <GrpcVersion>2.83.0</GrpcVersion>
     <!--#endif -->
     <!--#if (!USE_LOCAL) -->
     <MomentumVersion>$(TemplateMomentumVersion)</MomentumVersion>
@@ -67,7 +67,7 @@
     <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Diagnostics.Testing" Version="10.8.0" />
+    <PackageVersion Include="Microsoft.Extensions.Diagnostics.Testing" Version="10.11.0" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.11.0" />
@@ -85,9 +85,10 @@
     <PackageVersion Include="Microsoft.Orleans.Dashboard" Version="$(MicrosoftOrleansVersion)" />
     <PackageVersion Include="Microsoft.Orleans.GrainDirectory.AzureStorage" Version="$(MicrosoftOrleansVersion)" />
     <!--#endif -->
-    <!-- Transitive from Aspire.Hosting.AppHost (and Orleans when included); pinned to patch GHSA-hv8m-jj95-wg3x and related LZ4/MessagePack advisories -->
-    <PackageVersion Include="MessagePack" Version="2.5.302" />
-    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.301" />
+    <!-- Transitive from Aspire.Hosting.AppHost (and Orleans when included); pinned to patch GHSA-hv8m-jj95-wg3x, GHSA-qhrr-8q5h-9q3h and related LZ4/MessagePack advisories -->
+    <PackageVersion Include="MessagePack" Version="2.5.307" />
+    <!-- 10.0.303+ pulls a Microsoft.Build.Tasks.Git patched for GHSA-23fw-v26w-5fgq -->
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.303" />
     <PackageVersion Include="Momentum.Extensions" Version="$(MomentumVersion)" />
     <PackageVersion Include="Momentum.Extensions.Abstractions" Version="$(MomentumVersion)" />
     <PackageVersion Include="Momentum.Extensions.Messaging.Kafka" Version="$(MomentumVersion)" />

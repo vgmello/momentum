@@ -20,6 +20,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
     `^15.0.2`, `@mermaid-js/layout-elk` `^0.2` → `^1.0.0` (all major); `bun.lock` files regenerated —
     the individual Dependabot PRs had left them stale.
   - **CI**: `actions/setup-java` `v5` → `v6`; `dorny/test-reporter` `v3.0.0` → `v3.2.0`.
+  - **Alignment** required by the above (NuGet `NU1109` downgrade errors): `Microsoft.Extensions.*` /
+    `Microsoft.AspNetCore.*` (`MicrosoftExtensionsVersion`) `10.0.10` → `10.0.14`, gRPC (`GrpcVersion`)
+    `2.80.0` → `2.83.0` (Aspire 13.6 requires ≥ these), and `Microsoft.Extensions.Diagnostics.Testing`
+    `10.8.0` → `10.11.0` to match `Http.Resilience`.
+
+### Security
+
+- `MessagePack` pin `2.5.302` → `2.5.307` (GHSA-qhrr-8q5h-9q3h) and `Microsoft.SourceLink.GitHub`
+  `10.0.301` → `10.0.303`, which brings a `Microsoft.Build.Tasks.Git` patched for GHSA-23fw-v26w-5fgq —
+  both new advisories that fail restore under warnings-as-errors (`NU1902`).
 
 ## [2026-07-28]
 
