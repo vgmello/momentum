@@ -23,7 +23,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   - **Alignment** required by the above (NuGet `NU1109` downgrade errors): `Microsoft.Extensions.*` /
     `Microsoft.AspNetCore.*` (`MicrosoftExtensionsVersion`) `10.0.10` → `10.0.14`, gRPC (`GrpcVersion`)
     `2.80.0` → `2.83.0` (Aspire 13.6 requires ≥ these), and `Microsoft.Extensions.Diagnostics.Testing`
-    `10.8.0` → `10.11.0` to match `Http.Resilience`.
+    `10.8.0` → `10.11.0` to match `Http.Resilience`; `Microsoft.OpenApi` pin `2.7.5` → `2.12.2`
+    (required by `Microsoft.AspNetCore.OpenApi` 10.0.14).
 
 ### Security
 
