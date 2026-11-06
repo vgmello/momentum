@@ -326,7 +326,7 @@ public abstract class PayloadSizeCalculator
 
         // [MaxLength] without an argument means "no limit" (Length = -1), so it gives no usable bound
         var maxLength = stringLengthAttr?.MaximumLength
-                        ?? (maxLengthAttr is { Length: > 0 } ? maxLengthAttr.Length : null)
+                        ?? (maxLengthAttr is { Length: > 0 } ? (int?)maxLengthAttr.Length : null)
                         ?? lengthAttr?.MaximumLength;
 
         return new DataAnnotationConstraints
