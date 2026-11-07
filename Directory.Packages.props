@@ -2,12 +2,13 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
-    <AspireVersion>13.6.1</AspireVersion>
+    <AspireVersion>13.6.4</AspireVersion>
     <AspireAppHostSdkVersion>$(AspireVersion)</AspireAppHostSdkVersion>
     <MicrosoftExtensionsVersion>10.0.14</MicrosoftExtensionsVersion>
     <!--#if (INCLUDE_ORLEANS) -->
     <MicrosoftOrleansVersion>10.2.2</MicrosoftOrleansVersion>
     <!--#endif -->
+    <WolverineVersion>6.62.0</WolverineVersion>
     <OpenTelemetryCoreVersion>1.17.0</OpenTelemetryCoreVersion>
     <OpenTelemetryInstrumentationVersion>1.17.0</OpenTelemetryInstrumentationVersion>
     <!--#if (INCLUDE_GRPC) -->
@@ -50,8 +51,8 @@
     <PackageVersion Include="Grpc.Net.Client" Version="$(GrpcVersion)" />
     <PackageVersion Include="Grpc.Tools" Version="2.83.0" />
     <!--#endif -->
-    <PackageVersion Include="linq2db" Version="6.5.0" />
-    <PackageVersion Include="linq2db.Extensions" Version="6.5.0" />
+    <PackageVersion Include="linq2db" Version="6.5.1" />
+    <PackageVersion Include="linq2db.Extensions" Version="6.5.1" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.TestHost" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="$(MicrosoftExtensionsVersion)" />
@@ -127,12 +128,12 @@
     <PackageVersion Include="Testcontainers" Version="4.16.0" />
     <PackageVersion Include="Testcontainers.Kafka" Version="4.16.0" />
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.16.0" />
-    <PackageVersion Include="WolverineFx" Version="6.23.0" />
+    <PackageVersion Include="WolverineFx" Version="$(WolverineVersion)" />
     <!--#if (USE_KAFKA) -->
-    <PackageVersion Include="WolverineFx.Kafka" Version="6.23.0" />
+    <PackageVersion Include="WolverineFx.Kafka" Version="$(WolverineVersion)" />
     <!--#endif -->
-    <PackageVersion Include="WolverineFx.Postgresql" Version="6.23.0" />
-    <PackageVersion Include="WolverineFx.RuntimeCompilation" Version="6.23.0" />
+    <PackageVersion Include="WolverineFx.Postgresql" Version="$(WolverineVersion)" />
+    <PackageVersion Include="WolverineFx.RuntimeCompilation" Version="$(WolverineVersion)" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
     <PackageVersion Include="xunit.v3" Version="3.2.2" />
   </ItemGroup>

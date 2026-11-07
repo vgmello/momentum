@@ -4,6 +4,32 @@ All notable changes to this project are documented in this file, grouped by date
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2026-11-07]
+
+### Changed
+
+- **Dependencies**: consolidated Dependabot updates #370, #371 and #372:
+  - Aspire (`AspireVersion`) `13.6.1` → `13.6.4`.
+  - `linq2db` (+`.Extensions`) `6.5.0` → `6.5.1`.
+  - WolverineFx (+`.Kafka`, `.Postgresql`, `.RuntimeCompilation`) `6.23.0` → `6.62.0`. Dependabot's grouped
+    update (#372) left `WolverineFx.Kafka` on `6.23.0`, as happened with the `6.23.0` bump; the four packages
+    now share a `WolverineVersion` property so they stay in lockstep.
+  - **Upgrade note**: Wolverine 6.62 changes the PostgreSQL message-storage schema. It adds six partial indexes
+    on `wolverine_incoming_envelopes`/`wolverine_outgoing_envelopes` (none existed in 6.23), seven nullable
+    `wolverine_dead_letters` columns with a `failure_group` index, and a `wolverine_dead_letter_history`
+    table. ServiceDefaults registers Wolverine's resource setup on startup, so the first 6.62 replica of each
+    host applies this automatically in every environment (no `db-apply` step).
+    - The migration runs as one implicit transaction with non-concurrent `CREATE INDEX` under Npgsql's
+      default 30-second command timeout, blocking those tables until it commits. On large tables it can time
+      out, roll back and fail startup on every attempt: pre-create the indexes `CONCURRENTLY` (including the
+      dead-letter `failure_group` column and index), or raise `Command Timeout` on the application connection
+      string (`ConnectionStrings:<Service>Db`) for the first start, accepting a longer write stall and longer
+      startup probes. #376 has the exact DDL and checks.
+    - Rolling back is destructive: a 6.23 replica that starts after the migration drops the new indexes
+      and dead-letter columns (Weasel 9.19 drops indexes and columns it doesn't know), and 6.62 replicas then
+      fail to write dead letters until they migrate again. Don't let 6.23 replicas start once the first
+      6.62 replica has migrated.
+
 ## [2026-11-06]
 
 ### Changed
