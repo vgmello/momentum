@@ -4,6 +4,17 @@ All notable changes to this project are documented in this file, grouped by date
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [2026-11-07]
+
+### Changed
+
+- **Dependencies**: consolidated Dependabot updates #370, #371 and #372:
+  - Aspire (`AspireVersion`) `13.6.1` → `13.6.4`.
+  - `linq2db` (+`.Extensions`) `6.5.0` → `6.5.1`.
+  - WolverineFx (+`.Kafka`, `.Postgresql`, `.RuntimeCompilation`) `6.23.0` → `6.62.0`. Dependabot's grouped
+    update (#372) left `WolverineFx.Kafka` on `6.23.0`, as happened with the `6.23.0` bump; the four packages
+    now share a `WolverineVersion` property so they stay in lockstep.
+
 ## [2026-11-06]
 
 ### Changed
