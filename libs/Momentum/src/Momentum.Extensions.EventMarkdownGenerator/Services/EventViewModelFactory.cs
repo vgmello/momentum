@@ -65,7 +65,11 @@ public static partial class EventViewModelFactory
                 Name = p.Name,
                 TypeName = p.TypeName,
                 IsRequired = p.IsRequired,
-                IsComplexType = p.IsComplexType,
+                // A collection only counts as complex when its element type has a schema page; otherwise
+                // templates would render a Reference Schemas entry pointing at nothing (e.g. List<string>)
+                IsComplexType = TypeUtils.IsCollectionType(p.PropertyType)
+                    ? GetSchemaPath(p.PropertyType) is not null
+                    : p.IsComplexType,
                 IsCollectionType = TypeUtils.IsCollectionType(p.PropertyType),
                 Description = GetPropertyDescription(p),
                 SchemaLink = GetSchemaPath(p.PropertyType),
