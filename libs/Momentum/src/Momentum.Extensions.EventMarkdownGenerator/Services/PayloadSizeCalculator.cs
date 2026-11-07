@@ -10,7 +10,7 @@ namespace Momentum.Extensions.EventMarkdownGenerator.Services;
 
 /// <summary>
 ///     Calculates estimated payload sizes for event properties based on type analysis
-///     and data annotation constraints (MaxLength, Range, StringLength).
+///     and data annotation constraints (MaxLength, StringLength, Length, Range).
 ///     Subclass to define serialization-format-specific overhead (JSON, Binary, etc.).
 /// </summary>
 public abstract class PayloadSizeCalculator
@@ -298,7 +298,8 @@ public abstract class PayloadSizeCalculator
             {
                 return new PayloadSizeResult
                 {
-                    SizeBytes = GetPrimitiveTypeSize(type),
+                    // Collection elements aren't unwrapped by the caller; size int? like int, not as "Nullable`1"
+                    SizeBytes = GetPrimitiveTypeSize(Nullable.GetUnderlyingType(type) ?? type),
                     IsAccurate = true,
                     Warning = null
                 };

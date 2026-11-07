@@ -141,6 +141,34 @@ public class FluidMarkdownGeneratorTests
     }
 
     [Fact]
+    public async Task GenerateMarkdown_WithBuiltInScalarProperties_ShouldRenderPlainRowsWithoutReferenceSchemas()
+    {
+        // #367: DateOnly/TimeOnly (and nullable forms), Uri, Half, Int128, UInt128 render like DateTime —
+        // a plain row, no schema link, no Reference Schemas section
+        var generator = await FluidMarkdownGenerator.CreateAsync();
+        var template = CreateTestEventWithDocumentation();
+        var (properties, _) = EventPropertyMetadataBuilder.Build(typeof(ScalarPropertiesEvent), null,
+            PayloadSizeCalculator.Create("json"), "PartitionKey");
+        var eventWithDoc = template with { Metadata = template.Metadata with { Properties = properties } };
+        var outputDir = CreateTempDirectory();
+
+        try
+        {
+            var result = generator.GenerateMarkdown(eventWithDoc, outputDir);
+
+            result.Content.ShouldNotContain("/events/schemas/System.");
+            result.Content.ShouldNotContain("### Reference Schemas");
+            result.Content.ShouldContain("| ClosedLocalDate| `DateOnly?` |");
+            result.Content.ShouldContain("| OpensAt| `TimeOnly` |");
+            result.Content.ShouldContain("| Callback| `Uri` |");
+        }
+        finally
+        {
+            Directory.Delete(outputDir, true);
+        }
+    }
+
+    [Fact]
     public async Task GenerateMarkdown_ShouldContainEventMetadata()
     {
         var generator = await FluidMarkdownGenerator.CreateAsync();
@@ -630,6 +658,14 @@ public class FluidMarkdownGeneratorTests
     // Test types
     [EventTopic("test.public.tests.v1")]
     public record TestEvent(Guid Id, string Name);
+
+    public record ScalarPropertiesEvent(
+        DateOnly? ClosedLocalDate,
+        TimeOnly OpensAt,
+        Uri Callback,
+        Half Ratio,
+        Int128 Big,
+        UInt128? BigUnsigned);
 
     [EventTopic("cashiers.cashier-created")]
     public record CashierCreated(Guid TenantId, TestSchemaType Cashier);
