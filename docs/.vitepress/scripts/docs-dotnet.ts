@@ -162,7 +162,7 @@ async function getFileInfo(filePath: string): Promise<FileInfo | null> {
 }
 
 // docfx is always installed as a .NET global tool (see Build-Documentation.ps1 /
-// `dotnet tool install -g docfx`), which places it in a fixed, user-owned directory.
+// `dotnet tool install -g docfx --version 2.78.5`), which places it in a fixed, user-owned directory.
 // Resolving the executable there instead of trusting an arbitrary PATH lookup avoids
 // running a look-alike binary that a writable PATH entry could shadow (sonar S4036).
 function resolveDocfxPath(): string {
@@ -172,7 +172,7 @@ function resolveDocfxPath(): string {
 
     if (!fs.existsSync(docfxPath)) {
         throw new Error(
-            `DocFX executable not found at "${docfxPath}". Install it with: dotnet tool install -g docfx`
+            `DocFX executable not found at "${docfxPath}". Install it with: dotnet tool install -g docfx --version 2.78.5`
         );
     }
 

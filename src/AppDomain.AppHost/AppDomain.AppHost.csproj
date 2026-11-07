@@ -22,7 +22,7 @@
         <!--#endif -->
         <!--#if (INCLUDE_GRPC) -->
         <PackageReference Include="Google.Protobuf"/>
-        <PackageReference Include="Grpc.AspNetCore" VersionOverride="2.80.0" />
+        <PackageReference Include="Grpc.AspNetCore"/>
         <!--#endif -->
     </ItemGroup>
 

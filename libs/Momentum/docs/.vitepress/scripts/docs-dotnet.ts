@@ -202,7 +202,7 @@ function runDocfx(): void {
         log('Documentation generated successfully');
     } catch (error) {
         log(`Error running docfx: ${error}`);
-        log('Make sure DocFX is installed: dotnet tool install -g docfx');
+        log('Make sure DocFX is installed: dotnet tool install -g docfx --version 2.78.5');
         process.exit(1);
     }
 }
