@@ -42,6 +42,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   `IsComplexType` now reuses `IsPrimitiveType` so nested types get the same handling. Payload size estimates
   added for these types; `Uri` is sized like a string, and `Uri` collection elements are reported as dynamic
   (string collection element sizing is unchanged).
+- **Dependencies (follow-up to #369)**: `AppDomain.AppHost` no longer overrides `Grpc.AspNetCore` to `2.80.0`
+  (a stale pin from #203) and uses the central `GrpcVersion` (`2.83.0`); `Google.Protobuf` `3.35.1` →
+  `3.36.1`. Both are the minimums declared by `Aspire.Hosting.AppHost` 13.6.1.
+- **ServiceDefaults.Api**: `OpenApi:SecuritySchemes` entries missing any field Microsoft.OpenApi requires for
+  their type are skipped — not just `ApiKey` without `Name`, but also `ApiKey` without `In`, `Http` without
+  `Scheme`, `OAuth2` without `Flows` and `OpenIdConnect` without `OpenIdConnectUrl` — so one incomplete entry
+  can't fail the whole OpenAPI document. The AV0021 suppression comment now states accurately that no
+  endpoint is versioned yet.
+- **CI/Docs**: the docs build now enforces the DocFX pin (falls back to `dotnet tool update --allow-downgrade`
+  when a different version is already installed, and fails if the installed version doesn't match, now
+  printing the actual error); the tools directory is prepended to `PATH` with the platform separator; local
+  DocFX install hints include the pinned version.
+- **CI/Dependabot**: `Microsoft.OpenApi` joins the `dotnet-core` group and `MessagePack` the `aspire` group, so
+  these transitive pins move together with the packages that require them (avoids the `NU1109` failures
+  #369 hit); their major updates are ignored, since the drivers are built against the 2.x lines.
+- **events-docsgen**: collection properties whose element type has no schema page (`List<string>`,
+  `int[]`, `List<DateOnly>`, `Dictionary<string, string>`, …) are no longer flagged `IsComplexType` in the
+  event template model, so the event page no longer renders a **Reference Schemas** entry with an empty
+  `<!--@include: @/events/schemas/#schema-->` (#373). Collections of schema types are unchanged. Custom
+  templates that read `IsComplexType` now see `false` for such collections.
+- **events-docsgen**: `DateOnly`, `TimeOnly` (and nullable forms) — plus `Uri`, `Half`, `Int128` and
+  `UInt128` — are now treated as scalars instead of complex types, so they no longer produce `System.*`
+  schema pages, sidebar entries, property links or Reference Schemas sections (#367). `IsComplexType` now
+  reuses `IsPrimitiveType` so nested types get the same handling. Payload size estimates added for these
+  types; `Uri` is sized like a string, and `Uri` collection elements are reported as dynamic (string collection
+  element sizing is unchanged).
 - **events-docsgen**: string (and `Uri`) size estimates now also honour `[Length(min, max)]`, and read
   `[MaxLength]`/`[StringLength]`/`[Length]`/`[Range]` from a record's positional parameter when the
   property itself has none (`record E([MaxLength(50)] string Name)` targets the parameter) — including
@@ -54,8 +80,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   skipped (like entries without a `Type`). `Microsoft.OpenApi` 2.12 throws when serializing such a scheme,
   which would otherwise fail the whole OpenAPI document. `Name`/`In` are documented as bindable keys.
 - **ServiceDefaults.Api**: suppress the new `Asp.Versioning` 10.2 analyzer `AV0021` on
-  `AddEndpointsApiExplorer()`. Versioning only reads the URL-segment version and OpenAPI documents are
-  produced by `Microsoft.AspNetCore.OpenApi`, so behavior is unchanged from 10.0; adopting the versioned
+  `AddEndpointsApiExplorer()`. Versioning is configured but no endpoint is versioned yet, and OpenAPI
+  documents are produced by `Microsoft.AspNetCore.OpenApi`, so behavior is unchanged from 10.0; adopting the versioned
   API explorer (`Asp.Versioning.Mvc.ApiExplorer`) would change OpenAPI grouping and is left as a follow-up.
 
 ### Security

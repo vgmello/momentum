@@ -20,9 +20,12 @@ public static class OpenApiExtensions
     /// <param name="configuration">
     ///     Optional application configuration. When provided, security schemes are bound from
     ///     <c>OpenApi:SecuritySchemes</c>. Each key becomes a scheme name with properties
-    ///     <c>Type</c>, <c>Scheme</c>, <c>BearerFormat</c>, <c>Description</c>, and for <c>ApiKey</c> schemes
-    ///     <c>Name</c> and <c>In</c>. Schemes without a <c>Type</c>, and <c>ApiKey</c> schemes without a
-    ///     <c>Name</c>, are skipped. When <c>null</c> or when the section is absent, no security schemes are added.
+    ///     <c>Type</c>, <c>Scheme</c>, <c>BearerFormat</c>, <c>Description</c>, for <c>ApiKey</c> schemes
+    ///     <c>Name</c> and <c>In</c>, for <c>OAuth2</c> <c>Flows</c> (e.g. <c>Flows:ClientCredentials:TokenUrl</c>),
+    ///     and for <c>OpenIdConnect</c> <c>OpenIdConnectUrl</c>. Schemes without a <c>Type</c>, or missing a field the OpenAPI spec requires
+    ///     for their type (<c>ApiKey</c>: <c>Name</c> and <c>In</c>; <c>Http</c>: <c>Scheme</c>; <c>OAuth2</c>:
+    ///     <c>Flows</c>; <c>OpenIdConnect</c>: <c>OpenIdConnectUrl</c>), are skipped.
+    ///     When <c>null</c> or when the section is absent, no security schemes are added.
     /// </param>
     /// <remarks>
     ///     This method applies Momentum's standard OpenAPI configuration:
@@ -149,9 +152,9 @@ public static class OpenApiExtensions
             if (scheme.Type is null)
                 continue;
 
-            // apiKey schemes require a name; Microsoft.OpenApi throws on serialization without one,
-            // which would fail the whole document rather than just this scheme
-            if (scheme.Type == SecuritySchemeType.ApiKey && string.IsNullOrWhiteSpace(scheme.Name))
+            // Microsoft.OpenApi throws while serializing a scheme that lacks a required field, which
+            // would fail the whole document rather than just this scheme
+            if (!HasRequiredFields(scheme))
                 continue;
 
             result[child.Key] = scheme;
@@ -159,4 +162,18 @@ public static class OpenApiExtensions
 
         return result;
     }
+
+    /// <summary>
+    ///     Mirrors the per-type required-field checks Microsoft.OpenApi enforces when serializing a security
+    ///     scheme. <c>MutualTLS</c> has no required fields but is only valid in OpenAPI 3.1 documents (the
+    ///     ASP.NET Core 10 default); that version-dependent check is not replicated here.
+    /// </summary>
+    private static bool HasRequiredFields(OpenApiSecurityScheme scheme) => scheme.Type switch
+    {
+        SecuritySchemeType.ApiKey => !string.IsNullOrWhiteSpace(scheme.Name) && scheme.In is not null,
+        SecuritySchemeType.Http => !string.IsNullOrWhiteSpace(scheme.Scheme),
+        SecuritySchemeType.OAuth2 => scheme.Flows is not null,
+        SecuritySchemeType.OpenIdConnect => scheme.OpenIdConnectUrl is not null,
+        _ => true
+    };
 }

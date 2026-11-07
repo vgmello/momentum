@@ -235,6 +235,68 @@ public class OpenApiTransformerIntegrationTests
         }
     }
 
+    [Theory]
+    [InlineData("ApiKey", "In", "Header")]        // ApiKey without Name
+    [InlineData("ApiKey", "Name", "X-Api-Key")]   // ApiKey without In
+    [InlineData("Http", "Description", "Basic")]  // Http without Scheme
+    [InlineData("OAuth2", "Description", "OAuth")] // OAuth2 without Flows
+    [InlineData("OpenIdConnect", "Description", "OIDC")] // OpenIdConnect without OpenIdConnectUrl
+    public async Task SecuritySchemes_MissingRequiredField_ShouldBeSkippedWithoutBreakingDocument(
+        string type, string otherKey, string otherValue)
+    {
+        var config = new Dictionary<string, string?>
+        {
+            ["OpenApi:SecuritySchemes:Bearer:Type"] = "Http",
+            ["OpenApi:SecuritySchemes:Bearer:Scheme"] = "bearer",
+            ["OpenApi:SecuritySchemes:Incomplete:Type"] = type,
+            [$"OpenApi:SecuritySchemes:Incomplete:{otherKey}"] = otherValue
+        };
+
+        await using var app = await CreateAppWithDefaults(
+            configValues: config,
+            endpoints: app => app.MapGet("/test", () => new SimpleModel("ok")));
+
+        var doc = await FetchOpenApiDocument(app);
+
+        var securitySchemes = doc.RootElement
+            .GetProperty("components")
+            .GetProperty("securitySchemes");
+
+        securitySchemes.TryGetProperty("Bearer", out _).ShouldBeTrue("Valid scheme should still be present");
+        securitySchemes.TryGetProperty("Incomplete", out _).ShouldBeFalse(
+            $"{type} scheme missing a required field should not be added");
+    }
+
+    [Fact]
+    public async Task SecuritySchemes_WithCompleteOAuth2AndOpenIdConnectSchemes_ShouldBeAdded()
+    {
+        var config = new Dictionary<string, string?>
+        {
+            ["OpenApi:SecuritySchemes:OAuth:Type"] = "OAuth2",
+            ["OpenApi:SecuritySchemes:OAuth:Flows:ClientCredentials:TokenUrl"] = "https://auth.example.com/token",
+            ["OpenApi:SecuritySchemes:OAuth:Flows:ClientCredentials:Scopes:api"] = "API access",
+            ["OpenApi:SecuritySchemes:Oidc:Type"] = "OpenIdConnect",
+            ["OpenApi:SecuritySchemes:Oidc:OpenIdConnectUrl"] = "https://auth.example.com/.well-known/openid-configuration"
+        };
+
+        await using var app = await CreateAppWithDefaults(
+            configValues: config,
+            endpoints: app => app.MapGet("/test", () => new SimpleModel("ok")));
+
+        var doc = await FetchOpenApiDocument(app);
+
+        var securitySchemes = doc.RootElement
+            .GetProperty("components")
+            .GetProperty("securitySchemes");
+
+        securitySchemes.TryGetProperty("OAuth", out var oauth).ShouldBeTrue("Complete OAuth2 scheme should be present");
+        oauth.GetProperty("flows").GetProperty("clientCredentials").GetProperty("tokenUrl").GetString()
+            .ShouldBe("https://auth.example.com/token");
+        securitySchemes.TryGetProperty("Oidc", out var oidc).ShouldBeTrue("Complete OpenIdConnect scheme should be present");
+        oidc.GetProperty("openIdConnectUrl").GetString()
+            .ShouldBe("https://auth.example.com/.well-known/openid-configuration");
+    }
+
     [Fact]
     public async Task SecuritySchemes_WithSchemeWithoutType_ShouldBeSkipped()
     {

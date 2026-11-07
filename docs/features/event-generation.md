@@ -139,7 +139,7 @@ Each property object in the `event.Properties` array contains:
 | `Name`                 | string  | Property name                               |
 | `TypeName`             | string  | Property type display name                  |
 | `IsRequired`           | boolean | Whether property is required (non-nullable) |
-| `IsComplexType`        | boolean | Whether property is a complex object type   |
+| `IsComplexType`        | boolean | Whether property is a complex object type; for collections, whether the element type has a schema |
 | `IsCollectionType`     | boolean | Whether property is a collection/array      |
 | `Description`          | string  | Property description from XML documentation |
 | `SchemaLink`           | string  | Markdown link fragment for complex types    |

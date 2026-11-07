@@ -9,8 +9,8 @@ using Xunit;
 namespace Momentum.Extensions.EventMarkdownGenerator.Tests;
 
 /// <summary>
-///     Covers <see cref="EventViewModelFactory"/>'s GitHub source-link generation specifically — the rest of
-///     the view model is exercised via <see cref="FluidMarkdownGeneratorTests"/>.
+///     Covers <see cref="EventViewModelFactory"/>'s GitHub source-link generation and how collection properties
+///     are flagged complex — the rest of the view model is exercised via <see cref="FluidMarkdownGeneratorTests"/>.
 /// </summary>
 public class EventViewModelFactoryTests
 {
@@ -36,6 +36,44 @@ public class EventViewModelFactoryTests
         };
 
     private static EventDocumentation CreateDocumentation() => new() { Summary = "Test" };
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1144:Unused private types or members should be removed")]
+    private sealed record CollectionPropertiesEvent(
+        List<string> Tags,
+        List<DateOnly> Holidays,
+        Dictionary<string, string> Labels,
+        List<CollectionItem> Items,
+        CollectionItem[] ItemArray,
+        Dictionary<string, CollectionItem> ItemsByKey,
+        CollectionItem Single);
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1144:Unused private types or members should be removed")]
+    private sealed record CollectionItem(string Value);
+
+    [Fact]
+    public void CreateEventModel_CollectionOfTypesWithoutSchema_IsNotComplex()
+    {
+        // Collections of scalars must not be flagged complex, or event.liquid renders a Reference Schemas
+        // entry with an empty include; collections of schema types keep pointing at the element schema
+        var (properties, _) = EventPropertyMetadataBuilder.Build(typeof(CollectionPropertiesEvent), null,
+            PayloadSizeCalculator.Create("json"), "PartitionKey");
+        var metadata = CreateMetadata("CollectionPropertiesEvent", "Tests", "Tests") with { Properties = properties };
+
+        var viewModel = EventViewModelFactory.CreateEventModel(metadata, CreateDocumentation());
+
+        var byName = viewModel.Properties.ToDictionary(p => p.Name);
+        byName["Tags"].IsComplexType.ShouldBeFalse();
+        byName["Holidays"].IsComplexType.ShouldBeFalse();
+        byName["Labels"].IsComplexType.ShouldBeFalse();
+        var itemSchema = $"{typeof(CollectionItem).FullName}.md";
+        foreach (var name in new[] { "Items", "ItemArray", "ItemsByKey" })
+        {
+            byName[name].IsComplexType.ShouldBeTrue(name);
+            byName[name].ElementSchemaPath.ShouldBe(itemSchema, name);
+        }
+
+        byName["Single"].IsComplexType.ShouldBeTrue();
+    }
 
     [Fact]
     public void CreateEventModel_WithAssemblyNameContainingDot_DoesNotSplitItAcrossFolders()

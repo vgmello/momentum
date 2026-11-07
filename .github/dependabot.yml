@@ -15,9 +15,13 @@ updates:
           - "Microsoft.AspNetCore.*"
           - "System.*"
           - "Microsoft.EntityFrameworkCore.*"
+          # Transitive pin that must stay >= what Microsoft.AspNetCore.OpenApi requires
+          - "Microsoft.OpenApi"
       aspire:
         patterns:
           - "Aspire.*"
+          # Transitive (security) pin that must stay >= what Aspire.Hosting.AppHost requires
+          - "MessagePack"
       orleans:
         patterns:
           - "Microsoft.Orleans.*"
@@ -84,6 +88,12 @@ updates:
       - dependency-name: "xunit.v3"
         update-types: ["version-update:semver-major"]
       - dependency-name: "xunit.runner.visualstudio"
+        update-types: ["version-update:semver-major"]
+      # Transitive pins grouped with their drivers (dotnet-core / aspire); the drivers are built against
+      # the 2.x lines, so only take majors deliberately
+      - dependency-name: "Microsoft.OpenApi"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "MessagePack"
         update-types: ["version-update:semver-major"]
 
   # NPM packages for VitePress documentation (main docs)

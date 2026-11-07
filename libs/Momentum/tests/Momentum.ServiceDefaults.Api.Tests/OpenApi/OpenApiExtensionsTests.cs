@@ -95,6 +95,8 @@ public class OpenApiExtensionsTests
                 ["OpenApi:SecuritySchemes:Bearer:Type"] = "Http",
                 ["OpenApi:SecuritySchemes:Bearer:Scheme"] = "bearer",
                 ["OpenApi:SecuritySchemes:ApiKey:Type"] = "ApiKey",
+                ["OpenApi:SecuritySchemes:ApiKey:Name"] = "X-Api-Key",
+                ["OpenApi:SecuritySchemes:ApiKey:In"] = "Header",
                 ["OpenApi:SecuritySchemes:ApiKey:Description"] = "API Key authentication"
             })
             .Build();
