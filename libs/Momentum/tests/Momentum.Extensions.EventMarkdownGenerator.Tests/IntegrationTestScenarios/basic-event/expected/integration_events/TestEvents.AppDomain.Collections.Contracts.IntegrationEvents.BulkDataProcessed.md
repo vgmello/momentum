@@ -37,28 +37,6 @@ No documentation available
 This event uses a partition key for message routing:
 - `TenantId` - No description available
 
-### Reference Schemas
-
-#### Strings
-
-<!--@include: @/events/schemas/#schema-->
-
-#### Int32s
-
-<!--@include: @/events/schemas/#schema-->
-
-#### Strings
-
-<!--@include: @/events/schemas/#schema-->
-
-#### Decimals
-
-<!--@include: @/events/schemas/#schema-->
-
-#### Strings
-
-<!--@include: @/events/schemas/#schema-->
-
 ## Technical Details
 
 - **Full Type:** [TestEvents.AppDomain.Collections.Contracts.IntegrationEvents.BulkDataProcessed](#)

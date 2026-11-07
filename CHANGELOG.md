@@ -35,6 +35,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **events-docsgen**: collection properties whose element type has no schema page (`List<string>`,
+  `int[]`, `List<DateOnly>`, `Dictionary<string, string>`, …) are no longer flagged `IsComplexType` in the
+  event template model, so the event page no longer renders a **Reference Schemas** entry with an empty
+  `<!--@include: @/events/schemas/#schema-->` (#373). Collections of schema types are unchanged. Custom
+  templates that read `IsComplexType` now see `false` for such collections.
 - **events-docsgen**: `DateOnly`, `TimeOnly` (and nullable forms) — plus `Uri`, `Half`, `Int128` and
   `UInt128` — are now treated as scalars instead of complex types, so they no longer produce `System.*`
   schema pages, sidebar entries, property links or Reference Schemas sections (#367). `IsComplexType` now
