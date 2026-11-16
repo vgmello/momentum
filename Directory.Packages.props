@@ -6,7 +6,7 @@
     <AspireAppHostSdkVersion>$(AspireVersion)</AspireAppHostSdkVersion>
     <MicrosoftExtensionsVersion>10.0.14</MicrosoftExtensionsVersion>
     <!--#if (INCLUDE_ORLEANS) -->
-    <MicrosoftOrleansVersion>10.2.2</MicrosoftOrleansVersion>
+    <MicrosoftOrleansVersion>10.4.2</MicrosoftOrleansVersion>
     <!--#endif -->
     <WolverineVersion>6.62.0</WolverineVersion>
     <OpenTelemetryCoreVersion>1.17.0</OpenTelemetryCoreVersion>
