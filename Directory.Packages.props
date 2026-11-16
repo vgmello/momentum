@@ -9,8 +9,8 @@
     <MicrosoftOrleansVersion>10.2.2</MicrosoftOrleansVersion>
     <!--#endif -->
     <WolverineVersion>6.62.0</WolverineVersion>
-    <OpenTelemetryCoreVersion>1.17.0</OpenTelemetryCoreVersion>
-    <OpenTelemetryInstrumentationVersion>1.17.0</OpenTelemetryInstrumentationVersion>
+    <OpenTelemetryCoreVersion>1.21.0</OpenTelemetryCoreVersion>
+    <OpenTelemetryInstrumentationVersion>1.21.0</OpenTelemetryInstrumentationVersion>
     <!--#if (INCLUDE_GRPC) -->
     <GrpcVersion>2.83.0</GrpcVersion>
     <!--#endif -->
@@ -111,7 +111,7 @@
     <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryCoreVersion)" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="$(OpenTelemetryInstrumentationVersion)" />
     <!--#if (INCLUDE_GRPC) -->
-    <PackageVersion Include="OpenTelemetry.Instrumentation.GrpcCore" Version="1.0.0-beta.14" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.GrpcCore" Version="1.0.0-beta.20" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.GrpcNetClient" Version="1.15.0-beta.1" />
     <!--#endif -->
     <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="$(OpenTelemetryInstrumentationVersion)" />
