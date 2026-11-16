@@ -103,10 +103,10 @@
     <PackageVersion Include="OneOf" Version="3.0.271" />
     <PackageVersion Include="OneOf.SourceGenerator" Version="3.0.271" />
     <PackageVersion Include="Refit" Version="13.1.0" />
-    <PackageVersion Include="Refit.HttpClientFactory" Version="13.1.0" />
+    <PackageVersion Include="Refit.HttpClientFactory" Version="17.0.0" />
     <!-- Held at 2.0.0: 2.1.0's generator throws "Method not found: System.Text.ValueStringBuilder.AsSpan()"
          against the current runtime, failing the E2E client generation at build time. -->
-    <PackageVersion Include="Refitter.MSBuild" Version="2.0.0" />
+    <PackageVersion Include="Refitter.MSBuild" Version="2.3.1" />
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemetryCoreVersion)" />
     <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryCoreVersion)" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="$(OpenTelemetryInstrumentationVersion)" />
